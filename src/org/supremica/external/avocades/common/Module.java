@@ -108,9 +108,7 @@ public class Module extends ExtendedAutomata{
 			}
 		}
 		
-		blockedEventsEFA.addTransition(BLOCKED_STATE,
-									   BLOCKED_STATE,
-									   event,"","");
+		blockedEventsEFA.addTransition(BLOCKED_STATE, BLOCKED_STATE,event,"","");
 	}
 	
 	public void addEvent(String event){
@@ -154,8 +152,7 @@ public class Module extends ExtendedAutomata{
 		
 		integerVariables.put(name, upperBound);
 		
-		nodeVariablesEFA.addIntegerVariable(
-				name, lowerBound, upperBound, initialValue, markedValue);
+		this.addIntegerVariable(name, lowerBound, upperBound, initialValue, markedValue);
 		
 		return name;
 	}
@@ -182,8 +179,7 @@ public class Module extends ExtendedAutomata{
 		
 		integerVariables.put(name, upperBound);
 		
-		nodeVariablesEFA.addIntegerVariable(
-				name, lowerBound, upperBound, initialValue, markedValue);
+		this.addIntegerVariable(name, lowerBound, upperBound, initialValue, markedValue);
 		
 		return name;
 	}
@@ -212,8 +208,7 @@ public class Module extends ExtendedAutomata{
 		
 		integerVariables.put(name, upperBound);
 		
-		nodeVariablesEFA.addIntegerVariable(
-				name, lowerBound, upperBound, initialValue, markedValue);
+		this.addIntegerVariable(name, lowerBound, upperBound, initialValue, markedValue);
 		
 		return name;
 	}
@@ -251,7 +246,6 @@ public class Module extends ExtendedAutomata{
 		}
 		
 		/* create resource variable */
-		resourceVariablesEFA.addIntegerVariable(
-				resourceName, lowerBound, upperBound, initialValue, null);
+		this.addIntegerVariable(resourceName, lowerBound, upperBound, initialValue, null);
 	}
 }

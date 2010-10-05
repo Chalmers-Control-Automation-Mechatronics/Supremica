@@ -213,15 +213,14 @@ public class Project
                 }
  */
     public void addAttributes(Project otherProject)
-    {
+    {        
         addInputSignals(otherProject.getInputSignals());
         addOutputSignals(otherProject.getOutputSignals());
         addActions(otherProject.getActions());
         addControls(otherProject.getControls());
-        addTimers(otherProject.getTimers());
-        setAnimationURL(otherProject.getAnimationURL());
+        addTimers(otherProject.getTimers());        
+        setAnimationURL(otherProject.getAnimationURL());       
         setUserInterfaceURL(otherProject.getUserInterfaceURL());
-
         setName(otherProject.getName());
         setComment(otherProject.getComment());
     }

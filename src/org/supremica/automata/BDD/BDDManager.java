@@ -297,67 +297,9 @@ public class BDDManager
         return coreachableStatesBDD;
     }
 
-    public static BDD prelimUncontrollableStates(BDDAutomata bdda)
-    {
-
-        BDD uncontrollableStatesBDD = null;
-
-        BDD commonUnconEvents = bdda.getSpecsUncontrollableEvents().and(bdda.getPlantsUncontrollableEvents());
-        BDD outgoingTransitions = ((BDDMonolithicTransitions)bdda.getBDDTransitions()).getMyMonolithicTransitionForwardBDD().exist(bdda.getDestStateVariables());
-//        BDD outgoingTransitions = ((BDDMonolithicTransitions)bdda.bddTransitions).transitionForwardBDD.exist(bdda.getDestStateVariables());
-        BDD nonexistingOutgTrans = outgoingTransitions.not();
-        BDD nonexistingOutgTransWithUnconEvents = nonexistingOutgTrans.and(commonUnconEvents);
-
-//        nonexistingOutgTransWithUnconEvents.printDot();
-//        System.out.println("number of transitions: "+outgoingTransitions.pathCount());
-
-
-        uncontrollableStatesBDD = bdda.getPlantsForwardTransitions().and(bdda.getPlantsSelfLoopsBDD().not()).relprod(nonexistingOutgTransWithUnconEvents,bdda.getEventVarSet());
-//        uncontrollableStatesBDD = bdda.getPlantsForwardTransitions().relprod(nonexistingOutgTransWithUnconEvents,bdda.getEventVarSet());
-
-        uncontrollableStatesBDD = uncontrollableStatesBDD.exist(bdda.getDestStateVariables());
-
-        return uncontrollableStatesBDD;
-    }
-    
-/*    public BDD uncontrollableBackward(BDDAutomata bdda, BDD forbidden)
-    {
-        
-        BDD delta_all = bdda.getPlantsForwardTransitions().and(bdda.getSpecsForwardTransitions());
-        BDD t_u = delta_all.relprod(bdda.getUncontrollableEvents(), bdda.getEventVarSet());
-        
-        BDD r_all_p, r_all = forbidden.replace(makePairing(bdda.getSourceStateDomains(),bdda.getDestStateDomains()));
-        
-        BDD front = r_all.id();
-                
-        do
-        {
-            r_all_p = r_all;
-            
-            BDD tmp = t_u.relprod(front, bdda.getDestStateVariables());
-            BDD tmp2 = tmp.replace(makePairing(bdda.getSourceStateDomains(),bdda.getDestStateDomains()));
-            
- //           tmp.free();
- //           front.free();
-            
-            r_all = r_all.or(tmp2);
-//            front = fso.choose(r_all, tmp2);    // Takes care of tmp2!
-        } while (!r_all_p.equals(r_all));
-        
-//        front.free();
-//        t_u.free();
-        
-        
-        BDD ret = r_all.replace(makePairing(bdda.getDestStateDomains(),bdda.getSourceStateDomains()));
-//        r_all.free();
-        
-        return ret;
-    }*/
-
     public BDD uncontrollableBackward(BDDAutomata bdda, BDD forbidden)
     {
-        BDD delta_all = ((BDDMonolithicTransitions)bdda.getBDDTransitions()).getMyMonolithicTransitionBackwardBDD();
-        BDD t_u = delta_all.and(bdda.getUncontrollableEvents());
+        BDD t_u = ((BDDMonolithicTransitions)bdda.getBDDTransitions()).getMonolithicUncontrollableTransitionBackwardBDD();
 
         BDD Qk = null;
         BDD Qkn = forbidden;
@@ -365,7 +307,7 @@ public class BDDManager
         do
         {
             Qk = Qkn.id();
-            Qkn = Qk.or(preImage(bdda,Qk,t_u));
+            Qkn = Qk.or(image_preImage(bdda,Qk,t_u));
         } while (!Qkn.equals(Qk));
 
         return Qkn;
@@ -381,11 +323,28 @@ public class BDDManager
         do
         {
           Qk = Qkn.id();
-          Qkn = Qk.or(preImage(bdda,Qk,delta_all)).and(forbidden.not());
+          Qkn = Qk.or(image_preImage(bdda,Qk,delta_all)).and(forbidden.not());
         } while (!Qkn.equals(Qk));
 
         return Qkn;
     }
+
+    public BDD reachability(BDDAutomata bdda, BDD forbidden)
+    {
+        BDD delta_all = ((BDDMonolithicTransitions)bdda.getBDDTransitions()).getMonolithicTransitionForwardBDD();
+
+        BDD Qkn = bdda.initialStatesBDD;
+        BDD Qk = null;
+
+        do
+        {
+          Qk = Qkn.id();
+          Qkn = Qk.or(image_preImage(bdda,Qk,delta_all)).and(forbidden.not());
+        } while (!Qkn.equals(Qk));
+
+        return Qkn;
+    }
+
 
     public BDD safeStateSynthesis(BDDAutomata bdda, BDD forbidden)
     {
@@ -403,18 +362,18 @@ public class BDDManager
             Qkn = Qk.or(Q2);
         }while((!Qkn.equals(Qk)));
 
-        return Qkn.not();
+        return reachability(bdda, Qkn);
     }
 
-    public BDD preImage(BDDAutomata bdda, BDD states, BDD backwardTransitions)
+    public BDD image_preImage(BDDAutomata bdda, BDD states, BDD transitions)
     {
-        BDD preStates = null;
+        BDD nextStates = null;
 
-        preStates = backwardTransitions.relprod(states, bdda.getSourceStateVariables());
-        preStates = preStates.exist(bdda.getEventVarSet());
-        preStates.replaceWith(bdda.getDest2SourcePairing());
+        nextStates = transitions.relprod(states, bdda.getSourceStateVariables());
+        nextStates = nextStates.exist(bdda.getEventVarSet());
+        nextStates.replaceWith(bdda.getDest2SourcePairing());
 
-        return preStates;
-    } 
+        return nextStates;
+    }
     
 }

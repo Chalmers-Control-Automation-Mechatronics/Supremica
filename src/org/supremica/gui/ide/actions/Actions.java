@@ -119,7 +119,10 @@ public class Actions extends WatersActionManager
     public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(mIDEActions);
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(mIDEActions);
     public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
+    public IDEAction editorSynthesizerAction = new EditorSynthesizerAction(mIDEActions);
+    public IDEAction editorReadSpecAction = new EditorReadSpecAction(mIDEActions);
 
+   
     // Analyzer Options
     public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(mIDEActions);
 
@@ -148,7 +151,6 @@ public class Actions extends WatersActionManager
     public IDEAction analyzerRenameAction = new AnalyzerRenameAction(mIDEActions);
     public IDEAction analyzerExportAction = new AnalyzerExportAction(mIDEActions);
     public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(mIDEActions);
-    public IDEAction analyzerGuardAction = new AnalyzerGuardAction(mIDEActions);
 
     // Simulator
     public IDEAction simulatorLaunchAnimatorAction = new SimulatorLaunchAnimatorAction(mIDEActions);

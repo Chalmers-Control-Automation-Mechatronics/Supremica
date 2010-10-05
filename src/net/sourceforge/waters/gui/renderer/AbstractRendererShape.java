@@ -37,7 +37,7 @@ public abstract class AbstractRendererShape
     // Draw shape
     g.setColor(status.getColor());
     g.setStroke(BASICSTROKE);
-    g.draw(getShape());
+    g.draw(getShape());    
   }
 
   public Rectangle2D getBounds2D()

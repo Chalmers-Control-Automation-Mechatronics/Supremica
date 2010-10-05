@@ -10,8 +10,12 @@
 
 package org.supremica.automata;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -24,9 +28,11 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
+import net.sourceforge.waters.subject.module.EnumSetExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.subject.module.VariableMarkingSubject;
 
@@ -93,16 +99,69 @@ public class VariableHelper {
             (ident, range, true, init, markings);
 	}
 
-	public static boolean isInteger(final VariableComponentProxy variable)
+    public static VariableComponentSubject createEnumerationVariable
+        (final String name,
+         final Collection<String> elements,
+         final String initialValue,
+         final Collection<String> markedValues)
     {
-		return variable.getType() instanceof BinaryExpressionProxy;
-	}
+        if (!elements.contains(initialValue)) {
+            throw new IllegalArgumentException
+                ("Initial value is not within the specified range");
+        }        
+        final ModuleSubjectFactory factory =
+            ModuleSubjectFactory.getInstance();
+        final CompilerOperatorTable optable =
+            CompilerOperatorTable.getInstance();
+        final IdentifierSubject ident =
+            factory.createSimpleIdentifierProxy(name);
+        Set<SimpleIdentifierProxy> items = new HashSet<SimpleIdentifierProxy>();
+        for(String item:elements)
+        {
+            items.add(factory.createSimpleIdentifierProxy(item));
+        }
 
-	public static void setAsInteger(final VariableComponentSubject variable,
-                                    final int lowerBound,
-                                    final int upperBound,
-                                    final int initialValue,
-                                    final Integer markedValue)
+        EnumSetExpressionSubject type = factory.createEnumSetExpressionProxy(items);
+
+        final IdentifierSubject iclone1 = ident.clone();
+        final IdentifierSubject initval =
+            factory.createSimpleIdentifierProxy(initialValue);
+        final BinaryOperator opeq =  optable.getEqualsOperator();
+        final BinaryExpressionSubject init =
+            factory.createBinaryExpressionProxy(opeq, iclone1, initval);
+        final List<VariableMarkingSubject> markings;
+        if (markedValues == null) {
+            markings = null;
+        } else {
+            markings = new LinkedList<VariableMarkingSubject>();
+            final IdentifierSubject accepting =
+                factory.createSimpleIdentifierProxy
+                (EventDeclProxy.DEFAULT_MARKING_NAME);
+            final IdentifierSubject iclone2 = ident.clone();
+
+            for(String mv:markedValues)
+            {
+                final IdentifierSubject markedval =
+                    factory.createSimpleIdentifierProxy(mv);
+                final BinaryExpressionSubject pred =
+                    factory.createBinaryExpressionProxy(opeq, iclone2, markedval);
+                markings.add(factory.createVariableMarkingProxy(accepting, pred));
+            }
+        }
+        return factory.createVariableComponentProxy
+            (ident, type, true, init, markings);
+    }
+
+    public static boolean isInteger(final VariableComponentProxy variable)
+    {
+        return variable.getType() instanceof BinaryExpressionProxy;
+    }
+
+    public static void setAsInteger(final VariableComponentSubject variable,
+                                final int lowerBound,
+                                final int upperBound,
+                                final int initialValue,
+                                final Integer markedValue)
     {
 		if (initialValue > upperBound || initialValue < lowerBound) {
 			throw new IllegalArgumentException
@@ -149,30 +208,29 @@ public class VariableHelper {
                 factory.createVariableMarkingProxy(accepting, pred);
             markings.add(marking);
         }
-	}
+    }
 
-	public static int getUpperBound(final VariableComponentProxy variable)
+    public static int getUpperBound(final VariableComponentProxy variable)
     {
-		if (!isInteger(variable)) {
-			throw new IllegalArgumentException("The variable is not an integer");
-		} 
+        if (!isInteger(variable)) {
+                throw new IllegalArgumentException("The variable is not an integer");
+        }
         return ((IntConstantProxy) ((BinaryExpressionProxy) variable.getType()).getRight()).getValue();
     }
 
-	public static int getLowerBound(final VariableComponentProxy variable)
+    public static int getLowerBound(final VariableComponentProxy variable)
     {
-		if (!isInteger(variable)) {
-			throw new IllegalArgumentException("The variable is not an integer");
-		} 
-		return ((IntConstantProxy) ((BinaryExpressionProxy) variable.getType()).getLeft()).getValue();
-	}
+        if (!isInteger(variable)) {
+                throw new IllegalArgumentException("The variable is not an integer");
+        }
+        return ((IntConstantProxy) ((BinaryExpressionProxy) variable.getType()).getLeft()).getValue();
+    }
 
-	public static Integer getInitialIntegerValue
-        (final VariableComponentProxy variable)
+    public static Integer getInitialIntegerValue(final VariableComponentProxy variable)
     {
-		if (!isInteger(variable)) {
-			throw new IllegalArgumentException("The variable is not an integer");
-		} 
+        if (!isInteger(variable)) {
+                throw new IllegalArgumentException("The variable is not an integer");
+        }
         final SimpleExpressionProxy pred = variable.getInitialStatePredicate();
         if (!(pred instanceof BinaryExpressionProxy)) {
             return null;
@@ -186,12 +244,11 @@ public class VariableHelper {
         return intconst.getValue();
 	}
 
-	public static Integer getMarkedIntegerValue
-        (final VariableComponentProxy variable)
+    public static Integer getMarkedIntegerValue(final VariableComponentProxy variable)
     {
-		if (!isInteger(variable)) {
-			return null;
-		}
+        if (!isInteger(variable)) {
+                return null;
+        }
         final List<VariableMarkingProxy> markings =
             variable.getVariableMarkings();
         VariableMarkingProxy found = null;
@@ -220,10 +277,10 @@ public class VariableHelper {
         }
         final IntConstantProxy intconst = (IntConstantProxy) rhs;
         return intconst.getValue();
-	}
+    }
 
-	public static boolean isBinary(final VariableComponentProxy variable)
+    public static boolean isBinary(final VariableComponentProxy variable)
     {
         return isInteger(variable) && getLowerBound(variable) == 0 && getUpperBound(variable) == 1;
-	}
+    }
 }

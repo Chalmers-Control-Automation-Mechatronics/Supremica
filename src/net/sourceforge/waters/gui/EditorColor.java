@@ -122,7 +122,10 @@ public class EditorColor
   /** The colour of guard expressions. */
   public static final Color GUARDCOLOR = Color.CYAN.darker().darker();
 
-  /** The colour of action expressions. */
+  /** The color of guard expressions. */
+  public static final Color ADDEDGUARDCOLOR = new Color(114,68,174);
+
+  /** The color of action expressions. */
   public static final Color ACTIONCOLOR = Color.RED.darker().darker();
 
   /** The colour of the drag-select area. */

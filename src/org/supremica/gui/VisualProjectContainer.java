@@ -72,7 +72,7 @@ public class VisualProjectContainer
     }
     
     public void addProject(VisualProject theProject, boolean setActive)
-    {
+    {        
         theProjects.add(theProject);
         
         if (setActive)

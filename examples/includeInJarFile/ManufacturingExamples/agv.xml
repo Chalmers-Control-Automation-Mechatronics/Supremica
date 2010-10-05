@@ -7,7 +7,7 @@
 		<Event id="e11" label="e11" controllable="false"/>
 	</Events>
 	<States>
-		<State id="q0" initial="true" accepting="true"/>
+		 <State id="q0" initial="true" accepting="true"/>
 		<State id="q1" accepting="true"/>
 	</States>
 	<Transitions>

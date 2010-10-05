@@ -260,6 +260,7 @@ public class IDE
   {
     return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
   }
+  
 
   public Project getActiveProject()
   {

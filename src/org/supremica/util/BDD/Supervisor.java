@@ -983,14 +983,13 @@ public class Supervisor
         // this is really wiered, must be re-written. isnt it cheaper to just skip the reachability
         // i.e. return backward_u( possibly-uncontrollables) instead??
         
-        // note: dont try getUncontrollableStates(), we would need to compute reachables to get the border anyway :(
+        // note: dont try getUncontrollableStates(), we would need to compute reachables to get the border anyway :(        
         return getReachableUncontrollables();
     }
     
     /** return Q[supNBC] */
     private int getSafeStatesNBC()
-    {
-        
+    {        
         // note: dont use timer here (get reseted by getReachable)
         GrowFrame gf = BDDGrow.getGrowFrame(manager, "Safe states: nodeCount(X)");
         
@@ -1097,7 +1096,7 @@ public class Supervisor
             gf.stopTimer();
         }
         
-        timer.report("Safe states computed with " + itr + " iterations", true);
+        timer.report("Safe states computed with " + itr + " iterations", true);        
         return not_x;
 //        return output;
     }

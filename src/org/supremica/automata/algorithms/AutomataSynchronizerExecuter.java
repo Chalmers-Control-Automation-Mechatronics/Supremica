@@ -66,6 +66,11 @@ import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.UnaryExpressionSubject;
+import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
+
 
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
@@ -1237,7 +1242,8 @@ public final class AutomataSynchronizerExecuter
                         final GuardActionBlockSubject gab = new GuardActionBlockSubject();
                         if(allGuards.size() > 0)
                         {
-                            BinaryExpressionSubject synchedGuard = null;
+                            SimpleExpressionSubject synchedGuard = null;
+
                             if(allGuards.size() > 1)
                             {
                                 final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
@@ -1253,35 +1259,24 @@ public final class AutomataSynchronizerExecuter
                             }
                             else
                             {
-                                synchedGuard = (BinaryExpressionSubject)allGuards.get(0);
+                                if(allGuards.get(0) instanceof BinaryExpressionProxy)
+                                    synchedGuard = (BinaryExpressionSubject)allGuards.get(0);
+                                else
+                                    synchedGuard = (UnaryExpressionSubject)allGuards.get(0);
                             }
-                            final BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(synchedGuard.toString(),Operator.TYPE_BOOLEAN));
-                            gab.getGuardsModifiable().add(bes);
+                            gab.getGuardsModifiable().add((SimpleExpressionSubject)parser.parse(synchedGuard.toString(),Operator.TYPE_BOOLEAN));
                         }
                         if(allActions.size() > 0)
                         {
-                            final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-                            BinaryExpressionProxy synchedAction = null;
                             final Iterator<BinaryExpressionProxy> actionIt = allActions.iterator();
-                            synchedAction = actionIt.next();
                             while(actionIt.hasNext())
                             {
-                                final BinaryExpressionProxy currAction = actionIt.next();
-                                if(!eq.equals(synchedAction, currAction))
-                                {
-                                    synchedAction = null;
-                                    break;
-                                }
-
-                            }
-                            if(synchedAction != null)
-                            {
-                                final BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(synchedAction.toString(),Operator.TYPE_ARITHMETIC));
+                                BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(actionIt.next().toString(),Operator.TYPE_ARITHMETIC));
                                 gab.getActionsModifiable().add(bes);
                             }
                         }
+                        EdgeSubject edge = helper.importEdge(fromState, toState, newlabel,gab);
 
-                        final EdgeSubject edge = helper.importEdge(fromState, toState, newlabel,gab);
                         helper.mEdges.add(edge);
                     }
 

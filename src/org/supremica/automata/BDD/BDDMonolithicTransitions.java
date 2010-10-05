@@ -58,7 +58,8 @@ public class BDDMonolithicTransitions
     BDDAutomata bddAutomata;
     BDDManager manager;
     BDD transitionForwardBDD = null;    
-    BDD transitionBackwardBDD = null;    
+    BDD transitionBackwardBDD = null;
+    BDD uncontrollableTransitionBackwardBDD = null;
     
     BDD myTransitionForwardBDD = null;    
     BDD myTransitionBackwardBDD = null;    
@@ -70,16 +71,18 @@ public class BDDMonolithicTransitions
         manager = bddAutomata.getBDDManager();
         
         transitionForwardBDD = manager.getOneBDD();
-        transitionBackwardBDD = manager.getOneBDD();            
+        transitionBackwardBDD = manager.getOneBDD();
+        uncontrollableTransitionBackwardBDD = manager.getOneBDD();
         
         for (BDDAutomaton currAutomaton : bddAutomata)
         {
             transitionForwardBDD = transitionForwardBDD.and(currAutomaton.getTransitionForwardConjunctiveBDD());
             transitionBackwardBDD = transitionBackwardBDD.and(currAutomaton.getTransitionBackwardConjunctiveBDD());
+            uncontrollableTransitionBackwardBDD = uncontrollableTransitionBackwardBDD.and(currAutomaton.getUncontrollableTransitionBackwardBDD());
         }
 
-        //smarter way to obtain backward transitions
-/*        transitionBackwardBDD = transitionForwardBDD.replace(bddAutomata.sourceToTempStatePairing);
+/*        //smarter way to obtain backward transitions
+        transitionBackwardBDD = transitionForwardBDD.replace(bddAutomata.sourceToTempStatePairing);
         transitionBackwardBDD = transitionBackwardBDD.replace(bddAutomata.destToSourceStatePairing);
         transitionBackwardBDD = transitionBackwardBDD.replace(bddAutomata.tempToDestStatePairing);
 */
@@ -88,6 +91,7 @@ public class BDDMonolithicTransitions
         
         transitionForwardBDD = transitionForwardBDD.exist(bddAutomata.getEventVarSet());        
         transitionBackwardBDD = transitionBackwardBDD.exist(bddAutomata.getEventVarSet());
+        uncontrollableTransitionBackwardBDD = uncontrollableTransitionBackwardBDD.exist(bddAutomata.getEventVarSet());
     }
     
     public BDD getMonolithicTransitionForwardBDD()
@@ -108,5 +112,10 @@ public class BDDMonolithicTransitions
     public BDD getMyMonolithicTransitionBackwardBDD()
     {
         return myTransitionBackwardBDD;
+    }
+
+    public BDD getMonolithicUncontrollableTransitionBackwardBDD()
+    {
+        return uncontrollableTransitionBackwardBDD;
     }
 }

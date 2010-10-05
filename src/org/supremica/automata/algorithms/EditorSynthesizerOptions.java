@@ -52,7 +52,7 @@ package org.supremica.automata.algorithms;
 import org.supremica.properties.Config;
 import org.supremica.log.*;
 
-public final class SynthesizerOptions
+public final class EditorSynthesizerOptions
 {
     private static Logger logger = LoggerFactory.createLogger(SynthesizerOptions.class);
 
@@ -64,6 +64,8 @@ public final class SynthesizerOptions
     private boolean maximallyPermissive;
     private boolean maximallyPermissiveIncremental;
     private boolean reduceSupervisors;
+    private boolean generateGuard;
+    private boolean reachability;
     private boolean rememberDisabledUncontrollableEvents;
 
     private boolean bddExtractSupervisor;
@@ -72,10 +74,14 @@ public final class SynthesizerOptions
     public boolean addOnePlantAtATime = false;
 
 
+    //Guard options
+	private String event;
+	private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from allowed states; 2: Adaptive case
+
     /**
      * The current options, based on earlier user preferences.
      */
-    public SynthesizerOptions()
+    public EditorSynthesizerOptions()
     {
         this((SynthesisType) Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
             (SynthesisAlgorithm) Config.SYNTHESIS_ALGORITHM_TYPE.get(),
@@ -84,7 +90,9 @@ public final class SynthesizerOptions
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
             Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
-            Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get());
+            Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get(),
+            Config.SYNTHESIS_GUARD.get(),
+            Config.SYNTHESIS_REACHABILITY.get());
     }
 
     /**
@@ -93,9 +101,9 @@ public final class SynthesizerOptions
      * modify the necessary options one by one, starting from default! Much more readable and
      * also more practical when adding new options.
      */
-    private SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm,
+    private EditorSynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm,
     		boolean purge, boolean removeUnnecessarySupervisors, boolean maximallyPermissive,
-    		boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor)
+    		boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor, boolean generateGuard, boolean reachability)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -105,6 +113,11 @@ public final class SynthesizerOptions
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
         this.reduceSupervisors = reduceSupervisors;
         this.bddExtractSupervisor = bddExtractSupervisor;
+        this.generateGuard = generateGuard;
+        this.reachability = reachability;
+
+        this.event = "";
+		this.expressionType = 2;
     }
 
     public boolean isValid()
@@ -126,6 +139,8 @@ public final class SynthesizerOptions
             return "Unknown synthesis type.";
         }
 
+        //At present, it is only possible to synthesize with BDDs.
+/*
         if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
         {
             if ((synthesisType != SynthesisType.NONBLOCKINGCONTROLLABLE) &&
@@ -143,6 +158,7 @@ public final class SynthesizerOptions
                 return("BDD2 algorithms currently only support supNB synthesis.");
             }
         }
+ */
         return null;
     }
 
@@ -246,6 +262,26 @@ public final class SynthesizerOptions
         return reduceSupervisors;
     }
 
+    public boolean getGenerateGuard()
+    {
+        return generateGuard;
+    }
+
+    public boolean getReachability()
+    {
+        return reachability;
+    }
+
+    public void setGenerateGuard(boolean bool)
+    {
+        generateGuard = bool;
+    }
+
+    public void setReachability(boolean bool)
+    {
+        reachability = bool;
+    }
+
 
     /**
      * Stores the current set of options in SupremicaProperties.
@@ -254,36 +290,64 @@ public final class SynthesizerOptions
     {
         Config.SYNTHESIS_SYNTHESIS_TYPE.set(synthesisType);
         Config.SYNTHESIS_ALGORITHM_TYPE.set(synthesisAlgorithm);
-        Config.SYNTHESIS_PURGE.set(purge);
-        Config.SYNTHESIS_OPTIMIZE.set(removeUnnecessarySupervisors);
+//        Config.SYNTHESIS_PURGE.set(purge);
+//        Config.SYNTHESIS_OPTIMIZE.set(removeUnnecessarySupervisors);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
-        Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
+//        Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
         Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
+        Config.SYNTHESIS_GUARD.set(generateGuard);
 
-    }
-
-    /**
-     * Returns the default options for synthesis---modular synthesis of controllability only.
-     */
-    public static SynthesizerOptions getDefaultSynthesizerOptions()
-    {
-        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, true, true, true, true, true, false);
     }
 
     /**
      * Returns the default options for synthesis.
      */
-    public static SynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
+    public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
     {
-        SynthesizerOptions options = getDefaultSynthesizerOptions();
+        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.BDD, true, true, true, true, true, false,true,true);
+    }
+
+    /**
+     * Returns the default options for synthesis.
+     */
+    public static EditorSynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
+    {
+        EditorSynthesizerOptions options = getDefaultSynthesizerOptions();
 		options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
-        options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
+        options.synthesisAlgorithm = SynthesisAlgorithm.BDD;
         options.removeUnnecessarySupervisors = false;
         options.reduceSupervisors = false;
+        options.generateGuard = true;
+        options.reachability = true;
 
+        options.setExpressionType(2);
+		options.setEvent("");
+        
         return options;
     }
+
+    //Guard options
+
+	public int getExpressionType()
+    {
+        return expressionType;
+    }
+
+    public void setExpressionType(int set)
+	{
+		expressionType = set;
+	}
+
+    public String getEvent()
+    {
+        return event;
+    }
+
+    public void setEvent(String set)
+	{
+		event = set;
+	}
 
 
 }

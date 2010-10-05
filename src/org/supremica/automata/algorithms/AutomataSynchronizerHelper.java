@@ -777,7 +777,7 @@ public class AutomataSynchronizerHelper
                                 }
                 }
  */
-    
+
     /**
      * Returns a string with events from the initial state to currState
      * "a" -> "b" -> "c"

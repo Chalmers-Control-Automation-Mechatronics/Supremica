@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.gui.renderer;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.List;
@@ -75,20 +76,37 @@ public class Renderer
         queue.offer(new ShapeToRender(producer.getShape(edge
             .getGuardActionBlock()), context.getRenderingInformation(edge
             .getGuardActionBlock())));
-        for (final BinaryExpressionProxy action : edge.getGuardActionBlock()
-            .getActions()) {
+        for (final BinaryExpressionProxy action : edge.getGuardActionBlock().getActions()) {
           queue.offer(new ShapeToRender(producer.getShape(action),
               new RenderingInformation(false, false, EditorColor.ACTIONCOLOR,
                   EditorColor.ACTIONCOLOR, 0)));
         }
-        final List<SimpleExpressionProxy> guards =
-            edge.getGuardActionBlock().getGuards();
-        if (!guards.isEmpty()) {
-          final SimpleExpressionProxy guard = guards.get(0); // there should be
-                                                             // only one guard.
-          queue.offer(new ShapeToRender(producer.getShape(guard),
-              new RenderingInformation(false, false, EditorColor.GUARDCOLOR,
-                  EditorColor.GUARDCOLOR, 0)));
+        List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
+        // A naive solution for showing the added guards(after synthesis) with different color.
+        if(guards.size() == 1)
+        {
+            SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
+            queue.offer(new ShapeToRender(producer.getShape(guard),
+                new RenderingInformation(false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
+        }
+        else if(guards.size() == 2)
+        {
+            SimpleExpressionProxy guard = guards.get(0);
+            queue.offer(new ShapeToRender(producer.getShape(guard),
+                new RenderingInformation(false, false, EditorColor.ADDEDGUARDCOLOR, EditorColor.ADDEDGUARDCOLOR, 0)));
+        }
+        else if(guards.size() == 3)
+        {
+            for(int i= 1;i<guards.size();i++)
+            {
+                Color guardColor = EditorColor.GUARDCOLOR;
+                if(i==2)
+                    guardColor = EditorColor.ADDEDGUARDCOLOR;
+
+                SimpleExpressionProxy guard = guards.get(i); //Change color
+                queue.offer(new ShapeToRender(producer.getShape(guard),
+                    new RenderingInformation(false, false, guardColor, guardColor, 0)));
+            }
         }
       }
     }

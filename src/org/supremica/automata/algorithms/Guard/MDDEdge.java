@@ -1,5 +1,6 @@
 package org.supremica.automata.algorithms.Guard;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -10,8 +11,9 @@ public class MDDEdge {
 
     private MDDNode fromNode;
     private MDDNode toNode;
-    private HashSet<Integer> label = new HashSet<Integer>();
-    private HashSet<String> labelString = new HashSet<String>();
+    private ArrayList<Integer> label = new ArrayList<Integer>();
+    private ArrayList<String> labelString = new ArrayList<String>();
+    private String id;
 
 
     public MDDEdge(MDDNode fromNode, MDDNode toNode)
@@ -20,12 +22,11 @@ public class MDDEdge {
         this.toNode = toNode;
     }
 
-    public MDDEdge(MDDNode fromNode, MDDNode toNode, HashSet<Integer> label,HashSet<String> labelString)
+    public MDDEdge(MDDNode fromNode, MDDNode toNode, ArrayList<String> labelString,String id)
     {
         this(fromNode, toNode);
-        this.label = label;
         this.labelString = labelString;
-
+        this.id = id;
     }
 
     public void setFromNode(MDDNode fNode)
@@ -44,12 +45,12 @@ public class MDDEdge {
         setToNode(tNode);
     }
 
-    public void setLabel(HashSet<Integer> l)
+    public void setLabel(ArrayList<Integer> l)
     {
         label = l;
     }
 
-    public void setLabelString(HashSet<String> lString)
+    public void setLabelString(ArrayList<String> lString)
     {
         labelString = lString;
     }
@@ -59,17 +60,22 @@ public class MDDEdge {
         return fromNode;
     }
 
+    public String getID()
+    {
+        return id;
+    }
+
     public MDDNode getToNode()
     {
         return toNode;
     }
 
-    public HashSet<Integer> getLabel()
+    public ArrayList<Integer> getLabel()
     {
         return label;
     }
 
-    public HashSet<String> getLabelString()
+    public ArrayList<String> getLabelString()
     {
         return labelString;
     }

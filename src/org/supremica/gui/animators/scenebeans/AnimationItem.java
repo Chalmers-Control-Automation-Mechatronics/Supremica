@@ -90,7 +90,6 @@ public class AnimationItem
         try
         {
             final Animator view = new Animator(" Path: " + url.toString());
-            
                         /*
                         URL url = AnimationItem.class.getResource(path);
                          
@@ -98,7 +97,7 @@ public class AnimationItem
                         { // The class loader could not find the file
                          
                         }
-                         */
+                        */
             XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
             
             view.setAnimation(parser.parseAnimation());

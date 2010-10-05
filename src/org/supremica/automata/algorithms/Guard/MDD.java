@@ -1,7 +1,11 @@
 package org.supremica.automata.algorithms.Guard;
 
+import antlr.collections.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -9,15 +13,14 @@ import java.util.HashSet;
  */
 public class MDD {
     
-    HashSet<MDDNode> nodes = new HashSet<MDDNode>();
-    HashSet<MDDEdge> edges = new HashSet<MDDEdge>();
+    private ArrayList<MDDNode> nodes = new ArrayList<MDDNode>();
+    private ArrayList<MDDEdge> edges = new ArrayList<MDDEdge>();
 
     private int nodeID = -1;
     private MDDNode root;
-    private HashMap<MDDNode,HashSet<MDDEdge>> node2OutEdgesMap = new HashMap<MDDNode,HashSet<MDDEdge>>();
-    private HashMap<MDDNode,HashSet<MDDEdge>> node2InEdgesMap = new HashMap<MDDNode,HashSet<MDDEdge>>();
-
-    HashMap<Integer, MDDNode> nodeID2node = new HashMap<Integer, MDDNode>();
+    private Map<MDDNode,ArrayList<MDDEdge>> node2OutEdgesMap = new HashMap<MDDNode,ArrayList<MDDEdge>>();
+    private Map<MDDNode,ArrayList<MDDEdge>> node2InEdgesMap = new HashMap<MDDNode,ArrayList<MDDEdge>>();
+    private Map<Integer, MDDNode> nodeID2node = new HashMap<Integer, MDDNode>();
 
     public MDD()
     {
@@ -34,6 +37,17 @@ public class MDD {
         return root;
     }
 
+    public MDDEdge getEdgeWithID(String id)
+    {
+        for(MDDEdge edge:edges)
+        {
+            if(edge.getID().equals(id))
+                return edge;
+        }
+
+        return null;
+    }
+
     public void addEdge(MDDEdge edge)
     {
         edges.add(edge);
@@ -42,7 +56,7 @@ public class MDD {
         edge.getToNode().setReachedBy(edge.getLabel());
         if(node2OutEdgesMap.get(edge.getFromNode()) == null)
         {
-            HashSet<MDDEdge> temp = new HashSet<MDDEdge>();
+            ArrayList<MDDEdge> temp = new ArrayList<MDDEdge>();
             temp.add(edge);
             node2OutEdgesMap.put(edge.getFromNode(), temp);
         }
@@ -53,7 +67,7 @@ public class MDD {
 
         if(node2InEdgesMap.get(edge.getToNode()) == null)
         {
-            HashSet<MDDEdge> temp = new HashSet<MDDEdge>();
+            ArrayList<MDDEdge> temp = new ArrayList<MDDEdge>();
             temp.add(edge);
             node2InEdgesMap.put(edge.getToNode(), temp);
         }
@@ -64,17 +78,17 @@ public class MDD {
 
     }
 
-    public HashSet<MDDEdge> node2OutEdges(MDDNode node)
+    public ArrayList<MDDEdge> node2OutEdges(MDDNode node)
     {
         return node2OutEdgesMap.get(node);
     }
 
-    public HashSet<MDDEdge> node2InEdges(MDDNode node)
+    public ArrayList<MDDEdge> node2InEdges(MDDNode node)
     {
         return node2InEdgesMap.get(node);
     }
 
-    public HashSet<MDDEdge> getEdges()
+    public ArrayList<MDDEdge> getEdges()
     {
         return edges;
     }
@@ -102,9 +116,14 @@ public class MDD {
             return null;
     }
 
-    public HashSet<MDDNode> getNodes()
+    public ArrayList<MDDNode> getNodes()
     {
         return nodes;
+    }
+
+    public int nodeCount()
+    {
+        return nodes.size()-1;
     }
 
 }

@@ -5,26 +5,30 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author sajed
  */
-import net.sf.javabdd.BDD;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+
+import net.sf.javabdd.*;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 public class BDDMonolithicEdges
     implements BDDEdges
 {
-    BDDExtendedAutomata bddExAutomata;
-    BDDExtendedManager manager;
-    BDD edgesForwardBDD = null;
-    BDD edgesBackwardBDD = null;
+    private BDDExtendedAutomata bddExAutomata;
+    private BDDExtendedManager manager;
+    private BDD edgesForwardBDD = null;
+    private BDD edgesBackwardBDD = null;
 
-    BDD myEdgesForwardBDD = null;
-    BDD myEdgesBackwardBDD = null;
+    private BDD edgesForwardWithEventsBDD = null;
+    private BDD edgesBackwardWithEventsBDD = null;
+
+    private BDD uncontrollableEdgesForwardBDD = null;
+    private BDD uncontrollableEdgesBackwardBDD = null;
+    private BDD plantUncontrollableEdgesForwardBDD = null;
+    private BDD specUncontrollableEdgesForwardBDD = null;
+    private BDD plantUncontrollableEdgesBackwardBDD = null;
+    private BDD specUncontrollableEdgesBackwardBDD = null;
+    private boolean systemHasNoPlants = true;
+    private boolean systemHasNoSpecs = true;
 
     /** Creates a new instance of BDDMonolithicEdges */
     public BDDMonolithicEdges(BDDExtendedAutomata bddExAutomata)
@@ -34,91 +38,166 @@ public class BDDMonolithicEdges
 
         edgesForwardBDD = manager.getOneBDD();
         edgesBackwardBDD = manager.getOneBDD();
+        uncontrollableEdgesForwardBDD = manager.getZeroBDD();
+        uncontrollableEdgesBackwardBDD = manager.getZeroBDD();
+        plantUncontrollableEdgesForwardBDD = manager.getOneBDD();
+        specUncontrollableEdgesForwardBDD = manager.getOneBDD();
 
-/*        for (BDDExtendedAutomaton currAutomaton : bddExAutomata)
+        plantUncontrollableEdgesBackwardBDD = manager.getZeroBDD();
+        specUncontrollableEdgesBackwardBDD = manager.getZeroBDD();
+        
+        for (BDDExtendedAutomaton currAutomaton : bddExAutomata)
         {
+//            System.out.println(currAutomaton.getExAutomaton().getName());
+//            currAutomaton.getEdgeForwardBDD().printDot();
+
             edgesForwardBDD = edgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
-            edgesBackwardBDD = edgesBackwardBDD.and(currAutomaton.getEdgeBackwardBDD());
+
+            if(currAutomaton.getExAutomaton().isSpecification())
+            {
+                specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
+                systemHasNoSpecs = false;
+            }
+            else
+            {
+                plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
+                systemHasNoPlants = false;
+            }
+        }
+        if(systemHasNoPlants)
+            plantUncontrollableEdgesForwardBDD = manager.getZeroBDD();
+
+        if(systemHasNoSpecs)
+            specUncontrollableEdgesForwardBDD = manager.getZeroBDD();
+
+
+        BDD actionsBDD = computeSynchronizedActions(bddExAutomata.forwardTransWhereVisUpdated, bddExAutomata.forwardTransAndNextValsForV);
+//        System.err.println("actions synchronized");
+
+        edgesForwardBDD = edgesForwardBDD.and(actionsBDD);
+//        edgesForwardBDD.printDot();
+        
+        specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(actionsBDD);
+        plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(actionsBDD);
+
+        System.err.println("BDD represeting forward edges with events is created.");
+
+        specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
+//            specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
+/*
+        if(!specUncontrollableEdgesForwardBDD.isZero())
+        {
+            specUncontrollableEdgesBackwardBDD = sourceTooTdest(specUncontrollableEdgesForwardBDD);
         }
 */
-        
-        BDD newEdgesForwardBDD = computeSynchronizedEdges(bddExAutomata.forwardTransWhereVisUpdated, bddExAutomata.forwardTransAndNextValsForV);
-//        BDD newEdgesBackwardBDD = computeSynchronizedEdges(bddExAutomata.backwardTransWhereVisUpdated, bddExAutomata.backwardTransAndNextValsForV);
-        
-        BDD newEdgesBackwardBDD = edgesForwardBDD.replace(bddExAutomata.sourceToTempLocationPairing);
-        newEdgesBackwardBDD = newEdgesBackwardBDD.replace(bddExAutomata.destToSourceLocationPairing);
-        newEdgesBackwardBDD = newEdgesBackwardBDD.replace(bddExAutomata.tempToDestLocationPairing);
+        plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
+//            plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
+/*
+        if(!plantUncontrollableEdgesForwardBDD.isZero())
+        {
+            plantUncontrollableEdgesBackwardBDD = sourceTooTdest(plantUncontrollableEdgesForwardBDD);
+        }
+*/
+        uncontrollableEdgesForwardBDD = edgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
+        uncontrollableEdgesForwardBDD = uncontrollableEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
 
-        newEdgesBackwardBDD = newEdgesBackwardBDD.replace(bddExAutomata.sourceToTempVariablePairing);
-        newEdgesBackwardBDD = newEdgesBackwardBDD.replace(bddExAutomata.destToSourceVariablePairing);
-        newEdgesBackwardBDD = newEdgesBackwardBDD.replace(bddExAutomata.tempToDestVariablePairing);
+        if(!uncontrollableEdgesForwardBDD.isZero())
+        {
+            uncontrollableEdgesBackwardBDD = sourceTooTdest(uncontrollableEdgesForwardBDD);
+        }
 
-        myEdgesForwardBDD = newEdgesForwardBDD;//edgesForwardBDD;
-        myEdgesBackwardBDD = newEdgesBackwardBDD;//edgesBackwardBDD;
+        edgesBackwardBDD = sourceTooTdest(edgesForwardBDD);
+        System.err.println("BDD represeting backward edges with events is created.");
 
-        edgesForwardBDD = newEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());//edgesForwardBDD.exist(bddExAutomata.getEventVarSet());
-        edgesBackwardBDD = newEdgesBackwardBDD.exist(bddExAutomata.getEventVarSet());//edgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
+        edgesForwardWithEventsBDD = edgesForwardBDD;
+        edgesBackwardWithEventsBDD = edgesBackwardBDD;
+
+        edgesForwardBDD = edgesForwardBDD.exist(bddExAutomata.getEventVarSet());
+        System.err.println("BDD represeting forward edges without events is created.");
+//        System.err.println("Number of states in the closed-loop system: "+bddExAutomata.nbrOfStatesBDD(edgesForwardBDD.exist(bddExAutomata.getDestStatesVarSet())));
+        edgesBackwardBDD = edgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
+        System.err.println("BDD represeting backward edges without events is created.");
+
+        //create backward overflow
+        bddExAutomata.setBackwardOverflows(sourceTooTdest(bddExAutomata.getForwardOverflows()));
+
     }
 
-    public BDD computeSynchronizedEdges(BDD[][] inTransWhereVisUpdated, BDD[][] inTransAndNextValsForV)
+    public BDD sourceTooTdest(BDD bdd)
     {
-        BDD[] transWhereVisUpdated = inTransWhereVisUpdated[0];
-        BDD[] transAndNextValsForV = inTransAndNextValsForV[0];
+        BDD newBDD = bdd.id();
+        
+        newBDD.replaceWith(bddExAutomata.sourceToTempLocationPairing);
+        newBDD.replaceWith(bddExAutomata.destToSourceLocationPairing);
+        newBDD.replaceWith(bddExAutomata.tempToDestLocationPairing);
+        newBDD.replaceWith(bddExAutomata.sourceToTempVariablePairing);
+        newBDD.replaceWith(bddExAutomata.destToSourceVariablePairing);
+        newBDD.replaceWith(bddExAutomata.tempToDestVariablePairing);
 
-        for(int i = 1 ; i< (bddExAutomata.theExAutomata.size());i++)
+        return newBDD;
+    }
+
+    public BDD computeSynchronizedActions(BDD[][] inTransWhereVisUpdated, BDD[][] inTransAndNextValsForV)
+    {
+        BDD[] autTransWhereVisUpdated = inTransWhereVisUpdated[0];
+        BDD[] autTransAndNextValsForV = inTransAndNextValsForV[0];
+
+        if(bddExAutomata.theExAutomata.size() == 1)
         {
-            BDD[] currTransWhereVisUpdated = inTransWhereVisUpdated[i];
-            BDD[] currTransAndNextValsForV = inTransAndNextValsForV[i];
             for(VariableComponentProxy var:bddExAutomata.orgExAutomata.getVars())
             {
                 int varIndex = bddExAutomata.theIndexMap.getVariableIndex(var);
-                BDD tUpdate = transWhereVisUpdated[varIndex];
-                BDD ctUpdate = currTransWhereVisUpdated[varIndex];
-                BDD tNextVal = transAndNextValsForV[varIndex];
-                BDD ctNextVal = currTransAndNextValsForV[varIndex];
+                BDD noneUpdateVar = bddExAutomata.BDDBitVecTargetVarsMap.get(var.getName()).equ(bddExAutomata.BDDBitVecSourceVarsMap.get(var.getName()));
+                autTransAndNextValsForV[varIndex] = autTransWhereVisUpdated[varIndex].ite(autTransAndNextValsForV[varIndex],noneUpdateVar);
+            }
+        }
 
-                BDD noneUpdated = tUpdate.not().and(ctUpdate.not());
-                BDD nextTransAndNextValsForV_00 = noneUpdated.and(varEqualToVar(var.getName()));
+        for(int i = 1 ; i< (bddExAutomata.theExAutomata.size());i++)
+        {
+            BDD[] currAutTransWhereVisUpdated = inTransWhereVisUpdated[i];
+            BDD[] currAutTransAndNextValsForV = inTransAndNextValsForV[i];
+            
+            for(VariableComponentProxy var:bddExAutomata.orgExAutomata.getVars())
+            {
+                int varIndex = bddExAutomata.theIndexMap.getVariableIndex(var);
+                BDD tUpdate = autTransWhereVisUpdated[varIndex];
+                BDD ctUpdate = currAutTransWhereVisUpdated[varIndex];
+                BDD tNextVal = autTransAndNextValsForV[varIndex];
+                BDD ctNextVal = currAutTransAndNextValsForV[varIndex];
 
                 BDD firstUpdated = tUpdate.and(ctUpdate.not());
-                BDD nextTransAndNextValsForV_01 = firstUpdated.and(ctNextVal);
+                BDD nextTransAndNextValsForV_01 = firstUpdated.and(tNextVal);
 
                 BDD secondUpdated = tUpdate.not().and(ctUpdate);
-                BDD nextTransAndNextValsForV_10 = secondUpdated.and(tNextVal);
+                BDD nextTransAndNextValsForV_10 = secondUpdated.and(ctNextVal);
 
-                BDD bothUpdated = tUpdate.and(ctUpdate);
-                BDD nextTransAndNextValsForV_11 = tNextVal.and(ctNextVal);
+                autTransWhereVisUpdated[varIndex] = tUpdate.or(ctUpdate);
 
-                transWhereVisUpdated[varIndex] = bothUpdated.or(firstUpdated).or(secondUpdated).or(noneUpdated);
-                transAndNextValsForV[varIndex] = nextTransAndNextValsForV_00.or(nextTransAndNextValsForV_01).or(nextTransAndNextValsForV_10).or(nextTransAndNextValsForV_11);
+                BDD bothUpdated = tNextVal.and(ctNextVal);//.and(tUpdate).and(ctUpdate);                
+
+                BDD noneUpdated = (bothUpdated.or(firstUpdated).or(secondUpdated)).not();
+                BDD noChange = bddExAutomata.BDDBitVecTargetVarsMap.get(var.getName()).equ(bddExAutomata.BDDBitVecSourceVarsMap.get(var.getName()));
+                BDD noneUpdateVar = noneUpdated.and(noChange);
+
+                autTransAndNextValsForV[varIndex] = nextTransAndNextValsForV_01.or(nextTransAndNextValsForV_10).or(bothUpdated).or(noneUpdateVar);
             }
         }
 
         BDD newEdgesBDD = manager.getOneBDD();
         for(int i = 0; i < bddExAutomata.orgExAutomata.getVars().size(); i++)
         {
-            newEdgesBDD.andWith(transAndNextValsForV[i]);
+/*
+            String varName = bddExAutomata.theIndexMap.getVariableAt(i).getName();
+            autTransAndNextValsForV[i] = autTransAndNextValsForV[i].and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)));
+            autTransAndNextValsForV[i] = autTransAndNextValsForV[i].and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)));
+            autTransAndNextValsForV[i] = autTransAndNextValsForV[i].and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
+            autTransAndNextValsForV[i] = autTransAndNextValsForV[i].and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
+*/
+            newEdgesBDD.andWith(autTransAndNextValsForV[i]);
         }
         
         return newEdgesBDD;
 
-    }
-
-    public BDD varEqualToVar(String var)
-    {
-        ExpressionParser parser =  new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
-        try
-        {
-           BinaryExpressionProxy bep = null;
-           bep = (BinaryExpressionProxy)parser.parse(var+"="+var,Operator.TYPE_ARITHMETIC);
-           return BDDExtendedManager.action2BDD(bep);
-        }
-        catch(ParseException pe)
-        {
-           System.out.println(pe);
-        }
-
-        return null;
     }
 
     public BDD getMonolithicEdgesForwardBDD()
@@ -131,13 +210,49 @@ public class BDDMonolithicEdges
         return edgesBackwardBDD;
     }
 
-    public BDD getMyMonolithicEdgesForwardBDD()
+    public BDD getMonolithicEdgesForwardWithEventsBDD()
     {
-        return myEdgesForwardBDD;
+        return edgesForwardWithEventsBDD;
     }
 
-    public BDD getMyMonolithicEdgesBackwardBDD()
+    public BDD getMonolithicEdgesBackwardWithEventsBDD()
     {
-        return myEdgesBackwardBDD;
+        return edgesBackwardWithEventsBDD;
     }
+
+    public BDD getMonolithicUncontrollableEdgesBackwardBDD()
+    {
+        return uncontrollableEdgesBackwardBDD;
+    }
+
+    public BDD getMonolithicUncontrollableEdgesForwardBDD()
+    {
+        return uncontrollableEdgesForwardBDD;
+    }
+
+    public BDD getPlantMonolithicUncontrollableEdgesForwardBDD()
+    {
+        return plantUncontrollableEdgesForwardBDD;
+    }
+
+    public BDD getSpecMonolithicUncontrollableEdgesForwardBDD()
+    {
+        return specUncontrollableEdgesForwardBDD;
+    }
+
+    public BDD getPlantMonolithicUncontrollableEdgesBackwardBDD()
+    {
+        return plantUncontrollableEdgesBackwardBDD;
+    }
+
+    public BDD getSpecMonolithicUncontrollableEdgesBackwardBDD()
+    {
+        return specUncontrollableEdgesBackwardBDD;
+    }
+
+    public boolean plantOrSpecDoesNotExist()
+    {
+        return systemHasNoPlants | systemHasNoSpecs;
+    }
+
 }

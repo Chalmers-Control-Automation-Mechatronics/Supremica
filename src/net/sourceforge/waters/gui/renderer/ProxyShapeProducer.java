@@ -376,17 +376,37 @@ public class ProxyShapeProducer
       final int lx = (int) Math.round(x);
       double width = 0.0;
       double height = 2.0;
+
+      //Create a rectangle for only those guards that will be displayed ultimately.
       final List<SimpleExpressionProxy> guards = block.getGuards();
-      for (final SimpleExpressionProxy guard : guards) {
-        final int ly = (int) Math.round(y + height);
-        final LabelShape lshape =
-          createEdgeLabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
-        mMap.put(guard, lshape);
-        final RoundRectangle2D lrect = lshape.getShape();
-        height += lrect.getHeight();
-        if (width < lrect.getWidth()) {
-          width = lrect.getWidth();
-        }
+      if(guards.size() == 3)
+      {
+          for (int i = 1;i<guards.size();i++)
+          {
+            SimpleExpressionProxy guard = guards.get(i);
+            final int ly = (int) Math.round(y + height);
+            final LabelShape lshape =
+              new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT, "guard");
+            mMap.put(guard, lshape);
+            final RoundRectangle2D lrect = lshape.getShape();
+            height += lrect.getHeight();
+            if (width < lrect.getWidth()) {
+              width = lrect.getWidth();
+            }
+          }
+      }
+      else if(guards.size() == 1 || guards.size() == 2)
+      {
+            SimpleExpressionProxy guard = guards.get(0);
+            final int ly = (int) Math.round(y + height);
+            final LabelShape lshape =
+              new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT, "guard");
+            mMap.put(guard, lshape);
+            final RoundRectangle2D lrect = lshape.getShape();
+            height += lrect.getHeight();
+            if (width < lrect.getWidth()) {
+              width = lrect.getWidth();
+            }
       }
       if (!guards.isEmpty()) {
         height += 2;

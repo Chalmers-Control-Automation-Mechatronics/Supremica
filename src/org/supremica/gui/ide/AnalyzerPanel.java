@@ -193,9 +193,9 @@ public class AnalyzerPanel
     }
 
     public int addProject(Project project)
-    {
+    {       
         mVisualProject.clear();
-        mVisualProject.addAutomata(project);
+        mVisualProject.addAutomata(project);        
         mVisualProject.addAttributes(project);
         return project.size();
     }

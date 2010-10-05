@@ -7,6 +7,11 @@ package org.supremica.automata.BDD.EFA;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,7 +28,13 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -47,8 +58,6 @@ public class BDDExtendedAutomaton {
     BDD edgeBackwardDisjunctiveBDD;
     BDD forbiddenStateSet;
     BDD allowedStateSet;
-    BDD selfLoopsBDD;
-    BDD uncontrollableEventsBDD;
 
     HashMap<Integer,String> bddIndex2SourceStateName;
     public HashMap<String,HashSet<Integer>> enablingSigmaMap;
@@ -59,8 +68,6 @@ public class BDDExtendedAutomaton {
     String C_PAR = ")";
     String EQUALS = " = ";
     String NEQUALS = " != ";
-
-    boolean isTransSelfLoop = false;
 
     BDD initialLocation;
     BDD markedLocations;
@@ -73,8 +80,8 @@ public class BDDExtendedAutomaton {
     {
         this.bddExAutomata = bddExAutomata;
         this.theExAutomaton = theExAutomaton;
-        this.sourceLocationDomain = bddExAutomata.getSourceLocationDomain(theExAutomaton);
-        this.destLocationDomain = bddExAutomata.getDestLocationDomain(theExAutomaton);
+        this.sourceLocationDomain = bddExAutomata.getSourceLocationDomain(theExAutomaton.getName());
+        this.destLocationDomain = bddExAutomata.getDestLocationDomain(theExAutomaton.getName());
 
         this.manager = bddExAutomata.getBDDManager();
         this.bddExAutomata = bddExAutomata;
@@ -91,9 +98,6 @@ public class BDDExtendedAutomaton {
 
         edgeForwardDisjunctiveBDD = manager.getZeroBDD();
         edgeBackwardDisjunctiveBDD = manager.getZeroBDD();
-
-        uncontrollableEventsBDD = manager.getZeroBDD();
-        selfLoopsBDD = manager.getZeroBDD();
     }
 
     public void initialize()
@@ -101,6 +105,7 @@ public class BDDExtendedAutomaton {
         initialLocation = manager.getZeroBDD();
         markedLocations = manager.getZeroBDD();
         forbiddenLocations = manager.getZeroBDD();
+        BDD plantifiedBlockedLocation = manager.getZeroBDD();
 
         BDD tempMarkedLocations = manager.getZeroBDD();
 
@@ -111,7 +116,6 @@ public class BDDExtendedAutomaton {
         boolean anyMarkedLocation = false;
         for (NodeProxy currLocation : theExAutomaton.getNodes())
         {
-            isTransSelfLoop = false;
             // First create all edges in this automaton
             for (Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext(); )
             {
@@ -119,28 +123,31 @@ public class BDDExtendedAutomaton {
                 addEdge(currEdge);
             }
 
-            isTransSelfLoop = true;
             // Self loop events not in this alphabet
             for (EventDeclProxy event : inverseAlphabet)
             {
-               addEdge(currLocation, currLocation, event, null,null);
+               addEdge(currLocation, currLocation, event);
             }
 
             // Then add state properties
             int locationIndex = bddExAutomata.getLocationIndex(theExAutomaton, currLocation);
-            BDDExtendedManager.addLocation(tempMarkedLocations, locationIndex, sourceLocationDomain);
+            manager.addLocation(tempMarkedLocations, locationIndex, sourceLocationDomain);
             if (theExAutomaton.isLocationInitial(currLocation))
             {
-               BDDExtendedManager.addLocation(initialLocation, locationIndex, sourceLocationDomain);
+               manager.addLocation(initialLocation, locationIndex, sourceLocationDomain);
             }
             if (theExAutomaton.isLocationAccepted(currLocation))
             {
                 anyMarkedLocation = true;
-                BDDExtendedManager.addLocation(markedLocations, locationIndex, sourceLocationDomain);
+                manager.addLocation(markedLocations, locationIndex, sourceLocationDomain);
             }
             if (theExAutomaton.isLocationForbidden(currLocation))
             {
-               BDDExtendedManager.addLocation(forbiddenLocations, locationIndex, sourceLocationDomain);
+               manager.addLocation(forbiddenLocations, locationIndex, sourceLocationDomain);
+            }
+            if(theExAutomaton.isLocationPlantifiedBlocked(currLocation))
+            {
+               manager.addLocation(plantifiedBlockedLocation, locationIndex, sourceLocationDomain);
             }
         }
         if(!anyMarkedLocation)
@@ -148,21 +155,10 @@ public class BDDExtendedAutomaton {
             markedLocations = tempMarkedLocations.id();
         }
 
-        Iterator <EventDeclProxy> eventItr = theExAutomaton.getAlphabet().iterator();
-        BDD sigmaBDD;
-        int currEventIndex;
-        while(eventItr.hasNext())
-        {
-            EventDeclProxy event = eventItr.next();
-            currEventIndex = bddExAutomata.getEventIndex(event);
-            sigmaBDD = manager.createBDD(currEventIndex, bddExAutomata.getEventDomain());
-            if(event.getKind() != EventKind.CONTROLLABLE)
-                uncontrollableEventsBDD.orWith(sigmaBDD);
-        }
-
         bddExAutomata.addInitialLocations(initialLocation);
         bddExAutomata.addMarkedLocations(markedLocations);
         bddExAutomata.addForbiddenLocations(forbiddenLocations);
+        bddExAutomata.addPlantifiedBlockedLocations(plantifiedBlockedLocation);
     }
 
     public ExtendedAutomaton getExAutomaton()
@@ -190,37 +186,45 @@ public class BDDExtendedAutomaton {
         NodeProxy sourceLocation = theEdge.getSource();
         NodeProxy destLocation = theEdge.getTarget();
 //        ListSubject<AbstractSubject> theEvent = theEdge.getLabelBlock().getEventListModifiable();
-        String eventName = ((SimpleIdentifierSubject)theEdge.getLabelBlock().getEventList().iterator().next()).getName();
-        EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
-
-
-        // Add all states that could be reach by only unobservable events including the destState
-        for (NodeProxy epsilonState : epsilonClosure(destLocation,true))
+        Iterator<Proxy> eventIterator = theEdge.getLabelBlock().getEventList().iterator();
+        while(eventIterator.hasNext())
         {
-            addEdge(sourceLocation, epsilonState, theEvent, theEdge.getGuardActionBlock().getGuards(),theEdge.getGuardActionBlock().getActions());
+//            String eventName = ((SimpleIdentifierSubject)theEdge.getLabelBlock().getEventList().iterator().next()).getName();
+            String eventName = ((SimpleIdentifierSubject)eventIterator.next()).getName();
+            EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
+
+
+            // Add all states that could be reach by only unobservable events including the destState
+            for (NodeProxy epsilonState : epsilonClosure(destLocation,true))
+            {
+                if(theEdge.getGuardActionBlock() != null)
+                    addEdge(sourceLocation, epsilonState, theEvent, theEdge.getGuardActionBlock().getGuards(),theEdge.getGuardActionBlock().getActions());
+                else
+                    addEdge(sourceLocation, epsilonState, theEvent);
+            }
         }
+    }
+
+    void addEdge(NodeProxy sourceLocation, NodeProxy destLocation, EventDeclProxy theEvent)
+    {
+        addEdge(sourceLocation, destLocation, theEvent, null,null);
     }
 
     void addEdge(NodeProxy sourceLocation, NodeProxy destLocation, EventDeclProxy theEvent, List<SimpleExpressionProxy> guards, List<BinaryExpressionProxy> actions)
     {
+//        System.out.println("Edge belonging to "+theExAutomaton.getName()+": "+sourceLocation.getName()+"  "+theEvent.getName()+"  "+destLocation.getName());
         int sourceLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, sourceLocation);
         int destLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, destLocation);
         int eventIndex = bddExAutomata.getEventIndex(theEvent);
 
-//        System.out.println("state name: "+sourceState.getName());
-//        System.out.println("sourceStateIndex: "+sourceStateIndex);
-
-        BDD sourceBDD = BDDExtendedManager.factory.buildCube(sourceLocationIndex, sourceLocationDomain.vars());
+        BDD sourceBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
 
         Integer bddIndex = -1;
-//        String varsBits = "";
         if(!bddIndex2SourceStateName.containsValue(sourceLocation.getName()))
         {
-//            sourceBDD.printDot();
 
             BDD.BDDIterator satIt = new BDD.BDDIterator(sourceBDD, sourceLocationDomain.set());
             BigInteger[] currSat = satIt.nextTuple();
-//            System.out.println("currSat: " + ArrayHelper.arrayToString(currSat));
             for(int i=0; i<currSat.length;i++)
             {
                 if(currSat[i] != null)
@@ -233,17 +237,9 @@ public class BDDExtendedAutomaton {
             bddIndex2SourceStateName.put(bddIndex,sourceLocation.getName());
         }
 
-        if(isTransSelfLoop)
-        {
-              BDDExtendedManager.addEdge(selfLoopsBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions, bddExAutomata.BDDBitVecSourceVarsMap, bddExAutomata.BDDBitVecTargetVarsMap);
-        }
-        
-        BDDExtendedManager.addEdge(edgeForwardBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions, bddExAutomata.BDDBitVecSourceVarsMap, bddExAutomata.BDDBitVecTargetVarsMap);
-//        BDDExtendedManager.addEdge(edgeBackwardBDD, bddExAutomata.getBackwardTransWhereVisUpdated(this), bddExAutomata.getBackwardTransAndNextValsForV(this), destLocationIndex, sourceLocationDomain, sourceLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions, bddExAutomata.BDDBitVecTargetVarsMap, bddExAutomata.BDDBitVecSourceVarsMap);
-    }
-
-    public BDD getSelfLoopsBDD(){
-        return selfLoopsBDD;
+        manager.addEdge(edgeForwardBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions,
+                sourceLocation.getName(), destLocation.getName());
+//        BDDExtendedManager.addEdge(edgeBackwardBDD, bddExAutomata.getBackwardTransWhereVisUpdated(this), bddExAutomata.getBackwardTransAndNextValsForV(this), destLocationIndex, sourceLocationDomain, sourceLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions, bddExAutomata.BDDBitVecTargetVarsMap, bddExAutomata.BDDBitVecSourceVarsMap,bddExAutomata.orgExAutomata.getMinMaxValMap());
     }
 
     public BDD getForbiddenStateSet()
@@ -256,11 +252,6 @@ public class BDDExtendedAutomaton {
         return allowedStateSet;
     }
 
-    public BDD getUncontrollableEvents()
-    {
-        return uncontrollableEventsBDD;
-    }
-
     public BDD getEdgeForwardBDD()
     {
         return edgeForwardBDD;
@@ -269,6 +260,17 @@ public class BDDExtendedAutomaton {
     public BDD getEdgeBackwardBDD()
     {
         return edgeBackwardBDD;
+    }
+
+    public ArrayList<String> getComplementLocationNames(ArrayList<String> locationNames)
+    {
+        ArrayList<String> output = new ArrayList<String>();
+        for(NodeProxy location: getExAutomaton().getNodes())
+        {
+            if(!locationNames.contains(location.getName()))
+                output.add(location.getName());
+        }
+        return output;
     }
 
     public Set<NodeProxy> epsilonClosure(NodeProxy thisLocation, boolean includeSelf)

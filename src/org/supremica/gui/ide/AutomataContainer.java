@@ -24,7 +24,7 @@ public class AutomataContainer
     public AutomataContainer(final IDE ide, final Project project)
     {
         super(ide, project);
-        mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+        mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");        
         mAnalyzerPanel.addProject(project);
     }
 

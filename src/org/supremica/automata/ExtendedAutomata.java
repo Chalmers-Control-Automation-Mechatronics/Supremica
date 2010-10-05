@@ -57,13 +57,16 @@ package org.supremica.automata;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
+import java.util.StringTokenizer;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.module.*;
@@ -73,22 +76,23 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 {
+    private ModuleSubjectFactory factory;
+    private IdentifierSubject identifier;
+    private ExpressionParser parser;
+    private ModuleSubject module;
+    private boolean expand;
 
-	private ModuleSubjectFactory factory;
-	@SuppressWarnings("unused")
-	private IdentifierSubject identifier;
-	@SuppressWarnings("unused")
-	private ExpressionParser parser;
-	private ModuleSubject module;
-	private boolean expand;
     private int nbrOfExAutomata = 0;
     private ArrayList<ExtendedAutomaton> theExAutomata;
     private Map<String, EventDeclProxy> eventIdToProxyMap;
-    List<EventDeclProxy> unionAlphabet;
+    public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
-    int maxRangeOfVars = 0;
-    HashMap<String,Integer> var2initValMap;
-    boolean contradictingInitValues = false;
+    int domain = 0;
+    Map<String, MinMax> var2MinMaxValMap = null;
+
+    HashSet<EventDeclProxy> uncontrollableAlphabet = null;
+    HashSet<EventDeclProxy> plantAlphabet = null;
+    String locaVarSuffix = ".curr";
 
     public ExtendedAutomata()
     {
@@ -96,18 +100,27 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         theExAutomata = new ArrayList<ExtendedAutomaton>();
         unionAlphabet = new ArrayList<EventDeclProxy>();
         variables = new ArrayList<VariableComponentProxy>();
-        var2initValMap = new HashMap<String, Integer>();
-        contradictingInitValues = false;
+        var2MinMaxValMap = new HashMap<String, MinMax>();
+        uncontrollableAlphabet = new HashSet<EventDeclProxy>();
+        plantAlphabet = new HashSet<EventDeclProxy>();
     }
 
-	public ExtendedAutomata(ModuleSubject module)
+    public ExtendedAutomata(ModuleSubject module)
     {
         this();
+
         this.module = module;
+
         for(EventDeclProxy e: module.getEventDeclList())
         {
             if(e.getKind() != EventKind.PROPOSITION)
+            {
                 unionAlphabet.add(e);
+                if(e.getKind() == EventKind.UNCONTROLLABLE)
+                {
+                    uncontrollableAlphabet.add(e);
+                }
+            }
         }
         eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
         for(EventDeclProxy e:module.getEventDeclList())
@@ -119,74 +132,107 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         {
             if(sub instanceof VariableComponentProxy)
             {
-                variables.add((VariableComponentProxy)sub);
+                if(!sub.toString().contains(locaVarSuffix))
+                    variables.add(((VariableComponentProxy)sub));
             }
 
             if(sub instanceof SimpleComponentSubject)
             {
                 nbrOfExAutomata++;
-                addAutomatonToList(new ExtendedAutomaton(this, (SimpleComponentSubject)sub));
+                ExtendedAutomaton exAutomaton = new ExtendedAutomaton(this, (SimpleComponentSubject)sub);
+
+                if(!exAutomaton.isSpecification())
+                {
+                    plantAlphabet.addAll(exAutomaton.getAlphabet());
+                }
+                addAutomatonToList(exAutomaton);
             }
-        }
+        }        
 
         for(VariableComponentProxy var:variables)
         {
-            StringTokenizer token = new StringTokenizer(var.getInitialStatePredicate().toString(),"==");
-            token.nextToken();
-            int initialValue = Integer.parseInt(token.nextToken());
-            if(!var2initValMap.containsKey(var.getName()))
-            {
-                var2initValMap.put(var.getName(), initialValue);
-            }
-            else if(var2initValMap.get(var.getName()) != initialValue)
-            {
-                contradictingInitValues = true;
-            }
-
-            token = new StringTokenizer(var.getType().toString(), "..");
-            int lowerBound = Integer.parseInt(token.nextToken());
+            String varName = var.getName();
+            String range = var.getType().toString();
+            int lowerBound = -1;
             int upperBound = -1;
-            upperBound = Integer.parseInt(token.nextToken());
-            
-            if((upperBound-lowerBound+1)>maxRangeOfVars)
+
+            if(range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName()))
             {
-                maxRangeOfVars = upperBound-lowerBound+1;
-            }            
+                lowerBound = Integer.parseInt(((BinaryExpressionProxy)var.getType()).getLeft().toString());
+                upperBound = Integer.parseInt(((BinaryExpressionProxy)var.getType()).getRight().toString());
+            }
+            else if (range.contains(","))
+            {
+                StringTokenizer token = new StringTokenizer(range, ", { }");
+                lowerBound = 0;
+                upperBound = token.countTokens();
+            }
+
+            MinMax minMax = new MinMax(lowerBound,upperBound);
+
+            if(!var2MinMaxValMap.containsKey(varName))
+            {
+                var2MinMaxValMap.put(varName, minMax);
+            }
+
+//            int currDomain = upperBound+1-lowerBound;
+            int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
+            if(currDomain>domain)                            
+                domain = currDomain;
         }
+        //we multiply the domain with 2 to add 1 extra bit for the sign
+        domain *= 2;
+        parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
-  		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+
     }
 
-	public ExtendedAutomata(String name, boolean expand) 
-	{
-        this();
-        identifier = factory.createSimpleIdentifierProxy(name);
-		module = new ModuleSubject(name, null);
-
-		// make marking proposition
-        final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy
-            (EventDeclProxy.DEFAULT_MARKING_NAME);
-		module.getEventDeclListModifiable().add
-            (factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
-
-		this.expand = expand;
-
-		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-	}
-
-    public boolean isInitValuesContradicting()
+    public ExtendedAutomata(String name, boolean expand)
     {
-        return contradictingInitValues;
+    this();
+    identifier = factory.createSimpleIdentifierProxy(name);
+            module = new ModuleSubject(name, null);
+
+            // make marking proposition
+    final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy
+        (EventDeclProxy.DEFAULT_MARKING_NAME);
+            module.getEventDeclListModifiable().add
+        (factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
+
+            this.expand = expand;
+
+            parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
     }
 
-    public int getMaxRangeOfVars()
+
+    public void extDomain(int d)
     {
-        return maxRangeOfVars;
+        domain = d;
     }
 
-    public int getInitValueofVar(String var)
+    public String getlocVarSuffix()
     {
-        return var2initValMap.get(var);
+        return locaVarSuffix;
+    }
+
+    public HashSet<EventDeclProxy> getUncontrollableAlphabet()
+    {
+        return uncontrollableAlphabet;
+    }
+
+    public int getDomain()
+    {
+        return domain;
+    }
+
+    public int getMaxValueofVar(String var)
+    {
+        return var2MinMaxValMap.get(var).getMax();
+    }
+
+    public int getMinValueofVar(String var)
+    {
+        return var2MinMaxValMap.get(var).getMin();
     }
 
     public int size()
@@ -212,10 +258,22 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return invAlph;
     }
 
-	protected ModuleSubject getModule()
-	{
-		return module;
-	}
+    public ModuleSubject getModule()
+    {
+       return module;
+    }
+    
+    public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
+    {
+        module.getComponentListModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, null));
+    }
+
+    public void addEnumerationVariable(String name,Collection<String> elements,String initialValue,Collection<String> markedValues)
+    {
+        VariableComponentSubject var = VariableHelper.createEnumerationVariable(name, elements, initialValue, markedValues);
+        if(!module.getComponentListModifiable().contains(var))
+            module.getComponentListModifiable().add(var);
+    }
 
     public EventDeclProxy eventIdToProxy(String id)
     {
@@ -256,8 +314,13 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 	public void addAutomaton(ExtendedAutomaton exAutomaton)
 	{
         addAutomatonToList(exAutomaton);
-		module.getComponentListModifiable().add(exAutomaton.getComponent());
+        module.getComponentListModifiable().add(exAutomaton.getComponent());
 	}
+
+    public HashSet<EventDeclProxy> getPlantAlphabet()
+    {
+        return plantAlphabet;
+    }
 
     public void addAutomatonToList(ExtendedAutomaton exAutomaton)
     {
@@ -323,6 +386,43 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
             module.getEventDeclListModifiable().add(decl);
         }
+    }
+
+    class MinMax
+    {
+        private int min;
+        private int max;
+
+        public MinMax()
+        {
+
+        }
+        public MinMax(int min, int max)
+        {
+            this.min = min;
+            this.max = max;
+        }
+
+        public void setMin(int min)
+        {
+            this.min = min;
+        }
+
+        public void setMax(int max)
+        {
+            this.max = max;
+        }
+
+        public int getMin()
+        {
+            return min;
+        }
+
+        public int getMax()
+        {
+            return max;
+        }
+
     }
 
 }

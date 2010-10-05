@@ -338,6 +338,14 @@ public class IDEMenuBar extends JMenuBar
 		}
       }
 
+      // Analyze (Seamless Synthesis)
+      if(mEdAnalyzeMenu == null  && panel instanceof EditorPanel)
+      {
+          mEdAnalyzeMenu = new JMenu("Analyze");
+          mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
+          mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
+      }
+
       // Simulate
       if (mSimulateMenu == null && panel instanceof SimulatorPanel) {
         mSimulateMenu = new JMenu("Simulate");
@@ -402,7 +410,6 @@ public class IDEMenuBar extends JMenuBar
         mAnalyzeMenu.add(actions.analyzerDeleteAllAction.getMenuItem());
         mAnalyzeMenu.add(actions.analyzerRenameAction.getMenuItem());
         mAnalyzeMenu.add(actions.analyzerSendToEditorAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerGuardAction.getMenuItem());
       }
     }
 
@@ -486,6 +493,7 @@ public class IDEMenuBar extends JMenuBar
         if (mVerifyMenu != null) {
           add(mVerifyMenu);
         }
+        add(mEdAnalyzeMenu);
       } else if (panel instanceof SimulatorPanel) {
         add(mSimulateMenu);
         if (mVerifyMenu != null) {
@@ -686,6 +694,7 @@ public class IDEMenuBar extends JMenuBar
   private JMenu mVerifyMenu = null;
   private JMenu mSimulateMenu = null;
   private JMenu mAnalyzeMenu = null;
+  private JMenu mEdAnalyzeMenu = null;
   private JMenu mToolsMenu = null;
   private JMenu mExamplesMenu = null;
   private JMenu mModulesMenu = null;

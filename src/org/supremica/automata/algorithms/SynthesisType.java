@@ -51,10 +51,11 @@ package org.supremica.automata.algorithms;
 
 public enum SynthesisType
 {
-    CONTROLLABLE("Controllable"),
-    NONBLOCKING("Nonblocking"),
-    NONBLOCKINGCONTROLLABLE("Nonblocking and controllable"),
-    NONBLOCKINGCONTROLLABLEOBSERVABLE("Nonblocking, controllable and observable");
+    CONTROLLABLE("controllable"),
+    NONBLOCKING("nonblocking"),
+    NONBLOCKINGCONTROLLABLE("nonblocking and controllable"),
+    NONBLOCKINGCONTROLLABLEOBSERVABLE("nonblocking, controllable and observable");
+
     
     /** Textual description. */
     private final String description;
@@ -62,6 +63,38 @@ public enum SynthesisType
     private SynthesisType(String description)
     {
         this.description = description;
+    }
+
+    public static SynthesisType[] editorValues()
+    {
+        SynthesisType[] vals = new SynthesisType[3];
+        int i = 0;
+        for(SynthesisType v:SynthesisType.values())
+        {
+            if(i < 3)
+            {
+                vals[i] = v;
+            }
+            i++;
+        }
+
+        return vals;
+    }
+
+    public static SynthesisType[] analyzerValues()
+    {
+        SynthesisType[] vals = new SynthesisType[4];
+        int i = 0;
+        for(SynthesisType v:SynthesisType.values())
+        {
+            if(i < 4)
+            {
+                vals[i] = v;
+            }
+            i++;
+        }
+
+        return vals;
     }
     
     public String toString()

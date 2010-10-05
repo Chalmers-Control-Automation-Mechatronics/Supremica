@@ -17,12 +17,8 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.gui.SynthesizerDialog;
 import org.supremica.gui.AutomataSynthesisWorker;
 import java.util.List;
-import java.util.Vector;
-import net.sourceforge.waters.subject.module.*;
-import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.gui.ide.EditorPanel;
 import org.supremica.log.*;
 
 public class AnalyzerSynthesizerAction
@@ -63,22 +59,6 @@ public class AnalyzerSynthesizerAction
         // Get the current options and allow the user to change them...
         SynthesizerOptions options = new SynthesizerOptions();
 
-        EditorPanel editorPanel = ide.getActiveDocumentContainer().getEditorPanel();
-
-        Vector<String> controllableEvents = new Vector<String>();
-        controllableEvents.add("Generate guards for ALL controllable events");
-        for(EventDeclSubject sigmaS:  editorPanel.getModuleSubject().getEventDeclListModifiable())
-        {
-            if(sigmaS.getKind() == EventKind.CONTROLLABLE)
-            {
-                controllableEvents.add(sigmaS.getName());
-            }
-        }
-	/*
-	  SynthesizerDialog constructor does not accept controllableEvents
-	  argument. ~~~Robi
-        SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), selectedAutomata.size(), options,controllableEvents);
-	*/
         SynthesizerDialog synthesizerDialog = new SynthesizerDialog
 	  (ide.getFrame(), selectedAutomata.size(), options);
         synthesizerDialog.show();
@@ -87,5 +67,7 @@ public class AnalyzerSynthesizerAction
             return;
         }
         new AutomataSynthesisWorker(ide.getIDE(), selectedAutomata, options);
+
     }
+
 }

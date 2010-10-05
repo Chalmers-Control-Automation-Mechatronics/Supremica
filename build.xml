@@ -393,7 +393,8 @@
                deprecation="false"
                verbose="false"
                source="1.5"
-               includeantruntime="false">
+               includeantruntime="false"
+        >
             <classpath> 
                 <pathelement location="${build}"/>
                 <pathelement path="${lib}/${unjared}"/>
@@ -1018,8 +1019,8 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement location="examples" />
                 <pathelement path="${java.class.path}" />
             </classpath>            
-            <jvmarg value="-Xms128M"/>
-            <jvmarg value="-Xmx512M" />       
+            <jvmarg value="-Xms1024M"/>
+            <jvmarg value="-Xmx1024M" />
         </java>
     </target>
     

@@ -62,6 +62,7 @@ import java.util.HashMap;
 
 
 import java.util.HashSet;
+import java.util.StringTokenizer;
 import net.sourceforge.waters.subject.module.*;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -77,6 +78,8 @@ import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class ExtendedAutomaton
@@ -93,12 +96,14 @@ public class ExtendedAutomaton
 	private GraphSubject graph;
 	private ExpressionParser parser;
     private List<EventDeclProxy> alphabet;
+    private List<EventDeclProxy> uncontrollableAlphabet;
     private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToOutgoingEdgesMap;
-    private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToIngoingEdgesMap;
-    private Set<NodeProxy> nodes;
+    private HashMap<String,NodeProxy> nameToLocationMap;
+    private List<NodeProxy> nodes;
     private Set<NodeProxy> initialLocations;
     private Set<NodeProxy> acceptedLocations;
     private Set<NodeProxy> forbiddenLocations;
+    private NodeProxy blockedLocation = null;
 
 	public ExtendedAutomaton(String name, ExtendedAutomata automata, boolean acceptingStates)
 	{
@@ -128,43 +133,53 @@ public class ExtendedAutomaton
         graph = component.getGraph();
         module = automata.getModule();
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-        nodes = graph.getNodes();
-
-        locationToOutgoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(graph.getNodes().size());
-        locationToIngoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(graph.getNodes().size());
-        alphabet = new ArrayList<EventDeclProxy>();
+        nodes = new ArrayList<NodeProxy>();
+        nodes.addAll(graph.getNodes());
 
         initialLocations = new HashSet<NodeProxy>();
         forbiddenLocations = new HashSet<NodeProxy>();
         acceptedLocations = new HashSet<NodeProxy>();
 
+        locationToOutgoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(nodes.size());
+        nameToLocationMap = new HashMap<String, NodeProxy>(nodes.size());
+        alphabet = new ArrayList<EventDeclProxy>();
+        uncontrollableAlphabet = new ArrayList<EventDeclProxy>();
+
+        HashMap<NodeProxy, HashSet<String>> locationToOutgoingEventsMap = new HashMap<NodeProxy, HashSet<String>>(nodes.size());
+
         for(NodeProxy node:nodes)
         {
+            nameToLocationMap.put(node.getName(),node);            
             locationToOutgoingEdgesMap.put(node, new ArrayList<EdgeSubject>());
-            locationToIngoingEdgesMap.put(node, new ArrayList<EdgeSubject>());
+            locationToOutgoingEventsMap.put(node, new HashSet<String>());
 
-            if (node.toString().contains("initial"))
+            if (new StringTokenizer(node.toString(), " ").nextToken().equals("initial"))
             {
                 initialLocations.add(node);
             }
-            if (node.toString().contains("accepting"))
+            if (node.toString().contains(EventDeclProxy.DEFAULT_MARKING_NAME))
             {
                 acceptedLocations.add(node);
             }
-            if (node.toString().contains("forbidden"))
+            if (node.toString().contains(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
             {
                forbiddenLocations.add(node);
             }
         }
-
-
         EventListExpressionProxy blockedEvents = component.getGraph().getBlockedEvents();
+        HashSet<String> unconAlphabetString = new HashSet<String>();
         if(blockedEvents != null)
         {
             for(Proxy event:blockedEvents.getEventList())
             {
                 String eventName = ((SimpleIdentifierSubject)event).getName();
-                alphabet.add(automata.eventIdToProxy(eventName));
+                EventDeclProxy e = automata.eventIdToProxy(eventName);
+                alphabet.add(e);
+                if(e.getKind() == EventKind.UNCONTROLLABLE)
+                {
+                    uncontrollableAlphabet.add(e);
+                    unconAlphabetString.add(e.getName());
+                }
             }
         }
 
@@ -173,12 +188,133 @@ public class ExtendedAutomaton
             for(Proxy event:edge.getLabelBlock().getEventList())
             {
                 String eventName = ((SimpleIdentifierSubject)event).getName();
-                alphabet.add(automata.eventIdToProxy(eventName));
-            }
+                EventDeclProxy e = automata.eventIdToProxy(eventName);
+                alphabet.add(e);
+                locationToOutgoingEventsMap.get(edge.getSource()).add(e.getName());
 
+                if(e.getKind() == EventKind.UNCONTROLLABLE)
+                {
+                    uncontrollableAlphabet.add(e);
+                    unconAlphabetString.add(e.getName());
+                }
+            }
             locationToOutgoingEdgesMap.get(edge.getSource()).add(edge);
-            locationToIngoingEdgesMap.get(edge.getTarget()).add(edge);
         }
+
+        //PLANTIFY
+ /*       if(isSpecification() && uncontrollableAlphabet.size()>0)
+        {
+            //Add a blocked state for "plantify" purposes
+//            final List<Proxy> propList = new LinkedList<Proxy>();
+//            propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
+//            PlainEventListSubject markingProposition = factory.createPlainEventListProxy(propList);
+            NodeSubject bNode = factory.createSimpleNodeProxy(name, null,false, null, null, null);
+            bNode.setName("BlOcKeDStAtE");
+            NodeProxy blockedNode = (NodeProxy)bNode;
+            nodes.add(blockedNode);
+            blockedLocation = blockedNode;
+
+            locationToOutgoingEdgesMap.put(blockedLocation, new ArrayList<EdgeSubject>());
+            //Make a transition with an uncontrollble event(UE) to the blocked state from source states where
+            //the UE does not exist on the outgoing transitions
+            //(transformation of specification to plant to later consider the controllabailty problem as a blocking problem).
+
+            for(NodeProxy node:nodes)
+            {
+                if(!isLocationPlantifiedBlocked(node) && !forbiddenLocations.contains(node))
+                {
+                    ArrayList<EdgeSubject> edges = (ArrayList<EdgeSubject>)locationToOutgoingEdgesMap.get(node).clone();
+                    if(edges.isEmpty())
+                    {
+                        EdgeSubject newEdge = null;
+                        ArrayList<Proxy> es = new ArrayList<Proxy>();
+                        for(String e:unconAlphabetString)
+                        {
+                            es.add(factory.createSimpleIdentifierProxy(e));
+                        }
+                        LabelBlockSubject uncommonLabelBlock = factory.createLabelBlockProxy(es,null);
+
+                        newEdge = factory.createEdgeProxy(node, blockedLocation, uncommonLabelBlock, null, null, null, null);
+
+                        locationToOutgoingEdgesMap.get(node).add(newEdge);
+                    }
+                    else
+                    {
+                        for(EdgeSubject edge:edges)
+                        {
+
+                            EdgeSubject newEdge = null;
+                            HashSet<String> commonUnEvents = new HashSet<String>(unconAlphabetString);
+                            HashSet<String> uncommonUnEvents = new HashSet<String>(unconAlphabetString);
+
+                            commonUnEvents.retainAll(locationToOutgoingEventsMap.get(edge.getSource()));
+                            uncommonUnEvents.removeAll(commonUnEvents);
+
+                            //Create a transition (without guards and actions) from source to the forbidden state with all uncontrollable events that are not included in "edge"
+                            if(uncommonUnEvents.size()>0)
+                            {
+                                ArrayList<Proxy> es = new ArrayList<Proxy>();
+                                for(String e:uncommonUnEvents)
+                                {
+                                    es.add(factory.createSimpleIdentifierProxy(e));
+                                }
+                                LabelBlockSubject uncommonLabelBlock = factory.createLabelBlockProxy(es,null);
+
+                                newEdge = factory.createEdgeProxy(edge.getSource(), blockedLocation, uncommonLabelBlock, null, null, null, null);
+                            }
+
+                            //Create a transition from source to the forbidden state with an uncontrollable event that is included in "edge" but with the complement of edge.guard
+                            GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
+                            List<SimpleExpressionSubject> blockGuards = guardActionBlock.getGuardsModifiable();
+                            if(edge.getGuardActionBlock() != null)
+                            {
+                                for(SimpleExpressionProxy guard:edge.getGuardActionBlock().getGuards())
+                                {
+                                    try{blockGuards.add((SimpleExpressionSubject)parser.parse("!("+guard.getPlainText()+")", Operator.TYPE_BOOLEAN));}catch(ParseException e){}
+                                }
+
+                                if(commonUnEvents.size()>0)
+                                {
+                                    ArrayList<Proxy> es = new ArrayList<Proxy>();
+                                    for(String e:commonUnEvents)
+                                    {
+                                        es.add(factory.createSimpleIdentifierProxy(e));
+                                    }
+                                    LabelBlockSubject commonLabelBlock = factory.createLabelBlockProxy(es,null);
+
+                                    if(!edge.getGuardActionBlock().getGuards().isEmpty())
+                                        newEdge = factory.createEdgeProxy(edge.getSource(), blockedLocation, commonLabelBlock, guardActionBlock, null, null, null);
+                                }
+                            }
+
+                            if(newEdge != null)
+                            {
+                                locationToOutgoingEdgesMap.get(edge.getSource()).add(newEdge);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+*/
+    }
+
+    public NodeProxy getblockedLocation()
+    {
+        return blockedLocation;
+    }
+
+    public boolean isLocationPlantifiedBlocked(NodeProxy node)
+    {
+        if(node.equals(blockedLocation))
+            return true;
+
+        return false;
+    }
+
+    public NodeProxy getInitialLocation()
+    {
+        return initialLocations.iterator().next();
     }
 
     public boolean isLocationInitial(NodeProxy node)
@@ -202,14 +338,14 @@ public class ExtendedAutomaton
         return false;
     }
 
+    public Set<NodeProxy> getMarkedLocations()
+    {
+        return acceptedLocations;
+    }
+
     public  HashMap<NodeProxy,ArrayList<EdgeSubject>> getLocationToOutgoingEdgesMap()
     {
         return  locationToOutgoingEdgesMap;
-    }
-
-    public  HashMap<NodeProxy,ArrayList<EdgeSubject>> getLocationToIngoingEdgesMap()
-    {
-        return  locationToIngoingEdgesMap;
     }
 
     public ComponentKind getKind()
@@ -217,9 +353,14 @@ public class ExtendedAutomaton
         return component.getKind();
     }
 
-    public Set<NodeProxy> getNodes()
+    public List<NodeProxy> getNodes()
     {
         return nodes;
+    }
+
+    public NodeProxy getLocationWithName(String name)
+    {
+        return nameToLocationMap.get(name);
     }
 
     public int nbrOfNodes()
@@ -242,55 +383,52 @@ public class ExtendedAutomaton
         return alphabet;
     }
 
-	public void addInitialState(String name)
-	{
-		addState(name, true, true);
-	}
-
-	public void addAcceptingState(String name)
-	{
-		addState(name, true, false);
-	}
+    public List<EventDeclProxy> getUncontrollableAlphabet()
+    {
+        return uncontrollableAlphabet;
+    }
 
 	public void addState(String name)
 	{
 		if (allAcceptingStates)
 		{
-			addState(name, true, false);
+			addState(name, true, false, false);
 		}
 		else
 		{
-			addState(name, false, false);			
+			addState(name, false, false, false);
 		}
 	}
 
-	public void addState(String name, boolean accepting, boolean initial)
+	public SimpleNodeSubject addState(String name, boolean accepting, boolean initial, boolean forbidden)
 	{
 		SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
 		if (node == null)
 		{
+            final List<Proxy> propList = new LinkedList<Proxy>();
 			if (accepting)
-			{
-				final List<Proxy> propList = new LinkedList<Proxy>();
-				propList.add(factory.createSimpleIdentifierProxy
-                               (EventDeclProxy.DEFAULT_MARKING_NAME));
-				PlainEventListSubject acceptingProposition =
-                    factory.createPlainEventListProxy(propList);
-				graph.getNodesModifiable().add
-                    (factory.createSimpleNodeProxy(name, acceptingProposition,
-                                                   initial, null, null, null));
+			{				
+				propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
 			}
-			else
-			{
-				graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name, null, initial, null, null, null));
+			if (forbidden)
+			{				
+				propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
 			}
-		}
-	}
 
-	public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
-	{
-		module.getComponentListModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, null));
+            PlainEventListSubject markingProposition = factory.createPlainEventListProxy(propList);
+
+            node = factory.createSimpleNodeProxy(name, markingProposition,initial, null, null, null);
+            graph.getNodesModifiable().add (node);
+		}
+
+        return node;
 	}
+    
+    public boolean isSpecification()
+    {
+        return (component.getKind() == ComponentKind.SPEC);
+    }
+
 
 	/**
 	 * Adds transition to the extended finite automaton 

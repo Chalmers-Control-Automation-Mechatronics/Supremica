@@ -82,7 +82,7 @@ public class EFA extends ExtendedAutomaton{
        }
  
        //add new state
-       super.addState(name, accepting, initial);
+       super.addState(name, accepting, initial,false);
        states.add(name);
    }
    

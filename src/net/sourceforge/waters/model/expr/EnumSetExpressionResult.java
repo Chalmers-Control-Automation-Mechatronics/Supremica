@@ -48,7 +48,8 @@ class EnumSetExpressionResult extends ParseResult {
     final int size = mItems.size();
     final List<SimpleIdentifierProxy> clones =
       new ArrayList<SimpleIdentifierProxy>(size);
-    for (final SimpleIdentifierProxy item : mItems) {
+    for (final SimpleIdentifierProxy item : mItems)
+    {
       clones.add(item.clone());
     }
     return factory.createEnumSetExpressionProxy(text, clones);

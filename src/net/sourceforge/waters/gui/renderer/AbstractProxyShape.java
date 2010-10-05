@@ -14,7 +14,7 @@ public abstract class AbstractProxyShape
     
     protected AbstractProxyShape(Proxy proxy)
     {
-        mProxy = proxy;
+        mProxy = proxy;        
     }
     
     public void draw(Graphics2D g, RenderingInformation status)

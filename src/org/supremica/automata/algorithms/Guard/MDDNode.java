@@ -1,5 +1,6 @@
 package org.supremica.automata.algorithms.Guard;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -13,7 +14,7 @@ public class MDDNode {
     private String name = "";
     private String resAut = "";
     private int id;
-    private HashSet<Integer> reachedBy = new HashSet<Integer>();
+    private ArrayList<Integer> reachedBy = new ArrayList<Integer>();
 
     public MDDNode(int id, String name)
     {
@@ -69,12 +70,12 @@ public class MDDNode {
         return false;
     }
 
-    public void setReachedBy(HashSet<Integer> states)
+    public void setReachedBy(ArrayList<Integer> states)
     {
         reachedBy = states;
     }
 
-    public HashSet<Integer> getReachedBy()
+    public ArrayList<Integer> getReachedBy()
     {
         return reachedBy;
     }

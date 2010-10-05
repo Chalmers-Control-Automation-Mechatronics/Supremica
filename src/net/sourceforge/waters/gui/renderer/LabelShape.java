@@ -9,8 +9,10 @@
 
 package net.sourceforge.waters.gui.renderer;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
@@ -18,17 +20,25 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
+import java.util.StringTokenizer;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 
 
 public class LabelShape extends AbstractProxyShape
 {
-
   //##########################################################################
   //# Constructors
-  public LabelShape(final Proxy proxy, final int x, final int y,
-                    final Font font, final String aux /* unused? */)
+
+  public LabelShape(final Proxy p, final int x, final int y,
+		    final Font font, final String guardIndex)
   {
+      this(p, x, y, font);
+  }
+/*  public LabelShape(final Proxy proxy, final int x, final int y,
+                    final Font font, final String aux)
+  {
+
     super(proxy);
     mFont = font;
     mPoint = new Point(x + 2, y + (font.getSize()));
@@ -41,9 +51,8 @@ public class LabelShape extends AbstractProxyShape
         new RoundRectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(),
                                     rect.getHeight(), ARC_RADIUS, ARC_RADIUS);
   }
-
-  public LabelShape(final Proxy proxy,
-                    final int x, final int y, final Font font)
+*/
+  public LabelShape(final Proxy proxy, final int x, final int y, final Font font)
   {
     super(proxy);
     mFont = font;
@@ -66,18 +75,17 @@ public class LabelShape extends AbstractProxyShape
     return mBounds;
   }
 
-  public void draw(final Graphics2D graphics,
-                   final RenderingInformation status)
+  public void draw(final Graphics2D graphics,final RenderingInformation status)
   {
-    if (status.isFocused()) {
-      graphics.setColor(status.getShadowColor());
-      graphics.fill(getShape());
-    }
-    graphics.setFont(mFont);
-    graphics.setColor(status.getColor());
-    final int x = (int) Math.round(mPoint.getX());
-    final int y = (int) Math.round(mPoint.getY());
-    graphics.drawString(mName, x, y);
+        if (status.isFocused()) {
+          graphics.setColor(status.getShadowColor());
+          graphics.fill(getShape());
+        }
+        graphics.setFont(mFont);
+        graphics.setColor(status.getColor());
+        final int x = (int) Math.round(mPoint.getX());
+        final int y = (int) Math.round(mPoint.getY());
+        graphics.drawString(mName, x, y);
   }
 
 

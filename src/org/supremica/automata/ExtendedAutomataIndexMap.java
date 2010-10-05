@@ -8,56 +8,75 @@ package org.supremica.automata;
 import org.supremica.log.*;
 import org.supremica.util.Args;
 import java.util.*;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 public class ExtendedAutomataIndexMap {
 
-    private final Map<ExtendedAutomaton, Integer> exAutomatonToIndexMap;
-    private final Map<String,ExtendedAutomaton> nameToExAutomatonMap;
-    private final ExtendedAutomaton[] indexToExAutomatonArray;
-    private final Map<ExtendedAutomatonAndLocationEntry, Integer> automatonLocationEntryToIndexMap;
-    private final Map<ExtendedAutomatonAndIntegerEntry, NodeProxy> automatonIntegerEntryToLocationMap;
-    private final Map<EventDeclProxy, Integer> eventToIndexMap;
-    private final EventDeclProxy[] indexToEventArray;
-    private final Map<VariableComponentProxy, Integer> variableToIndexMap;
-    public final Map<String, Integer> variableStringToIndexMap;
-    private final Map<Integer, VariableComponentProxy> indexToVariableMap;
+    private Map<String, Integer> exAutomatonToIndexMap;
+    private Map<String,ExtendedAutomaton> nameToExAutomatonMap;
+    private ExtendedAutomaton[] indexToExAutomatonArray;
+    private Map<ExtendedAutomatonAndLocationEntry, Integer> automatonLocationEntryToIndexMap;
+    private Map<ExtendedAutomatonAndIntegerEntry, NodeProxy> automatonIntegerEntryToLocationMap;
+    private Map<EventDeclProxy, Integer> eventToIndexMap;
+    private EventDeclProxy[] indexToEventArray;
+    private Map<VariableComponentProxy, Integer> variableToIndexMap;
+    public Map<String, Integer> variableStringToIndexMap;
+    private Map<Integer, VariableComponentProxy> indexToVariableMap;
+    private Map<String, EventDeclProxy> eventIdToProxyMap;
 
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
+    private Map<String,Integer> var2initValMap;
+    private Map<String,List<VariableMarkingProxy>> var2markedValMap;
+    private Map<String,Integer> val2indexMap;
+    private Map<Integer,String> index2valMap;
+
+    private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
+
+
+    public ExtendedAutomataIndexMap()
+    {
+        var2initValMap = new HashMap<String, Integer>();
+        var2markedValMap = new HashMap<String, List<VariableMarkingProxy>>();
+        val2indexMap = new HashMap<String, Integer>();
+        index2valMap = new HashMap<Integer, String>();
+    }
+
 
     public ExtendedAutomataIndexMap(ExtendedAutomata theExAutomata)
     {
+        this();
         // This useful variable stores the union of the automata events
         List<EventDeclProxy> unionAlphabet = theExAutomata.getUnionAlphabet();
 
-        int initialLocationMapCapacity = 0;
-  /*      for (AbstractSubject currExAutomaton : theExAutomata)
+ /*       int initialLocationMapCapacity = 0;
+        for (AbstractSubject currExAutomaton : theExAutomata)
         {
             initialLocationMapCapacity += currExAutomaton.nbrOfLocations();
         }
 */
         // The hashtables are initialized with appropriate capacities.
-        exAutomatonToIndexMap = new HashMap<ExtendedAutomaton, Integer>(theExAutomata.size()*2);
+        exAutomatonToIndexMap = new HashMap<String, Integer>(theExAutomata.size()*2);
         nameToExAutomatonMap = new HashMap<String, ExtendedAutomaton>(theExAutomata.size());
         indexToExAutomatonArray = new ExtendedAutomaton[theExAutomata.size()];
-        automatonLocationEntryToIndexMap = new HashMap<ExtendedAutomatonAndLocationEntry, Integer>(initialLocationMapCapacity*2);
-        automatonIntegerEntryToLocationMap = new HashMap<ExtendedAutomatonAndIntegerEntry, NodeProxy>(initialLocationMapCapacity*2);
+        automatonLocationEntryToIndexMap = new HashMap<ExtendedAutomatonAndLocationEntry, Integer>();
+        automatonIntegerEntryToLocationMap = new HashMap<ExtendedAutomatonAndIntegerEntry, NodeProxy>();
         eventToIndexMap = new HashMap<EventDeclProxy, Integer>(unionAlphabet.size()*2);
         indexToEventArray = new EventDeclProxy[unionAlphabet.size()];
-
+        eventIdToProxyMap = new HashMap<String,EventDeclProxy>();
         variableToIndexMap = new HashMap<VariableComponentProxy, Integer>(theExAutomata.getVars().size());
         indexToVariableMap = new HashMap<Integer,VariableComponentProxy>(theExAutomata.getVars().size());
-
         variableStringToIndexMap = new HashMap<String, Integer>(theExAutomata.getVars().size());
+
         // The automatonIndex and the locationIndex hashmaps are filled
         int automatonIndex = 0;
         for (ExtendedAutomaton currExAutomaton : theExAutomata)
         {
             // The automatonIndex hashtable is updated
-            exAutomatonToIndexMap.put(currExAutomaton, automatonIndex);
+            exAutomatonToIndexMap.put(currExAutomaton.getName(), automatonIndex);
             indexToExAutomatonArray[automatonIndex] = currExAutomaton;
             nameToExAutomatonMap.put(currExAutomaton.getName(), currExAutomaton);
             automatonIndex++;
@@ -65,29 +84,100 @@ public class ExtendedAutomataIndexMap {
             int locationIndex = 0;
             for (NodeProxy currNode : currExAutomaton.getNodes())
             {
-                automatonLocationEntryToIndexMap.put(new ExtendedAutomatonAndLocationEntry(currExAutomaton, currNode), locationIndex);
-                automatonIntegerEntryToLocationMap.put(new ExtendedAutomatonAndIntegerEntry(currExAutomaton, locationIndex), currNode);
+                automatonLocationEntryToIndexMap.put(new ExtendedAutomatonAndLocationEntry(currExAutomaton.getName(), currNode.getName()), locationIndex);
+                automatonIntegerEntryToLocationMap.put(new ExtendedAutomatonAndIntegerEntry(currExAutomaton.getName(), locationIndex), currNode);
                 locationIndex++;
             }
         }
 
-        int variableIndex = 0;
+        int index = 0;
+        HashSet<Integer> integerDomain = new HashSet<Integer>();
         for(VariableComponentProxy var:theExAutomata.getVars())
         {
-            indexToVariableMap.put(variableIndex, var);
-            variableToIndexMap.put(var, variableIndex);
-            variableStringToIndexMap.put(var.getName(),variableIndex);
-            variableIndex++;
+            indexToVariableMap.put(index, var);
+            variableToIndexMap.put(var, index);
+            variableStringToIndexMap.put(var.getName(),index);
+            index++;
+
+            String varName = var.getName();
+            String range = var.getType().toString();
+
+            if(range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName()))
+            {
+                for(int i=theExAutomata.getMinValueofVar(varName);i<=theExAutomata.getMaxValueofVar(varName);i++)
+                {
+                    val2indexMap.put(""+i, i);
+                    index2valMap.put(i, ""+i);
+                    integerDomain.add(i);
+                }
+
+                int initialValue = val2indexMap.get(((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString());
+                var2initValMap.put(varName, initialValue);
+                var2markedValMap.put(varName, var.getVariableMarkings());
+            }
         }
+
+        index = 0;
+        for(VariableComponentProxy var:theExAutomata.getVars())
+        {
+            String varName = var.getName();
+            String range = var.getType().toString();
+
+            if (range.contains(","))
+            {
+                StringTokenizer token = new StringTokenizer(range, ", { }");
+                while(token.hasMoreTokens())
+                {
+                    String val = token.nextToken();
+                    while(integerDomain.contains(index))
+                        index++;
+
+                    if(!val2indexMap.keySet().contains(val))
+                    {
+                        val2indexMap.put(val, index);
+                        index2valMap.put(index, val);
+                    }
+                    else
+                        index--;
+                }
+
+                int initialValue = val2indexMap.get(((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString());
+                var2initValMap.put(varName, initialValue);
+                var2markedValMap.put(varName, var.getVariableMarkings());
+            }            
+        }
+        if(index > theExAutomata.getDomain())
+            theExAutomata.extDomain(index);
 
         // The eventIndex map is filled
         int eventIndex = 0;
         for (EventDeclProxy currEvent : unionAlphabet)
         {
+            eventIdToProxyMap.put(currEvent.getName(), currEvent);
             eventToIndexMap.put(currEvent, eventIndex);
             indexToEventArray[eventIndex] = currEvent;
             eventIndex++;
         }
+    }
+
+    public Integer getIndexOfVal(String val)
+    {
+        return val2indexMap.get(val);
+    }
+
+    public String getValOfIndex(int index)
+    {
+        return index2valMap.get(index);
+    }
+
+    public int getInitValueofVar(String var)
+    {
+        return var2initValMap.get(var);
+    }
+
+    public List<VariableMarkingProxy> getMarkedPredicatesofVar(String var)
+    {
+        return var2markedValMap.get(var);
     }
 
     public int getVariableIndex(VariableComponentProxy var)
@@ -100,7 +190,7 @@ public class ExtendedAutomataIndexMap {
         return indexToVariableMap.get(i);
     }
 
-    public int getExAutomatonIndex(final ExtendedAutomaton exAutomaton)
+    public int getExAutomatonIndex(final String exAutomaton)
     {
         Args.checkForNull(exAutomaton);
         return exAutomatonToIndexMap.get(exAutomaton);
@@ -124,6 +214,11 @@ public class ExtendedAutomataIndexMap {
         return eventToIndexMap.get(event);
     }
 
+    public EventDeclProxy eventIdToProxy(String id)
+    {
+        return eventIdToProxyMap.get(id);
+    }
+
     public EventDeclProxy getEventAt(final int index)
     {
         Args.checkForIndex(index);
@@ -131,24 +226,24 @@ public class ExtendedAutomataIndexMap {
     }
 
 
-    public int getLocationIndex(final ExtendedAutomaton automaton, final NodeProxy location)
+    public int getLocationIndex(final String automaton, final String location)
     {
         Args.checkForNull(automaton);
         Args.checkForNull(location);
         return automatonLocationEntryToIndexMap.get(new ExtendedAutomatonAndLocationEntry(automaton, location));
     }
 
-    public int getLocationIndex(final int automatonIndex, final NodeProxy location)
+    public int getLocationIndex(final int automatonIndex, final String location)
     {
         if (automatonIndex < 0)
         {
             throw new IndexOutOfBoundsException("automatonIndex has to >= 0");
         }
-        ExtendedAutomaton currAutomaton = getAutomatonAt(automatonIndex);
-        return getLocationIndex(currAutomaton, location);
+        ExtendedAutomaton currAutomaton = getExAutomatonAt(automatonIndex);
+        return getLocationIndex(currAutomaton.getName(), location);
     }
 
-    public NodeProxy getLocationAt(final ExtendedAutomaton automaton, final int locationIndex)
+    public NodeProxy getLocationAt(final String automaton, final int locationIndex)
     {
         Args.checkForNull(automaton);
         Args.checkForIndex(locationIndex);
@@ -165,24 +260,16 @@ public class ExtendedAutomataIndexMap {
         {
             throw new IndexOutOfBoundsException("locationIndex has to >= 0");
         }
-        ExtendedAutomaton currAutomaton = getAutomatonAt(automatonIndex);
-        return getLocationAt(currAutomaton, locationIndex);
+        ExtendedAutomaton currAutomaton = getExAutomatonAt(automatonIndex);
+        return getLocationAt(currAutomaton.getName(), locationIndex);
     }
-
-    public ExtendedAutomaton getAutomatonAt(final int index)
-    {
-        Args.checkForIndex(index);
-        return indexToExAutomatonArray[index];
-    }
-
-
 
     static class ExtendedAutomatonAndLocationEntry
     {
-        ExtendedAutomaton automaton;
-        NodeProxy location;
+        String automaton;
+        String location;
 
-        public ExtendedAutomatonAndLocationEntry(final ExtendedAutomaton automaton, final NodeProxy location)
+        public ExtendedAutomatonAndLocationEntry(final String automaton, final String location)
         {
             this.automaton = automaton;
             this.location = location;
@@ -190,14 +277,15 @@ public class ExtendedAutomataIndexMap {
 
         public int hashCode()
         {
-            return (automaton.getName() + location.getName()).hashCode();
+            return (automaton + location).hashCode();
         }
 
         public boolean equals(Object other)
         {
             if (other instanceof ExtendedAutomatonAndLocationEntry)
             {
-                return automaton.getName().equals(((ExtendedAutomatonAndLocationEntry) other).automaton.getName()) && location.getName().equals(((ExtendedAutomatonAndLocationEntry) other).location.getName());
+                return automaton.equals(((ExtendedAutomatonAndLocationEntry) other).automaton) &&
+                        location.equals(((ExtendedAutomatonAndLocationEntry) other).location);
             }
             return false;
         }
@@ -205,10 +293,10 @@ public class ExtendedAutomataIndexMap {
 
     static class ExtendedAutomatonAndIntegerEntry
     {
-        ExtendedAutomaton automaton;
+        String automaton;
         int locationIndex;
 
-        public ExtendedAutomatonAndIntegerEntry(ExtendedAutomaton automaton, int locationIndex)
+        public ExtendedAutomatonAndIntegerEntry(String automaton, int locationIndex)
         {
             this.automaton = automaton;
             this.locationIndex = locationIndex;
@@ -216,14 +304,15 @@ public class ExtendedAutomataIndexMap {
 
         public int hashCode()
         {
-            return (automaton.getName().hashCode() * locationIndex);
+            return (automaton.hashCode() * locationIndex);
         }
 
         public boolean equals(Object other)
         {
             if (other instanceof ExtendedAutomatonAndIntegerEntry)
             {
-                return automaton.getName().equals(((ExtendedAutomatonAndIntegerEntry)other).automaton.getName()) && locationIndex == ((ExtendedAutomatonAndIntegerEntry)other).locationIndex;
+                return automaton.equals(((ExtendedAutomatonAndIntegerEntry)other).automaton) &&
+                        locationIndex == ((ExtendedAutomatonAndIntegerEntry)other).locationIndex;
             }
             return false;
         }

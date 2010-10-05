@@ -295,15 +295,35 @@ public class AutomataSynchronizer
 
     public SimpleComponentProxy getSynchronizedComponent()
     {
-        SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
-        options.setEFAMode(true);
-        AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, options, arc2edgeTable,autName2indexTable);
-        AutomataSynchronizer synchronizer = new AutomataSynchronizer(helper);
+        AutomataSynchronizer synchronizer = new AutomataSynchronizer(synchHelper);
         synchronizer.execute();
         synchronizer.getAutomaton();
-        helper.createExtendedAutomaton();
-        return helper.getSynchronizedComponent();
+        synchHelper.createExtendedAutomaton();
+        return synchHelper.getSynchronizedComponent();
     }
+
+    public Automata removeGuardsActionsFromEFAs(ListSubject<AbstractSubject> components)
+    {
+        Automata automata = new Automata();
+        HashSet<SimpleComponentSubject> autComps = new HashSet<SimpleComponentSubject>();
+
+        for(AbstractSubject component : components)
+            if(component.toString().contains("NODES") && component.toString().contains("EDGES"))
+                autComps.add((SimpleComponentSubject)component);
+
+        arc2edgeTable = new HashMap[autComps.size()];
+
+        for(SimpleComponentSubject autComp: autComps)
+        {
+            autName2indexTable.put(autComp.getName(), automatonIndex);
+            arc2edgeTable[automatonIndex] = new HashMap<Arc, EdgeSubject>();
+            automata.addAutomaton(removeGuardsActionsFromEFA(autComp));
+            automatonIndex++;
+        }
+
+        return automata;
+    }
+
 
     public Automaton removeGuardsActionsFromEFA(SimpleComponentSubject component)
     {
@@ -399,28 +419,5 @@ public class AutomataSynchronizer
         }
 
         return automaton;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Automata removeGuardsActionsFromEFAs(ListSubject<AbstractSubject> components)
-    {
-        Automata automata = new Automata();
-        HashSet<SimpleComponentSubject> autComps = new HashSet<SimpleComponentSubject>();
-
-        for(AbstractSubject component : components)
-            if(component.toString().contains("NODES") && component.toString().contains("EDGES"))
-                autComps.add((SimpleComponentSubject)component);
-
-        arc2edgeTable = new HashMap[autComps.size()];
-
-        for(SimpleComponentSubject autComp: autComps)
-        {
-            autName2indexTable.put(autComp.getName(), automatonIndex);
-            arc2edgeTable[automatonIndex] = new HashMap<Arc, EdgeSubject>();
-            automata.addAutomaton(removeGuardsActionsFromEFA(autComp));
-            automatonIndex++;
-        }
-
-        return automata;
     }
 }

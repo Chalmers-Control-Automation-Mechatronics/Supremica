@@ -60,6 +60,7 @@ import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.Animator;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import grafchart.sfc.JGrafchartSupremicaEditor;
+import java.net.URL;
 import org.supremica.properties.Config;
 import org.supremica.util.ResourceClassLoader;
 import org.swixml.SwingEngine;
@@ -410,7 +411,9 @@ public class VisualProject
 
         if (theAnimator == null)
         {
-            theAnimator = AnimationItem.createInstance(getAnimationURL());
+            URL url = getAnimationURL();
+//            url = new URL("file:/C:/Supremica/trunk/animations/scenebeans/agv/agv.xml");
+            theAnimator = AnimationItem.createInstance(url);
         }
 
         theAnimator.setVisible(true);

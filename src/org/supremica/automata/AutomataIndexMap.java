@@ -71,7 +71,7 @@ public final class AutomataIndexMap
         
         int initialStateMapCapacity = 0;
         for (Automaton currAutomaton : theAutomata)
-        {
+        {           
             initialStateMapCapacity += currAutomaton.nbrOfStates();
         }
  

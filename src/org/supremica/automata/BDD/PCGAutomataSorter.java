@@ -49,7 +49,10 @@
  */
 package org.supremica.automata.BDD;
 
+import org.supremica.util.SupremicaException;
+import java.util.*;
 import java.util.ArrayList;
+import org.supremica.automata.*;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
@@ -66,10 +69,24 @@ public class PCGAutomataSorter
     {
     }
     
-    public Automata sortAutomata(Automata orgAutomata)
+    public Automata sortAutomata(Automata oorgAutomata)
     {
         Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
         ArrayList<PCGNode> pcgNodeList = new ArrayList<PCGNode>();
+        //Alphabetic sorting - so that the variable ordering of the corresponding BDDs become the same in every run
+        List<String> automataNames = new ArrayList<String>();
+
+        for(Automaton a:oorgAutomata)
+            automataNames.add(a.getName());
+
+        Collections.sort(automataNames);
+        Automata orgAutomata = new Automata();
+
+        for(String an:automataNames)
+            orgAutomata.addAutomaton(oorgAutomata.getAutomaton(an));
+
+//        orgAutomata = oorgAutomata.clone();
+        
         for (Automaton currAutomaton : orgAutomata)
         {
             pcgNodeList.add(new DefaultPCGNode(currAutomaton.getName(), currAutomaton.nbrOfStates()));

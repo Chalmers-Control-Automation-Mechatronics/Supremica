@@ -52,6 +52,7 @@ package org.supremica.automata.BDD;
 import java.math.BigInteger;
 import net.sf.javabdd.*;
 import java.util.*;
+import java.util.ArrayList;
 import org.supremica.automata.*;
 
 public class BDDAutomaton
@@ -66,28 +67,22 @@ public class BDDAutomaton
     BDDPairing destToSourcePairing;
     BDD transitionForwardBDD;
     BDD transitionBackwardBDD;
+    BDD uncontrollableTransitionBackwardBDD;
     BDD transitionForwardDisjunctiveBDD;
     BDD transitionBackwardDisjunctiveBDD;
     BDD forbiddenStateSet;
     BDD allowedStateSet;
-    BDD selfLoopsBDD;
     BDD uncontrollableEventsBDD;
     
     HashMap<Integer,String> bddIndex2SourceStateName;
     public HashMap<Integer,String> myIndex2stateName;
-    public HashMap<String,HashSet<Integer>> enablingSigmaMap;
-/*    HashMap<String,String>[] stateName2varsMap;
-    HashMap<Integer,String>[] var2logicExprMap;
- */   
+ 
     String OR = " | ";
     String AND = " & ";
     String O_PAR = "(";
     String C_PAR = ")";
     String EQUALS = " = ";
-    String NEQUALS = " != ";
-
-    boolean isTransSelfLoop = false;
-    
+    String NEQUALS = " != ";    
     
     int nbrOfTerms;
     public boolean allwFrbdnChosen = false;
@@ -109,28 +104,17 @@ public class BDDAutomaton
         this.destStateDomain = destStateDomain;
         
         bddIndex2SourceStateName = new HashMap<Integer,String>();
-        enablingSigmaMap = new HashMap<String, HashSet<Integer>>();
         myIndex2stateName = new HashMap<Integer, String>();
- /*       
-        stateName2varsMap = new HashMap[sourceStateDomain.varNum()];
-        for(int i=0;i<sourceStateDomain.varNum();i++)
-                stateName2varsMap[i] = new HashMap<String,String>();
-
-        var2logicExprMap = new HashMap[2];
-        var2logicExprMap[0] = new HashMap<Integer,String>();
-        var2logicExprMap[1] = new HashMap<Integer,String>();
- */       
+     
         sourceToDestPairing = manager.makePairing(sourceStateDomain, destStateDomain);
         destToSourcePairing = manager.makePairing(destStateDomain, sourceStateDomain);
         
         transitionForwardBDD = manager.getZeroBDD();
         transitionBackwardBDD = manager.getZeroBDD();
+        uncontrollableTransitionBackwardBDD = manager.getZeroBDD();
         
         transitionForwardDisjunctiveBDD = manager.getZeroBDD();
         transitionBackwardDisjunctiveBDD = manager.getZeroBDD();
-
-        uncontrollableEventsBDD = manager.getZeroBDD();
-        selfLoopsBDD = manager.getZeroBDD();
 
         nbrOfTerms = 0;
     }
@@ -152,15 +136,29 @@ public class BDDAutomaton
 //        System.out.println("Automaton "+theAutomaton.getName());
         for (State currState : theAutomaton)
         {
-            isTransSelfLoop = false;
+            Alphabet outgoingUnconEvents = new Alphabet();
+
             // First create all transitions in this automaton
             for (Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
             {
                 Arc currArc = arcIt.next();
+                if(theAutomaton.isSpecification() && !currArc.getEvent().isControllable() && !outgoingUnconEvents.contains(currArc.getEvent()))
+                    outgoingUnconEvents.add(currArc.getEvent());
+
                 addTransition(currArc);
             }
 
-            isTransSelfLoop = true;
+            //Specification to Plant transformation for handling uncontrrollabilty
+            if(theAutomaton.isSpecification())
+            {
+                Alphabet unconEvents = new Alphabet(theAutomaton.getAlphabet().getUncontrollableAlphabet());
+                Alphabet missingOutgoingUnconEvents = unconEvents.minus(outgoingUnconEvents);
+                for(LabeledEvent event:missingOutgoingUnconEvents)
+                {
+                    addTransition(currState, theAutomaton.getStateWithName("FS"), event);
+                }
+            }
+
             // Self loop events not in this alphabet
             for (LabeledEvent event : inverseAlphabet)
             {
@@ -177,33 +175,13 @@ public class BDDAutomaton
             }
             if (currState.isAccepting())
             {
-                BDDManager.addState(markedStates, stateIndex, sourceStateDomain);
-/*                System.out.println("in BDDAutomaton: "+theAutomaton.getName());
-                for ( BDD.BDDIterator satIt = new BDD.BDDIterator(markedStates, sourceStateDomain.set()); satIt.hasNext(); ) 
-                {
-                    BigInteger[] currSat = satIt.nextTuple();
-                    System.out.println("currStat: " + ArrayHelper.arrayToString(currSat));
-                }                
-*/               
+                BDDManager.addState(markedStates, stateIndex, sourceStateDomain);               
             }
             if (currState.isForbidden())
             {
                BDDManager.addState(forbiddenStates, stateIndex, sourceStateDomain);
             }
         }
-
-        Iterator <LabeledEvent> eventItr = theAutomaton.eventIterator();
-        BDD sigmaBDD;
-        int currEventIndex;
-        while(eventItr.hasNext())
-        {
-            LabeledEvent event = eventItr.next();
-            currEventIndex = bddAutomata.getEventIndex(event);
-            sigmaBDD = manager.createBDD(currEventIndex, bddAutomata.getEventDomain());
-            if(!event.isControllable())
-                uncontrollableEventsBDD.orWith(sigmaBDD);
-        }
-
         
         bddAutomata.addInitialStates(initialStates);
         bddAutomata.addMarkedStates(markedStates);
@@ -229,66 +207,34 @@ public class BDDAutomaton
         int destStateIndex = bddAutomata.getStateIndex(theAutomaton, destState);
         int eventIndex = bddAutomata.getEventIndex(theEvent);
 
-//        System.out.println("state name: "+sourceState.getName());
-//        System.out.println("sourceStateIndex: "+sourceStateIndex);
-
         BDD sourceBDD = BDDManager.factory.buildCube(sourceStateIndex, getSourceStateDomain().vars());
         Integer myIndex = generateIndex(sourceBDD);
 
-        if(!isTransSelfLoop)
-        {
-            if(!enablingSigmaMap.containsKey(theEvent.getName()))
-            {
-                HashSet<Integer> s = new HashSet<Integer>();
-                s.add(myIndex);
-                enablingSigmaMap.put(theEvent.getName(), s);
-            }
-            else
-            {
-                enablingSigmaMap.get(theEvent.getName()).add(myIndex);
-            }
-            
-        }
-
         Integer bddIndex = -1;
-//        String varsBits = "";
         if(!bddIndex2SourceStateName.containsValue(sourceState.getName()))
-        {
-//            sourceBDD.printDot();
-            
+        {            
             myIndex2stateName.put(myIndex, sourceState.getName());
-
 
             BDD.BDDIterator satIt = new BDD.BDDIterator(sourceBDD, getSourceStateDomain().set());
             BigInteger[] currSat = satIt.nextTuple();
-//            System.out.println("currSat: " + ArrayHelper.arrayToString(currSat));
             for(int i=0; i<currSat.length;i++)
             {
                 if(currSat[i] != null)
                 {
                      bddIndex = currSat[i].intValue();
-//                     varsBits = pad(currSat[i].toString(2),sourceStateDomain.varNum());
                      break;
                 }
             }
             
             bddIndex2SourceStateName.put(bddIndex,sourceState.getName());
-//            System.out.println("state name: "+sourceState.getName());
-//            System.out.println("BDD index: "+bddIndex);
-            
- /*           for(int i=0;i<sourceStateDomain.varNum();i++)
-            {
-                stateName2varsMap[i].put(sourceState.getName(),""+varsBits.charAt(i));
-            }*/
         }
 
-        if(isTransSelfLoop)
-        {
-            BDDManager.addTransition(selfLoopsBDD, sourceStateIndex, sourceStateDomain, destStateIndex, destStateDomain, eventIndex, bddAutomata.getEventDomain());
-        }
 
         BDDManager.addTransition(transitionForwardBDD, sourceStateIndex, sourceStateDomain, destStateIndex, destStateDomain, eventIndex, bddAutomata.getEventDomain());
         BDDManager.addTransition(transitionBackwardBDD, destStateIndex, sourceStateDomain, sourceStateIndex, destStateDomain, eventIndex, bddAutomata.getEventDomain());
+        
+        if(!theEvent.isControllable())
+            BDDManager.addTransition(uncontrollableTransitionBackwardBDD, destStateIndex, sourceStateDomain, sourceStateIndex, destStateDomain, eventIndex, bddAutomata.getEventDomain());
     }
 
     public HashSet<Integer> getComplementIndices(HashSet<Integer> indices)
@@ -396,9 +342,6 @@ public class BDDAutomaton
     }
  */
 
-    public BDD getSelfLoopsBDD(){
-        return selfLoopsBDD;
-    }
 
     public BDD getForbiddenStateSet()
     {
@@ -537,6 +480,11 @@ public class BDDAutomaton
     public BDD getTransitionBackwardBDD()
     {
         return transitionBackwardBDD;
+    }
+
+    public BDD getUncontrollableTransitionBackwardBDD()
+    {
+        return uncontrollableTransitionBackwardBDD;
     }
     
     public BDD getTransitionForwardConjunctiveBDD()
