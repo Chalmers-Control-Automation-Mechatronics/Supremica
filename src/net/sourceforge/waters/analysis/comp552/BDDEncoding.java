@@ -49,6 +49,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * Events and states are encoded in binary, with the most significant bit
  * appearing first in the ordering.</P>
  *
+ * <H4>You are encouraged to modify this class or replace it by something
+ * better.</H4>
+ *
  * <P>This class mainly serves as a demonstration to show how to encode
  * automata using BDDs. It is kept simple and leaves a lot of room for
  * performance improvement. Things that can be improved include are:</P>
@@ -641,7 +644,7 @@ public class BDDEncoding
    * The number of bits used to encode the events. Since events appear
    * first in the variable ordering, this number also is the index of the
    * first automaton variable. Events are encoded using the variable indexes
-   * 0..mNumEventBits-1.
+   * 0..{@link #mNumEventBits}-1.
    */
   private final int mNumEventBits;
   /**
@@ -654,7 +657,7 @@ public class BDDEncoding
    * The number of bits used to encode all automata states. Since each
    * automaton uses two sets of variables, the actual number of bits allocated
    * is double this number. The total number of bits allocated in the BDD
-   * factory is mNumEventBits+2*mNumAutomataBits.
+   * factory is {@link #mNumEventBits}+2*mNumAutomataBits.
    */
   private int mNumAutomataBits;
 

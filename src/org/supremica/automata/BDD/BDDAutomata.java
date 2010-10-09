@@ -60,7 +60,7 @@ public class BDDAutomata
     implements Iterable<BDDAutomaton>
 {
     private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
-    
+
     BDDManager manager;
     Automata theAutomata;
     List<BDDAutomaton> theBDDAutomataList = new LinkedList<BDDAutomaton>();
@@ -73,17 +73,17 @@ public class BDDAutomata
 
     AutomataIndexMap theIndexMap;
     Alphabet unionAlphabet;
- 
+
     BDDTransitions bddTransitions = null;
-               
+
     BDDDomain eventDomain;
     BDDDomain[] tempStateDomains = null;
     BDDDomain[] sourceStateDomains = null;
     BDDDomain[] destStateDomains = null;
-        
+
     BDDVarSet sourceStateVariables = null;
     BDDVarSet destStateVariables = null;
-    
+
     BDDPairing tempToDestStatePairing = null;
     BDDPairing sourceToTempStatePairing = null;
     BDDPairing destToSourceStatePairing = null;
@@ -92,7 +92,7 @@ public class BDDAutomata
     BDD markedStatesBDD = null;
     BDD forbiddenStatesBDD = null;
     BDD uncontrollableStatesBDD = null;
-    
+
     BDD reachableStatesBDD = null;
     BDD coreachableStatesBDD = null;
     BDD reachableAndCoreachableStatesBDD = null;
@@ -107,19 +107,19 @@ public class BDDAutomata
     double nbrOfSafeStates = -1;
 
 
-    public BDDAutomata(Automata orgAutomata)
+    public BDDAutomata(final Automata orgAutomata)
     {
-        AutomataSorter automataSorter = new PCGAutomataSorter();
+        final AutomataSorter automataSorter = new PCGAutomataSorter();
 
         theAutomata = automataSorter.sortAutomata(orgAutomata);
         manager = new BDDManager();
 
         //Adding a forbidden state for transforming an uncontrallibility problem to nonblocking problem
-        for (Automaton currAutomaton : theAutomata)
+        for (final Automaton currAutomaton : theAutomata)
         {
             if(currAutomaton.isSpecification())
             {
-                State forbiddenState = new State("FS");
+                final State forbiddenState = new State("FS");
                 currAutomaton.addState(forbiddenState);
             }
         }
@@ -128,11 +128,11 @@ public class BDDAutomata
         {
             theIndexMap = new AutomataIndexMap(theAutomata);
         }
-        catch (Exception e)
+        catch (final Exception e)
         {
             logger.error(e);
         }
-        
+
         initialStatesBDD = manager.getOneBDD();
         markedStatesBDD = manager.getOneBDD();
         forbiddenStatesBDD = manager.getZeroBDD();
@@ -142,40 +142,41 @@ public class BDDAutomata
 
         initialize();
     }
- 
+
     void initialize()
     {
         unionAlphabet = theAutomata.getUnionAlphabet();
         eventDomain = manager.createDomain(unionAlphabet.size());
         eventDomain.setName("Events");
-        
+
         sourceStateVariables = manager.createEmptyVarSet();
         destStateVariables = manager.createEmptyVarSet();
 
         tempStateDomains = new BDDDomain[theAutomata.size()];
         sourceStateDomains = new BDDDomain[theAutomata.size()];
         destStateDomains = new BDDDomain[theAutomata.size()];
-        
+
         int i = 0;
+        @SuppressWarnings("unused")
         BDD currUnconEvents = null;
-        for (Automaton automaton : theAutomata)
-        {            
-            int nbrOfStates = automaton.nbrOfStates();
+        for (final Automaton automaton : theAutomata)
+        {
+            final int nbrOfStates = automaton.nbrOfStates();
             //System.err.println("nbrOfStates: " + nbrOfStates);
-            BDDDomain tempStateDomain = manager.createDomain(nbrOfStates);
-            BDDDomain sourceStateDomain = manager.createDomain(nbrOfStates);
-            BDDDomain destStateDomain = manager.createDomain(nbrOfStates);
-            BDDAutomaton bddAutomaton = new BDDAutomaton(this, automaton, sourceStateDomain, destStateDomain);
+            final BDDDomain tempStateDomain = manager.createDomain(nbrOfStates);
+            final BDDDomain sourceStateDomain = manager.createDomain(nbrOfStates);
+            final BDDDomain destStateDomain = manager.createDomain(nbrOfStates);
+            final BDDAutomaton bddAutomaton = new BDDAutomaton(this, automaton, sourceStateDomain, destStateDomain);
 
             autName2SourceStateDomain.put(automaton.getName(),sourceStateDomain);
 
-            int[] vars = sourceStateDomain.vars();
-            int nbrOfVars = vars.length;
+            final int[] vars = sourceStateDomain.vars();
+            final int nbrOfVars = vars.length;
             aut2nbrOfBits.put(automaton.getName(), nbrOfVars);
 //            System.out.println(automaton.getName()+": ");
             for(int h=0;h<nbrOfVars;h++)
             {
-                int[] var = new int[1];
+                final int[] var = new int[1];
                 var[0] = vars[h];
                 bddVar2BDD.put(vars[h], manager.getFactory().buildCube(1, var));
                 bddVar2AutName.put(vars[h], automaton.getName());
@@ -184,7 +185,7 @@ public class BDDAutomata
             }
 
             bddAutomaton.initialize();
-            
+
 /*            vars = destStateDomain.vars();
             for(int h=0;h<vars.length;h++)
             {
@@ -192,7 +193,7 @@ public class BDDAutomata
             }
 */
             sourceStateVariables.unionWith(sourceStateDomain.set());
-            destStateVariables.unionWith(destStateDomain.set());          
+            destStateVariables.unionWith(destStateDomain.set());
             sourceStateDomains[i] = sourceStateDomain;
             sourceStateDomains[i].setName(automaton.getName());
             destStateDomains[i] = destStateDomain;
@@ -209,25 +210,25 @@ public class BDDAutomata
 //                    bddAutomaton.getTransitionForwardBDD().printDot();
 
             add(bddAutomaton);
-                        
+
             i++;
         }
-       
+
         sourceToTempStatePairing = manager.makePairing(sourceStateDomains, tempStateDomains);
         tempToDestStatePairing = manager.makePairing(tempStateDomains, destStateDomains);
-        destToSourceStatePairing = manager.makePairing(destStateDomains, sourceStateDomains);       
-  
+        destToSourceStatePairing = manager.makePairing(destStateDomains, sourceStateDomains);
+
         bddTransitions = new BDDTransitionFactory(this).createTransitions();
 
 //        System.out.println("number of transitions: "+((BDDMonolithicTransitions)bddTransitions).transitionForwardBDD.pathCount());
     }
-    
+
     public BDD getMonolithicStates()
     {
         return ((BDDMonolithicTransitions)bddTransitions).getMonolithicTransitionForwardBDD().exist(destStateVariables).exist(eventDomain.set());
     }
 
-    public BDD getBDDforBDDVar(int bddVar)
+    public BDD getBDDforBDDVar(final int bddVar)
     {
         return bddVar2BDD.get(bddVar);
     }
@@ -236,20 +237,20 @@ public class BDDAutomata
     {
         return manager;
     }
-    
+
     public Automata getAutomata()
     {
         return theAutomata;
     }
-    
-    public BDDAutomaton getBDDAutomaton(Automaton theAutomaton)
+
+    public BDDAutomaton getBDDAutomaton(final Automaton theAutomaton)
     {
         return automatonToBDDAutomatonMap.get(theAutomaton);
     }
 
-    public BDDAutomaton getBDDAutomaton(String autName)
+    public BDDAutomaton getBDDAutomaton(final String autName)
     {
-        for(Automaton aut: theAutomata)
+        for(final Automaton aut: theAutomata)
             if(aut.getName().equals(autName))
                 return automatonToBDDAutomatonMap.get(aut);
         return null;
@@ -287,24 +288,24 @@ public class BDDAutomata
             manager.done();
         }
     }
-  
+
     protected void finalize()
     {
         done();
     }
-    
-    public Alphabet getInverseAlphabet(Automaton currAutomaton)
+
+    public Alphabet getInverseAlphabet(final Automaton currAutomaton)
     {
         return theAutomata.getInverseAlphabet(currAutomaton);
     }
 
 
-    public BDDVarSet getSourceStateVars(Automaton aut)
+    public BDDVarSet getSourceStateVars(final Automaton aut)
     {
         BDDVarSet bddvarset = null;
         int i = 0;
 
-        for(Automaton inAut: theAutomata)
+        for(final Automaton inAut: theAutomata)
         {
             if(aut.equalAutomaton(inAut))
             {
@@ -316,12 +317,12 @@ public class BDDAutomata
         return bddvarset;
     }
 
-    public BDDDomain getSourceStateDomain(String autName)
+    public BDDDomain getSourceStateDomain(final String autName)
     {
         return autName2SourceStateDomain.get(autName);
     }
-        
-    void add(BDDAutomaton bddAutomaton)
+
+    void add(final BDDAutomaton bddAutomaton)
     {
         theBDDAutomataList.add(bddAutomaton);
         automatonToBDDAutomatonMap.put(bddAutomaton.getAutomaton(), bddAutomaton);
@@ -330,38 +331,38 @@ public class BDDAutomata
     {
         return theBDDAutomataList.iterator();
     }
-    
+
     public BDDVarSet getEventVarSet()
     {
         return eventDomain.set();
     }
-    
+
     public BDDDomain getEventDomain()
     {
         return eventDomain;
     }
-     
-    public int getAutomatonIndex(Automaton theAutomaton)
+
+    public int getAutomatonIndex(final Automaton theAutomaton)
     {
         return theIndexMap.getAutomatonIndex(theAutomaton);
     }
-    
-    public int getStateIndex(Automaton theAutomaton, State theState)
+
+    public int getStateIndex(final Automaton theAutomaton, final State theState)
     {
         return theIndexMap.getStateIndex(theAutomaton, theState);
     }
-    
-    public int getEventIndex(LabeledEvent theEvent)
+
+    public int getEventIndex(final LabeledEvent theEvent)
     {
         return theIndexMap.getEventIndex(theEvent);
     }
- 
-    public void addInitialStates(BDD initialStates)
+
+    public void addInitialStates(final BDD initialStates)
     {
         initialStatesBDD = initialStatesBDD.and(initialStates);
     }
-    
-    public void addMarkedStates(BDD markedStates)
+
+    public void addMarkedStates(final BDD markedStates)
     {
         markedStatesBDD = markedStatesBDD.and(markedStates);
     }
@@ -370,17 +371,17 @@ public class BDDAutomata
     {
         return markedStatesBDD;
     }
-    
-    public void addForbiddenStates(BDD forbiddenStates)
+
+    public void addForbiddenStates(final BDD forbiddenStates)
     {
         forbiddenStatesBDD = forbiddenStatesBDD.or(forbiddenStates);
     }
-    
-    public void addUncontrollableStates(BDD uncontrollableStates)
+
+    public void addUncontrollableStates(final BDD uncontrollableStates)
     {
         uncontrollableStatesBDD = uncontrollableStatesBDD.and(uncontrollableStates);
     }
-    
+
     public double numberOfReachableStates()
     {
         if (nbrOfReachableStates < 0)
@@ -389,52 +390,52 @@ public class BDDAutomata
         }
         return nbrOfReachableStates;
     }
-    
+
     public double numberOfCoreachableStates()
     {
         if (nbrOfCoreachableStates < 0)
         {
             getCoreachableStates();
-        }     
+        }
         return nbrOfCoreachableStates;
     }
-    
+
     public double numberOfBlockingStates()
     {
         if (nbrOfBlockingStates < 0)
         {
             getReachableAndCoreachableStates();
-        }     
-        return nbrOfBlockingStates;        
+        }
+        return nbrOfBlockingStates;
     }
-    
+
     public double numberOfReachableAndCoreachableStates()
     {
         if (nbrOfReachableAndCoreachableStates < 0)
         {
             getReachableAndCoreachableStates();
-        }     
-        return nbrOfReachableAndCoreachableStates;   
+        }
+        return nbrOfReachableAndCoreachableStates;
     }
-    
+
     public boolean isNonblocking()
     {
-        BDD reachableStatesBDD = getReachableStates();
-        BDD coreachableStatesBDD = getCoreachableStates();
-        BDD impBDD = reachableStatesBDD.imp(coreachableStatesBDD);
+        final BDD reachableStatesBDD = getReachableStates();
+        final BDD coreachableStatesBDD = getCoreachableStates();
+        final BDD impBDD = reachableStatesBDD.imp(coreachableStatesBDD);
         return impBDD.equals(manager.getOneBDD());
     }
-    
+
     public BDD getReachableStates()
     {
         if (reachableStatesBDD == null)
         {
             reachableStatesBDD = BDDManager.reachableStates(initialStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
-            nbrOfReachableStates = reachableStatesBDD.satCount(sourceStateVariables);              
+            nbrOfReachableStates = reachableStatesBDD.satCount(sourceStateVariables);
         }
         return reachableStatesBDD;
     }
- 
+
     BDD getCoreachableStates()
     {
         if (coreachableStatesBDD == null)
@@ -449,42 +450,42 @@ public class BDDAutomata
     {
         if (reachableAndCoreachableStatesBDD == null)
         {
-            BDD reachableStatesBDD = getReachableStates();
-            BDD coreachableStatesBDD = getCoreachableStates();
-            
-            reachableAndCoreachableStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);   
-        
-            nbrOfReachableAndCoreachableStates = reachableAndCoreachableStatesBDD.satCount(sourceStateVariables);  
+            final BDD reachableStatesBDD = getReachableStates();
+            final BDD coreachableStatesBDD = getCoreachableStates();
+
+            reachableAndCoreachableStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
+
+            nbrOfReachableAndCoreachableStates = reachableAndCoreachableStatesBDD.satCount(sourceStateVariables);
             nbrOfBlockingStates = nbrOfReachableStates - nbrOfReachableAndCoreachableStates;
         }
-    
+
         return reachableAndCoreachableStatesBDD;
-    } 
-    
+    }
+
     public Automaton getSupervisor()
     {
-        Automaton supervisorAutomaton = new Automaton("Sup");
-        BDD reachableAndCoreachableStatesBDD = getReachableAndCoreachableStates();
+        final Automaton supervisorAutomaton = new Automaton("Sup");
+        final BDD reachableAndCoreachableStatesBDD = getReachableAndCoreachableStates();
         reachableAndCoreachableStatesBDD.exist(destStateVariables);
-        
+
         // Create all events
       //  Alphabet newAlphabet = supervisorAutomaton.getAlphabet();
         //newAlphabet.addAll(unionAlphabet);
 
-        int[] sourceStateDomainIndicies = new int[sourceStateDomains.length];
+        final int[] sourceStateDomainIndicies = new int[sourceStateDomains.length];
         for (int i = 0; i < sourceStateDomains.length; i++)
         {
             logger.info("Source state domain " + i + ": " + ArrayHelper.arrayToString(sourceStateDomains[i].vars()));
             sourceStateDomainIndicies[i] = sourceStateDomains[i].getIndex();
-        } 
-        
+        }
+
         logger.info("sourceStateDomainIndicies: " + ArrayHelper.arrayToString(sourceStateDomainIndicies));
-        
-        int[] stateArray = new int[sourceStateDomains.length];
+
+        final int[] stateArray = new int[sourceStateDomains.length];
         // Create all states
-        for ( BDD.BDDIterator satIt = new BDD.BDDIterator(reachableAndCoreachableStatesBDD, sourceStateVariables); satIt.hasNext(); ) 
+        for ( final BDD.BDDIterator satIt = new BDD.BDDIterator(reachableAndCoreachableStatesBDD, sourceStateVariables); satIt.hasNext(); )
         {
-            BigInteger[] currSat = satIt.nextTuple();
+            final BigInteger[] currSat = satIt.nextTuple();
             for (int i = 0; i < sourceStateDomainIndicies.length; i++)
             {
                 stateArray[i] = currSat[sourceStateDomainIndicies[i]].intValue();
@@ -492,7 +493,7 @@ public class BDDAutomata
             logger.info("current state: " + ArrayHelper.arrayToString(stateArray));
         }
 //        // Create all states
-//        for (BDD.AllSatIterator stateIt = reachableAndCoreachableStatesBDD.allsat(); stateIt.hasNext(); ) 
+//        for (BDD.AllSatIterator stateIt = reachableAndCoreachableStatesBDD.allsat(); stateIt.hasNext(); )
 //        {
 //            byte[] currState = stateIt.nextSat();
 //            StringBuffer stringBuffer = new StringBuffer("[");
@@ -505,34 +506,34 @@ public class BDDAutomata
 //                }
 //            }
 //            stringBuffer.append("]");
-//            logger.info("state: " + stringBuffer.toString()); 
-//        }        
+//            logger.info("state: " + stringBuffer.toString());
+//        }
         return supervisorAutomaton;
     }
-     
+
     boolean isControllable()
     {
         return false;
     }
-    
+
     boolean isNonblockingAndControllable()
     {
         return false;
     }
-    
+
     public BDDDomain[] getSourceStateDomains()
     {
         return sourceStateDomains;
     }
-    
+
     public BDDDomain[] getDestStateDomains()
     {
         return destStateDomains;
     }
-    
+
     public BDD getForbiddenStates()
     {
         return forbiddenStatesBDD;
     }
-    
+
 }

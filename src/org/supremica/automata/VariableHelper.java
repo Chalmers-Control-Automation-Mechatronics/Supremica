@@ -32,9 +32,9 @@ import net.sourceforge.waters.subject.module.EnumSetExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.subject.module.VariableMarkingSubject;
+
 
 /**
  * Methods for convenient handling of integer and boolean variables.
@@ -108,20 +108,20 @@ public class VariableHelper {
         if (!elements.contains(initialValue)) {
             throw new IllegalArgumentException
                 ("Initial value is not within the specified range");
-        }        
+        }
         final ModuleSubjectFactory factory =
             ModuleSubjectFactory.getInstance();
         final CompilerOperatorTable optable =
             CompilerOperatorTable.getInstance();
         final IdentifierSubject ident =
             factory.createSimpleIdentifierProxy(name);
-        Set<SimpleIdentifierProxy> items = new HashSet<SimpleIdentifierProxy>();
-        for(String item:elements)
+        final Set<SimpleIdentifierProxy> items = new HashSet<SimpleIdentifierProxy>();
+        for(final String item:elements)
         {
             items.add(factory.createSimpleIdentifierProxy(item));
         }
 
-        EnumSetExpressionSubject type = factory.createEnumSetExpressionProxy(items);
+        final EnumSetExpressionSubject type = factory.createEnumSetExpressionProxy(items);
 
         final IdentifierSubject iclone1 = ident.clone();
         final IdentifierSubject initval =
@@ -139,7 +139,7 @@ public class VariableHelper {
                 (EventDeclProxy.DEFAULT_MARKING_NAME);
             final IdentifierSubject iclone2 = ident.clone();
 
-            for(String mv:markedValues)
+            for(final String mv:markedValues)
             {
                 final IdentifierSubject markedval =
                     factory.createSimpleIdentifierProxy(mv);

@@ -55,7 +55,6 @@
 package org.supremica.automata;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,27 +62,32 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import java.util.StringTokenizer;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 
 public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 {
-    private ModuleSubjectFactory factory;
-    private IdentifierSubject identifier;
-    private ExpressionParser parser;
+    private final ModuleSubjectFactory factory;
     private ModuleSubject module;
     private boolean expand;
 
     private int nbrOfExAutomata = 0;
-    private ArrayList<ExtendedAutomaton> theExAutomata;
+    private final ArrayList<ExtendedAutomaton> theExAutomata;
     private Map<String, EventDeclProxy> eventIdToProxyMap;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
@@ -105,13 +109,13 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         plantAlphabet = new HashSet<EventDeclProxy>();
     }
 
-    public ExtendedAutomata(ModuleSubject module)
+    public ExtendedAutomata(final ModuleSubject module)
     {
         this();
 
         this.module = module;
 
-        for(EventDeclProxy e: module.getEventDeclList())
+        for(final EventDeclProxy e: module.getEventDeclList())
         {
             if(e.getKind() != EventKind.PROPOSITION)
             {
@@ -123,12 +127,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             }
         }
         eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
-        for(EventDeclProxy e:module.getEventDeclList())
+        for(final EventDeclProxy e:module.getEventDeclList())
         {
             eventIdToProxyMap.put(e.getName(), e);
         }
 
-        for(AbstractSubject sub:module.getComponentListModifiable())
+        for(final AbstractSubject sub:module.getComponentListModifiable())
         {
             if(sub instanceof VariableComponentProxy)
             {
@@ -139,7 +143,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             if(sub instanceof SimpleComponentSubject)
             {
                 nbrOfExAutomata++;
-                ExtendedAutomaton exAutomaton = new ExtendedAutomaton(this, (SimpleComponentSubject)sub);
+                final ExtendedAutomaton exAutomaton = new ExtendedAutomaton(this, (SimpleComponentSubject)sub);
 
                 if(!exAutomaton.isSpecification())
                 {
@@ -147,12 +151,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 }
                 addAutomatonToList(exAutomaton);
             }
-        }        
+        }
 
-        for(VariableComponentProxy var:variables)
+        for(final VariableComponentProxy var:variables)
         {
-            String varName = var.getName();
-            String range = var.getType().toString();
+            final String varName = var.getName();
+            final String range = var.getType().toString();
             int lowerBound = -1;
             int upperBound = -1;
 
@@ -163,12 +167,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             }
             else if (range.contains(","))
             {
-                StringTokenizer token = new StringTokenizer(range, ", { }");
+                final StringTokenizer token = new StringTokenizer(range, ", { }");
                 lowerBound = 0;
                 upperBound = token.countTokens();
             }
 
-            MinMax minMax = new MinMax(lowerBound,upperBound);
+            final MinMax minMax = new MinMax(lowerBound,upperBound);
 
             if(!var2MinMaxValMap.containsKey(varName))
             {
@@ -176,21 +180,21 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             }
 
 //            int currDomain = upperBound+1-lowerBound;
-            int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
-            if(currDomain>domain)                            
+            final int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
+            if(currDomain>domain)
                 domain = currDomain;
         }
         //we multiply the domain with 2 to add 1 extra bit for the sign
         domain *= 2;
-        parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+        new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
 
     }
 
-    public ExtendedAutomata(String name, boolean expand)
+    public ExtendedAutomata(final String name, final boolean expand)
     {
     this();
-    identifier = factory.createSimpleIdentifierProxy(name);
+    factory.createSimpleIdentifierProxy(name);
             module = new ModuleSubject(name, null);
 
             // make marking proposition
@@ -201,11 +205,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
             this.expand = expand;
 
-            parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+            new ExpressionParser(factory, CompilerOperatorTable.getInstance());
     }
 
 
-    public void extDomain(int d)
+    public void extDomain(final int d)
     {
         domain = d;
     }
@@ -225,12 +229,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return domain;
     }
 
-    public int getMaxValueofVar(String var)
+    public int getMaxValueofVar(final String var)
     {
         return var2MinMaxValMap.get(var).getMax();
     }
 
-    public int getMinValueofVar(String var)
+    public int getMinValueofVar(final String var)
     {
         return var2MinMaxValMap.get(var).getMin();
     }
@@ -245,11 +249,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return variables;
     }
 
-    public List<EventDeclProxy> getInverseAlphabet(ExtendedAutomaton exAut)
+    public List<EventDeclProxy> getInverseAlphabet(final ExtendedAutomaton exAut)
     {
-        List<EventDeclProxy> events = getUnionAlphabet();
-        List<EventDeclProxy> invAlph = new ArrayList<EventDeclProxy>();
-        for(EventDeclProxy e:events)
+        final List<EventDeclProxy> events = getUnionAlphabet();
+        final List<EventDeclProxy> invAlph = new ArrayList<EventDeclProxy>();
+        for(final EventDeclProxy e:events)
         {
             if(!exAut.getAlphabet().contains(e))
                 invAlph.add(e);
@@ -262,20 +266,20 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     {
        return module;
     }
-    
-    public void addIntegerVariable(String name, int lowerBound, int upperBound, int initialValue, Integer markedValue)
+
+    public void addIntegerVariable(final String name, final int lowerBound, final int upperBound, final int initialValue, final Integer markedValue)
     {
         module.getComponentListModifiable().add(VariableHelper.createIntegerVariable(name, lowerBound, upperBound, initialValue, null));
     }
 
-    public void addEnumerationVariable(String name,Collection<String> elements,String initialValue,Collection<String> markedValues)
+    public void addEnumerationVariable(final String name,final Collection<String> elements,final String initialValue,final Collection<String> markedValues)
     {
-        VariableComponentSubject var = VariableHelper.createEnumerationVariable(name, elements, initialValue, markedValues);
+        final VariableComponentSubject var = VariableHelper.createEnumerationVariable(name, elements, initialValue, markedValues);
         if(!module.getComponentListModifiable().contains(var))
             module.getComponentListModifiable().add(var);
     }
 
-    public EventDeclProxy eventIdToProxy(String id)
+    public EventDeclProxy eventIdToProxy(final String id)
     {
         return eventIdToProxyMap.get(id);
     }
@@ -285,18 +289,18 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return unionAlphabet;
     }
 
-	public void addEvent(String name)
+	public void addEvent(final String name)
 	{
 		addEvent(name,"controllable");
 	}
-    
+
 
     public Iterator<ExtendedAutomaton> iterator()
     {
         return theExAutomata.iterator();
     }
-	
-	public void addEvent(String name, String kind)
+
+	public void addEvent(final String name, final String kind)
 	{
         final SimpleIdentifierProxy ident =
             factory.createSimpleIdentifierProxy(name);
@@ -311,7 +315,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 	}
 
 
-	public void addAutomaton(ExtendedAutomaton exAutomaton)
+	public void addAutomaton(final ExtendedAutomaton exAutomaton)
 	{
         addAutomatonToList(exAutomaton);
         module.getComponentListModifiable().add(exAutomaton.getComponent());
@@ -322,22 +326,22 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return plantAlphabet;
     }
 
-    public void addAutomatonToList(ExtendedAutomaton exAutomaton)
+    public void addAutomatonToList(final ExtendedAutomaton exAutomaton)
     {
         theExAutomata.add(exAutomaton);
     }
 
     public ArrayList<AbstractSubject> getComponents()
     {
-        ArrayList<AbstractSubject> components = new ArrayList<AbstractSubject>();
+        final ArrayList<AbstractSubject> components = new ArrayList<AbstractSubject>();
 
-        for(ExtendedAutomaton exAut:theExAutomata)
+        for(final ExtendedAutomaton exAut:theExAutomata)
             components.add(exAut.getComponent());
-        
+
         return components;
     }
 
-	public void writeToFile(File file)
+	public void writeToFile(final File file)
 	{
 
 		if (expand)
@@ -347,10 +351,10 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
 		try
 		{
-			JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());	
+			final JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());
 			marshaller.marshal(module, file);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -397,18 +401,18 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         {
 
         }
-        public MinMax(int min, int max)
+        public MinMax(final int min, final int max)
         {
             this.min = min;
             this.max = max;
         }
 
-        public void setMin(int min)
+        public void setMin(final int min)
         {
             this.min = min;
         }
 
-        public void setMax(int max)
+        public void setMax(final int max)
         {
             this.max = max;
         }

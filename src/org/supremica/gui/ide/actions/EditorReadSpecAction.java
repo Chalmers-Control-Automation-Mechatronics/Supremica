@@ -9,47 +9,45 @@
 
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import org.supremica.gui.ide.IDE;
-import java.util.List;
-import javax.swing.JFileChooser;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import java.io.FileInputStream;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.StringTokenizer;
+
+import javax.swing.Action;
+import javax.swing.JFileChooser;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import org.supremica.log.*;
+
+import org.supremica.gui.ide.IDE;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 public class EditorReadSpecAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LoggerFactory.createLogger(IDE.class);
     HashMap<String,HashSet<String>> event2guard;
 
 
-    public EditorReadSpecAction(List<IDEAction> actionList)
+    public EditorReadSpecAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -62,7 +60,7 @@ public class EditorReadSpecAction
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -70,17 +68,17 @@ public class EditorReadSpecAction
 
     public void doAction()
     {
-        ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
+        final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
         event2guard = new HashMap<String, HashSet<String>>();
 
         if(module.getComponentList().size() > 0)
         {
             final JFileChooser chooser = new JFileChooser();
-            int returnVal = chooser.showOpenDialog(ide.getFrame());
+            final int returnVal = chooser.showOpenDialog(ide.getFrame());
 
             if (returnVal == JFileChooser.APPROVE_OPTION)
             {
-                File file = chooser.getSelectedFile();
+                final File file = chooser.getSelectedFile();
                 FileReader fis = null;
                 BufferedReader bis = null;
                 try
@@ -90,28 +88,28 @@ public class EditorReadSpecAction
                    String text = null;
                    while((text = bis.readLine()) != null)
                    {
-                        StringTokenizer st = new StringTokenizer(text, "\t");
-                        String event = st.nextToken();
-                        String guard = st.nextToken();
+                        final StringTokenizer st = new StringTokenizer(text, "\t");
+                        final String event = st.nextToken();
+                        final String guard = st.nextToken();
                         if(event2guard.containsKey(event))
                         {
                             event2guard.get(event).add(guard);
                         }
                         else
                         {
-                            HashSet<String> temp = new HashSet<String>();
+                            final HashSet<String> temp = new HashSet<String>();
                             temp.add(guard);
                             event2guard.put(event,temp);
                         }
                    }
-                    
+
                     fis.close();
                     bis.close();
 
                 }
-                catch (FileNotFoundException e){}
-                catch (IOException e) { e.printStackTrace();}            
-                
+                catch (final FileNotFoundException e){}
+                catch (final IOException e) { e.printStackTrace();}
+
                 addGuardsToAutomata(module);
             }
         }
@@ -120,29 +118,30 @@ public class EditorReadSpecAction
 
     }
 
-    public void addGuardsToAutomata(ModuleSubject module)
+    public void addGuardsToAutomata(final ModuleSubject module)
     {
         //Add the guard to the automata
-        ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-        ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+        final ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+        final ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
         HashSet<String> currGuards = new HashSet<String>();
-            for(AbstractSubject simSubj: module.getComponentListModifiable())
+            for(final AbstractSubject simSubj: module.getComponentListModifiable())
             {
                 if(simSubj instanceof SimpleComponentSubject)
                 {
-                    for(EdgeSubject ep:((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable())
+                    for(final EdgeSubject ep:((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable())
                     {
 //                        for(String currEvent:event2guard.keySet())
 //                        {
                         SimpleExpressionSubject ses = null;
                         SimpleExpressionSubject ses1 = null;
+                        @SuppressWarnings("unused")
                         SimpleExpressionSubject ses2 = null;
                         //&& simSubj.getKind().name().equals("SPEC")
                         String guard = "";
 
 
-                        String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
+                        final String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
 
                         if(event2guard.containsKey(currEvent))
                             currGuards = event2guard.get(currEvent);
@@ -152,7 +151,7 @@ public class EditorReadSpecAction
                         String currGuard="";
                         try
                         {
-                            for(String g:currGuards)
+                            for(final String g:currGuards)
                             {
                                 guard += (g+"&");
                             }
@@ -178,7 +177,7 @@ public class EditorReadSpecAction
                                 guard = guard.substring(0, guard.length()-1);
                             ses2 = (SimpleExpressionSubject)(parser.parse(guard,Operator.TYPE_BOOLEAN));
                         }
-                        catch(ParseException pe)
+                        catch(final ParseException pe)
                         {
                             System.err.println(pe);
                             logger.error("Some of the guards could not be parsed and attached to the automata: It is likely that there exists some 'strange' characters in some variables or values!");

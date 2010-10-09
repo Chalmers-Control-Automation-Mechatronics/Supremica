@@ -72,20 +72,20 @@ public class AutomataSynchronizer
     private SynchronizationOptions syncOptions;
     private ArrayList<AutomataSynchronizerExecuter> synchronizationExecuters;
     private AutomataIndexMap indexMap;
-    
+
     // For stopping execution
     private boolean stopRequested = false;
 
 
     private HashMap<Arc,EdgeSubject> arc2edgeTable[];
-    private HashMap<String,Integer> autName2indexTable = new HashMap<String, Integer>();
+    private final HashMap<String,Integer> autName2indexTable = new HashMap<String, Integer>();
     private int automatonIndex = 0;
 
 
-    public AutomataSynchronizer(ListSubject<AbstractSubject> components, SynchronizationOptions options)
+    public AutomataSynchronizer(final ListSubject<AbstractSubject> components, final SynchronizationOptions options)
     {
         options.setEFAMode(true);
-        Automata automata = removeGuardsActionsFromEFAs(components);
+        final Automata automata = removeGuardsActionsFromEFAs(components);
         this.theAutomata = automata;
         this.syncOptions = options;
 
@@ -94,7 +94,7 @@ public class AutomataSynchronizer
         initialize();
     }
 
-    public AutomataSynchronizer(Automata automata, SynchronizationOptions options)
+    public AutomataSynchronizer(final Automata automata, final SynchronizationOptions options)
     {
         this.theAutomata = automata;
         this.syncOptions = options;
@@ -103,85 +103,85 @@ public class AutomataSynchronizer
 
         initialize();
     }
-    
+
     /**
      * Creates an AutomataSynchronizer based on an already existing helper.
      */
-    public AutomataSynchronizer(AutomataSynchronizerHelper helper)
-    {        
+    public AutomataSynchronizer(final AutomataSynchronizerHelper helper)
+    {
         this.theAutomata = helper.getAutomata();
         this.syncOptions = helper.getSynchronizationOptions();
         synchHelper = helper;
-        
+
         initialize();
     }
-    
+
     /**
      * Initializes the AutomataSynchronizerExecuter:s based on the AutomataSynchronizerHelper.
      */
     public void initialize()
     {
         // Allocate and initialize the synchronizationExecuters
-        int nbrOfExecuters = syncOptions.getNbrOfExecuters();
+        final int nbrOfExecuters = syncOptions.getNbrOfExecuters();
         synchronizationExecuters = new ArrayList<AutomataSynchronizerExecuter>(nbrOfExecuters);
         for (int i = 0; i < nbrOfExecuters; i++)
         {
-            AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+            final AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
             synchronizationExecuters.add(currSynchronizationExecuter);
         }
-  
-        indexMap = synchHelper.getIndexMap();    
+
+        indexMap = synchHelper.getIndexMap();
     }
-    
+
     public void execute()
     {
         State currInitialState;
-        int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
-        
+        final int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
+
         // Build the initial state - and the comment
-        Iterator<Automaton> autIt = theAutomata.iterator();
-        StringBuffer comment = new StringBuffer();
-        
+        final Iterator<Automaton> autIt = theAutomata.iterator();
+        final StringBuffer comment = new StringBuffer();
+
         // Set an apropriate comment on the automaton
         while (autIt.hasNext())
         {
-            Automaton currAutomaton = autIt.next();
+            final Automaton currAutomaton = autIt.next();
 
             currInitialState = currAutomaton.getInitialState();
             initialState[indexMap.getAutomatonIndex(currAutomaton)] = indexMap.getStateIndex(currAutomaton, currInitialState);
-            
+
             comment.append(currAutomaton.getName());
             comment.append(syncOptions.getAutomatonNameSeparator());
         }
         comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
         try {
 			synchHelper.addState(initialState);
-		} catch (SupremicaException e1) {
+		} catch (final SupremicaException e1) {
 			throw new RuntimeException(e1);
 		}
         synchHelper.addComment(comment.toString());
-        
+
         // Start all the synchronization executers and wait for completetion
-        for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+        for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
         {
             synchExecuter.start();
         }
-        
+
         // Wait for completion
-        
+
         try {
-			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
 			 	synchExecuter.join();
 			}
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// Current thread has been interrupted, perhaps
 			// due to an exception in one of the executers.
 			// Stop all tasks and throw the original exception
-			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
 	            synchExecuter.requestStop();
 	        }
-			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
-			 	Throwable cause = synchExecuter.getCauseOfInterrupt();
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			 	final Throwable cause = synchExecuter.getCauseOfInterrupt();
 			 	if (cause != null) {
 			 		if (cause instanceof RuntimeException) throw (RuntimeException) cause;
 			 		else throw new RuntimeException(cause);
@@ -189,22 +189,22 @@ public class AutomataSynchronizer
 			}
 		}
     }
-    
+
     public void displayInfo()
     {
         synchHelper.printStatistics();
     }
-    
+
     // -- MF -- Added to allow users easy access to the number of synch'ed states
     public long getNumberOfStates()
     {
         return synchHelper.getNumberOfAddedStates();
     }
-    
+
     public Automaton getAutomaton()
     {
-        AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
-        
+        final AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(0);
+
         if (currExec.buildAutomaton())
         {
             return synchHelper.getAutomaton();
@@ -214,12 +214,12 @@ public class AutomataSynchronizer
             return null;
         }
     }
-    
+
     public AutomataSynchronizerHelper getHelper()
     {
         return synchHelper;
     }
-    
+
     /**
      * Help the garbage collector by clearing variables.
      */
@@ -231,35 +231,35 @@ public class AutomataSynchronizer
         synchronizationExecuters.clear();
         synchronizationExecuters = null;
     }
-    
+
     public void requestStop()
     {
         stopRequested = true;
-        
+
         for (int i = 0; i < synchronizationExecuters.size(); i++)
         {
-            ((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
+            synchronizationExecuters.get(i).requestStop();
         }
     }
-    
+
     public boolean isStopped()
     {
         return stopRequested;
     }
-    
+
     /**
      * Method for synchronizing Automata with default options.
      *
      * @param automata the Automata to be synchronized.
      * @return Automaton representing the synchronous composition.
      */
-    public static Automaton synchronizeAutomata(Automata automata)
+    public static Automaton synchronizeAutomata(final Automata automata)
     throws Exception
     {
-        SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
+        final SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
         return synchronizeAutomata(automata, options);
     }
-    
+
     /**
      * Method for synchronizing Automata with supplied options.
      *
@@ -267,14 +267,14 @@ public class AutomataSynchronizer
      * @param options the SynchronizationOptions that should be used.
      * @return Automaton representing the synchronous composition.
      */
-    public static Automaton synchronizeAutomata(Automata automata, SynchronizationOptions options)
+    public static Automaton synchronizeAutomata(final Automata automata, final SynchronizationOptions options)
     throws Exception
     {
         options.setEFAMode(false);
-        AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, options);
+        final AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, options);
         return synchronizeAutomata(helper);
     }
-    
+
     /**
      * Method for synchronizing Automata based on an already existing AutomataSynchronizerHelper.
      * The helper includes the options and the automata to be composed!
@@ -282,38 +282,39 @@ public class AutomataSynchronizer
      * @param helper the AutomataSynchronizerHelper to be used.
      * @return Automaton representing the synchronous composition.
      */
-    public static Automaton synchronizeAutomata(AutomataSynchronizerHelper helper)
+    public static Automaton synchronizeAutomata(final AutomataSynchronizerHelper helper)
     throws Exception
     {
-        AutomataSynchronizer synchronizer = new AutomataSynchronizer(helper);
+        final AutomataSynchronizer synchronizer = new AutomataSynchronizer(helper);
         synchronizer.execute();
-        Automaton result = synchronizer.getAutomaton();
+        final Automaton result = synchronizer.getAutomaton();
         synchronizer.clear();
-        
+
         return result;
     }
 
     public SimpleComponentProxy getSynchronizedComponent()
     {
-        AutomataSynchronizer synchronizer = new AutomataSynchronizer(synchHelper);
+        final AutomataSynchronizer synchronizer = new AutomataSynchronizer(synchHelper);
         synchronizer.execute();
         synchronizer.getAutomaton();
         synchHelper.createExtendedAutomaton();
         return synchHelper.getSynchronizedComponent();
     }
 
-    public Automata removeGuardsActionsFromEFAs(ListSubject<AbstractSubject> components)
+    @SuppressWarnings("unchecked")
+    public Automata removeGuardsActionsFromEFAs(final ListSubject<AbstractSubject> components)
     {
-        Automata automata = new Automata();
-        HashSet<SimpleComponentSubject> autComps = new HashSet<SimpleComponentSubject>();
+        final Automata automata = new Automata();
+        final HashSet<SimpleComponentSubject> autComps = new HashSet<SimpleComponentSubject>();
 
-        for(AbstractSubject component : components)
+        for(final AbstractSubject component : components)
             if(component.toString().contains("NODES") && component.toString().contains("EDGES"))
                 autComps.add((SimpleComponentSubject)component);
 
         arc2edgeTable = new HashMap[autComps.size()];
 
-        for(SimpleComponentSubject autComp: autComps)
+        for(final SimpleComponentSubject autComp: autComps)
         {
             autName2indexTable.put(autComp.getName(), automatonIndex);
             arc2edgeTable[automatonIndex] = new HashMap<Arc, EdgeSubject>();
@@ -325,9 +326,9 @@ public class AutomataSynchronizer
     }
 
 
-    public Automaton removeGuardsActionsFromEFA(SimpleComponentSubject component)
+    public Automaton removeGuardsActionsFromEFA(final SimpleComponentSubject component)
     {
-        Automaton automaton = new Automaton(component.getName());
+        final Automaton automaton = new Automaton(component.getName());
 
         if(component.getKind() == ComponentKind.PLANT)
             automaton.setType(AutomatonType.PLANT);
@@ -341,7 +342,7 @@ public class AutomataSynchronizer
         State fromState , toState;
         LabeledEvent event;
         boolean initialFlag = true;
-        for(EdgeSubject edge : component.getGraph().getEdgesModifiable())
+        for(final EdgeSubject edge : component.getGraph().getEdgesModifiable())
         {
             fromState = automaton.getStateWithName(edge.getSource().getName());
             if(fromState == null)
@@ -384,12 +385,12 @@ public class AutomataSynchronizer
                 }
             }
 
-            ListSubject<AbstractSubject> eventList = edge.getLabelBlock().getEventListModifiable();
-            for(AbstractSubject e:eventList)
+            final ListSubject<AbstractSubject> eventList = edge.getLabelBlock().getEventListModifiable();
+            for(final AbstractSubject e:eventList)
             {
 //                EventDeclSubject eventSubject = (EventDeclSubject)e;
 //                SimpleComponentSubject eventSubject = (SimpleComponentSubject)e;
-                SimpleIdentifierSubject eventSubject = (SimpleIdentifierSubject)e;
+                final SimpleIdentifierSubject eventSubject = (SimpleIdentifierSubject)e;
                 event = automaton.getAlphabet().getEvent(eventSubject.getName());
                 if(event == null)
                 {
@@ -407,11 +408,11 @@ public class AutomataSynchronizer
  */
                 if(edge.getGuardActionBlock() == null)
                 {
-                    GuardActionBlockSubject gab = new GuardActionBlockSubject();
+                    final GuardActionBlockSubject gab = new GuardActionBlockSubject();
                     edge.setGuardActionBlock(gab);
                 }
 
-                Arc currArc = new Arc(fromState, toState, event);
+                final Arc currArc = new Arc(fromState, toState, event);
                 arc2edgeTable[automatonIndex].put(currArc, edge);
                 automaton.addArc(currArc);
             }

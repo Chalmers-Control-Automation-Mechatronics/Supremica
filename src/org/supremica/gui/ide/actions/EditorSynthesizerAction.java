@@ -9,31 +9,33 @@
 
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import org.supremica.gui.ide.IDE;
 import java.util.List;
 import java.util.Vector;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.subject.base.AbstractSubject;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
-import org.supremica.automata.*;
+
+import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
-import org.supremica.automata.algorithms.*;
+import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.gui.EditorSynthesizerDialog;
-import org.supremica.log.*;
+import org.supremica.gui.ide.IDE;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
 
 public class EditorSynthesizerAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
-    public EditorSynthesizerAction(List<IDEAction> actionList)
+    public EditorSynthesizerAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -45,7 +47,7 @@ public class EditorSynthesizerAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -53,9 +55,9 @@ public class EditorSynthesizerAction
 
     public void doAction()
     {
-        ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
+        final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
 
-        int nbrOfComponents = module.getComponentList().size();
+        final int nbrOfComponents = module.getComponentList().size();
         if(nbrOfComponents == 0)
             return;
 
@@ -66,13 +68,13 @@ public class EditorSynthesizerAction
         ide.getActiveDocumentContainer().getEditorPanel().addComponent(synchedEA);
         System.out.println(synchedEA.getGraph().getNodes().size());
 */
-        
-        EditorSynthesizerOptions options = new EditorSynthesizerOptions();
 
-        Vector eventNames = new Vector();
+        final EditorSynthesizerOptions options = new EditorSynthesizerOptions();
+
+        final Vector<String> eventNames = new Vector<String>();
         eventNames.add("Generate guards for ALL events");
 
-        for(EventDeclSubject sigmaS:  module.getEventDeclListModifiable())
+        for(final EventDeclSubject sigmaS:  module.getEventDeclListModifiable())
         {
             if(sigmaS.getKind() == EventKind.CONTROLLABLE)// || sigmaS.getKind() == EventKind.UNCONTROLLABLE)
             {
@@ -80,16 +82,16 @@ public class EditorSynthesizerAction
             }
         }
 
-        EditorSynthesizerDialog synthesizerDialog = new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options, eventNames);
+        final EditorSynthesizerDialog synthesizerDialog = new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options, eventNames);
         synthesizerDialog.show();
 
         if (!options.getDialogOK())
         {
             return;
-        }        
+        }
 
-        ExtendedAutomata exAutomata = new ExtendedAutomata(module);
-        BDDExtendedSynthesizer bddSynthesizer = new BDDExtendedSynthesizer(exAutomata);
+        final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
+        final BDDExtendedSynthesizer bddSynthesizer = new BDDExtendedSynthesizer(exAutomata);
         bddSynthesizer.synthesize(options);
 
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");

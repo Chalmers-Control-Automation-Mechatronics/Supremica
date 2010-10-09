@@ -49,10 +49,9 @@
  */
 package org.supremica.automata.BDD;
 
-import org.supremica.util.SupremicaException;
-import java.util.*;
 import java.util.ArrayList;
-import org.supremica.automata.*;
+import java.util.Collections;
+import java.util.List;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
@@ -68,79 +67,79 @@ public class PCGAutomataSorter
     public PCGAutomataSorter()
     {
     }
-    
-    public Automata sortAutomata(Automata oorgAutomata)
+
+    public Automata sortAutomata(final Automata oorgAutomata)
     {
         Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
-        ArrayList<PCGNode> pcgNodeList = new ArrayList<PCGNode>();
+        final ArrayList<PCGNode> pcgNodeList = new ArrayList<PCGNode>();
         //Alphabetic sorting - so that the variable ordering of the corresponding BDDs become the same in every run
-        List<String> automataNames = new ArrayList<String>();
+        final List<String> automataNames = new ArrayList<String>();
 
-        for(Automaton a:oorgAutomata)
+        for(final Automaton a:oorgAutomata)
             automataNames.add(a.getName());
 
         Collections.sort(automataNames);
-        Automata orgAutomata = new Automata();
+        final Automata orgAutomata = new Automata();
 
-        for(String an:automataNames)
+        for(final String an:automataNames)
             orgAutomata.addAutomaton(oorgAutomata.getAutomaton(an));
 
 //        orgAutomata = oorgAutomata.clone();
-        
-        for (Automaton currAutomaton : orgAutomata)
+
+        for (final Automaton currAutomaton : orgAutomata)
         {
             pcgNodeList.add(new DefaultPCGNode(currAutomaton.getName(), currAutomaton.nbrOfStates()));
         }
         //PCG pcg = new PCG(new Vector<PCGNode>(pcgNodeList));
-        
-        int[][] weightMatrix = getCommunicationMatrix(orgAutomata);
-        OrderingSolver orderingSolver = new OrderingSolver(orgAutomata.size());
-        
+
+        final int[][] weightMatrix = getCommunicationMatrix(orgAutomata);
+        final OrderingSolver orderingSolver = new OrderingSolver(orgAutomata.size());
+
         int i = 0;
-        for (@SuppressWarnings("unused") Automaton currAutomaton : orgAutomata)
+        for (@SuppressWarnings("unused") final Automaton currAutomaton : orgAutomata)
         {
             orderingSolver.addNode(pcgNodeList.get(i), weightMatrix[i], i - 1);
             i++;
         }
-        
-        int[] order = orderingSolver.getGoodOrder();
-        
-        Automata sortedAutomata = new Automata();
+
+        final int[] order = orderingSolver.getGoodOrder();
+
+        final Automata sortedAutomata = new Automata();
         for (i = 0; i < order.length; i++)
         {
             sortedAutomata.addAutomaton(new Automaton(orgAutomata.getAutomatonAt(order[i])));
         }
         return sortedAutomata;
     }
-    
-    static int[][] getCommunicationMatrix(Automata theAutomata)
+
+    static int[][] getCommunicationMatrix(final Automata theAutomata)
     {
-        int nbrOfAutomata = theAutomata.size();
-        int[][] communicationMatrix = new int[nbrOfAutomata][nbrOfAutomata];
-        
+        final int nbrOfAutomata = theAutomata.size();
+        final int[][] communicationMatrix = new int[nbrOfAutomata][nbrOfAutomata];
+
         for (int i = 0; i < nbrOfAutomata; i++)
         {
-            Automaton firstAutomaton = theAutomata.getAutomatonAt(i);
-            
+            final Automaton firstAutomaton = theAutomata.getAutomatonAt(i);
+
             communicationMatrix[i][i] = getCommunicationComplexity(firstAutomaton, firstAutomaton);
-            
+
             for (int j = 0; j < i; j++)
             {
-                Automaton secondAutomaton = theAutomata.getAutomatonAt(j);
-                int complexity = getCommunicationComplexity(firstAutomaton, secondAutomaton);
+                final Automaton secondAutomaton = theAutomata.getAutomatonAt(j);
+                final int complexity = getCommunicationComplexity(firstAutomaton, secondAutomaton);
                 communicationMatrix[i][j] = communicationMatrix[j][i] = complexity;
             }
         }
-        
+
         return communicationMatrix;
     }
-    
-    static int getCommunicationComplexity(Automaton firstAutomaton, Automaton secondAutomaton)
+
+    static int getCommunicationComplexity(final Automaton firstAutomaton, final Automaton secondAutomaton)
     {
-        Alphabet firstAlphabet = new Alphabet(firstAutomaton.getAlphabet());
-        Alphabet secondAlphabet = secondAutomaton.getAlphabet();
+        final Alphabet firstAlphabet = new Alphabet(firstAutomaton.getAlphabet());
+        final Alphabet secondAlphabet = secondAutomaton.getAlphabet();
         firstAlphabet.intersect(secondAlphabet);
         return firstAlphabet.size();
     }
-    
+
 }

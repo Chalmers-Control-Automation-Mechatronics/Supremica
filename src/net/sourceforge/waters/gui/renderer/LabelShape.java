@@ -9,20 +9,15 @@
 
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Font;
-import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
-
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-import java.util.StringTokenizer;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 
 
 public class LabelShape extends AbstractProxyShape

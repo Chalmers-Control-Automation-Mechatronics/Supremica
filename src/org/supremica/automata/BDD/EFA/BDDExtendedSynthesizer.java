@@ -1,11 +1,9 @@
 package org.supremica.automata.BDD.EFA;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
+
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -13,24 +11,23 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.UnaryExpressionSubject;
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.EFAMonlithicReachability;
-import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
-import org.supremica.automata.algorithms.SynthesisType;
+
+import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
+import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
+
 
 /**
  *
@@ -49,7 +46,7 @@ public class BDDExtendedSynthesizer {
     ModuleSubjectFactory factory = null;
     ExpressionParser parser = null;
 
-    public BDDExtendedSynthesizer(ExtendedAutomata theAutomata)
+    public BDDExtendedSynthesizer(final ExtendedAutomata theAutomata)
     {
         this.theAutomata = theAutomata;
         bddAutomata = new BDDExtendedAutomata(theAutomata);
@@ -57,7 +54,7 @@ public class BDDExtendedSynthesizer {
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
     }
 
-    public void synthesize(EditorSynthesizerOptions options)
+    public void synthesize(final EditorSynthesizerOptions options)
     {
  /*
         Map<String,Integer> var2val = new HashMap<String,Integer>();
@@ -66,12 +63,12 @@ public class BDDExtendedSynthesizer {
             int i = Integer.parseInt(((BinaryExpressionProxy)(var.getInitialStatePredicate())).getRight().toString());
             var2val.put(var.getName(), i);
         }
-        
+
         ExtendedAutomaton efa = theAutomata.iterator().next();
         EFAMonlithicReachability efaMR = new EFAMonlithicReachability(efa.getComponent(), theAutomata.getVars(),efa.getAlphabet());
         theAutomata.addAutomaton(new ExtendedAutomaton(theAutomata, efaMR.createEFA()));
 */
-        
+
 
         synthesisTimer = new ActionTimer();
         if(options.getSynthesisType().equals(SynthesisType.CONTROLLABLE))
@@ -94,7 +91,7 @@ public class BDDExtendedSynthesizer {
         }
 
     }
-    
+
     public int nbrOfStates()
     {
         return (int)bddAutomata.nbrOfStatesBDD(statesAfterSynthesis);
@@ -109,13 +106,13 @@ public class BDDExtendedSynthesizer {
     {
         return synthesisTimer;
     }
-    
+
     public ActionTimer getGuardTimer()
     {
         return guardTimer;
     }
 
-    public void generateGuard(Vector eventNames, EditorSynthesizerOptions options)
+    public void generateGuard(Vector<String> eventNames, final EditorSynthesizerOptions options)
     {
         eventNames.remove(0);
         String expressionType = "";
@@ -135,7 +132,7 @@ public class BDDExtendedSynthesizer {
         }
         if(!options.getEvent().equals(""))
         {
-            eventNames = new Vector();
+            eventNames = new Vector<String>();
             eventNames.add(options.getEvent());
         }
 
@@ -146,11 +143,11 @@ public class BDDExtendedSynthesizer {
 
         guardTimer = new ActionTimer();
 
-        Iterator<String> it = eventNames.iterator();
+        final Iterator<String> it = eventNames.iterator();
         guardTimer.start();
         while(it.hasNext())
         {
-            String sigmaName = it.next();
+            final String sigmaName = it.next();
             bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options.getExpressionType());
             String TF =bddgg.getGuard();
             if(TF.equals("1"))
@@ -192,7 +189,7 @@ public class BDDExtendedSynthesizer {
         testSet.add("11");
         System.out.println(bddAutomata.getBDDManager().isIncrementalSeq(testSet));
 */
-        
+
 //        try
 //        {
 //            out.newLine();
@@ -202,23 +199,23 @@ public class BDDExtendedSynthesizer {
 //        catch (IOException e) {}
     }
 
-    public void addGuardsToAutomata(ModuleSubject module)
+    public void addGuardsToAutomata(final ModuleSubject module)
     {
         String guard = "";
         BDDExtendedGuardGenerator currBDDGG = null;
 
-        for(AbstractSubject simSubj: module.getComponentListModifiable())
+        for(final AbstractSubject simSubj: module.getComponentListModifiable())
         {
             if(simSubj instanceof SimpleComponentSubject)
             {
-                for(EdgeSubject ep:((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable())
+                for(final EdgeSubject ep:((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable())
                 {
                     SimpleExpressionSubject ses = null;
                     SimpleExpressionSubject ses1 = null;
                     SimpleExpressionSubject ses2 = null;
                     //&& simSubj.getKind().name().equals("SPEC")
 
-                    String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
+                    final String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
                     currBDDGG = event2guard.get(currEvent);
 
                     if( currBDDGG != null && !currBDDGG.guardIsTrue())
@@ -227,7 +224,7 @@ public class BDDExtendedSynthesizer {
                         try
                         {
                             guard = currBDDGG.getGuard();
-                            currGuard="";                            
+                            currGuard="";
                             if(!ep.getGuardActionBlock().getGuardsModifiable().isEmpty())
                             {
                                 ses1 = ep.getGuardActionBlock().getGuardsModifiable().iterator().next().clone();
@@ -237,8 +234,8 @@ public class BDDExtendedSynthesizer {
                             //The following line cocerns the new guards that will be attached to the automata with a DIFFERENT COLOR!
                             ses2 = (SimpleExpressionSubject)(parser.parse(guard,Operator.TYPE_BOOLEAN));
                         }
-                        catch(ParseException pe)
-                        {                            
+                        catch(final ParseException pe)
+                        {
                             System.err.println(pe);
                             logger.error("Some of the guards could not be parsed and attached to the automata: It is likely that there exists some 'strange' characters in some variables or values!");
                             break;
@@ -257,7 +254,7 @@ public class BDDExtendedSynthesizer {
                             //For color purposes
                             ep.getGuardActionBlock().getGuardsModifiable().add(ses2);
                         }
-                        
+
 
                     }
                  }
@@ -265,15 +262,16 @@ public class BDDExtendedSynthesizer {
         }
     }
 
-    private String reduceExpr(SimpleExpressionProxy sep)
+    @SuppressWarnings("unused")
+    private String reduceExpr(final SimpleExpressionProxy sep)
     {
         if(sep instanceof  BinaryExpressionProxy)
         {
-            BinaryExpressionProxy bep = (BinaryExpressionProxy)sep;
-            BinaryOperator rootOperator = bep.getOperator();
-            String[] rp = new String[1]; // Since rp is going to passed by reference to findSeqExpr, it is put in an array
-            rp[0]="";            
-            String sequence = findSeqExpr(sep, rootOperator,rp);
+            final BinaryExpressionProxy bep = (BinaryExpressionProxy)sep;
+            final BinaryOperator rootOperator = bep.getOperator();
+            final String[] rp = new String[1]; // Since rp is going to passed by reference to findSeqExpr, it is put in an array
+            rp[0]="";
+            final String sequence = findSeqExpr(sep, rootOperator,rp);
             logger.info("sequnce: "+sequence);
             SimpleExpressionProxy remainPart = null;
             if(rp[0].length()>0)
@@ -282,17 +280,17 @@ public class BDDExtendedSynthesizer {
 //                logger.info(rp[0]);
                 try {
                     remainPart = parser.parse(rp[0],Operator.TYPE_BOOLEAN);
-                }catch(ParseException pe){}
+                }catch(final ParseException pe){}
 
                 if(sequence.trim().length()>0)
-                {                    
+                {
                     return reduceExpr(remainPart)+rootOperator+findInterval(sequence);
                 }
                 else
                 {
                     return (reduceExpr(bep.getLeft())+rootOperator+reduceExpr(bep.getRight()));
                 }
-                
+
             }
             else
             {
@@ -303,7 +301,7 @@ public class BDDExtendedSynthesizer {
             return sep.toString();
     }
 
-    private String findInterval(String elements)
+    private String findInterval(final String elements)
     {
         if(elements.length()>0)
             return elements.charAt(0)+" >= 0";
@@ -311,20 +309,20 @@ public class BDDExtendedSynthesizer {
             return "";
     }
 
-    private String findSeqExpr(SimpleExpressionProxy sep, Operator rootOperator,String[] remainingPart)
+    private String findSeqExpr(final SimpleExpressionProxy sep, final Operator rootOperator,final String[] remainingPart)
     {
 //        logger.info("in fin...: "+sep.toString());
         if(sep instanceof BinaryExpressionProxy)
-        {            
-            BinaryExpressionProxy bep =(BinaryExpressionProxy)sep;
-            BinaryOperator operator = (bep).getOperator();
+        {
+            final BinaryExpressionProxy bep =(BinaryExpressionProxy)sep;
+            final BinaryOperator operator = (bep).getOperator();
 
             if (bddAutomata.getBDDManager().isOpEqRel(operator))
                 return (bep.toString());
             if(operator.equals(rootOperator))
             {
                 return findSeqExpr(bep.getLeft(),rootOperator,remainingPart)+ " "+findSeqExpr(bep.getRight(),rootOperator,remainingPart);
-            }             
+            }
             else
             {
                 remainingPart[0] += "("+(bep.toString()+")"+rootOperator);
@@ -342,7 +340,7 @@ public class BDDExtendedSynthesizer {
     }
 
 
-    
+
     public void done()
     {
         if (bddAutomata != null)

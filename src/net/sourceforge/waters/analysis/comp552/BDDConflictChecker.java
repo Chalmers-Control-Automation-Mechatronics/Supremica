@@ -91,8 +91,34 @@ public class BDDConflictChecker extends ModelChecker
     // Let us try to open a BDD factory. The "java" BDD factory is much
     // easier to debug than the faster "buddy" factory, but let us try
     // "buddy" first to see whether the native library can be loaded.
-    // Another fast alternative is "cudd".
+    // Another (faster?) alternative is "cudd".
     final BDDFactory bddFactory = BDDFactory.init("buddy", 10000, 5000);
+
+    // Uncomment the following try-catch block to disable disconcerting
+    // debug output.
+    /*
+    try {
+      final Class<?>[] parameterTypes =
+        new Class<?>[] {Object.class, Object.class};
+      final Method method =
+        getClass().getMethod("silentBDDHandler", parameterTypes);
+      bddFactory.registerGCCallback(this, method);
+      bddFactory.registerReorderCallback(this, method);
+      bddFactory.registerResizeCallback(this, method);
+    } catch (final SecurityException exception) {
+      throw new WatersRuntimeException(exception);
+    } catch (final NoSuchMethodException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+    */
+
+    // Comment out the following try-catch block if you want dynamic variable
+    // reordering (not supported by all BDD packages).
+    try {
+      bddFactory.disableReorder();
+    } catch (final UnsupportedOperationException exception) {
+      // No auto reorder? --- Never mind!
+    }
 
     try {
 
@@ -202,6 +228,16 @@ public class BDDConflictChecker extends ModelChecker
       desFactory.createConflictTraceProxy(tracename, model, tracelist,
                                           ConflictKind.CONFLICT);
     return trace;
+  }
+
+
+  //#########################################################################
+  //# Debug Output
+  /**
+   * A dummy callback. Used to suppress debug output of BDD packages.
+   */
+  public void silentBDDHandler(final Object dummy1, final Object dummy2)
+  {
   }
 
 

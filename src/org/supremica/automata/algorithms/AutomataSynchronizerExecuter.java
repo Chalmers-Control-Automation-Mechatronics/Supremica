@@ -60,7 +60,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -68,9 +67,6 @@ import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.UnaryExpressionSubject;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-
 
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
@@ -1271,11 +1267,11 @@ public final class AutomataSynchronizerExecuter
                             final Iterator<BinaryExpressionProxy> actionIt = allActions.iterator();
                             while(actionIt.hasNext())
                             {
-                                BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(actionIt.next().toString(),Operator.TYPE_ARITHMETIC));
+                                final BinaryExpressionSubject bes = (BinaryExpressionSubject)(parser.parse(actionIt.next().toString(),Operator.TYPE_ARITHMETIC));
                                 gab.getActionsModifiable().add(bes);
                             }
                         }
-                        EdgeSubject edge = helper.importEdge(fromState, toState, newlabel,gab);
+                        final EdgeSubject edge = helper.importEdge(fromState, toState, newlabel,gab);
 
                         helper.mEdges.add(edge);
                     }

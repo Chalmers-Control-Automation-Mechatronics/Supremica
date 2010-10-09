@@ -210,6 +210,8 @@ public class IDEMenuBar extends JMenuBar
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_HISC.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_SD.addPropertyChangeListener(analyzeListener);
+    Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.addPropertyChangeListener
+      (analyzeListener);
   }
 
   // #########################################################################
@@ -332,18 +334,19 @@ public class IDEMenuBar extends JMenuBar
         }
 	    if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
            mVerifyMenu.addSeparator();
-           final Action plantComplete = 
+           final Action plantComplete =
            actions.getAction(AnalyzeSDPlantCompletenessAction.class);
             mVerifyMenu.add(plantComplete);
 		}
       }
 
       // Analyze (Seamless Synthesis)
-      if(mEdAnalyzeMenu == null  && panel instanceof EditorPanel)
-      {
-          mEdAnalyzeMenu = new JMenu("Analyze");
-          mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
-          mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
+      if (mEdAnalyzeMenu == null &&
+          Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.isTrue() &&
+          panel instanceof EditorPanel) {
+        mEdAnalyzeMenu = new JMenu("Analyze");
+        mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
+        mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
       }
 
       // Simulate
@@ -493,7 +496,9 @@ public class IDEMenuBar extends JMenuBar
         if (mVerifyMenu != null) {
           add(mVerifyMenu);
         }
-        add(mEdAnalyzeMenu);
+        if (mEdAnalyzeMenu != null) {
+          add(mEdAnalyzeMenu);
+        }
       } else if (panel instanceof SimulatorPanel) {
         add(mSimulateMenu);
         if (mVerifyMenu != null) {
@@ -647,6 +652,7 @@ public class IDEMenuBar extends JMenuBar
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mVerifyMenu = null;
+      mEdAnalyzeMenu = null;
       rebuildMenus();
     }
   }

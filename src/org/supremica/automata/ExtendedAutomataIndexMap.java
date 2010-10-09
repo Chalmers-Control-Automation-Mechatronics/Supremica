@@ -29,12 +29,14 @@ public class ExtendedAutomataIndexMap {
     private Map<Integer, VariableComponentProxy> indexToVariableMap;
     private Map<String, EventDeclProxy> eventIdToProxyMap;
 
-    private Map<String,Integer> var2initValMap;
-    private Map<String,List<VariableMarkingProxy>> var2markedValMap;
-    private Map<String,Integer> val2indexMap;
-    private Map<Integer,String> index2valMap;
+    private final Map<String,Integer> var2initValMap;
+    private final Map<String,List<VariableMarkingProxy>> var2markedValMap;
+    private final Map<String,Integer> val2indexMap;
+    private final Map<Integer,String> index2valMap;
 
-    private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
+    @SuppressWarnings("unused")
+    private static final Logger logger =
+      LoggerFactory.createLogger(AutomataIndexMap.class);
 
 
     public ExtendedAutomataIndexMap()
@@ -46,11 +48,11 @@ public class ExtendedAutomataIndexMap {
     }
 
 
-    public ExtendedAutomataIndexMap(ExtendedAutomata theExAutomata)
+    public ExtendedAutomataIndexMap(final ExtendedAutomata theExAutomata)
     {
         this();
         // This useful variable stores the union of the automata events
-        List<EventDeclProxy> unionAlphabet = theExAutomata.getUnionAlphabet();
+        final List<EventDeclProxy> unionAlphabet = theExAutomata.getUnionAlphabet();
 
  /*       int initialLocationMapCapacity = 0;
         for (AbstractSubject currExAutomaton : theExAutomata)
@@ -73,7 +75,7 @@ public class ExtendedAutomataIndexMap {
 
         // The automatonIndex and the locationIndex hashmaps are filled
         int automatonIndex = 0;
-        for (ExtendedAutomaton currExAutomaton : theExAutomata)
+        for (final ExtendedAutomaton currExAutomaton : theExAutomata)
         {
             // The automatonIndex hashtable is updated
             exAutomatonToIndexMap.put(currExAutomaton.getName(), automatonIndex);
@@ -82,7 +84,7 @@ public class ExtendedAutomataIndexMap {
             automatonIndex++;
 
             int locationIndex = 0;
-            for (NodeProxy currNode : currExAutomaton.getNodes())
+            for (final NodeProxy currNode : currExAutomaton.getNodes())
             {
                 automatonLocationEntryToIndexMap.put(new ExtendedAutomatonAndLocationEntry(currExAutomaton.getName(), currNode.getName()), locationIndex);
                 automatonIntegerEntryToLocationMap.put(new ExtendedAutomatonAndIntegerEntry(currExAutomaton.getName(), locationIndex), currNode);
@@ -91,16 +93,16 @@ public class ExtendedAutomataIndexMap {
         }
 
         int index = 0;
-        HashSet<Integer> integerDomain = new HashSet<Integer>();
-        for(VariableComponentProxy var:theExAutomata.getVars())
+        final HashSet<Integer> integerDomain = new HashSet<Integer>();
+        for(final VariableComponentProxy var:theExAutomata.getVars())
         {
             indexToVariableMap.put(index, var);
             variableToIndexMap.put(var, index);
             variableStringToIndexMap.put(var.getName(),index);
             index++;
 
-            String varName = var.getName();
-            String range = var.getType().toString();
+            final String varName = var.getName();
+            final String range = var.getType().toString();
 
             if(range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName()))
             {
@@ -111,24 +113,24 @@ public class ExtendedAutomataIndexMap {
                     integerDomain.add(i);
                 }
 
-                int initialValue = val2indexMap.get(((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString());
+                final int initialValue = val2indexMap.get(((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString());
                 var2initValMap.put(varName, initialValue);
                 var2markedValMap.put(varName, var.getVariableMarkings());
             }
         }
 
         index = 0;
-        for(VariableComponentProxy var:theExAutomata.getVars())
+        for(final VariableComponentProxy var:theExAutomata.getVars())
         {
-            String varName = var.getName();
-            String range = var.getType().toString();
+            final String varName = var.getName();
+            final String range = var.getType().toString();
 
             if (range.contains(","))
             {
-                StringTokenizer token = new StringTokenizer(range, ", { }");
+                final StringTokenizer token = new StringTokenizer(range, ", { }");
                 while(token.hasMoreTokens())
                 {
-                    String val = token.nextToken();
+                    final String val = token.nextToken();
                     while(integerDomain.contains(index))
                         index++;
 
@@ -141,17 +143,17 @@ public class ExtendedAutomataIndexMap {
                         index--;
                 }
 
-                int initialValue = val2indexMap.get(((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString());
+                final int initialValue = val2indexMap.get(((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString());
                 var2initValMap.put(varName, initialValue);
                 var2markedValMap.put(varName, var.getVariableMarkings());
-            }            
+            }
         }
         if(index > theExAutomata.getDomain())
             theExAutomata.extDomain(index);
 
         // The eventIndex map is filled
         int eventIndex = 0;
-        for (EventDeclProxy currEvent : unionAlphabet)
+        for (final EventDeclProxy currEvent : unionAlphabet)
         {
             eventIdToProxyMap.put(currEvent.getName(), currEvent);
             eventToIndexMap.put(currEvent, eventIndex);
@@ -160,32 +162,32 @@ public class ExtendedAutomataIndexMap {
         }
     }
 
-    public Integer getIndexOfVal(String val)
+    public Integer getIndexOfVal(final String val)
     {
         return val2indexMap.get(val);
     }
 
-    public String getValOfIndex(int index)
+    public String getValOfIndex(final int index)
     {
         return index2valMap.get(index);
     }
 
-    public int getInitValueofVar(String var)
+    public int getInitValueofVar(final String var)
     {
         return var2initValMap.get(var);
     }
 
-    public List<VariableMarkingProxy> getMarkedPredicatesofVar(String var)
+    public List<VariableMarkingProxy> getMarkedPredicatesofVar(final String var)
     {
         return var2markedValMap.get(var);
     }
 
-    public int getVariableIndex(VariableComponentProxy var)
+    public int getVariableIndex(final VariableComponentProxy var)
     {
         return variableToIndexMap.get(var);
     }
 
-    public VariableComponentProxy getVariableAt(int i)
+    public VariableComponentProxy getVariableAt(final int i)
     {
         return indexToVariableMap.get(i);
     }
@@ -214,7 +216,7 @@ public class ExtendedAutomataIndexMap {
         return eventToIndexMap.get(event);
     }
 
-    public EventDeclProxy eventIdToProxy(String id)
+    public EventDeclProxy eventIdToProxy(final String id)
     {
         return eventIdToProxyMap.get(id);
     }
@@ -239,7 +241,7 @@ public class ExtendedAutomataIndexMap {
         {
             throw new IndexOutOfBoundsException("automatonIndex has to >= 0");
         }
-        ExtendedAutomaton currAutomaton = getExAutomatonAt(automatonIndex);
+        final ExtendedAutomaton currAutomaton = getExAutomatonAt(automatonIndex);
         return getLocationIndex(currAutomaton.getName(), location);
     }
 
@@ -260,7 +262,7 @@ public class ExtendedAutomataIndexMap {
         {
             throw new IndexOutOfBoundsException("locationIndex has to >= 0");
         }
-        ExtendedAutomaton currAutomaton = getExAutomatonAt(automatonIndex);
+        final ExtendedAutomaton currAutomaton = getExAutomatonAt(automatonIndex);
         return getLocationAt(currAutomaton.getName(), locationIndex);
     }
 
@@ -280,7 +282,7 @@ public class ExtendedAutomataIndexMap {
             return (automaton + location).hashCode();
         }
 
-        public boolean equals(Object other)
+        public boolean equals(final Object other)
         {
             if (other instanceof ExtendedAutomatonAndLocationEntry)
             {
@@ -296,7 +298,7 @@ public class ExtendedAutomataIndexMap {
         String automaton;
         int locationIndex;
 
-        public ExtendedAutomatonAndIntegerEntry(String automaton, int locationIndex)
+        public ExtendedAutomatonAndIntegerEntry(final String automaton, final int locationIndex)
         {
             this.automaton = automaton;
             this.locationIndex = locationIndex;
@@ -307,7 +309,7 @@ public class ExtendedAutomataIndexMap {
             return (automaton.hashCode() * locationIndex);
         }
 
-        public boolean equals(Object other)
+        public boolean equals(final Object other)
         {
             if (other instanceof ExtendedAutomatonAndIntegerEntry)
             {

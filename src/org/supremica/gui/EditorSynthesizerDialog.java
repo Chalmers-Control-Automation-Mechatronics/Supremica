@@ -61,6 +61,8 @@ abstract class EditorSynthesizerPanel
     public abstract void update(EditorSynthesizerOptions s);
 
     public abstract void regain(EditorSynthesizerOptions s);
+
+    private static final long serialVersionUID = 1L;
 }
 
 class EditorSynthesizerDialogStandardPanel
@@ -68,23 +70,23 @@ class EditorSynthesizerDialogStandardPanel
     implements ActionListener
 {
     private static final long serialVersionUID = 1L;
-    private SynthesisSelector typeSelector;
-    private AlgorithmSelector algorithmSelector;
-    private JCheckBox purgeBox;
-    private JCheckBox removeUnecessarySupBox;
-    private JCheckBox reachableBox;
-    private Box guardBox;
-    private Box genGuardComputeSupBox;
-    private JRadioButton generateGuardButton;
-    private JRadioButton computeSupervisorButton;
+    private final SynthesisSelector typeSelector;
+    private final AlgorithmSelector algorithmSelector;
+    private final JCheckBox purgeBox;
+    private final JCheckBox removeUnecessarySupBox;
+    private final JCheckBox reachableBox;
+    private final Box guardBox;
+    private final Box genGuardComputeSupBox;
+    private final JRadioButton generateGuardButton;
+    private final JRadioButton computeSupervisorButton;
 
 
-    private NonblockNote nbNote;
+    private final NonblockNote nbNote;
 
-    private JRadioButton fromAllowedStatesButton;
-    private JRadioButton fromForbiddenStatesButton;
-    private JRadioButton optimalButton;
-    private JComboBox eventList;
+    private final JRadioButton fromAllowedStatesButton;
+    private final JRadioButton fromForbiddenStatesButton;
+    private final JRadioButton optimalButton;
+    private final JComboBox eventList;
 
     static class AlgorithmSelector
         extends JComboBox
@@ -96,12 +98,12 @@ class EditorSynthesizerDialogStandardPanel
             super();
         }
 
-        private AlgorithmSelector(Object[] array)
+        private AlgorithmSelector(final Object[] array)
         {
             super(array);
         }
 
-        private AlgorithmSelector(SynthesisAlgorithm algo)
+        private AlgorithmSelector(final SynthesisAlgorithm algo)
         {
             addItem(algo);
         }
@@ -111,17 +113,17 @@ class EditorSynthesizerDialogStandardPanel
             return (SynthesisAlgorithm) getSelectedItem();
         }
 
-        public void setAlgorithm(SynthesisAlgorithm algo)
+        public void setAlgorithm(final SynthesisAlgorithm algo)
         {
             setSelectedItem(algo);
         }
 
-        public static AlgorithmSelector create(int num)
+        public static AlgorithmSelector create(final int num)
         {
             if (num == 1)
             {
-                AlgorithmSelector selector = new AlgorithmSelector();
-                for (SynthesisAlgorithm algo: SynthesisAlgorithm.values())
+                final AlgorithmSelector selector = new AlgorithmSelector();
+                for (final SynthesisAlgorithm algo: SynthesisAlgorithm.values())
                 {
                     if (!algo.prefersModular())
                     {
@@ -132,8 +134,8 @@ class EditorSynthesizerDialogStandardPanel
             }
             else
             {
-                AlgorithmSelector selector = new AlgorithmSelector();
-                for (SynthesisAlgorithm algo: SynthesisAlgorithm.values())
+                final AlgorithmSelector selector = new AlgorithmSelector();
+                for (final SynthesisAlgorithm algo: SynthesisAlgorithm.values())
                 {
                     selector.addItem(algo);
                 }
@@ -157,7 +159,7 @@ class EditorSynthesizerDialogStandardPanel
             return (SynthesisType) getSelectedItem();
         }
 
-        public void setType(SynthesisType type)
+        public void setType(final SynthesisType type)
         {
             setSelectedItem(type);
         }
@@ -185,7 +187,7 @@ class EditorSynthesizerDialogStandardPanel
         }
     }
 
-    public EditorSynthesizerDialogStandardPanel(int num, Vector events)
+    public EditorSynthesizerDialogStandardPanel(final int num, final Vector<String> events)
     {
         algorithmSelector = AlgorithmSelector.create(num);
         algorithmSelector.addActionListener(this);
@@ -212,7 +214,7 @@ class EditorSynthesizerDialogStandardPanel
         }
 
         // Create layout!
-        Box mainBox = Box.createVerticalBox();
+        final Box mainBox = Box.createVerticalBox();
 
         JPanel panel = new JPanel();
         Box box = Box.createHorizontalBox();
@@ -257,11 +259,11 @@ class EditorSynthesizerDialogStandardPanel
 		computeSupervisorButton.setToolTipText("Compute the supervisor without generating guards.");
 
         computeSupervisorButton.addActionListener(this);
-        ButtonGroup grupp = new ButtonGroup();
+        final ButtonGroup grupp = new ButtonGroup();
         grupp.add(generateGuardButton);
         grupp.add(computeSupervisorButton);
 
-        JPanel genComPanel = new JPanel();
+        final JPanel genComPanel = new JPanel();
         genComPanel.add(computeSupervisorButton);
         genComPanel.add(generateGuardButton);
 
@@ -281,19 +283,19 @@ class EditorSynthesizerDialogStandardPanel
         optimalButton = new JRadioButton("Adaptive solution");
         optimalButton.setToolTipText("Generate the guard from the state set that yields the best result");
 
-        JLabel event = new JLabel("Events");
+        final JLabel event = new JLabel("Events");
 //		eventField = new JTextField(15);
 //		eventField.setToolTipText("The name of the desired event");
 
-        ButtonGroup group = new ButtonGroup();
+        final ButtonGroup group = new ButtonGroup();
         group.add(fromAllowedStatesButton);
         group.add(fromForbiddenStatesButton);
         group.add(optimalButton);
 
-        JPanel expressionTypePanel = new JPanel();
+        final JPanel expressionTypePanel = new JPanel();
         expressionTypePanel.add(optimalButton);
         expressionTypePanel.add(fromAllowedStatesButton);
-        expressionTypePanel.add(fromForbiddenStatesButton);        
+        expressionTypePanel.add(fromForbiddenStatesButton);
 
         eventList = new JComboBox(events);
 
@@ -309,7 +311,7 @@ class EditorSynthesizerDialogStandardPanel
         updatePanel();
     }
 
-    public void update(EditorSynthesizerOptions synthesizerOptions)
+    public void update(final EditorSynthesizerOptions synthesizerOptions)
     {
         typeSelector.setType(synthesizerOptions.getSynthesisType());
         algorithmSelector.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
@@ -342,7 +344,7 @@ class EditorSynthesizerDialogStandardPanel
     public void updatePanel()
     {
         //At present, it is only possible to perform the synthesis via BDDs
-        SynthesisAlgorithm selected = algorithmSelector.getAlgorithm();
+        final SynthesisAlgorithm selected = algorithmSelector.getAlgorithm();
         // Clear, then add the ones that are implemented
         algorithmSelector.removeAllItems();
         if (typeSelector.getType() == SynthesisType.CONTROLLABLE)
@@ -384,7 +386,7 @@ class EditorSynthesizerDialogStandardPanel
         algorithmSelector.setAlgorithm(selected);
     }
 
-    public void regain(EditorSynthesizerOptions synthesizerOptions)
+    public void regain(final EditorSynthesizerOptions synthesizerOptions)
     {
         synthesizerOptions.setSynthesisType(typeSelector.getType());
         synthesizerOptions.setSynthesisAlgorithm(algorithmSelector.getAlgorithm());
@@ -412,7 +414,7 @@ class EditorSynthesizerDialogStandardPanel
             synthesizerOptions.setEvent((String)eventList.getSelectedItem());
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(final ActionEvent e)
     {
         //X stands for "Should be setEnabled but setEnabled does not work as it should(?)."
 
@@ -432,7 +434,7 @@ class EditorSynthesizerDialogStandardPanel
             purgeBox.setVisible(false); //X
         }
         else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR)
-        { 
+        {
             if ((typeSelector.getType() == SynthesisType.NONBLOCKING) ||
                 (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
             {
@@ -452,18 +454,18 @@ class EditorSynthesizerDialogStandardPanel
 public class EditorSynthesizerDialog
     implements ActionListener
 {
-    private JButton okButton;
-    private JButton cancelButton;
-    private EditorSynthesizerOptions synthesizerOptions;
+    private final JButton okButton;
+    private final JButton cancelButton;
+    private final EditorSynthesizerOptions synthesizerOptions;
     EditorSynthesizerDialogStandardPanel standardPanel;
 
-    private JDialog dialog;
-    private Frame parentFrame;
+    private final JDialog dialog;
+    private final Frame parentFrame;
 
     /**
      * Creates modal dialog box for input of synthesizer and guard  options.
      */
-    public EditorSynthesizerDialog(Frame parentFrame, int numSelected, EditorSynthesizerOptions synthesizerOptions, Vector events)
+    public EditorSynthesizerDialog(final Frame parentFrame, final int numSelected, final EditorSynthesizerOptions synthesizerOptions, final Vector<String> events)
     {
         dialog = new JDialog(parentFrame, true);    // modal
         this.parentFrame = parentFrame;
@@ -474,17 +476,17 @@ public class EditorSynthesizerDialog
         dialog.setTitle("Synthesizer options");
         dialog.setSize(new Dimension(400, 330));
 
-        Container contentPane = dialog.getContentPane();
+        final Container contentPane = dialog.getContentPane();
 
         standardPanel = new EditorSynthesizerDialogStandardPanel(numSelected, events);
 
-        JTabbedPane tabbedPane = new JTabbedPane();
+        final JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
 //        tabbedPane.addTab("Guard options", null, guardPanel, "Guard options");
 
         // buttonPanel
-        JPanel buttonPanel = new JPanel();
+        final JPanel buttonPanel = new JPanel();
 
         okButton = addButton(buttonPanel, "OK");
         cancelButton = addButton(buttonPanel, "Cancel");
@@ -494,7 +496,7 @@ public class EditorSynthesizerDialog
         Utility.setDefaultButton(dialog, okButton);
 
         // ** MF ** Fix to get the frigging thing centered
-        Dimension dim = dialog.getMinimumSize();
+        final Dimension dim = dialog.getMinimumSize();
 
         dialog.setLocation(Utility.getPosForCenter(dim));
         dialog.setResizable(false);
@@ -511,9 +513,9 @@ public class EditorSynthesizerDialog
         standardPanel.update(synthesizerOptions);
     }
 
-    private JButton addButton(Container container, String name)
+    private JButton addButton(final Container container, final String name)
     {
-        JButton button = new JButton(name);
+        final JButton button = new JButton(name);
 
         button.addActionListener(this);
         container.add(button);
@@ -526,9 +528,9 @@ public class EditorSynthesizerDialog
         dialog.setVisible(true);
     }
 
-    public void actionPerformed(ActionEvent event)
+    public void actionPerformed(final ActionEvent event)
     {
-        Object source = event.getSource();
+        final Object source = event.getSource();
 
         if (source == okButton)
         {

@@ -1,7 +1,6 @@
 package org.supremica.automata.algorithms.Guard;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  *
@@ -16,41 +15,41 @@ public class MDDEdge {
     private String id;
 
 
-    public MDDEdge(MDDNode fromNode, MDDNode toNode)
+    public MDDEdge(final MDDNode fromNode, final MDDNode toNode)
     {
         this.fromNode = fromNode;
         this.toNode = toNode;
     }
 
-    public MDDEdge(MDDNode fromNode, MDDNode toNode, ArrayList<String> labelString,String id)
+    public MDDEdge(final MDDNode fromNode, final MDDNode toNode, final ArrayList<String> labelString,final String id)
     {
         this(fromNode, toNode);
         this.labelString = labelString;
         this.id = id;
     }
 
-    public void setFromNode(MDDNode fNode)
+    public void setFromNode(final MDDNode fNode)
     {
         fromNode = fNode;
     }
 
-    public void setToNode(MDDNode tNode)
+    public void setToNode(final MDDNode tNode)
     {
         toNode = tNode;
     }
 
-    public void setNodes(MDDNode fNode, MDDNode tNode)
+    public void setNodes(final MDDNode fNode, final MDDNode tNode)
     {
         setFromNode(fNode);
         setToNode(tNode);
     }
 
-    public void setLabel(ArrayList<Integer> l)
+    public void setLabel(final ArrayList<Integer> l)
     {
         label = l;
     }
 
-    public void setLabelString(ArrayList<String> lString)
+    public void setLabelString(final ArrayList<String> lString)
     {
         labelString = lString;
     }
