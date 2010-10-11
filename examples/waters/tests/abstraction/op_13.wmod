@@ -329,12 +329,15 @@
                             <Point Y="-20" X="-3"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S01234">
+                    <SimpleNode Initial="true" Name="S01234">
                         <PointGeometry>
                             <Point Y="144" X="144"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-24"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-21" X="-46"/>
+                            <Point Y="-20" X="-41"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S10">

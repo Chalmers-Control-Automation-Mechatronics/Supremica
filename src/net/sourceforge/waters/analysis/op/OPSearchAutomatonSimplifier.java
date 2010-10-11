@@ -162,7 +162,7 @@ public class OPSearchAutomatonSimplifier
     mEvents = null;
     mEventMap = null;
     mOriginalStates = null;
-    mObservableSucessor = null;
+    mObservableSuccessor = null;
     mUnobservableTauSuccessors = null;
     mObservableTauSuccessors = null;
     mTarjan = null;
@@ -252,9 +252,9 @@ public class OPSearchAutomatonSimplifier
       stateMap.put(state, code);
     }
 
-    mObservableSucessor = new int[numStates][numEvents];
+    mObservableSuccessor = new int[numStates][numEvents];
     for (next = 0; next < numStates; next++) {
-      Arrays.fill(mObservableSucessor[next], NO_TRANSITION);
+      Arrays.fill(mObservableSuccessor[next], NO_TRANSITION);
     }
     mUnobservableTauSuccessors = new int[numStates];
     Arrays.fill(mUnobservableTauSuccessors, IntListBuffer.NULL);
@@ -304,9 +304,9 @@ public class OPSearchAutomatonSimplifier
           mListBuffer.prepend(list, targetCode);
         }
       }
-    } else if (mObservableSucessor[sourceCode][eventCode] == NO_TRANSITION) {
-      mObservableSucessor[sourceCode][eventCode] = targetCode;
-    } else if (mObservableSucessor[sourceCode][eventCode] != targetCode){
+    } else if (mObservableSuccessor[sourceCode][eventCode] == NO_TRANSITION) {
+      mObservableSuccessor[sourceCode][eventCode] = targetCode;
+    } else if (mObservableSuccessor[sourceCode][eventCode] != targetCode){
       throw new NondeterministicDESException(aut, source, event);
     }
   }
@@ -399,13 +399,13 @@ public class OPSearchAutomatonSimplifier
         int esucc1 = 0, esucc2 = 0;
         final boolean en1, en2;
         if (comp1 == null) {
-          esucc1 = mObservableSucessor[code1][e];
+          esucc1 = mObservableSuccessor[code1][e];
           en1 = esucc1 != NO_TRANSITION;
         } else {
           en1 = comp1.isEnabledEvent(e);
         }
         if (comp2 == null) {
-          esucc2 = mObservableSucessor[code2][e];
+          esucc2 = mObservableSuccessor[code2][e];
           en2 = esucc2 != NO_TRANSITION;
         } else {
           en2 = comp2.isEnabledEvent(e);
@@ -426,7 +426,7 @@ public class OPSearchAutomatonSimplifier
               comp1.iterate(mReadOnlyIterator);
               while (mReadOnlyIterator.advance()) {
                 final int member1 = mReadOnlyIterator.getCurrentData();
-                final int succ1 = mObservableSucessor[e][member1];
+                final int succ1 = mObservableSuccessor[member1][e];
                 if (succ1 != NO_TRANSITION) {
                   enqueueSuccessors(pcode, e, succ1, comp2);
                 }
@@ -455,12 +455,12 @@ public class OPSearchAutomatonSimplifier
     comp.iterate(mReadOnlyIterator);
     while (mReadOnlyIterator.advance()) {
       final int source1 = mReadOnlyIterator.getCurrentData();
-      final int succ1 = mObservableSucessor[source1][e];
+      final int succ1 = mObservableSuccessor[source1][e];
       if (succ1 != NO_TRANSITION) {
         mAltReadOnlyIterator.reset(mReadOnlyIterator);
         while (mAltReadOnlyIterator.advance()) {
           final int source2 = mAltReadOnlyIterator.getCurrentData();
-          final int succ2 = mObservableSucessor[source2][e];
+          final int succ2 = mObservableSuccessor[source2][e];
           if (succ2 != NO_TRANSITION) {
             enqueueSuccessor(pcode, succ1, succ2);
           }
@@ -477,7 +477,7 @@ public class OPSearchAutomatonSimplifier
     comp2.iterate(mAltReadOnlyIterator);
     while (mAltReadOnlyIterator.advance()) {
       final int member2 = mAltReadOnlyIterator.getCurrentData();
-      final int succ2 = mObservableSucessor[member2][e];
+      final int succ2 = mObservableSuccessor[member2][e];
       if (succ2 != NO_TRANSITION) {
         enqueueSuccessor(pcode, esucc1, succ2);
       }
@@ -811,8 +811,8 @@ public class OPSearchAutomatonSimplifier
     final long predpair = getPair(current1, current2);
     final long predinfo = mBFSLongVisited.get(predpair);
     for (int e = 0; e < mUnobservableTau; e++) {
-      final int succ1 = mObservableSucessor[current1][e];
-      final int succ2 = mObservableSucessor[current2][e];
+      final int succ1 = mObservableSuccessor[current1][e];
+      final int succ2 = mObservableSuccessor[current2][e];
       if (succ1 != NO_TRANSITION && succ2 != NO_TRANSITION && succ1 != succ2) {
         final int root1 = getRootIndex(succ1);
         final int root2 = getRootIndex(succ1);
@@ -893,7 +893,7 @@ public class OPSearchAutomatonSimplifier
         for (final EventProxy prop : allProps) {
           final int p = mEventMap.get(prop);
           final boolean enabled = comp == null ?
-                                  mObservableSucessor[s][p] != NO_TRANSITION :
+                                  mObservableSuccessor[s][p] != NO_TRANSITION :
                                   comp.isEnabledEvent(p);
           if (enabled) {
             props.add(prop);
@@ -923,7 +923,7 @@ public class OPSearchAutomatonSimplifier
           final EventProxy event = mEvents[e];
           if (event.getKind() != EventKind.PROPOSITION) {
             if (comp == null) {
-              final int succ = mObservableSucessor[s][e];
+              final int succ = mObservableSuccessor[s][e];
               if (succ != NO_TRANSITION) {
                 final int target = getRootIndex(succ);
                 final StateProxy targetState = stateMap.get(target);
@@ -937,7 +937,7 @@ public class OPSearchAutomatonSimplifier
               comp.iterate(mReadOnlyIterator);
               while (mReadOnlyIterator.advance()) {
                 final int src = mReadOnlyIterator.getCurrentData();
-                final int succ = mObservableSucessor[src][e];
+                final int succ = mObservableSuccessor[src][e];
                 if (succ != NO_TRANSITION) {
                   final int target = getRootIndex(succ);
                   final StateProxy targetState = stateMap.get(target);
@@ -1101,7 +1101,7 @@ public class OPSearchAutomatonSimplifier
     writer.println("TRANSITIONS");
     for (int s = 0; s < mOriginalStates.length; s++) {
       for (int e = 0; e < mEvents.length; e++) {
-        final int succ = mObservableSucessor[s][e];
+        final int succ = mObservableSuccessor[s][e];
         switch (succ) {
         case DUMP_STATE:
           writer.println("  " + s + " -" + e + "-> DUMP");
@@ -1278,6 +1278,17 @@ public class OPSearchAutomatonSimplifier
     }
 
     //#######################################################################
+    //# Overrides for java.lang.Object
+    public String toString()
+    {
+      final StringWriter writer = new StringWriter();
+      final PrintWriter printer = new PrintWriter(writer);
+      mListBuffer.dumpList(printer, mStates);
+      printer.flush();
+      return writer.toString();
+    }
+
+    //#######################################################################
     //# Simple Access
     private int getRootIndex()
     {
@@ -1318,7 +1329,7 @@ public class OPSearchAutomatonSimplifier
         iterate(mReadOnlyIterator);
         while (mReadOnlyIterator.advance()) {
           final int state = mReadOnlyIterator.getCurrentData();
-          if (mObservableSucessor[state][e] != NO_TRANSITION) {
+          if (mObservableSuccessor[state][e] != NO_TRANSITION) {
             mEnabledEvents.set(e);
             break;
           }
@@ -1357,7 +1368,7 @@ public class OPSearchAutomatonSimplifier
       }
       mComponentOfState[state] = this;
       for (int e = 0; e < mUnobservableTau; e++) {
-        if (mObservableSucessor[state][e] != NO_TRANSITION) {
+        if (mObservableSuccessor[state][e] != NO_TRANSITION) {
           mEnabledEvents.set(e);
         }
       }
@@ -1402,7 +1413,7 @@ public class OPSearchAutomatonSimplifier
   private int mUnobservableTau;
   private int mObservableTau;
   private StateProxy[] mOriginalStates;
-  private int[][] mObservableSucessor;
+  private int[][] mObservableSuccessor;
   private int[] mUnobservableTauSuccessors;
   private int[] mObservableTauSuccessors;
   private Tarjan mTarjan;
