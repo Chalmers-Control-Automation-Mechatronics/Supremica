@@ -194,8 +194,8 @@ public class IntListBuffer
 
   /**
    * Gets the first data element from the given list.
-   * @param   The list number identifying the list to be examined
-   *          in this buffer.
+   * @param  list   The unique list number that identifies the list to be
+   *                examined in this buffer.
    * @throws  IllegalArgumentException to indicate that the list
    *                 is {@link #NULL} or empty.
    */
@@ -212,8 +212,8 @@ public class IntListBuffer
   /**
    * Computes the length of the given list. This method iterates over the
    * list to count it, so its complexity is linear.
-   * @param   The list number identifying the list to be examined
-   *          in this buffer.
+   * @param  list   The unique list number that identifies the list to be
+   *                examined in this buffer.
    * @return  The number of elements in the given list.
    */
   public int getLength(final int list)

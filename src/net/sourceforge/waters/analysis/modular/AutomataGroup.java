@@ -282,13 +282,16 @@ public class AutomataGroup
   }
 
   /**
-   * Runs the Monolithic SCC Control Loop Checker to determine information on the subset of Automata in this group
-   * @param checker The Control Loop Checker to use. It should contain the Kind Translator, and a factory before being called
+   * Runs the Monolithic SCC Control Loop Checker to determine information on
+   * the subset of Automata in this group.
+   * @param checker The Control Loop Checker to use. It should contain the
+   *                {@link KindTranslator} and a factory before being called.
    * @param nodesRemaining
-   * @throws AnalysisException
-   * @returns The number of space left in the model checker
+   *                The amount of space left in the model checker.
    */
-  public void run(final MonolithicSCCControlLoopChecker checker, final int nodesRemaining) throws AnalysisException
+  void run(final MonolithicSCCControlLoopChecker checker,
+           final int nodesRemaining)
+    throws AnalysisException
   {
     if (mValidRun)
       return;

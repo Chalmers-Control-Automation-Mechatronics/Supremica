@@ -45,13 +45,13 @@ public interface AutomatonBuilder extends ModelAnalyser
 
   /**
    * Gets the configured name of the output automaton.
-   * @see {@link #setOutputName(String) setOutputName()}
+   * @see #setOutputName(String) setOutputName()
    */
   public String getOutputName();
 
   /**
    * Gets the component kind to be given to the output automaton.
-   * @param  name   Kind of output automaton, or <CODE>null</CODE> to
+   * @param  kind   Kind of output automaton, or <CODE>null</CODE> to
    *                indicate that the kind of the input automaton is to
    *                be used.
    */
@@ -59,7 +59,7 @@ public interface AutomatonBuilder extends ModelAnalyser
 
   /**
    * Gets the configured component kind of the output automaton.
-   * @see {@link #setOutputKind(ComponentKind) setOutputKind()}
+   * @see #setOutputKind(ComponentKind) setOutputKind()
    */
   public ComponentKind getOutputKind();
 

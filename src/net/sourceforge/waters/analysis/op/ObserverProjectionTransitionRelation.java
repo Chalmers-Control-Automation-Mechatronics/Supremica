@@ -432,9 +432,8 @@ public class ObserverProjectionTransitionRelation
   /**
    * Removes the given proposition from the event alphabet of this transition
    * relation and removes the marking from all states.
-   *
-   * @param prop
-   *          The event to be removed.
+   * @param propID
+   *          The code of the event to be removed.
    */
   public void removeProposition(final int propID)
   {
