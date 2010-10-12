@@ -37,7 +37,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * per-automaton approach. Variables are allocated to encode the events
  * and the current and next states of each automaton. To compute the
  * synchronous product transition relation, first the transition relation
- * is build for each automaton, tagged with event codes. The transition
+ * is built for each automaton, tagged with event codes. The transition
  * relations of all automata are combined using logical AND, and the
  * event bits are removed from the result using existential quantification.</P>
  *
@@ -142,7 +142,7 @@ public class BDDEncoding
    * @param  marking      The marking to be considered. This should be an
    *                      event of type {@link EventKind#PROPOSITION
    *                      PROPOSITION}, which is used by the model.
-   * @return A BDD over the current state variables of automata in the
+   * @return A BDD over the current state variables of the automata in the
    *         model, which is true precisely when the model is a state marked
    *         by the given proposition,
    */
@@ -164,7 +164,7 @@ public class BDDEncoding
    * @return A BDD over the current and next state variables of all automata
    *         in the model, which is true precisely when there is a transition
    *         between the current and next state in the synchronous composition
-   *         of all automata in the encoded model,
+   *         of all automata in the encoded model.
    */
   public BDD getTransitionRelationBDD()
   {
@@ -303,9 +303,9 @@ public class BDDEncoding
    *                       encode the given number.
    * @return A BDD over the variables firstVarIndex, firstVarIndex+interleave,
    *         ..., firstVarIndex+(numBits-1)*interleave which is true precisely
-   *         when represent a binary code of the given number, with the most
-   *         significant bit appearing first, i.e., firstVarIndex encodes the
-   *         most significant bit.
+   *         when the variables represent a binary code of the given number,
+   *         with the most significant bit appearing first, i.e., firstVarIndex
+   *         encodes the most significant bit.
    */
   private BDD encodeBDD(final int code,
                         final int firstVarIndex,
@@ -428,9 +428,9 @@ public class BDDEncoding
      * <P>Computes a BDD encoding the initial states of this automaton
      * and adds it to another BDD.</P>
      * <P>This method constructs a BDD over the current state variables of
-     * this automaton, which is true precisely the current state is an initial
-     * state of this automaton. The resulting BDD is composed using logical AND
-     * with the given BDD.</P>
+     * this automaton, which is true precisely when the current state is an
+     * initial state of this automaton. The resulting BDD is composed using
+     * logical AND with the given BDD.</P>
      * <P>Since BDDs are best constructed bottom-up, this method works most
      * efficiently when the given BDD only contains variables that appear later
      * in the variable ordering than the current state variables of this
@@ -459,9 +459,9 @@ public class BDDEncoding
      * <P>Computes a BDD encoding the marked states of this automaton
      * and adds it to another BDD.</P>
      * <P>This method constructs a BDD over the current state variables of
-     * this automaton, which is true precisely the current state is a marked
-     * in this automaton. The resulting BDD is composed using logical AND
-     * with the given BDD.</P>
+     * this automaton, which is true precisely when the current state is a
+     * marked in this automaton. The resulting BDD is composed using logical
+     * AND with the given BDD.</P>
      * <P>Since BDDs are best constructed bottom-up, this method works most
      * efficiently when the given BDD only contains variables that appear later
      * in the variable ordering than the current state variables of this
