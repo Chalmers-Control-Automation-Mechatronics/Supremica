@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
- * <P>A diagnostics generator used for controllability checking.</P>
+ * <P>A diagnostics generator used for plant completeness checking.</P>
  *
  * @author Robi Malik
  */
