@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class ObserverProjectionConflictCheckerTest extends
+public class OPConflictCheckerTest extends
     AbstractStandardConflictCheckerTest
 {
 
@@ -25,8 +25,7 @@ public class ObserverProjectionConflictCheckerTest extends
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    final TestSuite testSuite =
-        new TestSuite(ObserverProjectionConflictCheckerTest.class);
+    final TestSuite testSuite = new TestSuite(OPConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -42,10 +41,8 @@ public class ObserverProjectionConflictCheckerTest extends
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final ObserverProjectionConflictChecker checker =
-      new ObserverProjectionConflictChecker(factory);
-    checker.setMethod
-      (ObserverProjectionConflictChecker.Method.OP);
+    final OPConflictChecker checker = new OPConflictChecker(factory);
+    checker.setMethod(OPConflictChecker.Method.OP);
     checker.setInternalStepNodeLimit(5000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);

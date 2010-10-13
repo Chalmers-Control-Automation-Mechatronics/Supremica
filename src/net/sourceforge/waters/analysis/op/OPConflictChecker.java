@@ -65,7 +65,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik, Rachel Francis
  */
 
-public class ObserverProjectionConflictChecker
+public class OPConflictChecker
   extends AbstractConflictChecker
 {
 
@@ -74,8 +74,7 @@ public class ObserverProjectionConflictChecker
   /**
    * Creates a new conflict checker without a model or marking proposition.
    */
-  public ObserverProjectionConflictChecker
-    (final ProductDESProxyFactory factory)
+  public OPConflictChecker(final ProductDESProxyFactory factory)
   {
     this(null, factory);
   }
@@ -88,9 +87,8 @@ public class ObserverProjectionConflictChecker
    * @param factory
    *          Factory used for trace construction.
    */
-  public ObserverProjectionConflictChecker
-    (final ProductDESProxy model,
-     final ProductDESProxyFactory factory)
+  public OPConflictChecker(final ProductDESProxy model,
+                           final ProductDESProxyFactory factory)
   {
     this(model, null, factory);
   }
@@ -109,10 +107,9 @@ public class ObserverProjectionConflictChecker
    * @param factory
    *          Factory used for trace construction.
    */
-  public ObserverProjectionConflictChecker
-    (final ProductDESProxy model,
-     final EventProxy marking,
-     final ProductDESProxyFactory factory)
+  public OPConflictChecker(final ProductDESProxy model,
+                           final EventProxy marking,
+                           final ProductDESProxyFactory factory)
   {
     super(model, marking, factory);
     mMethod = Method.OEQ;
@@ -406,6 +403,9 @@ public class ObserverProjectionConflictChecker
       break;
     case OP:
       mAbstractionRule = new ObserverProjectionAbstractionRule();
+      break;
+    case OPSEARCH:
+      mAbstractionRule = new OPSearchAbstractionRule();
       break;
     case WOEQ:
       mAbstractionRule = new ObservationEquivalenceAbstractionRule
@@ -848,21 +848,24 @@ public class ObserverProjectionConflictChecker
       tau = syncStep.getHiddenEvent();
     }
     recordStatistics(aut);
-    final ObservationEquivalenceStep oeStep =
+    final ObservationEquivalenceStep simpStep =
       mAbstractionRule.applyRule(aut, tau);
-    if (syncStep != null || oeStep != null) {
+    if (syncStep != null || simpStep != null) {
       if (syncStep != null) {
         mModifyingSteps.add(syncStep);
       }
-      if (oeStep != null) {
-        int expectedNumberOfEvents = aut.getEvents().size();
-        aut = oeStep.getResultAutomaton();
-        final Collection<EventProxy> newEvents = aut.getEvents();
-        if (tau != null && !newEvents.contains(tau)) {
-          expectedNumberOfEvents--;
+      if (simpStep != null) {
+        final Collection<EventProxy> oldEvents = aut.getEvents();
+        aut = simpStep.getResultAutomaton();
+        final Collection<EventProxy> newEvents =
+          new THashSet<EventProxy>(aut.getEvents());
+        for (final EventProxy event : oldEvents) {
+          if (event != tau && !newEvents.contains(event)) {
+            mEventHasDisappeared = true;
+            break;
+          }
         }
-        mEventHasDisappeared |= newEvents.size() < expectedNumberOfEvents;
-        mModifyingSteps.add(oeStep);
+        mModifyingSteps.add(simpStep);
       }
       updateEventsToAutomata(aut, candidate.getAutomata());
       return true;
@@ -1156,6 +1159,12 @@ public class ObserverProjectionConflictChecker
      * automata is not resolved, nondeterministic abstraction are used instead.
      */
     OP,
+    /**
+     * Automata are minimised according using an <I>observer projection</I>
+     * obtained by the OP-search algorithm presented in the paper by
+     * P. Pena, J.E.R. Cury, R. Malik, and S. Lafortune in WODES 2010.
+     */
+    OPSEARCH,
     /**
      * Automata are minimised according to <I>weak observation equivalence</I>.
      * Initial states and markings are not saturated, silent transitions
@@ -1757,7 +1766,7 @@ public class ObserverProjectionConflictChecker
         } else {
           partition = combinePartitions(loopPartition, bisimPartition);
         }
-        return new ObservationEquivalenceStep(convertedAut, aut, eventEnc,
+        return new ObservationEquivalenceStep(convertedAut, aut, tau,
                                               inputStateEnc, partition,
                                               outputStateEnc);
       } else {
@@ -1809,7 +1818,7 @@ public class ObserverProjectionConflictChecker
           new IsomorphismChecker(factory, false);
         checker.checkObservationEquivalence(aut, convertedAut, tau);
         */
-        return new ObservationEquivalenceStep(convertedAut, aut, eventEnc,
+        return new ObservationEquivalenceStep(convertedAut, aut, tau,
                                               inputStateEnc, partition,
                                               outputStateEnc);
       } else {
@@ -1890,6 +1899,41 @@ public class ObserverProjectionConflictChecker
       }
       return modified;
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class OPSearchAbstractionRule
+  private class OPSearchAbstractionRule
+    extends AbstractionRule
+  {
+
+    //#######################################################################
+    //# Rule Application
+    ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
+                                         final EventProxy tau)
+    throws AnalysisException
+    {
+      if (tau == null) {
+        return null;
+      } else {
+        final ProductDESProxyFactory factory = getFactory();
+        final Collection<EventProxy> hidden = Collections.singletonList(tau);
+        final OPSearchAutomatonSimplifier simplifier =
+          new OPSearchAutomatonSimplifier(aut, hidden, factory);
+        simplifier.setPropositions(mPropositions);
+        simplifier.run();
+        @SuppressWarnings("unused")
+        final AutomatonProxy convertedAut = simplifier.getComputedAutomaton();
+        return null;
+        /*
+        return new ObservationEquivalenceStep(convertedAut, aut, eventEnc,
+                                              inputStateEnc, partition,
+                                              outputStateEnc);
+        */
+      }
+    }
+
   }
 
 
@@ -2172,13 +2216,13 @@ public class ObserverProjectionConflictChecker
     private ObservationEquivalenceStep
       (final AutomatonProxy resultAut,
        final AutomatonProxy originalAut,
-       final EventEncoding eventEnc,
+       final EventProxy tau,
        final StateEncoding originalStateEnc,
        final List<int[]> partition,
        final StateEncoding resultStateEnc)
     {
       super(resultAut, originalAut);
-      mEventEncoding = eventEnc;
+      mTau = tau;
       mOriginalStateEncoding = originalStateEnc;
       mPartition = partition;
       mReverseOutputStateMap = resultStateEnc.getStateCodeMap();
@@ -2192,9 +2236,12 @@ public class ObserverProjectionConflictChecker
       final ProductDESProxyFactory factory = getFactory();
       final AutomatonProxy originalAutomaton = getOriginalAutomaton();
       final AutomatonProxy resultAutomaton = getResultAutomaton();
+      final EventEncoding eventEnc =
+        new EventEncoding(originalAutomaton, mTau, mPropositions,
+                          EventEncoding.FILTER_PROPOSITIONS);
       try {
         mTransitionRelation = new ListBufferTransitionRelation
-          (originalAutomaton, mEventEncoding, mOriginalStateEncoding,
+          (originalAutomaton, eventEnc, mOriginalStateEncoding,
            ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       } catch (final OverflowException exception) {
         throw new WatersRuntimeException(exception);
@@ -2215,7 +2262,8 @@ public class ObserverProjectionConflictChecker
       final List<SearchRecord> initialRecords =
         beginTrace(tracesInitialStateID);
       assert initialRecords.size() > 0;
-      appendTraceSteps(initialRecords, stepsNewStateMap, convertedSteps);
+      appendTraceSteps(initialRecords, eventEnc,
+                       stepsNewStateMap, convertedSteps);
 
       // Append internal steps, with intermittent tau as needed ...
       final int tau = EventEncoding.TAU;
@@ -2224,7 +2272,7 @@ public class ObserverProjectionConflictChecker
       while (iter.hasNext()) {
         final TraceStepProxy step = iter.next();
         final EventProxy stepEvent = step.getEvent();
-        final int eventID = mEventEncoding.getEventCode(stepEvent);
+        final int eventID = eventEnc.getEventCode(stepEvent);
         final Map<AutomatonProxy,StateProxy> stepsStateMap =
           step.getStateMap();
         if (eventID < 0) {
@@ -2248,7 +2296,8 @@ public class ObserverProjectionConflictChecker
           final List<SearchRecord> subtrace =
             findSubTrace(originalSourceID, eventID,
                          mReverseOutputStateMap.get(resultTargetState));
-          appendTraceSteps(subtrace, stepsNewStateMap, convertedSteps);
+          appendTraceSteps(subtrace, eventEnc,
+                           stepsNewStateMap, convertedSteps);
           final int subsize = subtrace.size();
           if (subsize > 0) {
             originalSourceID = subtrace.get(subsize - 1).getState();
@@ -2264,7 +2313,7 @@ public class ObserverProjectionConflictChecker
           final List<SearchRecord> subtrace =
             findSubTrace(originalSourceID, eventID,
                          mReverseOutputStateMap.get(resultTargetState));
-          appendTraceSteps(subtrace, stepEvent, stepsNewStateMap,
+          appendTraceSteps(subtrace, stepEvent, eventEnc, stepsNewStateMap,
                            stepsAfterStateMap, convertedSteps);
           stepsNewStateMap = stepsAfterStateMap;
           final int subsize = subtrace.size();
@@ -2425,6 +2474,8 @@ public class ObserverProjectionConflictChecker
      * A {@link TraceStepProxy} is created for each SearchRecord.
      * @param recordTrace
      *          The list of search records to convert into steps of a trace.
+     * @param eventEnc
+     *          Event encoding to recognise silent events.
      * @param stepsStateMap
      *          The state map for the step before adding the new information.
      * @param outputTrace
@@ -2432,16 +2483,18 @@ public class ObserverProjectionConflictChecker
      */
     private void appendTraceSteps
       (final List<SearchRecord> recordTrace,
+       final EventEncoding eventEnc,
        final Map<AutomatonProxy,StateProxy> stepsStateMap,
        final List<TraceStepProxy> outputTrace)
     {
-      appendTraceSteps(recordTrace, null,
+      appendTraceSteps(recordTrace, null, eventEnc,
                        stepsStateMap, stepsStateMap, outputTrace);
     }
 
     private void appendTraceSteps
       (final List<SearchRecord> recordTrace,
        final EventProxy event,
+       final EventEncoding eventEnc,
        final Map<AutomatonProxy,StateProxy> beforeEventStateMap,
        final Map<AutomatonProxy,StateProxy> afterEventStateMap,
        final List<TraceStepProxy> outputTrace)
@@ -2453,7 +2506,7 @@ public class ObserverProjectionConflictChecker
         final int subStepEventID = record.getEvent();
         final EventProxy stepEvent;
         if (subStepEventID >= 0) {
-          stepEvent = mEventEncoding.getProperEvent(subStepEventID);
+          stepEvent = eventEnc.getProperEvent(subStepEventID);
           if (stepEvent == event) {
             currentStateMap = afterEventStateMap;
           }
@@ -2474,11 +2527,10 @@ public class ObserverProjectionConflictChecker
     //#######################################################################
     //# Data Members
     /**
-     * Event encoding of original automaton. Maps event codes in the
-     * transition relation to event objects in the input and output automata
-     * and vice versa.
+     * The event that was hidden from the original automaton,
+     * or <CODE>null</CODE>.
      */
-    private final EventEncoding mEventEncoding;
+    private final EventProxy mTau;
     /**
      * State encoding of original automaton. Maps state codes in the input
      * transition relation to state objects in the input automaton.
@@ -2626,6 +2678,12 @@ public class ObserverProjectionConflictChecker
       new HashMap<EventProxy,EventInfo>();
   private Queue<AutomatonProxy> mDirtyAutomata;
   private Collection<EventProxy> mRedundantEvents;
+  /**
+   * A flag indicating that an event has disappeared unexpectedly.
+   * This flag is set when a proper event has been found to be only selflooped
+   * in an automaton after abstraction, and therefore has been removed from
+   * the automaton alphabet.
+   */
   private boolean mEventHasDisappeared;
   private Collection<SubSystem> mPostponedSubsystems;
   private Collection<AutomatonProxy> mProcessedAutomata;

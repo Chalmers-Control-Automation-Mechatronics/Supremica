@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.op.ObserverProjectionConflictChecker;
+import net.sourceforge.waters.analysis.op.OPConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
@@ -79,10 +79,10 @@ public class ProjectingModelVerifierFactory
       (factory, new NativeControllabilityChecker(factory), projector);
   }
 
-  public ObserverProjectionConflictChecker createConflictChecker
+  public OPConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ObserverProjectionConflictChecker(null, factory);
+    return new OPConflictChecker(null, factory);
   }
 
   public LanguageInclusionChecker createLanguageInclusionChecker
@@ -116,9 +116,9 @@ public class ProjectingModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof ObserverProjectionConflictChecker) {
-        final ObserverProjectionConflictChecker composer =
-            (ObserverProjectionConflictChecker) verifier;
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer =
+            (OPConflictChecker) verifier;
         composer.setFinalStepNodeLimit(limit);
       } else {
         verifier.setNodeLimit(limit);
@@ -148,9 +148,9 @@ public class ProjectingModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof ObserverProjectionConflictChecker) {
-        final ObserverProjectionConflictChecker composer =
-            (ObserverProjectionConflictChecker) verifier;
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer =
+            (OPConflictChecker) verifier;
         composer.setInternalStepNodeLimit(limit);
       } else {
         verifier.setNodeLimit(limit);
@@ -180,9 +180,9 @@ public class ProjectingModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof ObserverProjectionConflictChecker) {
-        final ObserverProjectionConflictChecker composer =
-            (ObserverProjectionConflictChecker) verifier;
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer =
+            (OPConflictChecker) verifier;
         composer.setFinalStepTransitionLimit(limit);
       } else {
         verifier.setTransitionLimit(limit);
@@ -212,9 +212,9 @@ public class ProjectingModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof ObserverProjectionConflictChecker) {
-        final ObserverProjectionConflictChecker composer =
-            (ObserverProjectionConflictChecker) verifier;
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer =
+            (OPConflictChecker) verifier;
         composer.setInternalStepTransitionLimit(limit);
       } else {
         verifier.setTransitionLimit(limit);
@@ -227,7 +227,7 @@ public class ProjectingModelVerifierFactory
   //#########################################################################
   //# Inner Class MethodArgument
   private static class MethodArgument
-    extends CommandLineArgumentEnum<ObserverProjectionConflictChecker.Method>
+    extends CommandLineArgumentEnum<OPConflictChecker.Method>
   {
 
     //#######################################################################
@@ -235,7 +235,7 @@ public class ProjectingModelVerifierFactory
     private MethodArgument()
     {
       super("-method", "Abstraction method used for conflict check",
-            ObserverProjectionConflictChecker.Method.class);
+            OPConflictChecker.Method.class);
     }
 
     //#######################################################################
@@ -243,10 +243,10 @@ public class ProjectingModelVerifierFactory
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
-      final ObserverProjectionConflictChecker.Method method = getValue();
-      if (verifier instanceof ObserverProjectionConflictChecker) {
-        final ObserverProjectionConflictChecker composer =
-            (ObserverProjectionConflictChecker) verifier;
+      final OPConflictChecker.Method method = getValue();
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer =
+            (OPConflictChecker) verifier;
         composer.setMethod(method);
       } else {
         fail(getName() + " option only supported for conflict check!");

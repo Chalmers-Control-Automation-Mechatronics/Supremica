@@ -42,10 +42,10 @@ public class ObservationEquivalenceConflictCheckerTest extends
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final ObserverProjectionConflictChecker checker =
-      new ObserverProjectionConflictChecker(factory);
+    final OPConflictChecker checker =
+      new OPConflictChecker(factory);
     checker.setMethod
-      (ObserverProjectionConflictChecker.Method.OEQ);
+      (OPConflictChecker.Method.OEQ);
     checker.setInternalStepNodeLimit(5000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);

@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.modular;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
-import net.sourceforge.waters.analysis.op.ObserverProjectionConflictChecker;
+import net.sourceforge.waters.analysis.op.OPConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
@@ -65,10 +65,10 @@ public class ModularModelVerifierFactory
     return new ModularControlLoopChecker(factory);
   }
 
-  public ObserverProjectionConflictChecker createConflictChecker
+  public OPConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ObserverProjectionConflictChecker(null, factory);
+    return new OPConflictChecker(null, factory);
   }
 
   public ModularLanguageInclusionChecker createLanguageInclusionChecker

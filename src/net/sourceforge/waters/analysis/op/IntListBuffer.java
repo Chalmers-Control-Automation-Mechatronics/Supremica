@@ -243,8 +243,8 @@ public class IntListBuffer
   /**
    * Adds the given data to the front of the specified list, but only if the
    * current first list element is different from the new data.
-   * @param  list   The unique list number that identifies the list to be modified
-   *                in this buffer.
+   * @param  list   The unique list number that identifies the list to be
+   *                modified in this buffer.
    * @param  data   The integer data to be stored as the new first element of
    *                the list.
    */
@@ -258,6 +258,14 @@ public class IntListBuffer
     }
   }
 
+  /**
+   * Removes the given data from the specified list.
+   * This method performs a sequential search of the list to find the item
+   * to be removed, and therefore is of linear complexity.
+   * @param  list   The unique list number that identifies the list to be
+   *                modified in this buffer.
+   * @param  data   The integer data to be removed from the list.
+   */
   public boolean remove(final int list, final int data)
   {
     if (list != NULL) {
@@ -285,6 +293,26 @@ public class IntListBuffer
       }
     }
     return false;
+  }
+
+  /**
+   * Constructs an array containing the elements in the given list.
+   * @param  list   The unique list number that identifies the list to be
+   *                examined in this buffer.
+   */
+  public int[] toArray(final int list)
+  {
+    final int count = getLength(list);
+    final int[] result = new int[count];
+    int index = 0;
+    int next = getNext(list);
+    while (next != NULL) {
+      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int offset = next & BLOCK_MASK;
+      result[index++] = block[offset + OFFSET_DATA];
+      next = block[offset + OFFSET_NEXT];
+    }
+    return result;
   }
 
 
