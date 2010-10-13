@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   ControllabilityKindTranslator
+//# PACKAGE: net.sourceforge.waters.analysis.sd
+//# CLASS:   SDPlantCompletenessDiagnostics
 //###########################################################################
 //# $Id$
 //###########################################################################

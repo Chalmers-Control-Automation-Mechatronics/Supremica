@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   ControllabilityKindTranslator
+//# PACKAGE: net.sourceforge.waters.analysis.sd
+//# CLASS:   SDPlantCompletenessKindTranslator
 //###########################################################################
-//# $Id: ControllabilityKindTranslator.java 5206 2010-02-04 00:45:23Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.sd;
@@ -18,12 +18,12 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 
 /**
- * <P>A kind translator used for controllability checking.
- * This translator relabels supervisors as specifications and otherwise
- * returns all component and event types as they are in the original
- * model.</P>
+ * <P>A kind translator used for plant completeness checking.
+ * This translator relabels supervisors and specifications as plants
+ * and plants as specifications. Furthermore, controllable and
+ * uncontrollable events are swapped.</P>
  *
- * @author Robi Malik
+ * @author Mahvash Baloch, Robi Malik
  */
 
 public class SDPlantCompletenessKindTranslator
@@ -57,7 +57,7 @@ public class SDPlantCompletenessKindTranslator
     case SUPERVISOR:
       return ComponentKind.PLANT;
     case PLANT:
-      return ComponentKind.SPEC;    
+      return ComponentKind.SPEC;
     default:
       return kind;
     }
