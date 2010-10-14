@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.op
-//# CLASS:   OPConflictCheckerTest
+//# CLASS:   OPSearchConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class OPConflictCheckerTest extends
+public class OPSearchConflictCheckerTest extends
     AbstractStandardConflictCheckerTest
 {
 
@@ -25,7 +25,7 @@ public class OPConflictCheckerTest extends
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    final TestSuite testSuite = new TestSuite(OPConflictCheckerTest.class);
+    final TestSuite testSuite = new TestSuite(OPSearchConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -42,7 +42,7 @@ public class OPConflictCheckerTest extends
     (final ProductDESProxyFactory factory)
   {
     final OPConflictChecker checker = new OPConflictChecker(factory);
-    checker.setMethod(OPConflictChecker.Method.OP);
+    checker.setMethod(OPConflictChecker.Method.OPSEARCH);
     checker.setInternalStepNodeLimit(5000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);

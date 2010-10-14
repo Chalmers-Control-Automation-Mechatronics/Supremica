@@ -27,6 +27,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
@@ -125,8 +126,7 @@ public class OPSearchAutomatonSimplifier
         doOPSearchStep();
       }
       if (needsMerge()) {
-        final AutomatonProxy aut = createOutputAutomaton();
-        return setAutomatonResult(aut);
+        return createOutputAutomaton();
       } else {
         return setAutomatonResult(mInputAutomaton);
       }
@@ -177,6 +177,18 @@ public class OPSearchAutomatonSimplifier
     mBFSLongList2 = null;
     mBFSLongVisited = null;
     mContainmentTestSet = null;
+  }
+
+  @Override
+  public PartitionedAutomatonResult getAnalysisResult()
+  {
+    return (PartitionedAutomatonResult) super.getAnalysisResult();
+  }
+
+  @Override
+  protected PartitionedAutomatonResult createAnalysisResult()
+  {
+    return new PartitionedAutomatonResult();
   }
 
 
@@ -848,7 +860,7 @@ public class OPSearchAutomatonSimplifier
     }
   }
 
-  private AutomatonProxy createOutputAutomaton()
+  private boolean createOutputAutomaton()
   {
     String name = getOutputName();
     if (name == null) {
@@ -881,6 +893,7 @@ public class OPSearchAutomatonSimplifier
     }
     final int numStates = mOriginalStates.length;
     final Collection<StateProxy> states = new ArrayList<StateProxy>(numStates);
+    final List<int[]> partition = new ArrayList<int[]>(numStates);
     final TIntObjectHashMap<MemStateProxy> stateMap =
       new TIntObjectHashMap<MemStateProxy>(numStates);
     int code = 0;
@@ -902,9 +915,19 @@ public class OPSearchAutomatonSimplifier
         final MemStateProxy state = new MemStateProxy(code, init, props);
         states.add(state);
         stateMap.put(root, state);
+        final int[] clazz;
+        if (comp == null) {
+          clazz = new int[1];
+          clazz[0] = s;
+        } else {
+          clazz = comp.toArray();
+        }
+        partition.add(clazz);
         code++;
       }
     }
+    final StateEncoding inputEnc = new StateEncoding(mOriginalStates);
+    final StateEncoding outputEnc = new StateEncoding(states);
     allProps = null;
 
     // 3. Create Transitions
@@ -980,8 +1003,12 @@ public class OPSearchAutomatonSimplifier
       events.add(event);
     }
     events.addAll(observableTauEvents);
-    return factory.createAutomatonProxy(name, kind,
-                                        events, states, transitions);
+    final AutomatonProxy aut =
+      factory.createAutomatonProxy(name, kind, events, states, transitions);
+
+    final PartitionedAutomatonResult result = getAnalysisResult();
+    result.setAutomaton(aut, inputEnc, outputEnc, partition);
+    return result.isSatisfied();
   }
 
   private void mergeComponents(final int state1, final int state2)
@@ -1303,6 +1330,11 @@ public class OPSearchAutomatonSimplifier
     private boolean isEnabledEvent(final int e)
     {
       return mEnabledEvents.get(e);
+    }
+
+    private int[] toArray()
+    {
+      return mListBuffer.toArray(mStates);
     }
 
     //#######################################################################

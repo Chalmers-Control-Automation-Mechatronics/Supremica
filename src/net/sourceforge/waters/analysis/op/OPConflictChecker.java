@@ -1916,22 +1916,23 @@ public class OPConflictChecker
     {
       if (tau == null) {
         return null;
-      } else {
-        final ProductDESProxyFactory factory = getFactory();
-        final Collection<EventProxy> hidden = Collections.singletonList(tau);
-        final OPSearchAutomatonSimplifier simplifier =
-          new OPSearchAutomatonSimplifier(aut, hidden, factory);
-        simplifier.setPropositions(mPropositions);
-        simplifier.run();
-        @SuppressWarnings("unused")
-        final AutomatonProxy convertedAut = simplifier.getComputedAutomaton();
-        return null;
-        /*
-        return new ObservationEquivalenceStep(convertedAut, aut, eventEnc,
-                                              inputStateEnc, partition,
-                                              outputStateEnc);
-        */
       }
+      final ProductDESProxyFactory factory = getFactory();
+      final Collection<EventProxy> hidden = Collections.singletonList(tau);
+      final OPSearchAutomatonSimplifier simplifier =
+        new OPSearchAutomatonSimplifier(aut, hidden, factory);
+      simplifier.setPropositions(mPropositions);
+      simplifier.run();
+      final PartitionedAutomatonResult result = simplifier.getAnalysisResult();
+      final AutomatonProxy convertedAut = result.getAutomaton();
+      if (aut == convertedAut) {
+        return null;
+      }
+      final StateEncoding inputEnc = result.getInputEncoding();
+      final StateEncoding outputEnc = result.getOutputEncoding();
+      final List<int[]> partition = result.getPartition();
+      return new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                            inputEnc, partition, outputEnc);
     }
 
   }
