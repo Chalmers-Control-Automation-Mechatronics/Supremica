@@ -1061,6 +1061,7 @@ public class OPSearchAutomatonSimplifier
           final EventProxy event;
           if (eindex < events.size()) {
             event = events.get(eindex);
+            eindex++;
           } else {
             eindex++;
             event = createObservableTauEvent(eindex);
