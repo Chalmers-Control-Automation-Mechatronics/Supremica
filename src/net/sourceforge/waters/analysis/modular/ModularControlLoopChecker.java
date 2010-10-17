@@ -221,11 +221,11 @@ public class ModularControlLoopChecker
     throw new UnsupportedOperationException("Modular Control Loop Checker does not calculate non-loop events");
   }
 
+  @Override
   public void setKindTranslator(final KindTranslator translator)
   {
     super.setKindTranslator(translator);
     mTranslator = new ManipulativeTranslator(translator);
-    clearAnalysisResult();
   }
 
   public void setMergeVersion(final AutomataGroup.MergeVersion m)

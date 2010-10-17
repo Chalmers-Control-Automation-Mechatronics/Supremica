@@ -126,12 +126,6 @@ public class MonolithicControlLoopChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
-  public void setKindTranslator(final KindTranslator translator)
-  {
-    super.setKindTranslator(translator);
-    clearAnalysisResult();
-  }
-
   public LoopTraceProxy getCounterExample()
   {
     return (LoopTraceProxy) super.getCounterExample();

@@ -153,16 +153,6 @@ public class BDDSafetyVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
-  @Override
-  public void setKindTranslator(final KindTranslator translator)
-  {
-    super.setKindTranslator(translator);
-    clearAnalysisResult();
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
   public SafetyDiagnostics getDiagnostics()
   {

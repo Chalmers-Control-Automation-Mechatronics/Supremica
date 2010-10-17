@@ -50,7 +50,10 @@ public abstract class AbstractModelVerifier
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   public void setKindTranslator(final KindTranslator translator)
   {
-    mKindTranslator = translator;
+    if (mKindTranslator != translator) {
+      mKindTranslator = translator;
+      clearAnalysisResult();
+    }
   }
 
   public KindTranslator getKindTranslator()

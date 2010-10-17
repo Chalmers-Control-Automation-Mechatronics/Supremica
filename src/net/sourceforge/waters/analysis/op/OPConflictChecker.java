@@ -163,7 +163,7 @@ public class OPConflictChecker
     return super.getNodeLimit();
   }
 
-
+  @Override
   public void setTransitionLimit(final int limit)
   {
     super.setTransitionLimit(limit);

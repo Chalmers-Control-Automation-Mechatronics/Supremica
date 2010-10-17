@@ -142,12 +142,6 @@ public class MonolithicSCCControlLoopChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
-  public void setKindTranslator(final KindTranslator translator)
-  {
-    super.setKindTranslator(translator);
-    clearAnalysisResult();
-  }
-
   public static void setLoopDetector(final CLDetector newDetector)
   {
     DETECTOR_VERSION = newDetector;
