@@ -33,9 +33,8 @@ namespace jni {
 
 ClassGlue::
 ClassGlue(const ClassInfo* info, jclass javaclass, JNIEnv* env)
+  : mKey(info, (jclass) env->NewGlobalRef(javaclass))
 {
-  mClassInfo = info;
-  mJavaClass = (jclass) env->NewGlobalRef(javaclass);
   if (waters::uint32 methodcount = info->getNumMethods()) {
     mMethodTable = new jmethodID[methodcount];
     for (waters::uint32 i = 0; i < methodcount; i++) {
@@ -60,13 +59,15 @@ ClassGlue::
 ~ClassGlue()
 {
   delete [] mMethodTable;
-  if (waters::uint32 fieldcount = mClassInfo->getNumFields()) {
+  const ClassInfo* info = mKey.getClassInfo();
+  if (waters::uint32 fieldcount = info->getNumFields()) {
     for (waters::uint32 i = 0; i < fieldcount; i++) {
       mEnvironment->DeleteLocalRef(mStaticFinalFieldTable[i]);
     }
     delete [] mStaticFinalFieldTable;
   }
-  mEnvironment->DeleteGlobalRef(mJavaClass);
+  jclass javaclass = mKey.getJavaClass();
+  mEnvironment->DeleteGlobalRef(javaclass);
 }
 
 
@@ -78,10 +79,12 @@ getMethodID(waters::uint32 methodcode)
 {
   jmethodID result = mMethodTable[methodcode];
   if (result == 0) {
-    const MethodInfo* methodinfo = mClassInfo->getMethodInfo(methodcode);
+    const ClassInfo* info = mKey.getClassInfo();
+    const MethodInfo* methodinfo = info->getMethodInfo(methodcode);
     const char* name = methodinfo->getName();
     const char* signature = methodinfo->getSignature();
-    result = mEnvironment->GetMethodID(mJavaClass, name, signature);
+    jclass javaclass = mKey.getJavaClass();
+    result = mEnvironment->GetMethodID(javaclass, name, signature);
     if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
       throw exception;
     }
@@ -96,10 +99,12 @@ getStaticMethodID(waters::uint32 methodcode)
 {
   jmethodID result = mMethodTable[methodcode];
   if (result == 0) {
-    const MethodInfo* methodinfo = mClassInfo->getMethodInfo(methodcode);
+    const ClassInfo* info = mKey.getClassInfo();
+    const MethodInfo* methodinfo = info->getMethodInfo(methodcode);
     const char* name = methodinfo->getName();
     const char* signature = methodinfo->getSignature();
-    result = mEnvironment->GetStaticMethodID(mJavaClass, name, signature);
+    jclass javaclass = mKey.getJavaClass();
+    result = mEnvironment->GetStaticMethodID(javaclass, name, signature);
     if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
       throw exception;
     }
@@ -114,15 +119,17 @@ getStaticFinalField(waters::uint32 fieldcode)
 {
   jobject result = mStaticFinalFieldTable[fieldcode];
   if (result == 0) {
-    const MethodInfo* fieldinfo = mClassInfo->getFieldInfo(fieldcode);
+    const ClassInfo* info = mKey.getClassInfo();
+    const MethodInfo* fieldinfo = info->getFieldInfo(fieldcode);
     const char* name = fieldinfo->getName();
     const char* signature = fieldinfo->getSignature();
-    jfieldID fid = mEnvironment->GetStaticFieldID(mJavaClass, name, signature);
+    jclass javaclass = mKey.getJavaClass();
+    jfieldID fid = mEnvironment->GetStaticFieldID(javaclass, name, signature);
     if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
       throw exception;
     }
     mStaticFinalFieldTable[fieldcode] = result =
-      mEnvironment->GetStaticObjectField(mJavaClass, fid);
+      mEnvironment->GetStaticObjectField(javaclass, fid);
   }
   return result;
 }

@@ -53,7 +53,7 @@ public:
   virtual waters::uint32 hash(const void* key) const;
   virtual bool equals(const void* key1, const void* key2) const;
   virtual const void* getKey(const void* value) const
-    {return ((ClassGlue*) value)->getJavaClass();};
+    {return ((ClassGlue*) value)->getClassKey();};
 
 private:
   //##########################################################################
@@ -94,7 +94,7 @@ private:
   //# Data Members
   JNIEnv* mEnvironment;
   ClassCacheHashAccessor mAccessor;
-  waters::HashTable<jclass,ClassGlue*> mClassMap;
+  waters::HashTable<ClassKey*,ClassGlue*> mClassMap;
   ClassGlue** mCodeMap;
 
 };

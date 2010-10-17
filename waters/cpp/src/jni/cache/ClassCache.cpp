@@ -47,13 +47,16 @@ hash(const void* key)
   const
 {
   jmethodID mid = mClassGlue->getMethodID(METHOD_Object_hashCode);
-  jobject javaobject = (jobject) key;
-  waters::uint32 result =
-    (waters::uint32) mEnvironment->CallIntMethod(javaobject, mid);
+  const ClassKey* ckey = (const ClassKey*) key;
+  waters::uint32 lkey[2];
+  jobject javaobject = ckey->getJavaClass();
+  lkey[0] = (waters::uint32) mEnvironment->CallIntMethod(javaobject, mid);
   if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
     throw exception;
   }
-  return waters::hashInt(result);
+  const ClassInfo* info = ckey->getClassInfo();
+  lkey[1] = info->getClassCode();
+  return waters::hashIntArray(lkey, 2);
 }
 
 
@@ -61,9 +64,14 @@ bool ClassCacheHashAccessor::
 equals(const void* key1, const void* key2)
   const
 {
-  jobject javaobject1 = (jobject) key1;
-  jobject javaobject2 = (jobject) key2;
-  return mEnvironment->IsSameObject(javaobject1, javaobject2);
+  const ClassKey* ckey1 = (const ClassKey*) key1;
+  const ClassKey* ckey2 = (const ClassKey*) key2;
+  if (ckey1->getClassInfo() != ckey2->getClassInfo()) {
+    return false;
+  }
+  jobject javaobject1 = ckey1->getJavaClass();
+  jobject javaobject2 = ckey2->getJavaClass();
+  return mEnvironment->IsSameObject(javaobject1, javaobject2) == JNI_TRUE;
 }
 
 
@@ -133,7 +141,8 @@ getClass(jclass javaclass, waters::uint32 classcode)
 ClassGlue* ClassCache::
 getClass(jclass javaclass, const ClassInfo* info)
 {
-  ClassGlue* result = mClassMap.get(javaclass);
+  ClassKey key(info, javaclass);
+  ClassGlue* result = mClassMap.get(&key);
   if (result) {
     mEnvironment->DeleteLocalRef(javaclass);
   } else {

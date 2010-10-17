@@ -35,6 +35,31 @@ class ClassInfo;
 
 
 //############################################################################
+//# class ClassKey
+//############################################################################
+
+class ClassKey
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit ClassKey(const ClassInfo* info, jclass javaclass) :
+    mClassInfo(info), mJavaClass(javaclass) {}
+
+  //##########################################################################
+  //# Simple Access
+  inline const ClassInfo* getClassInfo() const {return mClassInfo;};
+  inline jclass getJavaClass() const {return mJavaClass;};
+
+private:
+  //##########################################################################
+  //# Data Members
+  const ClassInfo* mClassInfo;
+  jclass mJavaClass;
+};
+
+
+//############################################################################
 //# class ClassGlue
 //############################################################################
 
@@ -42,17 +67,14 @@ class ClassGlue
 {
 public:
   //##########################################################################
-  //# Static Class Methods
-  static const waters::HashAccessor* getHashAccessor();
-
-  //##########################################################################
   //# Constructors & Destructors
   explicit ClassGlue(const ClassInfo* info, jclass javaclass, JNIEnv* env);
   ~ClassGlue();
 
   //##########################################################################
   //# Access
-  jclass getJavaClass() const {return mJavaClass;};
+  const ClassKey* getClassKey() const {return &mKey;};
+  jclass getJavaClass() const {return mKey.getJavaClass();};
   jmethodID getMethodID(waters::uint32 methodcode);
   jmethodID getStaticMethodID(waters::uint32 methodcode);
   jobject getStaticFinalField(waters::uint32 fieldcode);
@@ -61,15 +83,10 @@ public:
 private:
   //##########################################################################
   //# Data Members
-  const ClassInfo* mClassInfo;
-  jclass mJavaClass;
+  ClassKey mKey;
   jmethodID* mMethodTable;
   jobject* mStaticFinalFieldTable;
   JNIEnv* mEnvironment;
-
-  //##########################################################################
-  //# Class Constants
-  static const waters::HashAccessor* theAccessor;
 };
 
 }   /* namespace jni */
