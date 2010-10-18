@@ -282,6 +282,9 @@ public class ConflictAssess
       result = checker.run();
       final long stoptime = System.currentTimeMillis();
       time = 0.001 * (stoptime - starttime);
+      if (result == expect) {
+        mNumCorrectAnswers++;
+      }
     } catch (final OutOfMemoryError error) {
       checker = null;
       System.gc();
@@ -307,7 +310,6 @@ public class ConflictAssess
       }
       if (result == expect) {
         mReportPrinter.print(" - ok");
-        mNumCorrectAnswers++;
       } else {
         mReportPrinter.print(" - WRONG");
       }
@@ -329,17 +331,21 @@ public class ConflictAssess
         checker = null;
         System.gc();
         printException(error);
+        mProgressPrinter.println
+          ("trace " + mNumCorrectTraces + " " + mNumHalfCorrectTraces);
         return;
       } catch (final Throwable exception) {
         printException(exception);
-        return;
-      } finally {
         mProgressPrinter.println
           ("trace " + mNumCorrectTraces + " " + mNumHalfCorrectTraces);
+        return;
+      } finally {
         mProgressPrinter.flush();
         mSecurityManager.setEnabled(false);
       }
       checkCounterExample(des, trace);
+      mProgressPrinter.println
+        ("trace " + mNumCorrectTraces + " " + mNumHalfCorrectTraces);
     }
   }
 
