@@ -64,6 +64,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
@@ -745,6 +746,7 @@ public class ConflictAssess
     final Appender appender = new WriterAppender(layout, writer);
     appender.setName("stderr");
     final Logger root = Logger.getRootLogger();
+    root.setLevel(Level.ERROR);
     root.addAppender(appender);
 
     ConflictAssess assessor = null;
