@@ -125,6 +125,8 @@ public class ConflictAssess
           mNumCorrectTraces = Integer.parseInt(parts[1]);
           mNumReversedTraces = Integer.parseInt(parts[2]);
           crash = false;
+        } else if (key.equals("done")) {
+          crash = false;
         }
         line = reader.readLine();
       }
@@ -284,21 +286,17 @@ public class ConflictAssess
       checker = null;
       System.gc();
       printException(error);
-      mProgressPrinter.println("result " + mNumCorrectAnswers);
-      mProgressPrinter.flush();
       return;
     } catch (final Throwable exception) {
       printException(exception);
-      mProgressPrinter.println("result " + mNumCorrectAnswers);
-      mProgressPrinter.flush();
       return;
     } finally {
+      mProgressPrinter.println("result " + mNumCorrectAnswers);
+      mProgressPrinter.flush();
       mSecurityManager.setEnabled(false);
     }
 
     synchronized (this) {
-      mProgressPrinter.println("result " + mNumCorrectAnswers);
-      mProgressPrinter.flush();
       if (mTerminated) {
         return;
       }
@@ -331,17 +329,14 @@ public class ConflictAssess
         checker = null;
         System.gc();
         printException(error);
-        mProgressPrinter.println
-          ("trace " + mNumCorrectTraces + " " + mNumReversedTraces);
-        mProgressPrinter.flush();
         return;
       } catch (final Throwable exception) {
         printException(exception);
+        return;
+      } finally {
         mProgressPrinter.println
           ("trace " + mNumCorrectTraces + " " + mNumReversedTraces);
         mProgressPrinter.flush();
-        return;
-      } finally {
         mSecurityManager.setEnabled(false);
       }
       checkCounterExample(des, trace);
@@ -542,9 +537,6 @@ public class ConflictAssess
       }
     }
     mReportPrinter.flush();
-    mProgressPrinter.println
-      ("trace " + mNumCorrectTraces + " " + mNumReversedTraces);
-    mProgressPrinter.flush();
   }
 
   private synchronized void printException(final Throwable exception)
