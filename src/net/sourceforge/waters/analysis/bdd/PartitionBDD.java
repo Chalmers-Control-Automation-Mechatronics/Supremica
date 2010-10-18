@@ -135,6 +135,12 @@ abstract class PartitionBDD
     return mAutomata;
   }
 
+  boolean dependsOn(final AutomatonBDD autBDD)
+  {
+    final int a = autBDD.getAutomatonIndex();
+    return mAutomata.get(a);
+  }
+
   boolean isAtomic()
   {
     return mIsAtomic;
@@ -146,6 +152,27 @@ abstract class PartitionBDD
   abstract PartitionBDD compose(final PartitionBDD part,
                                 final AutomatonBDD[] automatonBDDs,
                                 final BDDFactory factory);
+
+
+  //#########################################################################
+  //# Simplification
+  BDD installSmallerBDD(final BDD altBDD)
+  {
+    if (mBDD.equals(altBDD)) {
+      altBDD.free();
+      return mBDD;
+    }
+    final int nodecount = getNodeCount();
+    final int altnodecount = altBDD.nodeCount();
+    if (nodecount <= altnodecount) {
+      altBDD.free();
+      return mBDD;
+    }
+    mBDD.free();
+    mBDD = altBDD;
+    mNodeCount = altnodecount;
+    return mBDD;
+  }
 
 
   //#########################################################################

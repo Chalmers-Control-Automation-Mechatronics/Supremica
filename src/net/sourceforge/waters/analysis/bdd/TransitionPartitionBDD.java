@@ -34,7 +34,7 @@ class TransitionPartitionBDD
   TransitionPartitionBDD(final EventBDD eventBDD)
   {
     super(eventBDD.getEvent(),
-          eventBDD.getTransitionsBDD(), 
+          eventBDD.getTransitionsBDD(),
           eventBDD.getSynchronisedAutomata());
   }
 
@@ -155,9 +155,32 @@ class TransitionPartitionBDD
   {
     if (mNextStateCube != null) {
       mNextStateCube.free();
-      mCurrentStateCube = null;
+      mNextStateCube = null;
       mCurrentToNext = null;
     }
+  }
+
+  BDD getNonDeadlockBDD(final AutomatonBDD[] automatonBDDs,
+                        final BDDFactory factory)
+  {
+    BDD bdd = getBDD();
+    if (bdd.isZero()) {
+      return factory.one();
+    }
+    final BitSet automata = getAutomata();
+    BDD unchanged = factory.one();
+    for (int a = automatonBDDs.length - 1; a >= 0; a--) {
+      if (automata.get(a)) {
+        final AutomatonBDD autBDD = automatonBDDs[a];
+        unchanged = autBDD.includeUnchangedBDD(unchanged, factory);
+      }
+    }
+    final BDD altBDD = bdd.apply(unchanged, BDDFactory.diff);
+    unchanged.free();
+    bdd = installSmallerBDD(altBDD);
+    buildBackwardCubes(automatonBDDs, factory);
+    final BDD nondeadlock = bdd.exist(mNextStateCube);
+    return nondeadlock;
   }
 
 

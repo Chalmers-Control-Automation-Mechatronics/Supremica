@@ -337,8 +337,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/gnonblocking/*Test.java"/>
-          <include name="**/despot/*Test.java"/>
+          <include name="**/BDD*.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Large*.java"/>
           <exclude name="**/Native*.java"/>
@@ -348,7 +347,6 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="waters.analysis.statelimit" value="10000"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
       <jvmarg value="-enableassertions"/>
     </junit>

@@ -902,6 +902,7 @@ public class OPSearchAutomatonSimplifier
       if (!stateMap.containsKey(root)) {
         final boolean init = (root == 0);
         final StronglyConnectedComponent comp = mComponentOfState[s];
+        // TODO Share proposition lists?
         final Collection<EventProxy> props = new LinkedList<EventProxy>();
         for (final EventProxy prop : allProps) {
           final int p = mEventMap.get(prop);

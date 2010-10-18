@@ -195,8 +195,14 @@ public class BDDEncoding
    */
   public BDD getEventBDD(final EventProxy event)
   {
-    final int code = mEventMap.get(event);
-    return encodeBDD(code, 0, mNumEventBits, 1);
+    final Integer code = mEventMap.get(event);
+    if (code == null) {
+      // It is more robust to return the 'false' BDD for propositions and
+      // other non-events, though the user should have avoided this call.
+      return mBDDFactory.zero();
+    } else {
+      return encodeBDD(code, 0, mNumEventBits, 1);
+    }
   }
 
   /**

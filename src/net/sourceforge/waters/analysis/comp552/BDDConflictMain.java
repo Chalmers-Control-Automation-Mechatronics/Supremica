@@ -15,7 +15,6 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -107,9 +106,11 @@ public class BDDConflictMain
           System.out.println("nonconflicting");
         } else {
           System.out.println("CONFLICTING");
+          /*
           System.out.println("Counterexample:");
           final ConflictTraceProxy counterex = checker.getCounterExample();
           System.out.println(counterex.toString());
+          */
         }
       }
 

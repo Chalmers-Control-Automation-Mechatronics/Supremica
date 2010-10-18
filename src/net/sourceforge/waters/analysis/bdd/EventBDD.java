@@ -9,18 +9,21 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import gnu.trove.THashSet;
+
 import java.util.BitSet;
-import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDVarSet;
 
+import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -39,7 +42,7 @@ abstract class EventBDD
            final BDDFactory factory)
   {
     mEvent = event;
-    mSynchronisedAutomata = new BitSet(numautomata);
+    mSynchronisedAutomataBitSet = new BitSet(numautomata);
     mTransitionsBDD = factory.one();
     mCurrentAutomaton = null;
     mIsOnlySelfloops = true;
@@ -70,7 +73,7 @@ abstract class EventBDD
 
   BitSet getSynchronisedAutomata()
   {
-    return mSynchronisedAutomata;
+    return mSynchronisedAutomataBitSet;
   }
 
   AutomatonBDD getCurrentAutomaton()
@@ -98,12 +101,15 @@ abstract class EventBDD
       mCurrentAutomatonBDD = factory.zero();
       final AutomatonProxy aut = autbdd.getAutomaton();
       final int numstates = aut.getStates().size();
-      mCurrentAutomatonSelfloops = new HashSet<StateProxy>(numstates);
+      mCurrentAutomatonSelfloops = new THashSet<StateProxy>(numstates);
+      final int numcodes = autbdd.getNumberOfStateCodes();
+      mCurrentAutomatonDeterministicSuccessors = new StateProxy[numcodes];
     }
   }
 
   void includeTransition(final TransitionProxy trans,
                          final BDDFactory factory)
+    throws NondeterministicDESException
   {
     if (mCurrentAutomatonBDD != null) {
       final BDD transbdd = mCurrentAutomaton.getTransitionBDD(trans, factory);
@@ -115,6 +121,21 @@ abstract class EventBDD
         mCurrentAutomatonSelfloops = null;
       } else if (mCurrentAutomatonSelfloops != null) {
         mCurrentAutomatonSelfloops.add(source);
+      }
+      if (mCurrentAutomatonDeterministicSuccessors != null) {
+        final int code = mCurrentAutomaton.getStateCode(source);
+        final StateProxy old = mCurrentAutomatonDeterministicSuccessors[code];
+        if (old == null) {
+          mCurrentAutomatonDeterministicSuccessors[code] = target;
+        } else if (old == target) {
+          // skip ...
+        } else if (mCurrentAutomaton.getKind() == ComponentKind.SPEC) {
+          final AutomatonProxy aut = mCurrentAutomaton.getAutomaton();
+          throw new NondeterministicDESException(aut, source, mEvent);
+        } else {
+          mCurrentAutomaton.setNondeterministic(mEvent);
+          mCurrentAutomatonDeterministicSuccessors = null;
+        }
       }
     }
   }
@@ -134,17 +155,17 @@ abstract class EventBDD
           } else if (mCurrentAutomatonBDD.isZero()) {
             mTransitionsBDD.free();
             mTransitionsBDD = mCurrentAutomatonBDD;
-            mSynchronisedAutomata.clear();
+            mSynchronisedAutomataBitSet.clear();
           } else {
             final BDDVarSet cube = mCurrentAutomaton.getNextStateCube(factory);
             final BDD projected = mCurrentAutomatonBDD.exist(cube);
             mCurrentAutomatonBDD.free();
             cube.free();
             mTransitionsBDD.andWith(projected);
-          }          
+          }
         } else {
-          final int index = mCurrentAutomaton.getBitIndex();
-          mSynchronisedAutomata.set(index);
+          final int index = mCurrentAutomaton.getAutomatonIndex();
+          mSynchronisedAutomataBitSet.set(index);
           mTransitionsBDD.andWith(mCurrentAutomatonBDD);
         }
       }
@@ -166,7 +187,7 @@ abstract class EventBDD
 
   BitSet getControllabilityTestedAutomata()
   {
-    final int size = mSynchronisedAutomata.size();
+    final int size = mSynchronisedAutomataBitSet.size();
     final BitSet result = new BitSet(size);
     return result;
   }
@@ -179,12 +200,13 @@ abstract class EventBDD
   //#########################################################################
   //# Data Members
   private final EventProxy mEvent;
-  private final BitSet mSynchronisedAutomata;
+  private final BitSet mSynchronisedAutomataBitSet;
 
   private BDD mTransitionsBDD;
   private boolean mIsOnlySelfloops;
   private AutomatonBDD mCurrentAutomaton;
   private BDD mCurrentAutomatonBDD;
   private Set<StateProxy> mCurrentAutomatonSelfloops;
+  private StateProxy[] mCurrentAutomatonDeterministicSuccessors;
 
 }

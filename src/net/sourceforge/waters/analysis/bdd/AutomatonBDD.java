@@ -9,12 +9,12 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,9 +24,10 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
-
+import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -48,65 +49,65 @@ class AutomatonBDD
   {
     mAutomaton = aut;
     mKind = kind;
-    mBitIndex = autindex;
+    mAutomatonIndex = autindex;
     final Collection<StateProxy> states = aut.getStates();
     final int numstates = states.size();
-    mNumberOfBits = AutomatonTools.log2(numstates);
-    mFirstVariableIndex = factory.varNum();
     mStateMap = new HashMap<StateProxy,StateCode>(numstates);
-    int index = 0;
-    switch (numstates) {
-    case 0:
-      break;
-    case 1:
-      final StateProxy state0 = states.iterator().next();
-      final StateCode code0 = new StateCode(state0, 0);
-      mStateMap.put(state0, code0);
-      break;
-    case 2:
-      factory.setVarNum(mFirstVariableIndex + 2);
-      final List<StateProxy> sorted = new ArrayList<StateProxy>(states);
-      Collections.sort(sorted, INIT_COMPARATOR);
-      for (final StateProxy state : sorted) {
-        final StateCode code = new StateCode(state, index++);
-        mStateMap.put(state, code);
+    final List<StateCode> reached = new ArrayList<StateCode>(numstates);
+    for (final StateProxy state : states) {
+      final StateCode code = new StateCode(state);
+      mStateMap.put(state, code);
+      if (state.isInitial()) {
+        reached.add(code);
       }
-      break;
-    default:
-      factory.setVarNum(mFirstVariableIndex + 2 * mNumberOfBits);
-      final List<StateCode> open = new LinkedList<StateCode>();
-      for (final StateProxy state : states) {
-        final StateCode code = new StateCode(state);
-        mStateMap.put(state, code);
-        if (state.isInitial()) {
-          open.add(code);
-        }
-      }
-      for (final TransitionProxy trans : aut.getTransitions()) {
-        final StateProxy source = trans.getSource();
-        final StateCode code = mStateMap.get(source);
-        code.addTransition(trans);
-      }
-      final int power2 = 1 << mNumberOfBits;
-      final int firstuse2 = numstates + numstates - power2;
-      Collections.sort(open);
-      while (!open.isEmpty()) {
-        final StateCode code = open.remove(0);
-        if (index >= firstuse2) {
-          code.setStateCode(index, true);
-          index += 2;
-        } else {
-          code.setStateCode(index++);
-        }
-        final Collection<StateCode> successors = code.removeSuccessorStates();
-        for (final StateCode succ : successors) {
-          if (succ.getStateCode() < 0 && !open.contains(succ)) {
-            open.add(succ);
-          }
-        }
-      }
-      break;
     }
+    for (final TransitionProxy trans : aut.getTransitions()) {
+      final StateProxy source = trans.getSource();
+      final StateCode code = mStateMap.get(source);
+      code.addTransition(trans);
+    }
+    for (int index = 0; index < reached.size(); index++) {
+      final StateCode code = reached.get(index);
+      final Collection<StateCode> successors = code.removeSuccessorStates();
+      for (final StateCode succ : successors) {
+        if (succ.setReachable()) {
+          reached.add(succ);
+        }
+      }
+    }
+    final int numreached = reached.size();
+    if (numreached < numstates) {
+      final Iterator<Map.Entry<StateProxy,StateCode>> iter =
+        mStateMap.entrySet().iterator();
+      while (iter.hasNext()) {
+        final Map.Entry<StateProxy,StateCode> entry = iter.next();
+        final StateCode code = entry.getValue();
+        if (!code.isReachable()) {
+          iter.remove();
+        }
+      }
+    }
+    mNumberOfBits = AutomatonTools.log2(numreached);
+    mFirstVariableIndex = factory.varNum();
+    mStateArray = new StateCode[1 << mNumberOfBits];
+    if (mNumberOfBits > 0) {
+      factory.setVarNum(mFirstVariableIndex + 2 * mNumberOfBits);
+    }
+    final int power2 = 1 << mNumberOfBits;
+    final int firstuse2 = numreached + numreached - power2;
+    int index = 0;
+    for (final StateCode code : reached) {
+      if (index >= firstuse2) {
+        code.setStateCode(index, true);
+        mStateArray[index++] = code;
+        mStateArray[index++] = code;
+      } else {
+        code.setStateCode(index);
+        mStateArray[index] = code;
+        index++;
+      }
+    }
+    mNondeterministicEvents = null;
   }
 
 
@@ -122,25 +123,110 @@ class AutomatonBDD
     return mKind;
   }
 
-  int getBitIndex()
+  int getFirstVariableIndex()
   {
-    return mBitIndex;
+    return mFirstVariableIndex;
+  }
+
+  int getLastVariableIndex()
+  {
+    return mFirstVariableIndex + 2 * mNumberOfBits - 1;
+  }
+
+  int getBitIndex(final int varindex)
+  {
+    return (varindex - mFirstVariableIndex) >> 1;
+  }
+
+  boolean isNextStateVariable(final int varindex)
+  {
+    return ((varindex - mFirstVariableIndex) & 1) != 0;
+  }
+
+  int getAutomatonIndex()
+  {
+    return mAutomatonIndex;
+  }
+
+  int getNumberOfEncodedStates()
+  {
+    return mStateMap.size();
+  }
+
+  int getNumberOfStateBits()
+  {
+    return mNumberOfBits;
+  }
+
+  int getNumberOfStateCodes()
+  {
+    return 1 << mNumberOfBits;
+  }
+
+  boolean isDeterministic()
+  {
+    return mNondeterministicEvents == null;
+  }
+
+  boolean isDeterministic(final EventProxy event)
+  {
+    if (mNondeterministicEvents == null) {
+      return true;
+    } else {
+      return !mNondeterministicEvents.contains(event);
+    }
+  }
+
+  void setNondeterministic(final EventProxy event)
+  {
+    if (mNondeterministicEvents == null) {
+      mNondeterministicEvents = new THashSet<EventProxy>();
+    }
+    mNondeterministicEvents.add(event);
   }
 
 
   //#########################################################################
   //# Constructing BDDs
   BDD getInitialStateBDD(final BDDFactory factory)
+    throws NondeterministicDESException
   {
     final BDD result = factory.zero();
     final Collection<StateProxy> states = mAutomaton.getStates();
+    int count = 0;
     for (final StateProxy state : states) {
       if (state.isInitial()) {
+        if (++count > 1) {
+          if (mKind == ComponentKind.SPEC) {
+            throw new NondeterministicDESException(mAutomaton, state);
+          } else {
+            setNondeterministic(null);
+          }
+        }
         final BDD statebdd = getStateBDD(state, factory);
         result.orWith(statebdd);
       }
     }
     return result;
+  }
+
+  BDD getMarkedStateBDD(final EventProxy prop, final BDDFactory factory)
+  {
+    final Collection<EventProxy> alphabet = mAutomaton.getEvents();
+    if (alphabet.contains(prop)) {
+      final BDD result = factory.zero();
+      final Collection<StateProxy> states = mAutomaton.getStates();
+      for (final StateProxy state : states) {
+        final Collection<EventProxy> props = state.getPropositions();
+        if (props.contains(prop)) {
+          final BDD statebdd = getStateBDD(state, factory);
+          result.orWith(statebdd);
+        }
+      }
+      return result;
+    } else {
+      return null;
+    }
   }
 
   BDDVarSet getCurrentStateCube(final BDDFactory factory)
@@ -191,8 +277,7 @@ class AutomatonBDD
 
   BDD includeUnchangedBDD(final BDD bdd, final BDDFactory factory)
   {
-    final Collection<StateProxy> states = mAutomaton.getStates();
-    final int numstates = states.size();
+    final int numstates = getNumberOfEncodedStates();
     final int power2 = 1 << mNumberOfBits;
     final int firstuse2 = numstates + numstates - power2;
     if (numstates == firstuse2) {
@@ -222,6 +307,27 @@ class AutomatonBDD
     return bdd;
   }
 
+  boolean isReachable(final StateProxy state)
+  {
+    return mStateMap.containsKey(state);
+  }
+
+  int getStateCode(final StateProxy state)
+  {
+    final StateCode entry = mStateMap.get(state);
+    if (entry == null) {
+      return -1;
+    } else {
+      return entry.getStateCode();
+    }
+  }
+
+  StateProxy getState(final int code)
+  {
+    final StateCode record = mStateArray[code];
+    return record.getState();
+  }
+
   BDD getStateBDD(final StateProxy state, final BDDFactory factory)
   {
     final StateCode entry = mStateMap.get(state);
@@ -232,12 +338,57 @@ class AutomatonBDD
       final int mask = 1 << bitno;
       final BDD var = getStateVariable(factory, bitno);
       if ((code & mask) == 0) {
-	result.andWith(var.not());
+        result.andWith(var.not());
+        var.free();
       } else {
-	result.andWith(var);
+        result.andWith(var);
       }
     }
     return result;
+  }
+
+  BDD getCurrentStateBitBDD(final StateProxy state,
+                            final int bitindex,
+                            final BDDFactory factory)
+  {
+    final StateCode entry = mStateMap.get(state);
+    final int code = entry.getStateCode();
+    if (entry.usesTwoCodes() && bitindex == mNumberOfBits - 1) {
+      return null;
+    } else if ((code & (1 << bitindex)) != 0) {
+      final int varindex = getStateVariableIndex(bitindex);
+      return factory.ithVar(varindex);
+    } else {
+      final int varindex = getStateVariableIndex(bitindex);
+      return factory.nithVar(varindex);
+    }
+  }
+
+  BDD getNextStateBitBDD(final StateProxy state,
+                         final int bitindex,
+                         final BDDFactory factory)
+  {
+    final StateCode entry = mStateMap.get(state);
+    final int code = entry.getStateCode();
+    if (entry.usesTwoCodes() && bitindex == mNumberOfBits - 1) {
+      return null;
+    } else if ((code & (1 << bitindex)) != 0) {
+      final int varindex = getNextStateVariableIndex(bitindex);
+      return factory.ithVar(varindex);
+    } else {
+      final int varindex = getNextStateVariableIndex(bitindex);
+      return factory.nithVar(varindex);
+    }
+  }
+
+  int getStateVariableIndex(final int bitno)
+  {
+    return mFirstVariableIndex + 2 * bitno;
+  }
+
+  int getNextStateVariableIndex(final int bitno)
+  {
+    return mFirstVariableIndex + 2 * bitno + 1;
   }
 
   BDD getTransitionBDD(final TransitionProxy trans, final BDDFactory factory)
@@ -264,6 +415,7 @@ class AutomatonBDD
         final BDD nextvar = getNextStateVariable(factory, bitno);
         if ((targetcode & mask) == 0) {
           result.andWith(nextvar.not());
+          nextvar.free();
         } else {
           result.andWith(nextvar);
         }
@@ -320,6 +472,7 @@ class AutomatonBDD
         final BDD result = buildCurrentStateGreaterOrEqualBDD
           (code, bitno - 1, factory);
         result.andWith(var.not());
+        var.free();
         return result;
       } else {
         final BDD result = buildCurrentStateGreaterOrEqualBDD
@@ -328,16 +481,6 @@ class AutomatonBDD
         return result;
       }
     }
-  }
-
-  private int getStateVariableIndex(final int bitno)
-  {
-    return mFirstVariableIndex + 2 * bitno;
-  }
-
-  private int getNextStateVariableIndex(final int bitno)
-  {
-    return mFirstVariableIndex + 2 * bitno + 1;
   }
 
   private BDD getStateVariable(final BDDFactory factory, final int bitno)
@@ -365,17 +508,8 @@ class AutomatonBDD
     {
       mState = state;
       mSuccessorStates = new TreeSet<StateCode>();
-      mNumIncomingTransitions = state.isInitial() ? 1 : 0;
+      mReachable = state.isInitial();
       mStateCode = -1;
-      mUsesTwoCodes = false;
-    }
-
-    private StateCode(final StateProxy state, final int code)
-    {
-      mState = state;
-      mSuccessorStates = null;
-      mNumIncomingTransitions = -1;
-      mStateCode = code;
       mUsesTwoCodes = false;
     }
 
@@ -388,9 +522,29 @@ class AutomatonBDD
 
     //#######################################################################
     //# Simple Access
+    private StateProxy getState()
+    {
+      return mState;
+    }
+
     private int getStateCode()
     {
       return mStateCode;
+    }
+
+    private boolean isReachable()
+    {
+      return mReachable;
+    }
+
+    private boolean setReachable()
+    {
+      if (mReachable) {
+        return false;
+      } else {
+        mReachable = true;
+        return true;
+      }
     }
 
     private void setStateCode(final int code)
@@ -424,7 +578,6 @@ class AutomatonBDD
       final StateProxy target = trans.getTarget();
       final StateCode code = mStateMap.get(target);
       mSuccessorStates.add(code);
-      code.mNumIncomingTransitions++;
     }
 
     private Set<StateCode> removeSuccessorStates()
@@ -438,33 +591,9 @@ class AutomatonBDD
     //# Data Members
     private final StateProxy mState;
     private Set<StateCode> mSuccessorStates;
-    private int mNumIncomingTransitions;
+    private boolean mReachable;
     private int mStateCode;
     private boolean mUsesTwoCodes;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class InitialStateComparator
-  private static class InitialStateComparator
-    implements Comparator<StateProxy>
-  {
-
-    //#######################################################################
-    //# Interface java.util.Comparator
-    public int compare(final StateProxy state1, final StateProxy state2)
-    {
-      final boolean init1 = state1.isInitial();
-      final boolean init2 = state2.isInitial();
-      if (init1 && !init2) {
-        return -1;
-      } else if (init2 && !init1) {
-        return 1;
-      } else {
-        return state1.compareTo(state2);
-      }
-    }
 
   }
 
@@ -473,12 +602,11 @@ class AutomatonBDD
   //# Data Members
   private final AutomatonProxy mAutomaton;
   private final ComponentKind mKind;
-  private final int mBitIndex;
+  private final int mAutomatonIndex;
   private final int mNumberOfBits;
   private final int mFirstVariableIndex;
+  private final StateCode[] mStateArray;
   private final Map<StateProxy,StateCode> mStateMap;
-
-  private static final InitialStateComparator INIT_COMPARATOR =
-    new InitialStateComparator();
+  private Set<EventProxy> mNondeterministicEvents;
 
 }

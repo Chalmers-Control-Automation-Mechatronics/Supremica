@@ -13,6 +13,7 @@ import java.util.BitSet;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -71,6 +72,7 @@ class UncontrollableEventBDD extends EventBDD
   }
 
   void includeTransition(final TransitionProxy trans, final BDDFactory factory)
+    throws NondeterministicDESException
   {
     super.includeTransition(trans, factory);
     if (mEnabledBDD != null) {
@@ -86,7 +88,7 @@ class UncontrollableEventBDD extends EventBDD
     if (mEnabledBDD != null) {
       final AutomatonBDD autbdd = getCurrentAutomaton();
       final ComponentKind kind = autbdd.getKind();
-      final int bitno = autbdd.getBitIndex();
+      final int bitno = autbdd.getAutomatonIndex();
       switch (kind) {
       case PLANT:
         if (mEnabledBDD.isZero()) {

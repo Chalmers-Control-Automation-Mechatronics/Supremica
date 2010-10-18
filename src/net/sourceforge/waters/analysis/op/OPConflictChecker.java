@@ -961,8 +961,8 @@ public class OPConflictChecker
    *         or <CODE>null</CODE> if the candidate does not have any local
    *         events.
    */
-  public EventProxy createSilentEvent(final Candidate candidate,
-                                      final ProductDESProxyFactory factory)
+  private EventProxy createSilentEvent(final Candidate candidate,
+                                       final ProductDESProxyFactory factory)
   {
     final Collection<EventProxy> local = candidate.getLocalEvents();
     if (local.isEmpty()) {
