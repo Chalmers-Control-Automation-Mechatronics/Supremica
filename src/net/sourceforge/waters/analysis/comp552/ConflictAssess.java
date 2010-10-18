@@ -284,15 +284,21 @@ public class ConflictAssess
       checker = null;
       System.gc();
       printException(error);
+      mProgressPrinter.println("result " + mNumCorrectAnswers);
+      mProgressPrinter.flush();
       return;
     } catch (final Throwable exception) {
       printException(exception);
+      mProgressPrinter.println("result " + mNumCorrectAnswers);
+      mProgressPrinter.flush();
       return;
     } finally {
       mSecurityManager.setEnabled(false);
     }
 
     synchronized (this) {
+      mProgressPrinter.println("result " + mNumCorrectAnswers);
+      mProgressPrinter.flush();
       if (mTerminated) {
         return;
       }
@@ -308,8 +314,6 @@ public class ConflictAssess
         mReportPrinter.print(" - WRONG");
       }
       mReportPrinter.println(" <" + mFormatter.format(time) + "s>");
-      mProgressPrinter.println("result " + mNumCorrectAnswers);
-      mProgressPrinter.flush();
     }
 
     if (!result && !expect) {
@@ -327,9 +331,15 @@ public class ConflictAssess
         checker = null;
         System.gc();
         printException(error);
+        mProgressPrinter.println
+          ("trace " + mNumCorrectTraces + " " + mNumReversedTraces);
+        mProgressPrinter.flush();
         return;
       } catch (final Throwable exception) {
         printException(exception);
+        mProgressPrinter.println
+          ("trace " + mNumCorrectTraces + " " + mNumReversedTraces);
+        mProgressPrinter.flush();
         return;
       } finally {
         mSecurityManager.setEnabled(false);
