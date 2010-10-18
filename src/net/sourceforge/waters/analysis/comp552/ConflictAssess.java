@@ -63,8 +63,10 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
-import org.supremica.gui.SupremicaLoggerFactory;
-import org.supremica.log.LoggerFactory;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.WriterAppender;
 import org.xml.sax.SAXException;
 
 
@@ -87,9 +89,6 @@ public class ConflictAssess
                          final TeachingSecurityManager secman)
     throws JAXBException, SAXException, IOException
   {
-    final LoggerFactory logger = SupremicaLoggerFactory.getInstance();
-    logger.logToNull();
-
     mSecurityManager = secman;
     final ModuleProxyFactory moduleFactory =
       ModuleElementFactory.getInstance();
@@ -103,6 +102,7 @@ public class ConflictAssess
     mDocumentManager.registerUnmarshaller(desMarshaller);
     mDocumentManager.registerUnmarshaller(moduleMarshaller);
 
+    mTerminated = false;
     if (progressFile.exists()) {
       boolean crash = false;
       final InputStream stream = new FileInputStream(progressFile);
@@ -127,6 +127,7 @@ public class ConflictAssess
           crash = false;
         } else if (key.equals("done")) {
           crash = false;
+          mTerminated = true;
         }
         line = reader.readLine();
       }
@@ -156,10 +157,10 @@ public class ConflictAssess
 
     mFormatter = new DecimalFormat("0.000");
     mStream = null;
-    mTerminated = false;
-
-    final Thread terminator = new Terminator(minutes);
-    terminator.start();
+    if (!mTerminated) {
+      final Thread terminator = new Terminator(minutes);
+      terminator.start();
+    }
   }
 
 
@@ -169,27 +170,32 @@ public class ConflictAssess
     throws Exception
   {
     try {
-      final File dirname = filename.getParentFile();
-      mStream = new FileInputStream(filename);
-      final Reader streamreader = new InputStreamReader(mStream);
-      final BufferedReader reader = new BufferedReader(streamreader);
-      System.setSecurityManager(mSecurityManager);
-      int index = 0;
-      String line = reader.readLine();
-      while (line != null) {
-        line = line.trim();
-        if (!line.startsWith("#")) {
-          final String[] parts = line.split(" +");
-          if (parts.length >= 2 && index >= mStartIndex) {
-            final File name = new File(dirname, parts[0]);
-            final boolean expect = parts[1].equals("true");
-            final List<ParameterBindingProxy> bindings =
-              parseBindings(parts, 2);
-            runTest(name, bindings, index, expect);
-            index++;
+      if (!mTerminated) {
+        final File dirname = filename.getParentFile();
+        mStream = new FileInputStream(filename);
+        final Reader streamreader = new InputStreamReader(mStream);
+        final BufferedReader reader = new BufferedReader(streamreader);
+        System.setSecurityManager(mSecurityManager);
+        int index = 0;
+        String line = reader.readLine();
+        while (line != null) {
+          line = line.trim();
+          if (!line.startsWith("#")) {
+            final String[] parts = line.split(" +");
+            if (parts.length >= 2 && index >= mStartIndex) {
+              final File name = new File(dirname, parts[0]);
+              final boolean expect = parts[1].equals("true");
+              final List<ParameterBindingProxy> bindings =
+                parseBindings(parts, 2);
+              runTest(name, bindings, index, expect);
+              if (mTerminated) {
+                return;
+              }
+              index++;
+            }
           }
+          line = reader.readLine();
         }
-        line = reader.readLine();
       }
     } finally {
       synchronized (this) {
@@ -734,6 +740,13 @@ public class ConflictAssess
    */
   public static void main(final String[] args)
   {
+    final PrintWriter writer = new PrintWriter(System.err);
+    final PatternLayout layout = new PatternLayout("%-5p %m%n");
+    final Appender appender = new WriterAppender(layout, writer);
+    appender.setName("stderr");
+    final Logger root = Logger.getRootLogger();
+    root.addAppender(appender);
+
     ConflictAssess assessor = null;
     try {
       if (args.length < 3) {
