@@ -197,6 +197,7 @@ public class ConflictAssess
           }
           line = reader.readLine();
         }
+        terminate();
       }
     } finally {
       synchronized (this) {
