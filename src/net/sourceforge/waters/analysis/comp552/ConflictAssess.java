@@ -123,7 +123,7 @@ public class ConflictAssess
           crash = false;
         } else if (key.equals("trace")) {
           mNumCorrectTraces = Integer.parseInt(parts[1]);
-          mNumReversedTraces = Integer.parseInt(parts[2]);
+          mNumHalfCorrectTraces = Integer.parseInt(parts[2]);
           crash = false;
         } else if (key.equals("done")) {
           crash = false;
@@ -145,7 +145,7 @@ public class ConflictAssess
       mStartIndex = 0;
       mNumCorrectAnswers = 0;
       mNumCorrectTraces = 0;
-      mNumReversedTraces = 0;
+      mNumHalfCorrectTraces = 0;
       final OutputStream progressStream = new FileOutputStream(progressFile);
       mProgressPrinter = new PrintWriter(progressStream);
       mProgressPrinter.println("start " + mStartTime);
@@ -335,7 +335,7 @@ public class ConflictAssess
         return;
       } finally {
         mProgressPrinter.println
-          ("trace " + mNumCorrectTraces + " " + mNumReversedTraces);
+          ("trace " + mNumCorrectTraces + " " + mNumHalfCorrectTraces);
         mProgressPrinter.flush();
         mSecurityManager.setEnabled(false);
       }
@@ -356,20 +356,24 @@ public class ConflictAssess
     final List<EventProxy> traceevents = trace.getEvents();
     final Collection<EventProxy> events = des.getEvents();
     boolean containsnull = false;
+    boolean containsprop = false;
     for (final EventProxy event : traceevents) {
       if (event == null) {
         containsnull = true;
+      } else if (event.getKind() == EventKind.PROPOSITION) {
+        containsprop = true;
       } else if (!events.contains(event)) {
         printMalformedCounterExample(trace, "contains bad events");
         return false;
       }
     }
-    return checkCounterExample(des, trace, containsnull, false);
+    return checkCounterExample(des, trace, containsnull, containsprop, false);
   }
 
   private boolean checkCounterExample(final ProductDESProxy des,
                                       final ConflictTraceProxy trace,
                                       final boolean containsnull,
+                                      final boolean containsprop,
                                       final boolean reversed)
   {
     final Collection<AutomatonProxy> automata = des.getAutomata();
@@ -406,8 +410,12 @@ public class ConflictAssess
     } else if (reversed) {
       return true;
     } else if (containsnull) {
-      mNumCorrectTraces++;
+      mNumHalfCorrectTraces++;
       printGoodCounterExample(trace, " (BUT CONTAINS null)");
+      return true;
+    } else if (containsprop) {
+      mNumHalfCorrectTraces++;
+      printGoodCounterExample(trace, " (BUT CONTAINS propositions)");
       return true;
     } else {
       mNumCorrectTraces++;
@@ -428,8 +436,8 @@ public class ConflictAssess
     final ConflictKind kind = trace.getKind();
     final ConflictTraceProxy reversedtrace =
       mDESFactory.createConflictTraceProxy(name, des, reversedlist, kind);
-    if (checkCounterExample(des, reversedtrace, false, true)) {
-      mNumReversedTraces++;
+    if (checkCounterExample(des, reversedtrace, false, false, true)) {
+      mNumHalfCorrectTraces++;
       printGoodCounterExample(trace, " (BUT REVERSED ORDER)");
       return true;
     } else {
@@ -455,7 +463,7 @@ public class ConflictAssess
     }
     final List<EventProxy> traceevents = trace.getEvents();
     for (final EventProxy event : traceevents) {
-      if (events.contains(event)) {
+      if (events.contains(event) && event.getKind() != EventKind.PROPOSITION) {
         boolean found = false;
         for (final TransitionProxy trans : transitions) {
           if (trans.getSource() == current && trans.getEvent().equals(event)) {
@@ -669,9 +677,9 @@ public class ConflictAssess
     mReportPrinter.println();
     final double score =
       0.5 * (mNumCorrectAnswers + mNumCorrectTraces) +
-      0.25 * mNumReversedTraces;
+      0.25 * mNumHalfCorrectTraces;
     final NumberFormat formatter =
-      new DecimalFormat((mNumReversedTraces & 1) == 0 ? "0.0" : "0.00");
+      new DecimalFormat((mNumHalfCorrectTraces & 1) == 0 ? "0.0" : "0.00");
     final String marks = formatter.format(score);
     mReportPrinter.println("Recommending " + marks + " marks.");
     mProgressPrinter.println("done " + mNumCorrectAnswers + " " + marks);
@@ -737,6 +745,10 @@ public class ConflictAssess
       for (int i = 4; i < args.length; i++) {
         secman.addReadOnlyDirectory(args[i]);
       }
+      secman.addLibrary("waters");
+      secman.addLibrary("buddy");
+      secman.addLibrary("cudd");
+      secman.addLibrary("cal");
       secman.close();
       assessor = new ConflictAssess(outputfile, marksfile, minutes, secman);
       assessor.runSuite(inputfile);
@@ -808,6 +820,6 @@ public class ConflictAssess
   private boolean mTerminated;
   private int mNumCorrectAnswers;
   private int mNumCorrectTraces;
-  private int mNumReversedTraces;
+  private int mNumHalfCorrectTraces;
 
 }

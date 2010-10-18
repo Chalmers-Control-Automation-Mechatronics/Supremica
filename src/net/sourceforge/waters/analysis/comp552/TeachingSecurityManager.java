@@ -29,6 +29,7 @@ class TeachingSecurityManager extends SecurityManager
   {
     mReadableDirectories = new LinkedList<String>();
     mWriteableDirectories = new LinkedList<String>();
+    mAllowedLibraries = new LinkedList<String>();
     mEnabled = false;
     mClosed = false;
   }
@@ -66,6 +67,13 @@ class TeachingSecurityManager extends SecurityManager
       final String path = file.getCanonicalPath();
       mReadableDirectories.add(path);
       mWriteableDirectories.add(path);
+    }
+  }
+
+  void addLibrary(final String libname)
+  {
+    if (!mClosed) {
+      mAllowedLibraries.add(libname);
     }
   }
 
@@ -115,12 +123,12 @@ class TeachingSecurityManager extends SecurityManager
     }
   }
 
-  public void checkLink(final String lib)
+  public void checkLink(final String libname)
   {
-    if (mEnabled) {
+    if (mEnabled && !mAllowedLibraries.contains(libname)) {
       throw new SecurityException
-	("Native code libraries disabled!\n" +
-	 "(Attempted to load library '" + lib + "'.)");
+        ("Native code libraries disabled!\n" +
+         "(Attempted to load library '" + libname + "'.)");
     }
   }
 
@@ -147,7 +155,9 @@ class TeachingSecurityManager extends SecurityManager
       final String[] actions = actionlist.split(",");
       for (final String action : actions) {
         if (action.equals("read")) {
-          if (mEnabled && !isAccessible(name, mReadableDirectories)) {
+          if (mEnabled &&
+              !isAccessible(name, mReadableDirectories) &&
+              !isAllowedLibrary(name)) {
             super.checkPermission(perm);
           }
         } else if (action.equals("write") || actions.equals("delete")) {
@@ -218,11 +228,26 @@ class TeachingSecurityManager extends SecurityManager
     }
   }
 
+  private boolean isAllowedLibrary(final String filename)
+  {
+    final File file = new File(filename);
+    final String tail = file.getName();
+    if (tail.startsWith("lib") && tail.endsWith(".so")) {
+      final int start = 3;
+      final int end = tail.length() - 3;
+      final String libname = tail.substring(start, end);
+      return mAllowedLibraries.contains(libname);
+    } else {
+      return false;
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
   private final Collection<String> mReadableDirectories;
   private final Collection<String> mWriteableDirectories;
+  private final Collection<String> mAllowedLibraries;
   private boolean mEnabled;
   private boolean mClosed;
 
