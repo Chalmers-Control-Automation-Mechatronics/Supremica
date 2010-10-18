@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.comp552;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
+import java.lang.reflect.ReflectPermission;
 import java.security.Permission;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -103,7 +104,7 @@ class TeachingSecurityManager extends SecurityManager
     checkConnect(host, port);
   }
 
-  public void checkCreateClassLoader()   
+  public void checkCreateClassLoader()
   {
   }
 
@@ -176,6 +177,8 @@ class TeachingSecurityManager extends SecurityManager
           super.checkPermission(perm);
         }
       }
+    } else if (perm instanceof ReflectPermission) {
+      // allow :-(
     } else if (mEnabled) {
       super.checkPermission(perm);
     }
@@ -196,7 +199,7 @@ class TeachingSecurityManager extends SecurityManager
     throw new SecurityException("Clipboard access disabled!");
   }
 
- 
+
   //#########################################################################
   //# Auxiliary Methods
   private boolean isAccessible(final String filename,
@@ -217,7 +220,7 @@ class TeachingSecurityManager extends SecurityManager
 
 
   //#########################################################################
-  //# Data Members 
+  //# Data Members
   private final Collection<String> mReadableDirectories;
   private final Collection<String> mWriteableDirectories;
   private boolean mEnabled;

@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.comp552;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +31,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
-import net.sourceforge.waters.external.valid.ValidUnmarshaller;
+import net.sourceforge.waters.analysis.bdd.BDDLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -65,13 +63,15 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
+import org.supremica.gui.SupremicaLoggerFactory;
+import org.supremica.log.LoggerFactory;
 import org.xml.sax.SAXException;
 
 
 /**
- * <P>A sample main class for testing the {@link ConflictChecker}
- * class. It provides a simple application that reads a test suite
- * description, runs all tests contained, and prints a result.</P>
+ * <P>A main class for testing the {@link BDDConflictChecker} class.
+ * It provides a simple application that reads a test suite description,
+ * runs all tests contained, and prints a result with recommended grades.</P>
  *
  * @author Robi Malik
  */
@@ -81,19 +81,20 @@ public class ConflictAssess
 
   //#########################################################################
   //# Constructors
-  private ConflictAssess(final File outputfile,
-                         final File marksfile,
+  private ConflictAssess(final File reportFile,
+                         final File progressFile,
                          final int minutes,
                          final TeachingSecurityManager secman)
-    throws FileNotFoundException, JAXBException, SAXException
+    throws JAXBException, SAXException, IOException
   {
+    final LoggerFactory logger = SupremicaLoggerFactory.getInstance();
+    logger.logToNull();
+
     mSecurityManager = secman;
     final ModuleProxyFactory moduleFactory =
       ModuleElementFactory.getInstance();
     mDESFactory = ProductDESElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
-    final ValidUnmarshaller importer =
-      new ValidUnmarshaller(moduleFactory, optable);
     final JAXBModuleMarshaller moduleMarshaller =
       new JAXBModuleMarshaller(moduleFactory, optable);
     final JAXBProductDESMarshaller desMarshaller =
@@ -101,19 +102,59 @@ public class ConflictAssess
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(desMarshaller);
     mDocumentManager.registerUnmarshaller(moduleMarshaller);
-    mDocumentManager.registerUnmarshaller(importer);
 
-    final OutputStream outstream = new FileOutputStream(outputfile);
-    mPrinter = new PrintWriter(outstream);
-    final OutputStream marksstream = new FileOutputStream(marksfile);
-    mMarker = new PrintWriter(marksstream);
+    if (progressFile.exists()) {
+      boolean crash = false;
+      final InputStream stream = new FileInputStream(progressFile);
+      final Reader streamreader = new InputStreamReader(stream);
+      final BufferedReader reader = new BufferedReader(streamreader);
+      String line = reader.readLine();
+      while (line != null) {
+        line = line.trim();
+        final String[] parts = line.split(" +");
+        final String key = parts[0];
+        if (key.equals("start")) {
+          mStartTime = Long.parseLong(parts[1]);
+        } else if (key.equals("in")) {
+          mStartIndex = Integer.parseInt(parts[1]) + 1;
+          crash = true;
+        } else if (key.equals("result")) {
+          mNumCorrectAnswers = Integer.parseInt(parts[1]);
+          crash = false;
+        } else if (key.equals("trace")) {
+          mNumCorrectTraces = Integer.parseInt(parts[1]);
+          mNumReversedTraces = Integer.parseInt(parts[2]);
+          crash = false;
+        }
+        line = reader.readLine();
+      }
+      stream.close();
+      final OutputStream progressStream =
+        new FileOutputStream(progressFile, true);
+      mProgressPrinter = new PrintWriter(progressStream);
+      final OutputStream reportStream = new FileOutputStream(reportFile, true);
+      mReportPrinter = new PrintWriter(reportStream);
+      if (crash) {
+        mReportPrinter.println("CRASHED");
+        mReportPrinter.flush();
+      }
+    } else {
+      mStartTime = System.currentTimeMillis();
+      mStartIndex = 0;
+      mNumCorrectAnswers = 0;
+      mNumCorrectTraces = 0;
+      mNumReversedTraces = 0;
+      final OutputStream progressStream = new FileOutputStream(progressFile);
+      mProgressPrinter = new PrintWriter(progressStream);
+      mProgressPrinter.println("start " + mStartTime);
+      mProgressPrinter.flush();
+      final OutputStream reportStream = new FileOutputStream(reportFile);
+      mReportPrinter = new PrintWriter(reportStream);
+    }
+
     mFormatter = new DecimalFormat("0.000");
-
     mStream = null;
     mTerminated = false;
-    mNumCorrectAnswers = 0;
-    mNumCorrectTraces = 0;
-    mNumReversedTraces = 0;
 
     final Thread terminator = new Terminator(minutes);
     terminator.start();
@@ -131,17 +172,19 @@ public class ConflictAssess
       final Reader streamreader = new InputStreamReader(mStream);
       final BufferedReader reader = new BufferedReader(streamreader);
       System.setSecurityManager(mSecurityManager);
+      int index = 0;
       String line = reader.readLine();
       while (line != null) {
         line = line.trim();
         if (!line.startsWith("#")) {
           final String[] parts = line.split(" +");
-          if (parts.length >= 2) {
+          if (parts.length >= 2 && index >= mStartIndex) {
             final File name = new File(dirname, parts[0]);
             final boolean expect = parts[1].equals("true");
             final List<ParameterBindingProxy> bindings =
               parseBindings(parts, 2);
-            runTest(name, bindings, expect);
+            runTest(name, bindings, index, expect);
+            index++;
           }
         }
         line = reader.readLine();
@@ -186,6 +229,7 @@ public class ConflictAssess
 
   private void runTest(final File filename,
                        final List<ParameterBindingProxy> bindings,
+                       final int index,
                        final boolean expect)
     throws Exception
   {
@@ -206,30 +250,32 @@ public class ConflictAssess
       if (mTerminated) {
         return;
       }
-      mPrinter.print(des.getName());
+      mReportPrinter.print(des.getName());
       if (bindings != null) {
-        mPrinter.print(" <");
+        mReportPrinter.print(" <");
         boolean first = true;
         for (final ParameterBindingProxy binding : bindings) {
           if (first) {
             first = false;
           } else {
-            mPrinter.print(", ");
+            mReportPrinter.print(", ");
           }
-          mPrinter.print(binding);
+          mReportPrinter.print(binding);
         }
-        mPrinter.print('>');
+        mReportPrinter.print('>');
       }
-      mPrinter.print(" ... ");
-      mPrinter.flush();
+      mReportPrinter.print(" ... ");
+      mReportPrinter.flush();
+      mProgressPrinter.println("in " + index);
+      mProgressPrinter.flush();
     }
 
-    ConflictChecker checker;
+    BDDConflictChecker checker;
     boolean result;
     double time;
     try {
       mSecurityManager.setEnabled(true);
-      checker = new ConflictChecker(des, mDESFactory);
+      checker = new BDDConflictChecker(des, mDESFactory);
       final long starttime = System.currentTimeMillis();
       result = checker.run();
       final long stoptime = System.currentTimeMillis();
@@ -251,27 +297,31 @@ public class ConflictAssess
         return;
       }
       if (result) {
-        mPrinter.print("nonconflicting");
+        mReportPrinter.print("nonconflicting");
       } else {
-        mPrinter.print("conflicting");
+        mReportPrinter.print("conflicting");
       }
       if (result == expect) {
-        mPrinter.print(" - ok");
+        mReportPrinter.print(" - ok");
         mNumCorrectAnswers++;
       } else {
-        mPrinter.print(" - WRONG");
+        mReportPrinter.print(" - WRONG");
       }
-      mPrinter.println(" <" + mFormatter.format(time) + "s>");
+      mReportPrinter.println(" <" + mFormatter.format(time) + "s>");
+      mProgressPrinter.println("result " + mNumCorrectAnswers);
+      mProgressPrinter.flush();
     }
 
     if (!result && !expect) {
       synchronized (this) {
-        mPrinter.print("  Counterexample ... ");
-        mPrinter.flush();
+        mReportPrinter.print("  Counterexample ... ");
+        mReportPrinter.flush();
+        mProgressPrinter.println("in " + index);
+        mProgressPrinter.flush();
       }
       ConflictTraceProxy trace;
       try {
-	mSecurityManager.setEnabled(true);
+        mSecurityManager.setEnabled(true);
         trace = checker.getCounterExample();
       } catch (final OutOfMemoryError error) {
         checker = null;
@@ -282,7 +332,7 @@ public class ConflictAssess
         printException(exception);
         return;
       } finally {
-	mSecurityManager.setEnabled(false);
+        mSecurityManager.setEnabled(false);
       }
       checkCounterExample(des, trace);
     }
@@ -334,7 +384,7 @@ public class ConflictAssess
     }
     final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);
     final LanguageInclusionChecker checker =
-      new NativeLanguageInclusionChecker(ldes, mDESFactory);
+      new BDDLanguageInclusionChecker(ldes, mDESFactory);
     final boolean blocking;
     try {
       blocking = checker.run();
@@ -351,12 +401,12 @@ public class ConflictAssess
     } else if (reversed) {
       return true;
     } else if (containsnull) {
-      printGoodCounterExample(trace, " (BUT CONTAINS null)");
       mNumCorrectTraces++;
+      printGoodCounterExample(trace, " (BUT CONTAINS null)");
       return true;
     } else {
-      printGoodCounterExample(trace);
       mNumCorrectTraces++;
+      printGoodCounterExample(trace);
       return true;
     }
   }
@@ -374,8 +424,8 @@ public class ConflictAssess
     final ConflictTraceProxy reversedtrace =
       mDESFactory.createConflictTraceProxy(name, des, reversedlist, kind);
     if (checkCounterExample(des, reversedtrace, false, true)) {
-      printGoodCounterExample(trace, " (BUT REVERSED ORDER)");
       mNumReversedTraces++;
+      printGoodCounterExample(trace, " (BUT REVERSED ORDER)");
       return true;
     } else {
       return false;
@@ -421,14 +471,14 @@ public class ConflictAssess
     (final ConflictTraceProxy conftrace, final SafetyTraceProxy langtrace)
   {
     printMalformedCounterExample(conftrace, "does not lead to blocking state");
-    mPrinter.println("  A marked state can be reached as follows:");
+    mReportPrinter.println("  A marked state can be reached as follows:");
     printCounterExample(langtrace);
   }
 
   private synchronized void printMalformedCounterExample
     (final TraceProxy trace, final String msg)
   {
-    mPrinter.println("BAD (" + msg + "):");
+    mReportPrinter.println("BAD (" + msg + "):");
     printCounterExample(trace);
   }
 
@@ -441,11 +491,11 @@ public class ConflictAssess
   private synchronized void printGoodCounterExample
     (final TraceProxy trace, final String msg)
   {
-    mPrinter.print("ok");
+    mReportPrinter.print("ok");
     if (msg != null) {
-      mPrinter.print(msg);
+      mReportPrinter.print(msg);
     }
-    mPrinter.println(':');
+    mReportPrinter.println(':');
     printCounterExample(trace);
   }
 
@@ -454,7 +504,7 @@ public class ConflictAssess
   {
     final List<EventProxy> traceevents = trace.getEvents();
     if (traceevents.isEmpty()) {
-      mPrinter.println("  <empty>");
+      mReportPrinter.println("  <empty>");
     } else {
       final StringBuffer buffer = new StringBuffer("  ");
       int count = 0;
@@ -467,7 +517,7 @@ public class ConflictAssess
         }
         final String name = event == null ? "(null)" : event.getName();
         if (buffer.length() + name.length() > 77) {
-          mPrinter.println(buffer);
+          mReportPrinter.println(buffer);
           buffer.delete(2, buffer.length());
         }
         if (count++ <= 100) {
@@ -478,9 +528,13 @@ public class ConflictAssess
         }
       }
       if (buffer.length() > 2) {
-        mPrinter.println(buffer);
+        mReportPrinter.println(buffer);
       }
     }
+    mReportPrinter.flush();
+    mProgressPrinter.println
+      ("trace " + mNumCorrectTraces + " " + mNumReversedTraces);
+    mProgressPrinter.flush();
   }
 
   private synchronized void printException(final Throwable exception)
@@ -489,7 +543,7 @@ public class ConflictAssess
       final String fullname = exception.getClass().getName();
       final int start = fullname.lastIndexOf('.');
       final String shortname = fullname.substring(start + 1);
-      mPrinter.println(shortname);
+      mReportPrinter.println(shortname);
       exception.printStackTrace(System.err);
     }
   }
@@ -610,24 +664,22 @@ public class ConflictAssess
   //# Cleaning Up
   private void printScore()
   {
-    mPrinter.println();
+    mReportPrinter.println();
     final double score =
       0.5 * (mNumCorrectAnswers + mNumCorrectTraces) +
       0.25 * mNumReversedTraces;
     final NumberFormat formatter =
       new DecimalFormat((mNumReversedTraces & 1) == 0 ? "0.0" : "0.00");
     final String marks = formatter.format(score);
-    mPrinter.println("Recommending " + marks + " marks.");
-    mMarker.println(mNumCorrectAnswers);
-    mMarker.println(mNumCorrectTraces);
-    mMarker.println(marks);
+    mReportPrinter.println("Recommending " + marks + " marks.");
+    mProgressPrinter.println("done " + mNumCorrectAnswers + " " + marks);
   }
 
   private void close()
   {
     try {
-      mPrinter.close();
-      mMarker.close();
+      mReportPrinter.close();
+      mProgressPrinter.close();
       if (mStream != null) {
         mStream.close();
         mStream = null;
@@ -647,7 +699,7 @@ public class ConflictAssess
     if (!mTerminated) {
       mTerminated = true;
       if (msg != null) {
-        mPrinter.println(msg);
+        mReportPrinter.println(msg);
       }
       printScore();
       close();
@@ -687,6 +739,7 @@ public class ConflictAssess
       assessor = new ConflictAssess(outputfile, marksfile, minutes, secman);
       assessor.runSuite(inputfile);
       assessor.terminate();
+      System.exit(0);
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
       System.err.println(exception.getClass().getName() +
@@ -698,7 +751,6 @@ public class ConflictAssess
         assessor.close();
       }
     }
-    System.exit(0);
   }
 
 
@@ -707,15 +759,23 @@ public class ConflictAssess
   private class Terminator extends Thread
   {
 
+    //#######################################################################
+    //# Constructor
     private Terminator(final int minutes)
     {
       mMinutes = minutes;
     }
 
+    //#######################################################################
+    //# Interface java.lang.Runnable
     public void run()
     {
       try {
-        Thread.sleep(60000 * mMinutes);
+        final long endTime = mStartTime + 60000 * mMinutes;
+        final long delta = endTime - System.currentTimeMillis();
+        if (delta > 0) {
+          Thread.sleep(delta);
+        }
         terminate("TIMEOUT <" + mMinutes + "min overall>");
       } catch (final InterruptedException exception) {
         terminate("FATAL ERROR (InterruptedException)");
@@ -724,6 +784,8 @@ public class ConflictAssess
       System.exit(0);
     }
 
+    //#######################################################################
+    //# Data Members
     private final int mMinutes;
 
   }
@@ -734,11 +796,13 @@ public class ConflictAssess
   private final TeachingSecurityManager mSecurityManager;
   private final ProductDESProxyFactory mDESFactory;
   private final DocumentManager mDocumentManager;
-  private final PrintWriter mPrinter;
-  private final PrintWriter mMarker;
+  private final PrintWriter mReportPrinter;
+  private final PrintWriter mProgressPrinter;
   private final NumberFormat mFormatter;
 
   private InputStream mStream;
+  private long mStartTime;
+  private int mStartIndex;
   private boolean mTerminated;
   private int mNumCorrectAnswers;
   private int mNumCorrectTraces;
