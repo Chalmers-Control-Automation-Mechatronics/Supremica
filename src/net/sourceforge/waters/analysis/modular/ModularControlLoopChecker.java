@@ -245,15 +245,15 @@ public class ModularControlLoopChecker
   {
     super.setUp();
     mAutoSets = new ArrayList<AutomataGroup>();
-    mTranslator = new ManipulativeTranslator(getKindTranslator());
+    final KindTranslator translator = getKindTranslator();
+    mTranslator = new ManipulativeTranslator(translator);
     mLoopEvents = new THashSet<EventProxy>();
-    for (final EventProxy event : getModel().getEvents())
-    {
-      if (event.getKind() == EventKind.CONTROLLABLE)
+    for (final EventProxy event : getModel().getEvents()) {
+      if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
         mLoopEvents.add(event);
+      }
     }
-    for (final AutomatonProxy aut: getModel().getAutomata())
-    {
+    for (final AutomatonProxy aut: getModel().getAutomata()) {
       mAutoSets.add(new AutomataGroup(aut));
     }
     mPeakAutomata = 0;

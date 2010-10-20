@@ -292,7 +292,7 @@
           <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
-          <exclude name="net/sourceforge/waters/analysis/modular/ModularControlLoopCheckerTest.java"/>
+          <exclude name="net/sourceforge/waters/analysis/op/OPSearchConflictCheckerTest.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Large*.java"/>
           <exclude name="**/Native*.java"/>
