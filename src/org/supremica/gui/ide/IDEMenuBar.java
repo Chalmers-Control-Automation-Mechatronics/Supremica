@@ -75,6 +75,8 @@ import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
 import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
+
 
 /**
  * <P>
@@ -337,6 +339,9 @@ public class IDEMenuBar extends JMenuBar
            final Action plantComplete =
            actions.getAction(AnalyzeSDPlantCompletenessAction.class);
             mVerifyMenu.add(plantComplete);
+           final Action activityLoop =
+           actions.getAction(AnalyzeSDActivityLoopAction.class);
+            mVerifyMenu.add(activityLoop);
 		}
       }
 
