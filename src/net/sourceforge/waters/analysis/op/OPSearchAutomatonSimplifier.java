@@ -114,13 +114,40 @@ public class OPSearchAutomatonSimplifier
     return mPropositions;
   }
 
+  /**
+   * Specifies whether the output automaton should be made deterministic.
+   * If non-null, any silent transitions in the output automaton will be
+   * labelled by this event, possibly causing nondeterminism. If not set,
+   * new events will be created for silent transitions in the output,
+   * and nondeterminism will be resolved by creating different events if
+   * needed.
+   * @param  event  The event to be used for silent transitions in the output
+   *                automaton, or <CODE>null</CODE>.
+   */
+  public void setOutputHiddenEvent(final EventProxy event)
+  {
+    mOutputHiddenEvent = event;
+  }
+
+  /**
+   * Gets the event representing silent transitions in the output automaton,
+   * or <CODE>null</CODE> if no such event is specified.
+   * @see #setOutputHiddenEvent(EventProxy) setOutputHiddenEvent()
+   */
+  public EventProxy getOutputHiddenEvent()
+  {
+    return mOutputHiddenEvent;
+  }
+
 
   //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException
   {
     try {
+      getLogger().debug("ENTER OPSearchAutomatonSimplifier.run()");
       setUp();
+      getLogger().debug(mInputAutomaton.getStates().size() + " states");
       mOPSearchPhase = true;
       while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
         doOPSearchStep();
@@ -132,6 +159,10 @@ public class OPSearchAutomatonSimplifier
       }
     } finally {
       tearDown();
+      final AutomatonProxy aut = getComputedAutomaton();
+      getLogger().debug
+        ("EXIT OPSearchAutomatonSimplifier.run(): " +
+         (aut == null ? "" : aut.getStates().size() + " states"));
     }
   }
 
@@ -517,10 +548,12 @@ public class OPSearchAutomatonSimplifier
                                     final int code2)
   {
     final int list1 = mUnobservableTauSuccessors[code1];
-    mAltReadOnlyIterator.reset(list1);
-    while (mAltReadOnlyIterator.advance()) {
-      final int succ1 = mAltReadOnlyIterator.getCurrentData();
-      enqueueSuccessor(pcode, succ1, code2);
+    if (list1 != IntListBuffer.NULL) {
+      mAltReadOnlyIterator.reset(list1);
+      while (mAltReadOnlyIterator.advance()) {
+        final int succ1 = mAltReadOnlyIterator.getCurrentData();
+        enqueueSuccessor(pcode, succ1, code2);
+      }
     }
   }
 
@@ -788,26 +821,28 @@ public class OPSearchAutomatonSimplifier
     final long predpair = getPair(current1, current2);
     long predinfo = mBFSLongVisited.get(predpair);
     final int list = mUnobservableTauSuccessors[current1];
-    final int root2 = getRootIndex(current2);
-    mAltReadOnlyIterator.reset(list);
-    while (mAltReadOnlyIterator.advance()) {
-      final int succ = mAltReadOnlyIterator.getCurrentData();
-      if (succ != current2) {
-        final int succroot = getRootIndex(succ);
-        if (succroot == startroot) {
-          final long succpair = getPair(succ, current2);
-          if (!mBFSLongVisited.containsKey(succpair)) {
+    if (list != IntListBuffer.NULL) {
+      final int root2 = getRootIndex(current2);
+      mAltReadOnlyIterator.reset(list);
+      while (mAltReadOnlyIterator.advance()) {
+        final int succ = mAltReadOnlyIterator.getCurrentData();
+        if (succ != current2) {
+          final int succroot = getRootIndex(succ);
+          if (succroot == startroot) {
+            final long succpair = getPair(succ, current2);
+            if (!mBFSLongVisited.containsKey(succpair)) {
+              if (predinfo == 0) {
+                predinfo = ((long) current1) | (((long) succ) << 32);
+              }
+              mBFSLongVisited.put(succpair, predinfo);
+              queue.add(succpair);
+            }
+          } else if (getPair(succroot, root2) == targetpair) {
             if (predinfo == 0) {
               predinfo = ((long) current1) | (((long) succ) << 32);
             }
-            mBFSLongVisited.put(succpair, predinfo);
-            queue.add(succpair);
+            return predinfo;
           }
-        } else if (getPair(succroot, root2) == targetpair) {
-          if (predinfo == 0) {
-            predinfo = ((long) current1) | (((long) succ) << 32);
-          }
-          return predinfo;
         }
       }
     }
@@ -1060,7 +1095,12 @@ public class OPSearchAutomatonSimplifier
         final int target = getRootIndex(succ);
         if (target != source && !used.get(target)) {
           final EventProxy event;
-          if (eindex < events.size()) {
+          if (mOutputHiddenEvent != null) {
+            event = mOutputHiddenEvent;
+            if (events.isEmpty()) {
+              events.add(event);
+            }
+          } else if (eindex < events.size()) {
             event = events.get(eindex);
             eindex++;
           } else {
@@ -1437,6 +1477,7 @@ public class OPSearchAutomatonSimplifier
   //# Data Members
   private Collection<EventProxy> mHiddenEvents;
   private Collection<EventProxy> mPropositions;
+  private EventProxy mOutputHiddenEvent;
 
   private AutomatonProxy mInputAutomaton;
   private IntListBuffer mListBuffer;

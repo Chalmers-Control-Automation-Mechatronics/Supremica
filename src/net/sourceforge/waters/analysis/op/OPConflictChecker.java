@@ -1922,6 +1922,7 @@ public class OPConflictChecker
       final OPSearchAutomatonSimplifier simplifier =
         new OPSearchAutomatonSimplifier(aut, hidden, factory);
       simplifier.setPropositions(mPropositions);
+      simplifier.setOutputHiddenEvent(tau);
       simplifier.run();
       final PartitionedAutomatonResult result = simplifier.getAnalysisResult();
       final AutomatonProxy convertedAut = result.getAutomaton();
