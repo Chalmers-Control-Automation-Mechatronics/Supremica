@@ -31,6 +31,7 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -145,9 +146,9 @@ public class OPSearchAutomatonSimplifier
   public boolean run() throws AnalysisException
   {
     try {
-      getLogger().debug("ENTER OPSearchAutomatonSimplifier.run()");
       setUp();
-      getLogger().debug(mInputAutomaton.getStates().size() + " states");
+      getLogger().debug("ENTER OPSearchAutomatonSimplifier.run(): " +
+                        mInputAutomaton.getStates().size() + " states");
       mOPSearchPhase = true;
       while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
         doOPSearchStep();
@@ -363,6 +364,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void setUpVerifier()
+    throws OverflowException
   {
     final int numStates = mOriginalStates.length;
     mVerifierStatePairs = new TLongArrayList(numStates);
@@ -374,6 +376,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void rebuildVerifier()
+    throws OverflowException
   {
     mVerifierStatePairs.clear();
     mVerifierStateMap.clear();
@@ -388,6 +391,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void buildVerifier()
+    throws OverflowException
   {
     final int numStates = mOriginalStates.length;
     for (int s = 0; s < numStates; s++) {
@@ -401,6 +405,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void expandVerifierPairSingleton(final int code)
+    throws OverflowException
   {
     if (getRootIndex(code) == code) {
       expandVerifierPairTagged(code, code, code);
@@ -408,8 +413,9 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void expandVerifierPairEncoded(final int pcode, final long pair)
+    throws OverflowException
   {
-    final int code1 = (int) (pair & 0xffffffff);
+    final int code1 = (int) (pair & 0xffffffffL);
     final int code2 = (int) (pair >> 32);
     expandVerifierPairTagged(pcode, code1, code2);
   }
@@ -417,6 +423,7 @@ public class OPSearchAutomatonSimplifier
   private void expandVerifierPairTagged(final int pcode,
                                         final int code1,
                                         final int code2)
+    throws OverflowException
   {
     final StronglyConnectedComponent comp1 = mComponentOfState[code1];
     final int tausucc1 = mUnobservableTauSuccessors[code1];
@@ -494,6 +501,7 @@ public class OPSearchAutomatonSimplifier
   private void enqueueSuccessors(final int pcode,
                                  final int e,
                                  final StronglyConnectedComponent comp)
+    throws OverflowException
   {
     comp.iterate(mReadOnlyIterator);
     while (mReadOnlyIterator.advance()) {
@@ -516,6 +524,7 @@ public class OPSearchAutomatonSimplifier
                                  final int e,
                                  final int esucc1,
                                  final StronglyConnectedComponent comp2)
+    throws OverflowException
   {
     comp2.iterate(mAltReadOnlyIterator);
     while (mAltReadOnlyIterator.advance()) {
@@ -531,6 +540,7 @@ public class OPSearchAutomatonSimplifier
                                     final StronglyConnectedComponent comp1,
                                     final int code1,
                                     final int code2)
+    throws OverflowException
   {
     if (comp1 == null) {
       enqueueTauSuccessors(pcode, code1, code2);
@@ -546,6 +556,7 @@ public class OPSearchAutomatonSimplifier
   private void enqueueTauSuccessors(final int pcode,
                                     final int code1,
                                     final int code2)
+    throws OverflowException
   {
     final int list1 = mUnobservableTauSuccessors[code1];
     if (list1 != IntListBuffer.NULL) {
@@ -558,6 +569,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void enqueueSuccessor(final int from, final int to1, final int to2)
+    throws OverflowException
   {
     if (to1 != to2) {
       final int root1 = getRootIndex(to1);
@@ -571,6 +583,10 @@ public class OPSearchAutomatonSimplifier
           list = mVerifierPredecessors.get(pindex);
         } else {
           final int pindex = mVerifierStateMap.size();
+          if (pindex >= getNodeLimit()) {
+            throw new OverflowException(OverflowException.Kind.NODE,
+                                        getNodeLimit());
+          }
           final int pcode = pindex + mOriginalStates.length;
           mVerifierStatePairs.add(pair);
           mVerifierStateMap.put(pair, pcode);
@@ -655,9 +671,10 @@ public class OPSearchAutomatonSimplifier
   //#########################################################################
   //# OP-Search Algorithm
   private void doOPSearchStep()
+    throws OverflowException
   {
     final long trans = findOPSearchTransition();
-    final int source = (int) (trans & 0xffffffff);
+    final int source = (int) (trans & 0xffffffffL);
     final int target = (int) (trans >> 32);
     final int unobsList = mUnobservableTauSuccessors[source];
     mListBuffer.remove(unobsList, target);
@@ -779,7 +796,7 @@ public class OPSearchAutomatonSimplifier
         final int len = currentpairs.size();
         for (int i = 0; i < len; i++) {
           final long pair = currentpairs.get(i);
-          final int state1 = (int) (pair & 0xffffffff);
+          final int state1 = (int) (pair & 0xffffffffL);
           final int state2 = (int) (pair >> 32);
           foundtrans = searchTauSuccessors(startroot, state1, state2,
                                            targetpair, nextpairs);
@@ -797,6 +814,7 @@ public class OPSearchAutomatonSimplifier
             break outer;
           }
         }
+        currentpairs.clear();
         final TLongArrayList tmp = nextpairs;
         nextpairs = currentpairs;
         currentpairs = tmp;
@@ -914,7 +932,7 @@ public class OPSearchAutomatonSimplifier
     final int numPairs = mVerifierStatePairs.size();
     for (int i = 0; i < numPairs; i++) {
       final long pair = mVerifierStatePairs.get(i);
-      final int state1 = (int) (pair & 0xffffffff);
+      final int state1 = (int) (pair & 0xffffffffL);
       final int state2 = (int) (pair >> 32);
       mergeComponents(state1, state2);
     }
@@ -1200,7 +1218,7 @@ public class OPSearchAutomatonSimplifier
       final int code = mOriginalStates.length + i;
       final long pair = mVerifierStatePairs.get(i);
       final int p1 = (int) (pair >> 32);
-      final int p2 = (int) (pair & 0xffffffff);
+      final int p2 = (int) (pair & 0xffffffffL);
       writer.println("  " + code + ": (" + p1 + '/' + p2 + ')');
     }
     writer.println("PREDECESSORS");
@@ -1214,6 +1232,16 @@ public class OPSearchAutomatonSimplifier
     writer.print("  DEAD: ");
     mListBuffer.dumpList(writer, mPredecessorsOfDead);
     writer.println();
+  }
+
+  @SuppressWarnings("unused")
+  private void checkComponentIntegrity()
+  {
+    for (final StronglyConnectedComponent comp : mComponentOfState) {
+      if (comp != null) {
+        comp.checkIntegrity();
+      }
+    }
   }
 
 
@@ -1310,13 +1338,14 @@ public class OPSearchAutomatonSimplifier
           final StronglyConnectedComponent comp =
             new StronglyConnectedComponent(list);
           mComponents.add(comp);
-          mReadOnlyIterator.reset(list);
-          while (mReadOnlyIterator.advance()) {
-            final int elem = mReadOnlyIterator.getCurrentData();
+          mAltReadOnlyIterator.reset(list);
+          while (mAltReadOnlyIterator.advance()) {
+            final int elem = mAltReadOnlyIterator.getCurrentData();
             mComponentOfState[elem] = comp;
           }
         } else {
           mListBuffer.dispose(list);
+          mComponentOfState[state] = null;
         }
       }
     }
@@ -1463,6 +1492,18 @@ public class OPSearchAutomatonSimplifier
       }
       mStates = mListBuffer.catenateDestructively(mStates, comp.mStates);
       mEnabledEvents.or(comp.mEnabledEvents);
+    }
+
+    //#######################################################################
+    //# Debugging
+    private void checkIntegrity()
+    {
+      final IntListBuffer.ReadOnlyIterator iter =
+        mListBuffer.createReadOnlyIterator(mStates);
+      while (iter.advance()) {
+        final int state = iter.getCurrentData();
+        assert mComponentOfState[state] == this : "Unexpected component!";
+      }
     }
 
     //#######################################################################
