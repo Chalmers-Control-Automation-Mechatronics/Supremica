@@ -43,7 +43,7 @@ public class OPSearchConflictCheckerTest extends
   {
     final OPConflictChecker checker = new OPConflictChecker(factory);
     checker.setMethod(OPConflictChecker.Method.OPSEARCH);
-    checker.setInternalStepNodeLimit(5000);
+    checker.setInternalStepNodeLimit(50000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);
     return checker;
