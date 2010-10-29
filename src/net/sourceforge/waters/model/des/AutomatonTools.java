@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.model.des;
 
+import gnu.trove.THashSet;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -45,8 +48,8 @@ public final class AutomatonTools
 
   /**
    * Creates a product DES consisting of a single automaton.
-   * @param  aut     The automaton to be used in the product DES.
-   * @param  factory Factory to construct objects.
+   * @param  aut      The automaton to be used in the product DES.
+   * @param  factory  Factory to construct objects.
    * @return A product DES with only one automaton. The product DES name
    *         and event list are taken from the given automaton.
    */
@@ -57,6 +60,38 @@ public final class AutomatonTools
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<AutomatonProxy> automata = Collections.singletonList(aut);
     return factory.createProductDESProxy(name, events, automata);
+  }
+
+  /**
+   * Creates a product DES consisting of the given automata.
+   * @param  name     The name to be given to the product DES.
+   * @param  automata The automata to be used for the product DES.
+   * @param  factory  Factory to construct objects.
+   * @return A product DES with only the given automata. The product DES
+   *         event alphabet consists of the union of the events sets of its
+   *         automata in deterministic order.
+   */
+  public static ProductDESProxy createProductDESProxy
+    (final String name,
+     final Collection<AutomatonProxy> automata,
+     final ProductDESProxyFactory factory)
+  {
+    int numEvents = 0;
+    for (final AutomatonProxy aut : automata) {
+      numEvents += aut.getEvents().size();
+    }
+    final Collection<EventProxy> eventSet =
+      new THashSet<EventProxy>(numEvents);
+    final Collection<EventProxy> eventList =
+      new ArrayList<EventProxy>(numEvents);
+    for (final AutomatonProxy aut : automata) {
+      for (final EventProxy event : aut.getEvents()) {
+        if (eventSet.add(event)) {
+          eventList.add(event);
+        }
+      }
+    }
+    return factory.createProductDESProxy(name, eventList, automata);
   }
 
 }

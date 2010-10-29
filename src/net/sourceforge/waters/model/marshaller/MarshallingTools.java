@@ -16,9 +16,12 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -49,7 +52,8 @@ public class MarshallingTools
                                     final String filename)
   {
     try {
-      final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
       final ProxyMarshaller<ProductDESProxy> marshaller =
         new JAXBProductDESMarshaller(factory);
       final File file = new File(filename);
@@ -63,6 +67,16 @@ public class MarshallingTools
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
     }
+  }
+
+  public static void saveProductDES(final AutomatonProxy aut,
+                                    final String filename)
+  {
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy(aut, factory);
+    saveProductDES(des, filename);
   }
 
   public static void saveModule(final ModuleProxy module,
@@ -84,6 +98,29 @@ public class MarshallingTools
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
     }
+  }
+
+  public static void saveModule(final ProductDESProxy des,
+                                final String filename)
+  {
+    try {
+      final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+      final ProductDESImporter importer = new ProductDESImporter(factory);
+      final ModuleProxy module = importer.importModule(des);
+      saveModule(module, filename);
+    } catch (final ParseException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+  public static void saveModule(final AutomatonProxy aut,
+                                final String filename)
+  {
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy(aut, factory);
+    saveModule(des, filename);
   }
 
 }

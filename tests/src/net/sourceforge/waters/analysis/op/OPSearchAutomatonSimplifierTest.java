@@ -63,88 +63,93 @@ public class OPSearchAutomatonSimplifierTest
   //# Test Cases
   public void testOPempty() throws Exception
   {
-    runOPVerifier("alpharemoval_8.wmod", true);
+    runOPSearch("alpharemoval_8.wmod", true);
   }
 
   public void testOP1() throws Exception
   {
-    runOPVerifier("op_1.wmod", false);
+    runOPSearch("op_1.wmod", false);
   }
 
   public void testOP2() throws Exception
   {
-    runOPVerifier("op_2.wmod", true);
+    runOPSearch("op_2.wmod", true);
   }
 
   public void testOP3() throws Exception
   {
-    runOPVerifier("op_3.wmod", false);
+    runOPSearch("op_3.wmod", false);
   }
 
   public void testOP3a() throws Exception
   {
-    runOPVerifier("tauTransRemovalFromNonAlpha_3.wmod", true);
+    runOPSearch("tauTransRemovalFromNonAlpha_3.wmod", true);
   }
 
   public void testOP4() throws Exception
   {
-    runOPVerifier("op_4.wmod", true);
+    runOPSearch("op_4.wmod", true);
   }
 
   public void testOP5() throws Exception
   {
-    runOPVerifier("op_5.wmod", true);
+    runOPSearch("op_5.wmod", true);
   }
 
   public void testOP6() throws Exception
   {
-    runOPVerifier("op_6.wmod", true);
+    runOPSearch("op_6.wmod", true);
   }
 
   public void testOP7() throws Exception
   {
-    runOPVerifier("op_7.wmod", true);
+    runOPSearch("op_7.wmod", true);
   }
 
   public void testOP8() throws Exception
   {
-    runOPVerifier("op_8.wmod", true);
+    runOPSearch("op_8.wmod", true);
   }
 
   public void testOP9() throws Exception
   {
-    runOPVerifier("op_9.wmod", true);
+    runOPSearch("op_9.wmod", true);
   }
 
   public void testOP10() throws Exception
   {
-    runOPVerifier("op_10.wmod", true);
+    runOPSearch("op_10.wmod", true);
   }
 
   public void testOP11() throws Exception
   {
-    runOPVerifier("op_11.wmod", true);
+    runOPSearch("op_11.wmod", true);
   }
 
   public void testOP12() throws Exception
   {
-    runOPVerifier("op_12.wmod", true);
+    runOPSearch("op_12.wmod", true);
   }
 
   public void testOP13() throws Exception
   {
-    runOPVerifier("op_13.wmod", true);
+    runOPSearch("op_13.wmod", true);
   }
 
   public void testOP14() throws Exception
   {
-    runOPVerifier("op_14.wmod", true);
+    runOPSearch("op_14.wmod", true);
+  }
+
+  public void testOP15() throws Exception
+  {
+    runOPSearch("op_15.wmod", true);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private void runOPVerifier(final String name, final boolean expect)
+  private void runOPSearch(final String name, final boolean expect)
     throws Exception
   {
     final ProductDESProxy des = getCompiledDES("tests", "abstraction", name);

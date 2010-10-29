@@ -30,8 +30,10 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AutomatonResult;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -40,6 +42,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -143,12 +147,21 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Invocation
-  public boolean run() throws AnalysisException
+  public boolean run()
+    throws AnalysisException
   {
+    final Logger logger = getLogger();
     try {
+      if (logger.isDebugEnabled()) {
+        final AutomatonProxy aut = getInputAutomaton();
+        final String msg =
+            "ENTER " + ProxyTools.getShortClassName(this) + ".run(): " +
+            aut.getName() + " with " + aut.getStates().size() +
+            " states and " + aut.getTransitions().size() + " transitions ...";
+        logger.debug(msg);
+        //MarshallingTools.saveModule(aut, "before.wmod");
+      }
       setUp();
-      getLogger().debug("ENTER OPSearchAutomatonSimplifier.run(): " +
-                        mInputAutomaton.getStates().size() + " states");
       mOPSearchPhase = true;
       while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
         doOPSearchStep();
@@ -160,10 +173,18 @@ public class OPSearchAutomatonSimplifier
       }
     } finally {
       tearDown();
-      final AutomatonProxy aut = getComputedAutomaton();
-      getLogger().debug
-        ("EXIT OPSearchAutomatonSimplifier.run(): " +
-         (aut == null ? "" : aut.getStates().size() + " states"));
+      if (logger.isDebugEnabled()) {
+        String msg = "EXIT " + ProxyTools.getShortClassName(this) + ".run()";
+        final AutomatonResult result = getAnalysisResult();
+        final AutomatonProxy aut =
+          result == null ? null : result.getAutomaton();
+        if (aut != null) {
+          msg += ": " + aut.getStates().size() + " states and " +
+                 aut.getTransitions().size() + " transitions";
+          //MarshallingTools.saveModule(aut, "after.wmod");
+        }
+        logger.debug(msg);
+      }
     }
   }
 
@@ -1047,6 +1068,7 @@ public class OPSearchAutomatonSimplifier
                                              eindex);
           }
         }
+        observableTauSuccessors.clear();
       }
     }
 

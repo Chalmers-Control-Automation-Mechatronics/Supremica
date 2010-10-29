@@ -242,8 +242,10 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
    */
   protected void addStatistics()
   {
-    final long current = System.currentTimeMillis();
-    mAnalysisResult.setRuntime(current - mStartTime);
+    if (mAnalysisResult != null) {
+      final long current = System.currentTimeMillis();
+      mAnalysisResult.setRuntime(current - mStartTime);
+    }
   }
 
 

@@ -81,7 +81,7 @@ class ExpressionScanner {
   {
     final Token token = peek();
     mNextToken = null;
-    return token;    
+    return token;
   }
 
   Token peek()
@@ -176,7 +176,7 @@ class ExpressionScanner {
   {
     final Integer character = new Integer(ch);
     return SEPARATORS.containsKey(character);
-    
+
   }
 
   /**
@@ -346,6 +346,7 @@ class ExpressionScanner {
   private int appendEscapeGroup()
     throws IOException
   {
+    int nesting = 1;
     int ch;
     do {
       ch = getNextCharacter();
@@ -354,7 +355,12 @@ class ExpressionScanner {
         return Token.END;
       }
       mTokenText.append((char) ch);
-    } while (!isEscapeEndCharachter(ch));
+      if (isEscapeStartCharachter(ch)) {
+        nesting++;
+      } else if (isEscapeEndCharachter(ch)) {
+        nesting--;
+      }
+    } while (nesting > 0);
     return Token.SYMBOL;
   }
 
@@ -385,7 +391,7 @@ class ExpressionScanner {
     }
   }
 
-      
+
   //#########################################################################
   //# Token Creation
   private Token createSeparatorToken(final int ch)
@@ -507,7 +513,7 @@ class ExpressionScanner {
     private final String mName;
   }
 
-  
+
   //#########################################################################
   //# Data Members
   private final OperatorTable mOperatorTable;

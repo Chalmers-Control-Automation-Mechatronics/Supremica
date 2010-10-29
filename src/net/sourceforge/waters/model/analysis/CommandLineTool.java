@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
@@ -31,8 +30,6 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -41,7 +38,6 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -230,7 +226,7 @@ public class CommandLineTool
         System.out.print(des.getName() + " ... ");
         System.out.flush();
 
-        // shuffle
+        /* shuffle
         {
           final String desname = des.getName();
           final String comment = des.getComment();
@@ -243,7 +239,7 @@ public class CommandLineTool
             desFactory.createProductDESProxy(desname, comment, null,
                                              events, automata);
           MarshallingTools.saveProductDES(shuffle, "shuffle.wdes");
-        }
+        } */
 
         final long start = System.currentTimeMillis();
         wrapper.setModel(des);
