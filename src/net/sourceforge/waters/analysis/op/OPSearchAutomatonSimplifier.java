@@ -924,7 +924,8 @@ public class OPSearchAutomatonSimplifier
     if (mVerifierStatePairs.isEmpty()) {
       final int numStates = mOriginalStates.length;
       for (int s = 0; s < numStates; s++) {
-        if (mComponentOfState[s] != null) {
+        final StronglyConnectedComponent comp = mComponentOfState[s];
+        if (comp != null && comp.getMaxNondeterminism() < comp.size()) {
           return true;
         }
       }
@@ -1430,6 +1431,11 @@ public class OPSearchAutomatonSimplifier
       return mListBuffer.toArray(mStates);
     }
 
+    private int size()
+    {
+      return mListBuffer.getLength(mStates);
+    }
+
     //#######################################################################
     //# Flag Setup
     private void initialiseEventStatus()
@@ -1514,6 +1520,27 @@ public class OPSearchAutomatonSimplifier
       }
       mStates = mListBuffer.catenateDestructively(mStates, comp.mStates);
       mEnabledEvents.or(comp.mEnabledEvents);
+    }
+
+    private int getMaxNondeterminism()
+    {
+      int max = 0;
+      for (int e = 0; e < mUnobservableTau; e++) {
+        if (isEnabledEvent(e)) {
+          int count = 0;
+          iterate(mReadOnlyIterator);
+          while (mReadOnlyIterator.advance()) {
+            final int state = mReadOnlyIterator.getCurrentData();
+            if (mObservableSuccessor[state][e] != NO_TRANSITION) {
+              count++;
+            }
+          }
+          if (count > max) {
+            max = count;
+          }
+        }
+      }
+      return max;
     }
 
     //#######################################################################
