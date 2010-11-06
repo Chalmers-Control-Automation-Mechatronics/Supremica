@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.op;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
+import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntStack;
 import gnu.trove.TLongArrayList;
@@ -935,6 +936,176 @@ public class OPSearchAutomatonSimplifier
     }
   }
 
+  private ListBufferTransitionRelation createTransitionRelation()
+    throws OverflowException
+  {
+    // 1. Encode events
+    final EventProxy otau = createObservableTauEvent(0);
+    final int numEvents = mEvents.length + 1;
+    final List<EventProxy> events = new ArrayList<EventProxy>(numEvents);
+    events.add(otau);
+    for (final EventProxy event : mEvents) {
+      events.add(event);
+    }
+    final EventEncoding enc = new EventEncoding(events);
+    final int numProperEvents = enc.getNumberOfProperEvents();
+    final int numProps = enc.getNumberOfPropositions();
+    final int ocode = enc.getEventCode(otau);
+
+    // 2. Merge states
+    // All strongly tau-connected components are treated as a single state.
+    // Furthermore, any two components that contains states reached by strings
+    // with equal projection are merged. The observer property ensures that the
+    // result is still observation equivalent to the original automaton.
+    final int numPairs = mVerifierStatePairs.size();
+    for (int i = 0; i < numPairs; i++) {
+      final long pair = mVerifierStatePairs.get(i);
+      final int state1 = (int) (pair & 0xffffffffL);
+      final int state2 = (int) (pair >> 32);
+      mergeComponents(state1, state2);
+    }
+    final TIntArrayList states = new TIntArrayList(mOriginalStates.length);
+    final TIntIntHashMap stateMap = new TIntIntHashMap(mOriginalStates.length);
+    for (int s0 = 0; s0 < mOriginalStates.length; s0++) {
+      final StronglyConnectedComponent comp = mComponentOfState[s0];
+      if (comp == null) {
+        final int s1 = states.size();
+        states.add(s0);
+        stateMap.put(s0, s1);
+      } else {
+        final int root = comp.getRootIndex();
+        if (root == s0) {
+          final int s1 = states.size();
+          states.add(s0);
+          stateMap.put(s0, s1);
+        }
+      }
+    }
+    final int numStates = states.size();
+
+    // 3. Initialise transition relation
+    String name = getOutputName();
+    if (name == null) {
+      name = mInputAutomaton.getName();
+    }
+    ComponentKind kind = getOutputKind();
+    if (kind == null) {
+      kind = mInputAutomaton.getKind();
+    }
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(name, kind, enc, numStates,
+                                       ListBufferTransitionRelation.
+                                       CONFIG_PREDECESSORS);
+
+    // 4. Assign initial and marked states
+    for (int s1 = 0; s1 < numStates; s1++) {
+      final int s0 = states.get(s1);
+      final StronglyConnectedComponent comp = mComponentOfState[s0];
+      if (comp == null) {
+        if (s0 == 0) {
+          rel.setInitial(s1, true);
+        }
+        for (int p1 = 0; p1 < numProps; p1++) {
+          final EventProxy prop = enc.getProposition(p1);
+          final int p0 = mEventMap.get(prop);
+          if (mObservableSuccessor[s0][p0] != NO_TRANSITION) {
+            rel.setMarked(s1, p1, true);
+          }
+        }
+      } else {
+        if (comp.isInitial()) {
+          rel.setInitial(s1, true);
+        }
+        for (int p1 = 0; p1 < numProps; p1++) {
+          final EventProxy prop = enc.getProposition(p1);
+          final int p0 = mEventMap.get(prop);
+          if (comp.isEnabledEvent(p0)) {
+            rel.setMarked(s1, p1, true);
+          }
+        }
+      }
+    }
+
+    // 5. Create Transitions
+    for (int s1 = 0; s1 < numStates; s1++) {
+      final int s0 = states.get(s1);
+      final StronglyConnectedComponent comp = mComponentOfState[s0];
+      // observable tau transitions ...
+      if (comp == null) {
+        final int list = mObservableTauSuccessors[s0];
+        if (list != IntListBuffer.NULL) {
+          mAltReadOnlyIterator.reset(list);
+          while (mAltReadOnlyIterator.advance()) {
+            final int succ = mAltReadOnlyIterator.getCurrentData();
+            if (s0 != succ) {
+              final int t0 = getRootIndex(succ);
+              final int t1 = stateMap.get(t0);
+              rel.addTransition(s1, ocode, t1);
+            }
+          }
+        }
+      } else if (comp.isEnabledEvent(mObservableTau)) {
+        while (mReadOnlyIterator.advance()) {
+          final int source = mReadOnlyIterator.getCurrentData();
+          final int list = mObservableTauSuccessors[source];
+          if (list != IntListBuffer.NULL) {
+            mAltReadOnlyIterator.reset(list);
+            while (mAltReadOnlyIterator.advance()) {
+              final int succ = mAltReadOnlyIterator.getCurrentData();
+              final int t0 = getRootIndex(succ);
+              if (s0 != t0) {
+                final int t1 = stateMap.get(t0);
+                rel.addTransition(s1, ocode, t1);
+              }
+            }
+          }
+        }
+      }
+      // proper event transitions ...
+      for (int e1 = 0; e1 < numProperEvents; e1++) {
+        if (e1 != EventEncoding.TAU) {
+          final EventProxy event = enc.getProperEvent(e1);
+          final int e0 = mEventMap.get(event);
+          if (comp == null) {
+            final int succ = mObservableSuccessor[s0][e0];
+            if (succ != NO_TRANSITION) {
+              final int t0 = getRootIndex(succ);
+              final int t1 = stateMap.get(t0);
+              rel.addTransition(s1, e1, t1);
+            }
+          } else if (comp.isEnabledEvent(e0)) {
+            comp.iterate(mReadOnlyIterator);
+            while (mReadOnlyIterator.advance()) {
+              final int src = mReadOnlyIterator.getCurrentData();
+              final int succ = mObservableSuccessor[src][e0];
+              if (succ != NO_TRANSITION) {
+                final int t0 = getRootIndex(succ);
+                final int t1 = stateMap.get(t0);
+                rel.addTransition(s1, e1, t1);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return rel;
+  }
+
+  @SuppressWarnings("unused")
+  private boolean createReducedOutputAutomaton()
+    throws AnalysisException
+  {
+    final ListBufferTransitionRelation rel = createTransitionRelation();
+    final ObservationEquivalenceTRSimplifier simp =
+      new ObservationEquivalenceTRSimplifier(rel);
+    simp.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+    final boolean change = simp.run();
+    final List<int[]> partition = simp.getResultPartition();
+    return true;
+  }
+
   private boolean createOutputAutomaton()
   {
     String name = getOutputName();
@@ -1434,6 +1605,11 @@ public class OPSearchAutomatonSimplifier
     private int size()
     {
       return mListBuffer.getLength(mStates);
+    }
+
+    private boolean isInitial()
+    {
+      return mListBuffer.contains(mStates, 0);
     }
 
     //#######################################################################

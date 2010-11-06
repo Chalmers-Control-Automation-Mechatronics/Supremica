@@ -401,7 +401,8 @@ public class ListBufferTransitionRelation
    * @param state
    *          ID of the state to be modified.
    * @param prop
-   *          ID of proposition identifying the marking to be modified.
+   *          ID of proposition identifying the marking of which is
+   *          to be modified.
    * @param value
    *          Whether the marking should be set (<CODE>true</CODE>) or cleared
    *          (<CODE>false</CODE>) for the given state and proposition.
@@ -490,6 +491,20 @@ public class ListBufferTransitionRelation
   public long createMarkings(final TIntArrayList props)
   {
     return mStateBuffer.createMarkings(props);
+  }
+
+  /**
+   * Adds a marking to a given marking pattern.
+   * @param  markings  Marking pattern to be augmented.
+   * @param  prop      Code of proposition to be added to pattern.
+   * @return A number identifying a marking consisting of all propositions
+   *         contained in the given markings, plus the the additional marking.
+   * @see #mergeMarkings(long, long)
+   * @see #setAllMarkings(int,long) setAllMarkings()
+   */
+  public long addMarking(final long markings, final int prop)
+  {
+    return mStateBuffer.addMarking(markings, prop);
   }
 
   /**

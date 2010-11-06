@@ -215,8 +215,8 @@ public abstract class TransitionListBuffer
 
   /**
    * Gets the total number of transitions currently stored in this buffer.
-   * As the number of transitions is not stored, this method is of linear
-   * complexity.
+   * As the number of transitions is not recorded explicitly, this method is
+   * of linear complexity.
    */
   public int getNumberOfTransitions()
   {
@@ -275,7 +275,7 @@ public abstract class TransitionListBuffer
   }
 
   /**
-   * Adds several transition to this buffer. New transition for the given
+   * Adds several transition to this buffer. New transitions for the given
    * from-state and event are inserted after existing transitions with the
    * same from-state and event. This method checks whether transitions are
    * already present and suppresses any duplicates. Its worst-case complexity

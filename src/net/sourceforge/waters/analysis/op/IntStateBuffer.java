@@ -348,9 +348,24 @@ public class IntStateBuffer
   }
 
   /**
+   * Adds a marking to a given marking pattern.
+   * @param  markings  Marking pattern to be augmented.
+   * @param  prop      Code of proposition to be added to pattern.
+   * @return A number identifying a marking consisting of all propositions
+   *         contained in the given markings, plus the the additional marking.
+   * @see #mergeMarkings(long, long)
+   * @see #setAllMarkings(int,long) setAllMarkings()
+   */
+  public long addMarking(final long markings, final int prop)
+  {
+    return markings | (1L << prop);
+  }
+
+  /**
    * Combines two marking patterns.
    * @return A number identifying a marking consisting of all propositions
    *         contained in one of the two input marking patterns.
+   * @see #addMarking(long, int)
    * @see #setAllMarkings(int,long) setAllMarkings()
    */
   public long mergeMarkings(final long markings1, final long markings2)

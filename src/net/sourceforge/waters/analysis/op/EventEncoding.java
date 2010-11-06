@@ -36,13 +36,13 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * so changes to the event encoding will not affect any transition relations
  * that have been created.
  *
- * Separate codes are assigned to proper events (non-propositions) and
+ * Codes are assigned independently to proper events (non-propositions) and
  * propositions. This means that a given integer number may represent two
  * events, a proper event and a proposition.
  *
  * Silent (tau) events are handled specially. The proper event code
- * {@link #TAU} is reserved for the silent event in every encoding, even
- * if no silent event is used. Multiple silent events can be specified to
+ * {@link #TAU}&nbsp;(0) is reserved for the silent event in every encoding,
+ * even if no silent event is used. Multiple silent events can be specified to
  * implement hiding.
  *
  * @see ListBufferTransitionRelation
@@ -126,6 +126,9 @@ public class EventEncoding
    * Creates a new event encoding.
    * This method creates an event encoding consisting of all the given events.
    * @param  events      Collection of events constituting the new encoding.
+   *                     Codes are assigned in the order given by the
+   *                     collection, with code {@link #TAU}&nbsp;(0) reserved
+   *                     to the silent event, even if it is not used.
    * @param  tau         The silent event to be used,
    *                     or <CODE>null</CODE> if none is to be configured.
    */
@@ -139,6 +142,9 @@ public class EventEncoding
    * Creates a new event encoding.
    * This method creates an event encoding without any silent event.
    * @param  events      Collection of events constituting the new encoding.
+   *                     Codes are assigned in the order given by the
+   *                     collection, with code {@link #TAU}&nbsp;(0) reserved
+   *                     to the silent event, even though it is not used.
    * @param  filter      A collection of events to restrict the encoding to.
    * @param  filterMode  Flags defining how the filter is to be used,
    *                     should be one of {@link #FILTER_PROPER_EVENTS},
@@ -154,6 +160,9 @@ public class EventEncoding
   /**
    * Creates a new event encoding.
    * @param  events      Collection of events constituting the new encoding.
+   *                     Codes are assigned in the order given by the
+   *                     collection, with code {@link #TAU}&nbsp;(0) reserved
+   *                     to the silent event, even if it is not used.
    * @param  tau         The silent event to be used,
    *                     or <CODE>null</CODE> if none is to be configured.
    * @param  filter      A collection of events to restrict the encoding to.
