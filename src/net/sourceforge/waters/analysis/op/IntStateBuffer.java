@@ -362,6 +362,18 @@ public class IntStateBuffer
   }
 
   /**
+   * Checks whether the given marking pattern contains the given proposition.
+   * @param  markings  Marking pattern to be examined.
+   * @param  prop      Code of proposition to be tested.
+   * @return <CODE>true</CODE> if the marking pattern includes the given
+   *         proposition, <CODE>false</CODE> otherwise.
+   */
+  public boolean isMarked(final long markings, final int prop)
+  {
+    return (markings & (1L << prop)) != 0;
+  }
+
+  /**
    * Combines two marking patterns.
    * @return A number identifying a marking consisting of all propositions
    *         contained in one of the two input marking patterns.

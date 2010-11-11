@@ -483,7 +483,7 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Creates markings pattern for the given propositions.
+   * Creates a markings pattern for the given propositions.
    * @param  props    Collection of proposition IDs defining a state marking.
    * @return A number identifying the given combination of propositions.
    * @see #setAllMarkings(int,long) setAllMarkings()
@@ -494,7 +494,7 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Adds a marking to a given marking pattern.
+   * Adds a marking to the given marking pattern.
    * @param  markings  Marking pattern to be augmented.
    * @param  prop      Code of proposition to be added to pattern.
    * @return A number identifying a marking consisting of all propositions
@@ -505,6 +505,18 @@ public class ListBufferTransitionRelation
   public long addMarking(final long markings, final int prop)
   {
     return mStateBuffer.addMarking(markings, prop);
+  }
+
+  /**
+   * Checks whether the given marking pattern contains the given proposition.
+   * @param  markings  Marking pattern to be examined.
+   * @param  prop      Code of proposition to be tested.
+   * @return <CODE>true</CODE> if the marking pattern includes the given
+   *         proposition, <CODE>false</CODE> otherwise.
+   */
+  public boolean isMarked(final long markings, final int prop)
+  {
+    return mStateBuffer.isMarked(markings, prop);
   }
 
   /**

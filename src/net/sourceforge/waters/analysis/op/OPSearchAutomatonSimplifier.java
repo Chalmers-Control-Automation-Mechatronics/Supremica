@@ -18,6 +18,7 @@ import gnu.trove.TIntStack;
 import gnu.trove.TLongArrayList;
 import gnu.trove.TLongIntHashMap;
 import gnu.trove.TLongLongHashMap;
+import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
 
 import java.io.PrintWriter;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -936,6 +938,23 @@ public class OPSearchAutomatonSimplifier
     }
   }
 
+  @SuppressWarnings("unused")
+  private boolean createReducedOutputAutomaton(boolean change)
+    throws AnalysisException
+  {
+     final ListBufferTransitionRelation rel = createTransitionRelation();
+    final ObservationEquivalenceTRSimplifier simp =
+      new ObservationEquivalenceTRSimplifier(rel);
+    simp.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+    change |= simp.run();
+    if (!change) {
+      return setAutomatonResult(mInputAutomaton);
+    }
+    final List<int[]> partition = simp.getResultPartition();
+    return createOutputAutomaton(rel, partition);
+  }
+
   private ListBufferTransitionRelation createTransitionRelation()
     throws OverflowException
   {
@@ -947,10 +966,10 @@ public class OPSearchAutomatonSimplifier
     for (final EventProxy event : mEvents) {
       events.add(event);
     }
-    final EventEncoding enc = new EventEncoding(events);
-    final int numProperEvents = enc.getNumberOfProperEvents();
-    final int numProps = enc.getNumberOfPropositions();
-    final int ocode = enc.getEventCode(otau);
+    mEventEncoding = new EventEncoding(events);
+    final int numProperEvents = mEventEncoding.getNumberOfProperEvents();
+    final int numProps = mEventEncoding.getNumberOfPropositions();
+    final int ocode = mEventEncoding.getEventCode(otau);
 
     // 2. Merge states
     // All strongly tau-connected components are treated as a single state.
@@ -964,24 +983,24 @@ public class OPSearchAutomatonSimplifier
       final int state2 = (int) (pair >> 32);
       mergeComponents(state1, state2);
     }
-    final TIntArrayList states = new TIntArrayList(mOriginalStates.length);
+    mRootStates = new TIntArrayList(mOriginalStates.length);
     final TIntIntHashMap stateMap = new TIntIntHashMap(mOriginalStates.length);
     for (int s0 = 0; s0 < mOriginalStates.length; s0++) {
       final StronglyConnectedComponent comp = mComponentOfState[s0];
       if (comp == null) {
-        final int s1 = states.size();
-        states.add(s0);
+        final int s1 = mRootStates.size();
+        mRootStates.add(s0);
         stateMap.put(s0, s1);
       } else {
         final int root = comp.getRootIndex();
         if (root == s0) {
-          final int s1 = states.size();
-          states.add(s0);
+          final int s1 = mRootStates.size();
+          mRootStates.add(s0);
           stateMap.put(s0, s1);
         }
       }
     }
-    final int numStates = states.size();
+    final int numStates = mRootStates.size();
 
     // 3. Initialise transition relation
     String name = getOutputName();
@@ -993,20 +1012,20 @@ public class OPSearchAutomatonSimplifier
       kind = mInputAutomaton.getKind();
     }
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(name, kind, enc, numStates,
+      new ListBufferTransitionRelation(name, kind, mEventEncoding, numStates,
                                        ListBufferTransitionRelation.
                                        CONFIG_PREDECESSORS);
 
     // 4. Assign initial and marked states
     for (int s1 = 0; s1 < numStates; s1++) {
-      final int s0 = states.get(s1);
+      final int s0 = mRootStates.get(s1);
       final StronglyConnectedComponent comp = mComponentOfState[s0];
       if (comp == null) {
         if (s0 == 0) {
           rel.setInitial(s1, true);
         }
         for (int p1 = 0; p1 < numProps; p1++) {
-          final EventProxy prop = enc.getProposition(p1);
+          final EventProxy prop = mEventEncoding.getProposition(p1);
           final int p0 = mEventMap.get(prop);
           if (mObservableSuccessor[s0][p0] != NO_TRANSITION) {
             rel.setMarked(s1, p1, true);
@@ -1017,7 +1036,7 @@ public class OPSearchAutomatonSimplifier
           rel.setInitial(s1, true);
         }
         for (int p1 = 0; p1 < numProps; p1++) {
-          final EventProxy prop = enc.getProposition(p1);
+          final EventProxy prop = mEventEncoding.getProposition(p1);
           final int p0 = mEventMap.get(prop);
           if (comp.isEnabledEvent(p0)) {
             rel.setMarked(s1, p1, true);
@@ -1028,7 +1047,7 @@ public class OPSearchAutomatonSimplifier
 
     // 5. Create Transitions
     for (int s1 = 0; s1 < numStates; s1++) {
-      final int s0 = states.get(s1);
+      final int s0 = mRootStates.get(s1);
       final StronglyConnectedComponent comp = mComponentOfState[s0];
       // observable tau transitions ...
       if (comp == null) {
@@ -1064,7 +1083,7 @@ public class OPSearchAutomatonSimplifier
       // proper event transitions ...
       for (int e1 = 0; e1 < numProperEvents; e1++) {
         if (e1 != EventEncoding.TAU) {
-          final EventProxy event = enc.getProperEvent(e1);
+          final EventProxy event = mEventEncoding.getProperEvent(e1);
           final int e0 = mEventMap.get(event);
           if (comp == null) {
             final int succ = mObservableSuccessor[s0][e0];
@@ -1092,19 +1111,206 @@ public class OPSearchAutomatonSimplifier
     return rel;
   }
 
-  @SuppressWarnings("unused")
-  private boolean createReducedOutputAutomaton()
+  private boolean createOutputAutomaton(final ListBufferTransitionRelation rel,
+                                        final List<int[]> partition)
     throws AnalysisException
   {
-    final ListBufferTransitionRelation rel = createTransitionRelation();
-    final ObservationEquivalenceTRSimplifier simp =
-      new ObservationEquivalenceTRSimplifier(rel);
-    simp.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
-    final boolean change = simp.run();
-    final List<int[]> partition = simp.getResultPartition();
-    return true;
+    // 1. Establish class map
+    final int numClasses = partition.size();
+    final int numInputStates = rel.getNumberOfStates();
+    final int[] classMap = new int[numInputStates];
+    for (int c = 0; c < numClasses; c++) {
+      for (final int s : partition.get(c)) {
+        classMap[s] = c;
+      }
+    }
+
+    // 2. Find degree of nondeterminism for each class
+    final int numProperEvents = mEventEncoding.getNumberOfProperEvents();
+    final int[] maxFanout = new int[numClasses];
+    final int[] currentFanout = new int[numClasses];
+    final int[] cls = new int[numClasses];
+    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
+    for (int e = OBSERVABLE_TAU + 1; e < numProperEvents; e++) {
+      Arrays.fill(currentFanout, 0);
+      Arrays.fill(cls, -1);
+      for (int toClass = 0; toClass < numClasses; toClass++) {
+        for (final int t : partition.get(toClass)) {
+          iter.reset(t, e);
+          while (iter.advance()) {
+            final int s = iter.getCurrentSourceState();
+            final int fromClass = classMap[s];
+            if (cls[fromClass] != toClass) {
+              currentFanout[fromClass]++;
+              cls[fromClass] = toClass;
+            }
+          }
+        }
+      }
+      for (int c = 0; c < numClasses; c++) {
+        if (currentFanout[c] > maxFanout[c]) {
+          maxFanout[c] = currentFanout[c];
+        }
+      }
+    }
+
+    // 3. Create output automaton states and partition
+    int numOutputStates = 0;
+    for (int c = 0; c < numClasses; c++) {
+      numOutputStates += maxFanout[c];
+    }
+    final List<StateProxy> states =
+      new ArrayList<StateProxy>(numOutputStates);
+    final int[] cindex = new int[numClasses];
+    final int numProps = mEventEncoding.getNumberOfPropositions();
+    final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
+      new TLongObjectHashMap<Collection<EventProxy>>();
+    final Collection<EventProxy> empty = Collections.emptyList();
+    markingsMap.put(0, empty);
+    final List<int[]> outputPartition = new ArrayList<int[]>(numOutputStates);
+    final TIntArrayList currentClass = new TIntArrayList();
+    int code = 0;
+    for (int c = 0; c < numClasses; c++) {
+      boolean init = false;
+      long markings = 0;
+      for (final int s : partition.get(c)) {
+        init |= rel.isInitial(s);
+        final long stateMarkings = rel.getAllMarkings(s);
+        markings = rel.mergeMarkings(markings, stateMarkings);
+        final int root = mRootStates.get(s);
+        final StronglyConnectedComponent comp = mComponentOfState[root];
+        if (comp == null) {
+          currentClass.add(root);
+        } else {
+          comp.iterate(mReadOnlyIterator);
+          while (mReadOnlyIterator.advance()) {
+            final int member = mReadOnlyIterator.getCurrentData();
+            currentClass.add(member);
+          }
+        }
+      }
+      final int[] currentClassArray = currentClass.toNativeArray();
+      currentClass.clear();
+      Collection<EventProxy> props = markingsMap.get(markings);
+      if (props == null) {
+        props = new ArrayList<EventProxy>(numProps);
+        for (int p = 0; p < numProps; p++) {
+          if (rel.isMarked(markings, p)) {
+            final EventProxy prop = mEventEncoding.getProposition(p);
+            props.add(prop);
+          }
+        }
+        markingsMap.put(markings, props);
+      }
+      cindex[c] = code;
+      final StateProxy state0 = new MemStateProxy(code++, init, props);
+      states.add(state0);
+      outputPartition.add(currentClassArray);
+      for (int i = 1; i < maxFanout[c]; i++) {
+        final StateProxy state = new MemStateProxy(code++, false, props);
+        states.add(state);
+        outputPartition.add(currentClassArray);
+      }
+    }
+
+    // 4. Create output automaton transitions
+    final ProductDESProxyFactory factory = getFactory();
+    final Collection<TransitionProxy> transitions =
+      new ArrayList<TransitionProxy>();
+    final List<EventProxy> events = new ArrayList<EventProxy>();
+
+    for (int c = 0; c < numClasses; c++) {
+      final int fanout = maxFanout[c];
+      if (fanout > 1) {
+        final EventProxy otau = createObservableTauEvent(events, 0);
+        final int start = cindex[c];
+        for (int offset = 0; offset < fanout; offset++) {
+          final int next = (offset + 1) % fanout;
+          final StateProxy source = states.get(start + offset);
+          final StateProxy target = states.get(start + next);
+          final TransitionProxy trans =
+            factory.createTransitionProxy(source, otau, target);
+          transitions.add(trans);
+        }
+      }
+    }
+
+    for (int e = OBSERVABLE_TAU; e < numProperEvents; e++) {
+      EventProxy event = mEventEncoding.getProperEvent(e);
+      Arrays.fill(currentFanout, 0);
+      Arrays.fill(cls, -1);
+      for (int toClass = 0; toClass < numClasses; toClass++) {
+        final StateProxy target = states.get(cindex[toClass]);
+        for (final int t : partition.get(toClass)) {
+          iter.reset(t, e);
+          while (iter.advance()) {
+            final int s = iter.getCurrentSourceState();
+            final int fromClass = classMap[s];
+            if (cls[fromClass] != toClass) {
+              int offset = currentFanout[fromClass]++;
+              if (e == OBSERVABLE_TAU) {
+                if (fromClass == toClass) {
+                  continue;
+                }
+                final int eindex;
+                if (maxFanout[fromClass] <= 1) {
+                  eindex = offset;
+                  offset = 0;
+                } else {
+                  eindex = offset / maxFanout[fromClass] + 1;
+                  offset = offset % maxFanout[fromClass];
+                }
+                // Note. First observable tau has been read from encoding.
+                event = createObservableTauEvent(events, eindex);
+              }
+              cls[fromClass] = toClass;
+              final StateProxy source = states.get(cindex[fromClass] + offset);
+              final TransitionProxy trans =
+                factory.createTransitionProxy(source, event, target);
+              transitions.add(trans);
+            }
+          }
+        }
+      }
+    }
+
+    // 5. Create output automaton
+    final String name = rel.getName();
+    final ComponentKind kind = rel.getKind();
+    final AutomatonProxy aut =
+      factory.createAutomatonProxy(name, kind, events, states, transitions);
+    final StateEncoding inputEnc = new StateEncoding(mOriginalStates);
+    final StateEncoding outputEnc = new StateEncoding(states);
+    final PartitionedAutomatonResult result = getAnalysisResult();
+    result.setAutomaton(aut, inputEnc, outputEnc, outputPartition);
+    return result.isSatisfied();
   }
+
+  private EventProxy createObservableTauEvent(final List<EventProxy> events,
+                                              final int eindex)
+  {
+    if (mOutputHiddenEvent != null) {
+      if (events.isEmpty()) {
+        events.add(mOutputHiddenEvent);
+      }
+      return mOutputHiddenEvent;
+    } else if (eindex < events.size()) {
+      return events.get(eindex);
+    } else {
+      assert eindex == events.size() : "Unexpected event index!";
+      final ProductDESProxyFactory factory = getFactory();
+      String autname = getOutputName();
+      if (autname == null) {
+        autname = mInputAutomaton.getName();
+      }
+      final String ename = ":op" + eindex + ':' + autname;
+      final EventProxy event =
+        factory.createEventProxy(ename, EventKind.CONTROLLABLE, false);
+      events.add(event);
+      return event;
+    }
+  }
+
 
   private boolean createOutputAutomaton()
   {
@@ -1773,10 +1979,14 @@ public class OPSearchAutomatonSimplifier
   private TLongLongHashMap mBFSLongVisited;
   private BitSet mContainmentTestSet;
 
+  private EventEncoding mEventEncoding;
+  private TIntArrayList mRootStates;
+
 
   //#########################################################################
   //# Data Members
   private static final int NO_TRANSITION = -1;
   private static final int DUMP_STATE = -2;
+  private static final int OBSERVABLE_TAU = 1;
 
 }
