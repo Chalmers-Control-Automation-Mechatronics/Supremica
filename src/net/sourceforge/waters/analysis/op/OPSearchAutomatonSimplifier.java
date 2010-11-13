@@ -13,7 +13,6 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntStack;
 import gnu.trove.TLongArrayList;
 import gnu.trove.TLongIntHashMap;
@@ -28,7 +27,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
@@ -169,11 +167,8 @@ public class OPSearchAutomatonSimplifier
       while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
         doOPSearchStep();
       }
-      if (needsMerge()) {
-        return createOutputAutomaton();
-      } else {
-        return setAutomatonResult(mInputAutomaton);
-      }
+      final boolean force = needsMerge();
+      return createReducedOutputAutomaton(force);
     } finally {
       tearDown();
       if (logger.isDebugEnabled()) {
@@ -928,7 +923,7 @@ public class OPSearchAutomatonSimplifier
       final int numStates = mOriginalStates.length;
       for (int s = 0; s < numStates; s++) {
         final StronglyConnectedComponent comp = mComponentOfState[s];
-        if (comp != null && comp.getMaxNondeterminism() < comp.size()) {
+        if (comp != null) {
           return true;
         }
       }
@@ -938,8 +933,7 @@ public class OPSearchAutomatonSimplifier
     }
   }
 
-  @SuppressWarnings("unused")
-  private boolean createReducedOutputAutomaton(boolean change)
+  private boolean createReducedOutputAutomaton(final boolean force)
     throws AnalysisException
   {
      final ListBufferTransitionRelation rel = createTransitionRelation();
@@ -947,22 +941,22 @@ public class OPSearchAutomatonSimplifier
       new ObservationEquivalenceTRSimplifier(rel);
     simp.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
-    change |= simp.run();
-    if (!change) {
+    final boolean change = simp.run();
+    if (force || change) {
+      final List<int[]> partition = simp.getResultPartition();
+      return createOutputAutomaton(rel, partition);
+    } else {
       return setAutomatonResult(mInputAutomaton);
     }
-    final List<int[]> partition = simp.getResultPartition();
-    return createOutputAutomaton(rel, partition);
   }
 
   private ListBufferTransitionRelation createTransitionRelation()
     throws OverflowException
   {
     // 1. Encode events
-    final EventProxy otau = createObservableTauEvent(0);
     final int numEvents = mEvents.length + 1;
     final List<EventProxy> events = new ArrayList<EventProxy>(numEvents);
-    events.add(otau);
+    final EventProxy otau = createObservableTauEvent(events, 0);
     for (final EventProxy event : mEvents) {
       events.add(event);
     }
@@ -1081,27 +1075,25 @@ public class OPSearchAutomatonSimplifier
         }
       }
       // proper event transitions ...
-      for (int e1 = 0; e1 < numProperEvents; e1++) {
-        if (e1 != EventEncoding.TAU) {
-          final EventProxy event = mEventEncoding.getProperEvent(e1);
-          final int e0 = mEventMap.get(event);
-          if (comp == null) {
-            final int succ = mObservableSuccessor[s0][e0];
+      for (int e1 = OBSERVABLE_TAU + 1; e1 < numProperEvents; e1++) {
+        final EventProxy event = mEventEncoding.getProperEvent(e1);
+        final int e0 = mEventMap.get(event);
+        if (comp == null) {
+          final int succ = mObservableSuccessor[s0][e0];
+          if (succ != NO_TRANSITION) {
+            final int t0 = getRootIndex(succ);
+            final int t1 = stateMap.get(t0);
+            rel.addTransition(s1, e1, t1);
+          }
+        } else if (comp.isEnabledEvent(e0)) {
+          comp.iterate(mReadOnlyIterator);
+          while (mReadOnlyIterator.advance()) {
+            final int src = mReadOnlyIterator.getCurrentData();
+            final int succ = mObservableSuccessor[src][e0];
             if (succ != NO_TRANSITION) {
               final int t0 = getRootIndex(succ);
               final int t1 = stateMap.get(t0);
               rel.addTransition(s1, e1, t1);
-            }
-          } else if (comp.isEnabledEvent(e0)) {
-            comp.iterate(mReadOnlyIterator);
-            while (mReadOnlyIterator.advance()) {
-              final int src = mReadOnlyIterator.getCurrentData();
-              final int succ = mObservableSuccessor[src][e0];
-              if (succ != NO_TRANSITION) {
-                final int t0 = getRootIndex(succ);
-                final int t1 = stateMap.get(t0);
-                rel.addTransition(s1, e1, t1);
-              }
             }
           }
         }
@@ -1116,12 +1108,22 @@ public class OPSearchAutomatonSimplifier
     throws AnalysisException
   {
     // 1. Establish class map
-    final int numClasses = partition.size();
     final int numInputStates = rel.getNumberOfStates();
     final int[] classMap = new int[numInputStates];
-    for (int c = 0; c < numClasses; c++) {
-      for (final int s : partition.get(c)) {
-        classMap[s] = c;
+    final int numClasses;
+    int[] current = null;
+    if (partition == null) {
+      numClasses = numInputStates;
+      for (int c = 0; c < numClasses; c++) {
+        classMap[c] = c;
+      }
+      current = new int[1];
+    } else {
+      numClasses = partition.size();
+      for (int c = 0; c < numClasses; c++) {
+        for (final int s : partition.get(c)) {
+          classMap[s] = c;
+        }
       }
     }
 
@@ -1135,7 +1137,12 @@ public class OPSearchAutomatonSimplifier
       Arrays.fill(currentFanout, 0);
       Arrays.fill(cls, -1);
       for (int toClass = 0; toClass < numClasses; toClass++) {
-        for (final int t : partition.get(toClass)) {
+        if (partition == null) {
+          current[0] = toClass;
+        } else {
+          current = partition.get(toClass);
+        }
+        for (final int t : current) {
           iter.reset(t, e);
           while (iter.advance()) {
             final int s = iter.getCurrentSourceState();
@@ -1171,9 +1178,14 @@ public class OPSearchAutomatonSimplifier
     final TIntArrayList currentClass = new TIntArrayList();
     int code = 0;
     for (int c = 0; c < numClasses; c++) {
+      if (partition == null) {
+        current[0] = c;
+      } else {
+        current = partition.get(c);
+      }
       boolean init = false;
       long markings = 0;
-      for (final int s : partition.get(c)) {
+      for (final int s : current) {
         init |= rel.isInitial(s);
         final long stateMarkings = rel.getAllMarkings(s);
         markings = rel.mergeMarkings(markings, stateMarkings);
@@ -1217,12 +1229,12 @@ public class OPSearchAutomatonSimplifier
     final ProductDESProxyFactory factory = getFactory();
     final Collection<TransitionProxy> transitions =
       new ArrayList<TransitionProxy>();
-    final List<EventProxy> events = new ArrayList<EventProxy>();
+    final List<EventProxy> otaus = new ArrayList<EventProxy>();
 
     for (int c = 0; c < numClasses; c++) {
       final int fanout = maxFanout[c];
       if (fanout > 1) {
-        final EventProxy otau = createObservableTauEvent(events, 0);
+        final EventProxy otau = createObservableTauEvent(otaus, 0);
         final int start = cindex[c];
         for (int offset = 0; offset < fanout; offset++) {
           final int next = (offset + 1) % fanout;
@@ -1241,7 +1253,12 @@ public class OPSearchAutomatonSimplifier
       Arrays.fill(cls, -1);
       for (int toClass = 0; toClass < numClasses; toClass++) {
         final StateProxy target = states.get(cindex[toClass]);
-        for (final int t : partition.get(toClass)) {
+        if (partition == null) {
+          current[0] = toClass;
+        } else {
+          current = partition.get(toClass);
+        }
+        for (final int t : current) {
           iter.reset(t, e);
           while (iter.advance()) {
             final int s = iter.getCurrentSourceState();
@@ -1261,7 +1278,7 @@ public class OPSearchAutomatonSimplifier
                   offset = offset % maxFanout[fromClass];
                 }
                 // Note. First observable tau has been read from encoding.
-                event = createObservableTauEvent(events, eindex);
+                event = createObservableTauEvent(otaus, eindex);
               }
               cls[fromClass] = toClass;
               final StateProxy source = states.get(cindex[fromClass] + offset);
@@ -1277,191 +1294,23 @@ public class OPSearchAutomatonSimplifier
     // 5. Create output automaton
     final String name = rel.getName();
     final ComponentKind kind = rel.getKind();
+    final int numEvents = mEventEncoding.getNumberOfEvents() + otaus.size();
+    final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
+    for (int p = 0; p < numProps; p++) {
+      final EventProxy prop = mEventEncoding.getProposition(p);
+      events.add(prop);
+    }
+    for (int e = OBSERVABLE_TAU + 1; e < numProperEvents; e++) {
+      final EventProxy event = mEventEncoding.getProperEvent(e);
+      events.add(event);
+    }
+    events.addAll(otaus);
     final AutomatonProxy aut =
       factory.createAutomatonProxy(name, kind, events, states, transitions);
     final StateEncoding inputEnc = new StateEncoding(mOriginalStates);
     final StateEncoding outputEnc = new StateEncoding(states);
     final PartitionedAutomatonResult result = getAnalysisResult();
     result.setAutomaton(aut, inputEnc, outputEnc, outputPartition);
-    return result.isSatisfied();
-  }
-
-  private EventProxy createObservableTauEvent(final List<EventProxy> events,
-                                              final int eindex)
-  {
-    if (mOutputHiddenEvent != null) {
-      if (events.isEmpty()) {
-        events.add(mOutputHiddenEvent);
-      }
-      return mOutputHiddenEvent;
-    } else if (eindex < events.size()) {
-      return events.get(eindex);
-    } else {
-      assert eindex == events.size() : "Unexpected event index!";
-      final ProductDESProxyFactory factory = getFactory();
-      String autname = getOutputName();
-      if (autname == null) {
-        autname = mInputAutomaton.getName();
-      }
-      final String ename = ":op" + eindex + ':' + autname;
-      final EventProxy event =
-        factory.createEventProxy(ename, EventKind.CONTROLLABLE, false);
-      events.add(event);
-      return event;
-    }
-  }
-
-
-  private boolean createOutputAutomaton()
-  {
-    String name = getOutputName();
-    if (name == null) {
-      name = mInputAutomaton.getName();
-    }
-    ComponentKind kind = getOutputKind();
-    if (kind == null) {
-      kind = mInputAutomaton.getKind();
-    }
-
-    // 1. Merge states
-    // All strongly tau-connected components are treated as a single state.
-    // Furthermore, any two components that contains states reached by strings
-    // with equal projection are merged. The observer property ensures that the
-    // result is still observation equivalent to the original automaton.
-    final int numPairs = mVerifierStatePairs.size();
-    for (int i = 0; i < numPairs; i++) {
-      final long pair = mVerifierStatePairs.get(i);
-      final int state1 = (int) (pair & 0xffffffffL);
-      final int state2 = (int) (pair >> 32);
-      mergeComponents(state1, state2);
-    }
-
-    // 2. Create States
-    Collection<EventProxy> allProps = new LinkedList<EventProxy>();
-    for (final EventProxy event : mEvents) {
-      if (event.getKind() == EventKind.PROPOSITION) {
-        allProps.add(event);
-      }
-    }
-    final int numStates = mOriginalStates.length;
-    final Collection<StateProxy> states = new ArrayList<StateProxy>(numStates);
-    final List<int[]> partition = new ArrayList<int[]>(numStates);
-    final TIntObjectHashMap<MemStateProxy> stateMap =
-      new TIntObjectHashMap<MemStateProxy>(numStates);
-    int code = 0;
-    for (int s = 0; s < numStates; s++) {
-      final int root = getRootIndex(s);
-      if (!stateMap.containsKey(root)) {
-        final boolean init = (root == 0);
-        final StronglyConnectedComponent comp = mComponentOfState[s];
-        // TODO Share proposition lists?
-        final Collection<EventProxy> props = new LinkedList<EventProxy>();
-        for (final EventProxy prop : allProps) {
-          final int p = mEventMap.get(prop);
-          final boolean enabled = comp == null ?
-                                  mObservableSuccessor[s][p] != NO_TRANSITION :
-                                  comp.isEnabledEvent(p);
-          if (enabled) {
-            props.add(prop);
-          }
-        }
-        final MemStateProxy state = new MemStateProxy(code, init, props);
-        states.add(state);
-        stateMap.put(root, state);
-        final int[] clazz;
-        if (comp == null) {
-          clazz = new int[1];
-          clazz[0] = s;
-        } else {
-          clazz = comp.toArray();
-        }
-        partition.add(clazz);
-        code++;
-      }
-    }
-    final StateEncoding inputEnc = new StateEncoding(mOriginalStates);
-    final StateEncoding outputEnc = new StateEncoding(states);
-    allProps = null;
-
-    // 3. Create Transitions
-    final ProductDESProxyFactory factory = getFactory();
-    final List<EventProxy> observableTauEvents = new ArrayList<EventProxy>();
-    final Collection<TransitionProxy> transitions =
-      new ArrayList<TransitionProxy>();
-    final int numEvents = mEvents.length;
-    final BitSet observableTauSuccessors = new BitSet(numStates);
-    for (int s = 0; s < numStates; s++) {
-      final StronglyConnectedComponent comp = mComponentOfState[s];
-      if (comp == null || comp.getRootIndex() == s) {
-        final StateProxy sourceState = stateMap.get(s);
-        // proper event transitions ...
-        for (int e = 0; e < numEvents; e++) {
-          final EventProxy event = mEvents[e];
-          if (event.getKind() != EventKind.PROPOSITION) {
-            if (comp == null) {
-              final int succ = mObservableSuccessor[s][e];
-              if (succ != NO_TRANSITION) {
-                final int target = getRootIndex(succ);
-                final StateProxy targetState = stateMap.get(target);
-                final TransitionProxy trans =
-                  factory.createTransitionProxy(sourceState,
-                                                event,
-                                                targetState);
-                transitions.add(trans);
-              }
-            } else if (comp.isEnabledEvent(e)) {
-              comp.iterate(mReadOnlyIterator);
-              while (mReadOnlyIterator.advance()) {
-                final int src = mReadOnlyIterator.getCurrentData();
-                final int succ = mObservableSuccessor[src][e];
-                if (succ != NO_TRANSITION) {
-                  final int target = getRootIndex(succ);
-                  final StateProxy targetState = stateMap.get(target);
-                  final TransitionProxy trans =
-                    factory.createTransitionProxy(sourceState,
-                                                  event,
-                                                  targetState);
-                  transitions.add(trans);
-                  break;
-                }
-              }
-            }
-          }
-        }
-        // observable tau transitions ...
-        if (comp == null) {
-          createObservableTauTransitions(s, stateMap,
-                                         observableTauEvents, transitions,
-                                         observableTauSuccessors, 0);
-        } else if (comp.isEnabledEvent(mObservableTau)) {
-          int eindex = 0;
-          comp.iterate(mReadOnlyIterator);
-          while (mReadOnlyIterator.advance()) {
-            final int source = mReadOnlyIterator.getCurrentData();
-            eindex =
-              createObservableTauTransitions(source, stateMap,
-                                             observableTauEvents,
-                                             transitions,
-                                             observableTauSuccessors,
-                                             eindex);
-          }
-        }
-        observableTauSuccessors.clear();
-      }
-    }
-
-    // 4. Create Output Automaton
-    final int numOutputEvents = mEvents.length + observableTauEvents.size();
-    final List<EventProxy> events = new ArrayList<EventProxy>(numOutputEvents);
-    for (final EventProxy event : mEvents) {
-      events.add(event);
-    }
-    events.addAll(observableTauEvents);
-    final AutomatonProxy aut =
-      factory.createAutomatonProxy(name, kind, events, states, transitions);
-
-    final PartitionedAutomatonResult result = getAnalysisResult();
-    result.setAutomaton(aut, inputEnc, outputEnc, partition);
     return result.isSatisfied();
   }
 
@@ -1494,58 +1343,29 @@ public class OPSearchAutomatonSimplifier
     }
   }
 
-  int createObservableTauTransitions
-    (final int source,
-     final TIntObjectHashMap<? extends StateProxy> stateMap,
-     final List<EventProxy> events,
-     final Collection<TransitionProxy> transitions,
-     final BitSet used,
-     int eindex)
+  private EventProxy createObservableTauEvent(final List<EventProxy> events,
+                                              final int eindex)
   {
-    final int list = mObservableTauSuccessors[source];
-    if (list != IntListBuffer.NULL) {
-      final ProductDESProxyFactory factory = getFactory();
-      final int root = getRootIndex(source);
-      final StateProxy sourceState = stateMap.get(root);
-      mAltReadOnlyIterator.reset(list);
-      while (mAltReadOnlyIterator.advance()) {
-        final int succ = mAltReadOnlyIterator.getCurrentData();
-        final int target = getRootIndex(succ);
-        if (target != source && !used.get(target)) {
-          final EventProxy event;
-          if (mOutputHiddenEvent != null) {
-            event = mOutputHiddenEvent;
-            if (events.isEmpty()) {
-              events.add(event);
-            }
-          } else if (eindex < events.size()) {
-            event = events.get(eindex);
-            eindex++;
-          } else {
-            eindex++;
-            event = createObservableTauEvent(eindex);
-            events.add(event);
-          }
-          final StateProxy targetState = stateMap.get(target);
-          final TransitionProxy trans =
-            factory.createTransitionProxy(sourceState, event, targetState);
-          transitions.add(trans);
-          used.set(target);
-        }
+    if (mOutputHiddenEvent != null) {
+      if (events.isEmpty()) {
+        events.add(mOutputHiddenEvent);
       }
+      return mOutputHiddenEvent;
+    } else if (eindex < events.size()) {
+      return events.get(eindex);
+    } else {
+      assert eindex == events.size() : "Unexpected event index!";
+      final ProductDESProxyFactory factory = getFactory();
+      String autname = getOutputName();
+      if (autname == null) {
+        autname = mInputAutomaton.getName();
+      }
+      final String ename = ":op" + (eindex + 1) + ':' + autname;
+      final EventProxy event =
+        factory.createEventProxy(ename, EventKind.CONTROLLABLE, false);
+      events.add(event);
+      return event;
     }
-    return eindex;
-  }
-
-  private EventProxy createObservableTauEvent(final int eindex)
-  {
-    final ProductDESProxyFactory factory = getFactory();
-    String autname = getOutputName();
-    if (autname == null) {
-      autname = mInputAutomaton.getName();
-    }
-    final String ename = ":op" + eindex + ':' + autname;
-    return factory.createEventProxy(ename, EventKind.CONTROLLABLE, false);
   }
 
 
@@ -1803,11 +1623,7 @@ public class OPSearchAutomatonSimplifier
       return mEnabledEvents.get(e);
     }
 
-    private int[] toArray()
-    {
-      return mListBuffer.toArray(mStates);
-    }
-
+    @SuppressWarnings("unused")
     private int size()
     {
       return mListBuffer.getLength(mStates);
@@ -1902,27 +1718,6 @@ public class OPSearchAutomatonSimplifier
       }
       mStates = mListBuffer.catenateDestructively(mStates, comp.mStates);
       mEnabledEvents.or(comp.mEnabledEvents);
-    }
-
-    private int getMaxNondeterminism()
-    {
-      int max = 0;
-      for (int e = 0; e < mUnobservableTau; e++) {
-        if (isEnabledEvent(e)) {
-          int count = 0;
-          iterate(mReadOnlyIterator);
-          while (mReadOnlyIterator.advance()) {
-            final int state = mReadOnlyIterator.getCurrentData();
-            if (mObservableSuccessor[state][e] != NO_TRANSITION) {
-              count++;
-            }
-          }
-          if (count > max) {
-            max = count;
-          }
-        }
-      }
-      return max;
     }
 
     //#######################################################################
