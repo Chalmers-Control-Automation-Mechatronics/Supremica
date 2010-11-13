@@ -28,7 +28,7 @@
                             <Point Y="96" X="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="-24"/>
+                            <Point Y="6" X="-16"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -47,7 +47,7 @@
                             <Point Y="96" X="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="-23"/>
+                            <Point Y="5" X="2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="S0">
@@ -96,7 +96,7 @@
                             <SimpleIdentifier Name="e2"/>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="3"/>
+                                <Point Y="-22" X="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -115,6 +115,14 @@
                         <SplineGeometry>
                             <Point Y="25" X="141"/>
                         </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S3" Source="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="4" X="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
                     </Edge>
                 </EdgeList>
             </Graph>

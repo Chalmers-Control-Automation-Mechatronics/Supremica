@@ -11,7 +11,6 @@
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau1"/>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau2"/>
         <EventDecl Observable="false" Kind="CONTROLLABLE" Name=":op1:result"/>
-        <EventDecl Observable="false" Kind="CONTROLLABLE" Name=":op2:result"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">
@@ -313,20 +312,12 @@
                             <Point Y="-5" X="-27"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S78">
+                    <SimpleNode Name="S5678">
                         <PointGeometry>
-                            <Point Y="192" X="224"/>
+                            <Point Y="144" X="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="4" X="2"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S56">
-                        <PointGeometry>
-                            <Point Y="96" X="224"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-20" X="-3"/>
+                            <Point Y="7" X="-18"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="S01234">
@@ -337,7 +328,7 @@
                             <Point Y="0" X="-24"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-20" X="-41"/>
+                            <Point Y="-20" X="-48"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S10">
@@ -358,41 +349,22 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S10" Source="S56">
+                    <Edge Target="S10" Source="S5678">
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="3"/>
+                                <Point Y="-23" X="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="96" X="224"/>
+                            <Point Y="144" X="224"/>
                         </StartPointGeometry>
                     </Edge>
-                    <Edge Target="S10" Source="S78">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="192" X="224"/>
-                        </StartPointGeometry>
-                    </Edge>
-                    <Edge Target="S78" Source="S01234">
-                        <LabelBlock>
-                            <SimpleIdentifier Name=":op2:result"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-25" X="-19"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S56" Source="S01234">
+                    <Edge Target="S5678" Source="S01234">
                         <LabelBlock>
                             <SimpleIdentifier Name=":op1:result"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-26" X="-53"/>
+                                <Point Y="-21" X="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

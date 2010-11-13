@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.TIntArrayList;
 
+import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -87,8 +88,9 @@ public class IntStateBuffer
   /**
    * Creates a new empty state buffer.
    * This constructor allocates a new state buffer with the given number
-   * of states. All attributes and markings of the states are initialised
-   * to be <CODE>false</CODE>.
+   * of states. States are initially marked as reachable, while all other
+   * attributes and markings of the states are initialised to be
+   * <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
    * @param  numProps   The number of propositions in the new buffer.
    * @throws OverflowException
@@ -102,8 +104,9 @@ public class IntStateBuffer
   /**
    * Creates a new empty state buffer.
    * This constructor allocates a new state buffer with the given number
-   * of states. All attributes and markings of the states are initialised
-   * to be <CODE>false</CODE>.
+   * of states. States are initially marked as reachable, while all other
+   * attributes and markings of the states are initialised to be
+   * <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
    * @param  numProps   The number of propositions in the new buffer.
    * @param  used       Marking pattern identifying propositions to be
@@ -122,6 +125,7 @@ public class IntStateBuffer
     }
     mUsedPropositions = (int) used;
     mStateInfo = new int[size];
+    Arrays.fill(mStateInfo, TAG_REACHABLE);
   }
 
 

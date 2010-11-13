@@ -967,7 +967,7 @@ public class OPSearchAutomatonSimplifier
 
     // 2. Merge states
     // All strongly tau-connected components are treated as a single state.
-    // Furthermore, any two components that contains states reached by strings
+    // Furthermore, any two components that contain states reached by strings
     // with equal projection are merged. The observer property ensures that the
     // result is still observation equivalent to the original automaton.
     final int numPairs = mVerifierStatePairs.size();
@@ -1058,6 +1058,7 @@ public class OPSearchAutomatonSimplifier
           }
         }
       } else if (comp.isEnabledEvent(mObservableTau)) {
+        comp.iterate(mReadOnlyIterator);
         while (mReadOnlyIterator.advance()) {
           final int source = mReadOnlyIterator.getCurrentData();
           final int list = mObservableTauSuccessors[source];

@@ -167,9 +167,9 @@ public class ListBufferTransitionRelation
   /**
    * Creates an empty transition relation. This method creates a transition
    * relation with the given number of states and event encoding, but without
-   * any transitions. Initial states have to be set using
-   * {@link #setInitial(int,boolean)}, and transitions have to be added using
-   * {@link #addTransition(int,int,int)}.
+   * any transitions. All states are marked reachable, yet initial states have
+   * to be set using {@link #setInitial(int,boolean)}, and transitions have to
+   * be added using {@link #addTransition(int,int,int)}.
    * @param  name      A name for the new transition relation.
    * @param  kind      A component kind for the new transition relation.
    * @param  eventEnc  Event encoding to define the assignment of integer

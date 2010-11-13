@@ -218,7 +218,7 @@ public class ObservationEquivalenceTRSimplifier implements
     final int numClasses = mP.size();
     assert numClasses >= 0;
     assert numClasses <= mNumStates;
-    mHasModifications |= numClasses > 0 && numClasses != mNumStates;
+    mHasModifications |= numClasses != mNumStates;
     if (!mHasModifications) {
       if (logger.isDebugEnabled()) {
         final String msg =

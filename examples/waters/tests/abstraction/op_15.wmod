@@ -97,8 +97,9 @@
                     <Edge Target="S:0" Source="S:0">
                         <LabelBlock>
                             <SimpleIdentifier Name="s1_off"/>
+                            <SimpleIdentifier Name="s1_on"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="7" X="-4"/>
+                                <Point Y="-41" X="-5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -266,17 +267,6 @@
         <SimpleComponent Kind="PLANT" Name="after">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S:0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="128" X="176"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-12" X="11"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                     <SimpleNode Name="S:1">
                         <PointGeometry>
                             <Point Y="192" X="240"/>
@@ -323,30 +313,22 @@
                             <Point Y="-17" X="-26"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="176"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="14" X="-15"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-12" X="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S:0" Source="S:0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="s1_off"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="84" X="145"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S:1" Source="S:0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name=":op1:result"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-69"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="158" X="209"/>
-                        </SplineGeometry>
-                    </Edge>
                     <Edge Target="S:1" Source="S:1">
                         <LabelBlock>
                             <SimpleIdentifier Name="s1_on"/>
@@ -444,6 +426,26 @@
                         <SplineGeometry>
                             <Point Y="299" X="213"/>
                         </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S:0" Source="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="84" X="145"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S:1" Source="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":op1:result"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-69"/>
+                            </LabelGeometry>
+                        </LabelBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
