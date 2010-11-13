@@ -49,7 +49,7 @@ public class Projecting3ControllabilityCheckerTest
       new NativeControllabilityChecker(factory);
     final Projection3 projector = new Projection3(factory);
     projector.setMethod(Method.STATE);
-    projector.setOutputStream(true);
+    projector.setOutputStream(false);
     final ProjectingControllabilityChecker checker =
       new ProjectingControllabilityChecker(factory, subchecker, projector);
     //checker.setMaxProjStates(2000);

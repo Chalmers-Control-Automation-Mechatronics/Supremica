@@ -49,7 +49,7 @@ public class Projecting3LanguageInclusionCheckerTest
       new NativeLanguageInclusionChecker(factory);
     final Projection3 projector = new Projection3(factory);
     projector.setMethod(Method.STATE);
-    projector.setOutputStream(true);
+    projector.setOutputStream(false);
     final ProjectingLanguageInclusionChecker checker =
       new ProjectingLanguageInclusionChecker(factory, subchecker, projector);
     checker.setMaxProjStates(2000);

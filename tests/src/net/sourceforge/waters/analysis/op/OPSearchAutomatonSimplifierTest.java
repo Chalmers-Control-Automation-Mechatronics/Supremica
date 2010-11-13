@@ -146,9 +146,19 @@ public class OPSearchAutomatonSimplifierTest
     runOPSearch("op_15.wmod", true);
   }
 
+  public void testOP15a() throws Exception
+  {
+    runOPSearch("op_15a.wmod", true);
+  }
+
   public void testOP16() throws Exception
   {
     runOPSearch("op_16.wmod", true);
+  }
+
+  public void testOP17() throws Exception
+  {
+    runOPSearch("op_17.wmod", true);
   }
 
 

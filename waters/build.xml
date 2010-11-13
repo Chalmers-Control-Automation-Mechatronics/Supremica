@@ -292,7 +292,6 @@
           <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
-          <exclude name="net/sourceforge/waters/analysis/op/OPSearchConflictCheckerTest.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Large*.java"/>
           <exclude name="**/Native*.java"/>
@@ -377,13 +376,14 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/composing/ComposingLanguageInclusionCheckerTest.java"/>
+          <include name="net/sourceforge/waters/analysis/op/OPSearchConflictCheckerTest.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="waters.test.ant" value="true"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
       <jvmarg value="-enableassertions"/>
     </junit>
   </target>
