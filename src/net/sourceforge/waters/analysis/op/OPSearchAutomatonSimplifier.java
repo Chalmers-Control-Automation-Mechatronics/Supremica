@@ -75,12 +75,32 @@ public class OPSearchAutomatonSimplifier
                                      final ProductDESProxyFactory factory)
   {
     super(aut, factory);
+    mOperationMode = Mode.MINIMIZE;
     mHiddenEvents = new THashSet<EventProxy>(hidden);
   }
 
 
   //#########################################################################
   //# Configuration
+  /**
+   * Specifies whether OP-Verifier or OP-Search is used.
+   * @param  mode   Either {@link Mode#MINIMIZE} (the default) or
+   *                {@link Mode#VERIFY}.
+   */
+  public void setOperationMode(final Mode mode)
+  {
+    mOperationMode = mode;
+  }
+
+  /**
+   * Gets the current operation mode, i.e., whether OP-Verifier or OP-Search
+   * is used.
+   */
+  public Mode getOperationMode()
+  {
+    return mOperationMode;
+  }
+
   /**
    * Specifies the set of silent or unobservable events to be used for
    * simplification.
@@ -163,12 +183,17 @@ public class OPSearchAutomatonSimplifier
         //MarshallingTools.saveModule(aut, "before.wmod");
       }
       setUp();
-      mOPSearchPhase = true;
-      while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
-        doOPSearchStep();
+      if (mOperationMode == Mode.VERIFY) {
+        final boolean satisfied = mListBuffer.isEmpty(mPredecessorsOfDead);
+        return setBooleanResult(satisfied);
+      } else {
+        mOPSearchPhase = true;
+        while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
+          doOPSearchStep();
+        }
+        final boolean force = needsMerge();
+        return createReducedOutputAutomaton(force);
       }
-      final boolean force = needsMerge();
-      return createReducedOutputAutomaton(force);
     } finally {
       tearDown();
       if (logger.isDebugEnabled()) {
@@ -420,6 +445,10 @@ public class OPSearchAutomatonSimplifier
       final long pair = mVerifierStatePairs.get(pindex);
       final int pcode = pindex + mOriginalStates.length;
       expandVerifierPairEncoded(pcode, pair);
+      if (mOperationMode == Mode.VERIFY &&
+          !mListBuffer.isEmpty(mPredecessorsOfDead)) {
+        break;
+      }
     }
   }
 
@@ -1467,6 +1496,38 @@ public class OPSearchAutomatonSimplifier
 
 
   //#########################################################################
+  //# Inner Class Mode
+  /**
+   * Enumeration of operation modes of {@link OPSearchAutomatonSimplifier}.
+   * This class allows the user to choose between the OP-Verifier and
+   * OP-Search algorithms.
+   */
+  public static enum Mode
+  {
+    /**
+     * Constant selecting OP-Verifier algorithm.
+     * When run in VERIFY mode, the {@link OPSearchAutomatonSimplifier}
+     * tests whether the projection of the input automaton using the given
+     * silent transitions has the observer property. If so a <CODE>true</CODE>
+     * analysis result is returned, otherwise <CODE>false</CODE>. In no case,
+     * an output automaton is computed.
+     */
+    VERIFY,
+    /**
+     * Constant selection OP-Search algorithm.
+     * When run in MINIMIZE mode, the {@link OPSearchAutomatonSimplifier}
+     * tries to minimise the input automaton in a conflict-preserving way,
+     * using the OP-Search algorithm. The analysis result will always be
+     * <CODE>true</CODE> and contain an automaton representing a simplified
+     * version of the input. If no minimisation is possible, the output
+     * automaton will be identical to (the same object as) the input
+     * automaton.
+     */
+    MINIMIZE;
+  }
+
+
+  //#########################################################################
   //# Inner Class Tarjan
   private class Tarjan
   {
@@ -1743,6 +1804,7 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Data Members
+  private Mode mOperationMode;
   private Collection<EventProxy> mHiddenEvents;
   private Collection<EventProxy> mPropositions;
   private EventProxy mOutputHiddenEvent;
