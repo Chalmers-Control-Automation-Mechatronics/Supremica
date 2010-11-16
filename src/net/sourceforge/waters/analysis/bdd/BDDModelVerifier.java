@@ -50,7 +50,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Robi Malik
  */
 
-abstract class BDDModelVerifier
+public abstract class BDDModelVerifier
   extends AbstractModelVerifier
 {
 
@@ -149,7 +149,7 @@ abstract class BDDModelVerifier
   }
 
 
-  //#########################################################################
+//#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
   @Override
   public void setKindTranslator(final KindTranslator translator)
