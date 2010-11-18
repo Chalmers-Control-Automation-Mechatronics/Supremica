@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -47,67 +46,106 @@
  *
  * Supremica is owned and represented by KA.
  */
+
+
 package org.supremica.automata.algorithms;
+
+import org.supremica.properties.BooleanProperty;
+import org.supremica.properties.Config;
 
 
 public enum EquivalenceRelation
 {
-    /** Language equivalence. */
-    LANGUAGEEQUIVALENCE("Language equivalence"),
-    /** Conflict equivalence. */
-    CONFLICTEQUIVALENCE("Conflict equivalence"),
-    /** Supervision equivalence. */
-    SUPERVISIONEQUIVALENCE("Supervision equivalence"),
-    /** Observation equivalence (aka Weak bisimulation equivalence). */
-    OBSERVATIONEQUIVALENCE("Observation equivalence"),
-    /** Bisimulation equivalence (aka Strong bisimulation equivalence). */
-    BISIMULATIONEQUIVALENCE("Bisimulation equivalence");
-    /** Failures equivalence. */
-    //FAILURESEQUIVALENCE("Failures equivalence", false);
-    
-    /** Textual description. */
-    private final String description;
 
-    private EquivalenceRelation(String description)
-    {
-        this.description = description;
+  //#########################################################################
+  //# Enumeration Members
+  /** Language equivalence. */
+  LANGUAGEEQUIVALENCE("Language equivalence"),
+  /** Observer projection (OP-search) */
+  OP("Observer projection", Config.GUI_ANALYZER_INCLUDE_OP),
+  /** Conflict equivalence. */
+  CONFLICTEQUIVALENCE("Conflict equivalence"),
+  /** Supervision equivalence. */
+  SUPERVISIONEQUIVALENCE("Supervision equivalence"),
+  /** Observation equivalence (aka Weak bisimulation equivalence). */
+  OBSERVATIONEQUIVALENCE("Observation equivalence"),
+  /** Bisimulation equivalence (aka Strong bisimulation equivalence). */
+  BISIMULATIONEQUIVALENCE("Bisimulation equivalence");
+
+
+  //#########################################################################
+  //# Constructors
+  private EquivalenceRelation(final String description)
+  {
+    this(description, null);
+  }
+
+  private EquivalenceRelation(final String description,
+                              final BooleanProperty property)
+  {
+    mProperty = property;
+    mDescription = description;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  public String toString()
+  {
+    return mDescription;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  boolean isEnabled()
+  {
+    if (mProperty == null) {
+      return true;
+    } else {
+      return mProperty.isTrue();
     }
-    
-    public String toString()
+  }
+
+
+  //#########################################################################
+  //# Static Access
+  public static EquivalenceRelation fromDescription(final String description)
+  {
+    for (final EquivalenceRelation value: values())
     {
-        return description;
+      if (value.mDescription.equals(description))
+      {
+        return value;
+      }
     }
-    
-    public static EquivalenceRelation fromDescription(String description)
-    {
-        for (EquivalenceRelation value: values())
-        {
-            if (value.description.equals(description))
-            {
-                return value;
-            }
-        }
-        return null;
+    return null;
+  }
+
+  public static EquivalenceRelation[] enabledValues()
+  {
+    int enabledCount = 0;
+    for (final EquivalenceRelation value: values()) {
+      if (value.isEnabled()) {
+        enabledCount++;
+      }
     }
-     
-    /*
-    // Would like to override values()...
-    public static EquivalenceRelation[] enabledValues()
-    {
-        int enabledCount = 0;
-        for (EquivalenceRelation value: values())
-        {
-            if (value.isEnabled())
-                enabledCount++;
-        }
-        EquivalenceRelation[] relations = new EquivalenceRelation[enabledCount];
-        int i = 0;
-        for (EquivalenceRelation value: values())
-        {
-            if (value.isEnabled())
-                relations[i++] = rel;
-        }
-        return relations;
+    final EquivalenceRelation[] relations =
+      new EquivalenceRelation[enabledCount];
+    int i = 0;
+    for (final EquivalenceRelation value: values()) {
+      if (value.isEnabled()) {
+        relations[i++] = value;
+      }
     }
-    */
+    return relations;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final BooleanProperty mProperty;
+  /** Textual description. */
+  private final String mDescription;
+
 }

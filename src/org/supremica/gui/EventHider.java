@@ -33,74 +33,74 @@ class EventHiderDialog
     // There should be a "EventSelectorDialog" or something that should be used for the selection.
     // Other classes may want to do this, you know. I didn't have the energy to do all that so this
     // is an ugly fix using the LanguageRestrictorDialog.
-    
+
     // LanguageRestictorDialog is no longer used by itself! It was used from old Supremica (ActionMan) before.
     // The function is not in the AutomataMinimizer.
 
     private static final long serialVersionUID = 1L;
-    
+
     private static Logger logger = LoggerFactory.createLogger(EventHiderDialog.class);
-    
-    private IDEActionInterface ide;
-    
-    private boolean preserveControllability = true;
-    
-    public EventHiderDialog(IDEActionInterface ide, Automata automata, Alphabet globalAlphabet)
+
+    private final IDEActionInterface ide;
+
+    private boolean preserveControllability = false;
+
+    public EventHiderDialog(final IDEActionInterface ide, final Automata automata, final Alphabet globalAlphabet)
     {
         super(automata, globalAlphabet);
-        super.setTitle("Event hider");       
+        super.setTitle("Event hider");
         super.okButton = new OkButton();
-        
-        // Add menu for choosing whether to preserve controllabilty or not.
-        JMenuBar menuBar = super.getJMenuBar();
-                
+
+        // Add menu for choosing whether to preserve controllability or not.
+        final JMenuBar menuBar = super.getJMenuBar();
+
         // Restrict
-        JMenu controllabilityMenu = new JMenu("Controllability");        
-        controllabilityMenu.setMnemonic(KeyEvent.VK_C);        
+        final JMenu controllabilityMenu = new JMenu("Controllability");
+        controllabilityMenu.setMnemonic(KeyEvent.VK_C);
         // Ignore controllability
-        JRadioButtonMenuItem preserveMenuIgnore = new JRadioButtonMenuItem("Ignore controllability", !preserveControllability);        
+        final JRadioButtonMenuItem preserveMenuIgnore = new JRadioButtonMenuItem("Ignore controllability", !preserveControllability);
         preserveMenuIgnore.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 preserveControllability = false;
             }
         });
         controllabilityMenu.add(preserveMenuIgnore);
         // Preserve controllability
-        JRadioButtonMenuItem preserveMenuPreserve = new JRadioButtonMenuItem("Preserve controllability", preserveControllability);        
+        final JRadioButtonMenuItem preserveMenuPreserve = new JRadioButtonMenuItem("Preserve controllability", preserveControllability);
         preserveMenuPreserve.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 preserveControllability = true;
             }
         });
         controllabilityMenu.add(preserveMenuPreserve);
         // Group the radio buttons
-        ButtonGroup preserveGroup = new ButtonGroup();
+        final ButtonGroup preserveGroup = new ButtonGroup();
         preserveGroup.add(preserveMenuIgnore);
         preserveGroup.add(preserveMenuPreserve);
         // Add to menu
         menuBar.add(controllabilityMenu);
-        
+
         super.pack();
         this.ide = ide;
     }
-    
+
     private class OkButton
         extends JButton
     {
         private static final long serialVersionUID = 1L;
-        
+
         public OkButton()
         {
             super("Ok");
-            
+
             setToolTipText("Do the hiding");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                public void actionPerformed(final ActionEvent e)
                 {
                     System.err.println("Tryck inte så hårt!");
                     doRestrict();
@@ -108,24 +108,24 @@ class EventHiderDialog
             });
         }
     }
-    
+
     protected void doRestrict()
     {
         // The set of new automata, based on the selected automata
-        Automata newAutomata = new Automata();
-        
+        final Automata newAutomata = new Automata();
+
         // Get the events selected by the user (may be for keeping or for hiding)
-        Alphabet alpha = restrictEvents.getAlphabet();
+        final Alphabet alpha = restrictEvents.getAlphabet();
         Alphabet toBeHidden;
-        
+
         // Loop over the selected automata
-        Iterator<Automaton> autit = automata.iterator();
+        final Iterator<Automaton> autit = automata.iterator();
         while (autit.hasNext())
         {
-            Automaton automaton = autit.next();
-            Automaton newAutomaton = new Automaton(automaton);
+            final Automaton automaton = autit.next();
+            final Automaton newAutomaton = new Automaton(automaton);
             newAutomaton.setName(null);
-            
+
             // Find out which events should be hidden
             if (restrictEvents.toErase())
             {
@@ -137,26 +137,26 @@ class EventHiderDialog
                 // Invert
                 toBeHidden = AlphabetHelpers.minus(automaton.getAlphabet(), alpha);
             }
-            
+
             // Do the hiding (preserve controllability!)
             newAutomaton.hide(toBeHidden, preserveControllability);
-            
+
             // Set appropriate comment
             newAutomaton.setComment(automaton.getName() + "//" +
                 AlphabetHelpers.intersect(automaton.getAlphabet(), toBeHidden));
-            
+
             // Add automaton
             newAutomata.addAutomaton(newAutomaton);
         }
-        
+
         // Shut the window!!
         shutWindow();
-        
+
         try
         {
             ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(newAutomata);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.debug("EventHiderDialog::doRestrict() -- ", ex);
             logger.debug(ex.getStackTrace());
@@ -168,28 +168,28 @@ public class EventHider
     extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
-    
+
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(EventHider.class);
-    private IDEActionInterface ide;
-    
-    public EventHider(IDEActionInterface ide)
+    private final IDEActionInterface ide;
+
+    public EventHider(final IDEActionInterface ide)
     {
         putValue(NAME, "Event hider");
         putValue(SHORT_DESCRIPTION, "Stop observing selected events");
         this.ide = ide;
     }
-    
-    public void actionPerformed(ActionEvent event)
+
+    public void actionPerformed(final ActionEvent event)
     {
         // Get the selected automata
-        Automata automata = ActionMan.getGui().getSelectedAutomata();
-        
+        final Automata automata = ActionMan.getGui().getSelectedAutomata();
+
         // Throw up the dialog, let the user select the alphabet
         new EventHiderDialog(ide, automata, ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
     }
-    
-    public void doAction(Automata theAutomata, Alphabet othersAlphabet)
+
+    public void doAction(final Automata theAutomata, final Alphabet othersAlphabet)
     {
         new EventHiderDialog(ide, theAutomata, othersAlphabet);
     }

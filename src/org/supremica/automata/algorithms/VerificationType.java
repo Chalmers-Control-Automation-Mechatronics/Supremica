@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -47,7 +46,11 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.automata.algorithms;
+
+import org.supremica.properties.BooleanProperty;
+import org.supremica.properties.Config;
 
 
 /**
@@ -55,35 +58,91 @@ package org.supremica.automata.algorithms;
  */
 public enum VerificationType
 {
-    CONTROLLABILITY("Controllability"),
-    INVERSECONTROLLABILITY("Inverse controllability"),
-    NONBLOCKING("Nonblocking"),
-    CONTROLLABILITYNONBLOCKING("Controllability and nonblocking"),
-    //MUTUALLYNONBLOCKING("Mutually nonblocking"),
-    LANGUAGEINCLUSION("Language inclusion");
-    
-    /** Textual description. */
-    private final String description;
-    
-    private VerificationType(String description)
-    {
-        this.description = description;
+
+  //#########################################################################
+  //# Enumeration Members
+  CONTROLLABILITY("Controllability"),
+  INVERSECONTROLLABILITY("Inverse controllability"),
+  NONBLOCKING("Nonblocking"),
+  CONTROLLABILITYNONBLOCKING("Controllability and nonblocking"),
+  //MUTUALLYNONBLOCKING("Mutually nonblocking"),
+  LANGUAGEINCLUSION("Language inclusion"),
+  /** Observer property (OP-verifier) */
+  OP("Observer property", Config.GUI_ANALYZER_INCLUDE_OP);
+
+
+  //#########################################################################
+  //# Constructors
+  private VerificationType(final String description)
+  {
+    this(description, null);
+  }
+
+  private VerificationType(final String description,
+                           final BooleanProperty property)
+  {
+    mProperty = property;
+    mDescription = description;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  public String toString()
+  {
+    return mDescription;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  boolean isEnabled()
+  {
+    if (mProperty == null) {
+      return true;
+    } else {
+      return mProperty.isTrue();
     }
-    
-    public String toString()
+  }
+
+
+  //#########################################################################
+  //# Static Access
+  public static VerificationType fromDescription(final String description)
+  {
+    for (final VerificationType value: values())
     {
-        return description;
+      if (value.mDescription.equals(description))
+      {
+        return value;
+      }
     }
-    
-    public static VerificationType fromDescription(String description)
-    {
-        for (VerificationType value: values())
-        {
-            if (value.description.equals(description))
-            {
-                return value;
-            }
-        }
-        return null;
+    return null;
+  }
+
+  public static VerificationType[] enabledValues()
+  {
+    int enabledCount = 0;
+    for (final VerificationType value: values()) {
+      if (value.isEnabled()) {
+        enabledCount++;
+      }
     }
+    final VerificationType[] result = new VerificationType[enabledCount];
+    int i = 0;
+    for (final VerificationType value: values()) {
+      if (value.isEnabled()) {
+        result[i++] = value;
+      }
+    }
+    return result;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final BooleanProperty mProperty;
+  /** Textual description. */
+  private final String mDescription;
+
 }

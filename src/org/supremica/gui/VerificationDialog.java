@@ -72,22 +72,22 @@ interface VerificationPanel
 public class VerificationDialog
     implements ActionListener
 {
-    private JButton okButton;
-    private JButton cancelButton;
-    private VerificationOptions verificationOptions;
-    private VerificationDialogStandardPanel standardPanel;
-    private VerificationDialogAdvancedPanelControllability advancedPanelControllability;
-    private VerificationDialogAdvancedPanelModularNonblocking advancedPanelNonblocking;
-    private MinimizationOptions minimizationOptions;
-    private JDialog dialog;
+    private final JButton okButton;
+    private final JButton cancelButton;
+    private final VerificationOptions verificationOptions;
+    private final VerificationDialogStandardPanel standardPanel;
+    private final VerificationDialogAdvancedPanelControllability advancedPanelControllability;
+    private final VerificationDialogAdvancedPanelModularNonblocking advancedPanelNonblocking;
+    private final MinimizationOptions minimizationOptions;
+    private final JDialog dialog;
 
-    private JTabbedPane tabbedPane;
+    private final JTabbedPane tabbedPane;
 
     /**
      * Creates modal dialog box for input of options for verification.
      */
-    public VerificationDialog(Frame parentFrame, VerificationOptions verificationOptions,
-        MinimizationOptions minimizationOptions)
+    public VerificationDialog(final Frame parentFrame, final VerificationOptions verificationOptions,
+        final MinimizationOptions minimizationOptions)
     {
         dialog = new JDialog(parentFrame, true);    // modal
         this.verificationOptions = verificationOptions;
@@ -97,7 +97,7 @@ public class VerificationDialog
         dialog.setSize(new Dimension(400, 300));
 
         // dialog.setResizable(false);
-        Container contentPane = dialog.getContentPane();
+        final Container contentPane = dialog.getContentPane();
 
         standardPanel = new VerificationDialogStandardPanel();
         advancedPanelControllability = new VerificationDialogAdvancedPanelControllability();
@@ -109,7 +109,7 @@ public class VerificationDialog
         tabbedPane.addTab("Advanced options", null, advancedPanelControllability, "Advanced options");
 
         // buttonPanel;
-        JPanel buttonPanel = new JPanel();
+        final JPanel buttonPanel = new JPanel();
 
         okButton = addButton(buttonPanel, "OK");
         cancelButton = addButton(buttonPanel, "Cancel");
@@ -119,7 +119,7 @@ public class VerificationDialog
         Utility.setDefaultButton(dialog, okButton);
 
         // ** MF ** Fix to get the frigging thing centered
-        Dimension dim = dialog.getMinimumSize();
+        final Dimension dim = dialog.getMinimumSize();
 
         dialog.setLocation(Utility.getPosForCenter(dim));
         dialog.setResizable(false);
@@ -137,9 +137,9 @@ public class VerificationDialog
         advancedPanelNonblocking.update(minimizationOptions);
     }
 
-    private JButton addButton(Container container, String name)
+    private JButton addButton(final Container container, final String name)
     {
-        JButton button = new JButton(name);
+        final JButton button = new JButton(name);
 
         button.addActionListener(this);
         container.add(button);
@@ -152,9 +152,9 @@ public class VerificationDialog
         dialog.setVisible(true);
     }
 
-    public void actionPerformed(ActionEvent event)
+    public void actionPerformed(final ActionEvent event)
     {
-        Object source = event.getSource();
+        final Object source = event.getSource();
 
         if (source == okButton)
         {
@@ -181,10 +181,10 @@ public class VerificationDialog
     {
         private static final long serialVersionUID = 1L;
 
-        private JComboBox verificationTypeBox;
-        private JComboBox algorithmSelector;
-        private JCheckBox showTrace;
-        private JTextArea note;
+        private final JComboBox verificationTypeBox;
+        private final JComboBox algorithmSelector;
+        private final JCheckBox showTrace;
+        private final JTextArea note;
 
         //private JTextArea note;// = new JTextArea("Bananas...");
         //final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake!
@@ -193,7 +193,8 @@ public class VerificationDialog
 
         public VerificationDialogStandardPanel()
         {
-            verificationTypeBox = new JComboBox(VerificationType.values());
+            verificationTypeBox =
+              new JComboBox(VerificationType.enabledValues());
             verificationTypeBox.addActionListener(this);
 
             algorithmSelector = new JComboBox();
@@ -205,10 +206,10 @@ public class VerificationDialog
             note = new JTextArea("Note:\n" + "Currently, modular nonblocking\n" + "verification is not supported.");
             note.setBackground(this.getBackground());
 
-            Box mainBox = Box.createVerticalBox();
+            final Box mainBox = Box.createVerticalBox();
 
             JPanel panel = new JPanel();
-            Box algoBox = Box.createVerticalBox();
+            final Box algoBox = Box.createVerticalBox();
             algoBox.add(verificationTypeBox);
             algoBox.add(algorithmSelector);
             panel.add(algoBox);
@@ -226,7 +227,7 @@ public class VerificationDialog
             this.add(mainBox);
         }
 
-        public void update(VerificationOptions verificationOptions)
+        public void update(final VerificationOptions verificationOptions)
         {
             verificationTypeBox.setSelectedItem(verificationOptions.getVerificationType());
             algorithmSelector.setSelectedItem(verificationOptions.getAlgorithmType());
@@ -242,7 +243,7 @@ public class VerificationDialog
         {
             // Some ugly stuff goes on here, the "advanced panel" is supposed to be the one
             // with index 1.
-            int advancedTabIndex = 1;
+            final int advancedTabIndex = 1;
 
             // Change the advanced panel
             if ((verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY ||
@@ -271,42 +272,42 @@ public class VerificationDialog
 
             // Which algorithms should be enabled?
             // Remember current selection
-            VerificationAlgorithm selected = (VerificationAlgorithm) algorithmSelector.getSelectedItem();
+            final VerificationAlgorithm selected = (VerificationAlgorithm) algorithmSelector.getSelectedItem();
             // Clear, then add the ones that are implemented
             algorithmSelector.removeAllItems();
             // Which type of verification?
-            if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY ||
-                verificationTypeBox.getSelectedItem() == VerificationType.INVERSECONTROLLABILITY ||
-                verificationTypeBox.getSelectedItem() == VerificationType.LANGUAGEINCLUSION)
-            {
-                algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
-                algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
-                algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
-                algorithmSelector.addItem(VerificationAlgorithm.COMBINED);
-                algorithmSelector.addItem(VerificationAlgorithm.BDD);
-                if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.isTrue() && verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY)
-                {
-					algorithmSelector.addItem(VerificationAlgorithm.SAT);
-				}
-            }
-            /*
-            else if (verificationTypeBox.getSelectedItem() == VerificationType.MUTUALLYNONBLOCKING)
-            {
-                // Only modular algo implemented
-                algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
-            }
-             */
-            else if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING)
-            {
-                algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
-                algorithmSelector.addItem(VerificationAlgorithm.MONOLITHICBDD);
-                algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
-                algorithmSelector.addItem(VerificationAlgorithm.COMBINED);
-                algorithmSelector.addItem(VerificationAlgorithm.BDD);
-            }
-            else if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITYNONBLOCKING)
-            {
-                algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
+            final VerificationType vtype =
+              (VerificationType) verificationTypeBox.getSelectedItem();
+            switch (vtype) {
+            case CONTROLLABILITY:
+            case INVERSECONTROLLABILITY:
+            case LANGUAGEINCLUSION:
+              algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
+              algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
+              algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
+              algorithmSelector.addItem(VerificationAlgorithm.COMBINED);
+              algorithmSelector.addItem(VerificationAlgorithm.BDD);
+              if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.isTrue() &&
+                  vtype == VerificationType.CONTROLLABILITY) {
+                algorithmSelector.addItem(VerificationAlgorithm.SAT);
+              }
+              break;
+            case NONBLOCKING:
+              algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
+              algorithmSelector.addItem(VerificationAlgorithm.MONOLITHICBDD);
+              algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
+              algorithmSelector.addItem(VerificationAlgorithm.COMBINED);
+              algorithmSelector.addItem(VerificationAlgorithm.BDD);
+              break;
+            case CONTROLLABILITYNONBLOCKING:
+              algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
+              break;
+            case OP:
+              algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
+              break;
+            default:
+              throw new IllegalStateException("Unknown verification type: " +
+                                              vtype + "!");
             }
             // Default selection
             algorithmSelector.setSelectedIndex(0);
@@ -335,62 +336,67 @@ public class VerificationDialog
          */
         private void updateNote()
         {
-            // Change the note
-            if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING &&
-                algorithmSelector.getSelectedItem() == VerificationAlgorithm.MODULAR)
-            {
-                note.setText("Note:\n" + "This algorithm uses incremental\n" +
-                    "composition and minimization with\n" +
-                    "respect to conflict equivalence.");
-                note.setVisible(true);
+          final VerificationType vtype =
+            (VerificationType) verificationTypeBox.getSelectedItem();
+          switch (vtype) {
+          case NONBLOCKING:
+            if (algorithmSelector.getSelectedItem() ==
+                VerificationAlgorithm.MODULAR) {
+              note.setText("Note:\n" + "This algorithm uses incremental\n" +
+                           "composition and minimization with\n" +
+                           "respect to conflict equivalence.");
+              note.setVisible(true);
+            } else {
+              note.setVisible(false);
             }
-            /*
-            else if (verificationTypeBox.getSelectedItem() == VerificationType.MUTUALLYNONBLOCKING)
-            {
-                note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" +
-                    "and hence there is no monolithic algoritm.");
-                note.setVisible(true);
-            }
-             */
-            else if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITYNONBLOCKING)
-            {
-                note.setText("Note:\n" + "Verifies both controllability and nonblocking in\n" +
-                    "one run. Currently, Supremica will not distinguish\n" +
-                    "controllability problems from blocking problems");
-                note.setVisible(true);
-            }
-            else if (verificationTypeBox.getSelectedItem() == VerificationType.LANGUAGEINCLUSION)
-            {
-                note.setText("Note:\n" + "This verifies whether the language of the unselected\n" +
-                    "automata is included in the inverse projection of\n" +
-                    "the language of the selected automata.\n" +
-                    "  The alphabet of the unselected automata must\n" +
-                    "include the alphabet of the selected automata.");
-                note.setVisible(true);
-            }
-            else if (verificationTypeBox.getSelectedItem() == VerificationType.INVERSECONTROLLABILITY)
-            {
-                note.setText("Note:\n" + "This verifies whether the controllable events in the\n" +
-                    "supervisor candidate are always accepted by\n" +
-                    "the plant. That is, the supervisor is considered\n" +
-                    "to be a controller as in the input/output approach\n" +
-                    "to control of DES presented by Balemi.");
-                note.setVisible(true);
-            }
-            else // Something else is selected
-            {
-                note.setVisible(false);
-            }
+            break;
+          case CONTROLLABILITYNONBLOCKING:
+            note.setText("Note:\n" +
+                         "Verifies both controllability and nonblocking in\n" +
+                         "one run. Currently, Supremica will not distinguish\n" +
+                         "controllability problems from blocking problems.");
+            note.setVisible(true);
+            break;
+          case LANGUAGEINCLUSION:
+            note.setText("Note:\n" +
+                         "This verifies whether the language of the unselected\n" +
+                         "automata is included in the inverse projection of\n" +
+                         "the language of the selected automata.\n" +
+                         "  The alphabet of the unselected automata must\n" +
+                         "include the alphabet of the selected automata.");
+            note.setVisible(true);
+            break;
+          case INVERSECONTROLLABILITY:
+            note.setText("Note:\n" +
+                         "This verifies whether the controllable events in the\n" +
+                         "supervisor candidate are always accepted by\n" +
+                         "the plant. That is, the supervisor is considered\n" +
+                         "to be a controller as in the input/output approach\n" +
+                         "to control of DES presented by Balemi.");
+            note.setVisible(true);
+            break;
+          case OP:
+            note.setText("Note:\n" +
+                         "This verifies whether the natural projection\n" +
+                         "hiding all tau events in the model satisfies the\n" +
+                         "observer property, using the OP-Verifier algorithm\n" +
+                         "by P. Pena et.al. (2009).");
+            note.setVisible(true);
+            break;
+          default:
+            note.setVisible(false);
+            break;
+          }
         }
 
-        public void regain(VerificationOptions verificationOptions)
+        public void regain(final VerificationOptions verificationOptions)
         {
             verificationOptions.setVerificationType((VerificationType) verificationTypeBox.getSelectedItem());
             verificationOptions.setAlgorithmType((VerificationAlgorithm) algorithmSelector.getSelectedItem());
             verificationOptions.setShowBadTrace(showTrace.isSelected());
         }
 
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(final ActionEvent e)
         {
             updatePanel();
             updateNote();
@@ -420,17 +426,17 @@ public class VerificationDialog
             ruleOSO = new JCheckBox("Rule OSO");
 
             // Create layout!
-            Box mainBox = Box.createVerticalBox();
+            final Box mainBox = Box.createVerticalBox();
 
             JPanel panel = new JPanel();
-            Box strategyBox = Box.createHorizontalBox();
+            final Box strategyBox = Box.createHorizontalBox();
             strategyBox.add(new JLabel("Minimization strategy: "));
             strategyBox.add(minimizationStrategy);
             panel.add(strategyBox);
             mainBox.add(panel);
 
             panel = new JPanel();
-            Box heuristicBox = Box.createHorizontalBox();
+            final Box heuristicBox = Box.createHorizontalBox();
             heuristicBox.add(new JLabel("Minimization heuristic: "));
             heuristicBox.add(minimizationHeuristic);
             panel.add(heuristicBox);
@@ -448,7 +454,7 @@ public class VerificationDialog
             this.add(mainBox);
         }
 
-        public void update(MinimizationOptions options)
+        public void update(final MinimizationOptions options)
         {
             minimizationStrategy.setSelectedItem(options.getMinimizationStrategy());
             minimizationHeuristic.setSelectedItem(options.getMinimizationHeuristic());
@@ -458,7 +464,7 @@ public class VerificationDialog
             ruleOSO.setSelected(options.getUseRuleOSO());
         }
 
-        public void regain(MinimizationOptions options)
+        public void regain(final MinimizationOptions options)
         {
             options.setMinimizationType(EquivalenceRelation.CONFLICTEQUIVALENCE);
 
@@ -477,26 +483,26 @@ public class VerificationDialog
     {
         private static final long serialVersionUID = 1L;
 
-        private JTextField exclusionStateLimit;
-        private JTextField reachabilityStateLimit;
-        private JCheckBox oneEventAtATimeBox;
-        private JCheckBox skipUncontrollabilityBox;
-        private JTextField nbrOfAttempts;
+        private final JTextField exclusionStateLimit;
+        private final JTextField reachabilityStateLimit;
+        private final JCheckBox oneEventAtATimeBox;
+        private final JCheckBox skipUncontrollabilityBox;
+        private final JTextField nbrOfAttempts;
 
         public VerificationDialogAdvancedPanelControllability()
         {
-            Box advancedBox = Box.createVerticalBox();
-            JLabel exclusionStateLimitText = new JLabel("Initial state limit for state exclusion");
+            final Box advancedBox = Box.createVerticalBox();
+            final JLabel exclusionStateLimitText = new JLabel("Initial state limit for state exclusion");
 
             exclusionStateLimit = new JTextField();
 
-            JLabel reachabilityStateLimitText = new JLabel("Initial state limit for reachability verification");
+            final JLabel reachabilityStateLimitText = new JLabel("Initial state limit for reachability verification");
 
             reachabilityStateLimit = new JTextField();
             oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
             skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");
 
-            JLabel nbrOfAttemptsText = new JLabel("Number of verification attempts");
+            final JLabel nbrOfAttemptsText = new JLabel("Number of verification attempts");
 
             nbrOfAttempts = new JTextField();
 
@@ -511,7 +517,7 @@ public class VerificationDialog
             this.add(advancedBox, BorderLayout.CENTER);
         }
 
-        public void update(VerificationOptions verificationOptions)
+        public void update(final VerificationOptions verificationOptions)
         {
             exclusionStateLimit.setText(Integer.toString(verificationOptions.getExclusionStateLimit()));
             reachabilityStateLimit.setText(Integer.toString(verificationOptions.getReachabilityStateLimit()));
@@ -520,7 +526,7 @@ public class VerificationDialog
             nbrOfAttempts.setText(Integer.toString(verificationOptions.getNbrOfAttempts()));
         }
 
-        public void regain(VerificationOptions verificationOptions)
+        public void regain(final VerificationOptions verificationOptions)
         {
             //verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("Exclusion state limit", exclusionStateLimit.getText(), 10));
             verificationOptions.setExclusionStateLimit(Integer.parseInt(exclusionStateLimit.getText())); // Should have min and max values?

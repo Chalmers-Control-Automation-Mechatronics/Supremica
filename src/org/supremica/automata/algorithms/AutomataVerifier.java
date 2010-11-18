@@ -50,9 +50,20 @@
 package org.supremica.automata.algorithms;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.op.OPSearchAutomatonSimplifier;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
@@ -64,6 +75,7 @@ import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
 import org.supremica.automata.BDD.BDDVerifier;
+import org.supremica.automata.IO.AutomataToWaters;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
@@ -103,13 +115,13 @@ public class AutomataVerifier
      */
     private Map<LabeledEvent,Automata> uncontrollableEventToPlantsMap = null;
     private AutomataSynchronizerHelper synchHelper;
-    private ArrayList<AutomataSynchronizerExecuter> synchronizationExecuters = new ArrayList<AutomataSynchronizerExecuter>();
+    private final ArrayList<AutomataSynchronizerExecuter> synchronizationExecuters = new ArrayList<AutomataSynchronizerExecuter>();
     private StateMemorizer potentiallyUncontrollableStates;
 
     // Used by findUncontrollableStates
     private AutomataSynchronizerHelper uncontrollabilityCheckHelper;
     @SuppressWarnings("unused")
-	private ArrayList<?> uncontrollabilityCheckExecuters = new ArrayList<Object>();
+	private final ArrayList<?> uncontrollabilityCheckExecuters = new ArrayList<Object>();
 
     // Used in excludeUncontrollableStates
     private int stateAmountLimit;
@@ -121,9 +133,9 @@ public class AutomataVerifier
      *
      *@see SynchronizationOptions
      */
-    private VerificationOptions verificationOptions;
-    private SynchronizationOptions synchronizationOptions;
-    private MinimizationOptions minimizationOptions;
+    private final VerificationOptions verificationOptions;
+    private final SynchronizationOptions synchronizationOptions;
+    private final MinimizationOptions minimizationOptions;
 
     /** For stopping execution. */
     private ExecutionDialog executionDialog = null;
@@ -133,7 +145,7 @@ public class AutomataVerifier
     /** For error message when Supremica can't be certain on the answer. */
     private boolean failure = false;
 
-    public AutomataVerifier(Automata theAutomata, VerificationOptions verificationOptions, SynchronizationOptions synchronizationOptions, MinimizationOptions minimizationOptions)
+    public AutomataVerifier(final Automata theAutomata, final VerificationOptions verificationOptions, final SynchronizationOptions synchronizationOptions, final MinimizationOptions minimizationOptions)
     throws IllegalArgumentException, Exception
     {
         this.theAutomata = new Automata(theAutomata);
@@ -147,7 +159,7 @@ public class AutomataVerifier
      *
      *@return null if everything is OK, otherwise returns a String describing the problem.
      */
-    public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
+    public static String validOptions(final Automata theAutomata, final VerificationOptions verificationOptions)
     {
         // At least one automaton
         if (theAutomata.size() < 1)
@@ -208,126 +220,118 @@ public class AutomataVerifier
      * This is an attempt to clean up this interface.
      */
     public boolean verify()
-    throws UnsupportedOperationException
+      throws UnsupportedOperationException
     {
-        try
-        {
-            // Find out what should be done and do it!
-            if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY ||
-                verificationOptions.getVerificationType() == VerificationType.INVERSECONTROLLABILITY ||
-                verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
-            {
-                // All of these verification types use the same algorithm. Just need to do some preparation first...
-
-                // Inverse controllability? Invert controllability!
-                if (verificationOptions.getVerificationType() == VerificationType.INVERSECONTROLLABILITY)
-                {
-                    // Invert controllability and plant/spec status
-                    prepareForInverseControllability();
-                }
-                else if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
-                {
-                    // Treat the unselected automata as plants (and the rest as supervisors, implicitly)
-                    prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
-                }
-
-                // We're gonna do some synchronization! Initialize a synchronization helper!
-                // Only some of the below algorithms use this helper?
-                synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-                synchHelper.setExecutionDialog(executionDialog);
-
-                // Work!
-                if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
-                {
-                    return monolithicControllabilityVerification();
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
-                {
-                    return modularControllabilityVerification();
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-                    verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-                {
-                    return compositionalControllabilityVerification();
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-                {
-                    return BDDControllabilityVerification(theAutomata);
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.SAT)
-                {
-					return true; // Alexey add a call to your code here
-				}
-                else
-                {
-                    throw new UnsupportedOperationException("The selected algorithm is not implemented");
-                }
-            }
-            else if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITYNONBLOCKING)
-            {
-                if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-                    verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-                {
-                    return compositionalControllabilityNonblockingVerification();
-                }
-                else
-                {
-                    throw new UnsupportedOperationException("The selected algorithm is not implemented");
-                }
-            }
-            else if (verificationOptions.getVerificationType() == VerificationType.NONBLOCKING)
-            {
-                if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
-                {
-                    // We're gonna do some serious synchronization! Initialize a synchronization helper!
-                    synchronizationOptions.setForbidUncontrollableStates(false);
-                    synchronizationOptions.setExpandForbiddenStates(true);
-                    synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-                    synchHelper.setExecutionDialog(executionDialog);
-
-                    // Work!
-                    return monolithicNonblockingVerification();
-                }
-                 else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHICBDD)
-                {
-                    return monolithicBDDNonblockingVerification();
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-                {
-                    return BDDNonblockingVerification();
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-                    verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-                {
-                    return compositionalNonblockingVerification();
-                }
-                else
-                {
-                    throw new UnsupportedOperationException("The selected algorithm is not implemented");
-                }
-            }
-            else
-            {
-                throw new UnsupportedOperationException("The selected type of verification " +
-                    "is not implemented");
-            }
+      try {
+        // Find out what should be done and do it!
+        final VerificationType vtype =
+          verificationOptions.getVerificationType();
+        switch (vtype) {
+        case CONTROLLABILITY:
+        case INVERSECONTROLLABILITY:
+        case LANGUAGEINCLUSION:
+          // All of these verification types use the same algorithm. Just need to do some preparation first...
+          // Inverse controllability? Invert controllability!
+          if (vtype == VerificationType.INVERSECONTROLLABILITY)
+          {
+            // Invert controllability and plant/spec status
+            prepareForInverseControllability();
+          }
+          else if (vtype == VerificationType.LANGUAGEINCLUSION)
+          {
+            // Treat the unselected automata as plants (and the rest as supervisors, implicitly)
+            prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
+          }
+          // We're gonna do some synchronization! Initialize a synchronization helper!
+          // Only some of the below algorithms use this helper?
+          synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+          synchHelper.setExecutionDialog(executionDialog);
+          // Work!
+          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
+          {
+            return monolithicControllabilityVerification();
+          }
+          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
+          {
+            return modularControllabilityVerification();
+          }
+          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
+              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
+          {
+            return compositionalControllabilityVerification();
+          }
+          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
+          {
+            return BDDControllabilityVerification(theAutomata);
+          }
+          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.SAT)
+          {
+            return true; // Alexey add a call to your code here
+          }
+          else
+          {
+            throw new UnsupportedOperationException("The selected algorithm is not implemented");
+          }
+        case CONTROLLABILITYNONBLOCKING:
+          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
+              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
+          {
+            return compositionalControllabilityNonblockingVerification();
+          }
+          else
+          {
+            throw new UnsupportedOperationException("The selected algorithm is not implemented");
+          }
+        case NONBLOCKING:
+          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
+          {
+            // We're gonna do some serious synchronization! Initialize a synchronization helper!
+            synchronizationOptions.setForbidUncontrollableStates(false);
+            synchronizationOptions.setExpandForbiddenStates(true);
+            synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+            synchHelper.setExecutionDialog(executionDialog);
+            // Work!
+            return monolithicNonblockingVerification();
+          }
+          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHICBDD)
+          {
+            return monolithicBDDNonblockingVerification();
+          }
+          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
+          {
+            return BDDNonblockingVerification();
+          }
+          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
+              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
+          {
+            return compositionalNonblockingVerification();
+          }
+          else
+          {
+            throw new UnsupportedOperationException("The selected algorithm is not implemented");
+          }
+        case OP:
+          return observerPropertyVerification();
+        default:
+          throw new UnsupportedOperationException
+            ("The selected type of verification is not implemented!");
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            logger.error("Exception in AutomataVerifier: " + e);
-
-            throw new RuntimeException(e);    // Try change this later
-        }
+      }
+      catch (final Exception e)
+      {
+        e.printStackTrace();
+        logger.error("Exception in AutomataVerifier: " + e);
+        throw new RuntimeException(e);    // Try change this later
+      }
     }
 
     /**
      * Prepares the helper and the automataindexform for inverse controllability...
      */
-    public void prepareForInverseControllability()
+    private void prepareForInverseControllability()
     {
         // Invert the properties!
-        for (Automaton aut: theAutomata)
+        for (final Automaton aut: theAutomata)
         {
             // Invert automaton type
             if (aut.isPlant())
@@ -340,8 +344,8 @@ public class AutomataVerifier
             }
 
             // Invert event controllability
-            Alphabet alpha = aut.getAlphabet();
-            for (LabeledEvent ev: alpha)
+            final Alphabet alpha = aut.getAlphabet();
+            for (final LabeledEvent ev: alpha)
             {
                 ev.setControllable(!ev.isControllable());
             }
@@ -353,7 +357,7 @@ public class AutomataVerifier
      *
      *@param inclusionAutomata The automata that should be verified for inclusion
      */
-    public void prepareForLanguageInclusion(Automata inclusionAutomata)
+    private void prepareForLanguageInclusion(final Automata inclusionAutomata)
     throws Exception
     {
         if (inclusionAutomata == null)
@@ -364,26 +368,26 @@ public class AutomataVerifier
         // Make a copy and modify!
 
         // We shall verify   L(autA) \subseteq L(autB)
-        Automata autA = new Automata(inclusionAutomata); // The automata that are not selected
-        Automata autB = new Automata(theAutomata); // The selected automata
+        final Automata autA = new Automata(inclusionAutomata); // The automata that are not selected
+        final Automata autB = new Automata(theAutomata); // The selected automata
 
         // Make autA plants
-        for (Automaton aut: autA)
+        for (final Automaton aut: autA)
         {
             aut.setType(AutomatonType.PLANT);
-            Alphabet alpha = aut.getAlphabet();
-            for (LabeledEvent ev: alpha)
+            final Alphabet alpha = aut.getAlphabet();
+            for (final LabeledEvent ev: alpha)
             {
                 ev.setControllable(false);
             }
         }
 
         // Make autB specifications
-        for (Automaton aut: autB)
+        for (final Automaton aut: autB)
         {
             aut.setType(AutomatonType.SPECIFICATION);
-            Alphabet alpha = aut.getAlphabet();
-            for (LabeledEvent ev: alpha)
+            final Alphabet alpha = aut.getAlphabet();
+            for (final LabeledEvent ev: alpha)
             {
                 ev.setControllable(false);
             }
@@ -427,14 +431,14 @@ public class AutomataVerifier
 
         potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
 
-        Automata selectedAutomata = new Automata();
+        final Automata selectedAutomata = new Automata();
         boolean allModulesControllable = true;
-        boolean[] typeIsSupSpecTable = synchHelper.getAutomataIndexForm().getTypeIsSupSpecTable();
-        boolean[] controllableEventsTable = synchHelper.getAutomataIndexForm().getControllableEventsTable();
-        AutomataIndexMap indexMap = synchHelper.getIndexMap();
+        final boolean[] typeIsSupSpecTable = synchHelper.getAutomataIndexForm().getTypeIsSupSpecTable();
+        final boolean[] controllableEventsTable = synchHelper.getAutomataIndexForm().getControllableEventsTable();
+        final AutomataIndexMap indexMap = synchHelper.getIndexMap();
 
         // Iterate over supervisors/specifications
-        loop: for (Automaton supervisor: theAutomata)
+        loop: for (final Automaton supervisor: theAutomata)
         {
             // To enable the overriding the AutomatonType of automata we use typeIsSupSpecTable!
             // if ((supervisor.getType() == AutomatonType.Supervisor) || (supervisor.getType() == AutomatonType.SPECIFICATION))
@@ -446,7 +450,7 @@ public class AutomataVerifier
 
                 // Examine uncontrollable events in supervisor
                 // and select plants containing these events
-                for (LabeledEvent event : supervisor.getAlphabet())
+                for (final LabeledEvent event : supervisor.getAlphabet())
                 {
                     // To enable overriding the controllability status of events!
                     //if (!event.isControllable())
@@ -458,7 +462,7 @@ public class AutomataVerifier
                         {
                             // Iterate over the plants and add them to selectedAutomata
                             //for (Iterator plantIt = ((Set) uncontrollableEventToPlantsMap.get(event)).iterator();
-                            for (Automaton plant : uncontrollableEventToPlantsMap.get(event))
+                            for (final Automaton plant : uncontrollableEventToPlantsMap.get(event))
                             {
                                 if (!selectedAutomata.containsAutomaton(plant))
                                 {
@@ -545,7 +549,7 @@ public class AutomataVerifier
      *@exception  Exception Description of the Exception
      *@see  AutomataSynchronizerExecuter
      */
-    private boolean moduleIsControllable(Automata selectedAutomata)
+    private boolean moduleIsControllable(final Automata selectedAutomata)
     throws Exception
     {
         // Clear the hash-table and set some variables in the synchronization helper
@@ -563,7 +567,7 @@ public class AutomataVerifier
 
         for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
         {
-            AutomataSynchronizerExecuter currSynchronizationExecuter =
+            final AutomataSynchronizerExecuter currSynchronizationExecuter =
                 new AutomataSynchronizerExecuter(synchHelper);
 
             synchronizationExecuters.add(currSynchronizationExecuter);
@@ -572,7 +576,7 @@ public class AutomataVerifier
         // Start all the synchronization executers and wait for completion
         for (int i = 0; i < synchronizationExecuters.size(); i++)
         {
-            AutomataSynchronizerExecuter currExec =
+            final AutomataSynchronizerExecuter currExec =
                 synchronizationExecuters.get(i);
 
             currExec.selectAutomata(selectedAutomata);
@@ -580,18 +584,18 @@ public class AutomataVerifier
         }
 
         try {
-			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
 			 	synchExecuter.join();
 			}
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// Current thread has been interrupted, perhaps
 			// due to an exception in one of the executers.
 			// Stop all tasks and throw the original exception
-			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
 	            synchExecuter.requestStop();
 	        }
-			for (AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
-			 	Throwable cause = synchExecuter.getCauseOfInterrupt();
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
+			 	final Throwable cause = synchExecuter.getCauseOfInterrupt();
 			 	if (cause != null) {
 			 		if (cause instanceof RuntimeException) throw (RuntimeException) cause;
 			 		else throw new RuntimeException(cause);
@@ -610,7 +614,7 @@ public class AutomataVerifier
         if (Config.VERBOSE_MODE.isTrue())
         {
             // For printing the names of the automata in selectedAutomata
-            for (Iterator<?> autIt = selectedAutomata.iterator();
+            for (final Iterator<?> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 automataNames = automataNames.append(((Automaton) autIt.next()).getName());
@@ -625,13 +629,13 @@ public class AutomataVerifier
         // Was the result uncontrollable?
         if (!synchHelper.getAutomataIsControllable())
         {
-            AutomataIndexMap indexMap = synchHelper.getIndexMap();
+            final AutomataIndexMap indexMap = synchHelper.getIndexMap();
             // Try to add some more automata
             // Make array with indices of selected automata to remember which were originally selected
-            int[] automataIndices = new int[selectedAutomata.size()];
+            final int[] automataIndices = new int[selectedAutomata.size()];
             int i = 0;
 
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 automataIndices[i++] = indexMap.getAutomatonIndex(autIt.next());
@@ -640,7 +644,7 @@ public class AutomataVerifier
             if (Config.VERBOSE_MODE.isTrue())
             {
                 String states;
-                int size = potentiallyUncontrollableStates.size(automataIndices);
+                final int size = potentiallyUncontrollableStates.size(automataIndices);
 
                 if (size == 1)
                 {
@@ -681,7 +685,7 @@ public class AutomataVerifier
 
             // Make nbrOfAttempts attempts on prooving controllability and
             // uncontrollability alternatingly and then give up
-            int nbrOfAttempts = verificationOptions.getNbrOfAttempts();
+            final int nbrOfAttempts = verificationOptions.getNbrOfAttempts();
             stateAmount = 1;
             for (attempt = 1; attempt <= nbrOfAttempts; attempt++)
             {
@@ -691,10 +695,10 @@ public class AutomataVerifier
                 if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
                 {
                     // Try to find more similarities
-                    int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
+                    final int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
                     if (moreSimilarAutomata != null)
                     {
-                        int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
+                        final int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
                         if (Config.VERBOSE_MODE.isTrue())
                         {
                             logger.info("All similar automata are already added, trying to add some more...");
@@ -808,12 +812,12 @@ public class AutomataVerifier
      *@see #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
      *@see #excludeUncontrollableStates(int[], org.supremica.automata.Automata, int[])
      */
-    private int[] findSimilarAutomata(Automata theAutomata, Automata selectedAutomata)
+    private int[] findSimilarAutomata(final Automata theAutomata, final Automata selectedAutomata)
     throws Exception
     {
-        int amountOfSelected = selectedAutomata.size();
-        int amountOfAutomata = theAutomata.size();
-        int amountOfUnselected = amountOfAutomata - amountOfSelected;
+        final int amountOfSelected = selectedAutomata.size();
+        final int amountOfAutomata = theAutomata.size();
+        final int amountOfUnselected = amountOfAutomata - amountOfSelected;
 
         // Are there any automata to find in the first place?
         if (amountOfUnselected == 0)
@@ -822,16 +826,16 @@ public class AutomataVerifier
         }
 
         // Compute the union alphabet of the automata in selectedAutomata
-        Alphabet synchAlphabet = selectedAutomata.getUnionAlphabet();
+        final Alphabet synchAlphabet = selectedAutomata.getUnionAlphabet();
 
         // Do the work, compare the new automata with the already selected
         Automaton currAutomaton;
-        int[] tempArray = new int[amountOfUnselected];
-        double[] arraySortValue = new double[amountOfUnselected];
+        final int[] tempArray = new int[amountOfUnselected];
+        final double[] arraySortValue = new double[amountOfUnselected];
         int count = 0;
 
-        AutomataIndexMap indexMap = synchHelper.getIndexMap();
-        for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+        final AutomataIndexMap indexMap = synchHelper.getIndexMap();
+        for (final Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
         {
             currAutomaton = autIt.next();
 
@@ -889,7 +893,7 @@ public class AutomataVerifier
         }
 
         // Return an array of appropriate length
-        int[] outArray = new int[count];
+        final int[] outArray = new int[count];
 
         System.arraycopy(tempArray, 0, outArray, 0, count);
 
@@ -906,14 +910,14 @@ public class AutomataVerifier
      *@return  double representing how similar the two alphabets are. Returns quota between common
      * events in the alphabets and unique events in rightAlphabet.
      */
-    private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
+    private double compareAlphabets(final Alphabet leftAlphabet, final Alphabet rightAlphabet)
     {
         // USE Alphabet.nbrOfCommonEvents INSTEAD!!!!
         // Naaaah... that's not the same thing, but this method should be in AlphabetHelpers
         //
         int amountOfCommon = 0;
         int amountOfUnique = 0;
-        Iterator<?> eventIterator = rightAlphabet.iterator();
+        final Iterator<?> eventIterator = rightAlphabet.iterator();
         LabeledEvent currEvent;
 
         while (eventIterator.hasNext())
@@ -955,12 +959,12 @@ public class AutomataVerifier
      *@param  automataIndices integer array with indices of automata in the current "composition".
      *@see  #findSimilarAutomata(org.supremica.automata.Automata, org.supremica.automata.Automata)
      */
-    private void excludeUncontrollableStates(int[] similarAutomata, Automata selectedAutomata, int[] automataIndices)
+    private void excludeUncontrollableStates(final int[] similarAutomata, final Automata selectedAutomata, final int[] automataIndices)
     throws Exception
     {
-        AutomataIndexMap indexMap = synchHelper.getIndexMap();
+        final AutomataIndexMap indexMap = synchHelper.getIndexMap();
         String addedAutomata = "";
-        int start = selectedAutomata.size() - automataIndices.length;
+        final int start = selectedAutomata.size() - automataIndices.length;
 
         if (attempt == 1)
         {
@@ -1013,7 +1017,7 @@ public class AutomataVerifier
 
                 for (int j = 0; j < synchronizationOptions.getNbrOfExecuters(); j++)
                 {
-                    AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+                    final AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
 
                     synchronizationExecuters.add(currSynchronizationExecuter);
                 }
@@ -1022,7 +1026,7 @@ public class AutomataVerifier
                 // For the moment we assume that we only have one thread
                 for (int j = 0; j < synchronizationExecuters.size(); j++)
                 {
-                    AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(j);
+                    final AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(j);
 
                     currExec.selectAutomata(selectedAutomata);
                     currExec.start();
@@ -1038,10 +1042,10 @@ public class AutomataVerifier
                 // Examine if there are states in potentiallyUncontrollableStates
                 // that are not represented in the new synchronization
                 int stateCount = 0;
-                Iterator<?> stateIt = synchHelper.getStateIterator();
+                final Iterator<?> stateIt = synchHelper.getStateIterator();
                 while (stateIt.hasNext())
                 {
-                    int[] currState = (int[]) stateIt.next();
+                    final int[] currState = (int[]) stateIt.next();
 
                     // Look for the state among the potentially uncontrollable states
                     potentiallyUncontrollableStates.find(automataIndices, currState);
@@ -1080,7 +1084,7 @@ public class AutomataVerifier
                 potentiallyUncontrollableStates.clean(automataIndices);
 
                 // Print result
-                int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
+                final int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
                 if (Config.VERBOSE_MODE.isTrue())
                 {
                     String message = "";
@@ -1135,14 +1139,14 @@ public class AutomataVerifier
      *@return  Description of the Return Value
      *@exception  Exception Description of the Exception
      */
-    private boolean findUncontrollableStates(int[] automataIndices)
+    private boolean findUncontrollableStates(final int[] automataIndices)
     throws Exception
     {
         // WOHOOPS! Eventuellt �r det listigt att g�ra ny onlinesynchronizer,
         // med den nya automataIndices varje g�ng... t�nk p� det. FIXA!
         if (uncontrollabilityCheckHelper == null)
         {
-            AutomataSynchronizerExecuter onlineSynchronizer = new AutomataSynchronizerExecuter(synchHelper);
+            final AutomataSynchronizerExecuter onlineSynchronizer = new AutomataSynchronizerExecuter(synchHelper);
             onlineSynchronizer.selectAutomata(automataIndices);
             onlineSynchronizer.initialize();
 
@@ -1165,7 +1169,7 @@ public class AutomataVerifier
 
         for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
         {
-            AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(uncontrollabilityCheckHelper);
+            final AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(uncontrollabilityCheckHelper);
 
             synchronizationExecuters.add(currSynchronizationExecuter);
         }
@@ -1173,7 +1177,7 @@ public class AutomataVerifier
         // Start all the synchronization executers and wait for completion
         for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
         {
-            AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(i);
+            final AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(i);
 
             currExec.selectAllAutomata();
             currExec.start();
@@ -1233,7 +1237,7 @@ public class AutomataVerifier
 	private boolean BDDLanguageInclusionVerification()
     	throws Exception
     {
-        Automata unselected = ActionMan.getGui().getUnselectedAutomata();
+        final Automata unselected = ActionMan.getGui().getUnselectedAutomata();
 
         // we already know the answer: L(P) = \Sigma^*
         if (unselected.size() < 1)
@@ -1241,18 +1245,18 @@ public class AutomataVerifier
             return true;
         }
 
-        Automata selected = new Automata(theAutomata, true);    /* <-- MUST BE SHALLOW COPY ... */
+        final Automata selected = new Automata(theAutomata, true);    /* <-- MUST BE SHALLOW COPY ... */
 
         selected.removeAutomata(unselected);    /* .. OR THIS REMOVE WONT WORK !!! */
 
         boolean ret = false;
-        org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDLanguageInclusionVerification");
+        final org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDLanguageInclusionVerification");
 
         switch (Options.inclusion_algorithm)
         {
 
             case Options.INCLUSION_ALGO_MONOLITHIC :
-                AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected);
+                final AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected);
 
                 ret = abf.passLanguageInclusion();
 
@@ -1260,7 +1264,7 @@ public class AutomataVerifier
                 break;
 
             case Options.INCLUSION_ALGO_MODULAR :
-                org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(selected, unselected);
+                final org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(selected, unselected);
 
                 ret = mli.passLanguageInclusion();
 
@@ -1268,7 +1272,7 @@ public class AutomataVerifier
                 break;
 
             case Options.INCLUSION_ALGO_INCREMENTAL :
-                org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(selected, unselected);
+                final org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(selected, unselected);
 
                 ret = ili.passLanguageInclusion();
 
@@ -1296,7 +1300,7 @@ public class AutomataVerifier
      * @see org.supremica.util.BDD.BDDAutomata
      * @see AutomataBDDVerifier
      */
-    private boolean BDDControllabilityVerification(Automata theAutomata)
+    private boolean BDDControllabilityVerification(final Automata theAutomata)
     throws Exception
     {
         boolean ret;
@@ -1307,12 +1311,12 @@ public class AutomataVerifier
             return true;
         }
 
-        org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDControllabilityVerification");
+        final org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDControllabilityVerification");
 
         switch (Options.inclusion_algorithm)
         {
             case Options.INCLUSION_ALGO_MONOLITHIC :
-                AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
+                final AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
 
                 ret = abf.isControllable();
 
@@ -1320,7 +1324,7 @@ public class AutomataVerifier
                 break;
 
             case Options.INCLUSION_ALGO_MODULAR :
-                org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(theAutomata);
+                final org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(theAutomata);
 
                 ret = mli.isControllable();
 
@@ -1328,7 +1332,7 @@ public class AutomataVerifier
                 break;
 
             case Options.INCLUSION_ALGO_INCREMENTAL :
-                org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(theAutomata);
+                final org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(theAutomata);
 
                 ret = ili.isControllable();
 
@@ -1357,8 +1361,8 @@ public class AutomataVerifier
     private boolean monolithicBDDNonblockingVerification()
     throws Exception
     {
-        BDDVerifier bddVerifier = new BDDVerifier(theAutomata);
-        boolean isNonblocking = bddVerifier.isNonblocking();
+        final BDDVerifier bddVerifier = new BDDVerifier(theAutomata);
+        final boolean isNonblocking = bddVerifier.isNonblocking();
         logger.info("Number of reachable state: " + bddVerifier.numberOfReachableStates());
         logger.info("Number of coreachable states: " + bddVerifier.numberOfCoreachableStates());
         logger.info("Number of blocking states: " + bddVerifier.numberOfBlockingStates());
@@ -1378,8 +1382,8 @@ public class AutomataVerifier
     {
 
         // timer.start();
-        AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
-        boolean ret = abf.isNonblocking();
+        final AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
+        final boolean ret = abf.isNonblocking();
 
         abf.cleanup();
 
@@ -1406,7 +1410,7 @@ public class AutomataVerifier
         // Initialize the synchronizationExecuters
         for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
         {
-            AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+            final AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
 
             synchronizationExecuters.add(currSynchronizationExecuter);
         }
@@ -1414,7 +1418,7 @@ public class AutomataVerifier
         // Start all the synchronization executers and wait for completion
         for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
         {
-            AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(i);
+            final AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(i);
 
             currExec.selectAllAutomata();
             currExec.start();
@@ -1449,7 +1453,7 @@ public class AutomataVerifier
         }
 
         // Otherwise we must synchronize!
-        Automaton theAutomaton = AutomataSynchronizer.synchronizeAutomata(synchHelper);
+        final Automaton theAutomaton = AutomataSynchronizer.synchronizeAutomata(synchHelper);
 
                 /*
                 // Otherwise we must synchronize...
@@ -1514,7 +1518,7 @@ public class AutomataVerifier
     	throws Exception
     {
         boolean allIndividuallyNonblocking = true;
-        Iterator<?> autIt = theAutomata.iterator();
+        final Iterator<?> autIt = theAutomata.iterator();
         Automaton currAutomaton;
 
         while (autIt.hasNext())
@@ -1563,7 +1567,7 @@ public class AutomataVerifier
     throws Exception
     {
         // Mark all states in all automata
-        for (Automaton automaton : theAutomata)
+        for (final Automaton automaton : theAutomata)
         {
             automaton.setAllStatesAccepting();
         }
@@ -1620,7 +1624,7 @@ public class AutomataVerifier
             message = "";
 
             // Minimizer
-            AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
+            final AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
             threadToStop = minimizer;
             if (executionDialog != null)
             {
@@ -1641,7 +1645,7 @@ public class AutomataVerifier
             // JUNK
             message = minimizer.getStatisticsLineLaTeX();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             requestStop();
             logger.error("Error in AutomataVerifier when verifying nonblocking compositionally. " + ex);
@@ -1659,7 +1663,7 @@ public class AutomataVerifier
         if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
         {
             logger.info("Automata after minimisation:");
-            for (Automaton aut : theAutomata)
+            for (final Automaton aut : theAutomata)
             {
                 logger.info(aut + ", " + aut.nbrOfStates() + " states.");
             }
@@ -1670,7 +1674,7 @@ public class AutomataVerifier
     }
 
     @SuppressWarnings("unused")
-	private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)
+	private boolean modularLanguageinclusionVerification(final Automata inclusionAutomata)
     	throws Exception
     {
         prepareForLanguageInclusion(inclusionAutomata);
@@ -1678,7 +1682,7 @@ public class AutomataVerifier
     }
 
     @SuppressWarnings("unused")
-	private boolean monolithicLanguageinclusionVerification(Automata inclusionAutomata)
+	private boolean monolithicLanguageinclusionVerification(final Automata inclusionAutomata)
     	throws Exception
     {
         prepareForLanguageInclusion(inclusionAutomata);
@@ -1693,7 +1697,7 @@ public class AutomataVerifier
      *@exception  Exception Description of the Exception
      *@see AutomataSynchronizerExecuter
      */
-    private boolean moduleIsNonblocking(Automaton theAutomaton)
+    private boolean moduleIsNonblocking(final Automaton theAutomaton)
     throws Exception
     {
         return moduleIsNonblocking(theAutomaton, false);
@@ -1707,7 +1711,7 @@ public class AutomataVerifier
      *@exception  Exception Description of the Exception
      *@see AutomataSynchronizerExecuter
      */
-    private boolean moduleIsNonblocking(Automaton original, boolean destructive)
+    private boolean moduleIsNonblocking(final Automaton original, final boolean destructive)
     throws Exception
     {
         // Should we save the original by creating a copy that we can destroy?
@@ -1722,7 +1726,7 @@ public class AutomataVerifier
         }
 
         // Examine all states, starting from the marked ones and moving backwards...
-        LinkedList<State> statesToExamine = new LinkedList<State>();
+        final LinkedList<State> statesToExamine = new LinkedList<State>();
         Iterator<?> stateIterator = aut.stateIterator();
         State currState;
 
@@ -1771,7 +1775,7 @@ public class AutomataVerifier
                 // If we did a copy of theAutomata before we destroyed it we could display the trace...
                 if (!destructive && verificationOptions.showBadTrace())
                 {
-                    String trace = (original.getTrace(original.getStateWithName(currState.getName()))).toString();
+                    final String trace = (original.getTrace(original.getStateWithName(currState.getName()))).toString();
                     if (!trace.equals(""))
                     {
                         logger.info("Trace to blocking state: " + trace);
@@ -1793,6 +1797,51 @@ public class AutomataVerifier
     }
 
     /**
+     * Checks observer property using OP-search algorithm from Waters.
+     */
+    private boolean observerPropertyVerification()
+      throws AnalysisException
+    {
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
+      final AutomataToWaters importer = new AutomataToWaters(factory);
+      final AutomatonProxy aut;
+      switch (theAutomata.size()) {
+      case 0:
+        throw new IllegalStateException("No automata for OP check!");
+      case 1:
+        final Automaton first = theAutomata.iterator().next();
+        aut = importer.convertAutomaton(first);
+        break;
+      default:
+        final ProductDESProxy des = importer.convertAutomata(theAutomata);
+        final SynchronousProductBuilder sync =
+          new MonolithicSynchronousProductBuilder(des, factory);
+        final int limit = verificationOptions.getReachabilityStateLimit();
+        sync.setNodeLimit(limit);
+        sync.run();
+        aut = sync.getComputedAutomaton();
+        break;
+      }
+      final Collection<EventProxy> hidden = new ArrayList<EventProxy>(2);
+      final String tau = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
+      final String tau_c =
+        Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
+      final String tau_u =
+        Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
+      for (final EventProxy event : aut.getEvents()) {
+        final String name = event.getName();
+        if (name.equals(tau) || name.equals(tau_c) || name.equals(tau_u)) {
+          hidden.add(event);
+        }
+      }
+      final OPSearchAutomatonSimplifier simp =
+        new OPSearchAutomatonSimplifier(aut, hidden, factory);
+      simp.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
+      return simp.run();
+    }
+
+    /**
      * Displays info about the previous operation.
      */
     public void displayInfo()
@@ -1806,7 +1855,7 @@ public class AutomataVerifier
     /**
      * Assigns the verifier an ExecutionDialog.
      */
-    public void setExecutionDialog(ExecutionDialog executionDialog)
+    public void setExecutionDialog(final ExecutionDialog executionDialog)
     {
         this.executionDialog = executionDialog;
 
@@ -1854,7 +1903,7 @@ public class AutomataVerifier
     /**
      * Standard method for monolithic nonblocking verification on theAutomaton.
      */
-    public static boolean verifyMonolithicNonblocking(Automata automata)
+    public static boolean verifyMonolithicNonblocking(final Automata automata)
     throws Exception
     {
         SynchronizationOptions synchronizationOptions;
@@ -1864,7 +1913,7 @@ public class AutomataVerifier
         verificationOptions.setAlgorithmType(VerificationAlgorithm.MONOLITHIC);
         synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
-        AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, null);
+        final AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, null);
 
         return verifier.verify();
     }
@@ -1872,7 +1921,7 @@ public class AutomataVerifier
     /**
      * Standard method for compositional nonblocking verification on theAutomaton.
      */
-    public static boolean verifyCompositionalNonblocking(Automata automata)
+    public static boolean verifyCompositionalNonblocking(final Automata automata)
     throws Exception
     {
         VerificationOptions verificationOptions;
@@ -1885,7 +1934,7 @@ public class AutomataVerifier
         minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
         minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
 
-        AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, minimizationOptions);
+        final AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, minimizationOptions);
 
         return verifier.verify();
     }
@@ -1893,7 +1942,7 @@ public class AutomataVerifier
     /**
      * Standard method for performing compositional controllability verification on theAutomata.
      */
-    public static boolean verifyCompositionalControllability(Automata theAutomata)
+    public static boolean verifyCompositionalControllability(final Automata theAutomata)
     throws Exception
     {
         SynchronizationOptions synchronizationOptions;
@@ -1907,7 +1956,7 @@ public class AutomataVerifier
         minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
         minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
 
-        AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, minimizationOptions);
+        final AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, minimizationOptions);
 
         return verifier.verify();
     }
@@ -1915,7 +1964,7 @@ public class AutomataVerifier
     /**
      * Standard method for performing modular controllability verification on theAutomata.
      */
-    public static boolean verifyModularControllability(Automata theAutomata)
+    public static boolean verifyModularControllability(final Automata theAutomata)
     throws Exception
     {
         SynchronizationOptions synchronizationOptions;
@@ -1924,7 +1973,7 @@ public class AutomataVerifier
         synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
         verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
 
-        AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, null);
+        final AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, null);
 
         return verifier.verify();
     }
@@ -1937,7 +1986,7 @@ public class AutomataVerifier
      * @param automataB the automata that should include
      * @return true if "L(automataA)" is included in "L^-1(automataB)".
      */
-    public static boolean verifyModularInclusion(Automata automataA, Automata automataB)
+    public static boolean verifyModularInclusion(final Automata automataA, final Automata automataB)
     throws Exception
     {
         SynchronizationOptions synchronizationOptions;
@@ -1947,12 +1996,12 @@ public class AutomataVerifier
         verificationOptions.setInclusionAutomata(automataA);
         synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
-        Automata theAutomata = new Automata();
+        final Automata theAutomata = new Automata();
         theAutomata.addAutomata(automataA);
         theAutomata.addAutomata(automataB);
         //theAutomata.setIndicies();
 
-        AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, null);
+        final AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, null);
 
         return verifier.verify();
     }
