@@ -64,7 +64,12 @@ public final class EditorSynthesizerOptions
     private boolean maximallyPermissive;
     private boolean maximallyPermissiveIncremental;
     private boolean reduceSupervisors;
-    private boolean generateGuard;
+    private boolean printGuard;
+    private boolean addGuards;
+    private boolean saveInFile;
+    private boolean saveIDDInFile;
+    private boolean compHeuristic;
+    private boolean indpHeuristic;
     private boolean reachability;
     private boolean rememberDisabledUncontrollableEvents;
 
@@ -91,7 +96,9 @@ public final class EditorSynthesizerOptions
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
             Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
             Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get(),
-            Config.SYNTHESIS_GUARD.get(),
+            Config.SYNTHESIS_PRINT_GUARD.get(),
+            Config.SYNTHESIS_ADD_GUARDS.get(),
+            Config.SYNTHESIS_SAVE_IN_FILE.get(),
             Config.SYNTHESIS_REACHABILITY.get());
     }
 
@@ -103,7 +110,8 @@ public final class EditorSynthesizerOptions
      */
     private EditorSynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm,
     		boolean purge, boolean removeUnnecessarySupervisors, boolean maximallyPermissive,
-    		boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor, boolean generateGuard, boolean reachability)
+    		boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor, 
+                boolean computePrintGuard, boolean addGuards, boolean saveInFile, boolean reachability)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -113,7 +121,9 @@ public final class EditorSynthesizerOptions
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
         this.reduceSupervisors = reduceSupervisors;
         this.bddExtractSupervisor = bddExtractSupervisor;
-        this.generateGuard = generateGuard;
+        this.printGuard = computePrintGuard;
+        this.addGuards = addGuards;
+        this.saveInFile = saveInFile;
         this.reachability = reachability;
 
         this.event = "";
@@ -262,9 +272,65 @@ public final class EditorSynthesizerOptions
         return reduceSupervisors;
     }
 
-    public boolean getGenerateGuard()
+    public boolean getPrintGuard()
     {
-        return generateGuard;
+        return printGuard;
+    }
+
+    public void setPrintGuard(boolean bool)
+    {
+        printGuard = bool;
+    }
+    
+    public boolean getAddGuards()
+    {
+        return addGuards;
+    }
+
+    public void setAddGuards(boolean bool)
+    {
+        addGuards = bool;
+    }
+    
+    public boolean getSaveInFile()
+    {
+        return saveInFile;
+    }
+
+
+    public void setSaveInFile(boolean bool)
+    {
+        saveInFile = bool;
+    }
+
+    public void setSaveIDDInFile(boolean bool)
+    {
+        saveIDDInFile = bool;
+    }
+
+    public boolean getSaveIDDInFile()
+    {
+        return saveIDDInFile;
+    }
+
+    public void setCompHeuristic(boolean bool)
+    {
+        compHeuristic = bool;
+    }
+
+    public boolean getCompHeuristic()
+    {
+        return compHeuristic;
+    }
+
+    public void setIndpHeuristic(boolean bool)
+    {
+        indpHeuristic = bool;
+    }
+
+    public boolean getIndpHeuristic()
+    {
+        return indpHeuristic;
     }
 
     public boolean getReachability()
@@ -272,10 +338,6 @@ public final class EditorSynthesizerOptions
         return reachability;
     }
 
-    public void setGenerateGuard(boolean bool)
-    {
-        generateGuard = bool;
-    }
 
     public void setReachability(boolean bool)
     {
@@ -296,7 +358,12 @@ public final class EditorSynthesizerOptions
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
 //        Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
         Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
-        Config.SYNTHESIS_GUARD.set(generateGuard);
+        Config.SYNTHESIS_PRINT_GUARD.set(printGuard);
+        Config.SYNTHESIS_ADD_GUARDS.set(addGuards);
+        Config.SYNTHESIS_SAVE_IN_FILE.set(saveInFile);
+        Config.SYNTHESIS_SAVE_IDD_IN_FILE.set(saveIDDInFile);
+        Config.SYNTHESIS_COMPLEMENT_HEURISTIC.set(compHeuristic);
+        Config.SYNTHESIS_INDEPENDENT_HEURISTIC.set(indpHeuristic);
 
     }
 
@@ -305,7 +372,7 @@ public final class EditorSynthesizerOptions
      */
     public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.BDD, true, true, true, true, true, false,true,true);
+        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.BDD, true, true, true, true, true, false,true, true, false, true);
     }
 
     /**
@@ -318,8 +385,13 @@ public final class EditorSynthesizerOptions
         options.synthesisAlgorithm = SynthesisAlgorithm.BDD;
         options.removeUnnecessarySupervisors = false;
         options.reduceSupervisors = false;
-        options.generateGuard = true;
+        options.printGuard = true;
+        options.addGuards = true;
+        options.saveInFile = false;
         options.reachability = true;
+        options.saveIDDInFile = false;
+        options.compHeuristic = true;
+        options.indpHeuristic = true;
 
         options.setExpressionType(2);
 		options.setEvent("");

@@ -231,7 +231,7 @@ public class BDDExtendedManager
                 return ro.getResult();
             }
             else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getPlusOperator()))
-            {
+            {                
                 final BDDBitVector.ResultOverflows ro = expr2BDDBitVec(bexpr.getLeft(),false).
                         addConsideringOverflows(expr2BDDBitVec(bexpr.getRight(),false));
                 localOverflows = localOverflows.or(ro.getOverflows());
@@ -407,6 +407,7 @@ public class BDDExtendedManager
         if(guards != null && guards.size() > 0)
         {
             //Only the first guard should be considered. If there are more, it will just affcet the GUI.
+            localOverflows = factory.zero();
             guardBDD = guard2BDD(guards.get(0));
         }
 

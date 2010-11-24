@@ -255,7 +255,12 @@ public final class Config
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissive", true, "Synthesize a maximally permissive supervisor");
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissiveIncremental", true, "Use incremental algorithm when synthesizing");
     public static final BooleanProperty SYNTHESIS_REDUCE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisReduceSupervisors", false, "Try to minimize supervisors");
-    public static final BooleanProperty SYNTHESIS_GUARD = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "generateGuard", false, "Generate guards for the controllable events");
+    public static final BooleanProperty SYNTHESIS_PRINT_GUARD = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "generateGuard", false, "Generate guards for the controllable events");
+    public static final BooleanProperty SYNTHESIS_ADD_GUARDS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "addGuards", false, "Add the guards to the model");
+    public static final BooleanProperty SYNTHESIS_SAVE_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveInFile", false, "Save the guard-event pairs in a file");
+    public static final BooleanProperty SYNTHESIS_COMPLEMENT_HEURISTIC = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "complementHeuristic", true, "Apply the complement heuristic");
+    public static final BooleanProperty SYNTHESIS_INDEPENDENT_HEURISTIC = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "independentHeuristic", true, "Apply the independent heuristic");
+    public static final BooleanProperty SYNTHESIS_SAVE_IDD_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveIDDInFile", true, "Save the guard-event pairs as an IDD in a file");
     public static final BooleanProperty SYNTHESIS_REACHABILITY = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "reachability", false, "Remove the unreachable states");
 
     // ALGORITHMS_MINIMIZATION

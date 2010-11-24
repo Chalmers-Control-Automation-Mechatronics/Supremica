@@ -72,16 +72,18 @@ class EditorSynthesizerDialogStandardPanel
     private static final long serialVersionUID = 1L;
     private final SynthesisSelector typeSelector;
     private final AlgorithmSelector algorithmSelector;
-    private final JCheckBox purgeBox;
-    private final JCheckBox removeUnecessarySupBox;
     private final JCheckBox reachableBox;
     private final Box guardBox;
     private final Box genGuardComputeSupBox;
-    private final JRadioButton generateGuardButton;
-    private final JRadioButton computeSupervisorButton;
 
+    private final JCheckBox printGuardBox;
+    private final JCheckBox addGuardsBox;
+    private final JCheckBox saveEventGuardInFileBox;
+    private final JCheckBox saveIDDInFileBox;
 
-    private final NonblockNote nbNote;
+    private final JCheckBox complementHeuristicBox;
+    private final JCheckBox independentHeuristicBox;
+
 
     private final JRadioButton fromAllowedStatesButton;
     private final JRadioButton fromForbiddenStatesButton;
@@ -170,58 +172,30 @@ class EditorSynthesizerDialogStandardPanel
         }
     }
 
-    class NonblockNote
-        extends JTextArea
-    {
-        private static final long serialVersionUID = 1L;
-        private static final int transparent = 0;
-
-        public NonblockNote()
-        {
-            super("Note:\n" + "Modular nonblocking synthesis results in a\n" +
-                "compact representation of the monolithic\n" +
-                "supervisor that Supremica can not currently\n" +
-                "make use of.");
-
-            super.setBackground(new Color(0, 0, 0, transparent));
-        }
-    }
 
     public EditorSynthesizerDialogStandardPanel(final int num, final Vector<String> events)
     {
+
         algorithmSelector = AlgorithmSelector.create(num);
         algorithmSelector.addActionListener(this);
 
         typeSelector = SynthesisSelector.create();
         typeSelector.addActionListener(this);
 
-        purgeBox = new JCheckBox("Purge result");
-        purgeBox.setToolTipText("Remove all forbidden states");
-
-        removeUnecessarySupBox = new JCheckBox("Remove unnecessary supervisors");
-        removeUnecessarySupBox.setToolTipText("Remove supervisors that don't affect the controllability");
-
-        reachableBox = new JCheckBox("Remove the unreachable states");
-        reachableBox.setEnabled(true);
-        reachableBox.setVisible(true);
-
-        nbNote = new NonblockNote();
-
-        if (num == 1)
-        {
-            removeUnecessarySupBox.setEnabled(false);
-            nbNote.setVisible(false);
-        }
-
         // Create layout!
         final Box mainBox = Box.createVerticalBox();
+
+        JPanel supervisorPanel = new JPanel();
+	supervisorPanel.setBorder(BorderFactory.createTitledBorder("Supervisor"));
+        supervisorPanel.setLayout(new GridLayout(3, 1));
 
         JPanel panel = new JPanel();
         Box box = Box.createHorizontalBox();
         box.add(new JLabel("Property:"));
         box.add(typeSelector);
         panel.add(box);
-        mainBox.add(panel);
+        supervisorPanel.add(panel);
+//        mainBox.add(panel);
 
         panel = new JPanel();
         box = Box.createHorizontalBox();
@@ -230,46 +204,24 @@ class EditorSynthesizerDialogStandardPanel
         algorithmSelector.setEnabled(true);
         box.add(algorithmSelector);
         panel.add(box);
-        mainBox.add(panel);
+        supervisorPanel.add(panel);
+//        mainBox.add(panel);
 
         panel = new JPanel();
         box = Box.createHorizontalBox();
-        box.add(purgeBox);
-        box.add(removeUnecessarySupBox);
+        reachableBox = new JCheckBox("Remove the unreachable states");
+        reachableBox.setEnabled(true);
+        reachableBox.setVisible(true);
         box.add(reachableBox);
         reachableBox.addActionListener(this);
         panel.add(box);
-        mainBox.add(panel);
+        supervisorPanel.add(panel);
+//        mainBox.add(panel);
 
-        panel = new JPanel();
-        panel.add(nbNote);
-        mainBox.add(panel);
+        mainBox.add(supervisorPanel);
 
         // Add components
-        this.add(mainBox);
-
-        genGuardComputeSupBox = Box.createVerticalBox();
-
-        generateGuardButton = new JRadioButton("Compute supervisor and guards");
-        generateGuardButton.setToolTipText("Compute the supervisor and add the generated guards to the model.");
-
-        generateGuardButton.addActionListener(this);
-
-		computeSupervisorButton = new JRadioButton("Compute supervisor");
-		computeSupervisorButton.setToolTipText("Compute the supervisor without generating guards.");
-
-        computeSupervisorButton.addActionListener(this);
-        final ButtonGroup grupp = new ButtonGroup();
-        grupp.add(generateGuardButton);
-        grupp.add(computeSupervisorButton);
-
-        final JPanel genComPanel = new JPanel();
-        genComPanel.add(computeSupervisorButton);
-        genComPanel.add(generateGuardButton);
-
-        genGuardComputeSupBox.add(genComPanel);
-
-        this.add(genGuardComputeSupBox);
+        this.add(mainBox);        
 
         //Guard options
         guardBox = Box.createVerticalBox();
@@ -282,8 +234,8 @@ class EditorSynthesizerDialogStandardPanel
 
         optimalButton = new JRadioButton("Adaptive solution");
         optimalButton.setToolTipText("Generate the guard from the state set that yields the best result");
+        optimalButton.setSelected(true);
 
-        final JLabel event = new JLabel("Events");
 //		eventField = new JTextField(15);
 //		eventField.setToolTipText("The name of the desired event");
 
@@ -292,21 +244,72 @@ class EditorSynthesizerDialogStandardPanel
         group.add(fromForbiddenStatesButton);
         group.add(optimalButton);
 
+        complementHeuristicBox = new JCheckBox("Complement Heuristic");
+        complementHeuristicBox.setToolTipText("Apply the 'Complement Heuristic'.");
+        complementHeuristicBox.setEnabled(true);
+        complementHeuristicBox.setSelected(true);
+
+        independentHeuristicBox = new JCheckBox("Independent Heuristic");
+        independentHeuristicBox.setToolTipText("Apply the 'Independent Heuristic'.");
+        independentHeuristicBox.setEnabled(true);
+        independentHeuristicBox.setSelected(true);
+
         final JPanel expressionTypePanel = new JPanel();
-        expressionTypePanel.add(optimalButton);
-        expressionTypePanel.add(fromAllowedStatesButton);
-        expressionTypePanel.add(fromForbiddenStatesButton);
+        expressionTypePanel.setBorder(BorderFactory.createTitledBorder("Guard computation"));
+        expressionTypePanel.setLayout(new GridLayout(3, 1));
+        panel = new JPanel();
+        panel.add(optimalButton);
+        panel.add(fromAllowedStatesButton);
+        panel.add(fromForbiddenStatesButton);
+        expressionTypePanel.add(panel);
+        panel = new JPanel();
+        panel.add(complementHeuristicBox);
+        panel.add(independentHeuristicBox);
+        expressionTypePanel.add(panel);
 
         eventList = new JComboBox(events);
 
-        guardBox.add(expressionTypePanel);
-		guardBox.add(event);
-//        standardBox.add(eventField);
-        guardBox.add(eventList);
+        expressionTypePanel.add(eventList);
 
+        guardBox.add(expressionTypePanel);
         guardBox.setVisible(true);
 
         this.add(guardBox);
+
+        //Presentation options
+        genGuardComputeSupBox = Box.createVerticalBox();
+
+        printGuardBox = new JCheckBox("Print the guards");
+        printGuardBox.setToolTipText("Compute and print the guards.");
+
+        printGuardBox.addActionListener(this);
+
+        addGuardsBox = new JCheckBox("Add guards to the model");
+        addGuardsBox.setToolTipText("Compute and add the guards to the model.");
+
+        addGuardsBox.addActionListener(this);
+
+        saveEventGuardInFileBox = new JCheckBox("Save the result in a file");
+        saveEventGuardInFileBox.setToolTipText("Compute and write the event-guard pairs in a file.");
+
+        saveEventGuardInFileBox.addActionListener(this);
+
+        saveIDDInFileBox = new JCheckBox("Save the result as an IDD in a file");
+        saveIDDInFileBox.setToolTipText("For each event an IDD (expression graph) is generated representing the guard. The file is saved in .ps format.");
+
+        saveIDDInFileBox.addActionListener(this);
+
+        final JPanel representationPanel = new JPanel();
+        representationPanel.setBorder(BorderFactory.createTitledBorder("Guard representation"));
+        representationPanel.setLayout(new GridLayout(4, 1));
+        representationPanel.add(printGuardBox);
+        representationPanel.add(addGuardsBox);
+        representationPanel.add(saveEventGuardInFileBox);
+        representationPanel.add(saveIDDInFileBox);
+
+        genGuardComputeSupBox.add(representationPanel);
+
+        this.add(genGuardComputeSupBox);
 
         updatePanel();
     }
@@ -315,30 +318,19 @@ class EditorSynthesizerDialogStandardPanel
     {
         typeSelector.setType(synthesizerOptions.getSynthesisType());
         algorithmSelector.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
-        purgeBox.setSelected(synthesizerOptions.doPurge());
-        removeUnecessarySupBox.setSelected(synthesizerOptions.getRemoveUnecessarySupervisors());
-        generateGuardButton.setSelected(synthesizerOptions.getGenerateGuard());
+        printGuardBox.setSelected(synthesizerOptions.getPrintGuard());
         reachableBox.setSelected(synthesizerOptions.getReachability());
-        guardBox.setVisible(synthesizerOptions.getGenerateGuard());
-
-        if(synthesizerOptions.getExpressionType() == 0)
-        {
-            fromAllowedStatesButton.setSelected(false);
-            fromForbiddenStatesButton.setSelected(true);
-            optimalButton.setSelected(false);
-        }
-        else if(synthesizerOptions.getExpressionType() == 1)
-        {
-            fromAllowedStatesButton.setSelected(true);
-            fromForbiddenStatesButton.setSelected(false);
-            optimalButton.setSelected(false);
-        }
-        else if(synthesizerOptions.getExpressionType() == 2)
-        {
-            fromAllowedStatesButton.setSelected(false);
-            fromForbiddenStatesButton.setSelected(false);
-            optimalButton.setSelected(true);
-        }
+        
+/*
+        boolean selected = saveIDDInFileBox.isSelected() || saveEventGuardInFileBox.isSelected() || 
+                                addGuardsBox.isSelected() || printGuardBox.isSelected();
+        optimalButton.setEnabled(selected);
+        fromAllowedStatesButton.setEnabled(selected);
+        fromForbiddenStatesButton.setEnabled(selected);
+        eventList.setEnabled(selected);
+        complementHeuristicBox.setEnabled(selected);
+        independentHeuristicBox.setEnabled(selected);
+*/
     }
 
     public void updatePanel()
@@ -390,10 +382,13 @@ class EditorSynthesizerDialogStandardPanel
     {
         synthesizerOptions.setSynthesisType(typeSelector.getType());
         synthesizerOptions.setSynthesisAlgorithm(algorithmSelector.getAlgorithm());
-        synthesizerOptions.setPurge(purgeBox.isSelected());
-        synthesizerOptions.setRemoveUnecessarySupervisors(removeUnecessarySupBox.isSelected());
-        synthesizerOptions.setGenerateGuard(generateGuardButton.isSelected());
+        synthesizerOptions.setPrintGuard(printGuardBox.isSelected());
+        synthesizerOptions.setAddGuards(addGuardsBox.isSelected());
+        synthesizerOptions.setSaveInFile(saveEventGuardInFileBox.isSelected());
+        synthesizerOptions.setSaveIDDInFile(saveIDDInFileBox.isSelected());
         synthesizerOptions.setReachability(reachableBox.isSelected());
+        synthesizerOptions.setCompHeuristic(complementHeuristicBox.isSelected());
+        synthesizerOptions.setIndpHeuristic(independentHeuristicBox.isSelected());
 
         if(fromForbiddenStatesButton.isSelected())
         {
@@ -416,36 +411,31 @@ class EditorSynthesizerDialogStandardPanel
 
     public void actionPerformed(final ActionEvent e)
     {
-        //X stands for "Should be setEnabled but setEnabled does not work as it should(?)."
-
         // Default
-        purgeBox.setVisible(false); //X
-        removeUnecessarySupBox.setVisible(false); //X
-        guardBox.setVisible(true);
-        nbNote.setVisible(false);
 
         if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC)
         {
-            removeUnecessarySupBox.setVisible(false); //X
+           ;// Will be completed later
         }
         else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL)
         {
-            removeUnecessarySupBox.setVisible(false); //X
-            purgeBox.setVisible(false); //X
+            ;// Will be completed later
         }
         else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR)
         {
-            if ((typeSelector.getType() == SynthesisType.NONBLOCKING) ||
-                (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
-            {
-                purgeBox.setVisible(false); //X
-                removeUnecessarySupBox.setVisible(false); //X
-                nbNote.setVisible(true);
-            }
+            ;// Will be completed later
         }
 
-        guardBox.setVisible(generateGuardButton.isSelected());
-
+/*
+        boolean selected = saveIDDInFileBox.isSelected() || saveEventGuardInFileBox.isSelected() ||
+                                addGuardsBox.isSelected() || printGuardBox.isSelected();
+        optimalButton.setEnabled(selected);
+        fromAllowedStatesButton.setEnabled(selected);
+        fromForbiddenStatesButton.setEnabled(selected);
+        eventList.setEnabled(selected);
+        complementHeuristicBox.setEnabled(selected);
+        independentHeuristicBox.setEnabled(selected);
+*/
         updatePanel();
     }
 }
@@ -470,20 +460,19 @@ public class EditorSynthesizerDialog
         dialog = new JDialog(parentFrame, true);    // modal
         this.parentFrame = parentFrame;
         this.synthesizerOptions = synthesizerOptions;
-        synthesizerOptions.setGenerateGuard(true);
+        synthesizerOptions.setPrintGuard(true);
         synthesizerOptions.setReachability(true);
 
         dialog.setTitle("Synthesizer options");
-        dialog.setSize(new Dimension(400, 330));
+        dialog.setSize(new Dimension(420, 450));
 
         final Container contentPane = dialog.getContentPane();
 
         standardPanel = new EditorSynthesizerDialogStandardPanel(numSelected, events);
 
-        final JTabbedPane tabbedPane = new JTabbedPane();
+//        final JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
-//        tabbedPane.addTab("Guard options", null, guardPanel, "Guard options");
+//        tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
 
         // buttonPanel
         final JPanel buttonPanel = new JPanel();
@@ -491,7 +480,7 @@ public class EditorSynthesizerDialog
         okButton = addButton(buttonPanel, "OK");
         cancelButton = addButton(buttonPanel, "Cancel");
 
-        contentPane.add("Center", tabbedPane);
+        contentPane.add("Center", standardPanel);
         contentPane.add("South", buttonPanel);
         Utility.setDefaultButton(dialog, okButton);
 

@@ -1,5 +1,6 @@
 package org.supremica.automata.BDD.EFA;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -115,21 +116,6 @@ public class BDDExtendedSynthesizer {
     public void generateGuard(Vector<String> eventNames, final EditorSynthesizerOptions options)
     {
         eventNames.remove(0);
-        String expressionType = "";
-        switch(options.getExpressionType())
-        {
-            case(0):
-                expressionType = "Forbidden";
-            break;
-
-            case(1):
-                expressionType = "Allowed";
-            break;
-
-            case(2):
-                expressionType = "Adaptive";
-            break;
-        }
         if(!options.getEvent().equals(""))
         {
             eventNames = new Vector<String>();
@@ -148,55 +134,11 @@ public class BDDExtendedSynthesizer {
         while(it.hasNext())
         {
             final String sigmaName = it.next();
-            bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options.getExpressionType());
-            String TF =bddgg.getGuard();
-            if(TF.equals("1"))
-                TF = "This event is always ENABLED by the supervisor.";
-            if(TF.equals("0"))
-                TF = "This event is always DISABLED by the supervisor.";
-
-            logger.info(expressionType+" guard for event "+sigmaName+": "+TF);
-
-            if(!bddgg.getGuard().equals("1") && !bddgg.getGuard().equals("0"))
-                logger.info("Number of terms in the expression: "+bddgg.getNbrOfTerms());
-//                    try
-//                    {
-//                        out.write(sigmaS.getName()+"\t"+bddgg.getBDDSize()+"\t"+bddgg.getNbrOfTerms()+"\t"+bddgg.getRunTime());
-//                        out.newLine();
-//                    }
-//                    catch (IOException e) {}
-
+            bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options);
             event2guard.put(sigmaName, bddgg);
         }
         guardTimer.stop();
-/*
-        String expressionSample = " w==1 & (x==1 | (y==1 | z==2)) & x==0 & (y==1 | z==1)";
-//        String expressionSample = "w==1 & (x==1 | (y==1 & z==2))";
-        SimpleExpressionProxy sep = null;
-        try {
-            sep = (SimpleExpressionSubject)(parser.parse(expressionSample,Operator.TYPE_BOOLEAN));
-        }catch(ParseException pe){}
-
-        System.out.println("Expression to be reduced: "+expressionSample);
-        System.out.println("Reduced expression: "+reduceExpr(sep));
-*/
-/*        HashSet<String> testSet = new HashSet<String>();
-        testSet.add("12");
-        testSet.add("1");
-        testSet.add("4");
-        testSet.add("2");
-        testSet.add("13");
-        testSet.add("11");
-        System.out.println(bddAutomata.getBDDManager().isIncrementalSeq(testSet));
-*/
-
-//        try
-//        {
-//            out.newLine();
-//            out.write("Total time of generating guards for all events: "+totalGuardGenTime+" ms");
-//            out.close();
-//        }
-//        catch (IOException e) {}
+        
     }
 
     public void addGuardsToAutomata(final ModuleSubject module)
@@ -213,7 +155,6 @@ public class BDDExtendedSynthesizer {
                     SimpleExpressionSubject ses = null;
                     SimpleExpressionSubject ses1 = null;
                     SimpleExpressionSubject ses2 = null;
-                    //&& simSubj.getKind().name().equals("SPEC")
 
                     final String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
                     currBDDGG = event2guard.get(currEvent);
@@ -228,7 +169,7 @@ public class BDDExtendedSynthesizer {
                             if(!ep.getGuardActionBlock().getGuardsModifiable().isEmpty())
                             {
                                 ses1 = ep.getGuardActionBlock().getGuardsModifiable().iterator().next().clone();
-                                currGuard = ses1.toString()+" & ";
+                                currGuard = "("+ses1.toString()+")"+" & ";
                             }
                             ses = (SimpleExpressionSubject)(parser.parse(currGuard+guard,Operator.TYPE_BOOLEAN));
                             //The following line cocerns the new guards that will be attached to the automata with a DIFFERENT COLOR!
@@ -262,84 +203,10 @@ public class BDDExtendedSynthesizer {
         }
     }
 
-    @SuppressWarnings("unused")
-    private String reduceExpr(final SimpleExpressionProxy sep)
+    public HashMap<String,BDDExtendedGuardGenerator> getEventGuardMap()
     {
-        if(sep instanceof  BinaryExpressionProxy)
-        {
-            final BinaryExpressionProxy bep = (BinaryExpressionProxy)sep;
-            final BinaryOperator rootOperator = bep.getOperator();
-            final String[] rp = new String[1]; // Since rp is going to passed by reference to findSeqExpr, it is put in an array
-            rp[0]="";
-            final String sequence = findSeqExpr(sep, rootOperator,rp);
-            logger.info("sequnce: "+sequence);
-            SimpleExpressionProxy remainPart = null;
-            if(rp[0].length()>0)
-            {
-                rp[0] = rp[0].substring(0,rp[0].length()-1);// remove the redundant operator that is attached to the end
-//                logger.info(rp[0]);
-                try {
-                    remainPart = parser.parse(rp[0],Operator.TYPE_BOOLEAN);
-                }catch(final ParseException pe){}
-
-                if(sequence.trim().length()>0)
-                {
-                    return reduceExpr(remainPart)+rootOperator+findInterval(sequence);
-                }
-                else
-                {
-                    return (reduceExpr(bep.getLeft())+rootOperator+reduceExpr(bep.getRight()));
-                }
-
-            }
-            else
-            {
-                return findInterval(sequence);
-            }
-        }
-        else
-            return sep.toString();
+        return event2guard;
     }
-
-    private String findInterval(final String elements)
-    {
-        if(elements.length()>0)
-            return elements.charAt(0)+" >= 0";
-        else
-            return "";
-    }
-
-    private String findSeqExpr(final SimpleExpressionProxy sep, final Operator rootOperator,final String[] remainingPart)
-    {
-//        logger.info("in fin...: "+sep.toString());
-        if(sep instanceof BinaryExpressionProxy)
-        {
-            final BinaryExpressionProxy bep =(BinaryExpressionProxy)sep;
-            final BinaryOperator operator = (bep).getOperator();
-
-            if (bddAutomata.getBDDManager().isOpEqRel(operator))
-                return (bep.toString());
-            if(operator.equals(rootOperator))
-            {
-                return findSeqExpr(bep.getLeft(),rootOperator,remainingPart)+ " "+findSeqExpr(bep.getRight(),rootOperator,remainingPart);
-            }
-            else
-            {
-                remainingPart[0] += "("+(bep.toString()+")"+rootOperator);
-                return "";
-            }
-        }
-        else if(sep instanceof UnaryExpressionProxy)
-        {
-            //Not implemented yet. A solution could be to consider the NOT operator in the expression and then call findSeqEpr.
-        }
-        else
-            return sep.toString();
-
-        return "-1";
-    }
-
-
 
     public void done()
     {

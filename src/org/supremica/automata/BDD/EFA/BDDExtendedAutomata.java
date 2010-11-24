@@ -570,9 +570,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             {
                 markedVals.orWith(manager.guard2BDD(vmp.getPredicate()));
             }
-
-            if(!markedVals.isZero())
-                markedValuesBDD.andWith(markedVals);
+            if(theIndexMap.getMarkedPredicatesofVar(var.getName()).size() == 0)
+                markedVals = manager.getOneBDD();
+            
+            markedValuesBDD.andWith(markedVals);
         }
     }
 
@@ -697,7 +698,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     public double nbrOfStatesBDD(BDD bdd)
     {
         return bdd.satCount(sourceStateVariables);
-//        return bdd.satCount(sourceVariablesVarSet);
     }
 
     public BDDExtendedAutomaton getBDDExAutomaton(String autName)

@@ -182,7 +182,6 @@ public class BDDExtendedAutomaton {
             final String eventName = ((SimpleIdentifierSubject)eventIterator.next()).getName();
             final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
 
-
             // Add all states that could be reach by only unobservable events including the destState
             for (final NodeProxy epsilonState : epsilonClosure(destLocation,true))
             {
@@ -225,10 +224,8 @@ public class BDDExtendedAutomaton {
 
             bddIndex2SourceStateName.put(bddIndex,sourceLocation.getName());
         }
-
-        manager.addEdge(edgeForwardBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions,
+	manager.addEdge(edgeForwardBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions,
                 sourceLocation.getName(), destLocation.getName());
-//        BDDExtendedManager.addEdge(edgeBackwardBDD, bddExAutomata.getBackwardTransWhereVisUpdated(this), bddExAutomata.getBackwardTransAndNextValsForV(this), destLocationIndex, sourceLocationDomain, sourceLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions, bddExAutomata.BDDBitVecTargetVarsMap, bddExAutomata.BDDBitVecSourceVarsMap,bddExAutomata.orgExAutomata.getMinMaxValMap());
     }
 
     public BDD getForbiddenStateSet()
