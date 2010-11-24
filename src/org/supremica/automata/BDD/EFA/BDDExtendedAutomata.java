@@ -2,7 +2,7 @@ package org.supremica.automata.BDD.EFA;
 
 /**
  *
- * @author sajed
+ * @author Sajed Miremadi
  */
 
 import java.util.*;
@@ -109,8 +109,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     double nbrOfNonblockingControllableStates = -1;
     double nbrOfControllableStates = -1;
 
-    HashMap<String,BDDBitVector> BDDBitVecSourceVarsMap;
-    HashMap<String,BDDBitVector> BDDBitVecTargetVarsMap;
+    HashMap<String,SupremicaBDDBitVector> BDDBitVecSourceVarsMap;
+    HashMap<String,SupremicaBDDBitVector> BDDBitVecTargetVarsMap;
 
     BDD initValuesBDD = null;
     BDD markedValuesBDD = null;
@@ -138,8 +138,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             theExAutomata.add(theIndexMap.getExAutomatonWithName(automaton.getName()));
         }
 
-        BDDBitVecSourceVarsMap = new HashMap<String, BDDBitVector>(orgExAutomata.getVars().size());
-        BDDBitVecTargetVarsMap = new HashMap<String, BDDBitVector>(orgExAutomata.getVars().size());
+        BDDBitVecSourceVarsMap = new HashMap<String, SupremicaBDDBitVector>(orgExAutomata.getVars().size());
+        BDDBitVecTargetVarsMap = new HashMap<String, SupremicaBDDBitVector>(orgExAutomata.getVars().size());
         varNames = new HashSet<String>(orgExAutomata.getVars().size());
 
         manager = new BDDExtendedManager();
@@ -270,12 +270,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             }
 
 //            System.out.println("sourceVar variables: "+sourceVarDomain.set().toString());
-            BDDBitVecSourceVarsMap.put(var.getName(), manager.getFactory().buildVector(sourceVarDomain));
+            BDDBitVecSourceVarsMap.put(var.getName(), new SupremicaBDDBitVector(manager.getFactory(),sourceVarDomain));
             sourceVariablesVarSet.unionWith(sourceVarDomain.set());
 
             BDDDomain destVarDomain = manager.createDomain(orgExAutomata.getDomain());
 //            System.out.println("destVar variables: "+destVarDomain.set().toString());
-            BDDBitVecTargetVarsMap.put(var.getName(), manager.getFactory().buildVector(destVarDomain));
+            BDDBitVecTargetVarsMap.put(var.getName(), new SupremicaBDDBitVector(manager.getFactory(),destVarDomain));
             destVariablesVarSet.unionWith(destVarDomain.set());
 
             sourceVarDomains[varIndex] = sourceVarDomain;
@@ -424,22 +424,22 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         return destStateVariables;
     }
 
-    public BDDBitVector getBDDBitVecSource(String name)
+    public SupremicaBDDBitVector getBDDBitVecSource(String name)
     {
         return BDDBitVecSourceVarsMap.get(name);
     }
 
-    public BDDBitVector getBDDBitVecTarget(String name)
+    public SupremicaBDDBitVector getBDDBitVecTarget(String name)
     {
         return BDDBitVecTargetVarsMap.get(name);
     }
 
-    public HashMap<String, BDDBitVector> getBDDBitVecSourceMap()
+    public HashMap<String, SupremicaBDDBitVector> getBDDBitVecSourceMap()
     {
         return BDDBitVecSourceVarsMap;
     }
 
-    public HashMap<String, BDDBitVector> getBDDBitVecTargetMap()
+    public HashMap<String, SupremicaBDDBitVector> getBDDBitVecTargetMap()
     {
         return BDDBitVecTargetVarsMap;
     }
@@ -577,19 +577,19 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
     }
 
-    public BDDBitVector getMaxBDDBitVecOf(String variable)
+    public SupremicaBDDBitVector getMaxBDDBitVecOf(String variable)
     {
-        return manager.getFactory().constantVector(constantDomain.varNum(), orgExAutomata.getMaxValueofVar(variable));
+        return new SupremicaBDDBitVector(manager.getFactory(),constantDomain.varNum(),orgExAutomata.getMaxValueofVar(variable));
     }
 
-    public BDDBitVector getMinBDDBitVecOf(String variable)
+    public SupremicaBDDBitVector getMinBDDBitVecOf(String variable)
     {
-        return manager.getFactory().constantVector(constantDomain.varNum(),orgExAutomata.getMinValueofVar(variable));
+        return new SupremicaBDDBitVector(manager.getFactory(),constantDomain.varNum(),orgExAutomata.getMinValueofVar(variable));
     }
 
     public BDD getConstantBDD(String varName, int cons)
     {
-        BDDBitVector c = manager.getFactory().constantVector(constantDomain.varNum(),cons);
+        SupremicaBDDBitVector c = new SupremicaBDDBitVector(manager.getFactory(),constantDomain.varNum(),cons);
 
         BDD result = manager.getOneBDD();
         for(int i=0;i<c.size();i++)

@@ -17,7 +17,7 @@ import net.sf.javabdd.BDDFactory;
  * @version $Id$
  */
 
-public class SupremicaBDDBitVector {
+public class SupremicaBDDBitVector{
 
     private BDD[] bitvec;
     private final int signBitIndex;
