@@ -50,6 +50,20 @@ public class BDDPackageTest extends AbstractWatersTest
     testBDDPackage(BDDPackage.BUDDY);
   }
 
+  public void testBDDPackage_buddy_after_jdd()
+    throws SecurityException, NoSuchMethodException
+  {
+    System.loadLibrary("jdd");
+    testBDDPackage(BDDPackage.BUDDY);
+  }
+
+  public void testBDDPackage_buddy_before_jdd()
+    throws SecurityException, NoSuchMethodException
+  {
+    testBDDPackage(BDDPackage.BUDDY);
+    System.loadLibrary("jdd");
+  }
+
   public void testBDDPackage_cudd()
     throws SecurityException, NoSuchMethodException
   {

@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 
 public enum ModelVerifierFactoryLoader
 {
+  BDD("net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory"),
   Compositional("net.sourceforge.waters.analysis.gnonblocking.ComposingModelVerifierFactory"),
   Modular("net.sourceforge.waters.analysis.modular.ModularModelVerifierFactory"),
   Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory"),

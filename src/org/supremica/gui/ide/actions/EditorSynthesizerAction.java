@@ -10,13 +10,9 @@
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -119,7 +115,7 @@ public class EditorSynthesizerAction
                 final int returnVal = chooser.showOpenDialog(ide.getFrame());
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
-                    String path = chooser.getSelectedFile().getAbsolutePath();
+                    final String path = chooser.getSelectedFile().getAbsolutePath();
                     Config.FILE_SAVE_PATH.set(path);
                     if(!isGuardsComputed)
                     {
@@ -131,8 +127,8 @@ public class EditorSynthesizerAction
                         String name = module.getName();
                         if(name.isEmpty())
                             name = "guard_event_list";
-                        
-                        File file = new File(path+"/"+name+".xls");
+
+                        final File file = new File(path+"/"+name+".xls");
                         try
                         {
                             final FileWriter fstream = new FileWriter(file);
@@ -140,10 +136,10 @@ public class EditorSynthesizerAction
                             out.write("Event" + "\t" + "Guard size" +"\t"+"# Complement Heuristic was applied"+"\t"+"# Independent Heuristic was applied"+"\t"+"Guard expression");
                             out.newLine();
                             out.newLine();
-                            HashMap<String,BDDExtendedGuardGenerator> event2guard = bddSynthesizer.getEventGuardMap();
-                            for(String event:event2guard.keySet())
+                            final HashMap<String,BDDExtendedGuardGenerator> event2guard = bddSynthesizer.getEventGuardMap();
+                            for(final String event:event2guard.keySet())
                             {
-                                BDDExtendedGuardGenerator bddegg = event2guard.get(event);
+                                final BDDExtendedGuardGenerator bddegg = event2guard.get(event);
                                 out.write(event + "\t" + bddegg.getNbrOfTerms() +"\t"+ bddegg.getNbrOfCompHeuris()+"\t"+bddegg.getNbrOfIndpHeuris()+"\t"+bddegg.getGuard());
                                 out.newLine();
                                 out.newLine();
@@ -182,10 +178,10 @@ public class EditorSynthesizerAction
                     bddSynthesizer.generateGuard(eventNames, options);
                     isGuardsComputed = true;
                 }
-                HashMap<String,BDDExtendedGuardGenerator> event2guard = bddSynthesizer.getEventGuardMap();
-                for(String event:event2guard.keySet())
+                final HashMap<String,BDDExtendedGuardGenerator> event2guard = bddSynthesizer.getEventGuardMap();
+                for(final String event:event2guard.keySet())
                 {
-                    BDDExtendedGuardGenerator bddgg = event2guard.get(event);
+                    final BDDExtendedGuardGenerator bddgg = event2guard.get(event);
                     String TF =bddgg.getGuard();
                     if(TF.equals("True"))
                         TF = "This event is always ENABLED by the supervisor.";
@@ -208,7 +204,7 @@ public class EditorSynthesizerAction
                     isGuardsComputed = true;
                 }
                 bddSynthesizer.addGuardsToAutomata(module);
-            }           
+            }
         }
         else if(options.getAddGuards() || options.getSaveIDDInFile() || options.getSaveInFile() || options.getPrintGuard())
             logger.info("No guards can be generated when there does not exist any supervisor.");

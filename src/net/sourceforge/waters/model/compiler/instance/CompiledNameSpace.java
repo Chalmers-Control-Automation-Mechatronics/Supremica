@@ -407,13 +407,17 @@ class CompiledNameSpace
       throws VisitorException
     {
       try {
-	final IdentifierProxy base = ident.getBaseIdentifier();
-	mNameSpace =
-	  NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, mThrowing);
-	final IdentifierProxy comp = ident.getComponentIdentifier();
-	return (IdentifiedProxy) comp.acceptVisitor(this);
+        final IdentifierProxy base = ident.getBaseIdentifier();
+        final CompiledNameSpace namespace =
+          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, mThrowing);
+        if (namespace == null) {
+          return null;
+        }
+        mNameSpace = namespace;
+        final IdentifierProxy comp = ident.getComponentIdentifier();
+        return (IdentifiedProxy) comp.acceptVisitor(this);
       } catch (final EvalException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 

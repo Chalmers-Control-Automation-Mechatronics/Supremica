@@ -1,27 +1,25 @@
 package org.supremica.automata.algorithms.Guard;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- *
  * @author Sajed Miremadi
  */
+
 public class IDD {
 
     static int nodeID = -1;
 
     private IDDNode root;
-    private ArrayList<IDD> children;
-    private ArrayList<IDD> parents;
-    private ArrayList<ArrayList<String>> labels;
+    private final ArrayList<IDD> children;
+    private final ArrayList<IDD> parents;
+    private final ArrayList<ArrayList<String>> labels;
 
     private boolean visitedDuringCounting = false;
     private boolean oneTerminalIDD = false;
     private boolean zeroTerminalIDD = false;
 
-    public IDD(IDDNode root, ArrayList<IDD> children, ArrayList<ArrayList<String>> labels)
+    public IDD(final IDDNode root, final ArrayList<IDD> children, final ArrayList<ArrayList<String>> labels)
     {
         if(root.getID().equals("1"))
             oneTerminalIDD = true;
@@ -34,13 +32,13 @@ public class IDD {
         this.labels = labels;
         this.parents = new ArrayList<IDD>();
         if(children.size() > 0)
-            for(IDD iddChild:children)
+            for(final IDD iddChild:children)
             {
                 iddChild.parents.add(this);
             }
     }
 
-    public IDD(IDDNode root)
+    public IDD(final IDDNode root)
     {
         this(root, new ArrayList<IDD>(),new ArrayList<ArrayList<String>>());
     }
@@ -55,10 +53,10 @@ public class IDD {
         return zeroTerminalIDD;
     }
 
-    public int indexOfChildWithRoot(IDDNode node)
+    public int indexOfChildWithRoot(final IDDNode node)
     {
         int index = -1;
-        for(IDD child:children)
+        for(final IDD child:children)
         {
             if(child.getRoot().getID().equals(node.getID()))
             {
@@ -80,7 +78,7 @@ public class IDD {
 //        System.out.println("node: "+root.getName());
         int nbr = 1;
         visitedDuringCounting = true;
-        for(IDD child:children)
+        for(final IDD child:children)
         {
             if(!child.isVisitedDuringCounting())
             {
@@ -88,11 +86,11 @@ public class IDD {
 //                System.out.println(labelOfChild(child));
             }
         }
-        
+
         return nbr;
     }
 
-    public void addChild(IDD iddChild, ArrayList<String> label)
+    public void addChild(final IDD iddChild, final ArrayList<String> label)
     {
         iddChild.parents.add(this);
         children.add(iddChild);
@@ -104,7 +102,7 @@ public class IDD {
         return parents;
     }
 
-    public ArrayList<String> labelOfChild(IDD child)
+    public ArrayList<String> labelOfChild(final IDD child)
     {
         if(labels.size() > 0 && children.contains(child))
             return labels.get(children.indexOf(child));
@@ -121,7 +119,7 @@ public class IDD {
     {
         return root;
     }
-    
+
     public ArrayList<IDD> getChildren()
     {
         return children;
@@ -132,7 +130,7 @@ public class IDD {
         return children.size();
     }
 
-    public IDD getIthChild(int i)
+    public IDD getIthChild(final int i)
     {
         return children.get(i);
     }

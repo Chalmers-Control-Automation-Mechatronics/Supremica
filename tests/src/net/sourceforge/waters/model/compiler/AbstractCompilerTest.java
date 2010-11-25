@@ -452,6 +452,13 @@ public abstract class AbstractCompilerTest
                  EventKindException.class, "'start2'");
   }
 
+  public void testCompile_error7_small()
+    throws IOException, WatersException
+  {
+    compileError("handwritten", "error7_small", null,
+                 UndefinedIdentifierException.class, "'curr'");
+  }
+
   public void testCompile_markus1()
     throws IOException, WatersException
   {

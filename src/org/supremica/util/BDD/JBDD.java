@@ -47,25 +47,23 @@ class JBDD
 {
 	static
 	{
-		String lib = (Options.use_cudd)
-					 ? "cudd"
-					 : "buddy";
+		final String lib = "jdd";
 
 		try
 		{
 			System.loadLibrary(lib);
 		}
-		catch (UnsatisfiedLinkError ule)
+		catch (final UnsatisfiedLinkError ule)
 		{
 			System.err.println("DLL " + lib + " not in the path, trying user supplied directory");
 
 			try
 			{
-				java.io.File f = new java.io.File(Options.extraLibPath, System.mapLibraryName(lib));
+				final java.io.File f = new java.io.File(Options.extraLibPath, System.mapLibraryName(lib));
 
 				System.load(f.getAbsolutePath());
 			}
-			catch (UnsatisfiedLinkError ule2)
+			catch (final UnsatisfiedLinkError ule2)
 			{
 				System.err.println("Unable to load the DLL: " + ule2);
 				System.err.println("If you are using linux, this may be a GCC 3.x vs GCC 2.x issue :(");
@@ -95,11 +93,11 @@ class JBDD
 		this(DEFAULT_VAR_COUNT, DEFAULT_NODE_COUNT);
 	}
 
-	/** 
+	/**
 	 * Create the BDD object using the default node count and the given number of variables
-	 * @param vars maximum number of BDD variables to be used 
+	 * @param vars maximum number of BDD variables to be used
 	 */
-	public JBDD(int vars)
+	public JBDD(final int vars)
 	{
 		this(vars, DEFAULT_NODE_COUNT);
 	}
@@ -116,7 +114,7 @@ class JBDD
 		</pre>
 
 	*/
-	public JBDD(int vars, int nodes)
+	public JBDD(final int vars, final int nodes)
 	{
 		init(vars, nodes);
 
@@ -132,7 +130,7 @@ class JBDD
 		@return BDD for constant 0 */
 	public native int getZero();
 
-	/** 
+	/**
 	 * create a new BDD variable
 	 * @return new BDD variable
 	 */
@@ -447,13 +445,13 @@ class JBDD
 	public native void reorder_createVariableGroup(int first, int last, boolean fix_group);
 
 	// TEST BED
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
-		JBDD jbdd = new JBDD(10, 1);
-		int v1 = jbdd.createBDD();
-		int v2 = jbdd.createBDD();
-		int v3 = jbdd.createBDD();
-		int v4 = jbdd.createBDD();
+		final JBDD jbdd = new JBDD(10, 1);
+		final int v1 = jbdd.createBDD();
+		final int v2 = jbdd.createBDD();
+		final int v3 = jbdd.createBDD();
+		final int v4 = jbdd.createBDD();
 
 		Options.out.println("v1.refs = " + jbdd.internal_refcount(v1));
 		jbdd.ref(v1);
@@ -471,8 +469,8 @@ class JBDD
 		jbdd.gc();
 		jbdd.checkPackage();
 
-		int v1andv2 = jbdd.and(v1, v2);
-		int v1orv2 = jbdd.or(v1, v2);
+		final int v1andv2 = jbdd.and(v1, v2);
+		final int v1orv2 = jbdd.or(v1, v2);
 
 		Options.out.print("v1 & v2 = ");
 		jbdd.printSet(v1andv2);
@@ -481,12 +479,12 @@ class JBDD
 		jbdd.gc();
 		jbdd.checkPackage();
 
-		int[] set = new int[2];
+		final int[] set = new int[2];
 
 		set[0] = v1;
 		set[1] = 1;
 
-		int x = jbdd.makeSet(set, 2);
+		final int x = jbdd.makeSet(set, 2);
 
 		Options.out.print("X = ");
 		jbdd.printSet(x);

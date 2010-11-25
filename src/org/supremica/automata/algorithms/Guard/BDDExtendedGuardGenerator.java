@@ -10,7 +10,6 @@
 package org.supremica.automata.algorithms.Guard;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
 import java.util.ArrayList;
@@ -76,7 +75,7 @@ public class BDDExtendedGuardGenerator {
 
 
     /** Creates a new instance of BDDExtendedGuardGenerator */
-    public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata, final String eventLabel, final BDD states, EditorSynthesizerOptions options) {
+    public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata, final String eventLabel, final BDD states, final EditorSynthesizerOptions options) {
         theAutomata = bddAutomata.getExtendedAutomata();
         automataBDD = bddAutomata;
         manager = automataBDD.getBDDManager();
@@ -131,8 +130,8 @@ public class BDDExtendedGuardGenerator {
             allowedForbidden = true;
             final String allowedGuard = generateGuard(mustAllowedStatesBDD);
             final int minNbrOfTerms = nbrOfTerms;
-            int nbrOfCompHeurs = this.nbrOfCompHeurs;
-            int nbrOfIndpHeurs = this.nbrOfIndpHeurs;
+            final int nbrOfCompHeurs = this.nbrOfCompHeurs;
+            final int nbrOfIndpHeurs = this.nbrOfIndpHeurs;
 
             allowedForbidden = false;
             final String forbiddenGuard = generateGuard(mustForbiddenStatesBDD);
@@ -379,29 +378,29 @@ public class BDDExtendedGuardGenerator {
 
                 if(generateIDD_PS)
                     BDD2IDD2PS(goodBDD, fileName);
-                
+
                 guard = generateExpression(goodIDD);
             }
         }
 
         return guard;
     }
-    
+
    public IDD generateIDD(final BDD bdd)
-    {   
-        HashMap<Integer, IDD> visitedNodes = new HashMap<Integer, IDD>();
+    {
+        final HashMap<Integer, IDD> visitedNodes = new HashMap<Integer, IDD>();
         visitedNodes.put(1, new IDD(new IDDNode("1", "1")));
         IDD idd = null;
         if(bdd.isZero())
             idd = new IDD(new IDDNode("0","0"));
-        
+
         if(bdd.isOne())
             idd = new IDD(new IDDNode("1","1"));
-        
+
         if(bdd.nodeCount() > 0)
         {
             final IDDNode root = new IDDNode(""+bdd.hashCode(),automataBDD.getAutVarName(bdd.var()));
-            idd = new IDD(root);            
+            idd = new IDD(root);
             final BDD varBDD = automataBDD.getBDDforSourceBDDVar(bdd.var());
 
             BDD2IDD(bdd.low(), varBDD.not(), idd, visitedNodes);
@@ -411,7 +410,7 @@ public class BDDExtendedGuardGenerator {
         return idd;
     }
 
-    public void BDD2IDD(final BDD bdd, final BDD autStatesBDD, IDD idd, HashMap<Integer, IDD> visitedNodes)
+    public void BDD2IDD(final BDD bdd, final BDD autStatesBDD, final IDD idd, final HashMap<Integer, IDD> visitedNodes)
     {
         if(!bdd.isZero())
         {
@@ -424,7 +423,7 @@ public class BDDExtendedGuardGenerator {
                 //if node has not been visited
                 if(nextIDD == null)
                 {
-                    IDDNode node = new IDDNode(""+bdd.hashCode(),automataBDD.getAutVarName(bdd.var()));
+                    final IDDNode node = new IDDNode(""+bdd.hashCode(),automataBDD.getAutVarName(bdd.var()));
                     nextIDD = new IDD(node);
 
                     final BDD varBDD = automataBDD.getBDDforSourceBDDVar(bdd.var());
@@ -492,9 +491,9 @@ public class BDDExtendedGuardGenerator {
 
         return output;
     }
- 
 
-    public StringIntPair generateStateSetTerm(boolean isComp, boolean isAutomaton, String variable, ArrayList<String> set, String op1, String op2, String ineq1, String ineq2)
+
+    public StringIntPair generateStateSetTerm(final boolean isComp, final boolean isAutomaton, String variable, ArrayList<String> set, final String op1, final String op2, final String ineq1, final String ineq2)
     {
         variable = variable.replaceAll(" ", "");
         int localNbrOfTerms = 0;
@@ -502,7 +501,7 @@ public class BDDExtendedGuardGenerator {
         final String symbol = automataBDD.getLocVarSuffix();
 
         ArrayList<String> incrementalSeq = new ArrayList<String>();
-        ArrayList<String> setTemp = (ArrayList<String>)set.clone();
+        final ArrayList<String> setTemp = new ArrayList<String>(set);
         String inEq="";
         int inEqLength = Integer.MAX_VALUE;
         if(!isAutomaton)
@@ -525,7 +524,7 @@ public class BDDExtendedGuardGenerator {
 
         if(inEqLength < set.size())
         {
-            set = (ArrayList<String>)setTemp.clone();
+            set = new ArrayList<String>(setTemp);
             expr += ((allowedForbidden?op1:op2)+inEq);
             localNbrOfTerms += (inEqLength-setTemp.size());
         }
@@ -544,7 +543,7 @@ public class BDDExtendedGuardGenerator {
         return new StringIntPair(expr, localNbrOfTerms);
     }
 
-    public boolean isIndependentHeuristicApplicable(String autVarName, ArrayList<String> stateSet)
+    public boolean isIndependentHeuristicApplicable(final String autVarName, final ArrayList<String> stateSet)
     {
         final BDDExtendedAutomaton bddAut = automataBDD.getBDDExAutomaton(autVarName);
         final boolean isAutomaton = (bddAut != null)?true:false;
@@ -572,8 +571,8 @@ public class BDDExtendedGuardGenerator {
 
         return indpStates.equals(stateSet);
     }
- 
-    public StringIntPair compelmentHeuristic(String autVarName, ArrayList<String> stateSet)
+
+    public StringIntPair compelmentHeuristic(final String autVarName, final ArrayList<String> stateSet)
     {
         int localNbrOfTerms = 0;
         String expr = "";
@@ -602,18 +601,18 @@ public class BDDExtendedGuardGenerator {
 
     }
 
-    public String generateExpression(IDD idd)
+    public String generateExpression(final IDD idd)
     {
         String output = "";
-        HashMap<String, StringIntPair> cache = new HashMap<String, StringIntPair>();
-        StringIntPair sip = IDD2expr(idd, cache);
+        final HashMap<String, StringIntPair> cache = new HashMap<String, StringIntPair>();
+        final StringIntPair sip = IDD2expr(idd, cache);
         output = sip.s;
         nbrOfTerms = Math.abs(sip.i);
 
         return output;
     }
 
-    public StringIntPair IDD2expr(IDD idd, HashMap<String, StringIntPair> cache)
+    public StringIntPair IDD2expr(final IDD idd, final HashMap<String, StringIntPair> cache)
     {
         int localNbrOfTerms = 0;
 
@@ -622,16 +621,16 @@ public class BDDExtendedGuardGenerator {
             return new StringIntPair("", 0);
         }
 
-        ArrayList<String> terms = new ArrayList<String>();
+        final ArrayList<String> terms = new ArrayList<String>();
 
-        for(IDD iddChild:idd.getChildren())
+        for(final IDD iddChild:idd.getChildren())
         {
             int inForNbr = 0;
             final String autVarName = idd.getRoot().getName();
             final BDDExtendedAutomaton bddAut = automataBDD.getBDDExAutomaton(autVarName);
             final boolean isAutomaton = (bddAut != null)?true:false;
             StringIntPair expr_Nbr = null;
-            String idChild = iddChild.getRoot().getID();
+            final String idChild = iddChild.getRoot().getID();
             if(!applyComplementHeuristics)
             {
                 expr_Nbr = generateStateSetTerm(false, isAutomaton, autVarName, idd.labelOfChild(iddChild), OR, AND, EQUAL, NEQUAL);
@@ -641,7 +640,7 @@ public class BDDExtendedGuardGenerator {
                 expr_Nbr = compelmentHeuristic(autVarName, idd.labelOfChild(iddChild));
             }
 
-            boolean independentApplicable = applyIndependentHeuristics && isIndependentHeuristicApplicable(autVarName, idd.labelOfChild(iddChild));
+            final boolean independentApplicable = applyIndependentHeuristics && isIndependentHeuristicApplicable(autVarName, idd.labelOfChild(iddChild));
 
             String stateExpr = (expr_Nbr.i==1)?expr_Nbr.s:("("+expr_Nbr.s+")");
             inForNbr += expr_Nbr.i;
@@ -651,7 +650,7 @@ public class BDDExtendedGuardGenerator {
             {
                 if(!independentApplicable)
                 {
-                    StringIntPair e_n = IDD2expr(iddChild,cache);
+                    final StringIntPair e_n = IDD2expr(iddChild,cache);
                     if(e_n.i >= 0)
                     {
                         expr = e_n.s;
@@ -664,7 +663,7 @@ public class BDDExtendedGuardGenerator {
                         if(idd.getChildren().size() > 1 || idd.getParents().isEmpty())
                         {
                             inForNbr = (-e_n.i);
-                        }                        
+                        }
                         else
                             inForNbr = e_n.i;
                     }
@@ -679,7 +678,7 @@ public class BDDExtendedGuardGenerator {
             }
             else
             {
-                StringIntPair e_n = cache.get(idChild);
+                final StringIntPair e_n = cache.get(idChild);
                 expr = e_n.s;
                 inForNbr += e_n.i;
             }
@@ -708,9 +707,9 @@ public class BDDExtendedGuardGenerator {
         return new StringIntPair(expression, localNbrOfTerms);
     }
 
-    public void IDD2DOT(BufferedWriter out, IDD idd, final HashSet<IDD> visited)
+    public void IDD2DOT(final BufferedWriter out, final IDD idd, final HashSet<IDD> visited)
     {
-        IDDNode root = idd.getRoot();
+        final IDDNode root = idd.getRoot();
         try
         {
             if(!visited.contains(idd))
@@ -719,10 +718,10 @@ public class BDDExtendedGuardGenerator {
                 out.newLine();
                 visited.add(idd);
 
-                for(IDD child:idd.getChildren())
+                for(final IDD child:idd.getChildren())
                 {
                     String temp = ""+root.getID()+" -> "+child.getRoot().getID()+" [label=\"";
-                    ArrayList<String> label = idd.labelOfChild(child);
+                    final ArrayList<String> label = idd.labelOfChild(child);
                     if(label.size() > 0)
                         temp += label.get(0);
                     for(int i = 1;i < label.size(); i++)
@@ -743,7 +742,7 @@ public class BDDExtendedGuardGenerator {
         }
     }
 
-    public void generateDOT(IDD idd, final String path)
+    public void generateDOT(final IDD idd, final String path)
     {
         try
         {
@@ -773,8 +772,8 @@ public class BDDExtendedGuardGenerator {
 
     public void BDD2IDD2PS(final BDD bdd, final String fileName)
     {
-        String absPathDot = pathRoot+fileName+".dot";
-        String absPathPs = pathRoot+fileName+".ps";
+        final String absPathDot = pathRoot+fileName+".dot";
+        final String absPathPs = pathRoot+fileName+".ps";
         generateDOT(generateIDD(bdd), absPathDot);
         final Runtime rt = Runtime.getRuntime();
         try{
@@ -909,9 +908,9 @@ public class BDDExtendedGuardGenerator {
 
     class StringIntPair
     {
-        private String s;
-        private int i;
-        StringIntPair(String s, int i)
+        private final String s;
+        private final int i;
+        StringIntPair(final String s, final int i)
         {
             this.s = s;
             this.i = i;
