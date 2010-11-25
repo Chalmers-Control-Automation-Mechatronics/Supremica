@@ -352,6 +352,7 @@ public class IDEMenuBar extends JMenuBar
         mEdAnalyzeMenu = new JMenu("Analyze");
         mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
+        mEdAnalyzeMenu.add(actions.editorReadSpecAction.getMenuItem());
       }
 
       // Simulate

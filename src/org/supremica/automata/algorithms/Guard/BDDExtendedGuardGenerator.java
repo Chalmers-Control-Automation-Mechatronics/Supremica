@@ -10,6 +10,7 @@
 package org.supremica.automata.algorithms.Guard;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class BDDExtendedGuardGenerator {
         theAutomata = bddAutomata.getExtendedAutomata();
         automataBDD = bddAutomata;
         manager = automataBDD.getBDDManager();
-        pathRoot = Config.FILE_SAVE_PATH.getAsString()+"/";
+        pathRoot = Config.FILE_SAVE_PATH.getAsString()+"\\";
         generateIDD_PS = options.getSaveIDDInFile();
 
         switch(options.getExpressionType())
@@ -336,18 +337,6 @@ public class BDDExtendedGuardGenerator {
         if(guard.equals(TRUE))
             return true;
         return false;
-    }
-
-    public void BDD2IDD2PS(final BDD bdd, final String fileName)
-    {
-        generateDOT(generateIDD(bdd), pathRoot+fileName+".dot");
-
-        final Runtime rt = Runtime.getRuntime();
-        try{
-            final Process proc = rt.exec("cmd /C dot -Tps "+pathRoot+fileName+".dot"+" -o "+pathRoot+fileName+".ps");
-            proc.waitFor();
-            proc.exitValue();
-        }catch(final Exception e) {System.out.println(e);}
     }
 
     public String generateGuard(final BDD states)
@@ -719,39 +708,6 @@ public class BDDExtendedGuardGenerator {
         return new StringIntPair(expression, localNbrOfTerms);
     }
 
- 
-
-
-    public void generateDOT(IDD idd, final String path)
-    {
-        try
-        {
-            final FileWriter fstream = new FileWriter(path);
-            final BufferedWriter out = new BufferedWriter(fstream);
-            out.write("digraph G {");
-            out.newLine();
-            out.write("size = \"7.5,10\"");
-            out.newLine();
-//            out.write("0 [shape=box, label=\"0\", style=filled, shape=box, height=0.3, width=0.3];");
-//            out.newLine();
-            out.write("1 [shape=box, label=\"1\", style=filled, shape=box, height=0.3, width=0.3];");
-            out.newLine();
-            final HashSet<IDD> visited = new HashSet<IDD>();
-//            addedNodes2Dot.add(0);
-            if(idd.nbrOfNodes() > 1)
-            {
-                IDD2DOT(out, idd, visited);
-            }
-            out.write("}");
-            out.close();
-        }
-        catch (final Exception e)
-        {
-           logger.error("IDD to DOT: " + e.getMessage());
-        }
-    }
-
-
     public void IDD2DOT(BufferedWriter out, IDD idd, final HashSet<IDD> visited)
     {
         IDDNode root = idd.getRoot();
@@ -778,13 +734,58 @@ public class BDDExtendedGuardGenerator {
                     out.newLine();
                     IDD2DOT(out, child, visited);
 
-                }      
+                }
             }
         }
         catch (final Exception e)
         {
             logger.error("IDD to DOT: " + e.getMessage());
         }
+    }
+
+    public void generateDOT(IDD idd, final String path)
+    {
+        try
+        {
+            final FileWriter fstream = new FileWriter(path);
+            final BufferedWriter out = new BufferedWriter(fstream);
+            out.write("digraph G {");
+            out.newLine();
+            out.write("size = \"7.5,10\"");
+            out.newLine();
+//            out.write("0 [shape=box, label=\"0\", style=filled, shape=box, height=0.3, width=0.3];");
+//            out.newLine();
+            out.write("1 [shape=box, label=\"1\", style=filled, shape=box, height=0.3, width=0.3];");
+            out.newLine();
+            final HashSet<IDD> visited = new HashSet<IDD>();
+            if(idd.nbrOfNodes() > 1)
+            {
+                IDD2DOT(out, idd, visited);
+            }
+            out.write("}");
+            out.close();
+        }
+        catch (final Exception e)
+        {
+           logger.error("IDD to DOT: " + e.getMessage());
+        }
+    }
+
+    public void BDD2IDD2PS(final BDD bdd, final String fileName)
+    {
+        String absPathDot = pathRoot+fileName+".dot";
+        String absPathPs = pathRoot+fileName+".ps";
+        generateDOT(generateIDD(bdd), absPathDot);
+        final Runtime rt = Runtime.getRuntime();
+        try{
+            final Process proc1 = rt.exec("dot -Tps "+absPathDot+" -o "+absPathPs);
+            proc1.waitFor();
+            proc1.exitValue();
+            final Process proc2 = rt.exec("cmd /C del "+absPathDot);
+            proc2.waitFor();
+            proc2.exitValue();
+        }catch(final Exception e) {System.out.println(e);}
+
     }
 
     public String BDD2Expr(final BDD bdd)
