@@ -685,6 +685,8 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/buddy.dll" perm="644"/> 
         <copy file="${platform}/win.x86/lib/cudd.dll" todir="${dist}"/>
         <chmod file="${dist}/cudd.dll" perm="644"/> 
+        <copy file="${platform}/win.x86/lib/jdd.dll" todir="${dist}"/>
+        <chmod file="${dist}/jdd.dll" perm="644"/> 
         <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${dist}"/>
         <chmod file="${dist}/BisimulationEquivalence.dll" perm="644"/> 
         <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>
