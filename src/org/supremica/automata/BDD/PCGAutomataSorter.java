@@ -138,7 +138,7 @@ public class PCGAutomataSorter
     {
         final Alphabet firstAlphabet = new Alphabet(firstAutomaton.getAlphabet());
         final Alphabet secondAlphabet = secondAutomaton.getAlphabet();
-        firstAlphabet.intersect(secondAlphabet);
+        firstAlphabet.intersect(secondAlphabet);        
         return firstAlphabet.size();
     }
 

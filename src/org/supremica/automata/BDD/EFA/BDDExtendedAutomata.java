@@ -6,12 +6,18 @@ package org.supremica.automata.BDD.EFA;
  */
 
 import java.util.*;
+import java.util.ArrayList;
 
 import net.sf.javabdd.*;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -24,6 +30,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.automata.BDD.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.EFAMonlithicReachability;
 
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
@@ -129,7 +136,25 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         this.orgExAutomata = orgExAutomata;        
         locaVarSuffix = orgExAutomata.getlocVarSuffix();
         theIndexMap = new ExtendedAutomataIndexMap(orgExAutomata);
-        AutomataSorter automataSorter = new PCGAutomataSorter();
+        theExAutomata = new PCGExtendedAutomataSorter().sortAutomata(orgExAutomata.getExtendedAutomataList());
+ /*       theExAutomata = new ArrayList<ExtendedAutomaton>();
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("CC"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("CL"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("CR"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("CT"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("Hiss1"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("Hiss2"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("R1"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("R2"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("Puck1"));
+        theExAutomata.add(theIndexMap.getExAutomatonWithName("Puck3"));
+        for(ExtendedAutomaton aut: theExAutomata)
+        {
+            System.err.println(aut.getName());
+        }
+
+ */
+/*        AutomataSorter automataSorter = new PCGAutomataSorter();
         Automata theAutomata = automataSorter.sortAutomata(removeGuardsActionsFromEFAs(orgExAutomata));
 
         theExAutomata = new ArrayList<ExtendedAutomaton>();
@@ -137,6 +162,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         {
             theExAutomata.add(theIndexMap.getExAutomatonWithName(automaton.getName()));
         }
+*/        
+//        theExAutomata = orgExAutomata.getExtendedAutomataList();
 
         BDDBitVecSourceVarsMap = new HashMap<String, SupremicaBDDBitVector>(orgExAutomata.getVars().size());
         BDDBitVecTargetVarsMap = new HashMap<String, SupremicaBDDBitVector>(orgExAutomata.getVars().size());
@@ -234,84 +261,23 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             }
         }
 
-        for(ExtendedAutomaton automaton:theExAutomata)
-        {
-            Collection<String> locNames = new HashSet<String>();
-            Collection<String> markedLocNames = new HashSet<String>();
-            for(NodeProxy s: automaton.getNodes())
-            {
-                locNames.add(s.getName());
-                if(automaton.isLocationAccepted(s))
-                {
-                    markedLocNames.add(s.getName());
-                }
-            }
-
-//            orgExAutomata.addEnumerationVariable(automaton.getName()+locaVarSuffix, locNames,
-//                    automaton.getInitialLocation().getName(), markedLocNames);
-        }
-
 //        System.out.println("domain: "+orgExAutomata.getDomain());
-        for(VariableComponentProxy var:orgExAutomata.getVars())
-        {
-            varNames.add(var.getName());
-            int varIndex = theIndexMap.getVariableIndex(var);
-//            System.out.println("variable name: "+var.getName());
-            BDDDomain tempVarDomain = manager.createDomain(orgExAutomata.getDomain());
-//            System.out.println("tempVar variables: "+tempVarDomain.set().toString());
-            BDDDomain sourceVarDomain = manager.createDomain(orgExAutomata.getDomain());
-            int[] sourceVars = sourceVarDomain.vars();
-            for(int i = 0; i<sourceVars.length; i++)
-            {
-                int[] sourceVar = new int[1];
-                sourceVar[0] = sourceVars[i];
-                sourceBDDVar2BDD.put(sourceVars[i], manager.getFactory().buildCube(1, sourceVar));
-                bddVar2AutVarName.put(sourceVars[i], var.getName());
-            }
 
-//            System.out.println("sourceVar variables: "+sourceVarDomain.set().toString());
-            BDDBitVecSourceVarsMap.put(var.getName(), new SupremicaBDDBitVector(manager.getFactory(),sourceVarDomain));
-            sourceVariablesVarSet.unionWith(sourceVarDomain.set());
-
-            BDDDomain destVarDomain = manager.createDomain(orgExAutomata.getDomain());
-//            System.out.println("destVar variables: "+destVarDomain.set().toString());
-            BDDBitVecTargetVarsMap.put(var.getName(), new SupremicaBDDBitVector(manager.getFactory(),destVarDomain));
-            destVariablesVarSet.unionWith(destVarDomain.set());
-
-            sourceVarDomains[varIndex] = sourceVarDomain;
-            sourceVarDomains[varIndex].setName(var.getName());
-            destVarDomains[varIndex] = destVarDomain;
-            destVarDomains[varIndex].setName(var.getName());
-            tempVarDomains[varIndex] = tempVarDomain;
-        }
-        manager.setVariableStringToIndexMap(theIndexMap.variableStringToIndexMap);
-
-        destToSourceVariablePairing = manager.makePairing(destVarDomains, sourceVarDomains);
-        sourceToTempVariablePairing = manager.makePairing(sourceVarDomains, tempVarDomains);
-        tempToDestVariablePairing = manager.makePairing(tempVarDomains, destVarDomains);
-
-        sourceToDestVariablePairing = manager.makePairing(sourceVarDomains,destVarDomains);
         
-        initValuesBDD = manager.getZeroBDD();
-        markedValuesBDD = manager.getOneBDD();
+        ArrayList<VariableComponentProxy> sortedVarList = new ArrayList<VariableComponentProxy>(new PCGVariableSorter(orgExAutomata).sortVars(orgExAutomata.getVars()));
+//        ArrayList<VariableComponentProxy> sortedVarList = new ArrayList<VariableComponentProxy>(orgExAutomata.getVars());
 
-        manager.setBDDExAutomata(this);
-        
-        computeInitValues();
-        computeMarkedValues();
-
-/*        BDDDomain tempLocationDomain = manager.createDomain(5);
-        BDDDomain sourceLocationDomain = manager.createDomain(5);
-        BDDDomain destLocationDomain = manager.createDomain(5);
-*/
         for(ExtendedAutomaton automaton:theExAutomata){
 
-//            System.out.println(automaton.getName());
+//            System.err.println(automaton.getName());
             int autIndex = theIndexMap.getExAutomatonIndex(automaton.getName());
             int nbrOfStates = automaton.nbrOfNodes();
             BDDDomain tempLocationDomain = manager.createDomain(nbrOfStates);
-//            System.out.println("tempLocation variables: "+tempLocationDomain.set().toString());
+//            VariableComponentProxy var = theIndexMap.getCorrepondentVariable(automaton);
+//            BDDDomain tempLocationDomain = tempVarDomains[theIndexMap.getVariableIndex(var)];
+
             BDDDomain sourceLocationDomain = manager.createDomain(nbrOfStates);
+//            BDDDomain sourceLocationDomain = sourceVarDomains[theIndexMap.getVariableIndex(var)];
             int[] sourceVars = sourceLocationDomain.vars();
             for(int i = 0; i<sourceVars.length; i++)
             {
@@ -322,8 +288,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                 bddVar2AutVarName.put(sourceVars[i], automaton.getName());
             }
 
-//            System.out.println("sourceLocation variables: "+sourceLocationDomain.set().toString());
+//            System.err.println("sourceLocation variables: "+sourceLocationDomain.set().toString());
             BDDDomain destLocationDomain = manager.createDomain(nbrOfStates);
+//            BDDDomain destLocationDomain = destVarDomains[theIndexMap.getVariableIndex(var)];
 /*            System.out.println("destLocation variables: "+destLocationDomain.set().toString());
             for(NodeProxy loc: automaton.getNodes())
             {
@@ -337,8 +304,59 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             destLocationDomains[autIndex] = destLocationDomain;
             destLocationDomains[autIndex].setName(automaton.getName());
 
-            tempLocationDomains[autIndex] = tempLocationDomain;            
+            tempLocationDomains[autIndex] = tempLocationDomain;
+
+            //Place the variables that are related to this automaton (the variables that are updated in this automaton)
+            for(VariableComponentProxy varRelatedToAutomaton:automaton.getUsedTargetVariables())
+            {
+                if(sortedVarList.contains(varRelatedToAutomaton))
+                {
+                    initializeVariable(varRelatedToAutomaton);
+                }
+            }
+            sortedVarList.removeAll(automaton.getUsedTargetVariables());
+            
         }
+
+        //Manual variable ordering
+/*      sortedVarList = new ArrayList<VariableComponentProxy>();
+
+        sortedVarList.add(orgExAutomata.getVariableByName("R1_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("R2_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("CL_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("CR_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("CT_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("CC_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("Hiss1_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("Hiss2_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("Puck1_state"));
+        sortedVarList.add(orgExAutomata.getVariableByName("Puck3_state"));
+
+        sortedVarList = new ArrayList<VariableComponentProxy>(orgExAutomata.getVars());
+*/
+
+
+        for(VariableComponentProxy var:sortedVarList)
+        {
+            initializeVariable(var);
+        }
+
+        manager.setVariableStringToIndexMap(theIndexMap.variableStringToIndexMap);
+
+        destToSourceVariablePairing = manager.makePairing(destVarDomains, sourceVarDomains);
+        sourceToTempVariablePairing = manager.makePairing(sourceVarDomains, tempVarDomains);
+        tempToDestVariablePairing = manager.makePairing(tempVarDomains, destVarDomains);
+
+        sourceToDestVariablePairing = manager.makePairing(sourceVarDomains,destVarDomains);
+
+        initValuesBDD = manager.getZeroBDD();
+        markedValuesBDD = manager.getOneBDD();
+
+        manager.setBDDExAutomata(this);
+
+        computeInitValues();
+        computeMarkedValues();
+
         for(ExtendedAutomaton automaton:theExAutomata)
         {
             BDDExtendedAutomaton bddExAutomaton = new BDDExtendedAutomaton(this, automaton);
@@ -357,8 +375,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         sourceStateVariables = sourceStateVariables.union(sourceLocationVariables);
         sourceStateVariables = sourceStateVariables.union(sourceVariablesVarSet);
 
-        destStateVariables.unionWith(destLocationVariables);
-        destStateVariables.unionWith(destVariablesVarSet);
+        destStateVariables = destStateVariables.union(destLocationVariables);
+        destStateVariables = destStateVariables.union(destVariablesVarSet);
        
         sourceToTempLocationPairing = manager.makePairing(sourceLocationDomains, tempLocationDomains);
         tempToDestLocationPairing = manager.makePairing(tempLocationDomains, destLocationDomains);
@@ -369,6 +387,41 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         bddEdges = new BDDEdgeFactory(this).createEdges();
 
 //        System.out.println("number of transitions: "+((BDDMonolithicTransitions)bddTransitions).transitionForwardBDD.pathCount());
+    }
+
+    public void initializeVariable(VariableComponentProxy var)
+    {
+        varNames.add(var.getName());
+        int varIndex = theIndexMap.getVariableIndex(var);
+//            System.out.println("variable name: "+var.getName());
+
+
+        BDDDomain tempVarDomain = manager.createDomain(orgExAutomata.getDomain());
+//            System.out.println("tempVar variables: "+tempVarDomain.set().toString());
+        BDDDomain sourceVarDomain = manager.createDomain(orgExAutomata.getDomain());
+        int[] sourceVars = sourceVarDomain.vars();
+        for(int i = 0; i<sourceVars.length; i++)
+        {
+            int[] sourceVar = new int[1];
+            sourceVar[0] = sourceVars[i];
+            sourceBDDVar2BDD.put(sourceVars[i], manager.getFactory().buildCube(1, sourceVar));
+            bddVar2AutVarName.put(sourceVars[i], var.getName());
+        }
+
+//            System.out.println("sourceVar variables: "+sourceVarDomain.set().toString());
+        BDDBitVecSourceVarsMap.put(var.getName(), new SupremicaBDDBitVector(manager.getFactory(),sourceVarDomain));
+        sourceVariablesVarSet.unionWith(sourceVarDomain.set());
+
+        BDDDomain destVarDomain = manager.createDomain(orgExAutomata.getDomain());
+//            System.out.println("destVar variables: "+destVarDomain.set().toString());
+        BDDBitVecTargetVarsMap.put(var.getName(), new SupremicaBDDBitVector(manager.getFactory(),destVarDomain));
+        destVariablesVarSet.unionWith(destVarDomain.set());
+
+        sourceVarDomains[varIndex] = sourceVarDomain;
+        sourceVarDomains[varIndex].setName(var.getName());
+        destVarDomains[varIndex] = destVarDomain;
+        destVarDomains[varIndex].setName(var.getName());
+        tempVarDomains[varIndex] = tempVarDomain;
     }
 
     public boolean isSourceLocationVar(int var)
@@ -701,11 +754,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     }
 
     public BDDExtendedAutomaton getBDDExAutomaton(String autName)
-    {
-        for(ExtendedAutomaton aut: theExAutomata)
-            if(aut.getName().equals(autName))
-                return automatonToBDDAutomatonMap.get(aut);
-        return null;
+    {               
+        ExtendedAutomaton efa = theIndexMap.getExAutomatonWithName(autName);
+        return (efa==null?null:automatonToBDDAutomatonMap.get(efa));
     }
 
     public List<EventDeclProxy> getInverseAlphabet(ExtendedAutomaton exAutomaton)

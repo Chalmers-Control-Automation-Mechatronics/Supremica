@@ -87,7 +87,7 @@ public class EditorReadSpecAction
                    bis = new BufferedReader(fis);
                    String text = null;
                    while((text = bis.readLine()) != null)
-                   {
+                   {                        
                         final StringTokenizer st = new StringTokenizer(text, "\t");
                         final String event = st.nextToken();
                         final String guard = st.nextToken();

@@ -34,6 +34,8 @@ public class ExtendedAutomataIndexMap {
     private final Map<String,Integer> val2indexMap;
     private final Map<Integer,String> index2valMap;
 
+    ExtendedAutomata theExAutomata = null;
+
     @SuppressWarnings("unused")
     private static final Logger logger =
       LoggerFactory.createLogger(AutomataIndexMap.class);
@@ -51,6 +53,8 @@ public class ExtendedAutomataIndexMap {
     public ExtendedAutomataIndexMap(final ExtendedAutomata theExAutomata)
     {
         this();
+
+        this.theExAutomata = theExAutomata;
         // This useful variable stores the union of the automata events
         final List<EventDeclProxy> unionAlphabet = theExAutomata.getUnionAlphabet();
 
@@ -86,6 +90,9 @@ public class ExtendedAutomataIndexMap {
             int locationIndex = 0;
             for (final NodeProxy currNode : currExAutomaton.getNodes())
             {
+                /*StringTokenizer st = new StringTokenizer(currNode.getName(), "_");
+                st.nextToken();
+                locationIndex = Integer.parseInt(st.nextToken());*/
                 automatonLocationEntryToIndexMap.put(new ExtendedAutomatonAndLocationEntry(currExAutomaton.getName(), currNode.getName()), locationIndex);
                 automatonIntegerEntryToLocationMap.put(new ExtendedAutomatonAndIntegerEntry(currExAutomaton.getName(), locationIndex), currNode);
                 locationIndex++;
@@ -190,6 +197,15 @@ public class ExtendedAutomataIndexMap {
     public VariableComponentProxy getVariableAt(final int i)
     {
         return indexToVariableMap.get(i);
+    }
+
+    public VariableComponentProxy getCorrepondentVariable(ExtendedAutomaton efa)
+    {
+        for(VariableComponentProxy var:theExAutomata.getVars())
+            if(var.getName().contains(efa.getName()))
+                return var;
+
+        return null;
     }
 
     public int getExAutomatonIndex(final String exAutomaton)

@@ -103,6 +103,7 @@ public class EditorSynthesizerAction
 
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
         logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+bddSynthesizer.nbrOfStates()+" states.");
+        logger.info("number of nodes in the safe BDD: "+bddSynthesizer.getResult().nodeCount());
 
         if(bddSynthesizer.nbrOfStates()>0)
         {

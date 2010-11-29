@@ -54,11 +54,13 @@
 
 package org.supremica.automata;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -68,9 +70,13 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -91,17 +97,17 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class ExtendedAutomaton
 {
 
-	private boolean allAcceptingStates = false;
+    private boolean allAcceptingStates = false;
 
-	private final String name;
-	private final ExtendedAutomata automata;
-	private final ModuleSubjectFactory factory;
- 	private IdentifierSubject identifier;
-	@SuppressWarnings("unused")
+    private final String name;
+    private final ExtendedAutomata automata;
+    private final ModuleSubjectFactory factory;
+    private IdentifierSubject identifier;
+    @SuppressWarnings("unused")
     private final ModuleSubject module;
-	private final SimpleComponentSubject component;
-	private final GraphSubject graph;
-	private final ExpressionParser parser;
+    private final SimpleComponentSubject component;
+    private final GraphSubject graph;
+    private final ExpressionParser parser;
     private List<EventDeclProxy> alphabet;
     private List<EventDeclProxy> uncontrollableAlphabet;
     private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToOutgoingEdgesMap;
@@ -111,25 +117,30 @@ public class ExtendedAutomaton
     private Set<NodeProxy> acceptedLocations;
     private Set<NodeProxy> forbiddenLocations;
     private final NodeProxy blockedLocation = null;
+    private Map<EventDeclProxy,Set<VariableComponentProxy>> guardVariables;
+    private Map<EventDeclProxy,Set<VariableComponentProxy>> actionVariables;
 
-	public ExtendedAutomaton(final String name, final ExtendedAutomata automata, final boolean acceptingStates)
-	{
-		this.name = name;
+    private Set<VariableComponentProxy> usedSourceVariables;
+    private Set<VariableComponentProxy> usedTargetVariables;
 
-		factory = ModuleSubjectFactory.getInstance();
+    public ExtendedAutomaton(final String name, final ExtendedAutomata automata, final boolean acceptingStates)
+    {
+        this.name = name;
 
-		this.automata = automata;
+        factory = ModuleSubjectFactory.getInstance();
 
-		module = automata.getModule();
+        this.automata = automata;
 
-		identifier = factory.createSimpleIdentifierProxy(name);
-		graph = factory.createGraphProxy();
-		component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
+        module = automata.getModule();
 
-		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+        identifier = factory.createSimpleIdentifierProxy(name);
+        graph = factory.createGraphProxy();
+        component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
 
-		allAcceptingStates = acceptingStates;
-	}
+        parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+
+        allAcceptingStates = acceptingStates;
+    }
 
     public ExtendedAutomaton(final ExtendedAutomata automata, final SimpleComponentSubject component)
     {
@@ -154,6 +165,11 @@ public class ExtendedAutomaton
 
         final HashMap<NodeProxy, HashSet<String>> locationToOutgoingEventsMap = new HashMap<NodeProxy, HashSet<String>>(nodes.size());
 
+        usedSourceVariables = new HashSet<VariableComponentProxy>();
+        usedTargetVariables = new HashSet<VariableComponentProxy>();
+        guardVariables = new HashMap<EventDeclProxy, Set<VariableComponentProxy>>();
+        actionVariables = new HashMap<EventDeclProxy, Set<VariableComponentProxy>>();
+
         for(final NodeProxy node:nodes)
         {
             nameToLocationMap.put(node.getName(),node);
@@ -173,6 +189,7 @@ public class ExtendedAutomaton
                forbiddenLocations.add(node);
             }
         }
+        
         final EventListExpressionProxy blockedEvents = component.getGraph().getBlockedEvents();
         final HashSet<String> unconAlphabetString = new HashSet<String>();
         if(blockedEvents != null)
@@ -181,32 +198,78 @@ public class ExtendedAutomaton
             {
                 final String eventName = ((SimpleIdentifierSubject)event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
-                alphabet.add(e);
+                if(!alphabet.contains(e))
+                    alphabet.add(e);
                 if(e.getKind() == EventKind.UNCONTROLLABLE)
                 {
-                    uncontrollableAlphabet.add(e);
+                    if(!uncontrollableAlphabet.contains(e))
+                        uncontrollableAlphabet.add(e);
+
                     unconAlphabetString.add(e.getName());
                 }
             }
         }
 
         for(final EdgeSubject edge:component.getGraph().getEdgesModifiable())
-        {
+        {            
             for(final Proxy event:edge.getLabelBlock().getEventList())
             {
                 final String eventName = ((SimpleIdentifierSubject)event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
-                alphabet.add(e);
+                //The variables that appear in the guards and actions will later be used in the weighted matrix of the PCG
+                if(edge.getGuardActionBlock() != null)
+                {
+                    if(!edge.getGuardActionBlock().getGuards().isEmpty())
+                    {
+                        Set<VariableComponentProxy> vars = extractVariablesFromExpr(edge.getGuardActionBlock().getGuards().get(0));
+
+                        usedSourceVariables.addAll(vars);
+                        if(guardVariables.get(e) == null)
+                            guardVariables.put(e, vars);
+                        else
+                            guardVariables.get(e).addAll(vars);
+
+                        //Create the relations between different variables (if two variables appear in the same guard, they are related!)
+                        for(VariableComponentProxy v:vars)
+                        {
+                            ArrayList<VariableComponentProxy> varsExtended = new ArrayList<VariableComponentProxy>(vars);
+                            varsExtended.remove(v);
+                            automata.addToRelatedVars(v, varsExtended);
+                        }
+                    }
+
+                    if(!edge.getGuardActionBlock().getActions().isEmpty())
+                    {
+                        for(SimpleExpressionProxy action:edge.getGuardActionBlock().getActions())
+                        {
+                            Set<VariableComponentProxy> vars = extractVariablesFromExpr(((BinaryExpressionProxy)action).getLeft());
+                            usedTargetVariables.addAll(vars);
+                            if(actionVariables.get(e) == null)
+                                actionVariables.put(e, vars);
+                            else
+                                actionVariables.get(e).addAll(vars);
+                            
+                        }
+
+                    }
+
+                }
+
+                if(!alphabet.contains(e))
+                    alphabet.add(e);
                 locationToOutgoingEventsMap.get(edge.getSource()).add(e.getName());
 
                 if(e.getKind() == EventKind.UNCONTROLLABLE)
                 {
-                    uncontrollableAlphabet.add(e);
+                    if(!uncontrollableAlphabet.contains(e))
+                        uncontrollableAlphabet.add(e);
+                    
                     unconAlphabetString.add(e.getName());
                 }
             }
             locationToOutgoingEdgesMap.get(edge.getSource()).add(edge);
         }
+
 
         //PLANTIFY
  /*       if(isSpecification() && uncontrollableAlphabet.size()>0)
@@ -306,6 +369,45 @@ public class ExtendedAutomaton
 */
     }
 
+    public Set<VariableComponentProxy> extractVariablesFromExpr(SimpleExpressionProxy expr)
+    {
+        Set<VariableComponentProxy> vars = new HashSet<VariableComponentProxy>();
+        for(Proxy proxy:module.getComponentList())
+        {
+            if(proxy instanceof VariableComponentProxy)
+            {
+                VariableComponentProxy var = (VariableComponentProxy)proxy;
+                if(expr.toString().contains(var.getName()))
+                {
+                    vars.add(var);
+                }
+            }
+        }
+
+        return vars;
+    }
+
+    public Set<VariableComponentProxy> getGuardVariables(EventDeclProxy e)
+    {
+        return guardVariables.get(e);
+    }
+
+    public Set<VariableComponentProxy> getActionVariables(EventDeclProxy e)
+    {
+        return actionVariables.get(e);
+    }
+
+
+    public Set<VariableComponentProxy> getUsedSourceVariables()
+    {
+        return usedSourceVariables;
+    }
+
+    public Set<VariableComponentProxy> getUsedTargetVariables()
+    {
+        return usedTargetVariables;
+    }
+
     public NodeProxy getblockedLocation()
     {
         return blockedLocation;
@@ -380,10 +482,10 @@ public class ExtendedAutomaton
         return component.getName();
     }
 
-	public SimpleComponentSubject getComponent()
-	{
-		return component;
-	}
+    public SimpleComponentSubject getComponent()
+    {
+            return component;
+    }
 
     public List<EventDeclProxy> getAlphabet()
     {
@@ -396,40 +498,40 @@ public class ExtendedAutomaton
     }
 
 	public void addState(final String name)
-	{
-		if (allAcceptingStates)
-		{
-			addState(name, true, false, false);
-		}
-		else
-		{
-			addState(name, false, false, false);
-		}
-	}
+    {
+            if (allAcceptingStates)
+            {
+                    addState(name, true, false, false);
+            }
+            else
+            {
+                    addState(name, false, false, false);
+            }
+    }
 
-	public SimpleNodeSubject addState(final String name, final boolean accepting, final boolean initial, final boolean forbidden)
-	{
-		SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
-		if (node == null)
-		{
+    public SimpleNodeSubject addState(final String name, final boolean accepting, final boolean initial, final boolean forbidden)
+    {
+        SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
+        if (node == null)
+        {
             final List<Proxy> propList = new LinkedList<Proxy>();
-			if (accepting)
-			{
-				propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
-			}
-			if (forbidden)
-			{
-				propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
-			}
+            if (accepting)
+            {
+                    propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
+            }
+            if (forbidden)
+            {
+                    propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
+            }
 
             final PlainEventListSubject markingProposition = factory.createPlainEventListProxy(propList);
 
             node = factory.createSimpleNodeProxy(name, markingProposition,initial, null, null, null);
             graph.getNodesModifiable().add (node);
-		}
+        }
 
         return node;
-	}
+    }
 
     public boolean isSpecification()
     {
@@ -437,128 +539,128 @@ public class ExtendedAutomaton
     }
 
 
-	/**
-	 * Adds transition to the extended finite automaton
-	 *
-	 * @param from  name of the source state
-	 * @param to name of the destination state
-	 * @param label semi-colon separated list of event names for the transition
-	 * @param guardIn guard expression for the transition
-	 * @param actionIn action expression for the transition
-	 */
-	public void addTransition(final String from, final String to, final String label, final String guardIn, final String actionIn)
-	{
-		final SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
-		if (fromNode == null)
-		{
-			System.out.println("ExtendedAutomaton.addTransition(): From node " + from + " does not exist!");
-		}
-		final SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
-		if (toNode == null)
-		{
-			System.out.println("ExtendedAutomaton.addTransition(): To node " + to + " does not exist!");
-		}
+    /**
+     * Adds transition to the extended finite automaton
+     *
+     * @param from  name of the source state
+     * @param to name of the destination state
+     * @param label semi-colon separated list of event names for the transition
+     * @param guardIn guard expression for the transition
+     * @param actionIn action expression for the transition
+     */
+    public void addTransition(final String from, final String to, final String label, final String guardIn, final String actionIn)
+    {
+            final SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
+            if (fromNode == null)
+            {
+                    System.out.println("ExtendedAutomaton.addTransition(): From node " + from + " does not exist!");
+            }
+            final SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
+            if (toNode == null)
+            {
+                    System.out.println("ExtendedAutomaton.addTransition(): To node " + to + " does not exist!");
+            }
 
-		// parse label into event name list and make LabelBlockSubject
-		final List<Proxy> events = new LinkedList<Proxy>();
-		String remainingEvents = label;
-		String curEvent;
-		while(remainingEvents.contains(";"))
-		{
-			curEvent = remainingEvents.substring(0,remainingEvents.indexOf(";"));
-			remainingEvents = remainingEvents.substring(remainingEvents.indexOf(";") + 1);
-			events.add(factory.createSimpleIdentifierProxy(curEvent));
+            // parse label into event name list and make LabelBlockSubject
+            final List<Proxy> events = new LinkedList<Proxy>();
+            String remainingEvents = label;
+            String curEvent;
+            while(remainingEvents.contains(";"))
+            {
+                    curEvent = remainingEvents.substring(0,remainingEvents.indexOf(";"));
+                    remainingEvents = remainingEvents.substring(remainingEvents.indexOf(";") + 1);
+                    events.add(factory.createSimpleIdentifierProxy(curEvent));
 
-			// Add event declaration to the module if needed
-            automata.includeControllableEvent(curEvent);
-		}
-		final LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
+                    // Add event declaration to the module if needed
+        automata.includeControllableEvent(curEvent);
+            }
+            final LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
 
-		// make GuardActionSubject
-		// Get guard ...
-		SimpleExpressionSubject guard = null;
-		try
-		{
-			final String guardText = guardIn;
-			if (guardText != null && !guardText.trim().equals(""))
-			{
-				guard = (SimpleExpressionSubject) parser.parse(guardText, Operator.TYPE_BOOLEAN);
-			}
-		}
-		catch (final ParseException exception)
-		{
-			System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
-			System.out.println("\t automaton: " + name);
-			System.out.print("\t from: " + from);
-			System.out.println(" to: " + to);
-			System.out.println("\t label: " + label);
-			System.out.println("\t guard: " + guardIn);
-			System.out.println("\t action: " + actionIn);
-			return;
-		}
-		// Get actions ...
-		List<BinaryExpressionSubject> actions = null;
-		final String actionText = actionIn;
-		if (actionText != null && !actionText.trim().equals(""))
-		{
-			final String[] texts = actionIn.split(";");
-			actions = new ArrayList<BinaryExpressionSubject>(texts.length);
-			for (final String text : texts)
-			{
-				if (text.length() > 0)
-				{
-					try
-					{
-						final SimpleExpressionSubject action = (SimpleExpressionSubject) parser.parse(text);
-						if (!(action instanceof BinaryExpressionSubject))
-						{
-							throw new TypeMismatchException(action, "ACTION");
-						}
-						final BinaryExpressionSubject binaction = (BinaryExpressionSubject) action;
-						actions.add(binaction);
-					}
-					catch (final ParseException exception)
-					{
-						System.out.println("ExtendedAutomaton.addTransition(): Syntax error in action!");
-						System.out.println("\t automaton: " + name);
-						System.out.print("\t from: " + from);
-						System.out.println(" to: " + to);
-						System.out.println("\t label: " + label);
-						System.out.println("\t guard: " + guardIn);
-						System.out.println("\t action: " + actionIn);
-						return;
-					}
-					catch (final TypeMismatchException exception)
-					{
-						System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
-						System.out.println("\t automaton: " + name);
-						System.out.print("\t from: " + from);
-						System.out.println(" to: " + to);
-						System.out.println("\t label: " + label);
-						System.out.println("\t guard: " + guardIn);
-						System.out.println("\t action: " + actionIn);
-						return;
-					}
-				}
-			}
-		}
+            // make GuardActionSubject
+            // Get guard ...
+            SimpleExpressionSubject guard = null;
+            try
+            {
+                    final String guardText = guardIn;
+                    if (guardText != null && !guardText.trim().equals(""))
+                    {
+                            guard = (SimpleExpressionSubject) parser.parse(guardText, Operator.TYPE_BOOLEAN);
+                    }
+            }
+            catch (final ParseException exception)
+            {
+                    System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
+                    System.out.println("\t automaton: " + name);
+                    System.out.print("\t from: " + from);
+                    System.out.println(" to: " + to);
+                    System.out.println("\t label: " + label);
+                    System.out.println("\t guard: " + guardIn);
+                    System.out.println("\t action: " + actionIn);
+                    return;
+            }
+            // Get actions ...
+            List<BinaryExpressionSubject> actions = null;
+            final String actionText = actionIn;
+            if (actionText != null && !actionText.trim().equals(""))
+            {
+                    final String[] texts = actionIn.split(";");
+                    actions = new ArrayList<BinaryExpressionSubject>(texts.length);
+                    for (final String text : texts)
+                    {
+                            if (text.length() > 0)
+                            {
+                                    try
+                                    {
+                                            final SimpleExpressionSubject action = (SimpleExpressionSubject) parser.parse(text);
+                                            if (!(action instanceof BinaryExpressionSubject))
+                                            {
+                                                    throw new TypeMismatchException(action, "ACTION");
+                                            }
+                                            final BinaryExpressionSubject binaction = (BinaryExpressionSubject) action;
+                                            actions.add(binaction);
+                                    }
+                                    catch (final ParseException exception)
+                                    {
+                                            System.out.println("ExtendedAutomaton.addTransition(): Syntax error in action!");
+                                            System.out.println("\t automaton: " + name);
+                                            System.out.print("\t from: " + from);
+                                            System.out.println(" to: " + to);
+                                            System.out.println("\t label: " + label);
+                                            System.out.println("\t guard: " + guardIn);
+                                            System.out.println("\t action: " + actionIn);
+                                            return;
+                                    }
+                                    catch (final TypeMismatchException exception)
+                                    {
+                                            System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
+                                            System.out.println("\t automaton: " + name);
+                                            System.out.print("\t from: " + from);
+                                            System.out.println(" to: " + to);
+                                            System.out.println("\t label: " + label);
+                                            System.out.println("\t guard: " + guardIn);
+                                            System.out.println("\t action: " + actionIn);
+                                            return;
+                                    }
+                            }
+                    }
+            }
 
-		// Store parsed results ...
-		final GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
-		final List<SimpleExpressionSubject> blockGuards = guardActionBlock.getGuardsModifiable();
-		blockGuards.clear();
-		if (guard != null)
-		{
-			blockGuards.add(guard);
-		}
-		final List<BinaryExpressionSubject> blockActions = guardActionBlock.getActionsModifiable();
-		blockActions.clear();
-		if (actions != null)
-		{
-			blockActions.addAll(actions);
-		}
+            // Store parsed results ...
+            final GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
+            final List<SimpleExpressionSubject> blockGuards = guardActionBlock.getGuardsModifiable();
+            blockGuards.clear();
+            if (guard != null)
+            {
+                    blockGuards.add(guard);
+            }
+            final List<BinaryExpressionSubject> blockActions = guardActionBlock.getActionsModifiable();
+            blockActions.clear();
+            if (actions != null)
+            {
+                    blockActions.addAll(actions);
+            }
 
-		final EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
-		graph.getEdgesModifiable().add(newEdge);
-	}
+            final EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
+            graph.getEdgesModifiable().add(newEdge);
+    }
 }

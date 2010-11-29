@@ -114,6 +114,7 @@ public class BDDMonolithicEdges
 
         edgesForwardBDD = edgesForwardBDD.exist(bddExAutomata.getEventVarSet());
         System.err.println("BDD represeting forward edges without events is created.");
+        System.err.println("The number of nodes in the forward edge BDD: "+edgesForwardBDD.nodeCount());
 //        System.err.println("Number of states in the closed-loop system: "+bddExAutomata.nbrOfStatesBDD(edgesForwardBDD.exist(bddExAutomata.getDestStatesVarSet())));
         edgesBackwardBDD = edgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
         System.err.println("BDD represeting backward edges without events is created.");
@@ -142,7 +143,7 @@ public class BDDMonolithicEdges
         BDD[] autTransWhereVisUpdated = inTransWhereVisUpdated[0];
         BDD[] autTransAndNextValsForV = inTransAndNextValsForV[0];
 
-        if(bddExAutomata.theExAutomata.size() == 1)
+        if(bddExAutomata.orgExAutomata.size() == 1)
         {
             for(VariableComponentProxy var:bddExAutomata.orgExAutomata.getVars())
             {
@@ -152,7 +153,7 @@ public class BDDMonolithicEdges
             }
         }
 
-        for(int i = 1 ; i< (bddExAutomata.theExAutomata.size());i++)
+        for(int i = 1 ; i< (bddExAutomata.orgExAutomata.size());i++)
         {
             BDD[] currAutTransWhereVisUpdated = inTransWhereVisUpdated[i];
             BDD[] currAutTransAndNextValsForV = inTransAndNextValsForV[i];

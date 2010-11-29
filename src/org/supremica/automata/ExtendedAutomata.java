@@ -78,6 +78,7 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+import org.sat4j.minisat.core.VarActivityListener;
 
 
 public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
@@ -97,6 +98,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     HashSet<EventDeclProxy> uncontrollableAlphabet = null;
     HashSet<EventDeclProxy> plantAlphabet = null;
     String locaVarSuffix = ".curr";
+
+    Map<VariableComponentProxy,List<VariableComponentProxy>> var2relatedVarsMap = null;
 
     public ExtendedAutomata()
     {
@@ -132,14 +135,55 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             eventIdToProxyMap.put(e.getName(), e);
         }
 
+        var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
+
         for(final AbstractSubject sub:module.getComponentListModifiable())
         {
             if(sub instanceof VariableComponentProxy)
             {
+                VariableComponentProxy var = (VariableComponentProxy)sub;
+                var2relatedVarsMap.put(var, new ArrayList<VariableComponentProxy>());
                 if(!sub.toString().contains(locaVarSuffix))
                     variables.add(((VariableComponentProxy)sub));
-            }
 
+                final String varName = var.getName();
+                final String range = var.getType().toString();
+                int lowerBound = -1;
+                int upperBound = -1;
+
+                if(range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName()))
+                {
+                    lowerBound = Integer.parseInt(((BinaryExpressionProxy)var.getType()).getLeft().toString());
+                    upperBound = Integer.parseInt(((BinaryExpressionProxy)var.getType()).getRight().toString());
+                }
+                else if (range.contains(","))
+                {
+                    final StringTokenizer token = new StringTokenizer(range, ", { }");
+                    lowerBound = 0;
+                    upperBound = token.countTokens();
+                }
+
+                final MinMax minMax = new MinMax(lowerBound,upperBound);
+
+                if(!var2MinMaxValMap.containsKey(varName))
+                {
+                    var2MinMaxValMap.put(varName, minMax);
+                }
+
+    //            int currDomain = upperBound+1-lowerBound;
+                final int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
+                if(currDomain>domain)
+                    domain = currDomain;
+
+
+            }
+        }
+
+        //we multiply the domain with 2 to add 1 extra bit for the sign
+        domain *= 2;
+
+        for(final AbstractSubject sub:module.getComponentListModifiable())
+        {
             if(sub instanceof SimpleComponentSubject)
             {
                 nbrOfExAutomata++;
@@ -149,46 +193,20 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 {
                     plantAlphabet.addAll(exAutomaton.getAlphabet());
                 }
-                addAutomatonToList(exAutomaton);
+                theExAutomata.add(exAutomaton);
             }
         }
 
-        for(final VariableComponentProxy var:variables)
-        {
-            final String varName = var.getName();
-            final String range = var.getType().toString();
-            int lowerBound = -1;
-            int upperBound = -1;
+    }
 
-            if(range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName()))
-            {
-                lowerBound = Integer.parseInt(((BinaryExpressionProxy)var.getType()).getLeft().toString());
-                upperBound = Integer.parseInt(((BinaryExpressionProxy)var.getType()).getRight().toString());
-            }
-            else if (range.contains(","))
-            {
-                final StringTokenizer token = new StringTokenizer(range, ", { }");
-                lowerBound = 0;
-                upperBound = token.countTokens();
-            }
+    public List<VariableComponentProxy> getRelatedVars(VariableComponentProxy var)
+    {
+        return var2relatedVarsMap.get(var);
+    }
 
-            final MinMax minMax = new MinMax(lowerBound,upperBound);
-
-            if(!var2MinMaxValMap.containsKey(varName))
-            {
-                var2MinMaxValMap.put(varName, minMax);
-            }
-
-//            int currDomain = upperBound+1-lowerBound;
-            final int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
-            if(currDomain>domain)
-                domain = currDomain;
-        }
-        //we multiply the domain with 2 to add 1 extra bit for the sign
-        domain *= 2;
-        new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-
-
+    public void addToRelatedVars(VariableComponentProxy var, List<VariableComponentProxy> vars)
+    {
+        var2relatedVarsMap.get(var).addAll(vars);
     }
 
     public ExtendedAutomata(final String name, final boolean expand)
@@ -208,6 +226,10 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             new ExpressionParser(factory, CompilerOperatorTable.getInstance());
     }
 
+    public List<ExtendedAutomaton> getExtendedAutomataList()
+    {
+        return theExAutomata;
+    }
 
     public void extDomain(final int d)
     {
@@ -242,6 +264,15 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public int size()
     {
         return nbrOfExAutomata;
+    }
+
+    public VariableComponentProxy getVariableByName(String varName)
+    {
+        for(VariableComponentProxy var:variables)
+            if(var.getName().equals(varName))
+                return var;
+        
+        throw new IllegalArgumentException ("There does not exists a variable in the model with name "+varName+"!");
     }
 
     public List<VariableComponentProxy> getVars()
@@ -300,35 +331,30 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return theExAutomata.iterator();
     }
 
-	public void addEvent(final String name, final String kind)
-	{
+    public void addEvent(final String name, final String kind)
+    {
         final SimpleIdentifierProxy ident =
-            factory.createSimpleIdentifierProxy(name);
-		if (kind.equals("controllable")) {
-			module.getEventDeclListModifiable().add
-                (factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE));
-		} else if (kind.equals("uncontrollable")) {
-			module.getEventDeclListModifiable().add
-                (factory.createEventDeclProxy(ident,
-                                              EventKind.UNCONTROLLABLE));
-		}
-	}
+        factory.createSimpleIdentifierProxy(name);
+            if (kind.equals("controllable")) {
+                    module.getEventDeclListModifiable().add
+            (factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE));
+            } else if (kind.equals("uncontrollable")) {
+                    module.getEventDeclListModifiable().add
+            (factory.createEventDeclProxy(ident,
+                                          EventKind.UNCONTROLLABLE));
+            }
+    }
 
 
-	public void addAutomaton(final ExtendedAutomaton exAutomaton)
-	{
-        addAutomatonToList(exAutomaton);
+    public void addAutomaton(final ExtendedAutomaton exAutomaton)
+    {
+        theExAutomata.add(exAutomaton);
         module.getComponentListModifiable().add(exAutomaton.getComponent());
-	}
+    }
 
     public HashSet<EventDeclProxy> getPlantAlphabet()
     {
         return plantAlphabet;
-    }
-
-    public void addAutomatonToList(final ExtendedAutomaton exAutomaton)
-    {
-        theExAutomata.add(exAutomaton);
     }
 
     public ArrayList<AbstractSubject> getComponents()

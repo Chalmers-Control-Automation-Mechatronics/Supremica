@@ -80,7 +80,7 @@ public class BDDExtendedGuardGenerator {
         automataBDD = bddAutomata;
         manager = automataBDD.getBDDManager();
         pathRoot = Config.FILE_SAVE_PATH.getAsString()+"\\";
-        generateIDD_PS = options.getSaveIDDInFile();
+        generateIDD_PS = options.getSaveIDDInFile();        
 
         switch(options.getExpressionType())
         {
@@ -123,7 +123,6 @@ public class BDDExtendedGuardGenerator {
 
         applyComplementHeuristics = options.getCompHeuristic();
         applyIndependentHeuristics = options.getIndpHeuristic();
-
 
         if(optimalMode)
         {
@@ -672,8 +671,8 @@ public class BDDExtendedGuardGenerator {
                 else
                 {
                     nbrOfIndpHeurs++;
-                    if(idd.getChildren().size() == 1)
-                        inForNbr = -inForNbr;
+                    if(idd.getChildren().size() == 1) 
+                        inForNbr = -inForNbr; // keep track of the independet term by keeping the number of terms as a negative number
                 }
             }
             else
