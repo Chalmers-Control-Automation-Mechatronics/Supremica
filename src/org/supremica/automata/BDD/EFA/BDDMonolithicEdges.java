@@ -187,13 +187,13 @@ public class BDDMonolithicEdges
         BDD newEdgesBDD = manager.getOneBDD();
         for(int i = 0; i < bddExAutomata.orgExAutomata.getVars().size(); i++)
         {
-/*
+
             String varName = bddExAutomata.theIndexMap.getVariableAt(i).getName();
             autTransAndNextValsForV[i] = autTransAndNextValsForV[i].and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)));
             autTransAndNextValsForV[i] = autTransAndNextValsForV[i].and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)));
             autTransAndNextValsForV[i] = autTransAndNextValsForV[i].and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
             autTransAndNextValsForV[i] = autTransAndNextValsForV[i].and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
-*/
+
             newEdgesBDD.andWith(autTransAndNextValsForV[i]);
         }
         
