@@ -180,7 +180,7 @@ public class IntListBuffer
   public void dispose(final int list)
   {
     if (list != NULL) {
-      final int tail = getNext(list);
+      final int tail = getData(list);
       final int last = tail == NULL ? list : tail;
       setNext(last, mRecycleStart);
       mRecycleStart = list;
