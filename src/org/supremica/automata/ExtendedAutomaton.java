@@ -54,7 +54,6 @@
 
 package org.supremica.automata;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,7 +70,6 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -103,7 +101,6 @@ public class ExtendedAutomaton
     private final ExtendedAutomata automata;
     private final ModuleSubjectFactory factory;
     private IdentifierSubject identifier;
-    @SuppressWarnings("unused")
     private final ModuleSubject module;
     private final SimpleComponentSubject component;
     private final GraphSubject graph;
@@ -189,7 +186,7 @@ public class ExtendedAutomaton
                forbiddenLocations.add(node);
             }
         }
-        
+
         final EventListExpressionProxy blockedEvents = component.getGraph().getBlockedEvents();
         final HashSet<String> unconAlphabetString = new HashSet<String>();
         if(blockedEvents != null)
@@ -211,7 +208,7 @@ public class ExtendedAutomaton
         }
 
         for(final EdgeSubject edge:component.getGraph().getEdgesModifiable())
-        {            
+        {
             for(final Proxy event:edge.getLabelBlock().getEventList())
             {
                 final String eventName = ((SimpleIdentifierSubject)event).getName();
@@ -221,7 +218,7 @@ public class ExtendedAutomaton
                 {
                     if(!edge.getGuardActionBlock().getGuards().isEmpty())
                     {
-                        Set<VariableComponentProxy> vars = extractVariablesFromExpr(edge.getGuardActionBlock().getGuards().get(0));
+                        final Set<VariableComponentProxy> vars = extractVariablesFromExpr(edge.getGuardActionBlock().getGuards().get(0));
 
                         usedSourceVariables.addAll(vars);
                         if(guardVariables.get(e) == null)
@@ -230,9 +227,9 @@ public class ExtendedAutomaton
                             guardVariables.get(e).addAll(vars);
 
                         //Create the relations between different variables (if two variables appear in the same guard, they are related!)
-                        for(VariableComponentProxy v:vars)
+                        for(final VariableComponentProxy v:vars)
                         {
-                            ArrayList<VariableComponentProxy> varsExtended = new ArrayList<VariableComponentProxy>(vars);
+                            final ArrayList<VariableComponentProxy> varsExtended = new ArrayList<VariableComponentProxy>(vars);
                             varsExtended.remove(v);
                             automata.addToRelatedVars(v, varsExtended);
                         }
@@ -240,15 +237,15 @@ public class ExtendedAutomaton
 
                     if(!edge.getGuardActionBlock().getActions().isEmpty())
                     {
-                        for(SimpleExpressionProxy action:edge.getGuardActionBlock().getActions())
+                        for(final SimpleExpressionProxy action:edge.getGuardActionBlock().getActions())
                         {
-                            Set<VariableComponentProxy> vars = extractVariablesFromExpr(((BinaryExpressionProxy)action).getLeft());
+                            final Set<VariableComponentProxy> vars = extractVariablesFromExpr(((BinaryExpressionProxy)action).getLeft());
                             usedTargetVariables.addAll(vars);
                             if(actionVariables.get(e) == null)
                                 actionVariables.put(e, vars);
                             else
                                 actionVariables.get(e).addAll(vars);
-                            
+
                         }
 
                     }
@@ -263,7 +260,7 @@ public class ExtendedAutomaton
                 {
                     if(!uncontrollableAlphabet.contains(e))
                         uncontrollableAlphabet.add(e);
-                    
+
                     unconAlphabetString.add(e.getName());
                 }
             }
@@ -369,14 +366,14 @@ public class ExtendedAutomaton
 */
     }
 
-    public Set<VariableComponentProxy> extractVariablesFromExpr(SimpleExpressionProxy expr)
+    public Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr)
     {
-        Set<VariableComponentProxy> vars = new HashSet<VariableComponentProxy>();
-        for(Proxy proxy:module.getComponentList())
+        final Set<VariableComponentProxy> vars = new HashSet<VariableComponentProxy>();
+        for(final Proxy proxy:module.getComponentList())
         {
             if(proxy instanceof VariableComponentProxy)
             {
-                VariableComponentProxy var = (VariableComponentProxy)proxy;
+                final VariableComponentProxy var = (VariableComponentProxy)proxy;
                 if(expr.toString().contains(var.getName()))
                 {
                     vars.add(var);
@@ -387,12 +384,12 @@ public class ExtendedAutomaton
         return vars;
     }
 
-    public Set<VariableComponentProxy> getGuardVariables(EventDeclProxy e)
+    public Set<VariableComponentProxy> getGuardVariables(final EventDeclProxy e)
     {
         return guardVariables.get(e);
     }
 
-    public Set<VariableComponentProxy> getActionVariables(EventDeclProxy e)
+    public Set<VariableComponentProxy> getActionVariables(final EventDeclProxy e)
     {
         return actionVariables.get(e);
     }

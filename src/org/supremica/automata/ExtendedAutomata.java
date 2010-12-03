@@ -78,7 +78,6 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
-import org.sat4j.minisat.core.VarActivityListener;
 
 
 public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
@@ -141,7 +140,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         {
             if(sub instanceof VariableComponentProxy)
             {
-                VariableComponentProxy var = (VariableComponentProxy)sub;
+                final VariableComponentProxy var = (VariableComponentProxy)sub;
                 var2relatedVarsMap.put(var, new ArrayList<VariableComponentProxy>());
                 if(!sub.toString().contains(locaVarSuffix))
                     variables.add(((VariableComponentProxy)sub));
@@ -199,12 +198,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
     }
 
-    public List<VariableComponentProxy> getRelatedVars(VariableComponentProxy var)
+    public List<VariableComponentProxy> getRelatedVars(final VariableComponentProxy var)
     {
         return var2relatedVarsMap.get(var);
     }
 
-    public void addToRelatedVars(VariableComponentProxy var, List<VariableComponentProxy> vars)
+    public void addToRelatedVars(final VariableComponentProxy var, final List<VariableComponentProxy> vars)
     {
         var2relatedVarsMap.get(var).addAll(vars);
     }
@@ -266,12 +265,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return nbrOfExAutomata;
     }
 
-    public VariableComponentProxy getVariableByName(String varName)
+    public VariableComponentProxy getVariableByName(final String varName)
     {
-        for(VariableComponentProxy var:variables)
+        for(final VariableComponentProxy var:variables)
             if(var.getName().equals(varName))
                 return var;
-        
+
         throw new IllegalArgumentException ("There does not exists a variable in the model with name "+varName+"!");
     }
 

@@ -12,22 +12,17 @@ package org.supremica.automata.BDD.EFA;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
-import org.supremica.automata.BDD.DefaultPCGNode;
 import org.supremica.automata.ExtendedAutomata;
-import org.supremica.automata.ExtendedAutomaton;
+import org.supremica.automata.BDD.DefaultPCGNode;
 import org.supremica.util.BDD.Options;
 import org.supremica.util.BDD.PCGNode;
 import org.supremica.util.BDD.solvers.OrderingSolver;
@@ -36,7 +31,7 @@ import org.supremica.util.BDD.solvers.OrderingSolver;
 public class PCGVariableSorter
 {
     ExtendedAutomata efa;
-    public PCGVariableSorter(ExtendedAutomata efa)
+    public PCGVariableSorter(final ExtendedAutomata efa)
     {
         this.efa = efa;
     }
@@ -56,7 +51,7 @@ public class PCGVariableSorter
 
         for(final String v:varNames)
         {
-innerLoop:  for(VariableComponentProxy var:vars)
+innerLoop:  for(final VariableComponentProxy var:vars)
                 if(var.getName().equals(v))
                 {
                     orgVar.add(var);
@@ -66,7 +61,7 @@ innerLoop:  for(VariableComponentProxy var:vars)
 
 //        orgAutomata = oorgAutomata.clone();
 
-        SimpleExpressionCompiler mSimpleExpressionCompiler = new SimpleExpressionCompiler(ModuleElementFactory.getInstance(), CompilerOperatorTable.getInstance());
+        final SimpleExpressionCompiler mSimpleExpressionCompiler = new SimpleExpressionCompiler(ModuleElementFactory.getInstance(), CompilerOperatorTable.getInstance());
 
         for (final VariableComponentProxy currVar : orgVar)
         {
@@ -75,7 +70,7 @@ innerLoop:  for(VariableComponentProxy var:vars)
                 range = mSimpleExpressionCompiler.getRangeValue(currVar.getType());
 
             } catch (final EvalException exception) {System.err.println(exception);}
-            
+
             pcgNodeList.add(new DefaultPCGNode(currVar.getName(), range.size()));
         }
         //PCG pcg = new PCG(new Vector<PCGNode>(pcgNodeList));
@@ -83,12 +78,12 @@ innerLoop:  for(VariableComponentProxy var:vars)
         final int[][] weightMatrix = getCommunicationMatrix(orgVar);
         final OrderingSolver orderingSolver = new OrderingSolver(orgVar.size());
 
-        
+
         for (int i=0;i<orgVar.size();i++)
         {
             orderingSolver.addNode(pcgNodeList.get(i), weightMatrix[i], i - 1);
         }
-        
+
         int i = 0;
         final int[] order = orderingSolver.getGoodOrder();
 
@@ -125,20 +120,20 @@ innerLoop:  for(VariableComponentProxy var:vars)
     int getCommunicationComplexity(final VariableComponentProxy firstVar, final VariableComponentProxy secondVar)
     {
         int weight = 0;
-        ArrayList<VariableComponentProxy> relatedVars = new ArrayList<VariableComponentProxy>(efa.getRelatedVars(firstVar));
+        final ArrayList<VariableComponentProxy> relatedVars = new ArrayList<VariableComponentProxy>(efa.getRelatedVars(firstVar));
 
         if(firstVar.equals(secondVar))
         {
             weight = Integer.MAX_VALUE;
         }
         else
-        {            
-            ArrayList<VariableComponentProxy> secVar = new ArrayList<VariableComponentProxy>();
+        {
+            final ArrayList<VariableComponentProxy> secVar = new ArrayList<VariableComponentProxy>();
             secVar.add(secondVar);
             relatedVars.retainAll(secVar);
             weight = relatedVars.size();
         }
-        
+
         return weight;
     }
 
