@@ -1193,8 +1193,12 @@ public class OPSearchAutomatonSimplifier
 
     // 3. Create output automaton states and partition
     int numOutputStates = 0;
+    int outputFanout = 0;
     for (int c = 0; c < numClasses; c++) {
       numOutputStates += maxFanout[c];
+      if (maxFanout[c] > outputFanout) {
+        outputFanout = maxFanout[c];
+      }
     }
     final List<StateProxy> states =
       new ArrayList<StateProxy>(numOutputStates);
@@ -1277,8 +1281,49 @@ public class OPSearchAutomatonSimplifier
       }
     }
 
+    final int numEvents = mEventEncoding.getNumberOfEvents() + outputFanout;
+    final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
+    for (int p = 0; p < numProps; p++) {
+      final EventProxy prop = mEventEncoding.getProposition(p);
+      events.add(prop);
+    }
+
+    events:
     for (int e = OBSERVABLE_TAU; e < numProperEvents; e++) {
       EventProxy event = mEventEncoding.getProperEvent(e);
+      if (e != OBSERVABLE_TAU) {
+        boolean selfloop = true;
+        classes:
+        for (int toClass = 0; toClass < numClasses; toClass++) {
+          if (partition == null) {
+            current[0] = toClass;
+          } else {
+            current = partition.get(toClass);
+          }
+          selfloop = false;
+          for (final int t : current) {
+            iter.reset(t, e);
+            while (iter.advance()) {
+              final int s = iter.getCurrentSourceState();
+              final int fromClass = classMap[s];
+              if (fromClass == toClass) {
+                selfloop = true;
+              } else {
+                selfloop = false;
+                break classes;
+              }
+            }
+            if (!selfloop) {
+              break classes;
+            }
+          }
+        }
+        if (selfloop) {
+          continue events;
+        } else {
+          events.add(event);
+        }
+      }
       Arrays.fill(currentFanout, 0);
       Arrays.fill(cls, -1);
       for (int toClass = 0; toClass < numClasses; toClass++) {
@@ -1324,16 +1369,6 @@ public class OPSearchAutomatonSimplifier
     // 5. Create output automaton
     final String name = rel.getName();
     final ComponentKind kind = rel.getKind();
-    final int numEvents = mEventEncoding.getNumberOfEvents() + otaus.size();
-    final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
-    for (int p = 0; p < numProps; p++) {
-      final EventProxy prop = mEventEncoding.getProposition(p);
-      events.add(prop);
-    }
-    for (int e = OBSERVABLE_TAU + 1; e < numProperEvents; e++) {
-      final EventProxy event = mEventEncoding.getProperEvent(e);
-      events.add(event);
-    }
     events.addAll(otaus);
     final AutomatonProxy aut =
       factory.createAutomatonProxy(name, kind, events, states, transitions);

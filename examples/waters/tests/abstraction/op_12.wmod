@@ -118,22 +118,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
-                <EdgeList>
-                    <Edge Target="S0" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-9"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="21" X="63"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="64" X="64"/>
-                        </EndPointGeometry>
-                    </Edge>
-                </EdgeList>
             </Graph>
         </SimpleComponent>
     </ComponentList>
