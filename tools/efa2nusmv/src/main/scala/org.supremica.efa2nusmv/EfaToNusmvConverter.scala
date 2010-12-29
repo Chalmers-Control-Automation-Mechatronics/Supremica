@@ -1,62 +1,73 @@
 package org.supremica.efa2nusmv
 
-import scala.xml.Node 
+import scala.xml.Node
 
 import java.io.{File, PrintWriter}
 
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
-  
-object EfaToNusmvConverter {
-  
-  var pw: PrintWriter = new PrintWriter(System.out)
-  
-  def main(args: Array[String]) {
-	
-  	if(args.size > 2 || (args.size > 0 && args(0) == "-h")) {
-  		println("\nUsege: java -jar efa2smv [inFile [outFile]]")
-  	} else {
-  	  val inoutFilesOpt = args.size match {
-  	    case 2 => Some((new File(args(0)), new File(args(1))))
-  	    case 1 => Some((new File(args(0)), new File(args(0) + ".smv")))
-  	    case 0 => {
-  	                val f = getFile
-  	                if(f.isEmpty) 
-  	                  None 
-  	                else 
-  	                  Some((new File(f.get), new File(f.get + ".smv")))
-  	              }
-  	  }
-  	  if(inoutFilesOpt.isDefined){
-  		  val (inFile, outFile): (File, File) = inoutFilesOpt.get 
-          
-          convert(inFile, outFile)
 
-  	  } else {
-  		  // do nothing and exit
-  	  }
-  	}
+object EfaToNusmvConverter {
+
+  var pw: PrintWriter = new PrintWriter(System.out)
+
+  def main(args: Array[String]) {
+
+    if(args.size > 2 || (args.size > 0 && args(0) == "-h")) {
+      println("\nUsege: java -jar efa2smv.jar [inFile [outFile]]")
+    } else {
+      val inoutFilesOpt: Option[(File, File)] = args.size match {
+        case 2 => Some((new File(args(0)), new File(args(1))))
+        case 1 => Some((new File(args(0)), new File(args(0) + ".smv")))
+        case 0 => chooseFiles
+      }
+      inoutFilesOpt match {
+        case Some( (inFile, outFile) ) => convert(inFile, outFile)
+        case None => {} // do nothing and exit
+      }
+    }
+  }
+
+  def chooseFiles(): Option[(File,File)] = {
+    val in = getInputFile
+    val out = if(in.isEmpty) None else getOutputFile(in.get)
+    (in, out) match {
+      case (Some(i), Some(o)) => Some( (i,o) ) // work
+      case (Some(i), None)    => chooseFiles   // restart
+      case (None   , _)       => None          // exit
+    }
+  }
+
+  def getInputFile(): Option[File] = {
+    val chooser = new JFileChooser(".")
+    chooser.setFileFilter(new FileNameExtensionFilter(
+        "Supremica Waters modules", "wmod"))
+    val returnVal = chooser.showOpenDialog(null);
+    if(returnVal == JFileChooser.APPROVE_OPTION)
+      Some(chooser.getSelectedFile)
+    else
+      None
+  }
+
+  def getOutputFile(inputFile: File): Option[File] = {
+    val chooser = new JFileChooser
+    chooser.setFileFilter(new FileNameExtensionFilter(
+        "NuSMV files", "smv"))
+    chooser.setSelectedFile(new File(inputFile.getPath + ".smv"))
+    val returnVal = chooser.showSaveDialog(null);
+    if(returnVal == JFileChooser.APPROVE_OPTION)
+      Some(chooser.getSelectedFile)
+    else
+      None
   }
 
   def convert(inputFile: File, outputFile: File) {
-  	    val module = scala.xml.XML.loadFile(inputFile)
-  	    pw = new PrintWriter(outputFile)
+    val module = scala.xml.XML.loadFile(inputFile)
+    pw = new PrintWriter(outputFile)
 
-        printSmv(module)    
+    printSmv(module)
   }
-  
-  def getFile(): Option[String] = {
-      val chooser = new JFileChooser
-	    chooser.setFileFilter(new FileNameExtensionFilter(
-	        "Supremica Waters modules", "wmod"))
-	    val returnVal = chooser.showOpenDialog(null);
-	    if(returnVal == JFileChooser.APPROVE_OPTION) 
-	      Some(chooser.getSelectedFile.getPath)
-	    else 
-	      None
-  }
-
 
   def printSmv(module: Node) {
     pw.println("MODULE main")
@@ -71,31 +82,31 @@ object EfaToNusmvConverter {
     allTransitions(module)
     pw.println("TRANS")
     automataTransitions(module)
-    //pw.println("DEFINE")    
+    //pw.println("DEFINE")
     variableUpdateDesires(module)
-    //pw.println("DEFINE")    
+    //pw.println("DEFINE")
     combinationOfDesires(module)
     //pw.println("CTLSPEC AG (EF (event=" + escape(":accepting") + "))")
     printAcceptingReachableSpec(module)
     pw.flush
   }
-  
+
 
   def automataVarDecl(module: Node): Unit = {
     for(sc <- module \ "ComponentList" \ "SimpleComponent" ) {
-      val vd = automatonVarName(sc) + " : {" + 
+      val vd = automatonVarName(sc) + " : {" +
         interleaveWith(", ", automatonStateNames(sc)) + "};"
       pw.println(vd)
     }
   }
 
-  
+
   def automatonVarName(sc: Node): String = {
     "q_" + name(sc)
   }
-  
+
   def automatonStateNames(sc: Node): Seq[String] = {
-    for(s <- sc \ "Graph" \ "NodeList" \ "SimpleNode") yield 
+    for(s <- sc \ "Graph" \ "NodeList" \ "SimpleNode") yield
       name(s)
   }
 
@@ -103,7 +114,7 @@ object EfaToNusmvConverter {
     try{
       escape(getAttribute("Name", node))
     } catch {
-      case iae: IllegalArgumentException => 
+      case iae: IllegalArgumentException =>
         if(!((node \ "SimpleIdentifier").isEmpty)){
           name((node \ "SimpleIdentifier")(0))
         } else {
@@ -112,31 +123,31 @@ object EfaToNusmvConverter {
         }
     }
   }
-  
+
   def getAttribute(name:String, node: Node): String = {
     node.attribute(name) match {
       case Some(value) => value.toString
       case _ => throw new IllegalArgumentException("node " + node.toString +
-            " has no attribute " + name)        
+            " has no attribute " + name)
     }
   }
 
-  
+
   def interleaveWith(sep:String, s:Seq[String]): String = {
     val s1 = s.filter(!_.isEmpty)
     if(s1.isEmpty) {""}
     else {s1.reduceLeft((x,y) => x + sep + y)}
   }
 
-  
+
   def efavarVarDecl(module: Node): Unit = {
     for(vc <- module \ "ComponentList" \ "VariableComponent" ) {
       val vd = name(vc) + " : " + efaVarDomain(vc) + " ;"
       pw.println(vd)
-    }  
+    }
   }
 
-  
+
 
   def efaVarDomain(vc: Node): String = {
     val e = vc \ "VariableRange" \ "BinaryExpression"
@@ -154,15 +165,15 @@ object EfaToNusmvConverter {
     }
   }
 
-  
+
 
   def eventsDecl(module: Node): Unit = {
-    val events = (module \ "EventDeclList" \ "EventDecl") map name 
+    val events = (module \ "EventDeclList" \ "EventDecl") map name
     pw.println("event : {" + interleaveWith(", ",
       List("_dummy_event_when_all_stay_") ++ events) + "};")
   }
 
-  
+
   def escape(s:String):String = {
     val rep = s
 //     .replace("_", "_underscore_")
@@ -183,8 +194,8 @@ object EfaToNusmvConverter {
      else
        rep
   }
-  
-  
+
+
   def inits(module: Node): Unit = {
     pw.println(
       interleaveWith(" & ",
@@ -209,7 +220,7 @@ object EfaToNusmvConverter {
       } )
   }
 
-  
+
   abstract class ArExpr
   case class BinExpr(l: ArExpr, r: ArExpr, op: String) extends ArExpr
   case class UnExpr(e: ArExpr, op: String) extends ArExpr
@@ -218,13 +229,13 @@ object EfaToNusmvConverter {
 
   def parse(node: Node): ArExpr = {
     node match {
-      case <BinaryExpression>{ _* }</BinaryExpression> => 
+      case <BinaryExpression>{ _* }</BinaryExpression> =>
         new BinExpr(
           parse((node \ "_")(0)),
           parse((node \ "_")(1)),
-          getAttribute("Operator", node))      
-      
-      case <UnaryExpression>{ _* }</UnaryExpression> => 
+          getAttribute("Operator", node))
+
+      case <UnaryExpression>{ _* }</UnaryExpression> =>
         new UnExpr(
           parse((node \ "_")(0)),
           getAttribute("Operator", node))
@@ -240,7 +251,7 @@ object EfaToNusmvConverter {
     }
   }
 
-  
+
   def printExpr(e: ArExpr): String = {
     e match {
       case BinExpr(l,r, op) => "(" + printExpr(l) + printBinOp(op) + printExpr(r) + ")"
@@ -277,13 +288,13 @@ object EfaToNusmvConverter {
   }
 
 
-  
+
 
   def tranName(sc: Node, id: String): String = { "t__" + name(sc) + "__" + id }
-  
+
   def defineTransition(sc: Node, edgeAndId: Pair[Node, Int]): String = edgeAndId match {
     case (edge, id) => {
-      val expr = interleaveWith(" & ", 
+      val expr = interleaveWith(" & ",
         List(automatonVarName(sc) + "=" + escape(getAttribute("Source", edge)) )
         :::
         List ("(" + interleaveWith(" | ",
@@ -301,7 +312,7 @@ object EfaToNusmvConverter {
   def allTransitions(model: Node): Unit = {
     for(sc <- model \ "ComponentList" \ "SimpleComponent") {
       val edges = sc \ "Graph" \ "EdgeList" \ "Edge"
-      val edgeAndIds = edges.toList.zipWithIndex      
+      val edgeAndIds = edges.toList.zipWithIndex
       for(edgeAndId <- edgeAndIds) {
         pw.println(defineTransition(sc, edgeAndId) )
       }
@@ -315,7 +326,7 @@ object EfaToNusmvConverter {
             "(" + automatonVarName(sc) + "=" + name(node) + " & (" +
               interleaveWith(" | ", prop.map("event="+_))  + "))"
             }}
-           )      
+           )
       val stay = tranName(sc, "stay") + " := " +
         interleaveWith(" | ", List(notInAlphabet) ++ propositionExprs) + " ;"
       pw.println(stay)
@@ -323,29 +334,20 @@ object EfaToNusmvConverter {
     }
   }
 
-  // very nice, all iterations are hidden  
+  // very nice, all iterations are hidden
   def alphabet(sc: Node): List[String] = {
-    removeDuplicates((
+    (
       // propositions
-      (sc \ "Graph" \ "NodeList" \ "SimpleNode" \ "EventList"  \ "SimpleIdentifier") 
+      (sc \ "Graph" \ "NodeList" \ "SimpleNode" \ "EventList"  \ "SimpleIdentifier")
       ++
       // transition labels
-      (sc \ "Graph" \ "EdgeList" \ "Edge"       \ "LabelBlock" \ "SimpleIdentifier") 
+      (sc \ "Graph" \ "EdgeList" \ "Edge"       \ "LabelBlock" \ "SimpleIdentifier")
       ++
       // blockedEvents
-      (sc \ "Graph" \ "LabelBlock" \ "SimpleIdentifier")                             
-    ).map(name).toList)
+      (sc \ "Graph" \ "LabelBlock" \ "SimpleIdentifier")
+    ).map(name).toList.distinct
   }
 
-  def removeDuplicates[A](xs: List[A]): List[A] = {
-    if (xs.isEmpty)
-      xs
-    else
-      xs.head :: removeDuplicates(for (x <- xs.tail if x != xs.head) yield x)
-  }
-
-
-  
 
   def exprToSpecifyNextAutomatonState(sc: Node, edgeAndIds: Seq[Pair[Node, Int]]): String = {
     val edgeExprs = (edgeAndIds map ( (x:Pair[Node,Int]) => x match {
@@ -358,12 +360,12 @@ object EfaToNusmvConverter {
              ") = " + automatonVarName(sc) )
 
     interleaveWith(" | \n", edgeExprs )
-    
+
   }
 
   def automataTransitions(model: Node): Unit = {
     val scs = model \ "ComponentList" \ "SimpleComponent"
-    
+
     val oneTranConds = scs map ( (sc:Node) => {
         oneTranCond(sc, (sc \ "Graph" \ "EdgeList" \ "Edge").toList.zipWithIndex)
       } )
@@ -373,7 +375,7 @@ object EfaToNusmvConverter {
       } )
 
     val expr = "(\n" +
-      interleaveWith("\n) & ( \n",      
+      interleaveWith("\n) & ( \n",
         tranConds ++ oneTranConds
       ) +
       "\n)"
@@ -386,18 +388,18 @@ object EfaToNusmvConverter {
           case (_,id) => tranName(sc,id.toString)
         }
       )) ++ List(tranName(sc, "stay"))
-    ) + " = 1 "    
+    ) + " = 1 "
   }
 
 
-  
+
 
   def variableUpdateDesires(model: Node): Unit = {
     pw.println("-- automata desires about EFA variables: 0 - don't care, 1 - care, 2 - conflict")
     for(vc <- model \ "ComponentList" \ "VariableComponent") {
       for(sc <- model \ "ComponentList" \ "SimpleComponent" if everCaresAbout(vc, sc)) {
         val edgesAndIds = (sc \ "Graph" \ "EdgeList" \ "Edge").toList.zipWithIndex
-        pw.println("DEFINE")        
+        pw.println("DEFINE")
         pw.println(name(vc) + "__" + name(sc) + "__desire := case")
         for((edge, id) <- edgesAndIds){
           if(care(edge, vc)){
@@ -420,11 +422,9 @@ object EfaToNusmvConverter {
   }
 
   // returns true if given automaton sc has any node that updates given variable
-  def everCaresAbout(vc: Node, sc: Node): Boolean = {
-    !((sc \ "Graph" \ "EdgeList" \ "Edge")
-      .filter(edge => care(edge, vc))
-      .isEmpty)
-  }
+  def everCaresAbout(vc: Node, sc: Node): Boolean = 
+    (sc \ "Graph" \ "EdgeList" \ "Edge").exists(edge => care(edge, vc))
+
 
   // returns true if a given edge has some action with a given variable
   def care(edge: Node, vc: Node): Boolean = {
@@ -472,13 +472,13 @@ object EfaToNusmvConverter {
   }
 
 
-  
+
 
 
   // v_a + v_b => v_a_b
   // v_a_b + v_c => v_a_b_c
   // v_a_b_c + v_d => v_a_b_c_d
-  def combinationOfDesires(model: Node): Unit = {    
+  def combinationOfDesires(model: Node): Unit = {
     for(vc <- model \ "ComponentList" \ "VariableComponent") {
       val ats = (model \ "ComponentList" \ "SimpleComponent").filter(sc=>everCaresAbout(vc, sc)).map(name)
       pw.println("\n-- " + name(vc) + " : " + interleaveWith(" ", ats) )
@@ -492,7 +492,7 @@ object EfaToNusmvConverter {
       pw.println("TRANS next(" + name(vc) + ") = " +
         {
           if(ats.isEmpty) { // no automata cares about the variable - keep its value
-            name(vc)        
+            name(vc)
           } else if(combinedNames.isEmpty){  // only one automaton in the system cares
             desiredValVar(name(vc)+"__"+ats(0))
           } else {          // more than one cares - use last combined name
@@ -507,7 +507,7 @@ object EfaToNusmvConverter {
     list.map(p ++ _)
   }
 
-  // accumulateNames(List(List("a"), List("b"), List("c"))) = 
+  // accumulateNames(List(List("a"), List("b"), List("c"))) =
   //       = List(List("a"), List("a", "b"), List("a", "b", "c"))
   def accumulateNames(s: List[List[String]]): List[List[String]] = {
     if(s.length == 0){Nil}
@@ -515,7 +515,7 @@ object EfaToNusmvConverter {
     else{List(s(0))++prefixWith(s(0), accumulateNames(s.drop(1)))}
   }
 
-  
+
   def desireVar(name: String): String = name + "__desire"
   def desiredValVar(name: String): String = name + "__desiredVal"
 
@@ -548,7 +548,7 @@ object EfaToNusmvConverter {
     desiredValVar(r) // returns last combined name for future use
   }
 
-  
+
 
   def printAcceptingReachableSpec(module: Node): Unit = {
 
@@ -582,7 +582,7 @@ object EfaToNusmvConverter {
   def isAccepting(node: Node): Boolean = {
     (node \ "EventList" \ "SimpleIdentifier").map(name).contains(escape(":accepting"))
   }
-  
+
   def containsAcceptingNode(sc: Node): Boolean = {
     (sc \ "Graph" \ "NodeList" \ "SimpleNode" \ "EventList" \ "SimpleIdentifier")
       .map(name).contains(escape(":accepting"))
@@ -599,4 +599,3 @@ object EfaToNusmvConverter {
 
 }
 
-  
