@@ -5,6 +5,8 @@ import scala.xml.Node
 import java.io.{File, PrintWriter}
 
 import javax.swing.JFileChooser
+import javax.swing.UIManager
+import javax.swing.UnsupportedLookAndFeelException
 import javax.swing.filechooser.FileNameExtensionFilter
 
 
@@ -20,12 +22,24 @@ object EfaToNusmvConverter {
       val inoutFilesOpt: Option[(File, File)] = args.size match {
         case 2 => Some((new File(args(0)), new File(args(1))))
         case 1 => Some((new File(args(0)), new File(args(0) + ".smv")))
-        case 0 => chooseFiles
+        case 0 => {setSystemLookAndFeel; chooseFiles}
       }
       inoutFilesOpt match {
         case Some( (inFile, outFile) ) => convert(inFile, outFile)
-        case None => {} // do nothing and exit
+        case None                      => {} // do nothing and exit
       }
+    }
+  }
+
+  def setSystemLookAndFeel() {
+    try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+    }
+    catch {
+      case e: UnsupportedLookAndFeelException => {}
+      case e: ClassNotFoundException => {}
+      case e: InstantiationException => {}
+      case e: IllegalAccessException => {}
     }
   }
 

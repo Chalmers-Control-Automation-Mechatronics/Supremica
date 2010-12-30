@@ -120,7 +120,8 @@
                         <scalaVersion>${scala.version}</scalaVersion>
                         <useFsc>true</useFsc>
                         <args>
-                            <arg>-deprecation</arg>    
+                            <arg>-deprecation</arg>
+                            <arg>-unchecked</arg>
                         </args>
                         <jvmArgs>
                             <jvmArg>-Xms128M</jvmArg>
