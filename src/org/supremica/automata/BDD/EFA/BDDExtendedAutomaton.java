@@ -224,8 +224,7 @@ public class BDDExtendedAutomaton {
 
             bddIndex2SourceStateName.put(bddIndex,sourceLocation.getName());
         }
-	manager.addEdge(edgeForwardBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions,
-                sourceLocation.getName(), destLocation.getName());
+	manager.addEdge(edgeForwardBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions);
     }
 
     public BDD getForbiddenStateSet()

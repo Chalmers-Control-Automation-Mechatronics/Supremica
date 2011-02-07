@@ -103,7 +103,7 @@ public class EditorSynthesizerAction
 
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
         logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+bddSynthesizer.nbrOfStates()+" states.");
-        logger.info("number of nodes in the safe BDD: "+bddSynthesizer.getResult().nodeCount());
+        System.err.println("Number of nodes in the safe BDD: "+bddSynthesizer.getResult().nodeCount());
 
         if(bddSynthesizer.nbrOfStates()>0)
         {
@@ -158,22 +158,6 @@ public class EditorSynthesizerAction
 
             if(options.getPrintGuard())
             {
-                String expressionType = "";
-                switch(options.getExpressionType())
-                {
-                    case(0):
-                        expressionType = "Forbidden";
-                    break;
-
-                    case(1):
-                        expressionType = "Allowed";
-                    break;
-
-                    case(2):
-                        expressionType = "Adaptive";
-                    break;
-                }
-
                 if(!isGuardsComputed)
                 {
                     bddSynthesizer.generateGuard(eventNames, options);
@@ -187,9 +171,9 @@ public class EditorSynthesizerAction
                     if(TF.equals("True"))
                         TF = "This event is always ENABLED by the supervisor.";
                     else if(TF.equals("False"))
-                        TF = "This event is always DISABLED by the supervisor.";
+                        TF = "This event is always DISABLED by the supervisor"+(bddgg.isEventBlocked()?" (Blocked in the synchronization process).":".");
 
-                    logger.info(expressionType+" guard for event "+event+": "+TF);
+                    logger.info(bddgg.getBestStateSet()+" guard for event "+event+": "+TF);
 
                     logger.info("Number of terms in the expression: "+bddgg.getNbrOfTerms());
 

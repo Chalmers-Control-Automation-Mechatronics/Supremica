@@ -17,8 +17,14 @@ import org.supremica.automata.*;
 import org.supremica.automata.BDD.*;
 import org.supremica.automata.BDD.EFA.*;
 import net.sf.javabdd.*;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.ParseException;
 import org.supremica.log.*;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.properties.Config;
 
@@ -71,7 +77,9 @@ public class BDDExtendedGuardGenerator {
     private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
     String pathRoot = "";//C:/Users/sajed/Desktop/MDD_files/";
 
-//    HashSet<String> independentStates;
+    String bestStateSet = "";
+    
+    private boolean isEventBlocked = false;
 
 
     /** Creates a new instance of BDDExtendedGuardGenerator */
@@ -80,8 +88,21 @@ public class BDDExtendedGuardGenerator {
         automataBDD = bddAutomata;
         manager = automataBDD.getBDDManager();
         pathRoot = Config.FILE_SAVE_PATH.getAsString()+"\\";
-        generateIDD_PS = options.getSaveIDDInFile();        
-
+        generateIDD_PS = options.getSaveIDDInFile();
+  /*
+        final ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+        final ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+        SimpleExpressionSubject testExpr = null;
+        SimpleExpressionSubject careExpr = null;
+        try{
+            String exprString = "(x2&((!x1|(!x3|x4))&(!(!x3|x4)|x1))) | (!(x2|((!x4|x1)&(x1|x3))))";
+            String careString = "(!x2&x3&x4)|(x2&(!x3|x4)&(!x4|x3))";
+            testExpr = (SimpleExpressionSubject)(parser.parse(exprString,Operator.TYPE_BOOLEAN));
+            careExpr = (SimpleExpressionSubject)(parser.parse(careString,Operator.TYPE_BOOLEAN));
+        }catch(ParseException e){}
+        manager.guard2BDD(testExpr).printDot();
+        manager.guard2BDD(testExpr).simplify(manager.guard2BDD(careExpr).toVarSet()).printDot();
+*/
         switch(options.getExpressionType())
         {
             case 0:
@@ -137,6 +158,7 @@ public class BDDExtendedGuardGenerator {
             if(nbrOfTerms < minNbrOfTerms)
             {
                 guard = forbiddenGuard;
+                bestStateSet = "FORBIDDEN";
             }
             else
             {
@@ -144,6 +166,7 @@ public class BDDExtendedGuardGenerator {
                 nbrOfTerms = minNbrOfTerms;
                 this.nbrOfCompHeurs = nbrOfCompHeurs;
                 this.nbrOfIndpHeurs = nbrOfIndpHeurs;
+                bestStateSet = "ALLOWED";
             }
         }
         else
@@ -151,11 +174,21 @@ public class BDDExtendedGuardGenerator {
             if(allowedForbidden)
             {
                 guard = generateGuard(mustAllowedStatesBDD);
+                bestStateSet = "ALLOWED";
             }
             else
             {
                 guard = generateGuard(mustForbiddenStatesBDD);
+                bestStateSet = "FORBIDDEN";
             }
+        }
+        
+        //The event is blocked in the synchronization process
+        if(mustAllowedStatesBDD.satCount(automataBDD.getSourceStatesVarSet()) == 0 &&
+                mustForbiddenStatesBDD.satCount(automataBDD.getSourceStatesVarSet()) == 0)
+        {
+            guard = FALSE;
+            isEventBlocked = true;
         }
 /*
         ArrayList<IDD> children = new ArrayList<IDD>();
@@ -221,6 +254,16 @@ public class BDDExtendedGuardGenerator {
         HashMap<String, String> memory = new HashMap<String, String>();
         System.out.println(generateExpression(idd7, memory));
 */
+    }
+
+    public boolean isEventBlocked()
+    {
+        return isEventBlocked;
+    }
+
+    public String getBestStateSet()
+    {
+        return bestStateSet;
     }
 
     public String getGuard()
@@ -344,6 +387,8 @@ public class BDDExtendedGuardGenerator {
         nbrOfIndpHeurs = 0;
         String guard = "";
 
+
+
         if(states.equals(careStatesBDD))
         {
             guard = allowedForbidden ? TRUE : FALSE;
@@ -357,6 +402,8 @@ public class BDDExtendedGuardGenerator {
         else
         {
             BDD goodBDD = states.simplify(careStatesBDD.toVarSet());
+//            BDD goodBDD = states.simplify(careStatesBDD.exist(automataBDD.getTestVarSet()).toVarSet());
+//            BDD goodBDD = states.exist(automataBDD.getTestVarSet());
 
             if(states.nodeCount() <= goodBDD.nodeCount())
                 goodBDD = states;
@@ -419,7 +466,7 @@ public class BDDExtendedGuardGenerator {
 
                 IDD nextIDD = visitedNodes.get(bdd.hashCode());
 
-                //if node has not been visited
+                //if 'node' has not been visited
                 if(nextIDD == null)
                 {
                     final IDDNode node = new IDDNode(""+bdd.hashCode(),automataBDD.getAutVarName(bdd.var()));
@@ -641,7 +688,9 @@ public class BDDExtendedGuardGenerator {
 
             final boolean independentApplicable = applyIndependentHeuristics && isIndependentHeuristicApplicable(autVarName, idd.labelOfChild(iddChild));
 
-            String stateExpr = (expr_Nbr.i==1)?expr_Nbr.s:("("+expr_Nbr.s+")");
+            String stateExpr = "";
+            if(expr_Nbr.i>0)
+                stateExpr = (expr_Nbr.i==1)?expr_Nbr.s:("("+expr_Nbr.s+")");
             inForNbr += expr_Nbr.i;
 
             String expr = "";
@@ -658,7 +707,9 @@ public class BDDExtendedGuardGenerator {
                     }
                     else
                     {
-                        stateExpr = (Math.abs(e_n.i)==1)?e_n.s:("("+e_n.s+")");
+                        if(Math.abs(e_n.i)>0)
+                            stateExpr = (Math.abs(e_n.i)==1)?e_n.s:("("+e_n.s+")");
+
                         if(idd.getChildren().size() > 1 || idd.getParents().isEmpty())
                         {
                             inForNbr = (-e_n.i);
@@ -684,7 +735,10 @@ public class BDDExtendedGuardGenerator {
 
             if(!expr.isEmpty())
             {
-                terms.add("("+stateExpr +(allowedForbidden?AND:OR)+expr+")");
+                if(!stateExpr.isEmpty())
+                    terms.add("("+stateExpr +(allowedForbidden?AND:OR)+expr+")");
+                else
+                    terms.add("("+expr+")");
             }
             else
             {

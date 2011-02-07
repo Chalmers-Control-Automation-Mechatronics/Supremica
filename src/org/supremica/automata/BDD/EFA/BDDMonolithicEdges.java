@@ -3,7 +3,7 @@ package org.supremica.automata.BDD.EFA;
 
 /**
  *
- * @author sajed
+ * @author Sajed Miremadi
  */
 
 import net.sf.javabdd.*;
@@ -83,21 +83,9 @@ public class BDDMonolithicEdges
         System.err.println("BDD represeting forward edges with events is created.");
 
         specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
-//            specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
-/*
-        if(!specUncontrollableEdgesForwardBDD.isZero())
-        {
-            specUncontrollableEdgesBackwardBDD = sourceTooTdest(specUncontrollableEdgesForwardBDD);
-        }
-*/
+
         plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
-//            plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
-/*
-        if(!plantUncontrollableEdgesForwardBDD.isZero())
-        {
-            plantUncontrollableEdgesBackwardBDD = sourceTooTdest(plantUncontrollableEdgesForwardBDD);
-        }
-*/
+
         uncontrollableEdgesForwardBDD = edgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
         uncontrollableEdgesForwardBDD = uncontrollableEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
 

@@ -11,6 +11,7 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -154,6 +155,11 @@ public class BDDExtendedSynthesizer {
                     final String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
                     currBDDGG = event2guard.get(currEvent);
 
+                    if(ep.getGuardActionBlock()==null)
+                    {
+                        ep.setGuardActionBlock(new GuardActionBlockSubject());
+                    }
+
                     if( currBDDGG != null && !currBDDGG.guardIsTrue())
                     {
                         String currGuard="";
@@ -161,6 +167,7 @@ public class BDDExtendedSynthesizer {
                         {
                             guard = currBDDGG.getGuard();
                             currGuard="";
+                            
                             if(!ep.getGuardActionBlock().getGuardsModifiable().isEmpty())
                             {
                                 ses1 = ep.getGuardActionBlock().getGuardsModifiable().iterator().next().clone();
