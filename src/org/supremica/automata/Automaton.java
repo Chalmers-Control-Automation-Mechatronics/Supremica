@@ -242,7 +242,7 @@ public class Automaton
      */
     public boolean hasName()
     {
-        return !((name == null) || (name == ""));
+        return !((name == null) || (name.equals(""))); // Don't do this! (name == ""));
     }
 
     /**

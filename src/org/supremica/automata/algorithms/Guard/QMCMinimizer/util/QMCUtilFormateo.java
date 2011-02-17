@@ -14,7 +14,7 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCImplicante
 /**
  * Clase que contiene utilidades para el tabulado de listas en forma de matrices y formateo de expresiones.
  * @author Pedro Sanz
- * Fecha creación 19-jun-2006
+ * Fecha creaciï¿½n 19-jun-2006
  */
 public class QMCUtilFormateo
 {
@@ -63,7 +63,7 @@ public class QMCUtilFormateo
            }
 
          }
-        // Introduce los términos especificados en la tabla
+        // Introduce los tï¿½rminos especificados en la tabla
         if(terminos!=null)
         {
             // Minterms, seleccion por defecto
@@ -307,7 +307,7 @@ public class QMCUtilFormateo
     }
 
     /**
-     * Método que convierte un array de elementos String en una cadena
+     * Mï¿½todo que convierte un array de elementos String en una cadena
      * @param array
      * @return cadena
      */
@@ -361,7 +361,7 @@ public class QMCUtilFormateo
         return cadena;
     }
     /**
-     * Método que que formatea la lista de grupos de implicantes no esenciales en un array de cadenas
+     * Mï¿½todo que que formatea la lista de grupos de implicantes no esenciales en un array de cadenas
      * @param solucionesMinimas
      * @return
      */
@@ -469,7 +469,7 @@ public class QMCUtilFormateo
                     // Comprueba si la variable ha sido eliminada
                     if(binarioVar!='-')
                     {
-                        // Añado la variable al termino algebraico
+                        // Aï¿½ado la variable al termino algebraico
                         terminoAlg = terminoAlg + variables[j] + simbolo;
                     }
 
@@ -478,11 +478,11 @@ public class QMCUtilFormateo
                 {
                    terminoAlg = terminoAlg.substring(0, terminoAlg.length()-1);
                 }
-                if(terminoAlg == "")
+                if(terminoAlg.equals(""))
                 {
                     expresionAlg += "1";
                 }
-                // Añade el termino algebraico a la expresion algebraica
+                // Aï¿½ade el termino algebraico a la expresion algebraica
                 expresionAlg += terminoAlg + concatTerms;
                 terminoAlg = "";
 
@@ -499,7 +499,7 @@ public class QMCUtilFormateo
         return expresionAlg;
     }
     /**
-     * Método que actualiza los terminos cubiertos por una lista de implicantes dada
+     * Mï¿½todo que actualiza los terminos cubiertos por una lista de implicantes dada
      * @param listaImplicantes
      * @param listaTerminos
      */

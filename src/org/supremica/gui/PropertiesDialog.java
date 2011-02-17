@@ -148,44 +148,7 @@ public class PropertiesDialog
             panel.setLayout(layout);
             */
 
-            // Find all properties of this type and add to the panel
-            for (final Property property : Property.getAllProperties())
-            {
-                // I only want properties of the current type
-                if (property.getPropertyType() == type)
-                {
-                    // Depending on the kind of property, different choice mechanics...
-                    if (property instanceof BooleanProperty)
-                    {
-                        BooleanChooser chooser = new BooleanChooser((BooleanProperty) property);
-                        chooser.setEnabled(!property.isImmutable());
-                        chooserList.add(chooser);
-                        panel.add(chooser);
-                    }
-                    else if (property instanceof IntegerProperty)
-                    {
-                        IntegerChooser chooser = new IntegerChooser((IntegerProperty) property);
-                        chooser.setEnabled(!property.isImmutable());
-                        chooserList.add(chooser);
-                        panel.add(chooser);
-                    }
-                    else if (property instanceof DoubleProperty)
-                    {
-                        DoubleChooser chooser = new DoubleChooser((DoubleProperty) property);
-                        chooser.setEnabled(!property.isImmutable());
-                        chooserList.add(chooser);
-                        panel.add(chooser);
-                    }
-                    else if (property instanceof ObjectProperty)
-                    {
-                        StringChooser chooser = new StringChooser((ObjectProperty) property);
-                        chooser.setEnabled(!property.isImmutable());
-                        chooserList.add(chooser);
-                        panel.add(chooser);
-                    }
-                }
-            }
-
+	    fillPropertyPanel(type, panel);
             /*
             JScrollPane pane = new JScrollPane(panel);
             pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -292,6 +255,48 @@ public class PropertiesDialog
         return true;
     }
 
+    private void fillPropertyPanel(PropertyType type, JPanel panel)
+    {
+	// Find all properties of this type and add to the panel
+	for (final Property property : Property.getAllProperties())
+	{
+	    // I only want properties of the current type
+	    if (property.getPropertyType() == type)
+	    {
+		// Depending on the kind of property, different choice mechanics...
+		if (property instanceof BooleanProperty)
+		{
+		    BooleanChooser chooser = new BooleanChooser((BooleanProperty) property);
+		    chooser.setEnabled(!property.isImmutable());
+		    chooserList.add(chooser);
+		    panel.add(chooser);
+		}
+		else if (property instanceof IntegerProperty)
+		{
+		    IntegerChooser chooser = new IntegerChooser((IntegerProperty) property);
+		    chooser.setEnabled(!property.isImmutable());
+		    chooserList.add(chooser);
+		    panel.add(chooser);
+		}
+		else if (property instanceof DoubleProperty)
+		{
+		    DoubleChooser chooser = new DoubleChooser((DoubleProperty) property);
+		    chooser.setEnabled(!property.isImmutable());
+		    chooserList.add(chooser);
+		    panel.add(chooser);
+		}
+		else if (property instanceof ObjectProperty)
+		{
+		    StringChooser chooser = new StringChooser((ObjectProperty) property);
+		    chooser.setEnabled(!property.isImmutable());
+		    chooserList.add(chooser);
+		    panel.add(chooser);
+		}
+	    }
+	}
+
+    }
+
     /**
      * Interface for setting and getting a property from Config.
      */
@@ -332,6 +337,7 @@ public class PropertiesDialog
         {
             setSelected(property.get());
         }
+
     }
 
     /**

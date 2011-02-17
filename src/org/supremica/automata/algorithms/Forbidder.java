@@ -21,12 +21,16 @@ import org.supremica.automata.AutomatonType;
 import org.supremica.automata.ForbiddenEvent;
 import org.supremica.automata.algorithms.SearchStates;
 import org.supremica.gui.VisualProject;
+import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 
 public class Forbidder
 {
     private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(Forbidder.class);
-    
+
+    private static final String FORBIDDEN_EVENT_PREFIX = "x:";	// prefix for forbidden events
+    private static final String FORBIDDEN_AUTOMATA_PREFIX = "X:";   // prefix added to name of plant automata with forbidden event selfloops
+
     private Automaton[] the_automata;
     private int[] selected_indices;
     private SearchStates search_states;
@@ -45,7 +49,7 @@ public class Forbidder
         this.the_project = project;
         this.the_specs = new Automaton[selected_indices.length];
         
-        // for each automaton, make it a plant, uc-saturate it
+        // for each automaton, make it a plant if not already, then rename
         fiddleAutomata();
         
         // for each global state, create a forbidden event, selfloop it at each corresponding local state
@@ -54,7 +58,7 @@ public class Forbidder
             int index = selected_indices[i];	// get index for global state
             
             // make project-global unique forbidden event,
-            ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel("� x" + i));
+            ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel(FORBIDDEN_EVENT_PREFIX + i));
             x_event.setControllable(false);
             logger.debug(x_event.getLabel());
             
@@ -104,11 +108,11 @@ public class Forbidder
         this.the_project = project;
         this.the_specs = new Automaton[1];
         
-        // for each automaton, make it a plant, uc-saturate it
+        // for each automaton, make it a plantif not already, then rename
         fiddleAutomata();
         
         // Now we have a single project-global unique forbidden event,
-        ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel("� xx"));
+        ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel(FORBIDDEN_EVENT_PREFIX));
         x_event.setControllable(false);
         logger.debug(x_event.getLabel());
         
@@ -167,21 +171,24 @@ public class Forbidder
     }
     
     /**
-     * Set each automaton as plant, uc-saturate and rename them
+     * Plantify specs
+     * Rename all copies
      **/
     private void fiddleAutomata()
     {
-        // for each automaton, make it a plant, uc-saturate it
+        // for each automaton, make it a plant if not already
         for(int i = 0; i < num_automata; ++i)
         {
             Automaton automaton = the_automata[i];
-            // set copy to be plant
-            automaton.setType(AutomatonType.PLANT);
-            // uc-saturate copy
-            automaton.saturateLoop(automaton.getAlphabet().getUncontrollableAlphabet());
-            // rename copy
+
             String old_name = automaton.getName();
-            automaton.setName(the_project.getUniqueAutomatonName("� " + old_name));
+
+	    if(automaton.isSpecification() || automaton.isSupervisor())
+	    {
+		MinimizationHelper.plantify(automaton);
+	    }
+            // rename copy
+            automaton.setName(the_project.getUniqueAutomatonName(FORBIDDEN_AUTOMATA_PREFIX + old_name));
         }
     }
     

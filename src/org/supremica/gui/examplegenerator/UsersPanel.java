@@ -1,7 +1,7 @@
 package org.supremica.gui.examplegenerator;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import javax.swing.Box;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -12,7 +12,8 @@ import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.Users;
 
-class UsersPanel extends JPanel implements TestCase {
+class UsersPanel extends JPanel implements TestCase 
+{
 	private static final long serialVersionUID = 1L;
 	IntegerField int_num = null;
 	IntegerField int_rsc = null;
@@ -20,9 +21,8 @@ class UsersPanel extends JPanel implements TestCase {
 	JCheckBox acc = new JCheckBox("access  (b)", true);
 	JCheckBox rel = new JCheckBox("release (c)");
 
-	public UsersPanel() {
-		super(new GridLayout(2, 1, 10, 10));
-
+	public UsersPanel()
+        {
 		JPanel cont = new JPanel();
 
 		cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
@@ -31,13 +31,16 @@ class UsersPanel extends JPanel implements TestCase {
 		cont.add(rel);
 
 		JPanel num_users = new JPanel();
-
 		num_users.add(new JLabel("Number of resources: "));
 		num_users.add(int_rsc = new IntegerField("1", 6));
 		num_users.add(new JLabel("Number of users: "));
 		num_users.add(int_num = new IntegerField("3", 6));
-		add(BorderLayout.NORTH, cont);
-		add(BorderLayout.SOUTH, num_users);
+
+                Box theBox = Box.createVerticalBox();
+		theBox.add(cont);
+		theBox.add(num_users);
+		add(theBox, BorderLayout.NORTH);
+
 	}
 
 	public void synthesizeSupervisor(IDE ide) {

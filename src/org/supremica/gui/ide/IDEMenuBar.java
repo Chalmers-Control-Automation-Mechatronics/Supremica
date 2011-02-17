@@ -475,7 +475,8 @@ public class IDEMenuBar extends JMenuBar
     }
 
     // Configure
-    if (mConfigureMenu == null) {
+    if (mConfigureMenu == null)
+    {
       mConfigureMenu = new JMenu("Configure");
       mConfigureMenu.setMnemonic(KeyEvent.VK_O);
       mConfigureMenu.add(actions.analyzerOptionsAction.getMenuItem());

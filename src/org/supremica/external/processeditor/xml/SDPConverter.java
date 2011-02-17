@@ -179,7 +179,8 @@ public class SDPConverter {
 		if(description.indexOf(knownItem) !=-1)
 		    item = knownItem;		
 	    }
-	if(item == "") {
+	if(item.equals("")) // don't do this! == "")
+	{
 	    item = "UNKNOWN "+(knownItemsList.getItemCount()-
 			       listOfComponentTypesOrigalSize);
 	    knownItemsList.addItem(item);
