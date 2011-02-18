@@ -235,10 +235,22 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
     // # net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
-      final ComposingSafetyVerifier composing =
+      final String name = getValue();
+      if (verifier instanceof ComposingSafetyVerifier) {
+        final ComposingSafetyVerifier composing =
           (ComposingSafetyVerifier) verifier;
-      final String heuristic = getValue();
-      composing.setHeuristic(heuristic);
+        composing.setHeuristic(name);
+      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+        final CompositionalGeneralisedConflictChecker composer =
+          (CompositionalGeneralisedConflictChecker) verifier;
+        CompositionalGeneralisedConflictChecker.SelectingHeuristic heuristic = null;
+        if (name.equalsIgnoreCase("maxl")) {
+          heuristic = composer.createHeuristicMaxL();
+        } else {
+          fail("Unknown heuristic '" + name + "'!");
+        }
+        composer.setSelectingHeuristic(heuristic);
+      }
     }
 
   }

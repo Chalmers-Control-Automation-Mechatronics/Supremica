@@ -954,67 +954,67 @@ public class CompositionalGeneralisedConflictChecker extends
     mSyncProductTransitionLimit = limit;
   }
 
-  public HeuristicMinT createHeuristicMinT()
+  public PreselectingHeuristic createHeuristicMinT()
   {
     return new HeuristicMinT();
   }
 
-  public HeuristicMinTa createHeuristicMinTa()
+  public PreselectingHeuristic createHeuristicMinTa()
   {
     return new HeuristicMinTa();
   }
 
-  public HeuristicMaxS createHeuristicMaxS()
+  public PreselectingHeuristic createHeuristicMaxS()
   {
     return new HeuristicMaxS();
   }
 
-  public HeuristicMustL createHeuristicMustL()
+  public PreselectingHeuristic createHeuristicMustL()
   {
     return new HeuristicMustL();
   }
 
-  public HeuristicMaxL createHeuristicMaxL()
+  public SelectingHeuristic createHeuristicMaxL()
   {
     return new HeuristicMaxL();
   }
 
-  public HeuristicMaxLa createHeuristicMaxLa()
+  public SelectingHeuristic createHeuristicMaxLa()
   {
     return new HeuristicMaxLa();
   }
 
-  public HeuristicMaxLt createHeuristicMaxLt()
+  public SelectingHeuristic createHeuristicMaxLt()
   {
     return new HeuristicMaxLt();
   }
 
-  public HeuristicMaxLOnTransitions createHeuristicMaxLOnTransitions()
+  public SelectingHeuristic createHeuristicMaxLOnTransitions()
   {
     return new HeuristicMaxLOnTransitions();
   }
 
-  public HeuristicMaxC createHeuristicMaxC()
+  public SelectingHeuristic createHeuristicMaxC()
   {
     return new HeuristicMaxC();
   }
 
-  public HeuristicMaxCt createHeuristicMaxCt()
+  public SelectingHeuristic createHeuristicMaxCt()
   {
     return new HeuristicMaxCt();
   }
 
-  public HeuristicMaxCOnTransitions createHeuristicMaxCOnTransitions()
+  public SelectingHeuristic createHeuristicMaxCOnTransitions()
   {
     return new HeuristicMaxCOnTransitions();
   }
 
-  public HeuristicMinS createHeuristicMinS()
+  public SelectingHeuristic createHeuristicMinS()
   {
     return new HeuristicMinS();
   }
 
-  public HeuristicMinS createHeuristicMinSCommon()
+  public SelectingHeuristic createHeuristicMinSCommon()
   {
     return new HeuristicMinSCommon();
   }
@@ -1362,7 +1362,7 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private abstract class SelectingHeuristic
+  abstract class SelectingHeuristic
   {
     protected abstract double getHeuristicValue(Candidate candidate);
 
@@ -1544,7 +1544,7 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       List<Candidate> chosenCandidates = super.evaluate(candidates);
       if (chosenCandidates.size() > 1) {
-        final HeuristicMaxL maxL = createHeuristicMaxL();
+        final SelectingHeuristic maxL = createHeuristicMaxL();
         chosenCandidates = maxL.evaluate(chosenCandidates);
       }
       return chosenCandidates;
