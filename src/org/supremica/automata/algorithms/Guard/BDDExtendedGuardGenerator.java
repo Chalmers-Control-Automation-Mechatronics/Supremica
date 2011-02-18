@@ -11,21 +11,25 @@ package org.supremica.automata.algorithms.Guard;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.util.*;
 import java.util.ArrayList;
-import org.supremica.automata.*;
-import org.supremica.automata.BDD.*;
-import org.supremica.automata.BDD.EFA.*;
-import net.sf.javabdd.*;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
-import org.supremica.log.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+
+import org.supremica.automata.ExtendedAutomata;
+import org.supremica.automata.ExtendedAutomaton;
+import org.supremica.automata.BDD.BDDAutomata;
+import org.supremica.automata.BDD.EFA.BDDEdges;
+import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
+import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
+import org.supremica.automata.BDD.EFA.BDDExtendedManager;
+import org.supremica.automata.BDD.EFA.BDDMonolithicEdges;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 
@@ -78,7 +82,7 @@ public class BDDExtendedGuardGenerator {
     String pathRoot = "";//C:/Users/sajed/Desktop/MDD_files/";
 
     String bestStateSet = "";
-    
+
     private boolean isEventBlocked = false;
 
 
@@ -182,7 +186,7 @@ public class BDDExtendedGuardGenerator {
                 bestStateSet = "FORBIDDEN";
             }
         }
-        
+
         //The event is blocked in the synchronization process
         if(mustAllowedStatesBDD.satCount(automataBDD.getSourceStatesVarSet()) == 0 &&
                 mustForbiddenStatesBDD.satCount(automataBDD.getSourceStatesVarSet()) == 0)
@@ -722,7 +726,7 @@ public class BDDExtendedGuardGenerator {
                 else
                 {
                     nbrOfIndpHeurs++;
-                    if(idd.getChildren().size() == 1) 
+                    if(idd.getChildren().size() == 1)
                         inForNbr = -inForNbr; // keep track of the independet term by keeping the number of terms as a negative number
                 }
             }
