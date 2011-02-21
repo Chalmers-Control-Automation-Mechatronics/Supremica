@@ -89,16 +89,20 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private int nbrOfExAutomata = 0;
     private final ArrayList<ExtendedAutomaton> theExAutomata;
     private Map<String, EventDeclProxy> eventIdToProxyMap;
+    private Map<ExtendedAutomaton,Integer> exAutomatonToIndex;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
     int domain = 0;
     Map<String, MinMax> var2MinMaxValMap = null;
 
-    HashSet<EventDeclProxy> uncontrollableAlphabet = null;
+    public HashSet<EventDeclProxy> uncontrollableAlphabet = null;
+    public HashSet<EventDeclProxy> controllableAlphabet = null;
     HashSet<EventDeclProxy> plantAlphabet = null;
     String locaVarSuffix = ".curr";
 
     Map<VariableComponentProxy,List<VariableComponentProxy>> var2relatedVarsMap = null;
+    public double theoNbrOfReachableStates = 0;
+    public int nbrOfEFAsVars = 0;
 
     public ExtendedAutomata()
     {
@@ -108,7 +112,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         variables = new ArrayList<VariableComponentProxy>();
         var2MinMaxValMap = new HashMap<String, MinMax>();
         uncontrollableAlphabet = new HashSet<EventDeclProxy>();
+        controllableAlphabet = new HashSet<EventDeclProxy>();
         plantAlphabet = new HashSet<EventDeclProxy>();
+        exAutomatonToIndex = new HashMap<ExtendedAutomaton, Integer>();
     }
 
     public ExtendedAutomata(final ModuleSubject module)
@@ -125,6 +131,10 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 if(e.getKind() == EventKind.UNCONTROLLABLE)
                 {
                     uncontrollableAlphabet.add(e);
+                }
+                else
+                {
+                    controllableAlphabet.add(e);
                 }
             }
         }
@@ -163,6 +173,10 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 }
 
                 final MinMax minMax = new MinMax(lowerBound,upperBound);
+                if(theoNbrOfReachableStates == 0)
+                    theoNbrOfReachableStates = (double)(Math.abs(upperBound - lowerBound +1));
+                else
+                    theoNbrOfReachableStates *= ((double) Math.abs(upperBound - lowerBound +1));
 
                 if(!var2MinMaxValMap.containsKey(varName))
                 {
@@ -173,29 +187,33 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 final int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
                 if(currDomain>domain)
                     domain = currDomain;
-
-
             }
         }
 
         //we multiply the domain with 2 to add 1 extra bit for the sign
         domain *= 2;
-
         for(final AbstractSubject sub:module.getComponentListModifiable())
         {
             if(sub instanceof SimpleComponentSubject)
             {
-                nbrOfExAutomata++;
                 final ExtendedAutomaton exAutomaton = new ExtendedAutomaton(this, (SimpleComponentSubject)sub);
+
+                if(theoNbrOfReachableStates == 0)
+                    theoNbrOfReachableStates = ((double)  exAutomaton.nbrOfNodes());
+                else
+                    theoNbrOfReachableStates *= ((double) exAutomaton.nbrOfNodes());
 
                 if(!exAutomaton.isSpecification())
                 {
                     plantAlphabet.addAll(exAutomaton.getAlphabet());
                 }
                 theExAutomata.add(exAutomaton);
+                exAutomatonToIndex.put(exAutomaton, nbrOfExAutomata);
+                nbrOfExAutomata++;
             }
         }
 
+        nbrOfEFAsVars = variables.size()+theExAutomata.size();
     }
 
     public List<VariableComponentProxy> getRelatedVars(final VariableComponentProxy var)
@@ -210,19 +228,24 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
     public ExtendedAutomata(final String name, final boolean expand)
     {
-    this();
-    factory.createSimpleIdentifierProxy(name);
-            module = new ModuleSubject(name, null);
+        this();
+        factory.createSimpleIdentifierProxy(name);
+                module = new ModuleSubject(name, null);
 
-            // make marking proposition
-    final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy
-        (EventDeclProxy.DEFAULT_MARKING_NAME);
-            module.getEventDeclListModifiable().add
-        (factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
+                // make marking proposition
+        final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy
+            (EventDeclProxy.DEFAULT_MARKING_NAME);
+                module.getEventDeclListModifiable().add
+            (factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
 
-            this.expand = expand;
+                this.expand = expand;
 
-            new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+                new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+    }
+
+    public int getExAutomatonIndex(ExtendedAutomaton efa)
+    {
+        return exAutomatonToIndex.get(efa);
     }
 
     public List<ExtendedAutomaton> getExtendedAutomataList()

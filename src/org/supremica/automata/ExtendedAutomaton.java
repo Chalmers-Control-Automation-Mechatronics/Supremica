@@ -55,6 +55,7 @@
 package org.supremica.automata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -70,6 +71,7 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -364,6 +366,11 @@ public class ExtendedAutomaton
             }
         }
 */
+    }
+
+    public Collection<EdgeProxy> getTransitions()
+    {
+        return component.getGraph().getEdges();
     }
 
     public Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr)

@@ -153,7 +153,7 @@ for3:       for(String var:es.getVar2val().keySet())
             }
         }
         if(initLocation == null)
-            throw new IllegalArgumentException("The automaton has not an initial location!");
+            throw new IllegalArgumentException("The EFA has not an initial location!");
 
         EFAState initState = new EFAState(initLocation, var2val);
 

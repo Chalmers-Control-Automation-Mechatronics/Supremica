@@ -1,0 +1,27 @@
+graph structure {
+	node [style = filled];
+	"cat" [label = "cat", color = red, shape = box]; 
+	"cat" -- "room0" [style = solid, label = "4 (0)"];
+	"cat" -- "room1" [style = solid, label = "3 (1)"];
+	"cat" -- "room2" [style = solid, label = "2 (0)"];
+	"cat" -- "room3" [style = solid, label = "3 (1)"];
+	"cat" -- "room4" [style = solid, label = "2 (0)"];
+	"mouse" [label = "mouse", color = red, shape = box]; 
+	"mouse" -- "room0" [style = solid, label = "4 (0)"];
+	"mouse" -- "room1" [style = solid, label = "2 (0)"];
+	"mouse" -- "room2" [style = solid, label = "2 (0)"];
+	"mouse" -- "room3" [style = solid, label = "2 (0)"];
+	"mouse" -- "room4" [style = solid, label = "2 (0)"];
+	"room0" [label = "room0", color = green, shape = ellipse]; 
+	"room0" -- "room1" [style = solid, label = "2 (0)"];
+	"room0" -- "room2" [style = solid, label = "2 (0)"];
+	"room0" -- "room3" [style = solid, label = "2 (0)"];
+	"room0" -- "room4" [style = solid, label = "2 (0)"];
+	"room1" [label = "room1", color = green, shape = ellipse]; 
+	"room1" -- "room2" [style = solid, label = "2 (0)"];
+	"room1" -- "room3" [style = solid, label = "1 (1)"];
+	"room2" [label = "room2", color = green, shape = ellipse]; 
+	"room3" [label = "room3", color = green, shape = ellipse]; 
+	"room3" -- "room4" [style = solid, label = "2 (0)"];
+	"room4" [label = "room4", color = green, shape = ellipse]; 
+}

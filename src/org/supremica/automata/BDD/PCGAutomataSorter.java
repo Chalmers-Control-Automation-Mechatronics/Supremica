@@ -93,6 +93,38 @@ public class PCGAutomataSorter
         //PCG pcg = new PCG(new Vector<PCGNode>(pcgNodeList));
 
         final int[][] weightMatrix = getCommunicationMatrix(orgAutomata);
+        //Code for finding the (min,max,avg) cardinality of the level-1 dependency set of an automaton
+        double[] degree = new double[orgAutomata.size()];
+        double minLD = Double.MAX_VALUE;
+        double maxLD = Double.MIN_VALUE;
+        double avgLD = 0;
+        for (int i=0; i<orgAutomata.size();i++)
+        {
+            degree[i] = 1;
+            for (int j=0; j<orgAutomata.size();j++)
+            {
+                if(i!=j)
+                {
+                    if(weightMatrix[i][j] != 0)
+                       degree[i] ++;
+                }
+            }
+            double LD = degree[i] / orgAutomata.size();
+            if(LD < minLD)
+            {
+                minLD = LD;
+            }
+            if(LD > maxLD)
+            {
+                maxLD = LD;
+            }
+            
+            avgLD += (LD/orgAutomata.size());
+        }
+        System.err.println("minLD: "+minLD);
+        System.err.println("maxLD: "+maxLD);
+        System.err.println("avgLD: "+avgLD);
+
         final OrderingSolver orderingSolver = new OrderingSolver(orgAutomata.size());
 
         int i = 0;

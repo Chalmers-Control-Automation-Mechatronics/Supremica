@@ -13,13 +13,18 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -27,6 +32,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
+import org.supremica.automata.BDD.ReduceBDDvars;
+import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.gui.EditorSynthesizerDialog;
@@ -59,11 +66,22 @@ public class EditorSynthesizerAction
         doAction();
     }
 
+    public static int max(int[] t) {
+        int maximum = t[0];
+        for (int i=1; i<t.length; i++) {
+            if (t[i] > maximum) {
+                maximum = t[i];
+            }
+        }
+        return maximum;
+    }
 
     public void doAction()
     {
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
-
+//        ReduceBDDvars rBDDv = new ReduceBDDvars(ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata().getAutomatonAt(0));
+//        rBDDv.printAllPaths();
+        
         final int nbrOfComponents = module.getComponentList().size();
         if(nbrOfComponents == 0)
             return;
@@ -99,15 +117,93 @@ public class EditorSynthesizerAction
 
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
         final BDDExtendedSynthesizer bddSynthesizer = new BDDExtendedSynthesizer(exAutomata);
-        bddSynthesizer.synthesize(options);
+/*
+        //Create a naive PCG graph
+        int[][] weight = new int[exAutomata.size()][exAutomata.size()];
+        int[] efaDegree = new int[exAutomata.size()];
+        boolean[][] weightComputed = new boolean[exAutomata.size()][exAutomata.size()];
+        for(ExtendedAutomaton efa1:exAutomata)
+        {
+            efaDegree[exAutomata.getExAutomatonIndex(efa1)] = 0;
+            for(ExtendedAutomaton efa2:exAutomata)
+            {
+                boolean weightComp = false;
+                if(exAutomata.getExAutomatonIndex(efa1) == exAutomata.getExAutomatonIndex(efa2))
+                        weightComp = true;
+
+                weightComputed[exAutomata.getExAutomatonIndex(efa1)][exAutomata.getExAutomatonIndex(efa2)] = weightComp;
+            }
+        }
+
+        for(ExtendedAutomaton efa1:exAutomata)
+        {
+            for(ExtendedAutomaton efa2:exAutomata)
+            {
+                int index1 = exAutomata.getExAutomatonIndex(efa1);
+                int index2 = exAutomata.getExAutomatonIndex(efa2);
+                if(!weightComputed[index1][index2])
+                {
+                    ArrayList<EventDeclProxy> commonEvents = new ArrayList<EventDeclProxy>(efa1.getAlphabet());
+                    commonEvents.retainAll(efa2.getAlphabet());
+                    int commonVarsSize = 0;
+                    for(EventDeclProxy event:commonEvents)
+                    {
+                        if(efa1.getGuardVariables(event) != null && efa2.getGuardVariables(event) != null)
+                        {
+                            HashSet<VariableComponentProxy> gVars = new HashSet<VariableComponentProxy>(efa1.getGuardVariables(event));
+                            gVars.retainAll(efa2.getGuardVariables(event));
+                            commonVarsSize += (gVars.size());
+                        }
+                    }
+                    int w = commonEvents.size()+commonVarsSize;
+                    weight[index1][index2] = w;
+                    efaDegree[index1] += w;
+                    efaDegree[index2] += w;
+                    weightComputed[index1][index2] = true;
+                    weightComputed[index2][index1] = true;
+                }
+            }
+        }
+*/
+        System.err.println("SIZE: "+exAutomata.nbrOfEFAsVars);
+        System.err.println("Number of controllable events: "+exAutomata.controllableAlphabet.size());
+        System.err.println("Number of theoretical reachable states: "+((double)exAutomata.theoNbrOfReachableStates));
+//        double LD = (double)max(efaDegree)/(double)exAutomata.nbrOfEFAsVars;
+//        System.err.println("LD: "+ LD);
+
+        bddSynthesizer.synthesize(options);       
 
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
-        logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+bddSynthesizer.nbrOfStates()+" states.");
-        System.err.println("Number of nodes in the safe BDD: "+bddSynthesizer.getResult().nodeCount());
+        logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.getNbrOfRecahableStates());
+        logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+(double)bddSynthesizer.nbrOfStates()+" states.");
 
-        if(bddSynthesizer.nbrOfStates()>0)
+
+//        System.err.println("Number of nodes in the safe BDD: "+bddSynthesizer.getResult().nodeCount());
+
+        if(bddSynthesizer.nbrOfStates()>0 && (options.getSaveInFile() || options.getSaveIDDInFile() ||
+                options.getPrintGuard() || options.getAddGuards()))
         {
-            boolean isGuardsComputed = false;
+            bddSynthesizer.generateGuard(eventNames, options);
+            final HashMap<String,BDDExtendedGuardGenerator> event2guard = bddSynthesizer.getEventGuardMap();
+
+            //
+            int minGuardSize = Integer.MAX_VALUE;
+            int maxGuardSize = Integer.MIN_VALUE;
+            double aveGuardSize = 0;
+            for(final String event:event2guard.keySet())
+            {
+                int guardSize = event2guard.get(event).getNbrOfTerms();
+                if(guardSize < minGuardSize)
+                    minGuardSize = guardSize;
+                if(guardSize > maxGuardSize)
+                    maxGuardSize = guardSize;
+                aveGuardSize += guardSize;
+
+            }
+            System.err.println("Min guard: "+minGuardSize);
+            System.err.println("Max guard: "+maxGuardSize);
+            System.err.println("Average guard: "+aveGuardSize/exAutomata.controllableAlphabet.size());
+
 
             if(options.getSaveInFile() || options.getSaveIDDInFile())
             {
@@ -118,11 +214,7 @@ public class EditorSynthesizerAction
                 {
                     final String path = chooser.getSelectedFile().getAbsolutePath();
                     Config.FILE_SAVE_PATH.set(path);
-                    if(!isGuardsComputed)
-                    {
-                        bddSynthesizer.generateGuard(eventNames, options);
-                        isGuardsComputed = true;
-                    }
+
                     if(options.getSaveInFile())
                     {
                         String name = module.getName();
@@ -137,11 +229,15 @@ public class EditorSynthesizerAction
                             out.write("Event" + "\t" + "Guard size" +"\t"+"# Complement Heuristic was applied"+"\t"+"# Independent Heuristic was applied"+"\t"+"Guard expression");
                             out.newLine();
                             out.newLine();
-                            final HashMap<String,BDDExtendedGuardGenerator> event2guard = bddSynthesizer.getEventGuardMap();
                             for(final String event:event2guard.keySet())
                             {
                                 final BDDExtendedGuardGenerator bddegg = event2guard.get(event);
-                                out.write(event + "\t" + bddegg.getNbrOfTerms() +"\t"+ bddegg.getNbrOfCompHeuris()+"\t"+bddegg.getNbrOfIndpHeuris()+"\t"+bddegg.getGuard());
+                                String guard = bddegg.getGuard();
+                                if(guard.equals(bddegg.FALSE))
+                                    guard = "False";
+                                if(guard.equals(bddegg.TRUE))
+                                    guard = "True";
+                                out.write(event + "\t" + bddegg.getNbrOfTerms() +"\t"+ bddegg.getNbrOfCompHeuris()+"\t"+bddegg.getNbrOfIndpHeuris()+"\t"+guard);
                                 out.newLine();
                                 out.newLine();
                             }
@@ -158,36 +254,24 @@ public class EditorSynthesizerAction
 
             if(options.getPrintGuard())
             {
-                if(!isGuardsComputed)
-                {
-                    bddSynthesizer.generateGuard(eventNames, options);
-                    isGuardsComputed = true;
-                }
-                final HashMap<String,BDDExtendedGuardGenerator> event2guard = bddSynthesizer.getEventGuardMap();
                 for(final String event:event2guard.keySet())
                 {
                     final BDDExtendedGuardGenerator bddgg = event2guard.get(event);
                     String TF =bddgg.getGuard();
-                    if(TF.equals("True"))
+                    if(TF.equals(bddgg.TRUE))
                         TF = "This event is always ENABLED by the supervisor.";
-                    else if(TF.equals("False"))
+                    else if(TF.equals(bddgg.FALSE))
                         TF = "This event is always DISABLED by the supervisor"+(bddgg.isEventBlocked()?" (Blocked in the synchronization process).":".");
 
                     logger.info(bddgg.getBestStateSet()+" guard for event "+event+": "+TF);
 
                     logger.info("Number of terms in the expression: "+bddgg.getNbrOfTerms());
-
                 }
                 logger.info("The guards were generated in "+bddSynthesizer.getGuardTimer().toString()+".");
             }
 
             if(options.getAddGuards())
             {
-                if(!isGuardsComputed)
-                {
-                    bddSynthesizer.generateGuard(eventNames, options);
-                    isGuardsComputed = true;
-                }
                 bddSynthesizer.addGuardsToAutomata(module);
             }
         }

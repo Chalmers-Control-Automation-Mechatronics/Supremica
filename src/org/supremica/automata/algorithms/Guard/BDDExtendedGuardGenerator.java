@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import net.sf.javabdd.BDD;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.NodeProxy;
 
 import org.supremica.automata.ExtendedAutomata;
@@ -56,15 +57,15 @@ public class BDDExtendedGuardGenerator {
 
     ExtendedAutomata theAutomata;
 
-    String OR = " | ";
-    String AND = " & ";
+    String OR = " "+CompilerOperatorTable.getInstance().getOrOperator().getName()+" ";
+    String AND = " "+CompilerOperatorTable.getInstance().getAndOperator().getName()+" ";
     String O_PAR = "(";
     String C_PAR = ")";
     String guard = "";
-    String TRUE = "True";
-    String FALSE = "False";
-    String EQUAL = " == ";
-    String NEQUAL = " != ";
+    public String TRUE = "1";
+    public String FALSE = "0";
+    String EQUAL = " "+CompilerOperatorTable.getInstance().getEqualsOperator().getName()+" ";
+    String NEQUAL = " "+CompilerOperatorTable.getInstance().getNotEqualsOperator().getName()+" ";
     String eventName;
 
     int bddSize;
@@ -87,7 +88,7 @@ public class BDDExtendedGuardGenerator {
 
 
     /** Creates a new instance of BDDExtendedGuardGenerator */
-    public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata, final String eventLabel, final BDD states, final EditorSynthesizerOptions options) {
+    public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata, final String eventLabel, final BDD states, final EditorSynthesizerOptions options) {        
         theAutomata = bddAutomata.getExtendedAutomata();
         automataBDD = bddAutomata;
         manager = automataBDD.getBDDManager();

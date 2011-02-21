@@ -168,5 +168,16 @@ innerLoop:  for(ExtendedAutomaton efa:oorgAutomata)
         return firstAlphabet.size();
     }
 
+    int getCommunicationComplexity2(final ExtendedAutomaton firstAutomaton, final ExtendedAutomaton secondAutomaton)
+    {
+        int weight = 0;
+        List<EventDeclProxy> firstAlphabet = new ArrayList<EventDeclProxy>(firstAutomaton.getAlphabet());
+        List<EventDeclProxy> secondAlphabet = new ArrayList<EventDeclProxy>(secondAutomaton.getAlphabet());
+        firstAlphabet.retainAll(secondAlphabet);
+
+//        return weight;
+        return firstAlphabet.size();
+    }
+
 
 }

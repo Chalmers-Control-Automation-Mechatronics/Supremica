@@ -149,7 +149,8 @@ public class BDDExtendedManager
 
     public BDD guard2BDD(final SimpleExpressionProxy sexpr)
     {
-        return expr2BDDBitVec(sexpr, true).getBit(0);
+        SupremicaBDDBitVector guardBDD = expr2BDDBitVec(sexpr, true);
+        return guardBDD.getBit(0);
     }
 
     BDD action2BDD(final BinaryExpressionProxy expr)
@@ -179,6 +180,7 @@ public class BDDExtendedManager
 
     SupremicaBDDBitVector expr2BDDBitVec(final SimpleExpressionProxy expr, final boolean guardAction)
     {
+//        System.err.println("reached: "+expr.toString());
         if(expr instanceof UnaryExpressionProxy)
         {
             final UnaryExpressionProxy unExpr = (UnaryExpressionProxy)expr;
@@ -204,7 +206,8 @@ public class BDDExtendedManager
             if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getAndOperator()))
             {
                 final SupremicaBDDBitVector tmp = expr2BDDBitVec(bexpr.getLeft(),true).copy();
-                tmp.setBit(0, tmp.getBit(0).and(expr2BDDBitVec(bexpr.getRight(),true).getBit(0)));
+                SupremicaBDDBitVector rightGuard= expr2BDDBitVec(bexpr.getRight(),true);
+                tmp.setBit(0, tmp.getBit(0).and(rightGuard.getBit(0)));
                 return tmp;
             }
             else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getOrOperator()))
@@ -229,7 +232,7 @@ public class BDDExtendedManager
                 return ro.getResult();
             }
             else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getPlusOperator()))
-            {                
+            {
                 final SupremicaBDDBitVector.ResultOverflows ro = expr2BDDBitVec(bexpr.getLeft(),false).
                         addConsideringOverflows(expr2BDDBitVec(bexpr.getRight(),false));
                 localOverflows = localOverflows.or(ro.getOverflows());
@@ -454,12 +457,12 @@ public class BDDExtendedManager
     {
         final BDD delta_all = ((BDDMonolithicEdges)bddExAutomata.getBDDEdges()).getMonolithicEdgesBackwardBDD();
 
-        BDD Qkn = bddExAutomata.getMarkedStates().and(forbidden.not());
+        BDD Qkn = bddExAutomata.getMarkedStates().and(forbidden.not()).and(bddExAutomata.getReachableStates());
         BDD Qk = null;
         do
         {
           Qk = Qkn.id();
-          Qkn = Qk.or(image_preImage(Qk,delta_all,bddExAutomata.getBackwardOverflows())).and(forbidden.not());
+          Qkn = (Qk.or(image_preImage(Qk,delta_all,bddExAutomata.getBackwardOverflows())).and(forbidden.not())).and(bddExAutomata.getReachableStates());
         } while (!Qkn.equals(Qk));
 
         return Qkn;

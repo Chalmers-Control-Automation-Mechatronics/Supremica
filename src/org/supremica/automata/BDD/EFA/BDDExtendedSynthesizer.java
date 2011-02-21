@@ -18,6 +18,8 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 import org.supremica.automata.ExtendedAutomata;
+import org.supremica.automata.ExtendedAutomaton;
+import org.supremica.automata.algorithms.EFAMonlithicReachability;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
@@ -34,7 +36,7 @@ public class BDDExtendedSynthesizer {
 
     private static Logger logger = LoggerFactory.createLogger(BDDExtendedSynthesizer.class);
 
-    BDDExtendedAutomata bddAutomata;
+    public BDDExtendedAutomata bddAutomata;
     ExtendedAutomata theAutomata;
     private BDD statesAfterSynthesis;
     private ActionTimer synthesisTimer;
@@ -60,7 +62,8 @@ public class BDDExtendedSynthesizer {
             int i = Integer.parseInt(((BinaryExpressionProxy)(var.getInitialStatePredicate())).getRight().toString());
             var2val.put(var.getName(), i);
         }
-
+*/
+        /*
         ExtendedAutomaton efa = theAutomata.iterator().next();
         EFAMonlithicReachability efaMR = new EFAMonlithicReachability(efa.getComponent(), theAutomata.getVars(),efa.getAlphabet());
         theAutomata.addAutomaton(new ExtendedAutomaton(theAutomata, efaMR.createEFA()));
@@ -89,9 +92,9 @@ public class BDDExtendedSynthesizer {
 
     }
 
-    public int nbrOfStates()
+    public double nbrOfStates()
     {
-        return (int)bddAutomata.nbrOfStatesBDD(statesAfterSynthesis);
+        return bddAutomata.nbrOfStatesBDD(statesAfterSynthesis);
     }
 
     public BDD getResult()
@@ -119,7 +122,6 @@ public class BDDExtendedSynthesizer {
         }
 
         BDDExtendedGuardGenerator bddgg = null;
-
 
         event2guard = new HashMap<String,BDDExtendedGuardGenerator>();
 

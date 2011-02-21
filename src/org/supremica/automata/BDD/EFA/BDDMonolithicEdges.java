@@ -46,6 +46,8 @@ public class BDDMonolithicEdges
         plantUncontrollableEdgesBackwardBDD = manager.getZeroBDD();
         specUncontrollableEdgesBackwardBDD = manager.getZeroBDD();
         
+        System.err.println("Start generating BDDs for forward and backward transitions...");
+
         for (BDDExtendedAutomaton currAutomaton : bddExAutomata)
         {
 //            System.out.println(currAutomaton.getExAutomaton().getName());
@@ -103,7 +105,7 @@ public class BDDMonolithicEdges
         edgesForwardBDD = edgesForwardBDD.exist(bddExAutomata.getEventVarSet());
         System.err.println("BDD represeting forward edges without events is created.");
         System.err.println("The number of nodes in the forward edge BDD: "+edgesForwardBDD.nodeCount());
-//        System.err.println("Number of states in the closed-loop system: "+bddExAutomata.nbrOfStatesBDD(edgesForwardBDD.exist(bddExAutomata.getDestStatesVarSet())));
+//        System.err.println("Number of states in the closed-loop system: "+bddExAutomata.getNbrOfRecahableStates());
         edgesBackwardBDD = edgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
         System.err.println("BDD represeting backward edges without events is created.");
 
@@ -186,7 +188,6 @@ public class BDDMonolithicEdges
         }
         
         return newEdgesBDD;
-
     }
 
     public BDD getMonolithicEdgesForwardBDD()
