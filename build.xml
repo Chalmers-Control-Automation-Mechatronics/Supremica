@@ -173,6 +173,11 @@
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/lpsolve55j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/glpk-java.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/org.sat4j.core.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/minisatjni1.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/cplex.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/org.sat4j.pb.jar" dest="${lib}/${unjared}"/>
 
         <!-- svg export -->
         <unjar src="${lib}/batik-awt-util.jar" dest="${lib}/${unjared}"/>       

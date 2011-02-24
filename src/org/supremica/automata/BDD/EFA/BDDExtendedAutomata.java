@@ -47,9 +47,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     BDDDomain eventDomain;
     BDDDomain constantDomain;
 
-    BDDDomain[] sourceStateDomains = null;
-    BDDDomain[] destStateDomains = null;
-
     BDDVarSet sourceStateVariables = null;
     BDDVarSet destStateVariables = null;
 
@@ -191,9 +188,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
         sourceVariablesVarSet = manager.createEmptyVarSet();
         destVariablesVarSet = manager.createEmptyVarSet();
-
-        sourceStateDomains = new BDDDomain[orgExAutomata.size()];
-        destStateDomains = new BDDDomain[orgExAutomata.size()];
 
         sourceLocationDomains = new BDDDomain[orgExAutomata.size()];
         destLocationDomains = new BDDDomain[orgExAutomata.size()];

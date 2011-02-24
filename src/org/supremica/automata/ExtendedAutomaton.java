@@ -110,6 +110,7 @@ public class ExtendedAutomaton
     private List<EventDeclProxy> alphabet;
     private List<EventDeclProxy> uncontrollableAlphabet;
     private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToOutgoingEdgesMap;
+    private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToIngoingEdgesMap;
     private HashMap<String,NodeProxy> nameToLocationMap;
     private List<NodeProxy> nodes;
     private Set<NodeProxy> initialLocations;
@@ -158,6 +159,7 @@ public class ExtendedAutomaton
         acceptedLocations = new HashSet<NodeProxy>();
 
         locationToOutgoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(nodes.size());
+        locationToIngoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(nodes.size());
         nameToLocationMap = new HashMap<String, NodeProxy>(nodes.size());
         alphabet = new ArrayList<EventDeclProxy>();
         uncontrollableAlphabet = new ArrayList<EventDeclProxy>();
@@ -173,6 +175,7 @@ public class ExtendedAutomaton
         {
             nameToLocationMap.put(node.getName(),node);
             locationToOutgoingEdgesMap.put(node, new ArrayList<EdgeSubject>());
+            locationToIngoingEdgesMap.put(node, new ArrayList<EdgeSubject>());
             locationToOutgoingEventsMap.put(node, new HashSet<String>());
 
             if (new StringTokenizer(node.toString(), " ").nextToken().equals("initial"))
@@ -267,6 +270,7 @@ public class ExtendedAutomaton
                 }
             }
             locationToOutgoingEdgesMap.get(edge.getSource()).add(edge);
+            locationToIngoingEdgesMap.get(edge.getTarget()).add(edge);
         }
 
 
@@ -459,6 +463,11 @@ public class ExtendedAutomaton
     public  HashMap<NodeProxy,ArrayList<EdgeSubject>> getLocationToOutgoingEdgesMap()
     {
         return  locationToOutgoingEdgesMap;
+    }
+
+    public  HashMap<NodeProxy,ArrayList<EdgeSubject>> getLocationToIngoingEdgesMap()
+    {
+        return  locationToIngoingEdgesMap;
     }
 
     public ComponentKind getKind()

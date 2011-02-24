@@ -79,8 +79,6 @@ public class EditorSynthesizerAction
     public void doAction()
     {
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
-//        ReduceBDDvars rBDDv = new ReduceBDDvars(ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata().getAutomatonAt(0));
-//        rBDDv.printAllPaths();
         
         final int nbrOfComponents = module.getComponentList().size();
         if(nbrOfComponents == 0)
@@ -114,8 +112,11 @@ public class EditorSynthesizerAction
         {
             return;
         }
-
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
+
+//        ReduceBDDvars rBDDv = new ReduceBDDvars(exAutomata.getExtendedAutomataList().get(0));
+//        rBDDv.computeOptimalPaths();
+
         final BDDExtendedSynthesizer bddSynthesizer = new BDDExtendedSynthesizer(exAutomata);
 /*
         //Create a naive PCG graph
