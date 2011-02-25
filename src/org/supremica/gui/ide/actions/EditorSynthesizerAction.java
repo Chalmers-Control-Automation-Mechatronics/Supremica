@@ -13,18 +13,13 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -32,8 +27,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
-import org.supremica.automata.BDD.ReduceBDDvars;
-import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.gui.EditorSynthesizerDialog;
@@ -66,7 +59,7 @@ public class EditorSynthesizerAction
         doAction();
     }
 
-    public static int max(int[] t) {
+    public static int max(final int[] t) {
         int maximum = t[0];
         for (int i=1; i<t.length; i++) {
             if (t[i] > maximum) {
@@ -79,7 +72,7 @@ public class EditorSynthesizerAction
     public void doAction()
     {
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
-        
+
         final int nbrOfComponents = module.getComponentList().size();
         if(nbrOfComponents == 0)
             return;
@@ -172,7 +165,7 @@ public class EditorSynthesizerAction
 //        double LD = (double)max(efaDegree)/(double)exAutomata.nbrOfEFAsVars;
 //        System.err.println("LD: "+ LD);
 
-        bddSynthesizer.synthesize(options);       
+        bddSynthesizer.synthesize(options);
 
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
         logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.getNbrOfRecahableStates());
@@ -193,7 +186,7 @@ public class EditorSynthesizerAction
             double aveGuardSize = 0;
             for(final String event:event2guard.keySet())
             {
-                int guardSize = event2guard.get(event).getNbrOfTerms();
+                final int guardSize = event2guard.get(event).getNbrOfTerms();
                 if(guardSize < minGuardSize)
                     minGuardSize = guardSize;
                 if(guardSize > maxGuardSize)

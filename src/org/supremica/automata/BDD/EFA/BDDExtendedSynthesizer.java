@@ -18,8 +18,6 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 import org.supremica.automata.ExtendedAutomata;
-import org.supremica.automata.ExtendedAutomaton;
-import org.supremica.automata.algorithms.EFAMonlithicReachability;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
@@ -169,7 +167,7 @@ public class BDDExtendedSynthesizer {
                         {
                             guard = currBDDGG.getGuard();
                             currGuard="";
-                            
+
                             if(!ep.getGuardActionBlock().getGuardsModifiable().isEmpty())
                             {
                                 ses1 = ep.getGuardActionBlock().getGuardsModifiable().iterator().next().clone();

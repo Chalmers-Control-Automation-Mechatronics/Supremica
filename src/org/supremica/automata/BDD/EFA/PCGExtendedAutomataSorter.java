@@ -44,7 +44,7 @@ public class PCGExtendedAutomataSorter
 
         for(final String an:automataNames)
         {
-innerLoop:  for(ExtendedAutomaton efa:oorgAutomata)
+innerLoop:  for(final ExtendedAutomaton efa:oorgAutomata)
                 if(efa.getName().equals(an))
                 {
                     orgAutomata.add(efa);
@@ -63,12 +63,12 @@ innerLoop:  for(ExtendedAutomaton efa:oorgAutomata)
         final int[][] weightMatrix = getCommunicationMatrix(orgAutomata);
         final OrderingSolver orderingSolver = new OrderingSolver(orgAutomata.size());
 
-        
+
         for (int i=0;i<orgAutomata.size();i++)
         {
             orderingSolver.addNode(pcgNodeList.get(i), weightMatrix[i], i - 1);
         }
-        
+
         int i = 0;
         final int[] order = orderingSolver.getGoodOrder();
 
@@ -105,11 +105,11 @@ innerLoop:  for(ExtendedAutomaton efa:oorgAutomata)
     int getCommunicationComplexity(final ExtendedAutomaton firstAutomaton, final ExtendedAutomaton secondAutomaton)
     {
         int weight = 0;
-        List<EventDeclProxy> firstAlphabet = new ArrayList<EventDeclProxy>(firstAutomaton.getAlphabet());
-        List<EventDeclProxy> secondAlphabet = new ArrayList<EventDeclProxy>(secondAutomaton.getAlphabet());
+        final List<EventDeclProxy> firstAlphabet = new ArrayList<EventDeclProxy>(firstAutomaton.getAlphabet());
+        final List<EventDeclProxy> secondAlphabet = new ArrayList<EventDeclProxy>(secondAutomaton.getAlphabet());
         firstAlphabet.retainAll(secondAlphabet);
-        for(EventDeclProxy event:firstAlphabet)
-        {            
+        for(final EventDeclProxy event:firstAlphabet)
+        {
             Set<VariableComponentProxy> guardVars1 = new HashSet<VariableComponentProxy>();
             if(firstAutomaton.getGuardVariables(event)!=null)
                     guardVars1 = new HashSet<VariableComponentProxy>((firstAutomaton.getGuardVariables(event)));
@@ -118,19 +118,19 @@ innerLoop:  for(ExtendedAutomaton efa:oorgAutomata)
             if(firstAutomaton.getActionVariables(event)!=null)
                     actionVars1 = new HashSet<VariableComponentProxy>(firstAutomaton.getActionVariables(event));
 
-            Set<VariableComponentProxy> guardVars2 = new HashSet<VariableComponentProxy>();
+            final Set<VariableComponentProxy> guardVars2 = new HashSet<VariableComponentProxy>();
             if(secondAutomaton.getGuardVariables(event)!=null)
                     guardVars1 = new HashSet<VariableComponentProxy>((secondAutomaton.getGuardVariables(event)));
 
-            Set<VariableComponentProxy> actionVars2 = new HashSet<VariableComponentProxy>();
+            final Set<VariableComponentProxy> actionVars2 = new HashSet<VariableComponentProxy>();
             if(secondAutomaton.getActionVariables(event)!=null)
                     actionVars1 = new HashSet<VariableComponentProxy>((secondAutomaton.getActionVariables(event)));
 
             guardVars1.retainAll(guardVars2);
-            int commonGuardVars = guardVars1.size();
+            final int commonGuardVars = guardVars1.size();
 
             actionVars1.retainAll(actionVars2);
-            int commonActionVars = actionVars1.size();
+            final int commonActionVars = actionVars1.size();
 
             weight += (3+2*commonGuardVars + commonActionVars);
 
@@ -148,17 +148,17 @@ innerLoop:  for(ExtendedAutomaton efa:oorgAutomata)
         Set<VariableComponentProxy> guardVars2_allEvents = new HashSet<VariableComponentProxy>();
         if(secondAutomaton.getUsedSourceVariables() != null)
             guardVars2_allEvents = new HashSet<VariableComponentProxy>(secondAutomaton.getUsedSourceVariables());
-        
+
         Set<VariableComponentProxy> actionVars2_allEvents = new HashSet<VariableComponentProxy>();
         if(secondAutomaton.getUsedSourceVariables() != null)
             actionVars2_allEvents = new HashSet<VariableComponentProxy>(secondAutomaton.getUsedTargetVariables());
 
 
         guardVars1_allEvents.retainAll(actionVars2_allEvents);
-        int guard1_action2_uncommonEvents = guardVars1_allEvents.size();
+        final int guard1_action2_uncommonEvents = guardVars1_allEvents.size();
 
         guardVars2_allEvents.retainAll(actionVars1_allEvents);
-        int guard2_action1_uncommonEvents = guardVars2_allEvents.size();
+        final int guard2_action1_uncommonEvents = guardVars2_allEvents.size();
 
         weight += (guard1_action2_uncommonEvents + guard2_action1_uncommonEvents);
 
@@ -170,12 +170,10 @@ innerLoop:  for(ExtendedAutomaton efa:oorgAutomata)
 
     int getCommunicationComplexity2(final ExtendedAutomaton firstAutomaton, final ExtendedAutomaton secondAutomaton)
     {
-        int weight = 0;
-        List<EventDeclProxy> firstAlphabet = new ArrayList<EventDeclProxy>(firstAutomaton.getAlphabet());
-        List<EventDeclProxy> secondAlphabet = new ArrayList<EventDeclProxy>(secondAutomaton.getAlphabet());
+        final List<EventDeclProxy> firstAlphabet = new ArrayList<EventDeclProxy>(firstAutomaton.getAlphabet());
+        final List<EventDeclProxy> secondAlphabet = new ArrayList<EventDeclProxy>(secondAutomaton.getAlphabet());
         firstAlphabet.retainAll(secondAlphabet);
-
-//        return weight;
+        // return weight;
         return firstAlphabet.size();
     }
 
