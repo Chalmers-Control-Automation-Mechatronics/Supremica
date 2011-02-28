@@ -54,7 +54,7 @@ class EatingPhilosopher
     final static int L_PUT = 2;
     final static int R_PUT = 3;
     final static int START_EATING = 4;
-    final static String LABEL_SEP = ".";
+    final static String LABEL_SEP = ":";    // Was once "." but someone broke that
     
     // note, must be the same in both Philosopher and Fork
     final static String NAME_SEP = ":";
@@ -261,7 +261,7 @@ class Chopstick
     final static int R_TAKE = 1;
     final static int L_PUT = 2;
     final static int R_PUT = 3;
-    final static String LABEL_SEP = ".";
+    final static String LABEL_SEP = ":";
     
     // note, must be the same in both Philosopher and Fork
     final static String NAME_SEP = ":";
@@ -403,7 +403,7 @@ class MemoryChopstick
     final static int R_TAKE = 1;
     final static int L_PUT = 2;
     final static int R_PUT = 3;
-    final static String LABEL_SEP = ".";
+    final static String LABEL_SEP = ":";
     
     // note, must be the same in both Philosopher and Fork
     final static String NAME_SEP = ":";

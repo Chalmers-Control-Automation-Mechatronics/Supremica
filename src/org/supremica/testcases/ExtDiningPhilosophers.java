@@ -48,7 +48,7 @@ class ExtEatingPhilosopher
     final static int R_TAKE = 1;
     final static int INTERM_EVENT = 2;
     final static int PUT = 3;
-    final static String LABEL_SEP = ".";
+    final static String LABEL_SEP = ":";
     
     // note, must be the same in both Philosopher and Fork
     final static String NAME_SEP = ":";
@@ -204,7 +204,7 @@ public class ExtDiningPhilosophers{
     
     Project project = new Project("Extended Dining philosophers");
     Automata theAutomata = new Automata();
-    final static String LABEL_SEP = ".";
+    final static String LABEL_SEP = ":";
     
     int nextId(int id, int modulo)
     {

@@ -12,6 +12,8 @@ import org.supremica.automata.LabeledEvent;
 class User
 	extends Automaton
 {
+    final static String SEPARATOR = ":";    // This was once ".", but then someone broke the possibility to use the dot in event/state-names
+
 	User(int id, int num_resources, boolean a, boolean b, boolean c)
 		throws Exception
 	{
@@ -29,9 +31,9 @@ class User
 		// Do the following for each resource
 		for (int r = 1; r <= num_resources; ++r)
 		{
-			LabeledEvent ai = new LabeledEvent("a" + id + "." + r);
-			LabeledEvent bi = new LabeledEvent("b" + id + "." + r);
-			LabeledEvent ci = new LabeledEvent("c" + id + "." + r);
+			LabeledEvent ai = new LabeledEvent("a" + id + SEPARATOR + r);
+			LabeledEvent bi = new LabeledEvent("b" + id + SEPARATOR + r);
+			LabeledEvent ci = new LabeledEvent("c" + id + SEPARATOR + r);
 
 			ai.setControllable(a);
 			bi.setControllable(b);
@@ -60,6 +62,8 @@ class User
 class Fifo
 	extends Automaton
 {
+        final static String SEPARATOR = ":";    // This was once ".", but then someone broke the possibility to use the dot in event/state-names
+
 	Fifo(int id1, int id2, int resrc, boolean a, boolean b, boolean c)
 		throws Exception
 	{
@@ -67,10 +71,10 @@ class Fifo
 
 		setType(AutomatonType.SPECIFICATION);
 
-		LabeledEvent a1 = new LabeledEvent("a" + id1 + "." + resrc);
-		LabeledEvent a2 = new LabeledEvent("a" + id2 + "." + resrc);
-		LabeledEvent b1 = new LabeledEvent("b" + id1 + "." + resrc);
-		LabeledEvent b2 = new LabeledEvent("b" + id2 + "." + resrc);
+		LabeledEvent a1 = new LabeledEvent("a" + id1 + SEPARATOR + resrc);
+		LabeledEvent a2 = new LabeledEvent("a" + id2 + SEPARATOR + resrc);
+		LabeledEvent b1 = new LabeledEvent("b" + id1 + SEPARATOR + resrc);
+		LabeledEvent b2 = new LabeledEvent("b" + id2 + SEPARATOR + resrc);
 
 		a1.setControllable(a);
 		a2.setControllable(a);
@@ -111,6 +115,8 @@ class Fifo
 class Mutex
 	extends Automaton
 {
+	    final static String SEPARATOR = ":";    // This was once ".", but then someone broke the possibility to use the dot in event/state-names
+
 	Mutex(int id1, int id2, int resrc, boolean a, boolean b, boolean c)
 		throws Exception
 	{
@@ -118,10 +124,10 @@ class Mutex
 
 		setType(AutomatonType.SPECIFICATION);
 
-		LabeledEvent b1 = new LabeledEvent("b" + id1 + "." + resrc);
-		LabeledEvent b2 = new LabeledEvent("b" + id2 + "." + resrc);
-		LabeledEvent c1 = new LabeledEvent("c" + id1 + "." + resrc);
-		LabeledEvent c2 = new LabeledEvent("c" + id2 + "." + resrc);
+		LabeledEvent b1 = new LabeledEvent("b" + id1 + SEPARATOR + resrc);
+		LabeledEvent b2 = new LabeledEvent("b" + id2 + SEPARATOR + resrc);
+		LabeledEvent c1 = new LabeledEvent("c" + id1 + SEPARATOR + resrc);
+		LabeledEvent c2 = new LabeledEvent("c" + id2 + SEPARATOR + resrc);
 
 		b1.setControllable(b);
 		b2.setControllable(b);

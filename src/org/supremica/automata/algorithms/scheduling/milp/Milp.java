@@ -16,12 +16,12 @@ public class Milp
     /****************************************************************************************/
     /*                                 VARIABLE SECTION                                     */
     /****************************************************************************************/
-    
+
     private static final int NO_PATH_SPLIT_INDEX = -1;
-       
+
     /** The involved automata, plants, zone specifications */
     private Automata theAutomata, plants, zones, externalSpecs;
-    
+
     /**
      * The bridge to a MILP-solver, allowing to:
      * 1) build appropriate MILP models from the info supplied by this class;
@@ -29,17 +29,17 @@ public class Milp
      * 3) process the solution retrieving event occurrence times.
      */
     private MilpSolverUI milpSolver = null;
-    
+
     /**
      * int[zone_nr][plant_nr][event/state-switch][state_nr] - stores the indices
      * of the booking/unbooking events and the states that fire them.
      */
     private int[][][][] bookingTics, unbookingTics;
-    
+
     /** The indices of the event- and state-arrays in bookingTics/unbookingTics */
     private final static int STATE_SWITCH = 0;
     private final static int EVENT_SWITCH = 1;
-    
+
     /**
      * Mapping between plant_ + zone_ + bookingTics_indices and a mutex-variable-counter.
      * The keys consist of int[]'s of the form {zoneIndex, firstPlantIndex, secondPlantIndex,
@@ -48,16 +48,16 @@ public class Milp
      */
     private TreeMap<int[], Integer> mutexVarCounterMap =
             new TreeMap<int[], Integer>(new IntArrayComparator());
-    
+
 //    /** The optimal cycle time (makespan) */
 //    private double makespan;
 //
     /** The map that assigns an index to each automaton/state/event */
     private AutomataIndexMap indexMap;
-    
+
     /** The automaton representing the (resulting) optimal schedule */
     private Automaton schedule = null;
-    
+
     /**
      * Contains the boolean expressions that control the path alternatives,
      * indicated by the first states of each alt. path. It is needed to ensure
@@ -65,20 +65,20 @@ public class Milp
      * MILP solver, even if they would interfere with the mutex constraints.
      */
     private Hashtable<State,String> pathCutTable = null;
-    
+
     /** The timer */
     private ActionTimer timer = new ActionTimer();
-    
+
     /** This boolean is true if the scheduler-thread should be (is) running */
     protected volatile boolean isRunning = false;
-    
+
     /** Decides if the schedule should be built */
     protected boolean buildSchedule;
-    
+
     /** The output string */
     @SuppressWarnings("unused")
 	private String outputStr = "";
-    
+
     /**
      * Contains the info about the nearest path splits above a given state. The
      * indices of the IntArrayTreeSet (this storage format is chosen to avoid
@@ -87,48 +87,48 @@ public class Milp
      * [plantIndex, fromStateIndex, toStateIndex]-objects stored in altPathVariablesTree.
      */
     private IntArrayTreeSet[][] upstreamsAltPathVars = null;
-    
+
     /** The array of strings containing alternative paths variables */
     private ArrayList<String> altPathVariablesStrArray = null; //TO BE DEPRECATED
     private IntArrayTreeSet altPathVariablesTree = null;
-    
+
     /** The string containing mutex variables */
     private ArrayList<String> mutexVariables = null;
-    
+
     /**
      * The declaration of variables, used in internal ordering of precedence constraints.
      **/
     private ArrayList<String> internalPrecVariables = null; //TO BE DEPRECATED
     /**
-     * These variables describe the internal event ordering in the external 
-     * precedence specifications. For example, suppose that we have a specification 
-     * stating that first sigma_a or sigma_b should happen, followed by 
-     * sigma_c or sigma_d. Then two variables are needed, namely 
-     * 'sigma_a_before_sigma_b' and 'sigma_c_before_sigma_d'. These are stored 
-     * as ordered eventIndices, e.g. [sigma_a, sigma_b] where 
+     * These variables describe the internal event ordering in the external
+     * precedence specifications. For example, suppose that we have a specification
+     * stating that first sigma_a or sigma_b should happen, followed by
+     * sigma_c or sigma_d. Then two variables are needed, namely
+     * 'sigma_a_before_sigma_b' and 'sigma_c_before_sigma_d'. These are stored
+     * as ordered eventIndices, e.g. [sigma_a, sigma_b] where
      * indexMap.getEventIndex(sigma_a) < indexMap.getEventIndex(sigma_b).
-     * (IntArrayTreeSet is used to avoid variable repetition). 
+     * (IntArrayTreeSet is used to avoid variable repetition).
      **/
     private IntArrayTreeSet externalPrecVariables = null;
-    
+
     /**
      * The ArrayList containing the cycle time constraints.
      * Each constraint is stored as an int[] containing {timePlantIndex, stateIndex}.
      */
     private ArrayList<int[]> cycleTimeConstraints = null;
-    
+
     /**
      * The ArrayList containing initial (precedence) constraints.
      * Each constraint is stored as an int[] containing {timePlantIndex, stateIndex}.
      */
     private ArrayList<int[]> initPrecConstraints = null;
-    
+
     /**
      * The ArrayList containing precedence constraints.
      * Each constraint is stored as an int[] containing {timeIndex, fromStateIndex, toStateIndex}.
      */
     private ArrayList<int[]> precConstraints = null;
-    
+
     /**
      * The ArrayList containg alternative paths constraints.
      * Each constraint has a body and an id. The body is a string describing
@@ -139,7 +139,7 @@ public class Milp
      */
     private ArrayList<Constraint> altPathsConstraints = null;
     private ArrayList<ArrayList<int[]>> newAltPathsConstraints = null;
-    
+
     /**
      * The ArrayList containing mutex constraint objects.
      * Each constraint has a body and an id. The body is a string describing
@@ -150,93 +150,96 @@ public class Milp
      */
 //    private ArrayList<Constraint> mutexConstraints = null;
     private ArrayList<int[]> mutexConstraints = null;
-    
+
     private ArrayList<ArrayList<int[]>> xorConstraints = null;
-    
+
     private ArrayList<ArrayList<ArrayList<ArrayList<int[]>>>> sharedEventConstraints = null;
-    
+
     /**
      * Contains the minimal state times of each plant,
      * indexed as [milpPlantIndex, stateIndex].
      */
     private double[][] deltaTimes = null;
-    
+
     /** The constraints represented by external specifications, in string form. */
     private String externalConstraints = "";
-    
+
     /**
-     * The constraints preventing circular wait situations du to cross-booking of 
-     * zones. A simple example of this is when R_i first books Z_k and then Z_l 
-     * (without unboking Z_k), while R_j does the reverse (Z_l -> Z_k), 
+     * The constraints preventing circular wait situations du to cross-booking of
+     * zones. A simple example of this is when R_i first books Z_k and then Z_l
+     * (without unboking Z_k), while R_j does the reverse (Z_l -> Z_k),
      * the robot robot ordering should then be the same for Z_k and
      * Z_l to avoid deadlock. This is taken care of during the optimization, but
      * with the help of these constraints, the search field is narrowed, which
      * should decrease the running time. Also, approximative solutions are easier
-     * to obtains using these constraints. 
-     * 
+     * to obtains using these constraints.
+     *
      * Each CircularWaitConstraintBlock contains a list of int[]-objects and a boolean.
      * The boolean keeps track of whether any buffer corresponds to the current
-     * constraint, while each int[] consists of the following indices: 
+     * constraint, while each int[] consists of the following indices:
      * [zone, plant1, plant2, bookingTicPlant1, bookingTicPlant2].
      */
     private ArrayList<CircularWaitConstraintBlock> circularWaitConstraints = null;
-    
+
     /*
      * The thread that performs the search for the optimal solution
      */
     private Thread milpThread;
-    
+
     /**
      *  Used to round off the optimal times, as returned by MILP, thus removing
      *  the added EPSILONs.
      */
     private double roundOffCoeff = -1;
-    
+
     /**
      * This value is higher than 1 if the total time risk exceeding the bigM-value.
      * In that case, each statetime-value is divised by timeThroughBigMApprox.
      */
     private double timeThroughBigMApprox = 1;
-    
+
     //TODO: totally ugly (snabb fix): needs to be redone! (se nedan)
     private ArrayList<int[]>[] consecutiveBookingEdges;
-    
+
     protected String infoMsgs = "";
     protected String warnMsgs = "";
     protected String errorMsgs = "";
     protected ArrayList<StackTraceElement[]> debugMsgs = new ArrayList<StackTraceElement[]>();
-    
+
     protected boolean balanceVelocities = false;
-    
+
+	private final static String SEPARATOR = ".";	// Note! The dot was hijacked to be an operator after this code was written
+													// If problems occur, this could be replaced.
+
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
-    
+
     public Milp(Automata theAutomata, boolean buildSchedule)
     throws Exception
     {
         this(theAutomata, buildSchedule, SchedulingConstants.MILP_GLPK);
     }
-    
+
     public Milp(Automata theAutomata, boolean buildSchedule, String milpSolverName)
         throws Exception
     {
         this(theAutomata, buildSchedule, milpSolverName, false);
     }
-    
+
     public Milp(Automata theAutomata, boolean buildSchedule, boolean balanceVelocities)
     throws Exception
     {
         this(theAutomata, buildSchedule, SchedulingConstants.MILP_GLPK, balanceVelocities);
     }
-    
+
     public Milp(Automata theAutomata, boolean buildSchedule, String milpSolverName, boolean balanceVelocities)
     throws Exception
     {
         this.theAutomata = theAutomata;
         this.buildSchedule = buildSchedule;
         this.balanceVelocities = balanceVelocities;
-        
+
         if (milpSolverName.equals(SchedulingConstants.MILP_GLPK))
         {
             milpSolver = new GlpkUI(this);
@@ -254,20 +257,20 @@ public class Milp
             throw new Exception(milpSolverName + " = is not a known MILP-solver.");
         }
     }
-    
+
     public void startSearchThread()
     {
         milpThread = new Thread(this);
         isRunning = true;
         milpThread.start();
     }
-    
+
     public void run()
     {
         try
         {
             schedule();
-            
+
             if (isRunning)
             {
                 requestStop(true);
@@ -280,19 +283,19 @@ public class Milp
         catch (Exception ex)
         {
             //milpSolver.cleanUp();
-            
+
             isRunning = false;
-            
+
             errorMsgs += "Milp::schedule() -> " + ex.getMessage();
             debugMsgs.add(ex.getStackTrace());
             ex.printStackTrace();//temp
         }
     }
-    
+
     /****************************************************************************************/
     /*                                 "SCHEDULER"-INTERFACE METHODS                        */
     /****************************************************************************************/
-    
+
     /**
      * This method converts the selected automata to a MILP-representation, calls the MILP-solver,
      * processes and stores the resulting information.
@@ -301,55 +304,55 @@ public class Milp
     throws Exception
     {
         long totalTime = 0;
-                      
+
         if (isRunning)
         {
             timer.restart();
             initialize();
         }
-        
+
         // Converts automata to constraints that the MILP-solver takes as input (*.mod file)
         if (isRunning)
-        {      
+        {
             createExternalConstraints();
             createBasicConstraints();
-            
+
             //new... test... (should be called when mutex constraints already are created)
             //TODO: better name... better implementation...
             ActionTimer at = new ActionTimer();
             at.start();
             createCircularWaitConstraints();
             at.stop();
-            addToMessages("Time for the creation of noncrossbooking constraints = " + 
+            addToMessages("Time for the creation of noncrossbooking constraints = " +
                     at.elapsedTime() + "ms", SchedulingConstants.MESSAGE_TYPE_INFO);
-           
-            
+
+
             milpSolver.createModelFile();
-            
+
             long procTime = timer.elapsedTime();
             addToMessages("\tPre-processing time = " + procTime + "ms\n", SchedulingConstants.MESSAGE_TYPE_INFO);
             totalTime += procTime;
         }
-        
+
         // Calls the MILP-solver
         if (isRunning)
         {
             timer.restart();
-            
+
             milpSolver.launchMilpSolver();
-            
+
             long procTime = timer.elapsedTime();
             infoMsgs += "\tOptimization time = " + procTime + "ms\n";
             totalTime += procTime;
         }
-        
+
         // Processes the output from the MILP-solver (*.sol file) and stores the optimal times for each state
         if (isRunning)
         {
             timer.restart();
             milpSolver.processSolutionFile();
         }
-        
+
         // Builds the optimal schedule (if solicited)
         if (isRunning && buildSchedule)
         {
@@ -360,13 +363,13 @@ public class Milp
             totalTime += procTime;
             infoMsgs += "\tTotal time = " + totalTime + "ms\n";
         }
-        
+
         if (isRunning && buildSchedule && balanceVelocities)
         {
             balanceVelocities();
         }
     }
-    
+
     /**
      * This method constructs an automaton representing the optimal schedule, using the
      * sequence of times (one time value for every state of the involved plant automata)
@@ -386,9 +389,9 @@ public class Milp
         synthesizerOptions.setPurge(true);
         synthesizerOptions.setMaximallyPermissive(true);
         synthesizerOptions.setMaximallyPermissiveIncremental(true);
- 
+
         AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
- 
+
         Automaton synthAll = synthesizer.execute().getFirstAutomaton();
         synthAll.setName("SYNTH_OVER_ALL");
         synthAll.setType(AutomatonType.PLANT);
@@ -399,18 +402,18 @@ public class Milp
         schedule = new Automaton("Schedule");
         schedule.setType(AutomatonType.SUPERVISOR);
         //timer.start(); // Restart the timer
-        
+
         SynchronizationStepper stepper = new SynchronizationStepper(theAutomata);
-        
+
         // The current synchronized state indices, consisting of as well plant
         // as specification indices and used to step through the final graph following the
         // time schedule (which is needed to build the schedule automaton)
         int[] currComposedStateIndices = stepper.getInitialStateIndices();
-        
+
         // The first set of state indices correspond to the initial state of the composed automaton.
         // They are thus used to construct the initial state of the schedule automaton.
         State currScheduledState = makeScheduleState(currComposedStateIndices, true);
-        
+
         // This alphabet is needed to check which events are common to the plants
         // If several transitions with the same event are enabled simultaneously, naturally
         // the transition having the greatest time value should be fired
@@ -418,18 +421,18 @@ public class Milp
         for (int i=0; i<plants.size() - 1; i++)
         {
             Alphabet firstAlphabet = plants.getAutomatonAt(i).getAlphabet();
-            
+
             for (int j=i+1; j<plants.size(); j++)
             {
                 Alphabet secondAlphabet = plants.getAutomatonAt(j).getAlphabet();
-                
+
                 commonPlantEventsAlphabet.addEvents(AlphabetHelpers.intersect(firstAlphabet, secondAlphabet));
             }
         }
-        
+
         // The time accumulated along the optimal path so far
         double accumulatedTime = 0;
-        
+
         // Walk from the initial state until an accepting (synchronized) state is found
         // In every step, the cheapest allowed transition is chosen
         // This is done until an accepting state is found for our schedule
@@ -438,32 +441,32 @@ public class Milp
             // Every plant is checked for possible transitions and the one with smallest time value
             // is chosen.
             double smallestTime = Double.MAX_VALUE;
-            
+
             // The event that is next to be fired in the schedule (i.e. the event corresponding to the smallest allowed time value) is stored
             LabeledEvent currOptimalEvent = null;
-            
+
             // The index of a plant in the "plants"-variable. Is increased whenever a plant is found
             int plantIndex = -1;
-            
+
             // Stores the highest firing times for each active synchronizing event
             Hashtable<LabeledEvent, Double> synchArcsInfo = new Hashtable<LabeledEvent, Double>();
-            
+
             // Which automaton fires the "cheapest" transition...
             for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
             {
 //                 Automaton currPlant = indexMap.getAutomatonAt(i);
                 Automaton currPlant = autIt.next();
-                
+
                 // Since the plants are supposed to fire events, the check for the "smallest time event"
                 // is only done for the plants
                 if (currPlant.isPlant())
                 {
 //                     plantIndex++;
                     plantIndex = indexMap.getAutomatonIndex(currPlant);
-                    
+
                     State currState = indexMap.getStateAt(currPlant, currComposedStateIndices[plantIndex]);
                     double currTime = milpSolver.getOptimalTimes()[plantIndex][currComposedStateIndices[plantIndex]];
-                    
+
                     // Choose the smallest time (as long as it is not smaller than the previously scheduled time)...
                     if (currTime <= smallestTime)
                     {
@@ -471,7 +474,7 @@ public class Milp
                         {
                             Arc currArc = arcs.next();
                             LabeledEvent currEvent = currArc.getEvent();
-                            
+
                             // ... that correspoinds to an enabled transition
                             if (stepper.isEnabled(currEvent))
                                 // temp (fulhack)
@@ -479,12 +482,12 @@ public class Milp
                             {
                                 int currStateIndex = indexMap.getStateIndex(currPlant, currState);
                                 int nextStateIndex = indexMap.getStateIndex(currPlant, currArc.getToState());
-                                
+
                                 // If the next node has lower time value, then it cannot belong
                                 // to the optimal path, since precedence constraints are not fulfilled
                                 // Otherwise, this could be the path
 //                                 if (optimalTimes[plantIndex][nextStateIndex] >= currTime + indexMap.getStateAt(currPlant, nextStateIndex).getCost())
-                                if (currState.nbrOfOutgoingMultiArcs() == 1  || 
+                                if (currState.nbrOfOutgoingMultiArcs() == 1  ||
                                         milpSolver.getOptimalAltPathVariables()[plantIndex][currStateIndex][nextStateIndex])
                                 {
                                     // But! Care should be taken with the events common to any pair of plants.
@@ -501,7 +504,7 @@ public class Milp
                                     else
                                     {
                                         Double currSynchTime = synchArcsInfo.get(currEvent);
-                                        
+
                                         if (currSynchTime == null)
                                         {
                                             synchArcsInfo.put(currEvent, new Double(currTime));
@@ -517,7 +520,7 @@ public class Milp
                     }
                 }
             }
-            
+
             // Here is the check to see if there have been any synchronizing events. If so, and if the
             // time of the slowest synchronizing event is smaller than the current optimal time, obviously
             // an update is needed.
@@ -527,7 +530,7 @@ public class Milp
                 {
                     LabeledEvent currSynchEvent = synchEvents.next();
                     double currSynchTime = synchArcsInfo.get(currSynchEvent).doubleValue();
-                    
+
                     if (currSynchTime <= smallestTime)
                     {
                         currOptimalEvent = currSynchEvent;
@@ -535,22 +538,22 @@ public class Milp
                     }
                 }
             }
-            
+
             // Remove the added epsilons from the smallest time, thus obtaining the true smallest time
             smallestTime = removeEpsilons(smallestTime);
-            
+
             // Set the cost of the current state
             currScheduledState.setCost(smallestTime - accumulatedTime);
             // Update the accumulated time
             accumulatedTime = smallestTime;
-            
+
             // Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
             // This state will be the next parting point in our walk
             currComposedStateIndices = stepper.step(currComposedStateIndices, currOptimalEvent);
-            
+
             // Update the schedule automaton
             State nextScheduledState;
-            
+
             // If all the states that build up the current state are accepting, make the composed state accepting too
             boolean isAccepting = true;
             for (int i=0; i<theAutomata.size(); i++)
@@ -560,7 +563,7 @@ public class Milp
                     isAccepting = false;
                 }
             }
-            
+
             // Connect the last transition of the schedule to the initial state (that is also made marked)
             if (isAccepting)
             {
@@ -568,7 +571,7 @@ public class Milp
 //                {
 //                    throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule (sched_time = " + smallestTime + "; makespan = " + makespan + "). Something went wrong...");
 //                }
-                
+
                 nextScheduledState = schedule.getInitialState();
                 nextScheduledState.setAccepting(true);
                 nextScheduledState.setName(nextScheduledState.getName() + ";  makespan = " + smallestTime);
@@ -578,24 +581,24 @@ public class Milp
                 // Add the next state to the schedule
                 nextScheduledState = makeScheduleState(currComposedStateIndices);
             }
-            
+
             // Add the transition time to the name of the state-to-be-in-the-schedule
             currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
-            
+
             if (! schedule.getAlphabet().contains(currOptimalEvent))
             {
                 schedule.getAlphabet().addEvent(currOptimalEvent);
             }
             schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
-            
+
             //temp (fulhack)
 //            synthState = synthState.nextState(currOptimalEvent);
-            
+
             currScheduledState = nextScheduledState;
         }
-        
-        
-        
+
+
+
 //        // A dummy reset-event that returns the schedule automaton from its accepting
 //        // to its initial state. Needed to describe repetitive working cycles...
 //        String resetEventName = "reset";
@@ -616,10 +619,10 @@ public class Milp
 //            plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
 //        }
     }
-    
+
     /**
-     * This method create an instance of VelocityBalancer, supplying the selected 
-     * automata (theAutomata) and the newly built schedule, if it exists. 
+     * This method create an instance of VelocityBalancer, supplying the selected
+     * automata (theAutomata) and the newly built schedule, if it exists.
      * VelocityBalancer balances then the velocities of the selected plants.
      */
     protected void balanceVelocities()
@@ -631,18 +634,18 @@ public class Milp
                     SchedulingConstants.MESSAGE_TYPE_ERROR);
             return;
         }
-        
+
         Automata autosToBeBalanced = theAutomata.clone();
         autosToBeBalanced.addAutomaton(schedule);
-        
+
         new VelocityBalancer(autosToBeBalanced, this);
     }
-    
-    
+
+
     /****************************************************************************************/
     /*                                 INIT METHODS                                         */
     /****************************************************************************************/
-    
+
     /**
      * Creates the (temporary) *.mod- and *.sol- files that are used to communicate
      * with the MILP-solver (GLPK). The automata are preprocessed (syntes and purge)
@@ -650,15 +653,15 @@ public class Milp
      */
     protected void initialize()
     throws Exception
-    {       
+    {
         deltaTimes = new double[theAutomata.getPlantAutomata().size()][];
-        
+
         altPathVariablesStrArray = new ArrayList<String>(); //TO BE DEPRECATED
         altPathVariablesTree = new IntArrayTreeSet();
         mutexVariables = new ArrayList<String>();
         internalPrecVariables = new ArrayList<String>(); //TO BE DEPRECATED
         externalPrecVariables = new IntArrayTreeSet();
-        
+
         cycleTimeConstraints = new ArrayList<int[]>();
         initPrecConstraints = new ArrayList<int[]>();
         precConstraints = new ArrayList<int[]>();
@@ -668,18 +671,18 @@ public class Milp
         xorConstraints = new ArrayList<ArrayList<int[]>>();
         circularWaitConstraints = new ArrayList<CircularWaitConstraintBlock>();
         sharedEventConstraints = new ArrayList<ArrayList<ArrayList<ArrayList<int[]>>>>();
-        
+
         pathCutTable = new Hashtable<State,String>();
-        
+
         initAutomata();
         initMutexStates();
-        
+
         initAltPathVarTrees();
-        
+
         milpSolver.initialize();
     }
-    
-    
+
+
     /**
      * Goes through the supplied automata and synchronizes all specifications
      * that do not represent zones with corresponding plant automata.
@@ -689,7 +692,7 @@ public class Milp
      */
     private void initAutomata()
     throws Exception
-    {               
+    {
         // Making all state names coherent to avoid bugs due to inappropriate state names
         for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
         {
@@ -701,15 +704,15 @@ public class Milp
                 currState.setName("q" + counter++);
             }
         }
-        
+
         // The index map is initialized
         indexMap = new AutomataIndexMap(theAutomata);
-               
+
         plants = theAutomata.getPlantAutomata();
         zones = new Automata();
         externalSpecs = new Automata();
         Automata allSpecs = theAutomata.getSpecificationAutomata();
-        
+
         Hashtable<Automaton, Automata> toBeSynthesizedSet = new Hashtable<Automaton, Automata>(plants.size());
         for (Iterator<Automaton> specIt = allSpecs.iterator(); specIt.hasNext(); )
         {
@@ -717,18 +720,18 @@ public class Milp
             Alphabet specAlphabet = spec.getAlphabet();
             int counter = 0;
             Automaton latestPlant = null;
-            
+
             for (Iterator<Automaton> plantIt = plants.iterator(); plantIt.hasNext(); )
             {
                 Automaton plant = plantIt.next();
-                
+
                 if (specAlphabet.overlap(plant.getAlphabet()))
                 {
                     counter++;
                     latestPlant = plant;
                 }
             }
-            
+
             if (counter == 0)
             {
                 warnMsgs += "Specification " + spec.getName() + " has no common events with any of the plants";
@@ -744,12 +747,12 @@ public class Milp
                 toBeSynthesizedSet.put(latestPlant, toBeSynthesized);
             }
         }
-        
+
         for (Enumeration<Automaton> keysEnum = toBeSynthesizedSet.keys(); keysEnum.hasMoreElements(); )
         {
             Automaton plant = keysEnum.nextElement();
             Automata toBeSynthesized = toBeSynthesizedSet.get(plant);
-            
+
             if (toBeSynthesized != null)
             {
                 // Store the costs of each of the plants states
@@ -760,7 +763,7 @@ public class Milp
                     int stateIndex = indexMap.getStateIndex(plant, currState);
                     costs[stateIndex] = currState.getCost();
                 }
-                
+
                 // If there are several automata with similar names (one is a plant the other are
                 // restricting specification), then perform a synthesis
                 SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
@@ -769,58 +772,58 @@ public class Milp
                 synthesizerOptions.setPurge(true);
                 synthesizerOptions.setMaximallyPermissive(true);
                 synthesizerOptions.setMaximallyPermissiveIncremental(true);
-                
+
                 AutomataSynthesizer synthesizer = new AutomataSynthesizer(toBeSynthesized, SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
-                
+
                 Automaton restrictedPlant = synthesizer.execute().getFirstAutomaton();
                 restrictedPlant.setName(plant.getName());
                 restrictedPlant.setType(AutomatonType.PLANT);
-                
+
                 // Set the state costs for the resulting synthesized automaton in an appropriate way
                 for (Iterator<State> stateIter = restrictedPlant.stateIterator(); stateIter.hasNext(); )
                 {
                     State currState = stateIter.next();
-                    
-                    String stateName = currState.getName().substring(0, currState.getName().indexOf("."));
+
+                    String stateName = currState.getName().substring(0, currState.getName().indexOf(SEPARATOR));
                     int stateIndex = indexMap.getStateIndex(restrictedPlant, new State(stateName));
-                    
+
                     currState.setIndex(stateIndex);
                     currState.setCost(costs[stateIndex]);
                 }
-                
+
                 // Remove the specifications that have been synthesized
                 String str = "";
                 for (Iterator<Automaton> toBeSynthesizedIt = toBeSynthesized.iterator(); toBeSynthesizedIt.hasNext(); )
                 {
                     Automaton isSynthesized = toBeSynthesizedIt.next();
-                    
+
                     str += isSynthesized.getName() + " || ";
-                    
+
                     if (isSynthesized.isSpecification())
                     {
                         allSpecs.removeAutomaton(isSynthesized);
                     }
                 }
-                
+
                 String plantName = restrictedPlant.getName();
                 plants.removeAutomaton(plantName);
                 restrictedPlant.setName(plantName + "_constrained");
                 plants.addAutomaton(restrictedPlant);
-                
+
                 infoMsgs += "\t" + str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName() + "\n";
             }
         }
-        
+
         // Rescale the times in plants if necessary
 //        rescalePlantTimes();
-                
+
         // Prepare the plants before scheduling (add dummy initial state if needed, remove selfloops if needed)
         SchedulingHelper.preparePlantsForScheduling(plants);
-        
+
         for (Iterator<Automaton> specsIt = allSpecs.iterator(); specsIt.hasNext(); )
         {
             Automaton spec = specsIt.next();
-            
+
             if (isMutexZone(spec))
             {
                 zones.addAutomaton(spec);
@@ -830,18 +833,18 @@ public class Milp
                 externalSpecs.addAutomaton(spec);
             }
         }
-        
+
         // Filling theAutomata with SHALLOW copies of plants and zones
         theAutomata = new Automata(plants, true);
         theAutomata.addAutomata(zones);
         theAutomata.addAutomata(externalSpecs);
         indexMap = new AutomataIndexMap(theAutomata);
         //updateGui(theAutomata); @Deprecated
-        
-        // Before constructing the MILP-formulation, ensure that the plants do not contain loops 
+
+        // Before constructing the MILP-formulation, ensure that the plants do not contain loops
         // (throw exception if they do)
         checkForLoops(plants);
-        
+
 //        //temp
 //        for (Iterator<Automaton> autIt = plants.iterator(); autIt.hasNext();)
 //        {
@@ -849,12 +852,12 @@ public class Milp
 //            for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext();)
 //            {
 //                State state = stateIt.next();
-//                addToMessages(auto.getName() + "." + state.getName() + "  -->  " + 
+//                addToMessages(auto.getName() + SEPARATOR + state.getName() + "  -->  " +
 //                        indexMap.getStateIndex(auto, state) + ", cost = " + state.getCost(), SchedulingConstants.MESSAGE_TYPE_INFO);
 //            }
 //        }
     }
-    
+
     /**
      * Rescales the times in plants if their total sum is close to the bigM-value.
      */
@@ -863,16 +866,16 @@ public class Milp
     {
         double maxCost = 0;
         int totNrStates = 0;
-        
+
         for (Iterator<Automaton> autIt = plants.iterator(); autIt.hasNext();)
         {
             Automaton auto = autIt.next();
-            
+
             for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext();)
             {
                 State state = stateIt.next();
                 totNrStates++;
-                
+
                 if (state.getCost() > maxCost)
                 {
                     maxCost = state.getCost();
@@ -886,7 +889,7 @@ public class Milp
             for (Iterator<Automaton> autIt = plants.iterator(); autIt.hasNext();)
             {
                 Automaton auto = autIt.next();
-                
+
                 for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext();)
                 {
                     State state = stateIt.next();
@@ -899,13 +902,13 @@ public class Milp
             timeThroughBigMApprox = 1;
         }
     }
-    
+
     private void initMutexStates()
     throws Exception
     {
         bookingTics = new int[zones.size()][plants.size()][2][1];
         unbookingTics = new int[zones.size()][plants.size()][2][1];
-        
+
         // Initializing all book/unbook-state indices to -1.
         // The ones that remain -1 at the output of this method correspond
         // to non-conflicting plant-zone-pairs.
@@ -919,50 +922,50 @@ public class Milp
                 unbookingTics[i][j][EVENT_SWITCH][0] = -1;
             }
         }
-        
+
         for (int i=0; i<zones.size(); i++)
         {
             Automaton currZone = zones.getAutomatonAt(i);
-            
+
             // 			ArrayList[] bookUnbookStatePairIndices = new ArrayList[plants.size()];
-            
+
             for (int j=0; j<plants.size(); j++)
             {
                 Automaton currPlant = plants.getAutomatonAt(j);
-                
+
                 // 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currPlant.getAlphabet(), currZone.getAlphabet());
-                
+
                 Alphabet bookingAlphabet = AlphabetHelpers.intersect(currPlant.getAlphabet(), currZone.getInitialState().activeEvents(false));
-                
+
                 if (bookingAlphabet.size() > 0)
                 {
                     Alphabet unbookingAlphabet = AlphabetHelpers.minus(AlphabetHelpers.intersect(currPlant.getAlphabet(), currZone.getAlphabet()), bookingAlphabet);
-                    
+
                     ArrayList<State> bookingStates = new ArrayList<State>();
                     ArrayList<State> unbookingStates = new ArrayList<State>();
                     ArrayList<LabeledEvent> bookingEvents = new ArrayList<LabeledEvent>();
                     ArrayList<LabeledEvent> unbookingEvents = new ArrayList<LabeledEvent>();
-                    
+
                     for (Iterator<State> stateIter = currPlant.stateIterator(); stateIter.hasNext(); )
                     {
                         State currState = stateIter.next();
-                        
+
                         Alphabet currStatesBookingAlphabet = AlphabetHelpers.intersect(currState.activeEvents(false), bookingAlphabet);
                         for (Iterator<LabeledEvent> currBookingEventsIter = currStatesBookingAlphabet.iterator(); currBookingEventsIter.hasNext(); )
                         {
                             ArrayList<State> possibleUnbookingStates = new ArrayList<State>();
                             LabeledEvent currBookingEvent = currBookingEventsIter.next();
-                            
+
                             possibleUnbookingStates.add(currState.nextState(currBookingEvent));
-                            
+
                             while (possibleUnbookingStates.size() > 0)
                             {
                                 State currPossibleUnbookingState = possibleUnbookingStates.remove(0);
-                                
+
                                 for (Iterator<Arc> outgoingArcsIter = currPossibleUnbookingState.outgoingArcsIterator(); outgoingArcsIter.hasNext(); )
                                 {
                                     Arc currArc = outgoingArcsIter.next();
-                                    
+
                                     if (unbookingAlphabet.contains(currArc.getEvent()))
                                     {
                                         bookingStates.add(currState);
@@ -978,16 +981,16 @@ public class Milp
                             }
                         }
                     }
-                    
+
                     if (bookingStates.size() != unbookingStates.size())
                     {
                         String exceptionStr = "The numbers of book/unbook-states do not correspond. Something is wrong....\n";
                         exceptionStr += "nr_book_states[" + i + "][" + j + "] = " + bookingStates.size() + "\n";
                         exceptionStr += "nr_unbook_states[" + i + "][" + j + "] = " + unbookingStates.size() + "\n";
-                        
+
                         throw new Exception(exceptionStr);
                     }
-                    
+
                     if (bookingStates.size() > 0)
                     {
                         bookingTics[i][j][STATE_SWITCH] = new int[bookingStates.size()];
@@ -1006,25 +1009,25 @@ public class Milp
             }
         }
     }
-    
+
     private boolean isMutexZone(Automaton spec)
     {
         if (spec.nbrOfStates() < 3)
         {
             return false;
         }
-        
+
         State initialState = spec.getInitialState();
         if (!initialState.isAccepting())
         {
             return false;
         }
-        
+
         if (spec.nbrOfAcceptingStates() != 1)
         {
             return false;
         }
-        
+
         for (Iterator<State> stateIt = spec.stateIterator(); stateIt.hasNext(); )
         {
             State state = stateIt.next();
@@ -1040,10 +1043,10 @@ public class Milp
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     // prec_temp
     private void createExternalConstraints()
     throws Exception
@@ -1051,7 +1054,7 @@ public class Milp
         for (int i=0; i<externalSpecs.size(); i++)
         {
             Automaton currSpec = externalSpecs.getAutomatonAt(i);
-            
+
             if (currSpec.nbrOfStates() == 2)
             {
                 if (!currSpec.getInitialState().isAccepting())
@@ -1071,32 +1074,32 @@ public class Milp
                             //temp: choose one
                             createExternalPrecedenceConstraints(currSpec);
                             createExternalPrecedenceConstraintsNew(currSpec);
-                            
+
                             //temp_test
-                            
-                            
+
+
                             continue;
                         }
                     }
                 }
             }
-            
+
             throw new Exception("Specification " + currSpec.getName() + " was not recognized by the DES-MILP-converter");
         }
     }
-    
+
     private void createXORConstraints(Automaton currSpec)
     throws Exception
     {
         // Replace some characters that the GLPK-solver would not accept
         String specName = currSpec.getName().trim();
-        specName = specName.replace(".", "_");
+        specName = specName.replace(SEPARATOR, "_");
         specName = specName.replace(" ", "_");
-        
+
         ArrayList<int[]> currXorConstraints = new ArrayList<int[]>();
-        
+
         State currSpecState = currSpec.getInitialState();
-                
+
         for (int i=0; i<plants.size(); i++)
         {
             Automaton currPlant = plants.getAutomatonAt(i);
@@ -1118,9 +1121,9 @@ public class Milp
                             int currPlantIndex = indexMap.getAutomatonIndex(currPlant);
                             int currStateIndex = indexMap.getStateIndex(currPlant, currPlantState);
                             int currEventIndex = indexMap.getEventIndex(currEvent);
-                              
+
                             // Find the closest alt.path-variables leading to the current plant state
-                            Collection<int[]> currPathSplitVars = getActiveAltPathVars(new int[]{currPlantIndex, currStateIndex, currEventIndex});                            
+                            Collection<int[]> currPathSplitVars = getActiveAltPathVars(new int[]{currPlantIndex, currStateIndex, currEventIndex});
                             if (currPathSplitVars.size() == 0)
                             {
                                 // If this state is always reached from the initial state, add a default alt.path variable
@@ -1136,11 +1139,11 @@ public class Milp
                 }
             }
         }
-       
+
         // Collect all alt.path-variables coupled with the events in this specification into one block for future use
         xorConstraints.add(currXorConstraints);
     }
-    
+
     //TO BE INAUGURATED
 	private void createExternalPrecedenceConstraintsNew(Automaton currSpec)
     {
@@ -1149,7 +1152,7 @@ public class Milp
         {
             involvedEventInfoList[i] = new ArrayList<int[]>();
         }
-        
+
         // Loops through the plant automata and finds the states in which the preceding/following
         // (starting/finishing) events of this spec are enabled. Also, the infos needed to retrieve
         // upstreams path-split variables are found. It's all stored in precedingEventsInfo/followingEventsInfo as
@@ -1158,13 +1161,13 @@ public class Milp
         {
             Automaton plant = plantIt.next();
             Alphabet commonActiveAlphabet = AlphabetHelpers.intersect(plant.getAlphabet(), currSpec.getAlphabet());
-            
+
             if (commonActiveAlphabet.size() > 0)
             {
                 for (Iterator<State> stateIt = currSpec.stateIterator(); stateIt.hasNext();)
                 {
                     State specState = stateIt.next();
-                    
+
                     // Set the index of the involvedEventInfoList-array (0 if the current events are of
                     // preceding-type and 1 if they are of following-type
                     int ieiType = 0;
@@ -1172,7 +1175,7 @@ public class Milp
                     {
                         ieiType = 1;
                     }
-                    
+
                     for (Iterator<LabeledEvent> eventIt = specState.activeEvents(false).iterator(); eventIt.hasNext();)
                     {
                         LabeledEvent currEvent = eventIt.next();
@@ -1181,7 +1184,7 @@ public class Milp
                             for (Iterator <State> plantStateIt = plant.stateIterator(); plantStateIt.hasNext(); )
                             {
                                 State plantState = plantStateIt.next();
-                                
+
                                 if (plantState.activeEvents(false).contains(currEvent))
                                 {
                                     involvedEventInfoList[ieiType].add(new int[]{
@@ -1196,8 +1199,8 @@ public class Milp
                 }
             }
         }
-        
-        // Store new external precedence variables as [sigma_a, sigma_b], 
+
+        // Store new external precedence variables as [sigma_a, sigma_b],
         // where indexMap.getEventIndex(sigma_a) < indexMap.getEventIndex(sigma_b).
         for (int i = 0; i < involvedEventInfoList.length; i++)
         {
@@ -1213,12 +1216,12 @@ public class Milp
                     {
                         externalPrecVariables.add(new int[]{k, j});
                     }
-                    // else if (j == k), there should be no variable since we are then 
+                    // else if (j == k), there should be no variable since we are then
                     // dealing with the same event fired from another state
                 }
             }
         }
-        
+
         //temp
         for (int i = 0; i < 2; i++)
         {
@@ -1231,7 +1234,7 @@ public class Milp
             {
                 str += " (F) : ";
             }
-            
+
             for (int[] ips : involvedEventInfoList[i])
             {
                 for (int j = 0; j < ips.length - 1; j++)
@@ -1251,7 +1254,7 @@ public class Milp
             addToMessages(str, SchedulingConstants.MESSAGE_TYPE_INFO);
         }
         // ...to here
-        
+
         ArrayList<int[]>[] permutations = new ArrayList[2];
         permutations[0] = getIndexPermutations(involvedEventInfoList[0].size());
         permutations[1] = permutations[0];
@@ -1260,7 +1263,7 @@ public class Milp
             permutations[1] = getIndexPermutations(involvedEventInfoList[1].size());
         }
         int maxNrOfEventPairs = Math.min(involvedEventInfoList[0].size(), involvedEventInfoList[1].size());
-        
+
         for (int[] pPerm : permutations[0])
         {
             for (int[] fPerm : permutations[1])
@@ -1283,29 +1286,29 @@ public class Milp
                     }
                     str += " -> ";
                 }
-                
+
                 addToMessages(str, SchedulingConstants.MESSAGE_TYPE_INFO);
             }
         }
     }
-    
+
     //TO BE DEPRECATED
 	private void createExternalPrecedenceConstraints(Automaton currSpec)
     throws Exception
     {
         // Get the name of the specification and replace some characters that the GLPK-solver would not accept
         String specName = currSpec.getName().trim();
-        specName = specName.replace(".", "_");
+        specName = specName.replace(SEPARATOR, "_");
         specName = specName.replace(" ", "_");
         ArrayList<int[]> precedingEventsInfo = new ArrayList<int[]>();
         ArrayList<int[]> followingEventsInfo = new ArrayList<int[]>();
         ArrayList<int[]> currEventsInfo = null;
-        
+
         //TODO: used for the alternative precedence
 //        ArrayList<int[]> precedingPlantStates = new ArrayList<int[]>();
 //        ArrayList<int[]> followingPlantStates = new ArrayList<int[]>();
 //        ArrayList<int[]> currPlantStates = null;
-        
+
         // Loops through the plant automata and finds the states in which the preceding/following
         // (starting/finishing) events of this spec are enabled. Also, the infos needed to retrieve
         // upstreams path-split variables are found. It's all stored in precedingEventsInfo/followingEventsInfo as
@@ -1314,7 +1317,7 @@ public class Milp
         {
             Automaton plant = plantIt.next();
             Alphabet commonActiveAlphabet = AlphabetHelpers.intersect(plant.getAlphabet(), currSpec.getAlphabet());
-            
+
             if (commonActiveAlphabet.size() > 0)
             {
                 //test
@@ -1333,7 +1336,7 @@ public class Milp
                         //TODO: alternative precedence
 //                        currPlantStates = followingPlantStates;
                     }
-                    
+
                     for (Iterator<LabeledEvent> eventIt = specState.activeEvents(false).iterator(); eventIt.hasNext();)
                     {
                         LabeledEvent currEvent = eventIt.next();
@@ -1342,7 +1345,7 @@ public class Milp
                             for (Iterator <State> plantStateIt = plant.stateIterator(); plantStateIt.hasNext(); )
                             {
                                 State plantState = plantStateIt.next();
-                                
+
                                 if (plantState.activeEvents(false).contains(currEvent))
                                 {
                                     // Add a plant/state-delimiter
@@ -1351,7 +1354,7 @@ public class Milp
                                     currEventsInfo.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
                                     // Find nearest path splits above the current state
                                     findNearestPathSplits(plant, plantState.nextState(currEvent), currEventsInfo, currEvent);
-                                    
+
                                     //TODO: alternative precedence
 //                                    currPlantStates.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
                                 }
@@ -1361,7 +1364,7 @@ public class Milp
                 }
             }
         }
-        
+
         // Partition eventsInfo into allPlantStates. Every super-array of allPlantStates
         // contains info about one plantState and its altPaths
         ArrayList<ArrayList> allPPlantStates = new ArrayList<ArrayList>();
@@ -1388,8 +1391,8 @@ public class Milp
                 allFPlantStates.get(allFPlantStates.size()-1).add(info);
             }
         }
-        
-        
+
+
         //temp
         //OLD
         for (ArrayList<int[]> al : allPPlantStates)
@@ -1418,10 +1421,10 @@ public class Milp
             }
             addToMessages(str, SchedulingConstants.MESSAGE_TYPE_INFO);
         }
-        
-        
-        
-        
+
+
+
+
         // The nr of internal variables is the sum of all possible pairs of the variables
         int nrInternalPrecVars = (allPPlantStates.size() * (allPPlantStates.size() - 1) +
                 allFPlantStates.size() * (allFPlantStates.size() - 1)) / 2;
@@ -1442,7 +1445,7 @@ public class Milp
                 int[] secondPlantState = secondPlantStateInfo.get(0);
                 String internalPrecedenceVar = "r" + firstPlantState[0] + "_st" + firstPlantState[1] +
                         "_before_r" + secondPlantState[0] + "_st" + secondPlantState[1];
-                
+
                 internalPrecVarsTable.put(new IntKey(firstPlantState, secondPlantState),
                         new InternalPrecVariable(internalPrecedenceVar, idCounter++));
                 internalPrecVariables.add(internalPrecedenceVar);
@@ -1458,16 +1461,16 @@ public class Milp
                 int[] secondPlantState = secondPlantStateInfo.get(0);
                 String internalPrecedenceVar = "r" + firstPlantState[0] + "_st" + firstPlantState[1] +
                         "_before_r" + secondPlantState[0] + "_st" + secondPlantState[1];
-                
+
                 internalPrecVarsTable.put(new IntKey(firstPlantState, secondPlantState),
                         new InternalPrecVariable(internalPrecedenceVar, idCounter++));
                 internalPrecVariables.add(internalPrecedenceVar);
             }
         }
-        
+
         // Get every possible (precedence-)event sequence (of maximal length)
         ArrayList<ArrayList> allAlternatingPlantStatesInfo = getEveryAlternatingOrdering(allPPlantStates, allFPlantStates);
-        
+
         //temp
         for (ArrayList<ArrayList> arr : allAlternatingPlantStatesInfo)
         {
@@ -1487,21 +1490,21 @@ public class Milp
                 addToMessages(str, SchedulingConstants.MESSAGE_TYPE_WARN);
             }
         }
-        
+
         // Kepps track of the internal precedence variable values that are used
         // (the others will be forbidden by additional MILP-constraints)
         BooleanCombinationTreeSet usedVariableCombinations = new BooleanCombinationTreeSet();
-        
+
         int caseCounter = 0;
         externalConstraints += "\n\n";
         for (ArrayList<ArrayList<int[]>> currAlternatingPlantStateInfoArray : allAlternatingPlantStatesInfo)
         {
             String equalNumberPConstrStr = "";
             String equalNumberFConstrStr = "";
-            
+
             externalConstraints += "/* " + specName + ", case " + ++caseCounter + " */\n";
             int constrCounter = 1;
-            
+
             // Create the object representing curring combination of variable values.
             // -1 if the default internal prec.variable value, otherwise the
             // variable value that makes this case possible (0 or 1) will be stored
@@ -1511,7 +1514,7 @@ public class Milp
             {
                 currVariableCombination[i] = -1;
             }
-            
+
             // Get the correct internal precedence variables for this combination of events
             String internalPrecStr = "";
             int nrDefaultInternalPrec = 0;
@@ -1534,10 +1537,10 @@ public class Milp
                     currAllPlantStates = allFPlantStates;
                     isPreceding = false;
                 }
-                
+
                 ArrayList<int[]> currPlantStateInfo = currAlternatingPlantStateInfoArray.get(i);
                 int[] currPlantState = currPlantStateInfo.get(0);
-                
+
                 // This constructs "equalNumberConstr" making sure that the numbers
                 // of preceding and following events that actually occur are equal.
                 for (int j = 1; j < currPlantStateInfo.size(); j++)
@@ -1566,7 +1569,7 @@ public class Milp
                         }
                     }
                 }
-                
+
                 // Create the case variable (combination of internal precedence variables)
                 // that accepts or negates this case. Also update the info about
                 // currently used variable values (currVariableCombination).
@@ -1600,10 +1603,10 @@ public class Milp
                     }
                 }
             }
-            
+
             // Remember this combination of internal precedence variable values
             usedVariableCombinations.add(currVariableCombination);
-            
+
             // Remove the trailing "+" in the constraint strings
             int cutIndex = equalNumberPConstrStr.length();
             if (equalNumberPConstrStr.endsWith("+ "))
@@ -1617,14 +1620,14 @@ public class Milp
                 cutIndex = equalNumberFConstrStr.lastIndexOf("+");
             }
             equalNumberFConstrStr = equalNumberFConstrStr.substring(0, cutIndex).trim();
-            
+
             // Add the case variable, if it exists, to the constraint string
             String tailStr = ";\n";
             if (internalPrecStr != "")
             {
                 tailStr = " - bigM*(" + nrDefaultInternalPrec + internalPrecStr + ")" + tailStr;
             }
-            
+
             // nr_starting_events == nr_finishing_events
             // (to devalidate this constraint if this case is not chosen, the equality is implemented
             // with help of "... >= ... - M*f_case" and "... <= ... - M*f_case"
@@ -1632,7 +1635,7 @@ public class Milp
                     " >= " + equalNumberFConstrStr + tailStr;
             externalConstraints += "multi_plant_prec_" + specName + "_TOT_dual" + caseCounter + " : " + equalNumberFConstrStr +
                     " >= " + equalNumberPConstrStr + tailStr;
-            
+
             // Constructs several types of constraints. Firstly, there are precedence
             // constraints, making sure that each plant-state comes after every plant-state
             // that has lower index in the current variable ordering (precedingAltPathsStr/followingAltPathsStr).
@@ -1642,14 +1645,14 @@ public class Milp
             {
                 ArrayList<int[]> followingPlantStateInfo = currAlternatingPlantStateInfoArray.get(fIndex);
                 int[] followingPlantState = followingPlantStateInfo.get(0);
-                
+
                 // Checks whether the current event belongs to the finish-events
                 boolean fIsFinishEvent = true;
                 if (Math.IEEEremainder(fIndex, 2) == 0)
                 {
                     fIsFinishEvent = false;
                 }
-                
+
                 String startFinishLogicStrLeft = "";
                 String startFinishLogicStrRight = "";
                 if (fIsFinishEvent)
@@ -1662,7 +1665,7 @@ public class Milp
                 }
                 // As well caseCounter as constrCounter are used to give this constraint a unique id
                 startFinishLogicStrLeft += "_r" + followingPlantState[0] + "_st" + followingPlantState[1] + "_" + caseCounter + "_" +  constrCounter + " : ";
-                
+
                 // Adds corresponding path split variables that negate the constraint
                 // if the involved "following" event never happen
                 int nrFPathSplits = 0;
@@ -1682,14 +1685,14 @@ public class Milp
                         startFinishLogicStrRight += "1" + " + ";
                     }
                 }
-                
+
                 // Every event prior to the current (fIndex) event in the current
                 // variable order is treated
                 for (int pIndex = 0; pIndex < fIndex; pIndex++)
                 {
                     ArrayList<int[]> precedingPlantStateInfo = currAlternatingPlantStateInfoArray.get(pIndex);
                     int[] precedingPlantState = precedingPlantStateInfo.get(0);
-                    
+
                     // Correct sign is chosen depending on whether the preceding
                     // event is starting or finishing
                     boolean pIsFinishEvent = true;
@@ -1697,7 +1700,7 @@ public class Milp
                     {
                         pIsFinishEvent = false;
                     }
-                    
+
                     if (fIsFinishEvent)
                     {
                         if (pIndex != 0)
@@ -1723,7 +1726,7 @@ public class Milp
                             startFinishLogicStrLeft += " - ";
                         }
                     }
-                    
+
                     // Adds corresponding path split variables that negate the constraint
                     // if the involved "preceding" event never happen
                     String precedingAltPathsStr = "";
@@ -1743,7 +1746,7 @@ public class Milp
                             startFinishLogicStrLeft += "1";
                         }
                     }
-                    
+
                     // Finally a constraint per treated plant-state-pair is added to the MILP-formulation
                     externalConstraints += "multi_plant_prec_" + specName + "_" + caseCounter + "_" + constrCounter++ + " : time[" +
                             followingPlantState[0] + ", " + followingPlantState[1] + "] >= time[" +
@@ -1756,7 +1759,7 @@ public class Milp
                     }
                     externalConstraints += " + epsilon;\n";
                 }
-                
+
                 // Cuts the last "+"-term
                 if (startFinishLogicStrRight.contains("+"))
                 {
@@ -1775,7 +1778,7 @@ public class Milp
                 }
                 externalConstraints += ";\n";
             }
-            
+
             // For each event that does not belong to the current variable ordering,
             // a constraint, "0 >= alt_paths - M*(x -  f_case) is added. This makes
             // sure that the paths leading to the corresponding plant-state is never
@@ -1787,7 +1790,7 @@ public class Milp
                 if (!isPlantStateInArray(currAlternatingPlantStateInfoArray, unusedPlantStateInfo)) //fulhack denna isPlantStateInArray
                 {
                     String unusedPlantStateConstr = "0 >= ";
-                    
+
                     for (int i = 1; i < unusedPlantStateInfo.size(); i++)
                     {
                         if (unusedPlantStateInfo.get(i)[0] != NO_PATH_SPLIT_INDEX)
@@ -1800,12 +1803,12 @@ public class Milp
                             unusedPlantStateConstr += "1 + ";
                         }
                     }
-                    
+
                     if (unusedPlantStateConstr.contains("+"))
                     {
                         unusedPlantStateConstr = unusedPlantStateConstr.substring(0, unusedPlantStateConstr.lastIndexOf("+")).trim();
                     }
-                    
+
                     externalConstraints += "multi_plant_prec_" + specName + "_" + caseCounter + "_" + constrCounter++ + " : " +
                             unusedPlantStateConstr;
                     if (internalPrecStr != "")
@@ -1815,7 +1818,7 @@ public class Milp
                 }
             }
         }
-        
+
         // A constraint per unused combination of internal precedence variable
         // values is added. The constraint looks as "0 >= 1 -  M*f_unused_case.
         // Thus, an unused variable combination can never occur, meaning that
@@ -1825,11 +1828,11 @@ public class Milp
         for (int i = 0; i<allBooleanCombinations.size(); i++)
         {
             int[] currBoolCombination = allBooleanCombinations.get(i);
-            
+
             if (!usedVariableCombinations.contains(currBoolCombination))
             {
                 externalConstraints += "unused_internal_prec_combination_" + i + " : 0 >= 1";
-                
+
                 String unusedCombinationConstraint = "";
                 int nrActiveInternalVars = 0;
                 for (InternalPrecVariable internalVar : internalPrecVarsTable.values())
@@ -1845,11 +1848,11 @@ public class Milp
                     }
                     unusedCombinationConstraint += internalVar.getName();
                 }
-                
+
                 externalConstraints += " - bigM*(" + nrActiveInternalVars + unusedCombinationConstraint + ");\n";
             }
         }
-        
+
         // Adding 101/010-constraints that make sure that certain combinations of
         // internal precedece variables, such as c<a<b<c and c>a>b>c are disregarded
         // by the MILP-solver. Nice thought, but may be unnecessary now that
@@ -1874,7 +1877,7 @@ public class Milp
                     int[] thirdPlantState = ((ArrayList<int[]>)allPPlantStates.get(k)).get(0);
                     String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState)).getName();
                     String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState)).getName();
-                    
+
                     // 101-constraint
                     String oneZeroOneDisablement = "2 - " + firstAlpha + " + " + secondAlpha + " - " + thirdAlpha + " >= 1;\n";
                     externalConstraints += "ozo_disablement_" + disablementCounter++ +  " : " + oneZeroOneDisablement;
@@ -1898,7 +1901,7 @@ public class Milp
                     int[] thirdPlantState = ((ArrayList<int[]>)allFPlantStates.get(k)).get(0);
                     String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState)).getName();
                     String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState)).getName();
-                    
+
                     // 101-constraint
                     String oneZeroOneDisablement = "2 - " + firstAlpha + " + " + secondAlpha + " - " + thirdAlpha + " >= 1;\n";
                     externalConstraints += "ozo_disablement_" + disablementCounter++ +  " : " + oneZeroOneDisablement;
@@ -1909,7 +1912,7 @@ public class Milp
             }
         }
     }
-    
+
     /**
      *  Calls {@link #findNearestPathSplits(Automaton, State, ArrayList<int[]>, LabeledEvent)}, thus
      *  initiating search for the path splits on all transitions leading to state.
@@ -1925,7 +1928,7 @@ public class Milp
     {
         findNearestPathSplits(auto, state, altPathsVariables, null);
     }
-    
+
     /**
      *  Finds all pairs of states {startState, endState} following the supplied
      *  event upwards from the supplied state, such that there is a
@@ -1956,7 +1959,7 @@ public class Milp
             for (Iterator<Arc> incomingArcsIt = state.incomingArcsIterator(); incomingArcsIt.hasNext(); )
             {
                 Arc currArc = incomingArcsIt.next();
-                
+
                 // Normally, this method is called to find all split states ABOVE a certain event.
                 // Thus, if the event is non-null, the other transitions leading to event.getTarget()
                 // should not be considered.
@@ -1980,7 +1983,7 @@ public class Milp
             }
         }
     }
-    
+
     /**
      * This method creates additional constraints that (should) speed up the optimization.
      * These constraints prevent two plants from booking two zones in different order if
@@ -1999,7 +2002,7 @@ public class Milp
     {
         //test-flag to choose between looking far or near into the future in search of connected components
         boolean fullCC = false;
-        
+
         // Each entry of this map contains an ArrayList of pairs of consecutive
         // booking states together with the information about whether there is
         // a buffer between the bookings or not, e.g. [Z1_b_index Z2_b_index isBuffer].
@@ -2010,27 +2013,27 @@ public class Milp
         // The keys are int[]-objects of type [plant_index, first_zone_index, second_zone_index].
         TreeMap<int[], ArrayList<int[]>> consecutiveBookingTicsIndices =
                 new TreeMap<int[], ArrayList<int[]>>(new IntArrayComparator());
-        
+
         // Find and store all consecutive bookingTics, i.e. when a plant first
         // books Z_i and then Z_j without unbooking Z_i
-        
+
         //TODO: totally ugly (snabb fix): needs to be redone! (se nedan)
         consecutiveBookingEdges = new ArrayList[zones.size()];
         for (int z = 0; z < zones.size(); z++)
         {
             consecutiveBookingEdges[z] = new ArrayList<int[]>();
         }
-        
+
         for (int p = 0; p < plants.size(); p++)
         {
             //test
             IntArrayTreeSet[][] t = new IntArrayTreeSet[zones.size()][];
-            
+
             for (int z1 = 0; z1 < bookingTics.length; z1++)
             {
                 //test
                 t[z1] = new IntArrayTreeSet[bookingTics[z1][p][STATE_SWITCH].length];
-                
+
                 for (int z2 = 0; z2 < bookingTics.length; z2++)
                 {
                     if (z1 != z2)
@@ -2038,29 +2041,29 @@ public class Milp
                         if ((bookingTics[z1][p][STATE_SWITCH][0] != -1) && (bookingTics[z2][p][STATE_SWITCH][0] != -1))
                         {
                             ArrayList<int[]> currConsecutiveBookingTicsIndices = findBookingStatesSequences(p, z1, z2);
-                            
+
                             //temp
                             findBookingTicSequences(p);
                             //temp
                             for (int[] is : currConsecutiveBookingTicsIndices)
                             {
-                                //System.out.println("bseq(r" + p + "_z" + z1 + "_z" + z2 + ") : " + 
-//                                        bookingTics[z1][p][STATE_SWITCH][is[0]] + " " + 
+                                //System.out.println("bseq(r" + p + "_z" + z1 + "_z" + z2 + ") : " +
+//                                        bookingTics[z1][p][STATE_SWITCH][is[0]] + " " +
 //                                        bookingTics[z2][p][STATE_SWITCH][is[1]] + " " + is[2]);
-                                
+
                                 //test
                                 if (t[z1][is[0]] == null)
                                 {
                                     t[z1][is[0]] = new IntArrayTreeSet();
                                 }
-                                
+
                                 t[z1][is[0]].add(new int[]{z2, is[1], is[2]});
                             }
-                            
+
                             if (currConsecutiveBookingTicsIndices.size() > 0)
                             {
                                 consecutiveBookingTicsIndices.put(new int[]{p, z1, z2}, currConsecutiveBookingTicsIndices);
-                                
+
                                 //TODO: totally ugly (snabb fix): needs to be redone!
                                 if (!fullCC)
                                 {
@@ -2077,7 +2080,7 @@ public class Milp
                     }
                 }
             }
-            
+
             //test (DIDN'T WORK)
             if (fullCC)
             {
@@ -2112,7 +2115,7 @@ public class Milp
                 }
             }
         }
-        
+
         // Är följande gamla kommentarer? /AK - 080422
         // TODO: sigue leendo... (UNDER CONSTRUCTION...)
         // Denna for-slinga �r n�stan en upprepning av det som g�rs l�ngre ner
@@ -2127,11 +2130,11 @@ public class Milp
 //            consecutiveBookingTicsIndices.keySet().toArray(new int[][]{}));
 //        graphExplorer.findConnectedCycles();
         // Sanity-check...
-        
+
         // Create a graph explorer
-        ConnectedComponentsGraph cycleFinder =  
+        ConnectedComponentsGraph cycleFinder =
                 new ConnectedComponentsGraph(consecutiveBookingEdges, plants.size());
-        
+
         //test (UF when moving in the same direction between two (zones connected by an edge in the cc-space)
         for (ConnectedComponentVertice vertice : cycleFinder.getVertices())
         {
@@ -2142,37 +2145,37 @@ public class Milp
                 {
                     ConnectedComponentEdge edge2 = vertice.getOutEdges().get(j);
                     if (edge1.getToVertice().equals(edge2.getToVertice()))
-                    {                      
+                    {
                         if (!edge1.getBufferExists())
                         {
                             CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
                             // Add the plant-state-bookingtic-info to the current constraint block
                             currCircularWaitConstraints.setBuffer(true); // No extra CW-constraints should be created
-                            currCircularWaitConstraints.add(new int[]{vertice.getVerticeIndex(), 
+                            currCircularWaitConstraints.add(new int[]{vertice.getVerticeIndex(),
                                 edge1.getColor(), edge2.getColor(), edge1.getFromTic(), edge2.getFromTic()});
-                            currCircularWaitConstraints.add(new int[]{edge1.getToVertice().getVerticeIndex(), 
+                            currCircularWaitConstraints.add(new int[]{edge1.getToVertice().getVerticeIndex(),
                                 edge2.getColor(), edge1.getColor(), edge2.getToTic(), edge1.getToTic()});
-                            
+
                             circularWaitConstraints.add(currCircularWaitConstraints);
                         }
                         if (!edge2.getBufferExists())
                         {
                             CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
-                                                        
+
                             // Add the plant-state-bookingtic-info to the current constraint block
                             currCircularWaitConstraints.setBuffer(true); // No extra CW-constraints should be created
-                            currCircularWaitConstraints.add(new int[]{vertice.getVerticeIndex(), 
+                            currCircularWaitConstraints.add(new int[]{vertice.getVerticeIndex(),
                                 edge2.getColor(), edge1.getColor(), edge2.getFromTic(), edge1.getFromTic()});
-                            currCircularWaitConstraints.add(new int[]{edge2.getToVertice().getVerticeIndex(), 
+                            currCircularWaitConstraints.add(new int[]{edge2.getToVertice().getVerticeIndex(),
                                 edge1.getColor(), edge2.getColor(), edge1.getToTic(), edge2.getToTic()});
-                            
+
                             circularWaitConstraints.add(currCircularWaitConstraints);
                         }
                     }
                 }
             }
         }
-        
+
         // Find and enumerate all cycles where every edge is of different color
         ArrayList<ArrayList<ConnectedComponentEdge>> rainbowCycles = cycleFinder.enumerateAllCycles();
 
@@ -2184,7 +2187,7 @@ public class Milp
             if (cycle.size() == 1) // @Deprecated? I don't think that loops can appear, since only depth-2 sequences are used in the end
             {
                 IntArrayTreeSet usedColorTics = new IntArrayTreeSet();
-                
+
                 ConnectedComponentEdge loop = cycle.get(0);
                 ConnectedComponentVertice loopVertice = loop.getToVertice();
 
@@ -2200,12 +2203,12 @@ public class Milp
                             if (usedColorTics.get(colorTic) == null)
                             {
                                 usedColorTics.add(colorTic);
-                            
+
                                 CircularWaitConstraintBlock currCircularWaitConstraints = new CircularWaitConstraintBlock();
 
                                 // Add the plant-state-bookingtic-info to the current constraint block
                                 currCircularWaitConstraints.add(new int[]{
-                                       loopVertice.getVerticeIndex(), edge.getColor(), loop.getColor(), edge.getToTic(), loop.getFromTic()}); 
+                                       loopVertice.getVerticeIndex(), edge.getColor(), loop.getColor(), edge.getToTic(), loop.getFromTic()});
                                 currCircularWaitConstraints.add(new int[]{
                                        loopVertice.getVerticeIndex(), loop.getColor(), edge.getColor(), loop.getToTic(), edge.getToTic()});
 
@@ -2240,23 +2243,23 @@ public class Milp
                    int firstTic = precedingEdge.getToTic();
                    int secondTic = cycle.get(i).getFromTic();
 
-                   // Remember that this cycle contains buffers if one is found on any edge 
+                   // Remember that this cycle contains buffers if one is found on any edge
                    if (cycle.get(i).getBufferExists())
                    {
-                       bufferInCycle = true;                    
+                       bufferInCycle = true;
                    }
 
                    // Add the plant-state-bookingtic-info to the current constraint block
                    currCircularWaitConstraints.add(new int[]{
                            zoneIndex, firstPlantIndex, secondPlantIndex, firstTic, secondTic
-                       });  
+                       });
                 }
 
                 currCircularWaitConstraints.setBuffer(bufferInCycle);
                 circularWaitConstraints.add(currCircularWaitConstraints);
-            } 
+            }
         }
-        
+
 // @Deprecated: t�nkte om...
 //                    for (int p = 0; p < plants.size(); p++)
 //                    {
@@ -2280,19 +2283,19 @@ public class Milp
 //                            }
 //                        }
 //                    }
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
 //        OBS!!! TILLF�LLIGT BORTKOMMENTERAT PGA BUGG (INDEX_OUT_OF_BOUNDS_EXCEPTION f�r /artiklar/AK/journal_milp/xml-filer/connected_components_abc.wmod)
 //        KOMMENTERA IN IGEN (ALT. ANV�ND SOM INSPIRATION F�R ATT L�GGA IN MILP-CONSTRAINTS) VID TILLF�LLE.
-//        
-//        
-//        
-//        
-//        
+//
+//
+//
+//
+//
 //        // Find the consecutive bookings of the same zone-pairs that are made by different
 //        // plants. Check for (almost) all combinations of z1&z2
 //        int counter = 1;
@@ -2304,7 +2307,7 @@ public class Milp
 //                {
 //                    // Used in for-loops to decrease code-repetition
 //                    int[] currZoneIndices = new int[]{z1, z2};
-//                    
+//
 //                    // Check for all combinations of p1 < p2 (this suffices since the mutex
 //                    // variables are always of the form "pi_books_zx_before_pj", where i < j)
 //                    for (int p1 = 0; p1 < plants.size() - 1; p1++)
@@ -2336,11 +2339,11 @@ public class Milp
 //                                                int eventIndex = bookingTics[currZoneIndices[localZInd]][p1][EVENT_SWITCH][tic1[localZInd]];
 //                                                State bState = indexMap.getStateAt(plants.getAutomatonAt(p1), stateIndex);
 //                                                LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-//                                                
+//
 //                                                findNearestPathSplits(plants.getAutomatonAt(p1), bState.nextState(bEvent),
 //                                                        pathSplitInfosP1, bEvent);
 //                                            }
-//                                            
+//
 //                                            // Create path split variables from the path split indices (for p1)
 //                                            String pathSplitStrP1 = "";
 //                                            int pathSplitCounterP1 = 0;
@@ -2353,7 +2356,7 @@ public class Milp
 //                                                    pathSplitStrP1 += " - " + makeAltPathsVariable(p1, pathSplitInfo[0], pathSplitInfo[1]);
 //                                                }
 //                                            }
-//                                            
+//
 //                                            // Create path split variables for p2 and write the consecutive
 //                                            // booking constraints (primal and dual) to the MILP-file
 //                                            String nonCrossConstrStr = "";
@@ -2361,17 +2364,17 @@ public class Milp
 //                                            ArrayList<int[]> pathSplitInfosP2 = new ArrayList<int[]>();
 //                                            for (int[] tic2 : consecutiveTicsP2)
 //                                            {
-//                                                
+//
 //                                                for (int localZInd = 0; localZInd < currZoneIndices.length; localZInd++)
 //                                                {
 //                                                    // This index is the combination of localZInd and zInd, ensuring that the tic2-elements
 //                                                    // used below correspond to the tic1[localZInd] (that is tic2[correspondingZInd] represents
 //                                                    // the same zone as tic1[localZInd]).
 //                                                    int correspondingZInd = (int)Math.IEEEremainder(zInd + localZInd, 2);
-//                                                    
+//
 //                                                    nonCrossConstrStr += "r" + p1 + "_books_z" + currZoneIndices[localZInd] + "_before_r" + p2;
 //                                                    dualNonCrossConstrStr += "r" + p1 + "_books_z" + currZoneIndices[1 - localZInd] + "_before_r" + p2;
-//                                                    
+//
 //                                                    // If there is a "var_x"-appendix corresponding to the current variable, it should be appended
 //                                                    Integer varCounter = mutexVarCounterMap.get(new int[]{currZoneIndices[localZInd], p1, p2,
 //                                                    tic1[localZInd], tic2[correspondingZInd]});
@@ -2386,23 +2389,23 @@ public class Milp
 //                                                    {
 //                                                        dualNonCrossConstrStr += "_var" + varCounter;
 //                                                    }
-//                                                    
+//
 //                                                    if (! nonCrossConstrStr.contains(">="))
 //                                                    {
 //                                                        nonCrossConstrStr = "consecutive_booking_" + counter + " : " + nonCrossConstrStr + " >= ";
 //                                                        dualNonCrossConstrStr = "consecutive_booking_" + counter++ + "_dual : " + dualNonCrossConstrStr + " >= ";
 //                                                    }
-//                                                    
+//
 //                                                    // Find nearest upwards path splits for each consecutive booking of p2
 //                                                    int stateIndex = bookingTics[localZInd][p2][STATE_SWITCH][tic2[correspondingZInd]];
 //                                                    int eventIndex = bookingTics[localZInd][p2][EVENT_SWITCH][tic2[correspondingZInd]];
 //                                                    State bState = indexMap.getStateAt(plants.getAutomatonAt(p2), stateIndex);
 //                                                    LabeledEvent bEvent = indexMap.getEventAt(eventIndex);
-//                                                    
+//
 //                                                    findNearestPathSplits(plants.getAutomatonAt(p2), bState.nextState(bEvent),
 //                                                            pathSplitInfosP2, bEvent);
 //                                                }
-//                                                
+//
 //                                                // Create path split variables from the path split indices (for p2)
 //                                                int pathSplitCounterP2 = 0;
 //                                                String pathSplitStrP2 = "";
@@ -2415,7 +2418,7 @@ public class Milp
 //                                                        pathSplitStrP2 += " - " + makeAltPathsVariable(p2, pathSplitInfo[0], pathSplitInfo[1]);
 //                                                    }
 //                                                }
-//                                                
+//
 //                                                // Add the path split variables to the newly created constraints
 //                                                if ((pathSplitCounterP1 + pathSplitCounterP2) > 0)
 //                                                {
@@ -2424,13 +2427,13 @@ public class Milp
 //                                                    dualNonCrossConstrStr += " - bigM*(" + (pathSplitCounterP1 + pathSplitCounterP2) +
 //                                                            pathSplitStrP1 + pathSplitStrP2 + ")";
 //                                                }
-//                                                
+//
 //                                                // Add the constraints to the constraint collection
 //                                                nonCrossbookingConstraints += nonCrossConstrStr + ";\n";
 //                                                nonCrossbookingConstraints += dualNonCrossConstrStr + ";\n";
 //                                            }
 //                                        }
-//                                        
+//
 //                                        //TODO: Installera och lek med RobotStudio
 //                                        //TODO: Varf�r blir g*_suboptimal = 0 f�r FT6x6???
 //                                        //      ... jo, f�r att den inte hittar ngn l�sning.
@@ -2450,25 +2453,25 @@ public class Milp
 //                }
 //            }
 //        }
-        
+
 //        BookingPairsGraphExplorer graphExplorer = new BookingPairsGraphExplorer(bEventPairs);
 //        graphExplorer.findConnectedCycles();
     }
-    
+
     private void initAltPathVarTrees()
     {
         upstreamsAltPathVars = new IntArrayTreeSet[plants.size()][];
-        
+
         for (int i = 0; i < plants.size(); i++)
         {
             Automaton plant = plants.getAutomatonAt(i);
-            
+
             upstreamsAltPathVars[i] = new IntArrayTreeSet[plant.nbrOfStates()];
             for (int j = 0; j < upstreamsAltPathVars[i].length; j++)
             {
                 upstreamsAltPathVars[i][j] = new IntArrayTreeSet();
             }
-            
+
             ArrayList<State> uncheckedStates = new ArrayList<State>();
             uncheckedStates.add(plant.getInitialState());
             while (! uncheckedStates.isEmpty())
@@ -2479,7 +2482,7 @@ public class Milp
                 {
                     State nextState = state.nextStateIterator().next();
                     uncheckedStates.add(nextState);
-                    
+
                     int nextStateIndex = indexMap.getStateIndex(plant, nextState);
                     upstreamsAltPathVars[i][nextStateIndex].addAll(upstreamsAltPathVars[i][currStateIndex]);
                 }
@@ -2489,14 +2492,14 @@ public class Milp
                     {
                         State nextState = stateIt.next();
                         int nextStateIndex = indexMap.getStateIndex(plant, nextState);
-                        
+
                         uncheckedStates.add(nextState);
-                        
+
                         // If the variable representing current path split has not yet been encoutered,
                         // store it.
                         altPathVariablesTree.add(new int[]{
                             indexMap.getAutomatonIndex(plant), currStateIndex, nextStateIndex});
-                        
+
                         // Get the pointer to the current alt path variable and store it in the upstreamsAltPathVars
                         upstreamsAltPathVars[i][nextStateIndex].add(altPathVariablesTree.get(new int[]{
                             indexMap.getAutomatonIndex(plant), currStateIndex, nextStateIndex}));
@@ -2505,7 +2508,7 @@ public class Milp
             }
         }
     }
-    
+
     //test
     public void findBookingTicSequences(int plantIndex)
     {
@@ -2518,18 +2521,18 @@ public class Milp
 
 
 
-        
+
         Automaton plant = plants.getAutomatonAt(plantIndex);
-        
+
         ArrayList<State> stateQueue = new ArrayList<State>();
         stateQueue.add(plant.getInitialState());
-        
+
         while (!stateQueue.isEmpty())
         {
             stateQueue.remove(0);
         }
     }
-    
+
     /**
      * Finds all pairs of booking tics, such that the plant with index plantIndex
      * books the mutex zone with index pZoneIndex first and the zone corresponding
@@ -2538,27 +2541,27 @@ public class Milp
      * @param   plantIndex  the internal index of the plant, booking the mutex zones
      * @param   pZoneIndex  the internal index of the firstly booked zone
      * @param   fZoneIndex  the internal index of the secondly booked zone
-     * 
-     * @return  array of int[], each containing pairs of booking tics indices and an int, 
-     *          showing if there is a buffer (appropriate unbooking event) between the booking tics. 
+     *
+     * @return  array of int[], each containing pairs of booking tics indices and an int,
+     *          showing if there is a buffer (appropriate unbooking event) between the booking tics.
      */
     private ArrayList<int[]> findBookingStatesSequences(int plantIndex, int pZoneIndex, int fZoneIndex)
     {
         ArrayList<int[]> bookingStateSequences = new ArrayList<int[]>();
-        
+
         Automaton plant = plants.getAutomatonAt(plantIndex);
-        
+
         // This array holds true values (i.e. =1) for each examined state that has a
         // pZone-unbooking event in the trace to the fZone-booking.
         int[] uEventFoundDownstreams = new int[plant.nbrOfStates()];
-        
+
         // For faster processing, the booking tics of the preceding zone are put into a hashtable
         Hashtable<Integer, Integer> pBStateIndicesTable = new Hashtable<Integer, Integer>();
         for (int i = 0; i < bookingTics[pZoneIndex][plantIndex][STATE_SWITCH].length; i++)
         {
             pBStateIndicesTable.put(new Integer(bookingTics[pZoneIndex][plantIndex][STATE_SWITCH][i]), new Integer(i));
         }
-        
+
         // Find the events that are common to the current plant and pZone
         Alphabet pCommonAlphabet = AlphabetHelpers.intersect(
                 plants.getAutomatonAt(plantIndex).getAlphabet(),
@@ -2583,37 +2586,37 @@ public class Milp
         }
         remainingBookingAlphabet = AlphabetHelpers.intersect(
                 plants.getAutomatonAt(plantIndex).getAlphabet(), remainingBookingAlphabet);
-        
+
         // The loop searching for preceding bookings to each booking of fZone that
         // fulfil the requirements of "consecutive booking"
         for (int i = 0; i < bookingTics[fZoneIndex][plantIndex][STATE_SWITCH].length; i++)
         {
-            
+
             State fState = indexMap.getStateAt(plant, bookingTics[fZoneIndex][plantIndex][STATE_SWITCH][i]);
-            
+
             ArrayList<State> upstreamsStates = new ArrayList<State>();
             upstreamsStates.add(fState);
-            
+
             // Starting with the booking of fZone, we search upwards
             while (!upstreamsStates.isEmpty())
             {
                 // Remove the last state in the list (important to search deepwards to avoid
                 // confusion in the values of "uEventFoundDownstreams"
                 State currUpstreamsState = upstreamsStates.remove(upstreamsStates.size() - 1);
-                
+
                 for (Iterator<Arc> incomingArcsIt = currUpstreamsState.incomingArcsIterator(); incomingArcsIt.hasNext();)
                 {
                     Arc incomingArc = incomingArcsIt.next();
-                    
+
                     // If the incoming event does not unbook pZone...
                     if (!pUnbookingAlphabet.contains(incomingArc.getEvent()))
                     {
                         int currStateIndex = indexMap.getStateIndex(plant, incomingArc.getFromState());
-                        
+
                         // Propagate the information about the pZone-unbooking event
                         uEventFoundDownstreams[currStateIndex] =
                                 uEventFoundDownstreams[indexMap.getStateIndex(plant, incomingArc.getToState())];
-                        
+
                         // If that event actually books pZone, then a consecutive sequence is added to the list
                         if (pBookingAlphabet.contains(incomingArc.getEvent()))
                         {
@@ -2635,20 +2638,20 @@ public class Milp
                     {
                         // An unbooking event was found which must be recorded
                         uEventFoundDownstreams[indexMap.getStateIndex(plant, incomingArc.getFromState())] = 1;
-                        
+
                         upstreamsStates.add(incomingArc.getFromState());
                     }
                 }
             }
         }
-        
+
         return bookingStateSequences;
     }
-    
+
     /****************************************************************************************/
     /*                                 THE� AUTOMATA-MILP-BRIDGE-METHODS                     */
     /****************************************************************************************/
-    
+
     /**
      * Converts the automata to the MILP-formulation of the optimization problem.
      * Precedence, Mutual Exclusion, Cycle Time and Alternative Path constraints are
@@ -2658,7 +2661,7 @@ public class Milp
     throws Exception
     {
         int nrOfPlants = plants.size();
-        
+
         // This alphabet is needed to check which events are shared by the plants.
         // The firing times of corresponding transitions should be equal for each shared event.
         // Also, the altPathVariableValues leading to such transitions should agree.
@@ -2666,19 +2669,19 @@ public class Milp
         for (int i=0; i<plants.size() - 1; i++)
         {
             Alphabet firstAlphabet = plants.getAutomatonAt(i).getAlphabet();
-            
+
             for (int j=i+1; j<plants.size(); j++)
             {
                 Alphabet secondAlphabet = plants.getAutomatonAt(j).getAlphabet();
-                
+
                 sharedPlantAlphabet.addEvents(AlphabetHelpers.intersect(firstAlphabet, secondAlphabet));
             }
         }
-        
-        // Each value of this map contains a list of time variables corresponding to a shared event 
+
+        // Each value of this map contains a list of time variables corresponding to a shared event
         // (the keys of the map are the event names).
         Hashtable<LabeledEvent, IntArrayTreeSet> sharedEventTimeVarsMap = new Hashtable<LabeledEvent,IntArrayTreeSet>();
-        
+
         for (int i=0; i<nrOfPlants; i++)
         {
             Automaton currPlant = plants.getAutomatonAt(i);
@@ -2686,11 +2689,11 @@ public class Milp
             for (Iterator<State> stateIter = currPlant.stateIterator(); stateIter.hasNext(); )
             {
                 State currState = stateIter.next();
-                
+
                 int currStateIndex = indexMap.getStateIndex(currPlant, currState);
-                
+
                 deltaTimes[i][currStateIndex] = currState.getCost();
-                
+
                 // If the current state has successors and is not initial, add precedence constraints
                 // If the current state is initial, add an initial (precedence) constraint
                 int nbrOfOutgoingMultiArcs = currState.nbrOfOutgoingMultiArcs();
@@ -2713,24 +2716,24 @@ public class Milp
                             }
                         }
                     }
-                    
+
                     if (currState.isInitial())
                     {
                         initPrecConstraints.add(new int[]{i, currStateIndex});
                     }
-                    
+
                     Iterator<State> nextStates = currState.nextStateIterator();
-                    
+
                     // If there is only one successor, add a precedence constraint
                     if (nbrOfOutgoingMultiArcs == 1)
                     {
                         State nextState = nextStates.next();
                         int nextStateIndex = indexMap.getStateIndex(currPlant, nextState);
-                        
+
                         //test
                         int eventIndex = indexMap.getEventIndex(currState.outgoingArcsIterator().next().getEvent());
                         int[] newConstraint = null;
-                        
+
                         //test contd.
                         for (Iterator<State> prevStateIt = nextState.previousStateIterator(); prevStateIt.hasNext(); )
                         {
@@ -2742,9 +2745,9 @@ public class Milp
                         }
                         if (newConstraint != null)
                         {
-                            // If the next state is a convergence state for several paths, precConstraints contain the 
+                            // If the next state is a convergence state for several paths, precConstraints contain the
                             // event index describing this path. This is used to construct constraints of the form
-                            // t_i >= t_j + T_i - M(1 - alpha_upstreams). Only one path is important at convergence. 
+                            // t_i >= t_j + T_i - M(1 - alpha_upstreams). Only one path is important at convergence.
                             precConstraints.add(newConstraint);
                         }
                         else
@@ -2760,19 +2763,19 @@ public class Milp
 //                         State nextRightState = nextStates.next();
 //                         int nextLeftStateIndex = indexMap.getStateIndex(currPlant, nextLeftState);
 //                         int nextRightStateIndex = indexMap.getStateIndex(currPlant, nextRightState);
-                    
+
 //                         String currAltPathsVariable = "r" + currPlantIndex + "_from_" + currStateIndex + "_to_" + nextLeftStateIndex;
-                    
+
 //                         altPathVariablesStrArray.add(currAltPathsVariable);
-                    
+
 //                         altPathsConstraints += "alt_paths_" + "r" + currPlantIndex + "_" + currStateIndex + " : ";
 //                         altPathsConstraints += "time[" + i + ", " + nextLeftStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextLeftStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
-                    
+
 //                         pathCutTable.put(nextLeftState, currAltPathsVariable);
-                    
+
 //                         altPathsConstraints += "dual_alt_paths_" + "r" + currPlantIndex + "_" + currStateIndex + " : ";
 //                         altPathsConstraints += "time[" + i + ", " + nextRightStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextRightStateIndex + "] - bigM*" + currAltPathsVariable + ";\n";
-                    
+
 //                         pathCutTable.put(nextRightState, "(1 - " + currAltPathsVariable + ")");
 //                     }
                     // If there are several successors, add one alternative-path variable for each successor
@@ -2780,41 +2783,41 @@ public class Milp
                     {
                         int currAlternative = 0;
                         String sumConstraint = "";
-                        
+
                         //new 080529
                         ArrayList<int[]> altPathInfo = new ArrayList<int[]>();
-                        
+
                         while (nextStates.hasNext())
                         {
                             State nextState = nextStates.next();
                             int nextStateIndex = indexMap.getStateIndex(currPlant, nextState);
-                            
+
                             String currAltPathsVariable = makeAltPathsVariable(i, currStateIndex, nextStateIndex);
                             sumConstraint += currAltPathsVariable + " + ";
-                            
+
                             //new 080529
                             altPathInfo.add(new int[]{i, currStateIndex, nextStateIndex});
-                            
+
                             altPathVariablesStrArray.add(currAltPathsVariable); //TO BE DEPRECATED
 //                            altPathVariablesTree.add(new int[]{indexMap.getAutomatonIndex(currPlant),
 //                                currStateIndex, nextStateIndex});
-                            
+
                             String altPathsConstraintsBody = "time[" + i + ", " + nextStateIndex + "] >= time["
                                     + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextStateIndex +
                                     "] - bigM*(1 - " + currAltPathsVariable + ") + epsilon";
                             altPathsConstraints.add(new Constraint(new int[]{i, currStateIndex, nextStateIndex},
                                     altPathsConstraintsBody));
-                            
+
                             pathCutTable.put(nextState, "(1 - " + currAltPathsVariable + ")");
-                            
+
                             currAlternative++;
                         }
-                        
+
                         //new 080529
                         newAltPathsConstraints.add(altPathInfo);
-                        
+
                         sumConstraint = sumConstraint.substring(0, sumConstraint.lastIndexOf("+")) + "= ";
-                        
+
 // 						TreeSet<int[]> nearestPathSplits = new TreeSet<int[]>(new PathSplipIndexComparator());
                         ArrayList<int[]> nearestPathSplits = new ArrayList<int[]>();
                         findNearestPathSplits(currPlant, currState, nearestPathSplits);
@@ -2827,7 +2830,7 @@ public class Milp
                         for (Iterator<int[]> splitIt = nearestPathSplits.iterator(); splitIt.hasNext(); )
                         {
                             int[] currPathSplit = splitIt.next();
-                            
+
                             if (currPathSplit[0] != NO_PATH_SPLIT_INDEX)
                             {
                                 sumConstraint += makeAltPathsVariable(i, currPathSplit[0], currPathSplit[1]) + " + ";
@@ -2841,7 +2844,7 @@ public class Milp
                         altPathsConstraints.add(new Constraint(new int[]{i, currStateIndex}, sumConstraint));
 // 						}
 // 						altPathsConstraints += sumConstraint.substring(0, sumConstraint.laspIndexOf("+")) + "= 1;\n";
-                        
+
                     }
                 }
                 else if (currState.isAccepting())
@@ -2852,12 +2855,12 @@ public class Milp
                 }
             }
         }
-        
+
         // Add the constraints for the time variables associated with shared events
         for (LabeledEvent sharedEvent : sharedEventTimeVarsMap.keySet())
         {
             ArrayList<ArrayList<ArrayList<int[]>>> currSharedEventInfoList = new ArrayList<ArrayList<ArrayList<int[]>>>();
-            
+
             IntArrayTreeSet sharedTimeVars = sharedEventTimeVarsMap.get(sharedEvent);
             int prevRobotIndex = -1;
             ArrayList<ArrayList<int[]>> currSharedEventInRobotList = null;
@@ -2870,31 +2873,31 @@ public class Milp
                     currSharedEventInfoList.add(currSharedEventInRobotList);
                     prevRobotIndex = sharedTimeVar[0];
                 }
-                
+
                 ArrayList<int[]> currSharedEventInStateList = new ArrayList<int[]>();
                 currSharedEventInRobotList.add(currSharedEventInStateList);
-                
+
                 currSharedEventInStateList.add(sharedTimeVar);
                 currSharedEventInStateList.addAll(getActiveAltPathVars(new int[]{sharedTimeVar[0], sharedTimeVar[1], indexMap.getEventIndex(sharedEvent)}));
-                
-                
+
+
 //                for (int j = i+1; j < sharedTimeVars.size(); j++)
 //                {
 //                    String header = "shared_event_" + sharedEvent.getLabel() + "_" + currCounter + " : ";
 //                    int[] firstSharedTimeVar = sharedTimeVars.get(i);
 //                    int[] secondSharedTimeVar = sharedTimeVars.get(j);
-//                    System.out.println(header + "time[" + firstSharedTimeVar[0] + ", " + firstSharedTimeVar[1] + 
+//                    System.out.println(header + "time[" + firstSharedTimeVar[0] + ", " + firstSharedTimeVar[1] +
 //                            "] = time[" + secondSharedTimeVar[0] + ", " + secondSharedTimeVar[1] + "];");
-//                    
+//
 //                    //int[] firstUpstreamsAltPathInfo = upstreamsAltPathVars[sharedTimeVars.get(i)[0]][sharedTimeVars.get(i)[1]]
 //                    //        int[] firstUpstreamsAltPathInfo = upstreamsAltPathVars[sharedTimeVars.get(i)[0]][sharedTimeVars.get(i)[1]]
 //                    String body = "shared_event_" + sharedEvent.getLabel() + "_alt_paths_" + currCounter++ + " : ";
-//                    Collection<int[]> firstAltPathInfoList = getActiveAltPathVars(new int[]{firstSharedTimeVar[0], firstSharedTimeVar[1], 
+//                    Collection<int[]> firstAltPathInfoList = getActiveAltPathVars(new int[]{firstSharedTimeVar[0], firstSharedTimeVar[1],
 //                        indexMap.getEventIndex(sharedEvent)});
-//                    Collection<int[]> secondAltPathInfoList = getActiveAltPathVars(new int[]{secondSharedTimeVar[0], secondSharedTimeVar[1], 
+//                    Collection<int[]> secondAltPathInfoList = getActiveAltPathVars(new int[]{secondSharedTimeVar[0], secondSharedTimeVar[1],
 //                        indexMap.getEventIndex(sharedEvent)});
-//                    
-//                                        
+//
+//
 //                    if (firstAltPathInfoList.size() == 0)
 //                    {
 //                        body += "1";
@@ -2924,14 +2927,14 @@ public class Milp
 //                    System.out.println(body);
 //                }
             }
-            
+
             //TODO... fixa omtolkningen i GLPK OCH CBC
             sharedEventConstraints.add(currSharedEventInfoList);
         }
-        
+
         // Constructing the mutex constraints
         // for every zone...
-        
+
         for (int i=0; i<bookingTics.length; i++)
         {
             // for every plant pair...
@@ -2941,7 +2944,7 @@ public class Milp
                 {
                     // updates the variable index if the booking event is repeated;
                     int repeatedBooking = 0;
-                    
+
                     // for every path combination that contains the event that books the current zone
                     for (int k1=0; k1<bookingTics[i][j1][STATE_SWITCH].length; k1++)
                     {
@@ -2950,31 +2953,31 @@ public class Milp
                             if (bookingTics[i][j1][STATE_SWITCH][0] != -1 && bookingTics[i][j2][STATE_SWITCH][0] != -1)
                             {
                                 repeatedBooking++;
-                                
+
                                 // Fills the map, that is used in restiction of cross-booking
                                 mutexVarCounterMap.put(new int[]{i, j1, j2, k1, k2}, new Integer(repeatedBooking));
                                 mutexVariables.add(makeMutexVariable(j1, j2, i, repeatedBooking));
-                                
+
 //                                //test
 //                                ArrayList<int[]> bList = new ArrayList<int[]>();
 //                                Automaton bPlant = indexMap.getAutomatonAt(j1);
 //                                State bState = indexMap.getStateAt(bPlant, bookingTics[i][j1][STATE_SWITCH][k1]);
 //                                LabeledEvent bEvent = indexMap.getEventAt(bookingTics[i][j1][EVENT_SWITCH][k1]);
 //                                findNearestPathSplits(bPlant, bState.nextState(bEvent), bList, bEvent);
-//                                
+//
 //                                //temp
 //                                String bName = bEvent.getName();
 //                                int sIndex = bookingTics[i][j1][STATE_SWITCH][k1];
 //                                int pIndex = j1;
 //                                int zIndex = i;
 //                                int blistlength = bList.size();
-//                                
+//
 //                                ArrayList<int[]> uList = new ArrayList<int[]>();
 //                                Automaton uPlant = indexMap.getAutomatonAt(j2);
 //                                State uState = indexMap.getStateAt(uPlant, unbookingTics[i][j2][STATE_SWITCH][k2]);
 //                                LabeledEvent uEvent = indexMap.getEventAt(unbookingTics[i][j2][EVENT_SWITCH][k2]);
 //                                findNearestPathSplits(uPlant, uState.nextState(uEvent), uList, uEvent);
-//                                
+//
 //                                int totalNrOfPathSplits = 0;
 //                                String altPathsCoupling = "";
 //                                for (int[] bSplitState : bList)
@@ -3005,27 +3008,27 @@ public class Milp
 //                                }
 //                                mutexConstraintBody += " + epsilon";
 //                                mutexConstraints.add(new Constraint(new int[]{i, j1, j2, repeatedBooking}, mutexConstraintBody));
-//                                
+//
                                 //TODO: Ta fram passande och snäva bigM utifrån planttiderna
                                 mutexConstraints.add(new int[]{
-                                    j1, bookingTics[i][j1][STATE_SWITCH][k1], bookingTics[i][j1][EVENT_SWITCH][k1], 
+                                    j1, bookingTics[i][j1][STATE_SWITCH][k1], bookingTics[i][j1][EVENT_SWITCH][k1],
                                     unbookingTics[i][j1][STATE_SWITCH][k1], unbookingTics[i][j1][EVENT_SWITCH][k1],
-                                    j2, bookingTics[i][j2][STATE_SWITCH][k2], bookingTics[i][j2][EVENT_SWITCH][k2], 
-                                    unbookingTics[i][j2][STATE_SWITCH][k2], unbookingTics[i][j2][EVENT_SWITCH][k2], 
+                                    j2, bookingTics[i][j2][STATE_SWITCH][k2], bookingTics[i][j2][EVENT_SWITCH][k2],
+                                    unbookingTics[i][j2][STATE_SWITCH][k2], unbookingTics[i][j2][EVENT_SWITCH][k2],
                                     i, repeatedBooking});
-                                
+
 //                                //test (forts...)
 //                                bList = new ArrayList<int[]>();
 //                                bPlant = uPlant;
 //                                bState = indexMap.getStateAt(bPlant, bookingTics[i][j2][STATE_SWITCH][k2]);
 //                                bEvent = indexMap.getEventAt(bookingTics[i][j2][EVENT_SWITCH][k2]);
-//                                
+//
 //                                findNearestPathSplits(bPlant, bState.nextState(bEvent), bList, bEvent);
 //                                uList = new ArrayList<int[]>();
 //                                uPlant = indexMap.getAutomatonAt(j1);
 //                                uState = indexMap.getStateAt(uPlant, unbookingTics[i][j1][STATE_SWITCH][k1]);
 //                                uEvent = indexMap.getEventAt(unbookingTics[i][j1][EVENT_SWITCH][k1]);
-//                                
+//
 //                                findNearestPathSplits(uPlant, uState.nextState(uEvent), uList, uEvent);
 //                                totalNrOfPathSplits = 0;
 //                                altPathsCoupling = "";
@@ -3064,47 +3067,47 @@ public class Milp
             }
         }
     }
-    
+
     public void requestStop()
     {
         requestStop(false);
     }
-    
+
     public void requestStop(boolean disposeScheduleDialog)
     {
         isRunning = false;
-        
+
         milpSolver.cleanUp();
     }
-    
+
     public boolean isStopped()
     {
         return !isRunning;
     }
-    
+
     private State makeScheduleState(int[] stateIndices, boolean isInitial)
     {
         String stateName = "[";
-        
+
         for (int i=0; i<theAutomata.size() - 1; i++)
         {
-            stateName += indexMap.getStateAt(indexMap.getAutomatonAt(i), stateIndices[i]).getName() + ".";
+            stateName += indexMap.getStateAt(indexMap.getAutomatonAt(i), stateIndices[i]).getName() + SEPARATOR;	// SEPARATOR replaced "." here, see above!
         }
         stateName += indexMap.getStateAt(indexMap.getAutomatonAt(theAutomata.size()-1), stateIndices[theAutomata.size()-1]).getName() + "]";
-        
+
         State scheduledState = new State(stateName);
-        
+
         scheduledState.setInitial(isInitial);
         schedule.addState(scheduledState);
-        
+
         return scheduledState;
     }
-    
+
     private State makeScheduleState(int[] stateIndices)
     {
         return makeScheduleState(stateIndices, false);
     }
-    
+
 //@Deprecated
 //    private synchronized void updateGui(Automata autos)
 //	    throws Exception
@@ -3148,7 +3151,7 @@ public class Milp
 //            }
 //        }
 //    }
-    
+
     /**
      * Returns an automaton describing the optimised schedule.
      */
@@ -3156,28 +3159,28 @@ public class Milp
     {
         return schedule;
     }
-    
+
     public int getBIG_M_VALUE()
     {
         return SchedulingConstants.BIG_M_VALUE;
     }
-    
+
     //TO BE DEPRECATED
     public String makeAltPathsVariable(int plantIndex, int fromStateIndex, int toStateIndex)
     {
         return "r" + plantIndex + "_from_" + fromStateIndex + "_to_" + toStateIndex;
     }
-    
+
     public String makeTimeVariable(int plantIndex, int stateIndex)
     {
         return "time[" + plantIndex + ", " + stateIndex + "]";
     }
-    
+
     public String makeMutexVariable(int r1, int r2, int z, int var)
     {
         return "r" + r1 + "_books_z" + z + "_before_r" + r2 + "_var" + var;
     }
-    
+
     /**
      *  Removes epsilons from the supplied time variable, by returning closest
      *  value that is smaller than time and cannot be affected by the sum of
@@ -3198,19 +3201,19 @@ public class Milp
             }
             roundOffCoeff = SchedulingConstants.EPSILON * Math.pow(10, ("" + totalNrOfTimes).length());
         }
-        
+
         // Remove epsilons from the current time.
         // The timeThroughBigMApprox is equal to 1 unless a rescaling has been done.
         // If the system was rescaled, the times return to their original (or rather correct) values.
         return Math.floor(time / roundOffCoeff) * roundOffCoeff * timeThroughBigMApprox;
     }
-    
+
 //    private ArrayList<int[][]> getEveryOrderingNew(ArrayList<int[]>[] involvedEventInfo)
 //    {
 //        int eventsInEachOrdering = Math.max(involvedEventInfo[0].size(), involvedEventInfo[1].size());
 //
 //    }
-    
+
     /**
      * This method creates all permutation of indices in an array of length n.
      *
@@ -3220,7 +3223,7 @@ public class Milp
     private ArrayList<int[]> getIndexPermutations(int n)
     {
         ArrayList<int[]> permutations = new ArrayList<int[]>();
-        
+
         int[] descOrderIndex = new int[n];
         int[] descOrderDir = new int[n];
         int[] perm = new int[n];
@@ -3230,14 +3233,14 @@ public class Milp
             descOrderIndex[i] = perm.length - (i + 1);
             descOrderDir[i] = -1;
         }
-        
+
         int[] permToAdd = new int[perm.length];
         for (int i = 0; i < permToAdd.length; i++)
         {
             permToAdd[i] = perm[i];
         }
         permutations.add(permToAdd);
-        
+
         boolean swapping = true;
         while (swapping)
         {
@@ -3245,7 +3248,7 @@ public class Milp
             {
                 // If no swapping was performed in this for-loop, it's time to stop iterating
                 swapping = false;
-                
+
                 int swappableIndex = descOrderIndex[i] + descOrderDir[i];
                 if (swappableIndex >= 0 && swappableIndex < n)
                 {
@@ -3255,7 +3258,7 @@ public class Milp
                         int temp = perm[swappableIndex];
                         perm[swappableIndex] = perm[descOrderIndex[i]];
                         perm[descOrderIndex[i]] = temp;
-                        
+
                         // Add the permutation to the array
                         permToAdd = new int[perm.length];
                         for (int k = 0; k < permToAdd.length; k++)
@@ -3263,31 +3266,31 @@ public class Milp
                             permToAdd[k] = perm[k];
                         }
                         permutations.add(permToAdd);
-                        
+
                         // Update the order indices
                         int swappableDescOrderIndex = n - (temp + 1);
                         descOrderIndex[i] += descOrderDir[i];
                         descOrderIndex[swappableDescOrderIndex] -= descOrderDir[i];
-                        
+
                         // Change the swapping directions of all integers that are higher than
                         // the currently swapping one
                         for (int j = 0; j < i; j++)
                         {
                             descOrderDir[j] *= -1;
                         }
-                        
+
                         // Keep on iterating
                         swapping = true;
-                        
+
                         break outerForLoop;
                     }
                 }
             }
         }
-        
+
         return permutations;
     }
-    
+
     private void getEveryOrdering(ArrayList<ArrayList> toOrder,
             ArrayList<ArrayList> currOrder, ArrayList<ArrayList> allOrderings)
     {
@@ -3309,7 +3312,7 @@ public class Milp
             allOrderings.add(currOrder);
         }
     }
-    
+
 //    //TODO: INAUGURATED
 //    private ArrayList<int[]> getEveryAlternatingOrderingNew(ArrayList<int[]> toOrder1, ArrayList<int[]> toOrder2)
 //    {
@@ -3356,7 +3359,7 @@ public class Milp
 //
 //        return allCombinedOrderings;
 //    }
-    
+
     //TODO: DEPRECATED
     private ArrayList<ArrayList> getEveryAlternatingOrdering(ArrayList<ArrayList> toOrder1, ArrayList<ArrayList> toOrder2)
     {
@@ -3373,19 +3376,19 @@ public class Milp
                     ArrayList<ArrayList> newToOrder2 = new ArrayList<ArrayList>(toOrder2);
                     newToOrder1.remove(i);
                     newToOrder2.remove(j);
-                    
+
                     ArrayList<ArrayList> combinedAlternativeOrderings = getEveryAlternatingOrdering(toOrder1, newToOrder2);
                     combinedAlternativeOrderings.addAll(getEveryAlternatingOrdering(newToOrder1, toOrder2));
                     return combinedAlternativeOrderings;
                 }
             }
         }
-        
+
         ArrayList<ArrayList> allOrderings1 = new ArrayList<ArrayList>();
         ArrayList<ArrayList> allOrderings2 = new ArrayList<ArrayList>();
         getEveryOrdering(toOrder1, new ArrayList<ArrayList>(), allOrderings1);
         getEveryOrdering(toOrder2, new ArrayList<ArrayList>(), allOrderings2);
-        
+
         ArrayList<ArrayList> allCombinedOrderings = new ArrayList<ArrayList>();
         for (ArrayList<ArrayList> i1 : allOrderings1)
         {
@@ -3401,7 +3404,7 @@ public class Milp
                 allCombinedOrderings.add(combinedOrdering);
             }
         }
-        
+
         return allCombinedOrderings;
 //
 //        for (ArrayList<int[]> al : allCombinedOrderings)
@@ -3414,7 +3417,7 @@ public class Milp
 //            logger.warn("str...... = " + str);
 //        }
     }
-    
+
     /**
      * FULHACK (ugly implementation).
      */
@@ -3426,14 +3429,14 @@ public class Milp
             {
                 continue mainloop;
             }
-            
+
             for (int i = 0; i < inArray.size(); i++)
             {
                 if (inArray.get(i).length != plantStateInfo.get(i).length)
                 {
                     continue mainloop;
                 }
-                
+
                 for (int j = 0; j < inArray.get(i).length; j++)
                 {
                     if (inArray.get(i)[j] != plantStateInfo.get(i)[j])
@@ -3442,27 +3445,27 @@ public class Milp
                     }
                 }
             }
-            
+
             // If this point has been reached, then two identical plantStateInfos have been found
             return true;
         }
-        
+
         return false;
     }
-    
+
     private ArrayList<int[]> getAllBooleanVarCombinations(int length, ArrayList<int[]> combinationList)
     {
         ArrayList<int[]> newCombinationList = new ArrayList<int[]>();
-        
+
         if (length == 0)
         {
             return newCombinationList;
         }
-        
+
         if (combinationList == null)
         {
             combinationList = new ArrayList<int[]>();
-            
+
             int[] newElement = new int[length];
             for (int i = 0; i < newElement.length; i++)
             {
@@ -3470,7 +3473,7 @@ public class Milp
             }
             combinationList.add(newElement);
         }
-        
+
         for (Iterator<int[]> it = combinationList.iterator(); it.hasNext();)
         {
             int[] element = it.next();
@@ -3480,7 +3483,7 @@ public class Milp
                 {
                     element[i] = 0;
                     newCombinationList.add(element);
-                    
+
                     int[] dualElement = new int[length];
                     for (int j = 0; j < dualElement.length; j++)
                     {
@@ -3488,20 +3491,20 @@ public class Milp
                     }
                     dualElement[i] = 1;
                     newCombinationList.add(dualElement);
-                    
+
                     break;
                 }
             }
         }
-        
+
         if (newCombinationList.get(0)[length-1] != -1)
         {
             return newCombinationList;
         }
-        
+
         return getAllBooleanVarCombinations(length, newCombinationList);
     }
-    
+
     /**
      * This method returns the nearest variables upstreams from a given
      * [plantIndex stateIndex]-pair. If there is also an eventIndex supplied,
@@ -3522,19 +3525,19 @@ public class Milp
             {
                 int nextStateIndex = indexMap.getStateIndex(plantStateEvent[0],
                         state.nextState(indexMap.getEventAt(plantStateEvent[2])));
-                
+
                 ArrayList<int[]> activeAltPathVars = new ArrayList<int[]>();
                 activeAltPathVars.add(altPathVariablesTree.get(new int[]{
                     plantStateEvent[0], plantStateEvent[1], nextStateIndex
                 }));
-                
+
                 return activeAltPathVars;
             }
         }
-        
+
         return upstreamsAltPathVars[plantStateEvent[0]][plantStateEvent[1]];
     }
-    
+
     public String getMessages(int msgType)
     {
         switch (msgType)
@@ -3550,17 +3553,17 @@ public class Milp
                 return null;
         }
     }
-    
+
     public Object[] getDebugMessages()
     {
         return debugMsgs.toArray();
     }
-    
+
     public void addToMessages(String newMessage, int msgType)
     {
         addToMessages(newMessage, msgType, false);
     }
-    
+
     public void addToMessages(String newMessage, int msgType, boolean noLineBreak)
     {
         String lineBreakStr = "";
@@ -3568,7 +3571,7 @@ public class Milp
         {
             lineBreakStr = "\n";
         }
-        
+
         switch (msgType)
         {
             case(SchedulingConstants.MESSAGE_TYPE_INFO):
@@ -3584,17 +3587,17 @@ public class Milp
                 errorMsgs += "Wrong message type supplied to Milp.addToMessages() (messageStr = " + newMessage + ")";
         }
     }
-    
+
     public double[][] getDeltaTimes()
     {
         return deltaTimes;
     }
-    
+
     public int getNrOfZones()
     {
         return zones.size();
     }
-    
+
     public ArrayList<String> getAltPathVariablesStrArray()
     {
         return altPathVariablesStrArray;
@@ -3651,7 +3654,7 @@ public class Milp
     {
         return sharedEventConstraints;
     }
-    
+
     public Automata getSubControllers()
     throws MilpException
     {
@@ -3659,13 +3662,13 @@ public class Milp
         {
             throw new MilpException("No shedule found to partition into subcontrollers.");
         }
-        
+
         Alphabet zoneAlphabet = new Alphabet();
         for (Automaton zone : zones)
         {
             zoneAlphabet.union(zone.getAlphabet());
-        } 
-        
+        }
+
         Automata subControllers =  new Automata();
         for (int i = 0; i < plants.size(); i++)
         {
@@ -3675,21 +3678,21 @@ public class Milp
             currState.setAccepting(true);
             subController.addState(currState);
             subControllers.addAutomaton(subController);
-        }    
+        }
         Automaton subController = new Automaton("subC_" + schedule.getName());
         State currState = new State("q0");
         currState.setInitial(true);
         currState.setAccepting(true);
         subController.addState(currState);
         subControllers.addAutomaton(subController);
-        
+
         State scheduleState = schedule.getInitialState();
         boolean firstLoop = true;
         while (firstLoop || !scheduleState.isInitial())
         {
             firstLoop = false;
             Arc arc = scheduleState.outgoingArcsIterator().next();
-            
+
             if (zoneAlphabet.contains(arc.getEvent()))
             {
                 Automaton commonSubController = subControllers.getAutomatonAt(subControllers.size()-1);
@@ -3722,10 +3725,10 @@ public class Milp
                     }
                 }
             }
-            
+
             scheduleState = arc.getToState();
         }
-         
+
         for (int i = 0; i < subControllers.size(); i++)
         {
             Automaton currSubC = subControllers.getAutomatonAt(i);
@@ -3741,25 +3744,25 @@ public class Milp
                 }
             }
         }
-        
+
         return subControllers;
     }
-    
+
     /**
      * Check whether the plant contains any loop, in which case an exception is thrown.
-     * This is done using BookingPairsGraphExplorer with as many colors as there are states 
+     * This is done using BookingPairsGraphExplorer with as many colors as there are states
      * (since we don't want any limitation here, any cycle should be found). The fromTic-, toTic-
-     * and bufferExists-parameters of the Edge class are not used in this case. 
+     * and bufferExists-parameters of the Edge class are not used in this case.
      */
 	private void checkForLoops(Automata autos)
         throws MilpException
     {
         String exceptionStr = "";
-        
+
         for (Iterator<Automaton> autIt = autos.iterator(); autIt.hasNext();)
         {
             Automaton auto = autIt.next();
-            
+
             ArrayList<int[]>[] edgeInfos = new ArrayList[auto.nbrOfStates()];
             for (Iterator<State> stateIt = auto.stateIterator(); stateIt.hasNext();)
             {
@@ -3805,7 +3808,7 @@ public class Milp
                 exceptionStr += "\nLoops found in '" + auto.getName() + "':" + loopStr;
             }
         }
-        
+
         if (!exceptionStr.equals(""))
         {
             throw new MilpException(exceptionStr + "\nMILP-formulation impossible!");

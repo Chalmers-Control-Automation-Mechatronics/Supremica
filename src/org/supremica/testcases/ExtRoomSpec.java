@@ -30,7 +30,7 @@ public class ExtRoomSpec {
     final String ROOM_LABEL = "r";
     final String EMPTY_LABEL = "e";
     final String LABEL_SEP = "_";
-    final String LABEL_SEP2 = ".";
+    final String LABEL_SEP2 = ":";
     
     int ROOM_ID;
     int LEVEL_ID;

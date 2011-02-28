@@ -37,7 +37,7 @@ public class CatBuffer {
     public final String LEVEL_LABEL = "v";
     
     final static String LABEL_SEP1 = "_";
-    final static String LABEL_SEP2 = ".";
+    final static String LABEL_SEP2 = ":";   // Was once "." but someone broke that
     
     static int number_of_states;
     static State[] states;

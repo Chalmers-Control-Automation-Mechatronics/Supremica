@@ -36,7 +36,7 @@ public class MouseBuffer {
     public final String LEVEL_LABEL = "v";
     
     final static String LABEL_SEP1 = "_";
-    final static String LABEL_SEP2 = ".";
+    final static String LABEL_SEP2 = ":";
     
     static int number_of_states;
     static State[] states;

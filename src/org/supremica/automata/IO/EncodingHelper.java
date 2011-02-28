@@ -140,7 +140,7 @@ public class EncodingHelper
 				}
 				else
 				{
-					str.append(".");
+					str.append(".");	// Possible problem here! The dot was hijacked as an operator after this code was written
 				}
 
 				break;

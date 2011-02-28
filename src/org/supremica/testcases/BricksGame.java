@@ -11,6 +11,7 @@ import org.supremica.automata.LabeledEvent;
 
 class BrickBuilder
 {
+    	private final static String SEPARATOR = "_";    // This was once ".", but then someone broke the possibility to use the dot in event/state-names
 	private final State[][] shared_states;
 	private final int rows;
 	private final int cols;
@@ -74,7 +75,7 @@ class BrickBuilder
 		{
 			for (int j = 1; j <= cols; ++j)
 			{
-				shared_states[i][j] = new State(Integer.toString(i) + j + ".");
+				shared_states[i][j] = new State("q" + Integer.toString(i) + j + SEPARATOR);
 			}
 		}
 	}
