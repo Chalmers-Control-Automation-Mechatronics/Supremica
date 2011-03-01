@@ -3,12 +3,16 @@ package org.supremica.automata.BDD.EFA;
 
 /**
  *
- * @author sajed
+ * @author Sajed Miremadi, Zhennan Fei
  */
 
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntObjectHashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -19,11 +23,15 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 
 import org.supremica.automata.BDD.BDDLibraryType;
+import org.supremica.automata.BDD.EFA.EventDisParDepSets.EventDisParDepSet;
+import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
@@ -517,6 +525,121 @@ public class BDDExtendedManager
         nextStates.replaceWith(bddExAutomata.getDest2SourceVariablePairing());
 
         return nextStates;
+    }
+
+    BDD action2BDDDisjunctiveVersion(EventDisParDepSet eventDepSet, List<BinaryExpressionProxy> anAction) {
+        HashSet<String> updatedVars = new HashSet<String>();
+        BDD actionBDD = factory.one();
+        for (Iterator<BinaryExpressionProxy> statementItrator = anAction.iterator(); statementItrator.hasNext();) {
+            BinaryExpressionProxy aStatement = statementItrator.next();
+            String varName = aStatement.getLeft().toString();
+            updatedVars.add(varName);
+            localOverflows = factory.zero();
+            BDD aStatementBDD = action2BDD(aStatement);
+            // Restrict the value of the variable to the domain
+            aStatementBDD = aStatementBDD
+             .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
+             .and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
+             .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)))
+             .and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
+
+            actionBDD.andWith(aStatementBDD);
+        }
+        // Detect the automaton which contains this updated variables in its guard collection -- for heurictics
+        for (Iterator<ExtendedAutomaton> autInterator = bddExAutomata.theExAutomata.iterator();
+                                                                                        autInterator.hasNext();) {
+            int nbrOfSharedVariablesInGuards = 0;
+            ExtendedAutomaton anAutomaton = autInterator.next();
+            for (final NodeProxy currLocation : anAutomaton.getNodes()) {
+                for (final Iterator<EdgeSubject> edgeIt = anAutomaton.getLocationToOutgoingEdgesMap()
+                                                    .get(currLocation).iterator(); edgeIt.hasNext();) {
+                    final EdgeSubject currEdge = edgeIt.next();
+                    if (currEdge.getGuardActionBlock() != null) {
+                        List<SimpleExpressionProxy> guards = currEdge.getGuardActionBlock().getGuards();
+                        if (guards != null && guards.size() > 0) {
+                            String guardString = guards.get(0).toString();
+                            for (String varName : updatedVars) {
+                                if (guardString.contains(varName)) {
+                                    nbrOfSharedVariablesInGuards++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            eventDepSet.getAutomaton2nbrOfInfluencedVariables().put(anAutomaton, nbrOfSharedVariablesInGuards);
+        }
+        // find the variables which have not been uodated and constrcut the statement v := v in BDD.
+        for (Iterator<String> varIterator = bddExAutomata.BDDBitVecTargetVarsMap.keySet().iterator();
+                                                                                        varIterator.hasNext();) {
+            String varName = varIterator.next();
+            if (!updatedVars.contains(varName)) {
+                SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varName);
+                SupremicaBDDBitVector rightSide = bddExAutomata.getBDDBitVecSource(varName);
+                BDD compensateBDD = leftSide.equ(rightSide);
+                // Restrict the value of the compensate variable to the domain
+                compensateBDD = compensateBDD
+             .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
+             .and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
+             .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)))
+             .and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
+                actionBDD.andWith(compensateBDD);
+            }
+        }
+        return actionBDD;
+    }
+
+    BDD getDisjunctiveInitiallyUncontrollableStates() {
+        if (bddExAutomata.plants.isEmpty() || bddExAutomata.specs.isEmpty()) {
+            return getZeroBDD();
+        } else {
+            TIntArrayList plantUncontrollableEvents = bddExAutomata.plantUncontrollableEventIndexList;
+            TIntArrayList specUncontrollableEvents = bddExAutomata.specUncontrollableEventIndexList;
+            TIntObjectHashMap<BDD> plantsEnabledStates = new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.plants, plantUncontrollableEvents)
+                    .getUncontrollableEvents2EnabledStates();
+            TIntObjectHashMap<BDD> specEnabledStates = new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents)
+                    .getUncontrollableEvents2EnabledStates();
+            BDD uncontrollableStates = getZeroBDD();
+            for (int i = 0; i < specUncontrollableEvents.size(); i++) {
+                if (plantUncontrollableEvents.contains(specUncontrollableEvents.get(i))) {
+                    int eventIndex = specUncontrollableEvents.get(i);
+                    uncontrollableStates.orWith(plantsEnabledStates.get(eventIndex).and(specEnabledStates.get(eventIndex).not()));
+                }
+            }
+            return uncontrollableStates;
+        }
+    }
+
+    BDD disjunctiveNonblockingControllable(BDD forbiddenStates, boolean reachable) {
+
+        BDD reachableStatesBDD = bddExAutomata.getReachableStates();
+        BDD previousForbidenStates = null;
+        BDD tmpCoreachableStates = null;
+        BDD currentForbidenStates = forbiddenStates;
+
+        boolean flag = false;
+        do {
+            previousForbidenStates = currentForbidenStates.id();
+            currentForbidenStates = BDDExDisjunctiveHeuristicReachabilityAlgorithms.
+                    uncontrollableBackWorkSetAlgorithm(bddExAutomata, currentForbidenStates, reachableStatesBDD);
+            if (flag && currentForbidenStates.equals(previousForbidenStates)) {
+                break;
+            } else {
+                tmpCoreachableStates = BDDExDisjunctiveHeuristicReachabilityAlgorithms.
+                        backWorkSetAlgorithm(bddExAutomata, bddExAutomata.getMarkedStates(), reachableStatesBDD, currentForbidenStates);
+                currentForbidenStates = tmpCoreachableStates.not();
+                flag = true;
+            }
+        } while (!previousForbidenStates.equals(currentForbidenStates));
+
+        BDD nonblockingControllableStates = null;
+        if (reachable) {
+            nonblockingControllableStates = BDDExDisjunctiveHeuristicReachabilityAlgorithms.
+                    forwardWorkSetAlgorithm(bddExAutomata, bddExAutomata.getInitialState(), currentForbidenStates);
+        } else {
+            nonblockingControllableStates = currentForbidenStates.not();
+        }
+        return nonblockingControllableStates;
     }
 
 }

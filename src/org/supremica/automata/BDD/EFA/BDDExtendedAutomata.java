@@ -2,8 +2,13 @@ package org.supremica.automata.BDD.EFA;
 
 /**
  *
- * @author Sajed Miremadi
+ * @author Sajed Miremadi, Zhennan Fei
  */
+
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TObjectIntHashMap;
+import java.math.BigDecimal;
 
 import java.util.*;
 import java.util.ArrayList;
@@ -13,6 +18,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
@@ -23,6 +29,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.automata.BDD.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.automata.BDD.EFA.EventDisParDepSets.EventDisParDepSet;
+import org.supremica.automata.algorithms.EditorSynthesizerOptions;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
@@ -120,8 +129,27 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     HashSet<String> varNames;
     String locaVarSuffix;
 
+    EditorSynthesizerOptions options;
+    SynthesisAlgorithm synType;
 
-    public BDDExtendedAutomata(ExtendedAutomata orgExAutomata)
+    List<ExtendedAutomaton> plants;
+    List<ExtendedAutomaton> specs;
+
+    TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DependentSet;
+
+    TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> event2AutomatonsEdges;
+    TIntObjectHashMap<EventDisParDepSet> events2EventDisParDepSet;
+
+    Map<BDD, Integer> eventBDD2eventIndices;
+
+    TObjectIntHashMap<ExtendedAutomaton>automaton2nbrEdges;
+    TObjectIntHashMap<ExtendedAutomaton> automaton2nbrGuards;
+
+    TIntArrayList plantUncontrollableEventIndexList;
+    TIntArrayList specUncontrollableEventIndexList;
+
+
+    public BDDExtendedAutomata(ExtendedAutomata orgExAutomata, final  EditorSynthesizerOptions options)
     {
         this.orgExAutomata = orgExAutomata;
         locaVarSuffix = orgExAutomata.getlocVarSuffix();
@@ -150,12 +178,27 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         forwardOverflows = manager.getZeroBDD();
         backwardOverflows = manager.getZeroBDD();
 
+        this.options = options;
+        this.synType = options.getSynthesisAlgorithm();
+
+        this.plants = new ArrayList<ExtendedAutomaton>();
+        this.specs = new ArrayList<ExtendedAutomaton>();
+
+        this.plantUncontrollableEventIndexList = new TIntArrayList();
+        this.specUncontrollableEventIndexList = new TIntArrayList();
+
         initialize();
     }
 
     void initialize()
     {
         unionAlphabet = orgExAutomata.getUnionAlphabet();
+        if (synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+            event2AutomatonsEdges = new TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>>(unionAlphabet.size());
+            automaton2nbrEdges = new  TObjectIntHashMap<ExtendedAutomaton>(orgExAutomata.size());
+            automaton2nbrGuards = new TObjectIntHashMap<ExtendedAutomaton>(orgExAutomata.size());
+            eventBDD2eventIndices = new HashMap<BDD, Integer>(unionAlphabet.size());
+        }
         eventDomain = manager.createDomain(unionAlphabet.size());
 /*        System.out.println("event variables: "+eventDomain.set().toString());
         for(EventDeclProxy e: orgExAutomata.unionAlphabet)
@@ -166,6 +209,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         for(EventDeclProxy event:unionAlphabet)
         {
             int currEventIndex = getEventIndex(event);
+            if(synType.equals(SynthesisAlgorithm.PARTITIONBDD)){
+                event2AutomatonsEdges.put(currEventIndex, new HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>());
+            }
             BDD eventBDD = manager.createBDD(currEventIndex, eventDomain);
             if(orgExAutomata.getPlantAlphabet().contains(event))
             {
@@ -302,6 +348,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         {
             BDDExtendedAutomaton bddExAutomaton = new BDDExtendedAutomaton(this, automaton);
 
+            if (automaton.isSpecification()) {
+                specs.add(automaton);
+            } else {
+                plants.add(automaton);
+            }
+
             bddExAutomaton.initialize();
 
             add(bddExAutomaton);
@@ -319,7 +371,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
         sourceToDestLocationPairing = manager.makePairing(sourceLocationDomains,destLocationDomains);
 
-        bddEdges = new BDDEdgeFactory(this).createEdges();
+        if (options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.MONOLITHICBDD)) {
+            bddEdges = new BDDEdgeFactory(this).createEdges();
+        }
 
 //        System.out.println("number of transitions: "+((BDDMonolithicTransitions)bddTransitions).transitionForwardBDD.pathCount());
     }
@@ -623,8 +677,17 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     {
         if (reachableStatesBDD == null)
         {
-            reachableStatesBDD = manager.restrictedForward(manager.getZeroBDD());
-            nbrOfReachableStates = nbrOfStatesBDD(reachableStatesBDD);
+            if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
+            {
+               //reachableStatesBDD = BDDExDisjunctiveReachabilityAlgorithms.restrictedForwardWorkSetAlgorithm(this, getInitialState(), manager.getZeroBDD());
+               reachableStatesBDD = BDDExDisjunctiveHeuristicReachabilityAlgorithms.forwardWorkSetAlgorithm(this, getInitialState(), manager.getZeroBDD());
+            }
+            else
+            {
+                reachableStatesBDD = manager.restrictedForward(manager.getZeroBDD());
+            }
+
+            nbrOfReachableStates = nbrOfStatesBDD(reachableStatesBDD);            
 //            logger.info("Number of reachable states in the closed-loop system: "+nbrOfReachableStates);
         }
         return reachableStatesBDD;
@@ -640,7 +703,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     {
         if (coreachableStatesBDD == null)
         {
-            coreachableStatesBDD = manager.restrictedBackward(manager.getZeroBDD());
+            if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
+            {
+                coreachableStatesBDD = BDDExDisjunctiveHeuristicReachabilityAlgorithms.backWorkSetAlgorithm(this, getMarkedStates(), getReachableStates(), manager.getZeroBDD());
+                //coreachableStatesBDD = BDDExDisjunctiveReachabilityAlgorithms.restrictedBackwardWorkSetAlgorithm(this, getMarkedStates(), manager.getZeroBDD(), getReachableStates());
+            }
+            else
+            {
+                coreachableStatesBDD = manager.restrictedBackward(manager.getZeroBDD());
+            }
+            
             nbrOfCoreachableStates = nbrOfStatesBDD(coreachableStatesBDD);
         }
 
@@ -652,7 +724,15 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
         if(nonblockingControllableStatesBDD == null)
         {
-            nonblockingControllableStatesBDD = manager.nonblockingControllable(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()),reachable);
+            if(synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
+            {
+                nonblockingControllableStatesBDD = manager.nonblockingControllable(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()),reachable);
+            }
+            else
+            {
+                nonblockingControllableStatesBDD = manager.disjunctiveNonblockingControllable
+                        (manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations()), reachable);
+            }
             nbrOfNonblockingControllableStates = nbrOfStatesBDD(nonblockingControllableStatesBDD);
         }
 
@@ -663,13 +743,27 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     {
         if(controllableStatesBDD == null)
         {
-            BDD uncontrollableStates = manager.getInitiallyUncontrollableStates().or(getForbiddenLocations());
-//            BDD uncontrollableStates = manager.uncontrollableBackward(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()));
-            if(reachable)
-                controllableStatesBDD = (manager.restrictedForward(uncontrollableStates));
-            else
-                controllableStatesBDD = uncontrollableStates.not();
+            if (synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
+            {
+                final BDD uncontrollableStates = manager.getInitiallyUncontrollableStates().or(getForbiddenLocations());
+//             BDD uncontrollableStates = manager.uncontrollableBackward(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()));
+                if (reachable) {
+                    controllableStatesBDD = (manager.restrictedForward(uncontrollableStates));
 
+                } else {
+                    controllableStatesBDD = uncontrollableStates.not();
+                }
+            }
+            else
+            {
+                uncontrollableStatesBDD = manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations());
+                if (reachable) {
+                    controllableStatesBDD = BDDExDisjunctiveHeuristicReachabilityAlgorithms.forwardWorkSetAlgorithm(this, getInitialState(), uncontrollableStatesBDD);
+
+                } else {
+                    controllableStatesBDD = uncontrollableStatesBDD.not();
+                }
+            }
             nbrOfControllableStates = nbrOfStatesBDD(controllableStatesBDD);
         }
 
@@ -688,9 +782,15 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 //            coreachableStatesBDD.printDot();
 
 //            nonblockingStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
-            nonblockingStatesBDD = coreachableStatesBDD;
+            if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
+            {
+                nonblockingStatesBDD = coreachableStatesBDD;
+            }
+            else
+            {
+                nonblockingStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
+            }
 
-            nbrOfNonblockingStates = nbrOfStatesBDD(nonblockingStatesBDD);
             nbrOfBlockingStates = nbrOfReachableStates - nbrOfNonblockingStates;            
         }
 
@@ -867,6 +967,29 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     public BDDExtendedAutomaton getBDDExAutomatonAt(int i)
     {
         return automatonToBDDAutomatonMap.get(theIndexMap.getExAutomatonAt(i));
+    }
+
+    public TIntObjectHashMap<BDDExDisjunctiveDependentSet> getAutIndex2DependentSet() {
+        if (autIndex2DependentSet == null) {
+            autIndex2DependentSet = new TIntObjectHashMap<BDDExDisjunctiveDependentSet>();
+            for(final ExtendedAutomaton automaton:theExAutomata) {
+                int autoIndex = theIndexMap.getExAutomatonIndex(automaton.getName());
+                autIndex2DependentSet.put(autoIndex, automatonToBDDAutomatonMap.get(automaton).getDependentSet());
+            }
+        }
+        return autIndex2DependentSet;
+    }
+
+    public TIntObjectHashMap<EventDisParDepSet> getEvents2EventDisParDepSet() {
+        if (events2EventDisParDepSet == null) {
+            EventDisParDepSets eventDisParDepSets = new EventDisParDepSets(this);
+            events2EventDisParDepSet = eventDisParDepSets.getEvents2EventDisParDepSet();
+        }
+        return events2EventDisParDepSet;
+    }
+
+    public SynthesisAlgorithm getSynthAlg() {
+       return synType;
     }
 
 }

@@ -43,10 +43,10 @@ public class BDDExtendedSynthesizer {
     ModuleSubjectFactory factory = null;
     ExpressionParser parser = null;
 
-    public BDDExtendedSynthesizer(final ExtendedAutomata theAutomata)
+    public BDDExtendedSynthesizer(final ExtendedAutomata theAutomata, final  EditorSynthesizerOptions options)
     {
         this.theAutomata = theAutomata;
-        bddAutomata = new BDDExtendedAutomata(theAutomata);
+        bddAutomata = new BDDExtendedAutomata(theAutomata, options);
         factory = ModuleSubjectFactory.getInstance();
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
     }

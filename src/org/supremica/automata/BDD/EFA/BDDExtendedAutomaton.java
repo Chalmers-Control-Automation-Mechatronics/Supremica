@@ -2,9 +2,10 @@ package org.supremica.automata.BDD.EFA;
 
 /**
  *
- * @author sajed
+ * @author Sajed Miremadi, Zhennan Fei
  */
 
+import gnu.trove.TIntArrayList;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -26,8 +28,11 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent.Kind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomaton;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
 
 public class BDDExtendedAutomaton {
@@ -50,6 +55,10 @@ public class BDDExtendedAutomaton {
 
     HashMap<Integer,String> bddIndex2SourceStateName;
     public HashMap<String,HashSet<Integer>> enablingSigmaMap;
+
+    BDD selfLoopsBDD;
+    TIntArrayList caredEventsIndex;
+    BDDExDisjunctiveDependentSet dependentSet;
 
     String OR = " | ";
     String AND = " & ";
@@ -87,6 +96,10 @@ public class BDDExtendedAutomaton {
 
         edgeForwardDisjunctiveBDD = manager.getZeroBDD();
         edgeBackwardDisjunctiveBDD = manager.getZeroBDD();
+
+        selfLoopsBDD = manager.getZeroBDD();
+        caredEventsIndex = new TIntArrayList();
+        dependentSet = null;
     }
 
     public void initialize()
@@ -103,19 +116,34 @@ public class BDDExtendedAutomaton {
         final HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToOutgoingEdgesMap = theExAutomaton.getLocationToOutgoingEdgesMap();
 
         boolean anyMarkedLocation = false;
-        for (final NodeProxy currLocation : theExAutomaton.getNodes())
-        {
-            // First create all edges in this automaton
-            for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext(); )
-            {
-                final EdgeSubject currEdge = edgeIt.next();
-                addEdge(currEdge);
-            }
 
-            // Self loop events not in this alphabet
-            for (final EventDeclProxy event : inverseAlphabet)
-            {
-               addEdge(currLocation, currLocation, event);
+        int nbrOfEdges = 0;
+        int nbrOfGuards = 0;
+        for (final NodeProxy currLocation : theExAutomaton.getNodes()) {
+            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+                // Add the node proxy in the map
+                for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
+                    final EdgeSubject currEdge = edgeIt.next();
+                        if (currEdge.getGuardActionBlock() != null && currEdge.getGuardActionBlock().getGuards() != null
+                        && currEdge.getGuardActionBlock().getGuards().size() > 0) {
+                            nbrOfGuards++;
+                        }
+                    addNodeProxy(currEdge);
+                    nbrOfEdges++;
+                }
+                // Construct "keep BDD"
+                addKeep(currLocation);
+            } else {
+                // First create all edges in this automaton
+                for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
+                    final EdgeSubject currEdge = edgeIt.next();
+                    addEdge(currEdge);
+                }
+
+                // Self loop events not in this alphabet
+                for (final EventDeclProxy event : inverseAlphabet) {
+                    addEdge(currLocation, currLocation, event);
+                }
             }
 
             // Then add state properties
@@ -148,6 +176,11 @@ public class BDDExtendedAutomaton {
         bddExAutomata.addMarkedLocations(markedLocations);
         bddExAutomata.addForbiddenLocations(forbiddenLocations);
         bddExAutomata.addPlantifiedBlockedLocations(plantifiedBlockedLocation);
+
+        if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+            bddExAutomata.automaton2nbrEdges.put(theExAutomaton, nbrOfEdges);
+            bddExAutomata.automaton2nbrGuards.put(theExAutomaton, nbrOfGuards);
+        }
     }
 
     public ExtendedAutomaton getExAutomaton()
@@ -225,6 +258,76 @@ public class BDDExtendedAutomaton {
             bddIndex2SourceStateName.put(bddIndex,sourceLocation.getName());
         }
 	manager.addEdge(edgeForwardBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions);
+    }
+
+    private void addKeep(NodeProxy location){
+
+        final int locationIndex = bddExAutomata.getLocationIndex(theExAutomaton, location);
+
+        BDD sourceLocationBDD = manager.getFactory().buildCube(locationIndex, sourceLocationDomain.vars());
+        Integer bddIndex = -1;
+        if (!bddIndex2SourceStateName.containsValue(location.getName())) {
+            final BDD.BDDIterator satIt = new BDD.BDDIterator(sourceLocationBDD, sourceLocationDomain.set());
+            final BigInteger[] currSat = satIt.nextTuple();
+            for (int i = 0; i < currSat.length; i++) {
+                if (currSat[i] != null) {
+                    bddIndex = currSat[i].intValue();
+                    break;
+                }
+            }
+            bddIndex2SourceStateName.put(bddIndex, location.getName());
+        }
+
+        BDD destLocationBDD = manager.getFactory().buildCube(locationIndex, destLocationDomain.vars());
+
+        sourceLocationBDD.andWith(destLocationBDD);
+        selfLoopsBDD.orWith(sourceLocationBDD);
+    }
+
+
+    private void addNodeProxy(final EdgeSubject theEdge) {
+
+        final Iterator<Proxy> eventIterator = theEdge.getLabelBlock().getEventList().iterator();
+        while (eventIterator.hasNext()) {
+
+            final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
+            final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
+            int eventIndex = bddExAutomata.getEventIndex(theEvent);
+
+            caredEventsIndex.add(eventIndex);
+
+            if(theEvent.getKind() == EventKind.UNCONTROLLABLE){
+                if(theExAutomaton.isSpecification())
+                    bddExAutomata.specUncontrollableEventIndexList.add(eventIndex);
+                else{
+                    bddExAutomata.plantUncontrollableEventIndexList.add(eventIndex);
+                }
+            }
+
+            HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> currentEventsAutEdgeMap = bddExAutomata.event2AutomatonsEdges.get(eventIndex);
+            if (currentEventsAutEdgeMap.containsKey(theExAutomaton)) {
+                currentEventsAutEdgeMap.get(theExAutomaton).add(theEdge);
+            } else {
+                ArrayList<EdgeProxy> edgeList = new ArrayList<EdgeProxy>();
+                edgeList.add(theEdge);
+                currentEventsAutEdgeMap.put(theExAutomaton, edgeList);
+            }
+        }
+    }
+
+    public TIntArrayList getCaredEventsIndex() {
+        return caredEventsIndex;
+    }
+
+    public BDD getSelfLoopsBDD() {
+        return selfLoopsBDD;
+    }
+
+    public BDDExDisjunctiveDependentSet getDependentSet() {
+        if (dependentSet == null) {
+            dependentSet = new BDDExDisjunctiveDependentSet(manager, this);
+        }
+        return dependentSet;
     }
 
     public BDD getForbiddenStateSet()

@@ -110,7 +110,7 @@ public class EditorSynthesizerAction
 //        ReduceBDDvars rBDDv = new ReduceBDDvars(exAutomata.getExtendedAutomataList().get(0));
 //        rBDDv.computeOptimalPaths();
 
-        final BDDExtendedSynthesizer bddSynthesizer = new BDDExtendedSynthesizer(exAutomata);
+        final BDDExtendedSynthesizer bddSynthesizer = new BDDExtendedSynthesizer(exAutomata,options);
 /*
         //Create a naive PCG graph
         int[][] weight = new int[exAutomata.size()][exAutomata.size()];
