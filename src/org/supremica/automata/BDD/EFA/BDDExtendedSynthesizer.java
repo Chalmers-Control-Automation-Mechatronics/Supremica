@@ -92,7 +92,7 @@ public class BDDExtendedSynthesizer {
 
     public double nbrOfStates()
     {
-        return bddAutomata.nbrOfStatesBDD(statesAfterSynthesis);
+        return (bddAutomata.nbrOfStatesBDD(statesAfterSynthesis));
     }
 
     public BDD getResult()
@@ -174,6 +174,7 @@ public class BDDExtendedSynthesizer {
                                 currGuard = "("+ses1.toString()+")"+" & ";
                             }
                             ses = (SimpleExpressionSubject)(parser.parse(currGuard+guard,Operator.TYPE_BOOLEAN));
+
                             //The following line cocerns the new guards that will be attached to the automata with a DIFFERENT COLOR!
                             ses2 = (SimpleExpressionSubject)(parser.parse(guard,Operator.TYPE_BOOLEAN));
                         }
