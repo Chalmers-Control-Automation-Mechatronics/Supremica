@@ -680,7 +680,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     {
         if (nonblockingStatesBDD == null)
         {
-            System.err.println("Marked states: "+nbrOfStatesBDD(getMarkedStates()));
+//            System.err.println("Marked states: "+nbrOfStatesBDD(getMarkedStates()));
             reachableStatesBDD = getReachableStates();
 //            reachableStatesBDD.printDot();
             coreachableStatesBDD = getCoreachableStates();
