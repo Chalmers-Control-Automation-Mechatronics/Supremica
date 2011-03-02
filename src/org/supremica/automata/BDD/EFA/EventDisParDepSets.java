@@ -28,14 +28,14 @@ import org.supremica.log.LoggerFactory;
 public class EventDisParDepSets {
 
     static Logger logger = LoggerFactory.createLogger(EventDisParDepSets.class);
-    private BDDExtendedAutomata bddExAutomata;
-    private BDDExtendedManager manager;
-    private List<ExtendedAutomaton> theExAutomata;
-    private Map<ExtendedAutomaton, BDDExtendedAutomaton> automatonToBDDAutomatonMap;
+    private final BDDExtendedAutomata bddExAutomata;
+    private final BDDExtendedManager manager;
+    private final List<ExtendedAutomaton> theExAutomata;
+    private final Map<ExtendedAutomaton, BDDExtendedAutomaton> automatonToBDDAutomatonMap;
     private TIntObjectHashMap <EventDisParDepSet> events2EventDisParDepSet;
-    private TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> event2AutomatonsEdges;
+    private final TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> event2AutomatonsEdges;
 
-    public EventDisParDepSets(BDDExtendedAutomata bddAutomata){
+    public EventDisParDepSets(final BDDExtendedAutomata bddAutomata){
         this.bddExAutomata = bddAutomata;
         this.manager = bddAutomata.manager;
         this.theExAutomata = bddAutomata.theExAutomata;
@@ -47,10 +47,10 @@ public class EventDisParDepSets {
     private void initialize() {
         events2EventDisParDepSet = new TIntObjectHashMap<EventDisParDepSet>();
         event2AutomatonsEdges.forEachKey(new TIntProcedure() {
-            @Override
-            public boolean execute(int eventIndex) {
-                HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automatonsEdges = event2AutomatonsEdges.get(eventIndex);
-                EventDisParDepSet eventDisParSet = new EventDisParDepSet(eventIndex, automatonsEdges);
+            //@Override
+            public boolean execute(final int eventIndex) {
+                final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automatonsEdges = event2AutomatonsEdges.get(eventIndex);
+                final EventDisParDepSet eventDisParSet = new EventDisParDepSet(eventIndex, automatonsEdges);
                 events2EventDisParDepSet.put(eventIndex, eventDisParSet);
                 return true;
             }
@@ -63,12 +63,12 @@ public class EventDisParDepSets {
 
 
     class EventDisParDepSet{
-        private int eventIndex;
-        private HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includingAutomata2Edges;
-        private BDD eventForwardPartialTransitions;
-        private TObjectIntHashMap<ExtendedAutomaton> automaton2nbrOfInfluencedVariables;
+        private final int eventIndex;
+        private final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includingAutomata2Edges;
+        private final BDD eventForwardPartialTransitions;
+        private final TObjectIntHashMap<ExtendedAutomaton> automaton2nbrOfInfluencedVariables;
 
-        public EventDisParDepSet(int eventIndex, HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includingAutomata2Edges){
+        public EventDisParDepSet(final int eventIndex, final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includingAutomata2Edges){
             this.eventIndex = eventIndex;
             this.includingAutomata2Edges = includingAutomata2Edges;
             this.eventForwardPartialTransitions = manager.getZeroBDD();
@@ -77,26 +77,26 @@ public class EventDisParDepSets {
         }
 
         private void initialize(){
-            
-            List<BDD> forwardTransitionRelationsWithoutActions = new ArrayList<BDD>(); // Maintain one BDD edge list [Locations and Guards]
-            List<List<BinaryExpressionProxy>> actionList = new ArrayList<List<BinaryExpressionProxy>>(); // Maintain one updated actions list
-            List<Integer> conflictingIndices = new ArrayList<Integer>(); // Keep track the conflicting action indices to finally remove the conflicting path
 
-            Set<ExtendedAutomaton> includedAutomata = includingAutomata2Edges.keySet();
-            Iterator<ExtendedAutomaton> automatonIterator = includedAutomata.iterator();
+            final List<BDD> forwardTransitionRelationsWithoutActions = new ArrayList<BDD>(); // Maintain one BDD edge list [Locations and Guards]
+            final List<List<BinaryExpressionProxy>> actionList = new ArrayList<List<BinaryExpressionProxy>>(); // Maintain one updated actions list
+            final List<Integer> conflictingIndices = new ArrayList<Integer>(); // Keep track the conflicting action indices to finally remove the conflicting path
+
+            final Set<ExtendedAutomaton> includedAutomata = includingAutomata2Edges.keySet();
+            final Iterator<ExtendedAutomaton> automatonIterator = includedAutomata.iterator();
 
             while (automatonIterator.hasNext()) {
-                ExtendedAutomaton anAutomaton = automatonIterator.next();              
-                List<List<BinaryExpressionProxy>> tempActionList = cloneAndClearBinaryExpressionList(actionList);
-                List<BDD> tempForwardBDDList = cloneAndClearBDDList(forwardTransitionRelationsWithoutActions);
-                
-                for (Iterator<EdgeProxy> edgeIterator = includingAutomata2Edges.get(anAutomaton).iterator(); edgeIterator.hasNext();) {
-                    EdgeProxy anEdge = edgeIterator.next();
+                final ExtendedAutomaton anAutomaton = automatonIterator.next();
+                final List<List<BinaryExpressionProxy>> tempActionList = cloneAndClearBinaryExpressionList(actionList);
+                final List<BDD> tempForwardBDDList = cloneAndClearBDDList(forwardTransitionRelationsWithoutActions);
+
+                for (final Iterator<EdgeProxy> edgeIterator = includingAutomata2Edges.get(anAutomaton).iterator(); edgeIterator.hasNext();) {
+                    final EdgeProxy anEdge = edgeIterator.next();
                     List<BinaryExpressionProxy> actionOfTheEdge = null;
 
                     if (anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getActions() != null && !anEdge.getGuardActionBlock().getActions().isEmpty()) {
                         actionOfTheEdge = anEdge.getGuardActionBlock().getActions();
-                        if (tempActionList.isEmpty()) { 
+                        if (tempActionList.isEmpty()) {
                             actionList.add(actionOfTheEdge);
                         } else {
                             for (int index = 0; index < tempActionList.size(); index++) {
@@ -116,8 +116,8 @@ public class EventDisParDepSets {
                             }
                         }
                     }
-              
-                    BDD aForwardTransition = getEdgeBDDWithoutActions(anAutomaton, anEdge);
+
+                    final BDD aForwardTransition = getEdgeBDDWithoutActions(anAutomaton, anEdge);
                     if (tempForwardBDDList.isEmpty()) {
                         forwardTransitionRelationsWithoutActions.add(aForwardTransition);
                     } else {
@@ -135,17 +135,17 @@ public class EventDisParDepSets {
             //System.err.println("The event name: " + bddExAutomata.theIndexMap.getEventAt(eventIndex).getName());
             //System.err.println("the actions size: " +actionList.size());
             //System.err.println("the BDD size:" + forwardTransitionRelationsWithoutActions.size());
-          
+
             BDD isolatedEventForwardPartialTransitions = manager.getZeroBDD();
             for(int index = 0; index < forwardTransitionRelationsWithoutActions.size(); index++){
                 BDD actionForwardBDD = manager.getOneBDD();
                 if(actionList.size() > 0)
                     actionForwardBDD = manager.action2BDDDisjunctiveVersion(this, actionList.get(index));
                 else {
-                    for (Iterator<String> varIterator = bddExAutomata.BDDBitVecTargetVarsMap.keySet().iterator(); varIterator.hasNext();) {
-                        String varName = varIterator.next();
-                        SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varName);
-                        SupremicaBDDBitVector rightSide = bddExAutomata.getBDDBitVecSource(varName);
+                    for (final Iterator<String> varIterator = bddExAutomata.BDDBitVecTargetVarsMap.keySet().iterator(); varIterator.hasNext();) {
+                        final String varName = varIterator.next();
+                        final SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varName);
+                        final SupremicaBDDBitVector rightSide = bddExAutomata.getBDDBitVecSource(varName);
                         BDD compensateBDD = leftSide.equ(rightSide);
                         compensateBDD = compensateBDD
                                 .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
@@ -159,43 +159,43 @@ public class EventDisParDepSets {
             }
 
             BDD keep = manager.getOneBDD();
-            for (ExtendedAutomaton extendedAutomaton : theExAutomata) {
+            for (final ExtendedAutomaton extendedAutomaton : theExAutomata) {
                 if (!includedAutomata.contains(extendedAutomaton)) {
-                    BDDExtendedAutomaton bddAutomaton = automatonToBDDAutomatonMap.get(extendedAutomaton);
+                    final BDDExtendedAutomaton bddAutomaton = automatonToBDDAutomatonMap.get(extendedAutomaton);
                     keep = keep.and(bddAutomaton.getSelfLoopsBDD());
                 }
             }
-           
+
             isolatedEventForwardPartialTransitions = isolatedEventForwardPartialTransitions.and(keep);
             keep.free();
             eventForwardPartialTransitions.orWith(isolatedEventForwardPartialTransitions);
         }
 
-        private List<BDD> cloneAndClearBDDList(List<BDD> aBDDList){
+        private List<BDD> cloneAndClearBDDList(final List<BDD> aBDDList){
             // Shallow copy of aBDDList and clear this obsolete list
-            List<BDD> temp = new ArrayList<BDD>(aBDDList);
+            final List<BDD> temp = new ArrayList<BDD>(aBDDList);
             aBDDList.clear();
             return temp;
         }
 
-        private List<List<BinaryExpressionProxy>> cloneAndClearBinaryExpressionList(List<List<BinaryExpressionProxy>> actionList){
+        private List<List<BinaryExpressionProxy>> cloneAndClearBinaryExpressionList(final List<List<BinaryExpressionProxy>> actionList){
             // Shallow copy of the actionList and clear it.
-            List<List<BinaryExpressionProxy>> tempActionList = new ArrayList<List<BinaryExpressionProxy>>(actionList);
+            final List<List<BinaryExpressionProxy>> tempActionList = new ArrayList<List<BinaryExpressionProxy>>(actionList);
             actionList.clear();
             return tempActionList;
         }
 
-        private BDD getEdgeBDDWithoutActions(ExtendedAutomaton anAutomaton, EdgeProxy anEdge) {
+        private BDD getEdgeBDDWithoutActions(final ExtendedAutomaton anAutomaton, final EdgeProxy anEdge) {
 
-            BDDDomain sourceLocationDomain = bddExAutomata.getSourceLocationDomain(anAutomaton.getName());
-            BDDDomain destLocationDomain = bddExAutomata.getDestLocationDomain(anAutomaton.getName());
+            final BDDDomain sourceLocationDomain = bddExAutomata.getSourceLocationDomain(anAutomaton.getName());
+            final BDDDomain destLocationDomain = bddExAutomata.getDestLocationDomain(anAutomaton.getName());
 
-            NodeProxy sourceLocation = anEdge.getSource();
-            NodeProxy destLocation = anEdge.getTarget();
-            int sourceLocationIndex = bddExAutomata.getLocationIndex(anAutomaton, sourceLocation);
-            int destLocationIndex = bddExAutomata.getLocationIndex(anAutomaton, destLocation);
-            BDD sourceBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
-            BDD destBDD = manager.getFactory().buildCube(destLocationIndex, destLocationDomain.vars());
+            final NodeProxy sourceLocation = anEdge.getSource();
+            final NodeProxy destLocation = anEdge.getTarget();
+            final int sourceLocationIndex = bddExAutomata.getLocationIndex(anAutomaton, sourceLocation);
+            final int destLocationIndex = bddExAutomata.getLocationIndex(anAutomaton, destLocation);
+            final BDD sourceBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
+            final BDD destBDD = manager.getFactory().buildCube(destLocationIndex, destLocationDomain.vars());
 
             BDD forwardGuardBDD = manager.getOneBDD();
             List<SimpleExpressionProxy> guards = null;
@@ -209,10 +209,10 @@ public class EventDisParDepSets {
             return sourceBDD;
         }
 
-        private boolean conflicting(List<BinaryExpressionProxy> actions, List<BinaryExpressionProxy> others) {
+        private boolean conflicting(final List<BinaryExpressionProxy> actions, final List<BinaryExpressionProxy> others) {
             boolean whetherConflicting = false;
-            for(BinaryExpressionProxy aStatement: actions){
-                for(BinaryExpressionProxy anotherStatement: others){
+            for(final BinaryExpressionProxy aStatement: actions){
+                for(final BinaryExpressionProxy anotherStatement: others){
                     // Here the code needs extending the following example:
                     // a += 1 and a = a + 1 those two should be considered as the same statements
                     // but here they are not!
@@ -228,12 +228,12 @@ public class EventDisParDepSets {
             return whetherConflicting;
         }
 
-        private void updateActionList(List<List<BinaryExpressionProxy>> actionList, List<List<BinaryExpressionProxy>> tempBinaryExpressionList,
-                                                               List<Integer> conflictingIndices, List<BinaryExpressionProxy> theAction) {
+        private void updateActionList(final List<List<BinaryExpressionProxy>> actionList, final List<List<BinaryExpressionProxy>> tempBinaryExpressionList,
+                                                               final List<Integer> conflictingIndices, final List<BinaryExpressionProxy> theAction) {
             for(int index = 0; index < tempBinaryExpressionList.size(); index++){
                 if(!conflictingIndices.contains(new Integer(index))){
-                    List<BinaryExpressionProxy> temp = new ArrayList<BinaryExpressionProxy>(tempBinaryExpressionList.get(index));
-                    for(BinaryExpressionProxy e: theAction){
+                    final List<BinaryExpressionProxy> temp = new ArrayList<BinaryExpressionProxy>(tempBinaryExpressionList.get(index));
+                    for(final BinaryExpressionProxy e: theAction){
                         if(!temp.contains(e))
                             temp.add(e);
                     }

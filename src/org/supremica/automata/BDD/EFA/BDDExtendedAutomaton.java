@@ -6,6 +6,7 @@ package org.supremica.automata.BDD.EFA;
  */
 
 import gnu.trove.TIntArrayList;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -28,7 +28,6 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent.Kind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomaton;
@@ -260,11 +259,11 @@ public class BDDExtendedAutomaton {
 	manager.addEdge(edgeForwardBDD, bddExAutomata.getForwardTransWhereVisUpdated(this), bddExAutomata.getForwardTransAndNextValsForV(this), sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain, eventIndex, bddExAutomata.getEventDomain(), guards, actions);
     }
 
-    private void addKeep(NodeProxy location){
+    private void addKeep(final NodeProxy location){
 
         final int locationIndex = bddExAutomata.getLocationIndex(theExAutomaton, location);
 
-        BDD sourceLocationBDD = manager.getFactory().buildCube(locationIndex, sourceLocationDomain.vars());
+        final BDD sourceLocationBDD = manager.getFactory().buildCube(locationIndex, sourceLocationDomain.vars());
         Integer bddIndex = -1;
         if (!bddIndex2SourceStateName.containsValue(location.getName())) {
             final BDD.BDDIterator satIt = new BDD.BDDIterator(sourceLocationBDD, sourceLocationDomain.set());
@@ -278,7 +277,7 @@ public class BDDExtendedAutomaton {
             bddIndex2SourceStateName.put(bddIndex, location.getName());
         }
 
-        BDD destLocationBDD = manager.getFactory().buildCube(locationIndex, destLocationDomain.vars());
+        final BDD destLocationBDD = manager.getFactory().buildCube(locationIndex, destLocationDomain.vars());
 
         sourceLocationBDD.andWith(destLocationBDD);
         selfLoopsBDD.orWith(sourceLocationBDD);
@@ -292,7 +291,7 @@ public class BDDExtendedAutomaton {
 
             final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
             final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
-            int eventIndex = bddExAutomata.getEventIndex(theEvent);
+            final int eventIndex = bddExAutomata.getEventIndex(theEvent);
 
             caredEventsIndex.add(eventIndex);
 
@@ -304,11 +303,11 @@ public class BDDExtendedAutomaton {
                 }
             }
 
-            HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> currentEventsAutEdgeMap = bddExAutomata.event2AutomatonsEdges.get(eventIndex);
+            final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> currentEventsAutEdgeMap = bddExAutomata.event2AutomatonsEdges.get(eventIndex);
             if (currentEventsAutEdgeMap.containsKey(theExAutomaton)) {
                 currentEventsAutEdgeMap.get(theExAutomaton).add(theEdge);
             } else {
-                ArrayList<EdgeProxy> edgeList = new ArrayList<EdgeProxy>();
+                final ArrayList<EdgeProxy> edgeList = new ArrayList<EdgeProxy>();
                 edgeList.add(theEdge);
                 currentEventsAutEdgeMap.put(theExAutomaton, edgeList);
             }

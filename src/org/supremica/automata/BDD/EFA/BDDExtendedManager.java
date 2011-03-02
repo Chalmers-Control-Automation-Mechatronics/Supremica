@@ -8,11 +8,11 @@ package org.supremica.automata.BDD.EFA;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -29,9 +29,9 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 
+import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.EFA.EventDisParDepSets.EventDisParDepSet;
-import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
@@ -157,7 +157,7 @@ public class BDDExtendedManager
 
     public BDD guard2BDD(final SimpleExpressionProxy sexpr)
     {
-        SupremicaBDDBitVector guardBDD = expr2BDDBitVec(sexpr, true);
+        final SupremicaBDDBitVector guardBDD = expr2BDDBitVec(sexpr, true);
         return guardBDD.getBit(0);
     }
 
@@ -214,7 +214,7 @@ public class BDDExtendedManager
             if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getAndOperator()))
             {
                 final SupremicaBDDBitVector tmp = expr2BDDBitVec(bexpr.getLeft(),true).copy();
-                SupremicaBDDBitVector rightGuard= expr2BDDBitVec(bexpr.getRight(),true);
+                final SupremicaBDDBitVector rightGuard= expr2BDDBitVec(bexpr.getRight(),true);
                 tmp.setBit(0, tmp.getBit(0).and(rightGuard.getBit(0)));
                 return tmp;
             }
@@ -372,7 +372,7 @@ public class BDDExtendedManager
     {
         BDD sourceBDD = getOneBDD();
         BDD destBDD = getOneBDD();
-        
+
         // Create a BDD representing the source location
         sourceBDD = factory.buildCube(sourceLocationIndex, sourceDomain.vars());
 
@@ -527,12 +527,12 @@ public class BDDExtendedManager
         return nextStates;
     }
 
-    BDD action2BDDDisjunctiveVersion(EventDisParDepSet eventDepSet, List<BinaryExpressionProxy> anAction) {
-        HashSet<String> updatedVars = new HashSet<String>();
-        BDD actionBDD = factory.one();
-        for (Iterator<BinaryExpressionProxy> statementItrator = anAction.iterator(); statementItrator.hasNext();) {
-            BinaryExpressionProxy aStatement = statementItrator.next();
-            String varName = aStatement.getLeft().toString();
+    BDD action2BDDDisjunctiveVersion(final EventDisParDepSet eventDepSet, final List<BinaryExpressionProxy> anAction) {
+        final HashSet<String> updatedVars = new HashSet<String>();
+        final BDD actionBDD = factory.one();
+        for (final Iterator<BinaryExpressionProxy> statementItrator = anAction.iterator(); statementItrator.hasNext();) {
+            final BinaryExpressionProxy aStatement = statementItrator.next();
+            final String varName = aStatement.getLeft().toString();
             updatedVars.add(varName);
             localOverflows = factory.zero();
             BDD aStatementBDD = action2BDD(aStatement);
@@ -546,19 +546,19 @@ public class BDDExtendedManager
             actionBDD.andWith(aStatementBDD);
         }
         // Detect the automaton which contains this updated variables in its guard collection -- for heurictics
-        for (Iterator<ExtendedAutomaton> autInterator = bddExAutomata.theExAutomata.iterator();
+        for (final Iterator<ExtendedAutomaton> autInterator = bddExAutomata.theExAutomata.iterator();
                                                                                         autInterator.hasNext();) {
             int nbrOfSharedVariablesInGuards = 0;
-            ExtendedAutomaton anAutomaton = autInterator.next();
+            final ExtendedAutomaton anAutomaton = autInterator.next();
             for (final NodeProxy currLocation : anAutomaton.getNodes()) {
                 for (final Iterator<EdgeSubject> edgeIt = anAutomaton.getLocationToOutgoingEdgesMap()
                                                     .get(currLocation).iterator(); edgeIt.hasNext();) {
                     final EdgeSubject currEdge = edgeIt.next();
                     if (currEdge.getGuardActionBlock() != null) {
-                        List<SimpleExpressionProxy> guards = currEdge.getGuardActionBlock().getGuards();
+                        final List<SimpleExpressionProxy> guards = currEdge.getGuardActionBlock().getGuards();
                         if (guards != null && guards.size() > 0) {
-                            String guardString = guards.get(0).toString();
-                            for (String varName : updatedVars) {
+                            final String guardString = guards.get(0).toString();
+                            for (final String varName : updatedVars) {
                                 if (guardString.contains(varName)) {
                                     nbrOfSharedVariablesInGuards++;
                                 }
@@ -570,12 +570,12 @@ public class BDDExtendedManager
             eventDepSet.getAutomaton2nbrOfInfluencedVariables().put(anAutomaton, nbrOfSharedVariablesInGuards);
         }
         // find the variables which have not been uodated and constrcut the statement v := v in BDD.
-        for (Iterator<String> varIterator = bddExAutomata.BDDBitVecTargetVarsMap.keySet().iterator();
+        for (final Iterator<String> varIterator = bddExAutomata.BDDBitVecTargetVarsMap.keySet().iterator();
                                                                                         varIterator.hasNext();) {
-            String varName = varIterator.next();
+            final String varName = varIterator.next();
             if (!updatedVars.contains(varName)) {
-                SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varName);
-                SupremicaBDDBitVector rightSide = bddExAutomata.getBDDBitVecSource(varName);
+                final SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varName);
+                final SupremicaBDDBitVector rightSide = bddExAutomata.getBDDBitVecSource(varName);
                 BDD compensateBDD = leftSide.equ(rightSide);
                 // Restrict the value of the compensate variable to the domain
                 compensateBDD = compensateBDD
@@ -593,16 +593,16 @@ public class BDDExtendedManager
         if (bddExAutomata.plants.isEmpty() || bddExAutomata.specs.isEmpty()) {
             return getZeroBDD();
         } else {
-            TIntArrayList plantUncontrollableEvents = bddExAutomata.plantUncontrollableEventIndexList;
-            TIntArrayList specUncontrollableEvents = bddExAutomata.specUncontrollableEventIndexList;
-            TIntObjectHashMap<BDD> plantsEnabledStates = new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.plants, plantUncontrollableEvents)
+            final TIntArrayList plantUncontrollableEvents = bddExAutomata.plantUncontrollableEventIndexList;
+            final TIntArrayList specUncontrollableEvents = bddExAutomata.specUncontrollableEventIndexList;
+            final TIntObjectHashMap<BDD> plantsEnabledStates = new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.plants, plantUncontrollableEvents)
                     .getUncontrollableEvents2EnabledStates();
-            TIntObjectHashMap<BDD> specEnabledStates = new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents)
+            final TIntObjectHashMap<BDD> specEnabledStates = new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents)
                     .getUncontrollableEvents2EnabledStates();
-            BDD uncontrollableStates = getZeroBDD();
+            final BDD uncontrollableStates = getZeroBDD();
             for (int i = 0; i < specUncontrollableEvents.size(); i++) {
                 if (plantUncontrollableEvents.contains(specUncontrollableEvents.get(i))) {
-                    int eventIndex = specUncontrollableEvents.get(i);
+                    final int eventIndex = specUncontrollableEvents.get(i);
                     uncontrollableStates.orWith(plantsEnabledStates.get(eventIndex).and(specEnabledStates.get(eventIndex).not()));
                 }
             }
@@ -610,9 +610,9 @@ public class BDDExtendedManager
         }
     }
 
-    BDD disjunctiveNonblockingControllable(BDD forbiddenStates, boolean reachable) {
+    BDD disjunctiveNonblockingControllable(final BDD forbiddenStates, final boolean reachable) {
 
-        BDD reachableStatesBDD = bddExAutomata.getReachableStates();
+        final BDD reachableStatesBDD = bddExAutomata.getReachableStates();
         BDD previousForbidenStates = null;
         BDD tmpCoreachableStates = null;
         BDD currentForbidenStates = forbiddenStates;

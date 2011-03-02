@@ -15,13 +15,14 @@ import org.supremica.log.LoggerFactory;
  */
 public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory
             .createLogger(BDDExDisjunctiveHeuristicReachabilityAlgorithms.class);
 
-    public static BDD forwardWorkSetAlgorithm(BDDExtendedAutomata bddAutomata, BDD initialStates, BDD forbiddenStates) {
+    public static BDD forwardWorkSetAlgorithm(final BDDExtendedAutomata bddAutomata, final BDD initialStates, final BDD forbiddenStates) {
 
-        BDDExDisjunctiveAbstractWorkSet variableWorkSet = new BDDDisjVariableWorkSet(bddAutomata);
-        TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap = bddAutomata.getAutIndex2DependentSet();
+        final BDDExDisjunctiveAbstractWorkSet variableWorkSet = new BDDDisjVariableWorkSet(bddAutomata);
+        final TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap = bddAutomata.getAutIndex2DependentSet();
         BDD reachableStatesBDD = initialStates.and(forbiddenStates.not());
         BDD previousReachableStatesBDD = null;
         boolean firstRound = true;
@@ -38,10 +39,10 @@ public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
         return reachableStatesBDD;
     }
 
-    private static BDD internalForwardWorkSetAlgorithm(BDDExtendedAutomata bddAutomata,
-            BDDExDisjunctiveAbstractWorkSet variableWorkSet,
-            TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap,
-            BDD reachableStatesBDD, BDD forbiddenStates, boolean firstRound) {
+    private static BDD internalForwardWorkSetAlgorithm(final BDDExtendedAutomata bddAutomata,
+            final BDDExDisjunctiveAbstractWorkSet variableWorkSet,
+            final TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap,
+            BDD reachableStatesBDD, final BDD forbiddenStates, boolean firstRound) {
 
         BDD previousReachableStatesBDD = null;
         while (!variableWorkSet.empty()) {
@@ -54,21 +55,21 @@ public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
                 choice = variableWorkSet.pickOne(firstRound);
             }
 
-            BDDExDisjunctiveDependentSet curDependentSet = autIndex2DepSetMap.get(choice);
-            BDD curTransition = curDependentSet.getPartialForwardTransition();
+            final BDDExDisjunctiveDependentSet curDependentSet = autIndex2DepSetMap.get(choice);
+            final BDD curTransition = curDependentSet.getPartialForwardTransition();
 
-            
-            TIntArrayList executedEventIndexList = new TIntArrayList();
+
+            final TIntArrayList executedEventIndexList = new TIntArrayList();
             BDD nextStatesOfCurTransition;
             BDD previousReachableStatesOfCurTransition;
             do {
                 previousReachableStatesOfCurTransition = reachableStatesBDD.id();
-                BDD nextStatesWithEvents = reachableStatesBDD.and(curTransition).exist(bddAutomata.sourceStateVariables);
-                BDD executedEventsBDD = nextStatesWithEvents.id().exist(bddAutomata.destStateVariables);
-                Set<BDD> eventBDDSet = bddAutomata.eventBDD2eventIndices.keySet();
-                for (Iterator<BDD> eventIterator = eventBDDSet.iterator(); eventIterator.hasNext();) {
-                    BDD anEventBDD = eventIterator.next();
-                    int eventIndex = bddAutomata.eventBDD2eventIndices.get(anEventBDD);
+                final BDD nextStatesWithEvents = reachableStatesBDD.and(curTransition).exist(bddAutomata.sourceStateVariables);
+                final BDD executedEventsBDD = nextStatesWithEvents.id().exist(bddAutomata.destStateVariables);
+                final Set<BDD> eventBDDSet = bddAutomata.eventBDD2eventIndices.keySet();
+                for (final Iterator<BDD> eventIterator = eventBDDSet.iterator(); eventIterator.hasNext();) {
+                    final BDD anEventBDD = eventIterator.next();
+                    final int eventIndex = bddAutomata.eventBDD2eventIndices.get(anEventBDD);
                     if (!executedEventsBDD.and(anEventBDD).equals(bddAutomata.manager.getZeroBDD())
                             && !executedEventIndexList.contains(eventIndex)) {
                         executedEventIndexList.add(eventIndex);
@@ -84,13 +85,13 @@ public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
         return reachableStatesBDD;
     }
 
-    public static BDD backWorkSetAlgorithm(BDDExtendedAutomata bddAutomata, BDD markedStates, BDD reachableStates, BDD forbiddenStates) {
+    public static BDD backWorkSetAlgorithm(final BDDExtendedAutomata bddAutomata, final BDD markedStates, final BDD reachableStates, final BDD forbiddenStates) {
 
-        BDDExDisjunctiveAbstractWorkSet variableWorkSet = new BDDDisjVariableWorkSet(bddAutomata);
-        TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap = bddAutomata.getAutIndex2DependentSet();
-        BDD reachableTargetStates = reachableStates.replace(bddAutomata.sourceToDestLocationPairing).replace(bddAutomata.sourceToDestVariablePairing);
+        final BDDExDisjunctiveAbstractWorkSet variableWorkSet = new BDDDisjVariableWorkSet(bddAutomata);
+        final TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap = bddAutomata.getAutIndex2DependentSet();
+        final BDD reachableTargetStates = reachableStates.replace(bddAutomata.sourceToDestLocationPairing).replace(bddAutomata.sourceToDestVariablePairing);
         BDD coreachableStatesBDD = markedStates.and(reachableStates).and(forbiddenStates.not());
-        
+
         BDD previousCoreachableStatesBDD = null;
         boolean firstRound = true;
         do {
@@ -105,10 +106,10 @@ public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
         return coreachableStatesBDD;
     }
 
-    private static BDD internalBackwardWorkSetAlgorithm(BDDExtendedAutomata bddAutomata,
-            BDDExDisjunctiveAbstractWorkSet variableWorkSet,
-            TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap,
-            BDD coreachableStatesBDD, BDD reachableTargetStates, BDD forbiddenStates, boolean firstRound) {
+    private static BDD internalBackwardWorkSetAlgorithm(final BDDExtendedAutomata bddAutomata,
+            final BDDExDisjunctiveAbstractWorkSet variableWorkSet,
+            final TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap,
+            BDD coreachableStatesBDD, final BDD reachableTargetStates, final BDD forbiddenStates, boolean firstRound) {
 
         BDD previousCoreachableStatesBDD = null;
         while (!variableWorkSet.empty()) {
@@ -121,21 +122,21 @@ public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
                 choice = variableWorkSet.pickOne(firstRound);
             }
 
-            BDDExDisjunctiveDependentSet curDependentSet = autIndex2DepSetMap.get(choice);
-            BDD curTransition = curDependentSet.getPartialBackwardTransition();
+            final BDDExDisjunctiveDependentSet curDependentSet = autIndex2DepSetMap.get(choice);
+            final BDD curTransition = curDependentSet.getPartialBackwardTransition();
 
 
-            TIntArrayList executedEventIndexList = new TIntArrayList();
+            final TIntArrayList executedEventIndexList = new TIntArrayList();
             BDD nextStatesOfCurTransition;
             BDD previousCoreachableStatesOfCurTransition;
             do {
                 previousCoreachableStatesOfCurTransition = coreachableStatesBDD.id();
-                BDD nextStatesWithEvents = (coreachableStatesBDD.and(curTransition).exist(bddAutomata.sourceStateVariables)).and(reachableTargetStates);
-                BDD executedEventsBDD = nextStatesWithEvents.id().exist(bddAutomata.destStateVariables);
-                Set<BDD> eventBDDSet = bddAutomata.eventBDD2eventIndices.keySet();
-                for (Iterator<BDD> eventIterator = eventBDDSet.iterator(); eventIterator.hasNext();) {
-                    BDD anEventBDD = eventIterator.next();
-                    int eventIndex = bddAutomata.eventBDD2eventIndices.get(anEventBDD);
+                final BDD nextStatesWithEvents = (coreachableStatesBDD.and(curTransition).exist(bddAutomata.sourceStateVariables)).and(reachableTargetStates);
+                final BDD executedEventsBDD = nextStatesWithEvents.id().exist(bddAutomata.destStateVariables);
+                final Set<BDD> eventBDDSet = bddAutomata.eventBDD2eventIndices.keySet();
+                for (final Iterator<BDD> eventIterator = eventBDDSet.iterator(); eventIterator.hasNext();) {
+                    final BDD anEventBDD = eventIterator.next();
+                    final int eventIndex = bddAutomata.eventBDD2eventIndices.get(anEventBDD);
                     if (!executedEventsBDD.and(anEventBDD).equals(bddAutomata.manager.getZeroBDD())
                             && !executedEventIndexList.contains(eventIndex)) {
                         executedEventIndexList.add(eventIndex);
@@ -152,11 +153,11 @@ public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
         return coreachableStatesBDD;
     }
 
-     public static BDD uncontrollableBackWorkSetAlgorithm(BDDExtendedAutomata bddAutomata, BDD forbiddenStates, BDD reachableStates) {
+     public static BDD uncontrollableBackWorkSetAlgorithm(final BDDExtendedAutomata bddAutomata, final BDD forbiddenStates, final BDD reachableStates) {
 
-        BDDExDisjunctiveAbstractWorkSet variableWorkSet = new BDDDisjVariableWorkSet(bddAutomata);
-        TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap = bddAutomata.getAutIndex2DependentSet();
-        BDD reachableTargetStates = reachableStates.replace(bddAutomata.sourceToDestLocationPairing).replace(bddAutomata.sourceToDestVariablePairing);
+        final BDDExDisjunctiveAbstractWorkSet variableWorkSet = new BDDDisjVariableWorkSet(bddAutomata);
+        final TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap = bddAutomata.getAutIndex2DependentSet();
+        final BDD reachableTargetStates = reachableStates.replace(bddAutomata.sourceToDestLocationPairing).replace(bddAutomata.sourceToDestVariablePairing);
         BDD coreachableStatesBDD = forbiddenStates.and(reachableStates);
 
         BDD previousCoreachableStatesBDD = null;
@@ -172,10 +173,10 @@ public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
         } while (!previousCoreachableStatesBDD.equals(coreachableStatesBDD));
         return coreachableStatesBDD;
     }
-      private static BDD internalUncontrollableBackwardWorkSetAlgorithm(BDDExtendedAutomata bddAutomata,
-            BDDExDisjunctiveAbstractWorkSet variableWorkSet,
-            TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap,
-            BDD coreachableStatesBDD, BDD reachableTargetStates, boolean firstRound) {
+      private static BDD internalUncontrollableBackwardWorkSetAlgorithm(final BDDExtendedAutomata bddAutomata,
+            final BDDExDisjunctiveAbstractWorkSet variableWorkSet,
+            final TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DepSetMap,
+            final BDD coreachableStatesBDD, final BDD reachableTargetStates, boolean firstRound) {
 
         BDD previousCoreachableStatesBDD = null;
         while (!variableWorkSet.empty()) {
@@ -188,21 +189,21 @@ public class BDDExDisjunctiveHeuristicReachabilityAlgorithms {
                 choice = variableWorkSet.pickOne(firstRound);
             }
 
-            BDDExDisjunctiveDependentSet curDependentSet = autIndex2DepSetMap.get(choice);
-            BDD curTransition = curDependentSet.getPartialBackwardTransition().and(bddAutomata.uncontrollableEventsBDD);
+            final BDDExDisjunctiveDependentSet curDependentSet = autIndex2DepSetMap.get(choice);
+            final BDD curTransition = curDependentSet.getPartialBackwardTransition().and(bddAutomata.uncontrollableEventsBDD);
 
 
-            TIntArrayList executedEventIndexList = new TIntArrayList();
+            final TIntArrayList executedEventIndexList = new TIntArrayList();
             BDD nextStatesOfCurTransition;
             BDD previousCoreachableStatesOfCurTransition;
             do {
                 previousCoreachableStatesOfCurTransition = coreachableStatesBDD.id();
-                BDD nextStatesWithEvents = (coreachableStatesBDD.and(curTransition).exist(bddAutomata.sourceStateVariables)).and(reachableTargetStates);
-                BDD executedEventsBDD = nextStatesWithEvents.id().exist(bddAutomata.destStateVariables);
-                Set<BDD> eventBDDSet = bddAutomata.eventBDD2eventIndices.keySet();
-                for (Iterator<BDD> eventIterator = eventBDDSet.iterator(); eventIterator.hasNext();) {
-                    BDD anEventBDD = eventIterator.next();
-                    int eventIndex = bddAutomata.eventBDD2eventIndices.get(anEventBDD);
+                final BDD nextStatesWithEvents = (coreachableStatesBDD.and(curTransition).exist(bddAutomata.sourceStateVariables)).and(reachableTargetStates);
+                final BDD executedEventsBDD = nextStatesWithEvents.id().exist(bddAutomata.destStateVariables);
+                final Set<BDD> eventBDDSet = bddAutomata.eventBDD2eventIndices.keySet();
+                for (final Iterator<BDD> eventIterator = eventBDDSet.iterator(); eventIterator.hasNext();) {
+                    final BDD anEventBDD = eventIterator.next();
+                    final int eventIndex = bddAutomata.eventBDD2eventIndices.get(anEventBDD);
                     if (!executedEventsBDD.and(anEventBDD).equals(bddAutomata.manager.getZeroBDD())
                             && !executedEventIndexList.contains(eventIndex)) {
                         executedEventIndexList.add(eventIndex);

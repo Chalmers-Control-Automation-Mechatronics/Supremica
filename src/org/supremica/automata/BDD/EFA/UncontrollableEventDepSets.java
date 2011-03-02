@@ -25,15 +25,15 @@ import org.supremica.log.LoggerFactory;
 
 public class UncontrollableEventDepSets {
     static Logger logger = LoggerFactory.createLogger(UncontrollableEventDepSets.class);
-    private BDDExtendedAutomata bddExAutomata;
-    private BDDExtendedManager manager;
-    private List<ExtendedAutomaton> members;
-    private Map<ExtendedAutomaton, BDDExtendedAutomaton> automatonToBDDAutomatonMap;
-    private TIntObjectHashMap <BDD> uncontrollableEvents2EnabledStates;
-    private TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> uncontrollableEvent2MembersEdges;
-    private TIntArrayList uncontrollableEventIndexList;
+    private final BDDExtendedAutomata bddExAutomata;
+    private final BDDExtendedManager manager;
+    private final List<ExtendedAutomaton> members;
+    private final Map<ExtendedAutomaton, BDDExtendedAutomaton> automatonToBDDAutomatonMap;
+    private final TIntObjectHashMap <BDD> uncontrollableEvents2EnabledStates;
+    private final TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> uncontrollableEvent2MembersEdges;
+    private final TIntArrayList uncontrollableEventIndexList;
 
-    public UncontrollableEventDepSets(BDDExtendedAutomata bddAutomata,  List<ExtendedAutomaton> members, TIntArrayList caredUncontrollableEventIndexList){
+    public UncontrollableEventDepSets(final BDDExtendedAutomata bddAutomata,  final List<ExtendedAutomaton> members, final TIntArrayList caredUncontrollableEventIndexList){
         this.bddExAutomata = bddAutomata;
         this.manager = bddAutomata.manager;
         this.members = members;
@@ -46,11 +46,11 @@ public class UncontrollableEventDepSets {
 
     private void initialize() {
         uncontrollableEventIndexList.forEach(new TIntProcedure() {
-            @Override
-            public boolean execute(int eventIndex) {
-                Set<ExtendedAutomaton> allAut = bddExAutomata.event2AutomatonsEdges.get(eventIndex).keySet();
-                HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> tmp = new HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>();
-                for (ExtendedAutomaton aut : allAut) {
+            //@Override
+            public boolean execute(final int eventIndex) {
+                final Set<ExtendedAutomaton> allAut = bddExAutomata.event2AutomatonsEdges.get(eventIndex).keySet();
+                final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> tmp = new HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>();
+                for (final ExtendedAutomaton aut : allAut) {
                     if (members.contains(aut)) {
                         tmp.put(aut, bddExAutomata.event2AutomatonsEdges.get(eventIndex).get(aut));
                     }
@@ -61,19 +61,19 @@ public class UncontrollableEventDepSets {
         });
 
         uncontrollableEventIndexList.forEach(new TIntProcedure() {
-            @Override
-            public boolean execute(int anUncontrollableEvent) {
-                List<BDD> forwardTransitionRelationsWithoutActions = new ArrayList<BDD>();
-                HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includedMemebersEdges = uncontrollableEvent2MembersEdges.get(anUncontrollableEvent);
-                Set<ExtendedAutomaton> includedMembers = includedMemebersEdges.keySet();
-                Iterator<ExtendedAutomaton> automatonIterator = includedMembers.iterator();
-                BDD eventForwardPartialTransitions = manager.getZeroBDD();
+            //@Override
+            public boolean execute(final int anUncontrollableEvent) {
+                final List<BDD> forwardTransitionRelationsWithoutActions = new ArrayList<BDD>();
+                final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includedMemebersEdges = uncontrollableEvent2MembersEdges.get(anUncontrollableEvent);
+                final Set<ExtendedAutomaton> includedMembers = includedMemebersEdges.keySet();
+                final Iterator<ExtendedAutomaton> automatonIterator = includedMembers.iterator();
+                final BDD eventForwardPartialTransitions = manager.getZeroBDD();
                 while (automatonIterator.hasNext()) {
-                    ExtendedAutomaton anMember = automatonIterator.next();
-                    List<BDD> tempForwardBDDList = cloneAndClearBDDList(forwardTransitionRelationsWithoutActions);
-                    for (Iterator<EdgeProxy> edgeIterator = includedMemebersEdges.get(anMember).iterator(); edgeIterator.hasNext();) {
-                        EdgeProxy anEdge = edgeIterator.next();
-                        BDD aForwardTransition = getEdgeBDDWithoutActions(anMember, anEdge);
+                    final ExtendedAutomaton anMember = automatonIterator.next();
+                    final List<BDD> tempForwardBDDList = cloneAndClearBDDList(forwardTransitionRelationsWithoutActions);
+                    for (final Iterator<EdgeProxy> edgeIterator = includedMemebersEdges.get(anMember).iterator(); edgeIterator.hasNext();) {
+                        final EdgeProxy anEdge = edgeIterator.next();
+                        final BDD aForwardTransition = getEdgeBDDWithoutActions(anMember, anEdge);
                         if (tempForwardBDDList.isEmpty()) {
                             forwardTransitionRelationsWithoutActions.add(aForwardTransition);
                         } else {
@@ -88,9 +88,9 @@ public class UncontrollableEventDepSets {
                 }
 
                 BDD keep = manager.getOneBDD();
-                for (ExtendedAutomaton extendedAutomaton : members) {
+                for (final ExtendedAutomaton extendedAutomaton : members) {
                     if (!includedMembers.contains(extendedAutomaton)) {
-                        BDDExtendedAutomaton bddAutomaton = automatonToBDDAutomatonMap.get(extendedAutomaton);
+                        final BDDExtendedAutomaton bddAutomaton = automatonToBDDAutomatonMap.get(extendedAutomaton);
                         keep = keep.and(bddAutomaton.getSelfLoopsBDD());
                     }
                 }
@@ -102,23 +102,23 @@ public class UncontrollableEventDepSets {
         });
     }
 
-    private List<BDD> cloneAndClearBDDList(List<BDD> aBDDList) {
-        List<BDD> temp = new ArrayList<BDD>(aBDDList);
+    private List<BDD> cloneAndClearBDDList(final List<BDD> aBDDList) {
+        final List<BDD> temp = new ArrayList<BDD>(aBDDList);
         aBDDList.clear();
         return temp;
     }
 
-    private BDD getEdgeBDDWithoutActions(ExtendedAutomaton anAutomaton, EdgeProxy anEdge) {
+    private BDD getEdgeBDDWithoutActions(final ExtendedAutomaton anAutomaton, final EdgeProxy anEdge) {
 
-        BDDDomain sourceLocationDomain = bddExAutomata.getSourceLocationDomain(anAutomaton.getName());
-        BDDDomain destLocationDomain = bddExAutomata.getDestLocationDomain(anAutomaton.getName());
+        final BDDDomain sourceLocationDomain = bddExAutomata.getSourceLocationDomain(anAutomaton.getName());
+        final BDDDomain destLocationDomain = bddExAutomata.getDestLocationDomain(anAutomaton.getName());
 
-        NodeProxy sourceLocation = anEdge.getSource();
-        NodeProxy destLocation = anEdge.getTarget();
-        int sourceLocationIndex = bddExAutomata.getLocationIndex(anAutomaton, sourceLocation);
-        int destLocationIndex = bddExAutomata.getLocationIndex(anAutomaton, destLocation);
-        BDD sourceBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
-        BDD destBDD = manager.getFactory().buildCube(destLocationIndex, destLocationDomain.vars());
+        final NodeProxy sourceLocation = anEdge.getSource();
+        final NodeProxy destLocation = anEdge.getTarget();
+        final int sourceLocationIndex = bddExAutomata.getLocationIndex(anAutomaton, sourceLocation);
+        final int destLocationIndex = bddExAutomata.getLocationIndex(anAutomaton, destLocation);
+        final BDD sourceBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
+        final BDD destBDD = manager.getFactory().buildCube(destLocationIndex, destLocationDomain.vars());
 
         BDD forwardGuardBDD = manager.getOneBDD();
         List<SimpleExpressionProxy> guards = null;

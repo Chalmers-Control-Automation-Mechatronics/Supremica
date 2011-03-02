@@ -21,13 +21,13 @@ import org.supremica.automata.ExtendedAutomaton;
 public class BDDExDisjunctiveDependentSet {
 
     static Logger logger = LoggerFactory.createLogger(BDDExDisjunctiveDependentSet.class);
-    private BDDExtendedAutomata bddAutomata;
-    private BDDExtendedManager manager;
-    private ExtendedAutomaton myExtendedAutomaton;
-    private BDDExtendedAutomaton me;
+    private final BDDExtendedAutomata bddAutomata;
+    private final BDDExtendedManager manager;
+    private final ExtendedAutomaton myExtendedAutomaton;
+    private final BDDExtendedAutomaton me;
 
     /* Indices of ExtendedAutomata which share events with me*/
-    private TIntArrayList eventDependentAutomata;
+    private final TIntArrayList eventDependentAutomata;
     /* Used for Heuristics, the variables updated by enabling the event might lead to the
        guards in other extended automata evaluated to be true. Besides, it records how many*/
     private TIntObjectHashMap<TIntIntHashMap> eventIndex2VariableDepAutomata;
@@ -37,7 +37,7 @@ public class BDDExDisjunctiveDependentSet {
     /* The partitioned BDD transitions for me. */
     private BDD partialForwardTransition;
 
-    public BDDExDisjunctiveDependentSet(BDDExtendedManager bddExtendedManager, BDDExtendedAutomaton me) {
+    public BDDExDisjunctiveDependentSet(final BDDExtendedManager bddExtendedManager, final BDDExtendedAutomaton me) {
         this.manager = bddExtendedManager;
         this.bddAutomata = manager.bddExAutomata;
         this.me = me;
@@ -48,28 +48,28 @@ public class BDDExDisjunctiveDependentSet {
 
     private void initialize() {
         partialForwardTransition = manager.getZeroBDD();
-        TIntArrayList caredEventsIndex = me.caredEventsIndex;
-        eventIndex2VariableDepAutomata = new TIntObjectHashMap(caredEventsIndex.size());
+        final TIntArrayList caredEventsIndex = me.caredEventsIndex;
+        eventIndex2VariableDepAutomata = new TIntObjectHashMap<TIntIntHashMap>(caredEventsIndex.size());
         events2EventDisParDepSet = bddAutomata.getEvents2EventDisParDepSet();
 
         caredEventsIndex.forEach(new TIntProcedure() {
-            @Override
-            public boolean execute(int currCaredEventIndex) {
+            //@Override
+            public boolean execute(final int currCaredEventIndex) {
 
                 // Complete the eventBDD2indices in bddAutomata in order to realize the heuristics for variables.
-                BDD eventBDD = manager.getFactory().buildCube(currCaredEventIndex, bddAutomata.getEventDomain().vars());
+                final BDD eventBDD = manager.getFactory().buildCube(currCaredEventIndex, bddAutomata.getEventDomain().vars());
                 if (!bddAutomata.eventBDD2eventIndices.containsKey(eventBDD)) {
                     bddAutomata.eventBDD2eventIndices.put(eventBDD, currCaredEventIndex);
                 }
-                
-                EventDisParDepSet eventDisDepSet = events2EventDisParDepSet.get(currCaredEventIndex);
+
+                final EventDisParDepSet eventDisDepSet = events2EventDisParDepSet.get(currCaredEventIndex);
 
                 boolean flag = false;
-                // Iterate each automaton which includes the current event. 
+                // Iterate each automaton which includes the current event.
                 // If the automaton isn't me, add it (no duplicate) into the event dependent automaton list.
-                for (Iterator<ExtendedAutomaton> autIterator = eventDisDepSet.getIncludingAutomata().iterator(); autIterator.hasNext();) {
-                    ExtendedAutomaton aut = autIterator.next();
-                    String autName = aut.getName();
+                for (final Iterator<ExtendedAutomaton> autIterator = eventDisDepSet.getIncludingAutomata().iterator(); autIterator.hasNext();) {
+                    final ExtendedAutomaton aut = autIterator.next();
+                    final String autName = aut.getName();
                     flag = !eventDependentAutomata.contains(bddAutomata.theIndexMap.getExAutomatonIndex(autName))
                         && aut!=myExtendedAutomaton;
                     if (flag) {
@@ -78,14 +78,14 @@ public class BDDExDisjunctiveDependentSet {
                 }
 
                 TIntIntHashMap autIndex2nbrOfInfluencedVariables = null;
-                TObjectIntHashMap<ExtendedAutomaton> aut2nbrOfInfluencedVariables = eventDisDepSet.getAutomaton2nbrOfInfluencedVariables();
-                Object [] keys = aut2nbrOfInfluencedVariables.keys();
+                final TObjectIntHashMap<ExtendedAutomaton> aut2nbrOfInfluencedVariables = eventDisDepSet.getAutomaton2nbrOfInfluencedVariables();
+                final Object [] keys = aut2nbrOfInfluencedVariables.keys();
 
                 for(int i = 0; i < keys.length; i++){
                     autIndex2nbrOfInfluencedVariables = new TIntIntHashMap();
-                    ExtendedAutomaton aut = (ExtendedAutomaton)keys[i];
+                    final ExtendedAutomaton aut = (ExtendedAutomaton)keys[i];
                     if(aut2nbrOfInfluencedVariables.get(aut) > 0){
-                        int autIndex = bddAutomata.theIndexMap.getExAutomatonIndex(aut.getName());
+                        final int autIndex = bddAutomata.theIndexMap.getExAutomatonIndex(aut.getName());
                         autIndex2nbrOfInfluencedVariables.put(autIndex, aut2nbrOfInfluencedVariables.get(aut));
                     }
                 }

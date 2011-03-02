@@ -13,7 +13,7 @@ public class BDDDisjVariableWorkSet extends BDDExDisjunctiveAbstractWorkSet{
 
     private boolean[] affactedAutomata;
     private int[] nbrOfAffactedVariables;
-    public BDDDisjVariableWorkSet(BDDExtendedAutomata bddExAutomata){
+    public BDDDisjVariableWorkSet(final BDDExtendedAutomata bddExAutomata){
         super(bddExAutomata);
         initialize();
     }
@@ -25,7 +25,7 @@ public class BDDDisjVariableWorkSet extends BDDExDisjunctiveAbstractWorkSet{
     }
 
     @Override
-    public int pickOne(boolean first) {
+    public int pickOne(final boolean first) {
         int selectedAutomataSizeFromH1 = 0;
         if(first)
             selectedAutomataSizeFromH1 = h1_least_guards_of_edges();
@@ -40,8 +40,8 @@ public class BDDDisjVariableWorkSet extends BDDExDisjunctiveAbstractWorkSet{
         int selectedAutomataSize = 0;
         int best = Integer.MIN_VALUE;
         for (int i = 0; i < size; i++) {
-            int n = bddExAutomata.automaton2nbrGuards.get(bddExAutomata.theIndexMap.getExAutomatonAt(i));
-            int d = bddExAutomata.automaton2nbrEdges.get(bddExAutomata.theIndexMap.getExAutomatonAt(i));
+            final int n = bddExAutomata.automaton2nbrGuards.get(bddExAutomata.theIndexMap.getExAutomatonAt(i));
+            final int d = bddExAutomata.automaton2nbrEdges.get(bddExAutomata.theIndexMap.getExAutomatonAt(i));
             int c = 0;
             if (n == 0) {
                 c = Integer.MAX_VALUE;
@@ -63,9 +63,9 @@ public class BDDDisjVariableWorkSet extends BDDExDisjunctiveAbstractWorkSet{
         double best = -1;
         for (int i = 0; i < size; i++) {
             if (workset[i] > 0) {
-                int n = nbrOfAffactedVariables[i];
-                int d = bddExAutomata.automaton2nbrEdges.get(bddExAutomata.theIndexMap.getExAutomatonAt(i));
-                double c = n/d;
+                final int n = nbrOfAffactedVariables[i];
+                final int d = bddExAutomata.automaton2nbrEdges.get(bddExAutomata.theIndexMap.getExAutomatonAt(i));
+                final double c = n/d;
                 if (best < c) {
                     best = c;
                     selectedAutomataSize = 0;
@@ -79,18 +79,18 @@ public class BDDDisjVariableWorkSet extends BDDExDisjunctiveAbstractWorkSet{
     }
 
     @Override
-    public void record_change(int automaton, TIntArrayList executedEventIndexList) {
+    public void record_change(final int automaton, final TIntArrayList executedEventIndexList) {
         for(int i = 0; i < size; i++){
             affactedAutomata[i] = false;
             nbrOfAffactedVariables[i] = 0;
         }
         for (int i = 0; i < executedEventIndexList.size(); i++) {
-            TIntObjectHashMap<TIntIntHashMap> eventIndex2VariableDepAutomata = autIndex2DepMap.get(automaton).getEventIndex2VariableDepAutomata();
-            TIntIntHashMap autIndex2nbrOFInfluencedVariables = eventIndex2VariableDepAutomata.get(executedEventIndexList.get(i));
+            final TIntObjectHashMap<TIntIntHashMap> eventIndex2VariableDepAutomata = autIndex2DepMap.get(automaton).getEventIndex2VariableDepAutomata();
+            final TIntIntHashMap autIndex2nbrOFInfluencedVariables = eventIndex2VariableDepAutomata.get(executedEventIndexList.get(i));
             if (autIndex2nbrOFInfluencedVariables != null) {
                 autIndex2nbrOFInfluencedVariables.forEachEntry(new TIntIntProcedure() {
-                    @Override
-                    public boolean execute(int autIndex, int nbr) {
+                    //@Override
+                    public boolean execute(final int autIndex, final int nbr) {
                         affactedAutomata[autIndex] = true;
                         nbrOfAffactedVariables[autIndex] += nbr;
                         return true;
