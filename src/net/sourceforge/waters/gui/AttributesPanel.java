@@ -84,9 +84,13 @@ class AttributesPanel extends RaisedDialogPanel
   AttributesPanel(final Class<? extends Proxy> clazz)
   {
     mAttributeValues = new TreeMap<String,List<String>>();
-    for (final String attrib : HISCAttributes.getApplicableKeys(clazz)) {
-      final List<String> values = HISCAttributes.getApplicableValues(attrib);
-      mAttributeValues.put(attrib, values);
+    try {
+      for (final String attrib : HISCAttributes.getApplicableKeys(clazz)) {
+        final List<String> values = HISCAttributes.getApplicableValues(attrib);
+        mAttributeValues.put(attrib, values);
+      }
+    } catch (final NoClassDefFoundError error) {
+      // No attributes --- no problem.
     }
 
     final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0);

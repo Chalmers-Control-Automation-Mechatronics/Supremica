@@ -470,7 +470,8 @@ public class MonolithicSafetyVerifier
     final EventProxy event0 = mEventCodingList.get(mErrorEvent);
     final AutomatonProxy aut = mAutomata[mErrorAutomaton];
     final List<StateProxy> codes0 = new ArrayList<StateProxy>(aut.getStates());
-
+    final int code0 = mSystemState[mErrorAutomaton];
+    final StateProxy state0 = codes0.get(code0);
     final TraceStepProxy step0 = factory.createTraceStepProxy(event0);
     steps.add(0, step0);
 
@@ -539,8 +540,6 @@ public class MonolithicSafetyVerifier
     final TraceStepProxy init = factory.createTraceStepProxy(null);
     steps.add(0, init);
     final String tracename = getTraceName();
-    final int code0 = mSystemState[mErrorAutomaton];
-    final StateProxy state0 = codes0.get(code0);
     final String comment = getTraceComment(event0, aut, state0);
     final SafetyTraceProxy trace = factory.createSafetyTraceProxy
       (tracename, comment, null, des, null, steps);

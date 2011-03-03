@@ -121,6 +121,8 @@ public abstract class WatersAnalyzeAction
         ProductDESElementFactory.getInstance();
       final ModelVerifierFactory vfactory = getModelVerifierFactory();
       return getModelVerifier(vfactory, desfactory);
+    } catch (final NoClassDefFoundError error) {
+      return null;
     } catch (final ClassNotFoundException exception) {
       return null;
     } catch (final UnsupportedOperationException exception) {

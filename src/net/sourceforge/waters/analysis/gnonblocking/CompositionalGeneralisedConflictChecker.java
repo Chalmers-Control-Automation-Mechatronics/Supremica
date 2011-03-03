@@ -1393,7 +1393,7 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     /**
-     * Counts the number of events which are shared by automata of this
+     * Counts the number of events which are shared by all automata of this
      * candidate, excluding tau.
      *
      * @param candidate
