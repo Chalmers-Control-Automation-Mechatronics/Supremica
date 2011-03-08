@@ -29,6 +29,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import org.xml.sax.SAXException;
 
+
 /**
  * A collection of static methods to facilitate the writing of Waters
  * documents to files.
@@ -48,6 +49,12 @@ public class MarshallingTools
 
   //#########################################################################
   //# Marshalling
+  /**
+   * Saves a product DES as a product DES (<CODE>.wdes</CODE>) file.
+   * @param  des       The product DES to be saved.
+   * @param  filename  The name of the output file,
+   *                   should have <CODE>.wdes</CODE> extension.
+   */
   public static void saveProductDES(final ProductDESProxy des,
                                     final String filename)
   {
@@ -69,6 +76,14 @@ public class MarshallingTools
     }
   }
 
+  /**
+   * Saves an automaton into a product DES (<CODE>.wdes</CODE>) file.
+   * This methods creates a product DES containing the events of the
+   * given automaton and the automaton, and saves it into a file.
+   * @param  aut       The automaton to be saved.
+   * @param  filename  The name of the output file,
+   *                   should have <CODE>.wdes</CODE> extension.
+   */
   public static void saveProductDES(final AutomatonProxy aut,
                                     final String filename)
   {
@@ -79,6 +94,12 @@ public class MarshallingTools
     saveProductDES(des, filename);
   }
 
+  /**
+   * Saves a module as a Waters module (<CODE>.wmod</CODE>) file.
+   * @param  module    The module to be saved.
+   * @param  filename  The name of the output file,
+   *                   should have <CODE>.wmod</CODE> extension.
+   */
   public static void saveModule(final ModuleProxy module,
                                 final String filename)
   {
@@ -100,6 +121,14 @@ public class MarshallingTools
     }
   }
 
+  /**
+   * Saves a product DES as a Waters module (<CODE>.wmod</CODE>) file.
+   * This method converts the given product into a module and saves the
+   * result to a file.
+   * @param  des       The product DES to be saved.
+   * @param  filename  The name of the output file,
+   *                   should have <CODE>.wmod</CODE> extension.
+   */
   public static void saveModule(final ProductDESProxy des,
                                 final String filename)
   {
@@ -113,6 +142,14 @@ public class MarshallingTools
     }
   }
 
+  /**
+   * Saves an automaton into a Waters module (<CODE>.wmod</CODE>) file.
+   * This methods creates a module containing the events of the
+   * given automaton and the automaton, and saves it into a file.
+   * @param  aut       The automaton to be saved.
+   * @param  filename  The name of the output file,
+   *                   should have <CODE>.wmod</CODE> extension.
+   */
   public static void saveModule(final AutomatonProxy aut,
                                 final String filename)
   {
