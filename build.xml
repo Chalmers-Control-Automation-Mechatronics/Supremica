@@ -116,20 +116,23 @@
     
     <target name="initialize_jars" depends="-jar_waters_jaxb">  
         <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
-        
+
         <!-- Library for handling db in SOC -->
         <unjar src="${lib}/sqljdbc.jar" dest="${lib}/${unjared}"/>
-        
+
         <!-- Library used by SOC -->
         <unjar src="${lib}/jniwrap-3.1.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jexcel-1.0.jar" dest="${lib}/${unjared}"/>
-        
+
         <!-- Create multisplit pane without nesting -->
         <unjar src="${lib}/multisplit.jar" dest="${lib}/${unjared}"/>
-        
+
         <unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>  
         <unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>
+        <!-- <unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/> -->
+        <!-- Appears to compile without antlr. Removing this for now,
+             but will probably install new version when implementing
+             Promela parsers. ~~~Robi -->
         <unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/help.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
@@ -144,7 +147,8 @@
         <unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
-        <!--    <unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>--> <!-- JacoZoom -->
+        <!--    <unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>-->
+    	<!-- JacoZoom -->
         <unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>     
         <unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/> 
         <unjar src="${lib}/jacorb.jar" dest="${lib}/${unjared}"/>       
@@ -180,13 +184,13 @@
         <unjar src="${lib}/org.sat4j.pb.jar" dest="${lib}/${unjared}"/>
 
         <!-- svg export -->
-        <unjar src="${lib}/batik-awt-util.jar" dest="${lib}/${unjared}"/>       
-        <unjar src="${lib}/batik-svggen.jar" dest="${lib}/${unjared}"/>       
-        <unjar src="${lib}/batik-dom.jar" dest="${lib}/${unjared}"/>       
-        <unjar src="${lib}/batik-util.jar" dest="${lib}/${unjared}"/>       
-        <unjar src="${lib}/batik-ext.jar" dest="${lib}/${unjared}"/>       
-        <unjar src="${lib}/xml-apis.jar" dest="${lib}/${unjared}"/>               
-        <unjar src="${lib}/batik-xml.jar" dest="${lib}/${unjared}"/>               
+        <unjar src="${lib}/batik-awt-util.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/batik-svggen.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/batik-dom.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/batik-util.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/batik-ext.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/xml-apis.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/batik-xml.jar" dest="${lib}/${unjared}"/>
         <!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->
         <!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->
         <!-- Tools for Adobe PostScript. -->
@@ -195,7 +199,6 @@
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
         <unjar src="${lib}/swing-worker.jar" dest="${resources}"/>
-
 
         <!-- Ant 1.6.0 is not able to unjar empty jar files -->
         <!--
@@ -210,7 +213,7 @@
         <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>   
-        <unjar src="${groovy-all.jar}" dest="${lib}/${unjared}"/> <!-- support for groovy -->
+        <unjar src="${groovy-all.jar}" dest="${lib}/${unjared}"/>
     </target>
     
     <target name="clean_build">
