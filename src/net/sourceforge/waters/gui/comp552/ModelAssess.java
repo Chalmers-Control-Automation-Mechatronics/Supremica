@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.gui.comp552;
 
+import gnu.trove.THashSet;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,6 +66,7 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -147,7 +150,8 @@ public class ModelAssess
     if (!mOutputDirectory.exists()) {
       mOutputDirectory.mkdirs();
     }
-    mFactory = ProductDESElementFactory.getInstance();
+    mModuleFactory = ModuleElementFactory.getInstance();
+    mProductDESFactory = ProductDESElementFactory.getInstance();
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final JAXBModuleMarshaller marshaller =
@@ -158,7 +162,7 @@ public class ModelAssess
     mDocumentManager.registerUnmarshaller(marshaller);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(factory, optable, false);
-    mIsomorphismChecker = new IsomorphismChecker(mFactory, true);
+    mIsomorphismChecker = new IsomorphismChecker(mProductDESFactory, true);
     loadConfiguration(config);
     loadClassList(classlist);
   }
@@ -226,10 +230,7 @@ public class ModelAssess
           final File modfile = new File(dir, words[1]);
           final URI uri = modfile.toURI();
           final ModuleProxy module = mMarshaller.unmarshal(uri);
-          final ModuleCompiler compiler =
-            new ModuleCompiler(mDocumentManager, mFactory, module);
-          final ProductDESProxy des = compiler.compile();
-          sol = new Solution(des);
+          sol = new Solution(module);
           mSolutions.add(sol);
         } else if (key.equals("plants")) {
           final float marks = Float.parseFloat(words[1]);
@@ -302,13 +303,14 @@ public class ModelAssess
     mSkip = false;
     try {
       final URI uri = file.toURI();
-      final ModuleProxy module = mMarshaller.unmarshal(uri);
-      printComment(module);
+      final ModuleProxy attempt = mMarshaller.unmarshal(uri);
+      printComment(attempt);
+      final Solution sol = findSolution(attempt);
+      sol.compileProductDES(attempt);
       final ModuleCompiler compiler =
-        new ModuleCompiler(mDocumentManager, mFactory, module);
+        new ModuleCompiler(mDocumentManager, mProductDESFactory, attempt);
       compiler.setSourceInfoEnabled(true);
       final ProductDESProxy des = compiler.compile();
-      final Solution sol = findSolution(des);
       final List<AutomatonProxy> printable = new LinkedList<AutomatonProxy>();
       printProductDES(des, sol, printable);
       printGraphs(printable, compiler);
@@ -322,12 +324,12 @@ public class ModelAssess
     }
   }
 
-  private Solution findSolution(final ProductDESProxy des)
+  private Solution findSolution(final ModuleProxy attempt)
   {
     int best = 0;
     Solution result = mDefaultSolution;
     for (final Solution solution : mSolutions) {
-      final int count = solution.getNumberOfMatches(des);
+      final int count = solution.getNumberOfMatches(attempt);
       if (count > 0) {
         best = count;
         result = solution;
@@ -649,22 +651,18 @@ public class ModelAssess
 
     //#######################################################################
     //# Constructor
-    private Solution(final ProductDESProxy des)
+    private Solution(final ModuleProxy module)
     {
-      mProductDES = des;
-      if (des == null) {
-        mEventMap = Collections.emptyMap();
-        mPlantMap = Collections.emptyMap();
+      mModule = module;
+      if (module == null) {
+        mEventDeclNames = Collections.emptySet();
       } else {
-        final Collection<EventProxy> events = des.getEvents();
-        mEventMap = new HashMap<String,EventProxy>(events.size());
-        for (final EventProxy event : events) {
-          final String name = event.getName();
-          final String lower = name.toLowerCase();
-          mEventMap.put(lower, event);
+        final Collection<EventDeclProxy> decls = module.getEventDeclList();
+        mEventDeclNames = new THashSet<String>(decls.size());
+        for (final EventDeclProxy decl : decls) {
+          final String name = decl.getName();
+          mEventDeclNames.add(name);
         }
-        final Collection<AutomatonProxy> automata = des.getAutomata();
-        mPlantMap = new HashMap<String,AutomatonProxy>(automata.size());
       }
       mTests = new LinkedList<AbstractTest>();
     }
@@ -676,7 +674,7 @@ public class ModelAssess
       mTests.add(test);
     }
 
-   private float runTests(final ProductDESProxy des)
+    private float runTests(final ProductDESProxy des)
     {
       skip("\\medskip");
       float marks = 0.0f;
@@ -690,31 +688,90 @@ public class ModelAssess
     }
 
     //#######################################################################
+    //# Compilation
+    /**
+     * Compiles the module into a product DES,
+     * using event arrays as defined in the given attempt.
+     */
+    private void compileProductDES(final ModuleProxy attempt)
+      throws EvalException
+    {
+      if (mModule == null) {
+        mEventMap = Collections.emptyMap();
+        mPlantMap = Collections.emptyMap();
+      } else {
+        final Collection<EventDeclProxy> theirDecls =
+          attempt.getEventDeclList();
+        final Map<String,EventDeclProxy> declMap =
+          new HashMap<String,EventDeclProxy>(theirDecls.size());
+        for (final EventDeclProxy decl : theirDecls) {
+          final String name = decl.getName();
+          declMap.put(name, decl);
+        }
+        final Collection<EventDeclProxy> myDecls = attempt.getEventDeclList();
+        final Collection<EventDeclProxy> newDecls =
+          new ArrayList<EventDeclProxy>(myDecls.size());
+        boolean change = false;
+        for (final EventDeclProxy myDecl : myDecls) {
+          final String name = myDecl.getName();
+          final EventDeclProxy theirDecl = declMap.get(name);
+          if (theirDecl != null &&
+              theirDecl.getKind() == myDecl.getKind() &&
+              theirDecl.isObservable() == myDecl.isObservable() &&
+              !theirDecl.getRanges().isEmpty()) {
+            newDecls.add(theirDecl);
+            change = true;
+          } else {
+            newDecls.add(myDecl);
+          }
+        }
+        final ModuleProxy newModule;
+        if (change) {
+          final String name = mModule.getName();
+          final String comment = mModule.getComment();
+          final Collection<ConstantAliasProxy> constants =
+            attempt.getConstantAliasList();
+          final Collection<Proxy> aliases = mModule.getEventAliasList();
+          final Collection<Proxy> components = mModule.getComponentList();
+          newModule = mModuleFactory.createModuleProxy
+            (name, comment, null, constants, newDecls, aliases, components);
+        } else {
+          newModule = mModule;
+        }
+        final ModuleCompiler compiler =
+          new ModuleCompiler(mDocumentManager, mProductDESFactory, newModule);
+        mProductDES = compiler.compile();
+        final Collection<EventProxy> events = mProductDES.getEvents();
+        mEventMap = new HashMap<String,EventProxy>(events.size());
+        for (final EventProxy event : events) {
+          final String name = event.getName();
+          final String lower = name.toLowerCase();
+          mEventMap.put(lower, event);
+        }
+        final Collection<AutomatonProxy> automata = mProductDES.getAutomata();
+        mPlantMap = new HashMap<String,AutomatonProxy>(automata.size());
+      }
+    }
+
+    //#######################################################################
     //# Event Check
-    private int getNumberOfMatches(final ProductDESProxy des)
+    private int getNumberOfMatches(final ModuleProxy attempt)
     {
       int matches = 0;
-      if (mEventMap != null) {
-        for (final EventProxy event : des.getEvents()) {
-          if (event.getKind() != EventKind.PROPOSITION) {
-            final String name = event.getName();
-            if (getEvent(name) != null) {
+        for (final EventDeclProxy decl : attempt.getEventDeclList()) {
+          if (decl.getKind() != EventKind.PROPOSITION) {
+            final String name = decl.getName();
+            if (hasEventDecl(name)) {
               matches++;
             }
           }
         }
-      }
       return matches;
     }
 
-    private EventProxy getEvent(final String name)
+    private boolean hasEventDecl(final String name)
     {
-      if (mEventMap == null) {
-        return null;
-      } else {
-        final String lower = name.toLowerCase();
-        return mEventMap.get(lower);
-      }
+      return mEventDeclNames.contains(name);
     }
 
     //#######################################################################
@@ -852,7 +909,7 @@ public class ModelAssess
       }
       final AutomatonProxy prop = replaceEvents(prop1, eventmap, kind);
       automata.add(prop);
-      return mFactory.createProductDESProxy(desname, events, automata);
+      return mProductDESFactory.createProductDESProxy(desname, events, automata);
     }
 
     ProductDESProxy createExclusionModel(final ProductDESProxy des,
@@ -901,7 +958,7 @@ public class ModelAssess
           final Collection<EventProxy> autevents = aut0.getEvents();
           final Collection<StateProxy> states = aut0.getStates();
           final Collection<TransitionProxy> transitions = aut0.getTransitions();
-          final AutomatonProxy aut = mFactory.createAutomatonProxy
+          final AutomatonProxy aut = mProductDESFactory.createAutomatonProxy
             (autname, ComponentKind.PROPERTY, autevents, states, transitions);
           automata.add(aut);
           break;
@@ -912,7 +969,7 @@ public class ModelAssess
       final AutomatonProxy prop =
         replaceEvents(prop1, eventmap, ComponentKind.PLANT);
       automata.add(prop);
-      return mFactory.createProductDESProxy(desname, events, automata);
+      return mProductDESFactory.createProductDESProxy(desname, events, automata);
     }
 
     AutomatonProxy replaceEvents(final AutomatonProxy aut,
@@ -933,7 +990,7 @@ public class ModelAssess
         final Collection<EventProxy> props0 = state0.getPropositions();
         final Collection<EventProxy> props1 = getReplacement(eventmap, props0);
         final StateProxy state1 =
-          mFactory.createStateProxy(name, initial, props1);
+          mProductDESFactory.createStateProxy(name, initial, props1);
         states1.add(state1);
         statemap.put(state0, state1);
       }
@@ -948,10 +1005,10 @@ public class ModelAssess
         final StateProxy target0 = trans0.getTarget();
         final StateProxy target1 = statemap.get(target0);
         final TransitionProxy trans1 =
-          mFactory.createTransitionProxy(source1, event1, target1);
+          mProductDESFactory.createTransitionProxy(source1, event1, target1);
         transitions1.add(trans1);
       }
-      return mFactory.createAutomatonProxy
+      return mProductDESFactory.createAutomatonProxy
         (autname, kind, events1, states1, transitions1);
     }
 
@@ -985,10 +1042,13 @@ public class ModelAssess
 
     //#######################################################################
     //# Data Members
-    private final ProductDESProxy mProductDES;
-    private final Map<String,EventProxy> mEventMap;
-    private final Map<String,AutomatonProxy> mPlantMap;
+    private final ModuleProxy mModule;
     private final List<AbstractTest> mTests;
+
+    private ProductDESProxy mProductDES;
+    private final Collection<String> mEventDeclNames;
+    private Map<String,EventProxy> mEventMap;
+    private Map<String,AutomatonProxy> mPlantMap;
 
     private boolean mPlantOK;
 
@@ -1227,7 +1287,7 @@ public class ModelAssess
     ControllabilityTest(final Solution sol, final float marks)
     {
       super(sol, "Controllability", marks,
-            new NativeControllabilityChecker(mFactory));
+            new NativeControllabilityChecker(mProductDESFactory));
     }
 
   }
@@ -1242,7 +1302,7 @@ public class ModelAssess
     //# Constructor
     ConflictTest(final Solution sol, final float marks)
     {
-      super(sol, "Nonblocking", marks, new NativeConflictChecker(mFactory));
+      super(sol, "Nonblocking", marks, new NativeConflictChecker(mProductDESFactory));
       mPropertyName = null;
     }
 
@@ -1251,7 +1311,7 @@ public class ModelAssess
                  final String propname)
     {
       super(sol, "Property " + propname, marks,
-            new NativeConflictChecker(mFactory));
+            new NativeConflictChecker(mProductDESFactory));
       mPropertyName = propname;
     }
 
@@ -1292,7 +1352,7 @@ public class ModelAssess
     LoopTest(final Solution sol, final float marks)
     {
       super(sol, "Loop check", marks,
-            new MonolithicControlLoopChecker(mFactory));
+            new MonolithicControlLoopChecker(mProductDESFactory));
     }
 
   }
@@ -1310,7 +1370,7 @@ public class ModelAssess
                           final String propname)
     {
       super(sol, "Property " + propname, marks,
-            new NativeLanguageInclusionChecker(mFactory));
+            new NativeLanguageInclusionChecker(mProductDESFactory));
       mPropertyName = propname;
     }
 
@@ -1344,7 +1404,7 @@ public class ModelAssess
                           final String propname)
     {
       super(sol, "Property " + propname, marks,
-            new NativeLanguageInclusionChecker(mFactory));
+            new NativeLanguageInclusionChecker(mProductDESFactory));
       mPropertyName = propname;
     }
 
@@ -1420,7 +1480,8 @@ public class ModelAssess
   private final File mInputDirectory;
   private final File mOutputDirectory;
 
-  private final ProductDESProxyFactory mFactory;
+  private final ModuleProxyFactory mModuleFactory;
+  private final ProductDESProxyFactory mProductDESFactory;
   private final DocumentManager mDocumentManager;
   private final ProxyUnmarshaller<ModuleProxy> mMarshaller;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
