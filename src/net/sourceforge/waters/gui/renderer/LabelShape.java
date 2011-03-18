@@ -22,37 +22,22 @@ import net.sourceforge.waters.model.base.Proxy;
 
 public class LabelShape extends AbstractProxyShape
 {
+
   //##########################################################################
   //# Constructors
-
-  public LabelShape(final Proxy p, final int x, final int y,
-		    final Font font, final String guardIndex)
+  public LabelShape(final Proxy proxy, final int x, final int y,
+                    final Font font)
   {
-      this(p, x, y, font);
+    this(proxy, x, y, font, proxy.toString());
   }
-/*  public LabelShape(final Proxy proxy, final int x, final int y,
-                    final Font font, final String aux)
-  {
 
-    super(proxy);
-    mFont = font;
-    mPoint = new Point(x + 2, y + (font.getSize()));
-    mName = aux;
-    final TextLayout layout =
-        new TextLayout(mName, mFont, new FontRenderContext(null, true, true));
-    final Rectangle2D rect = layout.getBounds();
-    rect.setRect(x, y, rect.getWidth() + 4, rect.getHeight() + 4);
-    mBounds =
-        new RoundRectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(),
-                                    rect.getHeight(), ARC_RADIUS, ARC_RADIUS);
-  }
-*/
-  public LabelShape(final Proxy proxy, final int x, final int y, final Font font)
+  public LabelShape(final Proxy proxy, final int x, final int y,
+                    final Font font, final String name)
   {
     super(proxy);
     mFont = font;
-    mPoint = new Point(x + 2, y + (font.getSize()));
-    mName = proxy.toString();
+    mPoint = new Point(x + 2, y + font.getSize());
+    mName = name;
     final TextLayout layout =
         new TextLayout(mName, mFont, new FontRenderContext(null, true, true));
     final Rectangle2D rect = layout.getBounds();

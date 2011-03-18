@@ -383,10 +383,10 @@ public class ProxyShapeProducer
       {
           for (int i = 1;i<guards.size();i++)
           {
-            SimpleExpressionProxy guard = guards.get(i);
+            final SimpleExpressionProxy guard = guards.get(i);
             final int ly = (int) Math.round(y + height);
             final LabelShape lshape =
-              new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT, "guard");
+              new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
             mMap.put(guard, lshape);
             final RoundRectangle2D lrect = lshape.getShape();
             height += lrect.getHeight();
@@ -397,7 +397,7 @@ public class ProxyShapeProducer
       }
       else if(guards.size() == 1 || guards.size() == 2)
       {
-            SimpleExpressionProxy guard = guards.get(0);
+            final SimpleExpressionProxy guard = guards.get(0);
             final int ly = (int) Math.round(y + height);
             final LabelShape lshape =
               new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT, "guard");
