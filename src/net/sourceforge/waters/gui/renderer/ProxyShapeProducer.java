@@ -400,7 +400,7 @@ public class ProxyShapeProducer
             final SimpleExpressionProxy guard = guards.get(0);
             final int ly = (int) Math.round(y + height);
             final LabelShape lshape =
-              new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT, "guard");
+              new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
             mMap.put(guard, lshape);
             final RoundRectangle2D lrect = lshape.getShape();
             height += lrect.getHeight();
