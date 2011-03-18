@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
 //# CLASS:   RemovalOfAlphaMarkingsRuleTest
 //###########################################################################
-//# $Id: RemovalOfAlphaMarkingsRuleTest.java 5431 2010-03-29 10:26:57Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.gnonblocking;
@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
+public class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
     AbstractAbstractionRuleTest
 {
 
@@ -27,7 +27,7 @@ public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
   {
     final TestSuite testSuite =
         new TestSuite(
-            RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest.class);
+            AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest.class);
     return testSuite;
   }
 
@@ -39,24 +39,24 @@ public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
   // #########################################################################
   // # Overrides for abstract base class
   // # net.sourceforge.waters.analysis.gnonblocking.AbstractAbstractionRuleTest
-  protected RemovalOfTauTransitionsLeadingToNonAlphaStatesRule createAbstractionRule(
-                                                                                     final ProductDESProxyFactory factory)
+  protected AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule
+    createAbstractionRule(final ProductDESProxyFactory factory)
   {
-    return new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(factory);
+    return new AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule(factory);
   }
 
   protected void configureAbstractionRule(final ProductDESProxy des)
   {
     super.configureAbstractionRule(des);
-    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rule =
+    final AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule rule =
         getAbstractionRule();
     final EventProxy alphaMarking = findEvent(des, ALPHA);
     rule.setAlphaMarking(alphaMarking);
   }
 
-  protected RemovalOfTauTransitionsLeadingToNonAlphaStatesRule getAbstractionRule()
+  protected AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule getAbstractionRule()
   {
-    return (RemovalOfTauTransitionsLeadingToNonAlphaStatesRule) super
+    return (AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule) super
         .getAbstractionRule();
   }
 

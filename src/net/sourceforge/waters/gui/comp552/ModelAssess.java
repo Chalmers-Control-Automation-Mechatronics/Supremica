@@ -281,7 +281,7 @@ public class ModelAssess
           break;
         }
         final String[] words = line.split("\t");
-        if (words.length == 3) {
+        if (words.length >= 3) {
           final Student student = new Student(words[0], words[1], words[2]);
           mStudents.add(student);
         }
@@ -602,7 +602,7 @@ public class ModelAssess
     final String msg = exception.getMessage();
     if (msg != null && msg.length() > 0) {
       mOutput.println("\\\\");
-      mOutput.println(msg);
+      printLaTeXString(msg, true);
     }
     mOutput.println();
   }
@@ -708,7 +708,7 @@ public class ModelAssess
           final String name = decl.getName();
           declMap.put(name, decl);
         }
-        final Collection<EventDeclProxy> myDecls = attempt.getEventDeclList();
+        final Collection<EventDeclProxy> myDecls = mModule.getEventDeclList();
         final Collection<EventDeclProxy> newDecls =
           new ArrayList<EventDeclProxy>(myDecls.size());
         boolean change = false;
@@ -1090,7 +1090,7 @@ public class ModelAssess
           if (mMarks > 0.0f) {
             final int round = (int) Math.round(mMarks);
             if (Math.abs(mMarks - round) >= 0.01f) {
-              mOutput.printf(" (%.1f marks)", mMarks);
+              mOutput.printf(" (" + mMarks + " marks)", mMarks);
             } else if (round != 1) {
               mOutput.print(" (" + round + " marks)");
             } else {
