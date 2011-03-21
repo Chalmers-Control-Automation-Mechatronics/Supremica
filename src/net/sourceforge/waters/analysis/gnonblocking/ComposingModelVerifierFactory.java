@@ -43,7 +43,8 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
     addArgument(new InternalStateLimitArgument());
     addArgument(new FinalTransitionLimitArgument());
     addArgument(new InternalTransitionLimitArgument());
-    addArgument(new HeuristicArgument());
+    addArgument(new SelectingHeuristicArgument());
+    addArgument(new PreSelectingHeuristicArgument());
   }
 
   // #########################################################################
@@ -67,6 +68,10 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
   }
 
   // #########################################################################
+  // #########################################################################
+  // # Class Variables
+  private static ComposingModelVerifierFactory theInstance = null;
+
   // # Factory Instantiation
   public static ComposingModelVerifierFactory getInstance()
   {
@@ -217,15 +222,59 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
     }
 
   }
+  // #########################################################################
+  // # Inner Class HeuristicArgument
+  private static class PreSelectingHeuristicArgument extends CommandLineArgumentString
+  {
+    // ##addArgument(new SelectingHeuristicArgument());#####################################################################
+    // # Constructors
+    private PreSelectingHeuristicArgument()
+    {
+      super("-pheur", "PreSelecting Heuristic adopted in composing candidate selection");
+    }
 
+    // #######################################################################
+    // # Overrides for Abstract Base Class
+    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final String name = getValue();
+      if (verifier instanceof ComposingSafetyVerifier) {
+        final ComposingSafetyVerifier composing =
+          (ComposingSafetyVerifier) verifier;
+        composing.setHeuristic(name);
+      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+        final CompositionalGeneralisedConflictChecker composer =
+          (CompositionalGeneralisedConflictChecker) verifier;
+        CompositionalGeneralisedConflictChecker.PreselectingHeuristic heuristic = null;
+        if (name.equalsIgnoreCase("minT")) {
+          heuristic = composer.createHeuristicMinT();
+        } else {
+                     if (name.equalsIgnoreCase("maxS") ){
+                       heuristic = composer.createHeuristicMaxS();
+                     }
+                     else{
+                           if (name.equalsIgnoreCase("mustL")){
+                                  heuristic = composer.createHeuristicMustL();
+                                 }
+                           else{
+                                 fail("Unknown PreSelecting heuristic '" + name + "'! Choose from the following : 1)minT 2)maxS 3)mustL.");
+                               }
+                         }
+               }
+
+           composer.setPreselectingHeuristic(heuristic);
+        }
+      }
+  }
 
   // #########################################################################
   // # Inner Class HeuristicArgument
-  private static class HeuristicArgument extends CommandLineArgumentString
+  private static class SelectingHeuristicArgument extends CommandLineArgumentString
   {
     // #######################################################################
     // # Constructors
-    private HeuristicArgument()
+    private SelectingHeuristicArgument()
     {
       super("-heur", "Heuristic adopted in composing candidate selection");
     }
@@ -247,16 +296,31 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
         if (name.equalsIgnoreCase("maxl")) {
           heuristic = composer.createHeuristicMaxL();
         } else {
-          fail("Unknown heuristic '" + name + "'!");
-        }
-        composer.setSelectingHeuristic(heuristic);
-      }
-    }
+                     if (name.equalsIgnoreCase("maxc") ){
+                       heuristic = composer.createHeuristicMaxC();
+                     }
+                     else{
+                           if (name.equalsIgnoreCase("minS")){
+                                  heuristic = composer.createHeuristicMinS();
+                                 }
+                           else{
+                                 fail("Unknown heuristic '" + name + "'! Choose from the following : 1)maxl 2)maxc 3)mins.");
+                               }
+                         }
+               }
 
-  }
+           composer.setSelectingHeuristic(heuristic);
+        }
+      }
+
+
+
+
 
   // #########################################################################
   // # Class Variables
-  private static ComposingModelVerifierFactory theInstance = null;
+  //private static ComposingModelVerifierFactory theInstance = null;
 
-}
+  }
+
+  }

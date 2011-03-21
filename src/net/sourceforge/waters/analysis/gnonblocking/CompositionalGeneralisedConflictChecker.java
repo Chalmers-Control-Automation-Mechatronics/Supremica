@@ -1083,7 +1083,7 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private abstract class PreselectingHeuristic
+  abstract class PreselectingHeuristic
   {
     /**
      * Checks if a candidate is valid. To satisfy being a valid candidate it
@@ -1110,7 +1110,6 @@ public class CompositionalGeneralisedConflictChecker extends
       return false;
     }
 
-    @SuppressWarnings("unused")
     boolean checkForLocalEvent(final Candidate candidate)
     {
       if (candidate.getLocalEventCount() > 0) {
