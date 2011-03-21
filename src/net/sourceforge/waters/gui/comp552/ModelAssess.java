@@ -481,6 +481,20 @@ public class ModelAssess
     }
   }
 
+  private void printMarks(final float marks)
+  {
+    final int round = (int) Math.round(marks);
+    if (Math.abs(marks - round) >= 0.01f) {
+      mOutput.print(marks);
+      mOutput.print(" marks");
+    } else if (round != 1) {
+      mOutput.print(round);
+      mOutput.print(" marks");
+    } else {
+      mOutput.print("1 mark");
+    }
+  }
+
   private void printLaTeXName(final NamedProxy named)
   {
     final String name = named.getName();
@@ -682,8 +696,9 @@ public class ModelAssess
         marks += test.run(des);
       }
       skip("\\smallskip");
-      mOutput.printf("Recommending %.1f marks.", marks);
-      mOutput.println();
+      mOutput.print("Recommending ");
+      printMarks(marks);
+      mOutput.println('.');
       return marks;
     }
 
@@ -1088,14 +1103,9 @@ public class ModelAssess
         if (result) {
           mOutput.print("OK");
           if (mMarks > 0.0f) {
-            final int round = (int) Math.round(mMarks);
-            if (Math.abs(mMarks - round) >= 0.01f) {
-              mOutput.printf(" (" + mMarks + " marks)", mMarks);
-            } else if (round != 1) {
-              mOutput.print(" (" + round + " marks)");
-            } else {
-              mOutput.print(" (1 mark)");
-            }
+            mOutput.print(" (");
+            printMarks(mMarks);
+            mOutput.print(')');
           }
           mOutput.println();
           mOutput.println();
