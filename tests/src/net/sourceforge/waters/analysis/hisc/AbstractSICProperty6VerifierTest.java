@@ -65,12 +65,15 @@ public abstract class AbstractSICProperty6VerifierTest extends
     runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", true);
   }
 
+  /*
+   * Actually the same as above.
   public void testSICProperty6Verifier_rhone_subsystem1_ld_failsic5()
     throws Exception
   {
     runModelVerifier("tests", "hisc",
                      "rhone_subsystem1_ld_failsic5.wmod", true);
   }
+   */
 
   // SimpleManufacturingExample
   public void testSICProperty6Verifier_Manuf_Cells() throws Exception

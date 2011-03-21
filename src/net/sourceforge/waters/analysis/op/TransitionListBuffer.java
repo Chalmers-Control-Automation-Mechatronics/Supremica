@@ -426,7 +426,7 @@ public abstract class TransitionListBuffer
       int[] block1 = mBlocks.get(list1 >>> mBlockShift);
       int offset1 = list1 & mBlockMask;
       int data1 = block1[offset1 + OFFSET_DATA];
-      final int event = data1 & mEventMask;
+      int event = data1 & mEventMask;
       do {
         int list2 = createList(dest, event);
         int next2 = getNext(list2);
@@ -459,6 +459,7 @@ public abstract class TransitionListBuffer
           offset1 = list1 & mBlockMask;
           data1 = block1[offset1 + OFFSET_DATA];
         } while ((data1 & mEventMask) == event);
+        event = data1 & mEventMask;
         existing.clear();
         if (added) {
           if (next2 != NULL) {
@@ -1213,6 +1214,7 @@ public abstract class TransitionListBuffer
         list = mStateTransitions[from];
         if (list == NULL) {
           list = mStateTransitions[from] = createList();
+          toString();
         }
       }
       mStateEventTransitions.put(fromCode, list);
@@ -1565,7 +1567,7 @@ public abstract class TransitionListBuffer
           }
         } while (mStateTransitions[mCurrentFromState] == NULL);
         mInnerIterator.reset(mCurrentFromState, mEvent);
-        return mInnerIterator.advance();
+        return advance();
       }
     }
 

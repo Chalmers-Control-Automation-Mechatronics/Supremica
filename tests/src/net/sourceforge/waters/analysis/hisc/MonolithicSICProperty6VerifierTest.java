@@ -62,14 +62,4 @@ public class MonolithicSICProperty6VerifierTest extends
     }
   }
 
-  public void testSICProperty6Verifier_rhone_subsystem1_ld_failsic5()
-    throws Exception
-  {
-    try {
-      super.testSICProperty6Verifier_rhone_subsystem1_ld_failsic5();
-    } catch (final OverflowException exception) {
-      // MonolithicConflictChecker fails because of state encoding size :-(
-    }
-  }
-
 }
