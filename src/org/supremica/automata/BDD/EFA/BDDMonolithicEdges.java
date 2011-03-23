@@ -51,7 +51,8 @@ public class BDDMonolithicEdges
         for (BDDExtendedAutomaton currAutomaton : bddExAutomata)
         {
 //            System.out.println(currAutomaton.getExAutomaton().getName());
-//            currAutomaton.getEdgeForwardBDD().printDot();
+//            if(currAutomaton.getExAutomaton().getName().equals("P1"))
+//                currAutomaton.getEdgeForwardBDD().printDot();
 
             edgesForwardBDD = edgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
 

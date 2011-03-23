@@ -42,6 +42,7 @@ public class BDDExtendedSynthesizer {
     private HashMap<String,BDDExtendedGuardGenerator> event2guard;
     ModuleSubjectFactory factory = null;
     ExpressionParser parser = null;
+    long nbrOfStates = -1;
 
     public BDDExtendedSynthesizer(final ExtendedAutomata theAutomata, final  EditorSynthesizerOptions options)
     {
@@ -73,26 +74,29 @@ public class BDDExtendedSynthesizer {
         {
             synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getControllableStates(options.getReachability());
+            nbrOfStates = bddAutomata.nbrOfControllableStates;
             synthesisTimer.stop();
         }
         else if(options.getSynthesisType().equals(SynthesisType.NONBLOCKING))
         {
             synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getNonblockingStates();
+            nbrOfStates = bddAutomata.nbrOfNonblockingStates;
             synthesisTimer.stop();
         }
         else if(options.getSynthesisType().equals(SynthesisType.NONBLOCKINGCONTROLLABLE))
         {
             synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getNonblockingControllableStates(options.getReachability());
+            nbrOfStates = bddAutomata.nbrOfNonblockingControllableStates;
             synthesisTimer.stop();
         }
 
     }
 
-    public double nbrOfStates()
+    public long nbrOfStates()
     {
-        return (bddAutomata.nbrOfStatesBDD(statesAfterSynthesis));
+        return nbrOfStates;
     }
 
     public BDD getResult()

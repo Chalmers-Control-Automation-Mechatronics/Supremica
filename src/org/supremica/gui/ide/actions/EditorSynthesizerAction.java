@@ -159,9 +159,10 @@ public class EditorSynthesizerAction
             }
         }
 */
-        System.err.println("SIZE: "+exAutomata.nbrOfEFAsVars);
-        System.err.println("Number of controllable events: "+exAutomata.controllableAlphabet.size());
-        System.err.println("Number of theoretical reachable states: "+((double)exAutomata.theoNbrOfReachableStates));
+//        System.err.println("SIZE: "+exAutomata.nbrOfEFAsVars);
+//        System.err.println("Number of controllable events: "+exAutomata.controllableAlphabet.size());
+//        System.err.println("Number of theoretical reachable states: "+((double)exAutomata.theoNbrOfReachableStates));
+
 //        double LD = (double)max(efaDegree)/(double)exAutomata.nbrOfEFAsVars;
 //        System.err.println("LD: "+ LD);
 
@@ -177,10 +178,9 @@ public class EditorSynthesizerAction
         if(bddSynthesizer.nbrOfStates()>0 && (options.getSaveInFile() || options.getSaveIDDInFile() ||
                 options.getPrintGuard() || options.getAddGuards()))
         {
-            bddSynthesizer.generateGuard(eventNames, options);
-            final HashMap<String,BDDExtendedGuardGenerator> event2guard = bddSynthesizer.getEventGuardMap();
-
-            //
+            boolean guardsGenerated = false;
+            HashMap<String,BDDExtendedGuardGenerator> event2guard = null;
+/*            //
             int minGuardSize = Integer.MAX_VALUE;
             int maxGuardSize = Integer.MIN_VALUE;
             double aveGuardSize = 0;
@@ -197,7 +197,7 @@ public class EditorSynthesizerAction
             System.err.println("Min guard: "+minGuardSize);
             System.err.println("Max guard: "+maxGuardSize);
             System.err.println("Average guard: "+aveGuardSize/exAutomata.controllableAlphabet.size());
-
+*/
 
             if(options.getSaveInFile() || options.getSaveIDDInFile())
             {
@@ -208,6 +208,13 @@ public class EditorSynthesizerAction
                 {
                     final String path = chooser.getSelectedFile().getAbsolutePath();
                     Config.FILE_SAVE_PATH.set(path);
+
+                    if(!guardsGenerated)
+                    {
+                        bddSynthesizer.generateGuard(eventNames, options);
+                        event2guard = bddSynthesizer.getEventGuardMap();
+                        guardsGenerated = true;
+                    }
 
                     if(options.getSaveInFile())
                     {
@@ -248,6 +255,12 @@ public class EditorSynthesizerAction
 
             if(options.getPrintGuard())
             {
+                if(!guardsGenerated)
+                {
+                    bddSynthesizer.generateGuard(eventNames, options);
+                    event2guard = bddSynthesizer.getEventGuardMap();
+                    guardsGenerated = true;
+                }
                 for(final String event:event2guard.keySet())
                 {
                     final BDDExtendedGuardGenerator bddgg = event2guard.get(event);
@@ -266,6 +279,12 @@ public class EditorSynthesizerAction
 
             if(options.getAddGuards())
             {
+                if(!guardsGenerated)
+                {
+                    bddSynthesizer.generateGuard(eventNames, options);
+                    event2guard = bddSynthesizer.getEventGuardMap();
+                    guardsGenerated = true;
+                }
                 bddSynthesizer.addGuardsToAutomata(module);
             }
         }

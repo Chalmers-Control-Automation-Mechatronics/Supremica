@@ -14,6 +14,8 @@
 
 package org.supremica.automata.algorithms.Guard;
 
+import org.supremica.automata.BDD.EFA.IDDNode;
+import org.supremica.automata.BDD.EFA.IDD;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -24,7 +26,6 @@ import java.util.Iterator;
 
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.module.NodeProxy;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
@@ -64,6 +65,7 @@ public class BDDExtendedGuardGenerator {
 
     ExtendedAutomata theAutomata;
 
+    String STATE_DELIMITER = ".";
     String OR = " "+CompilerOperatorTable.getInstance().getOrOperator().getName()+" ";
     String AND = " "+CompilerOperatorTable.getInstance().getAndOperator().getName()+" ";
     String O_PAR = "(";
@@ -95,7 +97,7 @@ public class BDDExtendedGuardGenerator {
 
 
     /** Creates a new instance of BDDExtendedGuardGenerator */
-    public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata, final String eventLabel, final BDD states, final EditorSynthesizerOptions options) {        
+    public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata, final String eventName, final BDD states, final EditorSynthesizerOptions options) {
         theAutomata = bddAutomata.getExtendedAutomata();
         automataBDD = bddAutomata;
         manager = automataBDD.getBDDManager();
@@ -128,7 +130,7 @@ public class BDDExtendedGuardGenerator {
                 break;
         }
 
-        eventName = eventLabel;
+        this.eventName = eventName;
         final int currEventIndex = automataBDD.getEventIndex(eventName);
         sigmaBDD = manager.createBDD(currEventIndex, automataBDD.getEventDomain());
         safeStatesBDD = states;
@@ -140,14 +142,17 @@ public class BDDExtendedGuardGenerator {
             backwardMonolithicTransitionsBDD = ((BDDMonolithicEdges) bddTransitions).getMonolithicEdgesBackwardWithEventsBDD();
 
 
-            computeStatesEnablingSigma();
-
-
-
+            computeStatesEnablingSigma();            
 
             computeSafeStatesEnablingSigma();
 //        System.err.println("safe states enabling "+eventName+": "+bddAutomata.nbrOfStatesBDD(safeStatesEnablingSigmaBDD));
-
+/*
+            String fileName = "idd_"+eventName+"_enabled";
+            if(generateIDD_PS)
+            {
+                BDD2IDD2PS(safeStatesEnablingSigmaBDD, fileName);
+            }
+*/
             computeStatesLeading2ForbiddenStates();
 
 //        System.err.println("states leading to forbidden states: "+bddAutomata.nbrOfStatesBDD(statesLeading2ForbiddenBDD));
@@ -433,7 +438,7 @@ public class BDDExtendedGuardGenerator {
 
             if(goodBDD.nodeCount()>0)
             {
-                final IDD goodIDD = generateIDD(goodBDD);
+                final IDD goodIDD = automataBDD.generateIDD(goodBDD, safeStatesEnablingSigmaBDD);
 //                System.out.println(goodIDD.nbrOfNodes());
 //                System.out.println(eventName+"   "+(allowedForbidden?"allowed":"forbidden")+"        "+states.nodeCount()+"          "+goodBDD.nodeCount()+"     "+goodMDD.nodeCount());
 //                System.out.println(eventName);
@@ -446,7 +451,9 @@ public class BDDExtendedGuardGenerator {
                     fileName += "_forbidden";
 
                 if(generateIDD_PS)
-                    BDD2IDD2PS(goodBDD, fileName);
+                {                 
+                    BDD2IDD2PS(goodBDD, safeStatesEnablingSigmaBDD, fileName);
+                }
 
                 guard = generateExpression(goodIDD);
             }
@@ -454,113 +461,6 @@ public class BDDExtendedGuardGenerator {
 
         return guard;
     }
-
-   public IDD generateIDD(final BDD bdd)
-    {
-        final HashMap<Integer, IDD> visitedNodes = new HashMap<Integer, IDD>();
-        visitedNodes.put(1, new IDD(new IDDNode("1", "1")));
-        IDD idd = null;
-        if(bdd.isZero())
-            idd = new IDD(new IDDNode("0","0"));
-
-        if(bdd.isOne())
-            idd = new IDD(new IDDNode("1","1"));
-
-        if(bdd.nodeCount() > 0)
-        {
-            final IDDNode root = new IDDNode(""+bdd.hashCode(),automataBDD.getAutVarName(bdd.var()));
-            idd = new IDD(root);
-            final BDD varBDD = automataBDD.getBDDforSourceBDDVar(bdd.var());
-
-            BDD2IDD(bdd.low(), varBDD.not(), idd, visitedNodes);
-            BDD2IDD(bdd.high(), varBDD, idd, visitedNodes);
-        }
-
-        return idd;
-    }
-
-    public void BDD2IDD(final BDD bdd, final BDD autStatesBDD, final IDD idd, final HashMap<Integer, IDD> visitedNodes)
-    {
-        if(!bdd.isZero())
-        {
-            if(bdd.isOne() || !automataBDD.getAutVarName(bdd.var()).equals(idd.getRoot().getName()))
-            {
-                final ArrayList<String> states = bdd2automatonStates(autStatesBDD);
-
-                IDD nextIDD = visitedNodes.get(bdd.hashCode());
-
-                //if 'node' has not been visited
-                if(nextIDD == null)
-                {
-                    final IDDNode node = new IDDNode(""+bdd.hashCode(),automataBDD.getAutVarName(bdd.var()));
-                    nextIDD = new IDD(node);
-
-                    final BDD varBDD = automataBDD.getBDDforSourceBDDVar(bdd.var());
-                    BDD2IDD(bdd.low(), varBDD.not(), nextIDD, visitedNodes);
-                    BDD2IDD( bdd.high(), varBDD, nextIDD, visitedNodes);
-
-                    if(!states.isEmpty())
-                        idd.addChild(nextIDD, states);
-
-                    visitedNodes.put(bdd.hashCode(), nextIDD);
-                }
-                else
-                {
-                    if(!states.isEmpty())
-                    {
-                        if(idd.labelOfChild(nextIDD) != null)//'idd' has a child with root 'node'
-                            idd.labelOfChild(nextIDD).addAll(states);
-                        else
-                            idd.addChild(nextIDD, states);
-                    }
-                }
-            }
-            else
-            {
-                final BDD varBDD = automataBDD.getBDDforSourceBDDVar(bdd.var());
-
-                BDD2IDD(bdd.low(),  autStatesBDD.and(varBDD.not()), idd, visitedNodes);
-                BDD2IDD(bdd.high(), autStatesBDD.and(varBDD), idd, visitedNodes);
-            }
-        }
-    }
-
-    ArrayList<String> bdd2automatonStates(final BDD autStatesBDD)
-    {
-        final ArrayList<String> output = new ArrayList<String>();
-        final int var = autStatesBDD.var();
-
-        if(automataBDD.isSourceLocationVar(var))
-        {
-            final ExtendedAutomaton exAut = automataBDD.getBDDExAutomaton(automataBDD.getAutVarName(var)).getExAutomaton();
-            for(final NodeProxy location:exAut.getNodes())
-            {
-                final int locationIndex = automataBDD.getLocationIndex(exAut, location);
-                final BDD locationBDD = manager.getFactory().buildCube(locationIndex, automataBDD.getSourceLocationDomain(exAut.getName()).vars());
-                if(!autStatesBDD.and(locationBDD).isZero() && !locationBDD.and(safeStatesEnablingSigmaBDD).isZero())
-                {
-                    output.add(location.getName());
-                }
-            }
-        }
-        else
-        {
-            final int maxValue = automataBDD.getExtendedAutomata().getMaxValueofVar(automataBDD.getAutVarName(var));
-            final int minValue = automataBDD.getExtendedAutomata().getMinValueofVar(automataBDD.getAutVarName(var));
-            for(int i=minValue;i<=maxValue;i++)
-            {
-                final BDD valueBDD = automataBDD.getConstantBDD(automataBDD.getAutVarName(var), i);
-                if(!autStatesBDD.and(valueBDD).isZero() && !valueBDD.and(safeStatesEnablingSigmaBDD).isZero())
-                {
-                    output.add(""+automataBDD.getIndexMap().getValOfIndex(i));
-                }
-            }
-
-        }
-
-        return output;
-    }
-
 
     public StringIntPair generateStateSetTerm(final boolean isComp, final boolean isAutomaton, String variable, ArrayList<String> set, final String op1, final String op2, final String ineq1, final String ineq2)
     {
@@ -680,7 +580,64 @@ public class BDDExtendedGuardGenerator {
 
         return output;
     }
+/*
+    public HashSet<String> cartesianProduct(HashSet<String> set1, HashSet<String> set2)
+    {
+        HashSet<String> product = new HashSet<String>();
+        for(String e1:set2)
+        {
+            for(String e2:set1)
+            {
+                product.add(e2+STATE_DELIMITER+e1);
+            }
+        }
 
+        return product;
+    }
+
+    public HashSet<String> IDD2States(IDD idd)
+    {
+        HashSet<String> elementsInIDD = new HashSet<String>();
+        HashSet<String> states = new HashSet<String>();
+        IDD2StatesIntern(idd, states, elementsInIDD);
+        HashSet<String> elementsNotInIDD = (HashSet<String>)(automataBDD.getEFANames().clone());
+        elementsNotInIDD.addAll(automataBDD.getVarNames()); elementsNotInIDD.removeAll(elementsInIDD);
+        HashSet<String> remainingStates = new HashSet();
+        for(String elem:elementsNotInIDD)
+        {
+            final boolean isAutomaton = (automataBDD.getBDDExAutomaton(elem) != null)?true:false;
+            if(isAutomaton)
+            {
+                HashSet<String> locationNames = new HashSet<String>();
+                for(NodeProxy location:automataBDD.getBDDExAutomaton(elem).getExAutomaton().getNodes())
+                    locationNames.add(location.getName());
+
+                remainingStates = new HashSet<String>(cartesianProduct(remainingStates,locationNames));
+            }
+            else
+            {
+                HashSet<String> values = new HashSet<String>();
+                for(int i = theAutomata.getMinValueofVar(elem);i<=theAutomata.getMaxValueofVar(elem);i++)
+                    values.add(""+i);
+
+                remainingStates = new HashSet<String>(cartesianProduct(remainingStates,values));
+            }
+        }
+
+        return cartesianProduct(states, remainingStates);
+    }
+
+    public void IDD2StatesIntern(IDD idd, HashSet<String> soFar, HashSet<String> elementsInIDD)
+    {
+        elementsInIDD.add(idd.getRoot().getName());
+        for(IDD currIDD:idd.getChildren())
+        {
+            HashSet<String> states = new HashSet<String>(idd.labelOfChild(currIDD));
+            soFar = new HashSet<String>(cartesianProduct(soFar,states));
+            IDD2StatesIntern(currIDD, soFar, elementsInIDD);
+        }
+    }
+*/
     public StringIntPair IDD2expr(final IDD idd, final HashMap<String, StringIntPair> cache)
     {
         int localNbrOfTerms = 0;
@@ -846,11 +803,11 @@ public class BDDExtendedGuardGenerator {
         }
     }
 
-    public void BDD2IDD2PS(final BDD bdd, final String fileName)
+    public void BDD2IDD2PS(final BDD bdd, final BDD validStatesBDD, final String fileName)
     {
         final String absPathDot = pathRoot+fileName+".dot";
         final String absPathPs = pathRoot+fileName+".ps";
-        generateDOT(generateIDD(bdd), absPathDot);
+        generateDOT(automataBDD.generateIDD(bdd, validStatesBDD), absPathDot);
         final Runtime rt = Runtime.getRuntime();
         try{
             final Process proc1 = rt.exec("dot -Tps "+absPathDot+" -o "+absPathPs);

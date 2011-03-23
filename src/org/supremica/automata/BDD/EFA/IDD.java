@@ -1,4 +1,4 @@
-package org.supremica.automata.algorithms.Guard;
+package org.supremica.automata.BDD.EFA;
 
 import java.util.ArrayList;
 
