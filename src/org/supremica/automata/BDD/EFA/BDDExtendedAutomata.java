@@ -438,7 +438,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         return EFANames;
     }
 
-    public boolean isSourceLocationVar(int var)
+    public boolean isSourceLocationVar(final int var)
     {
         if(sourceLocationVars.contains(var))
             return true;
@@ -713,7 +713,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             }
 
             //nbrOfReachableStates = nbrOfStatesBDD(reachableStatesBDD);
-            IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
+            final IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
             nbrOfReachableStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
 //            logger.info("Number of reachable states in the closed-loop system: "+nbrOfReachableStates);
         }
@@ -724,7 +724,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     {
         if(nbrOfReachableStates == -1)
             getReachableStates();
-        
+
         return nbrOfReachableStates;
     }
 
@@ -743,7 +743,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             }
 
             //nbrOfCoreachableStates = nbrOfStatesBDD(coreachableStatesBDD);
-            IDD idd = generateIDD(coreachableStatesBDD, coreachableStatesBDD);
+            final IDD idd = generateIDD(coreachableStatesBDD, coreachableStatesBDD);
             nbrOfCoreachableStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
         }
 
@@ -765,7 +765,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                         (manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations()), reachable);
             }
             //nbrOfNonblockingControllableStates = nbrOfStatesBDD(nonblockingControllableStatesBDD);
-            IDD idd = generateIDD(nonblockingControllableStatesBDD, nonblockingControllableStatesBDD);
+            final IDD idd = generateIDD(nonblockingControllableStatesBDD, nonblockingControllableStatesBDD);
             nbrOfNonblockingControllableStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
         }
 
@@ -799,7 +799,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             }
 
             //nbrOfControllableStates = nbrOfStatesBDD(controllableStatesBDD);
-            IDD idd = generateIDD(controllableStatesBDD, controllableStatesBDD);
+            final IDD idd = generateIDD(controllableStatesBDD, controllableStatesBDD);
             nbrOfControllableStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
         }
 
@@ -954,16 +954,17 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         return output;
     }
 
-    public BigInteger nbrOfStatesIDD(IDD idd, HashSet<String> elementsInIDD, HashMap<IDDNode,BigInteger> cache)
+    public BigInteger nbrOfStatesIDD(final IDD idd, final HashSet<String> elementsInIDD, final HashMap<IDDNode,BigInteger> cache)
     {
         elementsInIDD.add(idd.getRoot().getName());
         if(idd.isOneTerminal())
         {
-            HashSet<String> elementsNotInIDD = (HashSet<String>)(getEFANames().clone());
+            final HashSet<String> elementsNotInIDD =
+              new HashSet<String>(getEFANames());
             elementsNotInIDD.addAll(getVarNames());
             elementsNotInIDD.removeAll(elementsInIDD);
             BigInteger nbrOfRemainingStates = BigInteger.ONE;
-            for(String elem:elementsNotInIDD)
+            for(final String elem:elementsNotInIDD)
             {
                 final boolean isAutomaton = (getBDDExAutomaton(elem) != null)?true:false;
                 if(isAutomaton)
@@ -972,7 +973,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                 }
                 else
                 {
-                    long domainSize = orgExAutomata.getMaxValueofVar(elem)-orgExAutomata.getMinValueofVar(elem)+1;
+                    final long domainSize = orgExAutomata.getMaxValueofVar(elem)-orgExAutomata.getMinValueofVar(elem)+1;
                     nbrOfRemainingStates = nbrOfRemainingStates.multiply(BigInteger.valueOf(domainSize));
                 }
             }
@@ -982,13 +983,13 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         else
         {
             BigInteger nbrOfStates = BigInteger.ZERO;
-            for(IDD child: idd.getChildren())
+            for(final IDD child: idd.getChildren())
             {
-                long currStates = idd.labelOfChild(child).size();
+                final long currStates = idd.labelOfChild(child).size();
                 BigInteger newNbrOfStates = cache.get(child.getRoot());;
                 if(newNbrOfStates == null)
-                    newNbrOfStates = nbrOfStatesIDD(child,(HashSet<String>)elementsInIDD.clone(),cache);
-                
+                    newNbrOfStates = nbrOfStatesIDD(child, new HashSet<String>(elementsInIDD), cache);
+
                 nbrOfStates = nbrOfStates.add(newNbrOfStates.multiply(BigInteger.valueOf(currStates)));
             }
             cache.put(idd.getRoot(), nbrOfStates);
