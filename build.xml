@@ -61,8 +61,6 @@
     <property name="jaxb1-impl.jar" location="${lib}/jaxb1-impl.jar"/>
     <property name="jsr173_api.jar" location="${lib}/jsr173_1.0_api.jar"/>
     
-    <property name="groovy-all.jar" location="${lib}/groovy-all-1.6-beta-1.jar"/>
-    
     <path id="jaxb.classpath">
         <pathelement location="${activation.jar}"/>
         <pathelement location="${jaxb-api.jar}"/>
@@ -70,15 +68,20 @@
         <pathelement location="${jaxb1-impl.jar}"/>
         <pathelement location="${jsr173_api.jar}"/>
     </path>
+
+    <!-- GROOVY -->
+    <property name="groovy-all.jar" location="${lib}/groovy-all-1.6-beta-1.jar"/>
     
-    <path id="supremica.classpath">
-        <pathelement location="${dist}/SupremicaLib.jar"/>
-    </path>
-    
-    <path id="groovy.classpath" location="${groovy-all.jar}" />
+    <path id="groovy.classpath" location="${groovy-all.jar}"/>
     
     <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy" classpathref="groovy.classpath" />
     <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc" classpathref="groovy.classpath" />
+    
+
+    <!-- Build Instructions -->
+    <path id="supremica.classpath">
+        <pathelement location="${dist}/SupremicaLib.jar"/>
+    </path>
     
     <patternset id="all_nested_classfiles.patternset">
         <include name="**/*.class"/>
@@ -129,10 +132,8 @@
 
         <unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>  
         <unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
-        <!-- <unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/> -->
-        <!-- Appears to compile without antlr. Removing this for now,
-             but will probably install new version when implementing
-             Promela parsers. ~~~Robi -->
+        <unjar src="${lib}/anarres-cpp.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/antlr-runtime-3.3.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/help.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
@@ -294,7 +295,8 @@
                verbose="false"
                nowarn="true"
                excludes="${supremica_basedir}/external/robotCoordination/**,
-                 ${supremica_basedir}/external/operationframeworkto61131/**"
+                 ${supremica_basedir}/external/operationframeworkto61131/**,
+                 ${supremica_basedir}/net/sourceforge/waters/external/promela/parser/**"
                source="1.5"
                fork="true"
                includeantruntime="false"

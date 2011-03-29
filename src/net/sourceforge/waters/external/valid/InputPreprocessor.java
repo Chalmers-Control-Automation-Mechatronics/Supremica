@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.valid
+//# PACKAGE: net.sourceforge.waters.external.valid
 //# CLASS:   InputPreprocessor
 //###########################################################################
 //# $Id$
@@ -127,7 +127,7 @@ class InputPreprocessor extends Thread
     }
   }
 
-    
+
   //#######################################################################
   //# Data Members
   private final BufferedReader mReader;

@@ -12,6 +12,9 @@
   <property name="supremica.testsrc" location="${supremica.root}/tests/src"/>
 
   <property name="activation.jar" location="${supremica.lib}/activation.jar"/>
+  <property name="anarres.jar" location="${supremica.lib}/anarres-cpp.jar"/>
+  <property name="antlr.complete.jar" location="${supremica.lib}/antlr-3.3-complete.jar"/>
+  <property name="antlr.runtime.jar" location="${supremica.lib}/antlr-runtime-3.3.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
@@ -22,6 +25,11 @@
   <property name="junit.jar" location="${supremica.lib}/junit-4.4.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove-2.0.4.jar"/>
 
+  <path id="antlr.compile.classpath" location="${antlr.complete.jar}"/>
+  <path id="antlr.runtime.classpath">
+    <pathelement location="${antlr.runtime.jar}"/>
+    <pathelement location="${anarres.jar}"/>
+  </path>
   <path id="jaxb.classpath">
     <pathelement location="${activation.jar}"/>
     <pathelement location="${jaxb-api.jar}"/>
@@ -31,6 +39,7 @@
 
   <property name="bddlib" location="${supremica.root}/dist"/>
   <property name="classes" location="java/classes"/>
+  <property name="antlr" location="antlr"/>
   <property name="cpp" location="cpp"/>
   <property name="cpplib" location="${cpp}/lib"/>
   <property name="docsrc" location="java/javadoc"/>
@@ -52,6 +61,11 @@
   <property name="jniglue.indir" location="${cpp}/src/jni/templates"/>
   <property name="jniglue.outdir" location="${cpp}/src/jni/glue"/>
   <property name="jniglue.jar" location="${jar}/jniglue.jar"/>
+    
+  <property name="antlr.promela.input" location="${antlr}/Promela.g"/>
+  <property name="antlr.promela.outdir"
+            location="${supremica.src}/net/sourceforge/waters/external/promela/parser/"/>
+
   <property name="test.jar" location="${jar}/waters_test.jar"/>
   <property name="test.classes" location="${classes}/test"/>
   <property name="waters.jar" location="${jar}/waters.jar"/>
@@ -104,13 +118,30 @@
     </xjc>
   </target>
 
-  <target name="jaxb-compile" depends="jaxb-generate">
+  <target name="antlr-promela">
+    <java classname="org.antlr.Tool" fork="true" failonerror="true">
+      <classpath refid="antlr.compile.classpath"/>
+      <arg value="-verbose"/>
+      <arg value="-make"/>
+      <arg value="-o"/>
+      <arg path="${antlr.promela.outdir}"/>
+      <arg path="${antlr.promela.input}"/>
+    </java>
+  </target>
+
+  <target name="jaxb-compile" depends="jaxb-generate,antlr-promela">
     <mkdir dir="${waters.classes}"/>
     <javac srcdir="${src}" destdir="${waters.classes}"
            includes="net/sourceforge/waters/xsd/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
-    	   includeantruntime="false">
+           includeantruntime="false">
       <classpath refid="jaxb.classpath"/>
+    </javac>
+    <javac srcdir="${supremica.src}" destdir="${waters.classes}"
+           includes="net/sourceforge/waters/external/promela/**/*.java"
+           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
+           includeantruntime="false">
+      <classpath refid="antlr.runtime.classpath"/>
     </javac>
     <javac srcdir="${supremica.src}" destdir="${waters.classes}"
            includes="net/sourceforge/waters/model/unchecked/**/*.java"
@@ -119,9 +150,10 @@
   </target>
 
   <target name="jaxb-jar" depends="jaxb-compile"
-          description="Create the waters_jaxb2.jar archive.">
+          description="Create the waters_jaxb.jar archive.">
     <jar jarfile="${jaxb.jar}">
       <fileset dir="${waters.classes}">
+        <include name="net/sourceforge/waters/external/promela/parser/**/*.class"/>
         <include name="net/sourceforge/waters/model/unchecked/**/*.class"/>
         <include name="net/sourceforge/waters/xsd/**/*.class"/>
        </fileset>
@@ -141,6 +173,7 @@
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
       <include name="net/sourceforge/waters/**/*.java"/>
+      <exclude name="net/sourceforge/waters/external/promela/parser/**/*.java"/>
       <exclude name="net/sourceforge/waters/gui/**/*.java"/>
       <exclude name="net/sourceforge/waters/model/unchecked/**/*.java"/>
       <include name="org/supremica/log/**/*.java"/>
