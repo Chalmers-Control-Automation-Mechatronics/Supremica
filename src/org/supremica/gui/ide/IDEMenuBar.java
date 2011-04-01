@@ -74,8 +74,11 @@ import org.supremica.gui.ide.actions.SaveAsAction;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
+
 import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 
 
 /**
@@ -342,6 +345,13 @@ public class IDEMenuBar extends JMenuBar
            final Action activityLoop =
            actions.getAction(AnalyzeSDActivityLoopAction.class);
             mVerifyMenu.add(activityLoop);
+            final Action SSingular =
+              actions.getAction(AnalyzeSDSingularPropertyAction.class);
+            mVerifyMenu.add(SSingular);
+            final Action Sdfour =
+              actions.getAction(AnalyzeSDCFourPropertyAction.class);
+            mVerifyMenu.add(Sdfour);
+
 		}
       }
 
@@ -352,7 +362,6 @@ public class IDEMenuBar extends JMenuBar
         mEdAnalyzeMenu = new JMenu("Analyze");
         mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
-        mEdAnalyzeMenu.add(actions.editorReadSpecAction.getMenuItem());
       }
 
       // Simulate
@@ -475,8 +484,7 @@ public class IDEMenuBar extends JMenuBar
     }
 
     // Configure
-    if (mConfigureMenu == null)
-    {
+    if (mConfigureMenu == null) {
       mConfigureMenu = new JMenu("Configure");
       mConfigureMenu.setMnemonic(KeyEvent.VK_O);
       mConfigureMenu.add(actions.analyzerOptionsAction.getMenuItem());

@@ -1,0 +1,93 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.despot
+//# CLASS:   SICProperty6Verifier
+//###########################################################################
+//# $Id: SICProperty6Verifier.java 5926 2010-09-23 03:54:41Z robi $
+//###########################################################################
+
+package net.sourceforge.waters.analysis.sd;
+
+import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
+import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+
+/**
+ * A model verifier to check SD Controllability Property Four.
+ *
+ *
+ *
+ * @see SDPropertyBuilder
+ * @see LanguageInclusionChecker
+ *
+ * @author Mahvash Baloch, Robi Malik
+ */
+
+public class SDCFourVerifier extends AbstractSafetyVerifier
+
+{
+
+  //#########################################################################
+  //# Constructors
+  public SDCFourVerifier( final ProductDESProxy model,
+                              final ProductDESProxyFactory factory,
+                              final ControllabilityChecker checker)
+
+  {
+    super(model,
+          LanguageInclusionKindTranslator.getInstance(),
+          LanguageInclusionDiagnostics.getInstance(),
+          factory);
+    cChecker = checker;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  public boolean run() throws AnalysisException
+  {
+    setUp();
+    try {
+      final ProductDESProxy model = getModel();
+
+      final SDPropertyBuilder builder =
+        new SDPropertyBuilder(model, getFactory());
+
+
+      ProductDESProxy convertedModel = null;
+      convertedModel = builder.createModelSDFour();
+
+      final ModularLanguageInclusionChecker checker=
+        new ModularLanguageInclusionChecker(convertedModel, getFactory(),
+                                             cChecker );
+      checker.setModel(convertedModel);
+
+      final VerificationResult result;
+
+      try {
+        checker.run();
+      } finally {
+        result = checker.getAnalysisResult();
+        setAnalysisResult(result);
+      }
+        if(result.isSatisfied())
+        return(true);
+        else
+        { return (false);
+        }
+    } finally {
+      tearDown();
+    }
+  }
+
+  private final ControllabilityChecker cChecker;
+}
