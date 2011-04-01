@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import java.util.BitSet;
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.op.EventEncoding;
@@ -88,15 +89,24 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     final ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(autToAbstract, eventEnc,
             mInputStateEnc, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+     final int numStates = rel.getNumberOfStates();
+    final BitSet keep = new BitSet(numStates);
+    final TransitionIterator all = rel.createAllTransitionsReadOnlyIterator();
+    while (all.advance()) {
+      if(all.getCurrentEvent()!=tauID){
+        final int target=all.getCurrentTargetState();
+        keep.set(target);
+      }
+    }
+
     final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
-    final int numStates = rel.getNumberOfStates();
     int source = 0;
     boolean modified = false;
     main: while (source < numStates) {
       iter.reset(source, tauID);
       while (iter.advance()) {
         final int target = iter.getCurrentTargetState();
-        if (!rel.isMarked(target, alphaID)) {
+        if (!rel.isMarked(target, alphaID) && !keep.get(target) ) {
           iter.remove();
           rel.copyOutgoingTransitions(target, source);
           modified = true;

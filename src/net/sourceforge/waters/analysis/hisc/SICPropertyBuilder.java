@@ -160,7 +160,20 @@ public class SICPropertyBuilder
         newAutomata.add(createSIC5InterfaceAutomaton(aut, answer));
       }
     }
-    newAutomata.add(createSIC5Test(answer));
+    final Collection<EventProxy> events= mModel.getEvents();
+    final int numEvents = events.size();
+    final List<EventProxy> iface= new ArrayList<EventProxy>(numEvents);
+    final List<EventProxy> local= new ArrayList<EventProxy>(numEvents);
+    for (final EventProxy event : events) {
+      if (event.getKind() == EventKind.PROPOSITION) {
+        // skip
+      } else if (HISCAttributes.getEventType(event.getAttributes()) == HISCAttributes.EventType.DEFAULT) {
+        local.add(event);
+      } else {
+        iface.add(event);
+      }
+    }
+    newAutomata.add(createSIC5Test(answer,iface,local));
     // removes markings from automaton event alphabet
     final Collection<EventProxy> newEvents =
         removePropositions(mModel.getEvents());
@@ -297,16 +310,100 @@ public class SICPropertyBuilder
 
 
   //#########################################################################
+  // new sic5 test creator
+  private AutomatonProxy createSIC5Test(final EventProxy answer,
+                                        final List<EventProxy> iface,
+                                        final List<EventProxy> local)
+  {
+    final int num_iface = iface.size();
+    final int num_local = local.size();
+    final List<EventProxy>newEvents= new ArrayList<EventProxy>(num_iface+num_local);
+    newEvents.addAll(iface);
+    newEvents.addAll(local);
+
+    // creates the 3 states needed (the 3rd is optional, not needed if only
+    // request and answer events exist)
+    final List<StateProxy> states = new ArrayList<StateProxy>(2);
+    List<EventProxy> propositions = new ArrayList<EventProxy>(1);
+    // initial state has the default marking proposition
+    propositions.add(mMarking);
+    final StateProxy initialState =
+        mFactory.createStateProxy("T1", true, propositions);
+    states.add(initialState);
+    // next state has the precondition marking
+    propositions = new ArrayList<EventProxy>(1);
+    propositions.add(mPreconditionMarking);
+    final StateProxy alphaState =
+        mFactory.createStateProxy("T2", false, propositions);
+    states.add(alphaState);
+    StateProxy t3State = null;
+
+     // creates the transitions needed
+    final List<TransitionProxy> transitions = new ArrayList<TransitionProxy>();
+    for (final EventProxy event : newEvents) {
+      // self loop on the initial state that includes entire event alphabet
+      final TransitionProxy transition =
+          mFactory.createTransitionProxy(initialState, event, initialState);
+      transitions.add(transition);
+
+      // the transition which accepts any request event
+      if (event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
+        final TransitionProxy requestTransition =
+            mFactory.createTransitionProxy(initialState, event, alphaState);
+        transitions.add(requestTransition);
+      }
+
+      // the transitions which accepts any local event (i.e. non request, non
+      // answer events)
+      else if (!event.getAttributes().equals(HISCAttributes.ATTRIBUTES_ANSWER)
+          && !event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
+        if (states.size() < 3) {
+          // third state has no propositions
+          propositions = null;
+          t3State = mFactory.createStateProxy("T3", false, null);
+          states.add(t3State);
+        }
+        final TransitionProxy localTransition =
+            mFactory.createTransitionProxy(alphaState, event, t3State);
+        transitions.add(localTransition);
+        final TransitionProxy localSelfLoop =
+            mFactory.createTransitionProxy(t3State, event, t3State);
+        transitions.add(localSelfLoop);
+      }
+
+    }
+    // creates the two answer transitions
+    final TransitionProxy immediateAnswer =
+        mFactory.createTransitionProxy(alphaState, answer, initialState);
+    transitions.add(immediateAnswer);
+    if (t3State != null) {
+      final TransitionProxy finallyAnswer =
+          mFactory.createTransitionProxy(t3State, answer, initialState);
+      transitions.add(finallyAnswer);
+    }
+
+    // adds the two marking propositions to the automaton alphabet
+    newEvents.add(mMarking);
+    newEvents.add(mPreconditionMarking);
+
+    final AutomatonProxy newTestAut =
+        mFactory.createAutomatonProxy("Test:Aut", ComponentKind.SPEC,
+                                      newEvents, states, transitions);
+    return newTestAut;
+
+  }
+
   //# Auxiliary Methods
   /**
    * Creates the test automaton added to the model to check SIC Property V
    * with respect to the given answer event.
    */
-  private AutomatonProxy createSIC5Test(final EventProxy answer)
+/*  private AutomatonProxy createSIC5Test(final EventProxy answer)
   {
     // removes markings from automaton event alphabet
     final Collection<EventProxy> newEvents =
         removePropositions(mModel.getEvents());
+
 
     // creates the 3 states needed (the 3rd is optional, not needed if only
     // request and answer events exist)
@@ -377,8 +474,20 @@ public class SICPropertyBuilder
         mFactory.createAutomatonProxy("Test:Aut", ComponentKind.SPEC,
                                       newEvents, states, transitions);
 
+
+     // final AutomatonProxy newTestAuto =
+      mFactory.createAutomatonProxy("Test:Event", ComponentKind.SPEC,
+                                    newEvents, states, transitions);
+   // String name = "Test:" + getEventName();
+
     return newTestAut;
   }
+*/
+  // private String getEventName()
+  //{
+    // TODO Auto-generated method stub
+    //return null;
+  //}
 
   private AutomatonProxy createSIC5InterfaceAutomaton
     (final AutomatonProxy aut, final EventProxy answer)
