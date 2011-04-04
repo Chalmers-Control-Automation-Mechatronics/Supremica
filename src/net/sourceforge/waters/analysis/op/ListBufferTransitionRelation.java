@@ -58,7 +58,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * this event.
  *
  * The transition relation also associates with each state its initial
- * status and its propositions in a bit set, using a {@link IntStateBuffer}.
+ * status and its propositions in a bit set, using an {@link IntStateBuffer}.
  *
  * @see StateEncoding
  * @see EventEncoding

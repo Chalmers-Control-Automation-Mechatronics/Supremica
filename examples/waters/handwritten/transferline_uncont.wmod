@@ -55,14 +55,6 @@
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="init">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="tu_accept">
-                        <IntConstant Value="0"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="tu_load">
-                        <IntConstant Value="0"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="WORKING">
                         <PointGeometry>
@@ -137,18 +129,10 @@
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="machine_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="machine_unload">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="WORKING">
                                 <PointGeometry>
-                                    <Point Y="249" X="234"/>
+                                    <Point Y="144" X="160"/>
                                 </PointGeometry>
                                 <LabelGeometry>
                                     <Point Y="5" X="11"/>
@@ -159,7 +143,7 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="162" X="234"/>
+                                    <Point Y="57" X="160"/>
                                 </PointGeometry>
                                 <InitialArrowGeometry>
                                     <Point Y="-5" X="-5"/>
@@ -180,13 +164,13 @@
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="162" X="234"/>
+                                    <Point Y="57" X="160"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="205" X="208"/>
+                                    <Point Y="100" X="134"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="249" X="234"/>
+                                    <Point Y="144" X="160"/>
                                 </EndPointGeometry>
                             </Edge>
                             <Edge Target="IDLE" Source="WORKING">
@@ -199,13 +183,13 @@
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="249" X="234"/>
+                                    <Point Y="144" X="160"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="206" X="258"/>
+                                    <Point Y="101" X="184"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="162" X="234"/>
+                                    <Point Y="57" X="160"/>
                                 </EndPointGeometry>
                             </Edge>
                         </EdgeList>
@@ -216,21 +200,10 @@
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="tu_accept">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_reject">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="WORKING">
                                 <PointGeometry>
-                                    <Point Y="249" X="198"/>
+                                    <Point Y="128" X="128"/>
                                 </PointGeometry>
                                 <LabelGeometry>
                                     <Point Y="-3" X="9"/>
@@ -241,7 +214,7 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="162" X="198"/>
+                                    <Point Y="41" X="128"/>
                                 </PointGeometry>
                                 <InitialArrowGeometry>
                                     <Point Y="-5" X="-5"/>
@@ -265,13 +238,13 @@
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="249" X="198"/>
+                                    <Point Y="128" X="128"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="208" X="224"/>
+                                    <Point Y="87" X="154"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="162" X="198"/>
+                                    <Point Y="41" X="128"/>
                                 </EndPointGeometry>
                             </Edge>
                             <Edge Target="WORKING" Source="IDLE">
@@ -284,13 +257,13 @@
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="162" X="198"/>
+                                    <Point Y="41" X="128"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="207" X="171"/>
+                                    <Point Y="86" X="101"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="249" X="198"/>
+                                    <Point Y="128" X="128"/>
                                 </EndPointGeometry>
                             </Edge>
                         </EdgeList>
