@@ -498,10 +498,19 @@
             "Deletes all existing class files, recompiles all files, and packages all files into a jar file that can be executed without any other dependencies.">
     </target>
     
+    <target name="antlr_quick" depends="-jar_waters_jaxb"
+        description="Recompiles waters_jaxb.jar, unpacks into unjared, and rebuilds SupremicaLib.jar">
+        <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
+        <delete dir="${javalibs.dir}/META-INF"/>
+        <jar jarfile="${dist}/SupremicaLib.jar">
+            <fileset dir="${javalibs.dir}"/>
+        </jar>
+    </target>
+        
     <target name="jar_supremica_lib" depends="initialize_jars">
         <delete dir="${javalibs.dir}/META-INF"/>
         <jar jarfile="${dist}/SupremicaLib.jar"> 
-            <fileset dir="${javalibs.dir}"/>            
+            <fileset dir="${javalibs.dir}"/>
         </jar>
     </target>
     
