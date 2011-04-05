@@ -15,14 +15,14 @@ options {
 /*
 tokens {
 	PROCTYPENODE = 'proctype-definition';
-	INLINENODE = 'inline-definition';
+	//INLINENODE = 'inline-definition';
 	INITNODE = 'init-definition';
-	NEVERNODE = 'never-definition';
-	TRACENODE = 'trace-definition';
-  NOTRACENODE = 'notrace-definition';
-	UTYPENODE = 'utype-definition';
-	MTYPENODE = 'mtype-definition';
-	DECLARATIONSNODE = 'declarations';
+	//NEVERNODE = 'never-definition';
+	//TRACENODE = 'trace-definition';
+  	//NOTRACENODE = 'notrace-definition';
+	//UTYPENODE = 'utype-definition';
+	//MTYPENODE = 'mtype-definition';
+	//DECLARATIONSNODE = 'declarations';
 	NAMEDEFNODE = 'name';
 	CONFIGNODE = 'config';
 	ARGUMENTSNODE = 'arguments';
@@ -30,11 +30,24 @@ tokens {
 	STATEMENTNODE = 'statement';
 	GUARDNODE = 'guard';
 }
-*/  
+*/
+tokens{
+	PROCTYPENODE;
+	INITNODE;
+	TYPE;
+	CHAN_STATE;
+	STATEMENT;
+	MODULE_ROOT;
+	CONDITION;
+	REC;
+	SEN;
+}
 
 @header {
 package net.sourceforge.waters.external.promela.parser;
 
+
+import net.sourceforge.waters.external.promela.ast.*;
 import net.sourceforge.waters.external.promela.PromelaParserError;
 }
 
@@ -64,7 +77,7 @@ import net.sourceforge.waters.external.promela.PromelaParserError;
     if (!errors.contains(error))
       errors.add(error);
   }
-  
+
   public boolean isSyntacticallyCorrect() {
     return errors.size() == 0;
   }
@@ -79,17 +92,18 @@ specRule
 @init  { paraphrases.push("in specification"); }
 @after { paraphrases.pop(); }
 	:	moduleRule+ EOF
+		-> ^(MODULE_ROOT moduleRule*)
 	;
 
 moduleRule
 @init  { paraphrases.push("in module definition"); }
 @after { paraphrases.pop(); }
 	:	proctypeRule //-> ^(PROCTYPENODE proctypeRule)
-		| inlineRule //-> ^(INLINENODE inlineRule)
+		| inlineRule// -> ^(INLINENODE inlineRule)
 		| initRule //-> ^(INITNODE initRule)
 		| neverRule //-> ^(NEVERNODE neverRule)
 		| traceRule //-> ^(TRACENODE traceRule)
-    | notraceRule //-> ^(NOTRACENODE notraceRule)
+    		| notraceRule //-> ^(NOTRACENODE notraceRule)
 		| utypeRule //-> ^(UTYPENODE utypeRule)
 		| mtypeRule //-> ^(MTYPENODE mtypeRule)
 		| decl_lstRule //-> ^(DECLARATIONSNODE decl_lstRule)
@@ -118,7 +132,7 @@ neverRule
 @after { paraphrases.pop(); }
 	:	NEVER BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
 	;
-
+//modified
 proctypeRule
 @init  { paraphrases.push("in proctype"); }
 @after { paraphrases.pop(); }
@@ -127,6 +141,7 @@ proctypeRule
 		(enablerRule)? 
 		BLOCKBEGIN sequenceRule BLOCKEND 
 		(SEMICOLON)* 
+		-> ^(NAME<ProctypeTreeNode> NAME sequenceRule)
     ;
 
 inlineRule
@@ -154,40 +169,48 @@ utypeRule
 @after { paraphrases.pop(); }
 	:	TYPEDEF NAME BLOCKBEGIN decl_lstRule BLOCKEND (SEMICOLON)* 
 	;
-
+//modified
 initRule
 @init  { paraphrases.push("in init definition"); }
 @after { paraphrases.pop(); }
 	:	INIT (priorityRule)? BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
+		-> ^(INIT sequenceRule)
 	;
 
 priorityRule
 	:	PRIORITY constRule
 	;
 
+
 sequenceRule
 	:	// original: stepRule (';' stepRule)*
 //		(stepRule (';' | '-' '>')? )*
 		(stepRule (SEMICOLON)* (isguard=ARROW )? )*
-	;
+		->^(STATEMENT stepRule*)
+;
 
 stepRule 
 	:	decl_lstRule
 		| stmntRule (UNLESS stmntRule)?
-    | XR varrefRule (COMMA varrefRule)*
-    | XS varrefRule (COMMA varrefRule)*
+    		| XR varrefRule (COMMA varrefRule)*
+    		| XS varrefRule (COMMA varrefRule)*
 	;
 
 varrefRule
 	:	NAME (ALTPARENOPEN any_exprRule ALTPARENCLOSE)? (DOT varrefRule)?
+		
 	;
-
+//modified
 stmntRule
 @init  { paraphrases.push("in statement"); }
 @after { paraphrases.pop(); }
 	:	    IF optionsRule FI
+		-> ^(IF<ConditionTreeNode> optionsRule)
         | DO optionsRule OD
+		-> ^(DO<ConditionTreeNode> optionsRule)
         | ATOMIC BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
+		->^(ATOMIC sequenceRule)		
+
         | DSTEP BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
         | BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
         | sendRule
@@ -213,28 +236,39 @@ assignRule
 	:	varrefRule (ASSIGN any_exprRule | PLUSPLUS | MINUSMINUS)
 	;
 
+//modified
 receiveRule
 @init  { paraphrases.push("in receive statement"); }
 @after { paraphrases.pop(); }
-  : varrefRule 
-    (
-      (QUESTIONMARK|DOUBLEQUESTIONMARK) 
-      ( recv_argsRule 
-        | ALTPARENOPEN recv_argsRule ALTPARENCLOSE 
-        | LESS recv_argsRule MORE
-      )
-    ) 
+
+  : 	varrefRule ((QUESTIONMARK) ( recv_argsRule))
+    	-> ^(QUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule) 
+ 	| varrefRule ((QUESTIONMARK) ( ALTPARENOPEN recv_argsRule ALTPARENCLOSE))
+	-> ^(QUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule)
+	| varrefRule ((QUESTIONMARK) ( LESS recv_argsRule MORE))
+	-> ^(QUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule)	
+	
+   	| varrefRule ((DOUBLEQUESTIONMARK) ( recv_argsRule))
+	-> ^(DOUBLEQUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule) 
+	| varrefRule ((DOUBLEQUESTIONMARK) (ALTPARENOPEN recv_argsRule ALTPARENCLOSE))
+	-> ^(DOUBLEQUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule) 
+	| varrefRule ((DOUBLEQUESTIONMARK) (LESS recv_argsRule MORE))
+	-> ^(DOUBLEQUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule) 
   ;
 
+//modified
 recv_argsRule
 @init  { paraphrases.push("in receive arguments"); }
 @after { paraphrases.pop(); }
-	:	recv_argRule 
-	  (
-        (PARENOPEN recv_argsRule PARENCLOSE) 
-        | (COMMA recv_argRule)*
-    )
+	: recv_argRule (PARENOPEN recv_argsRule PARENCLOSE) 
+		-> ^(recv_argRule recv_argsRule)
+  	| recv_argRule (COMMA recv_argRule)*
+		-> ^(recv_argRule recv_argRule*)
+//	->  ^(recv_argRule ivarRule)
+
+	
     ;
+
 
 recv_argRule
 @init  { paraphrases.push("in receive argument"); }
@@ -243,19 +277,26 @@ recv_argRule
         | (EVAL PARENOPEN varrefRule PARENCLOSE)
         | ((MINUS)? constRule)
 	;
-
+//modified
 sendRule
 @init  { paraphrases.push("in send statement"); }
 @after { paraphrases.pop(); }
 	:	varrefRule 
-	    (EXCLAMATIONMARK|DOUBLEEXCLAMATIONMARK) 
+	    EXCLAMATIONMARK 
 	    send_argsRule
+	-> ^(EXCLAMATIONMARK<ExchangeTreeNode> varrefRule send_argsRule)
+	| varrefRule DOUBLEEXCLAMATIONMARK send_argsRule
+	-> ^(DOUBLEEXCLAMATIONMARK<ExchangeTreeNode> varrefRule send_argsRule)
+	
   ;
 
+
+//modified
 send_argsRule
 @init  { paraphrases.push("in send arguments"); }
 @after { paraphrases.pop(); }
 	:	(any_exprRule PARENOPEN arg_lstRule PARENCLOSE) 
+		-> ^(any_exprRule arg_lstRule)
 	    | arg_lstRule
     ;
 
@@ -263,6 +304,7 @@ arg_lstRule
 @init  { paraphrases.push("in send argument"); }
 @after { paraphrases.pop(); }
 	:	any_exprRule (COMMA any_exprRule)*
+		-> ^(any_exprRule any_exprRule*)
 	;
 
 decl_lstRule
@@ -270,22 +312,29 @@ decl_lstRule
 @after { paraphrases.pop(); }
 	:	// original: one_declRule (';' one_declRule)*
 		(one_declRule (SEMICOLON)* )+
+		->(one_declRule)*
 	;
 
+//modified
 one_declRule
 @init  { paraphrases.push("in declaration"); }
 @after { paraphrases.pop(); }
 	:	(visibleRule)? typenameRule ivarRule (COMMA ivarRule)*
+		-> ^(typenameRule ivarRule*)
 	;
 
 optionsRule
 @init  { paraphrases.push("in option"); }
 @after { paraphrases.pop(); }
 	:	COLONCOLON sequenceRule (COLONCOLON sequenceRule)*
+		-> sequenceRule*
+		//->  (sequenceRule sequenceRule*)
+		//-> ^(CONDITION<ConditionTreeNode> sequenceRule sequenceRule*)
 	;
 
 ivarRule
 	:	NAME (ALTPARENOPEN constRule ALTPARENCLOSE)? (ASSIGN (any_exprRule | ch_initRule))?
+		-> ^(NAME (constRule)? (any_exprRule)? (ch_initRule)? )
 	;
 
 /*
@@ -306,15 +355,15 @@ any_exprRule
         | 'run' NAME '(' (arg_lstRule)? ')' (priorityRule)?
 	;
 */
-//
+// changed a lot, very strange, coz Run A() is found here
 any_exprRule 
 @init  { paraphrases.push("in any expression"); }
 @after { paraphrases.pop(); }
-	:	(PARENOPEN (any_exprRule) PARENCLOSE 
+	:	(PARENOPEN (any_exprRule) PARENCLOSE ) (binaropRule any_exprRule)* 
 	  | PARENOPEN PARENCLOSE 
-    | varrefRule AT varrefRule
+    	  | varrefRule AT varrefRule
 	  | unaropRule any_exprRule 
-      | (unaropRule)? PARENOPEN receiveRule PARENCLOSE 
+          | (unaropRule)? PARENOPEN receiveRule PARENCLOSE 
 	  | PARENOPEN any_exprRule ARROW any_exprRule COLON any_exprRule PARENCLOSE 
 	  | LEN PARENOPEN varrefRule PARENCLOSE 
 	  | varrefRule 
@@ -324,9 +373,10 @@ any_exprRule
 	  | NP 
 	  | (ENABLED|PCVALUE) PARENOPEN any_exprRule PARENCLOSE 
 	  | varrefRule ALTPARENOPEN any_exprRule ALTPARENCLOSE AT varrefRule
-	  | RUN NAME PARENOPEN (arg_lstRule)? PARENCLOSE (priorityRule)?
-	  )
-	  (binaropRule any_exprRule)* 
+	  | RUN NAME PARENOPEN (arg_lstRule)? PARENCLOSE (priorityRule)? 
+		-> ^(RUN NAME (arg_lstRule)? )
+	  
+	  
 	;
 
 pollRule
@@ -334,13 +384,18 @@ pollRule
 @after { paraphrases.pop(); }
 	:	varrefRule QUESTIONMARK (ALTPARENOPEN recv_argsRule ALTPARENCLOSE | QUESTIONMARK ALTPARENOPEN recv_argsRule ALTPARENCLOSE)
 	;
-
+//modified
 ch_initRule
 	:	ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
+		-> ^(CHAN_STATE constRule typenameRule* )
 	;
 	
 typenameRule
-	:	BIT | BOOL | BYTE | SHORT | INT  | MTYPE | CHAN | unameRule
+	:	BIT | BOOL | BYTE | SHORT 
+		| INT -> ^(INT<TypeTreeNode>)
+		| MTYPE 
+		| CHAN -> ^(CHAN<TypeTreeNode>)
+		| unameRule
 	;
 
 unameRule
@@ -352,7 +407,9 @@ visibleRule
 	;
 	
 constRule
-	:	TRUE | FALSE | SKIP | NUMBER | CHARLITERAL
+	:	TRUE | FALSE | SKIP 
+		| NUMBER -> ^(NUMBER <ConstantTreeNode>)
+		| CHARLITERAL
 	;
 
 /*
@@ -500,6 +557,7 @@ NAME: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
 NUMBER: '0'..'9'+ ;
 STRING:	('"' ~('"')* '"');
 CHARLITERAL: ('\'' ~('\'')* '\'');
+
 
 COMMENT
 	:	'/*'
