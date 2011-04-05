@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -256,14 +257,20 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
       throws Exception
   {
     final String wdesext = mProductDESMarshaller.getDefaultExtension();
+    final String wmodext = mModuleMarshaller.getDefaultExtension();
     final Collection<EventProxy> answerEvents =
         getModelAnswerEvents(group, subdir, name);
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createSIC5Model(answer);
-      final File outfilename =
-          new File(mOutputDirectory, name.replace(':', '_') + "_"
-              + answer.getName().replace(':', '_') + wdesext);
-      mProductDESMarshaller.marshal(modifiedDES, outfilename);
+      final String fname = name.replace(':', '_') + "_" +
+                           answer.getName().replace(':', '_');
+      final File desfilename =
+          new File(mOutputDirectory, fname + wdesext);
+      mProductDESMarshaller.marshal(modifiedDES, desfilename);
+      final ModuleProxy module = mImporter.importModule(modifiedDES);
+      final File modfilename =
+        new File(mOutputDirectory, fname + wmodext);
+      mModuleMarshaller.marshal(module, modfilename);
       ProductDESIntegrityChecker.getInstance().check(modifiedDES);
     }
   }
@@ -346,6 +353,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
     mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
+    mImporter = new ProductDESImporter(moduleFactory);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
@@ -374,6 +382,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
+  private ProductDESImporter mImporter;
   private DocumentManager mDocumentManager;
   private SICPropertyBuilder mBuilder;
 }

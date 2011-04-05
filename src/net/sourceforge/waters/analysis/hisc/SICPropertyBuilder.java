@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.hisc;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,14 @@ public class SICPropertyBuilder
     return mPreconditionMarking;
   }
 
+  public void setSplitting(final boolean split)
+  {
+    mSplitting = split;
+  }
+
+  public boolean getSplitting(){
+    return mSplitting;
+  }
   public void setDefaultMarkings()
   {
     mMarking =
@@ -164,6 +173,7 @@ public class SICPropertyBuilder
     final int numEvents = events.size();
     final List<EventProxy> iface= new ArrayList<EventProxy>(numEvents);
     final List<EventProxy> local= new ArrayList<EventProxy>(numEvents);
+
     for (final EventProxy event : events) {
       if (event.getKind() == EventKind.PROPOSITION) {
         // skip
@@ -172,8 +182,20 @@ public class SICPropertyBuilder
       } else {
         iface.add(event);
       }
+
     }
-    newAutomata.add(createSIC5Test(answer,iface,local));
+
+    if(mSplitting && !local.isEmpty()){
+        for(final EventProxy event : local){
+          final List<EventProxy> local1= Collections.singletonList(event);
+          final String aut_name = "Test:" + event.getName();
+          newAutomata.add(createSIC5Test(answer,iface,local1,aut_name ));
+        }
+    }
+    else{
+      newAutomata.add(createSIC5Test(answer,iface,local,"Test:Aut"));
+   }
+
     // removes markings from automaton event alphabet
     final Collection<EventProxy> newEvents =
         removePropositions(mModel.getEvents());
@@ -309,11 +331,13 @@ public class SICPropertyBuilder
   }
 
 
+
   //#########################################################################
   // new sic5 test creator
   private AutomatonProxy createSIC5Test(final EventProxy answer,
                                         final List<EventProxy> iface,
-                                        final List<EventProxy> local)
+                                        final List<EventProxy> local,
+                                        final String name)
   {
     final int num_iface = iface.size();
     final int num_local = local.size();
@@ -372,6 +396,7 @@ public class SICPropertyBuilder
       }
 
     }
+
     // creates the two answer transitions
     final TransitionProxy immediateAnswer =
         mFactory.createTransitionProxy(alphaState, answer, initialState);
@@ -382,23 +407,24 @@ public class SICPropertyBuilder
       transitions.add(finallyAnswer);
     }
 
+
     // adds the two marking propositions to the automaton alphabet
     newEvents.add(mMarking);
     newEvents.add(mPreconditionMarking);
 
     final AutomatonProxy newTestAut =
-        mFactory.createAutomatonProxy("Test:Aut", ComponentKind.SPEC,
+        mFactory.createAutomatonProxy(name, ComponentKind.SPEC,
                                       newEvents, states, transitions);
     return newTestAut;
 
   }
 
+
   //# Auxiliary Methods
-  /**
+  /*
    * Creates the test automaton added to the model to check SIC Property V
    * with respect to the given answer event.
-   */
-/*  private AutomatonProxy createSIC5Test(final EventProxy answer)
+  private AutomatonProxy createSIC5Test(final EventProxy answer)
   {
     // removes markings from automaton event alphabet
     final Collection<EventProxy> newEvents =
@@ -482,7 +508,9 @@ public class SICPropertyBuilder
 
     return newTestAut;
   }
-*/
+   */
+
+
   // private String getEventName()
   //{
     // TODO Auto-generated method stub
@@ -765,6 +793,9 @@ public class SICPropertyBuilder
    */
   private ProductDESProxy mModel;
 
+
+
+
   private final ProductDESProxyFactory mFactory;
 
   /**
@@ -791,6 +822,8 @@ public class SICPropertyBuilder
   /**
    * The tau event used for the test automaton for SIC property VI.
    */
+  private boolean mSplitting = false;
+
   private EventProxy mTau;
 
 }
