@@ -642,4 +642,8 @@ public class BDDExtendedManager
         return nonblockingControllableStates;
     }
 
+    public void resetLocalOverflows(){
+        this.localOverflows = factory.zero();
+    }
+
 }

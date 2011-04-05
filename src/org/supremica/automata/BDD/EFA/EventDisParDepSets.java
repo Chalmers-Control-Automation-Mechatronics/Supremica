@@ -1,5 +1,6 @@
 package org.supremica.automata.BDD.EFA;
 
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntProcedure;
 import gnu.trove.TObjectIntHashMap;
@@ -23,7 +24,7 @@ import org.supremica.log.LoggerFactory;
  *
  * @author zhennan
  *
- *  Make use of  the event-base disjunctive partitioning technique to construct the automaton partial transition relation
+ *  Make use of  the event-base disjunctive partitioning technique to construct the automaton and variable partial transition relation
  */
 public class EventDisParDepSets {
 
@@ -47,7 +48,7 @@ public class EventDisParDepSets {
     private void initialize() {
         events2EventDisParDepSet = new TIntObjectHashMap<EventDisParDepSet>();
         event2AutomatonsEdges.forEachKey(new TIntProcedure() {
-            //@Override
+            @Override
             public boolean execute(final int eventIndex) {
                 final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automatonsEdges = event2AutomatonsEdges.get(eventIndex);
                 final EventDisParDepSet eventDisParSet = new EventDisParDepSet(eventIndex, automatonsEdges);
@@ -80,7 +81,7 @@ public class EventDisParDepSets {
 
             final List<BDD> forwardTransitionRelationsWithoutActions = new ArrayList<BDD>(); // Maintain one BDD edge list [Locations and Guards]
             final List<List<BinaryExpressionProxy>> actionList = new ArrayList<List<BinaryExpressionProxy>>(); // Maintain one updated actions list
-            final List<Integer> conflictingIndices = new ArrayList<Integer>(); // Keep track the conflicting action indices to finally remove the conflicting path
+            final TIntArrayList conflictingIndexList = new TIntArrayList(); // Keep track the conflicting action indices to finally remove the conflicting path
 
             final Set<ExtendedAutomaton> includedAutomata = includingAutomata2Edges.keySet();
             final Iterator<ExtendedAutomaton> automatonIterator = includedAutomata.iterator();
@@ -101,10 +102,10 @@ public class EventDisParDepSets {
                         } else {
                             for (int index = 0; index < tempActionList.size(); index++) {
                                 if (conflicting(tempActionList.get(index), actionOfTheEdge)) {
-                                    conflictingIndices.add(index);
+                                    conflictingIndexList.add(index);
                                 }
                             }
-                            updateActionList(actionList, tempActionList, conflictingIndices, actionOfTheEdge);
+                            updateActionList(actionList, tempActionList, conflictingIndexList, actionOfTheEdge);
                         }
                     } else {
                         if (!bddExAutomata.BDDBitVecSourceVarsMap.isEmpty()) {
@@ -112,7 +113,7 @@ public class EventDisParDepSets {
                             if (tempActionList.isEmpty()) {
                                 actionList.add(actionOfTheEdge);
                             } else {
-                                updateActionList(actionList, tempActionList, conflictingIndices, actionOfTheEdge);
+                                updateActionList(actionList, tempActionList, conflictingIndexList, actionOfTheEdge);
                             }
                         }
                     }
@@ -122,19 +123,14 @@ public class EventDisParDepSets {
                         forwardTransitionRelationsWithoutActions.add(aForwardTransition);
                     } else {
                         for(int index = 0; index < tempForwardBDDList.size(); index++){
-                            if(!conflictingIndices.contains(new Integer(index))){
+                            if(!conflictingIndexList.contains(index)){
                                 forwardTransitionRelationsWithoutActions.add(aForwardTransition.and(tempForwardBDDList.get(index)));
                             }
                         }
                     }
-                    conflictingIndices.clear();
+                    conflictingIndexList.clear();
                 }
             }
-
-            //Debug
-            //System.err.println("The event name: " + bddExAutomata.theIndexMap.getEventAt(eventIndex).getName());
-            //System.err.println("the actions size: " +actionList.size());
-            //System.err.println("the BDD size:" + forwardTransitionRelationsWithoutActions.size());
 
             BDD isolatedEventForwardPartialTransitions = manager.getZeroBDD();
             for(int index = 0; index < forwardTransitionRelationsWithoutActions.size(); index++){
@@ -211,27 +207,28 @@ public class EventDisParDepSets {
 
         private boolean conflicting(final List<BinaryExpressionProxy> actions, final List<BinaryExpressionProxy> others) {
             boolean whetherConflicting = false;
-            for(final BinaryExpressionProxy aStatement: actions){
-                for(final BinaryExpressionProxy anotherStatement: others){
-                    // Here the code needs extending the following example:
-                    // a += 1 and a = a + 1 those two should be considered as the same statements
-                    // but here they are not!
-                    if(aStatement.getLeft().toString().trim().equals(anotherStatement.getLeft().toString().trim()) &&
-                            !aStatement.getRight().toString().trim().equals(anotherStatement.getRight().toString().trim())){
+            for (final BinaryExpressionProxy aStatement : actions) {
+                manager.resetLocalOverflows();
+                BDD aStatementBDD = manager.action2BDD(aStatement);
+                for (final BinaryExpressionProxy anotherStatement : others) {
+                    manager.resetLocalOverflows();
+                    BDD anotherStatementBDD = manager.action2BDD(anotherStatement);
+                    if (!aStatementBDD.equals(anotherStatementBDD)) {
                         whetherConflicting = true;
                         break;
                     }
                 }
-                if(whetherConflicting)
+                if (whetherConflicting) {
                     break;
+                }
             }
             return whetherConflicting;
         }
 
         private void updateActionList(final List<List<BinaryExpressionProxy>> actionList, final List<List<BinaryExpressionProxy>> tempBinaryExpressionList,
-                                                               final List<Integer> conflictingIndices, final List<BinaryExpressionProxy> theAction) {
+                                                               final TIntArrayList conflictingIndexList, final List<BinaryExpressionProxy> theAction) {
             for(int index = 0; index < tempBinaryExpressionList.size(); index++){
-                if(!conflictingIndices.contains(new Integer(index))){
+                if(!conflictingIndexList.contains(new Integer(index))){
                     final List<BinaryExpressionProxy> temp = new ArrayList<BinaryExpressionProxy>(tempBinaryExpressionList.get(index));
                     for(final BinaryExpressionProxy e: theAction){
                         if(!temp.contains(e))
