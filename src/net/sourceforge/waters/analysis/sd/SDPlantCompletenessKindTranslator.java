@@ -66,8 +66,12 @@ public class SDPlantCompletenessKindTranslator
   public EventKind getEventKind(final EventProxy event)
   {
     final EventKind kind = event.getKind();
+    final String eName = event.getName();
     switch (kind) {
     case CONTROLLABLE:
+      if(eName.equals("tick"))
+        return kind;
+      else
       return EventKind.UNCONTROLLABLE;
     case UNCONTROLLABLE:
       return EventKind.CONTROLLABLE;
