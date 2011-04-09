@@ -48,7 +48,6 @@ public class EventDisParDepSets {
     private void initialize() {
         events2EventDisParDepSet = new TIntObjectHashMap<EventDisParDepSet>();
         event2AutomatonsEdges.forEachKey(new TIntProcedure() {
-            @Override
             public boolean execute(final int eventIndex) {
                 final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automatonsEdges = event2AutomatonsEdges.get(eventIndex);
                 final EventDisParDepSet eventDisParSet = new EventDisParDepSet(eventIndex, automatonsEdges);
@@ -209,10 +208,10 @@ public class EventDisParDepSets {
             boolean whetherConflicting = false;
             for (final BinaryExpressionProxy aStatement : actions) {
                 manager.resetLocalOverflows();
-                BDD aStatementBDD = manager.action2BDD(aStatement);
+                final BDD aStatementBDD = manager.action2BDD(aStatement);
                 for (final BinaryExpressionProxy anotherStatement : others) {
                     manager.resetLocalOverflows();
-                    BDD anotherStatementBDD = manager.action2BDD(anotherStatement);
+                    final BDD anotherStatementBDD = manager.action2BDD(anotherStatement);
                     if (!aStatementBDD.equals(anotherStatementBDD)) {
                         whetherConflicting = true;
                         break;
