@@ -212,7 +212,7 @@ public class EventDisParDepSets {
                 for (final BinaryExpressionProxy anotherStatement : others) {
                     manager.resetLocalOverflows();
                     final BDD anotherStatementBDD = manager.action2BDD(anotherStatement);
-                    if (!aStatementBDD.equals(anotherStatementBDD)) {
+                    if (aStatement.getLeft().equals(anotherStatement.getLeft())&&!aStatementBDD.equals(anotherStatementBDD)) {
                         whetherConflicting = true;
                         break;
                     }

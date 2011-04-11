@@ -821,10 +821,13 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
             {
                 nonblockingStatesBDD = coreachableStatesBDD;
+                nbrOfNonblockingStates = nbrOfCoreachableStates;
             }
             else
             {
                 nonblockingStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
+                final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
+                nbrOfNonblockingStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
             }
 
             nbrOfBlockingStates = nbrOfReachableStates - nbrOfNonblockingStates;
