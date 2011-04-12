@@ -11,6 +11,7 @@ package org.supremica.gui.ide;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -41,7 +42,7 @@ public class AnalyzerPanel
 
     private final DocumentContainer mDocumentContainer;
 
-    public AnalyzerPanel(DocumentContainer moduleContainer, String name)
+    public AnalyzerPanel(final DocumentContainer moduleContainer, final String name)
     {
         super(name);
         setPreferredSize(IDEDimensions.mainPanelPreferredSize);
@@ -71,7 +72,7 @@ public class AnalyzerPanel
         {
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent e)
+			public void actionPerformed(final ActionEvent e)
             {
                 automataPanel.selectAllAutomata();
             }
@@ -118,6 +119,13 @@ public class AnalyzerPanel
         final ProjectBuildFromWaters builder =
           new ProjectBuildFromWaters(manager);
         final Project supremicaProject = builder.build(des);
+        final List<String> warnings = builder.getWarnings();
+        if (!warnings.isEmpty()) {
+          final IDE ide = moduleContainer.getIDE();
+          for (final String warning : warnings) {
+            ide.warn(warning);
+          }
+        }
         addProject(supremicaProject);
         mVisualProject.updated();
         /*
@@ -142,7 +150,7 @@ public class AnalyzerPanel
         return mDocumentContainer.getIDE().getActions();
     }
 
-    public String getNewAutomatonName(String msg, String nameSuggestion)
+    public String getNewAutomatonName(final String msg, final String nameSuggestion)
     {
         boolean finished = false;
         String newName = "";
@@ -178,24 +186,24 @@ public class AnalyzerPanel
         return getSelectedAutomata().size();
     }
 
-    public boolean addAutomaton(Automaton theAutomaton)
+    public boolean addAutomaton(final Automaton theAutomaton)
     {
-        int size = mVisualProject.nbrOfAutomata();
+        final int size = mVisualProject.nbrOfAutomata();
         mVisualProject.addAutomaton(theAutomaton);
         return mVisualProject.nbrOfAutomata() > size;
     }
 
-    public int addAutomata(Automata theAutomata)
+    public int addAutomata(final Automata theAutomata)
     {
-        int size = mVisualProject.nbrOfAutomata();
+        final int size = mVisualProject.nbrOfAutomata();
         mVisualProject.addAutomata(theAutomata);
         return mVisualProject.nbrOfAutomata() - size;
     }
 
-    public int addProject(Project project)
-    {       
+    public int addProject(final Project project)
+    {
         mVisualProject.clear();
-        mVisualProject.addAutomata(project);        
+        mVisualProject.addAutomata(project);
         mVisualProject.addAttributes(project);
         return project.size();
     }

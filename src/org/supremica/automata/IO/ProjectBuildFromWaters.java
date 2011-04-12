@@ -61,7 +61,10 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.*;
@@ -85,13 +88,8 @@ import org.supremica.properties.Config;
  */
 public class ProjectBuildFromWaters
 {
-    //# Data Members
-    private final ProjectFactory mProjectFactory;
-    private final DocumentManager mDocumentManager;
 
-    private static final Logger logger =
-        LoggerFactory.createLogger(ProjectBuildFromWaters.class);
-
+    //#######################################################################
     //# Constructors
     /**
      * Creates a WATERS-to-Supremica converter using a default project
@@ -124,6 +122,15 @@ public class ProjectBuildFromWaters
     {
         mDocumentManager = manager;
         mProjectFactory = factory;
+        mWarnings = new LinkedList<String>();
+    }
+
+
+    //#######################################################################
+    //# Simple Access
+    public List<String> getWarnings()
+    {
+      return Collections.unmodifiableList(mWarnings);
     }
 
 
@@ -169,10 +176,11 @@ public class ProjectBuildFromWaters
     public Project build(final ProductDESProxy des)
     throws EvalException
     {
+        mWarnings.clear();
+        warnAboutUnsupportedPropositions(des);
         final Project currProject = mProjectFactory.getProject();
         currProject.setName(des.getName());
         currProject.setComment(des.getComment());
-
         for (final AutomatonProxy aut : des.getAutomata())
         {
             final Automaton supaut = build(aut);
@@ -212,14 +220,9 @@ public class ProjectBuildFromWaters
                     {
                         forbidden = currWatersEvent;
                     }
-                    else if (marking == null)
+                    else if (name.equals(EventDeclProxy.DEFAULT_MARKING_NAME))
                     {
                         marking = currWatersEvent;
-                    }
-                    else
-                    {
-                        throw new EvalException
-                            ("Multiple propositions are not yet supported!");
                     }
                     break;
                 default:
@@ -233,7 +236,7 @@ public class ProjectBuildFromWaters
         // Create states
         for (final StateProxy currWatersState : aut.getStates())
         {
-            State currSupremicaState = new State(currWatersState.getName());
+            final State currSupremicaState = new State(currWatersState.getName());
             // Set attributes
             // Initial?
             currSupremicaState.setInitial(currWatersState.isInitial());
@@ -262,16 +265,16 @@ public class ProjectBuildFromWaters
         for (final TransitionProxy currWatersTransition :
             aut.getTransitions())
         {
-            StateProxy watersSourceState = currWatersTransition.getSource();
-            StateProxy watersTargetState = currWatersTransition.getTarget();
-            EventProxy watersEvent = currWatersTransition.getEvent();
-            State supremicaSourceState =
+            final StateProxy watersSourceState = currWatersTransition.getSource();
+            final StateProxy watersTargetState = currWatersTransition.getTarget();
+            final EventProxy watersEvent = currWatersTransition.getEvent();
+            final State supremicaSourceState =
                 supaut.getStateWithName(watersSourceState.getName());
-            State supremicaTargetState =
+            final State supremicaTargetState =
                 supaut.getStateWithName(watersTargetState.getName());
-            LabeledEvent supremicaEvent =
+            final LabeledEvent supremicaEvent =
                 currSupremicaAlphabet.getEvent(watersEvent.getName());
-            Arc currSupremicaArc = new Arc(supremicaSourceState,
+            final Arc currSupremicaArc = new Arc(supremicaSourceState,
                 supremicaTargetState,
                 supremicaEvent);
             supaut.addArc(currSupremicaArc);
@@ -310,16 +313,16 @@ public class ProjectBuildFromWaters
      *
      * @param   aut The automaton that may need addition of cost to its states
      */
-    private void addCostToStates(Automaton aut)
+    private void addCostToStates(final Automaton aut)
         throws EvalException
     {
-        for (Iterator<State> stateIt = aut.iterator(); stateIt.hasNext();)
+        for (final Iterator<State> stateIt = aut.iterator(); stateIt.hasNext();)
         {
-            State state = stateIt.next();
-            String stateName = state.getName();
+            final State state = stateIt.next();
+            final String stateName = state.getName();
             if (stateName.contains("cost") && stateName.contains("="))
             {
-                int pivotIndex = stateName.indexOf("cost");
+                final int pivotIndex = stateName.indexOf("cost");
                 String prefixStr = stateName.substring(0, pivotIndex);
                 String suffixStr = stateName.substring(pivotIndex);
                 double costValue = -1;
@@ -327,7 +330,7 @@ public class ProjectBuildFromWaters
                 // Find the first numerical value, following the 'cost'-keyword (that is our state cost)
                 try
                 {
-                    StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(suffixStr));
+                    final StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(suffixStr));
                     tokenizer.parseNumbers();
 
                     int type = tokenizer.nextToken();
@@ -341,7 +344,7 @@ public class ProjectBuildFromWaters
                         type = tokenizer.nextToken();
                     }
                 }
-                catch (Exception e)
+                catch (final Exception e)
                 {
                     e.printStackTrace();
                 }
@@ -375,14 +378,14 @@ public class ProjectBuildFromWaters
         }
     }
 
-    private void addProbabilityToTransitions(Automaton aut)
+    private void addProbabilityToTransitions(final Automaton aut)
     {
-        ArrayList<Arc> arcsToBeRemoved = new ArrayList<Arc>();
-        ArrayList<Arc> arcsToBeAdded = new ArrayList<Arc>();
+        final ArrayList<Arc> arcsToBeRemoved = new ArrayList<Arc>();
+        final ArrayList<Arc> arcsToBeAdded = new ArrayList<Arc>();
 
-        for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext();)
+        for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext();)
         {
-            Arc arc = arcIt.next();
+            final Arc arc = arcIt.next();
             String label = arc.getLabel();
             if (label.contains("prob_"))
             {
@@ -391,7 +394,7 @@ public class ProjectBuildFromWaters
                 {
                     percentage = new Double(label.substring(label.lastIndexOf("prob_") + 5).trim());
                 }
-                catch (NumberFormatException e)
+                catch (final NumberFormatException e)
                 {
                     logger.error("Parsing of transition named " + label + " failed.");
                 }
@@ -404,8 +407,8 @@ public class ProjectBuildFromWaters
                         label = label.substring(0, label.length()-1);
                     }
 
-                    LabeledEvent newEvent = new LabeledEvent(label);
-                    Arc newArc = new Arc(arc.getSource(), arc.getTarget(), newEvent, percentage/100);
+                    final LabeledEvent newEvent = new LabeledEvent(label);
+                    final Arc newArc = new Arc(arc.getSource(), arc.getTarget(), newEvent, percentage/100);
                     if (! aut.getAlphabet().contains(newEvent))
                     {
                         aut.getAlphabet().addEvent(newEvent);
@@ -426,5 +429,46 @@ public class ProjectBuildFromWaters
             aut.addArc(arcsToBeAdded.get(i));
         }
     }
-}
 
+
+    //#######################################################################
+    //# Error Handling
+    private boolean warnAboutUnsupportedPropositions(final ProductDESProxy des)
+    {
+      StringBuffer warning = null;
+      for (final EventProxy event : des.getEvents()) {
+        if (event.getKind() == EventKind.PROPOSITION) {
+          final String name = event.getName();
+          if(!name.equals(EventDeclProxy.DEFAULT_MARKING_NAME) &&
+              !name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+            if (warning == null) {
+              warning = new StringBuffer
+                ("Multiple propositions are not supported by the analyser. " +
+                 "Ignoring ");
+            } else {
+              warning.append(", ");
+            }
+            warning.append(name);
+          }
+        }
+      }
+      if (warning != null) {
+        warning.append('.');
+        mWarnings.add(warning.toString());
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final ProjectFactory mProjectFactory;
+    private final DocumentManager mDocumentManager;
+    private final List<String> mWarnings;
+
+    private static final Logger logger =
+        LoggerFactory.createLogger(ProjectBuildFromWaters.class);
+
+}
