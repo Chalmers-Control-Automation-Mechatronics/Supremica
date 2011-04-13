@@ -70,8 +70,8 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     mAlphaMarking = alphaMarking;
   }
 
-  // #######################################################################
-  // # Rule Application
+  //#######################################################################
+  //# Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
       throws OverflowException
@@ -93,8 +93,8 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     final BitSet keep = new BitSet(numStates);
     final TransitionIterator all = rel.createAllTransitionsReadOnlyIterator();
     while (all.advance()) {
-      if(all.getCurrentEvent()!=tauID){
-        final int target=all.getCurrentTargetState();
+      if (all.getCurrentEvent() != tauID) {
+        final int target = all.getCurrentTargetState();
         keep.set(target);
       }
     }
@@ -106,7 +106,8 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
       iter.reset(source, tauID);
       while (iter.advance()) {
         final int target = iter.getCurrentTargetState();
-        if (!rel.isMarked(target, alphaID) && !keep.get(target) ) {
+        if (!rel.isMarked(target, alphaID) &&
+            !keep.get(target) && !rel.isInitial(target)) {
           iter.remove();
           rel.copyOutgoingTransitions(target, source);
           modified = true;

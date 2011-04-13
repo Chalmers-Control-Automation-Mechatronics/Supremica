@@ -166,10 +166,10 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
   {
     mPeakNumberOfNodes =
         Math.max(mPeakNumberOfNodes, result.getPeakNumberOfNodes());
-    mTotalNumberOfStates += result.getPeakNumberOfStates();
+    mTotalNumberOfStates += result.getTotalNumberOfStates();
     mPeakNumberOfStates =
         Math.max(mPeakNumberOfStates, result.getPeakNumberOfStates());
-    mTotalNumberOfTransitions += result.getPeakNumberOfTransitions();
+    mTotalNumberOfTransitions += result.getTotalNumberOfTransitions();
     mPeakNumberOfTransitions =
         Math.max(mPeakNumberOfTransitions, result.getPeakNumberOfTransitions());
     mConflictCheckerStats.add(result);
