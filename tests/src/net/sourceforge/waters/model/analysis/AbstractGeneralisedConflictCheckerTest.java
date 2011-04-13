@@ -112,6 +112,15 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testTwoInit() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "twoinit.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+
   // #########################################################################
   // # Test Cases --- SIC Property V
   public void testSIC5__hisc8_low2__a1() throws Exception

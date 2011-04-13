@@ -475,17 +475,17 @@ advanceInit(uint32* tuple)
 {
   const int w = mAutomatonRecord->getWordIndex();
   tuple[w] &= ~mAutomatonRecord->getBitMask();
-  const uint32 next = mIndex + 1;
+  uint32 next = mIndex + 1;
+  if (next == mAutomatonRecord->getEndOfInitialStates1()) {
+    next = mAutomatonRecord->getFirstInitialState2();
+  }
   bool result;
-  if (next >= mAutomatonRecord->getEndOfInitialStates2()) {
-    mIndex = mAutomatonRecord->getFirstInitialState1();
-    result = true;
-  } else if (next >= mAutomatonRecord->getEndOfInitialStates1()) {
-    mIndex = mAutomatonRecord->getFirstInitialState2();
-    result = false;
-  } else {
+  if (next < mAutomatonRecord->getEndOfInitialStates2()) {
     mIndex = next;
     result = false;
+  } else {
+    mIndex = mAutomatonRecord->getFirstInitialState1();
+    result = true;  // indicates end of iteration
   }
   tuple[w] |= mIndex << mAutomatonRecord->getShift();
   return result;

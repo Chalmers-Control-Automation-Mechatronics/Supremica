@@ -214,6 +214,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testTwoInit() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "twoinit.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testVerriegel4Counter2() throws Exception
   {
     final String group = "tests";
