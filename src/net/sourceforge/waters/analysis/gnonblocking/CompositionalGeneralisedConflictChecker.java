@@ -611,8 +611,8 @@ public class CompositionalGeneralisedConflictChecker extends
       dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
       mAbstractionRules.add(dnasRule);
 
-      final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
-          new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+      final AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
+          new AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
               mPropositions);
       rttlnsRule.setAlphaMarking(alpha);
       mAbstractionRules.add(rttlnsRule);
