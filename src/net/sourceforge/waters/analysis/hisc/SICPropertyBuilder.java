@@ -151,6 +151,7 @@ public class SICPropertyBuilder
     final int numaut = oldAutomata.size();
     final List<AutomatonProxy> newAutomata =
       new ArrayList<AutomatonProxy>(numaut);
+
     // The low level automaton of a model only need modifying once because they
     // don't depend on the answer event.
     if (mLowLevelAutomata == null) {
@@ -190,11 +191,13 @@ public class SICPropertyBuilder
           final List<EventProxy> local1= Collections.singletonList(event);
           final String aut_name = "Test:" + event.getName();
           newAutomata.add(createSIC5Test(answer,iface,local1,aut_name ));
+         // MarshallingTools.saveModule(newAutomata, "/research/vaibhav/sic5_changes_automaton/1.wmod");
         }
     }
     else{
       newAutomata.add(createSIC5Test(answer,iface,local,"Test:Aut"));
    }
+
 
     // removes markings from automaton event alphabet
     final Collection<EventProxy> newEvents =
@@ -211,6 +214,8 @@ public class SICPropertyBuilder
     final ProductDESProxy newModel =
         mFactory.createProductDESProxy(name, comment, null, newEvents,
                                        newAutomata);
+    // Test Automaton in case of splitting = false;
+    // MarshallingTools.saveProductDES(newModel, "/research/vaibhav/sic5_changes_automaton/"+name+".wmod");
     return newModel;
   }
 
@@ -415,6 +420,10 @@ public class SICPropertyBuilder
     final AutomatonProxy newTestAut =
         mFactory.createAutomatonProxy(name, ComponentKind.SPEC,
                                       newEvents, states, transitions);
+    // for mSplitting = false
+    //MarshallingTools.saveModule(newTestAut, "/research/vaibhav/sic5_changes_automaton/maip3_syn/6(mustl,mins)/splitting_false/"+name+".wmod");
+    //for mSplitting = true
+    //MarshallingTools.saveModule(newTestAut, "/research/vaibhav/sic5_changes_automaton/maip3_syn/6(mustl,mins)/splitting_true/"+name+".wmod");
     return newTestAut;
 
   }
@@ -822,7 +831,7 @@ public class SICPropertyBuilder
   /**
    * The tau event used for the test automaton for SIC property VI.
    */
-  private boolean mSplitting = false;
+  private boolean mSplitting = true;
 
   private EventProxy mTau;
 
