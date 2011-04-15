@@ -831,7 +831,7 @@ public class SICPropertyBuilder
   /**
    * The tau event used for the test automaton for SIC property VI.
    */
-  private boolean mSplitting = true;
+  private boolean mSplitting = false;
 
   private EventProxy mTau;
 
