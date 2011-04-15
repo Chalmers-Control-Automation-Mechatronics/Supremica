@@ -105,7 +105,7 @@ class AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
           (autToAbstract, eventEnc, mInputStateEnc,
            ListBufferTransitionRelation.CONFIG_ALL);
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    final TIntArrayList victims = new TIntArrayList();
+    final TIntArrayList targets = new TIntArrayList();
     final int numStates = rel.getNumberOfStates();
     boolean modified = false;
 
@@ -117,23 +117,23 @@ class AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
           final int eventID = iter.getCurrentEvent();
           if (eventID == tauID) {
             final int target = iter.getCurrentTargetState();
-            victims.add(target);
+            targets.add(target);
           } else {
-            victims.clear();
+            targets.clear();
             continue main;
           }
         }
-        if (!victims.isEmpty()) {
+        if (!targets.isEmpty()) {
           rel.removeOutgoingTransitions(source, tauID);
-          for (int i = 0; i < victims.size(); i++) {
-            final int target = victims.get(i);
-            // TODO: Need proper support for this operation with both
-            // transition buffers open.
+          for (int i = 0; i < targets.size(); i++) {
+            final int target = targets.get(i);
             rel.copyIncomingTransitions(source, target);
           }
           rel.removeIncomingTransitions(source);
+          rel.setInitial(source, false);
+          rel.setReachable(source, false);
           modified = true;
-          victims.clear();
+          targets.clear();
         }
       }
     }
