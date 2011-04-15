@@ -111,7 +111,7 @@ public class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "tauTransRemovalToNonAlpha_3.wmod";
+    final String name = "tauTransRemovalToNonAlpha_3a.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
@@ -145,7 +145,7 @@ public class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "tauTransRemovalToNonAlpha_4.wmod";
+    final String name = "tauTransRemovalToNonAlpha_4a.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
