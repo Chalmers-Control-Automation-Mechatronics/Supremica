@@ -169,12 +169,12 @@ public class ProductDESEqualityVisitor
       final ProductDESProxy expected = (ProductDESProxy) getSecondProxy();
       final Set<EventProxy> events1 = des.getEvents();
       final Set<EventProxy> events2 = expected.getEvents();
-      if (!compareSets(events1, events2)) {
+      if (!compareNamedSets(events1, events2)) {
         return false;
       }
       final Set<AutomatonProxy> aut1 = des.getAutomata();
       final Set<AutomatonProxy> aut2 = expected.getAutomata();
-      if (!compareSets(aut1, aut2)) {
+      if (!compareNamedSets(aut1, aut2)) {
         return false;
       }
       return true;

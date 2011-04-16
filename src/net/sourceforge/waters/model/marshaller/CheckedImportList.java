@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.marshaller;
 
 import net.sourceforge.waters.model.base.IndexedArrayList;
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
@@ -49,7 +50,7 @@ class CheckedImportList<P extends NamedProxy>
   //# Error Messages
   protected void appendContainerName(final StringBuffer buffer)
   {
-    final String clazzname = getShortClassName(mContainerClazz);
+    final String clazzname = ProxyTools.getShortClassName(mContainerClazz);
     buffer.append(clazzname);
     if (mContainerName != null) {
       buffer.append(" '");

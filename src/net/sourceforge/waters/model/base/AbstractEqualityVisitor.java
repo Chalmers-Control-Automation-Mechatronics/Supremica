@@ -432,6 +432,45 @@ public abstract class AbstractEqualityVisitor
   }
 
   /**
+   * Checks whether two sets of named proxies have the same contents. This
+   * method compares two sets of proxies, and checks whether they have elements
+   * considered as equal by this visitor. Names are used to match elements of
+   * the two sets and produce more detailed diagnostics if differences are
+   * found. This method can compare sets or collections, provided they do not
+   * contain duplicate names.
+   * @throws DuplicateNameException
+   *           to indicate that one of the input sets contains more than one
+   *           entry with the same name.
+   */
+  protected <P extends NamedProxy> boolean compareNamedSets
+    (final Collection<P> set, final Collection<P> expected)
+    throws VisitorException
+  {
+    //final Proxy container = mDiagnosticPath.peekLast();
+    final IndexedSet<P> map = new DiagnosticArraySet<P>(set);
+    for (final P eproxy : expected) {
+      final String name = eproxy.getName();
+      final P proxy = map.get(name);
+      if (proxy == null) {
+        return reportMissingItem(eproxy);
+      } else if (!compareProxies(proxy, eproxy)) {
+        return false;
+      }
+    }
+    if (map.size() == expected.size()) {
+      return true;
+    }
+    final IndexedSet<P> emap = new DiagnosticArraySet<P>(expected);
+    for (final P proxy : set) {
+      final String name = proxy.getName();
+      if (!emap.containsName(name)) {
+        return reportSuperfluousItem(proxy);
+      }
+    }
+    return true;
+  }
+
+  /**
    * Checks whether two lists have the same contents. This method compares
    * two lists of proxies, and checks whether they have equal elements
    * appearing in the same order. The equality used is defined by this
@@ -1012,6 +1051,34 @@ public abstract class AbstractEqualityVisitor
     private final NamedProxy mKey;
     private final String mValueName;
     private final String mExpectedName;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class DiagnosticArraySet
+  private class DiagnosticArraySet<P extends NamedProxy>
+    extends IndexedArraySet<P>
+  {
+
+    //#######################################################################
+    //# Constructor
+    private DiagnosticArraySet(final Collection<? extends P> collection)
+    {
+      super(collection);
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.water.model.base.IndexedArraySet
+    protected void appendContainerName(final StringBuffer buffer)
+    {
+      final Proxy container = mDiagnosticPath.peekLast();
+      ProxyTools.appendContainerName(container, buffer);
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
   }
 

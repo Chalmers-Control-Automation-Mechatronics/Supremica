@@ -311,21 +311,13 @@ public class IndexedArrayList<P extends NamedProxy>
 
   protected void appendContainerName(final StringBuffer buffer)
   {
-    final Class<?> clazz = getClass();
-    final String name = getShortClassName(clazz);
+    final String name = ProxyTools.getShortClassName(this);
     buffer.append(name);
   }
 
   protected void appendItemKindName(final StringBuffer buffer)
   {
     buffer.append("item");
-  }
-
-  protected String getShortClassName(final Class<?> clazz)
-  {
-    final String fullclazzname = clazz.getName();
-    final int dotpos = fullclazzname.lastIndexOf('.');
-    return fullclazzname.substring(dotpos + 1);
   }
 
 

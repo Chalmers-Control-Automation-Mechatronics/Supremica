@@ -74,6 +74,19 @@ public class ProxyTools
 
   //#########################################################################
   //# Class Names
+  public static void appendContainerName(final Proxy container,
+                                         final StringBuffer buffer)
+  {
+    final String clsname = getShortProxyInterfaceName(container);
+    buffer.append(clsname);
+    if (container instanceof NamedProxy) {
+      final NamedProxy named = (NamedProxy) container;
+      buffer.append(" '");
+      buffer.append(named.getName());
+      buffer.append('\'');
+    }
+  }
+
   public static String getShortProxyInterfaceName(final Proxy proxy)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();
