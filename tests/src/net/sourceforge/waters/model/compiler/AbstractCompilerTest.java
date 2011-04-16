@@ -162,6 +162,18 @@ public abstract class AbstractCompilerTest
     compile("tests", "hisc", "parManEg_I_mfb_lowlevel");
   }
 
+  public void testCompile_patrik1()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "patrik1");
+  }
+
+  public void testCompile_patrik2()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "patrik2");
+  }
+
   public void testCompile_PLanTS()
     throws IOException, WatersException
   {

@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 /**
  * <P>A simplification rule used for normalisation of binary relations.</P>
  *
- * <P>There are two versions of this rule, the <I>normal</I>, the
+ * <P>There are three versions of this rule, the <I>normal</I>, the
  * <I>negative</I>, and the <I>negating</I> rule.</P>
  *
  * <P><U>Normal:</U></P>
@@ -195,7 +195,7 @@ class RelationNormalizationRule extends SimplificationRule
 
 
   //#########################################################################
-  //# Inner Class RelationPlaceHolder
+  //# Inner Class NotNormalRelationPlaceHolder
   private static class NotNormalRelationPlaceHolder extends PlaceHolder
   {
 

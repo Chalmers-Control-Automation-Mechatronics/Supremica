@@ -209,8 +209,9 @@ public class ConstraintPropagator
           mSimpleExpressionCompiler.simplify(constraint, mContext);
         for (final SimplificationRule rule : mNormalizationRules) {
           if (rule.match(simplified, this)) {
-            // System.err.println
-            //  ("NORM: " + rule.getClass().getName() + " " + simplified);
+            // System.err.println("NORM: " +
+            //                    ProxyTools.getShortClassName(rule) +
+            //                    " " + simplified);
             rule.execute(this);
             continue outer;
           }
@@ -231,8 +232,9 @@ public class ConstraintPropagator
           final SimpleExpressionProxy constraint = iter.next();
           for (final SimplificationRule rule : mRewriteRules) {
             if (rule.match(constraint, this)) {
-              // System.err.println
-              //  ("MATCH: " + rule.getClass().getName() + " " + constraint);
+              // System.err.println("MATCH: " +
+              //                    ProxyTools.getShortClassName(rule) + " " +
+              //                    constraint);
               if (rule.isMakingReplacement()) {
                 iter.remove();
               }
@@ -505,6 +507,7 @@ public class ConstraintPropagator
         final CompiledRange intersection = current.intersection(estimate);
         if (intersection.isEmpty()) {
           setFalse();
+          return true;
         } else if (intersection instanceof CompiledIntRange) {
           final CompiledIntRange intrange = (CompiledIntRange) intersection;
           binding = new IntBinding(varname, intrange, expr);
@@ -686,19 +689,40 @@ public class ConstraintPropagator
       mBoundExpression = expr;
     }
 
-    void setConstrainedRange(final CompiledRange range)
+    /**
+     * Assigns a new range to this binding.
+     * If the new range is empty, the constraint propagator is set to the
+     * unsatisfiable or 'false' state.
+     * If the new range contains only one element, that element is assigned
+     * as the new bound expression. This may produce new constraints the
+     * old bound expression contains variables.
+     * @return <CODE>true</CODE> if the constraint propagator state has
+     *         been changed by this call.
+     */
+    boolean setConstrainedRange(final CompiledRange range)
     {
       mConstrainedRange = range;
       switch (range.size()) {
       case 0:
         setFalse();
-        break;
+        return true;
       case 1:
-        mIsAtomic = true;
-        mBoundExpression = range.getValues().iterator().next();
-        break;
+        if (!mIsAtomic) {
+          final SimpleExpressionProxy value =
+            range.getValues().iterator().next();
+          if (mBoundExpression != null) {
+            final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
+            final BinaryExpressionProxy constraint =
+              mFactory.createBinaryExpressionProxy(eqop,
+                                                   value, mBoundExpression);
+            mUnprocessedConstraints.add(constraint);
+          }
+          mBoundExpression = value;
+          mIsAtomic = true;
+        }
+        return true;
       default:
-        break;
+        return false;
       }
     }
 
