@@ -149,7 +149,15 @@ public abstract class BDDModelVerifier
   }
 
 
-//#########################################################################
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
   @Override
   public void setKindTranslator(final KindTranslator translator)

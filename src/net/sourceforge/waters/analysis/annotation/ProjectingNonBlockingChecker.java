@@ -250,6 +250,15 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     return stats;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier

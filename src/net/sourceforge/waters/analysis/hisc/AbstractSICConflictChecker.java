@@ -38,14 +38,14 @@ abstract public class AbstractSICConflictChecker
   }
 
   public AbstractSICConflictChecker(final ConflictChecker checker,
-                              final ProductDESProxyFactory factory)
+                                    final ProductDESProxyFactory factory)
   {
     this(checker, null, factory);
   }
 
   public AbstractSICConflictChecker(final ConflictChecker checker,
-                              final ProductDESProxy model,
-                              final ProductDESProxyFactory factory)
+                                    final ProductDESProxy model,
+                                    final ProductDESProxyFactory factory)
   {
     super(model, factory);
     mChecker = checker;
@@ -62,6 +62,14 @@ abstract public class AbstractSICConflictChecker
   public void setConflictChecker(final ConflictChecker checker)
   {
     mChecker = checker;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return mChecker.supportsNondeterminism();
   }
 
 

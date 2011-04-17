@@ -143,8 +143,17 @@ public class CompositionalGeneralisedConflictChecker extends
     super(model, marking, preMarking, factory);
   }
 
-  // #########################################################################
-  // # Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
   public CompositionalGeneralisedConflictCheckerVerificationResult getAnalysisResult()
   {

@@ -235,6 +235,14 @@ public class MonolithicSafetyVerifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   public void setKindTranslator(final KindTranslator translator)
   {

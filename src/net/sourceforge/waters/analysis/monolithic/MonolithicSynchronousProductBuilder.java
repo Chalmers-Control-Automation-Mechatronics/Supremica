@@ -153,6 +153,14 @@ public class MonolithicSynchronousProductBuilder
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   protected void setUp()

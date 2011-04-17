@@ -225,6 +225,17 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     }
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private ConflictTraceProxy buildCounterExample(
                                                  final int firstBlockingState,
                                                  final ProductDESProxy model,

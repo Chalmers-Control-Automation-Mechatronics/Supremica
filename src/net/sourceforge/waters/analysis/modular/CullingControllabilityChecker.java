@@ -239,6 +239,17 @@ public class CullingControllabilityChecker
     result.setNumberOfStates(mStates);
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Inner Class Op
   private static class Op
   {
     public final AutomatonProxy added;

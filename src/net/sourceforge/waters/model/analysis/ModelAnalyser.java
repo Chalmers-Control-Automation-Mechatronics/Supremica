@@ -77,7 +77,17 @@ public interface ModelAnalyser
   //#########################################################################
   //# Parameters
   /**
-   * Sets the node limit for this model verifier.
+   * Returns whether or not this model analyser supports nondeterministic
+   * automata. Only model analyser that return <CODE>true</CODE> on this
+   * call are guaranteed to give correct results when presented an input
+   * containing nondeterministic automata. Model analysers not supporting
+   * nondeterministic automata should throw {@link NondeterminsticDESException}
+   * when encountering a nondeterministic automaton in their input.
+   */
+  public boolean supportsNondeterminism();
+
+  /**
+   * Sets the node limit for this model analyser.
    * If set, the node limit is the maximum number of nodes the verifier
    * is allowed to keep in memory at any one time. If this number is
    * exceeded, an {@link OverflowException} is thrown.
@@ -89,7 +99,7 @@ public interface ModelAnalyser
   public void setNodeLimit(final int limit);
 
   /**
-   * Gets the node limit for this model verifier.
+   * Gets the node limit for this model analyser.
    * @return The current node limit, or {@link Integer#MAX_VALUE} to indicate
    *         that no node limit is used.
    * @see    #setNodeLimit(int)
@@ -97,7 +107,7 @@ public interface ModelAnalyser
   public int getNodeLimit();
 
   /**
-   * Sets the transition limit for this model verifier.
+   * Sets the transition limit for this model analyser.
    * If set, the transition limit is the maximum number of transitions the
    * verifier is allowed to keep in memory at any one time. If this number
    * is exceeded, an {@link OverflowException} is thrown.
@@ -111,7 +121,7 @@ public interface ModelAnalyser
   public void setTransitionLimit(final int limit);
 
   /**
-   * Gets the transition limit for this model verifier.
+   * Gets the transition limit for this model analyser.
    * @return The current transition limit, or {@link Integer#MAX_VALUE} to
    *         indicate that no transition limit is used.
    * @see    #setTransitionLimit(int)

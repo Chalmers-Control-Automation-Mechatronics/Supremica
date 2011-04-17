@@ -168,6 +168,16 @@ public class DistributedSafetyVerifier
   }
 
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private List<EventProxy> sanitiseTrace(final EventProxy[] trace) throws AnalysisException
   {
     final List<EventProxy> nt = new ArrayList<EventProxy>();

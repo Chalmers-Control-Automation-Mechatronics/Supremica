@@ -125,6 +125,14 @@ public class MonolithicControlLoopChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
   public LoopTraceProxy getCounterExample()
   {

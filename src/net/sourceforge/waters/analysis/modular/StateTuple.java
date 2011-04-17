@@ -11,9 +11,9 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.Arrays;
 
-public class StateCouple
+public class StateTuple
 {
-  public StateCouple(final int[] states)
+  public StateTuple(final int[] states)
   {
     mSetStates = states;
     mName = -1;
@@ -27,7 +27,7 @@ public class StateCouple
   @Override
   public boolean equals(final Object o){
     if(o != null && o.getClass() == getClass()){
-      final StateCouple detState = (StateCouple) o;
+      final StateTuple detState = (StateTuple) o;
       return Arrays.equals(mSetStates, detState.mSetStates);
     } else {
       return false;

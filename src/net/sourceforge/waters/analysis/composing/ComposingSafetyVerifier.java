@@ -208,6 +208,17 @@ public class ComposingSafetyVerifier
     }
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   //Works only for determinstic model
   private List<EventProxy> renovateTrace(final List<EventProxy> oldlist,
                                          final ASTAutomaton astaut) {

@@ -47,7 +47,7 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
           LanguageInclusionKindTranslator.getInstance(),
           LanguageInclusionDiagnostics.getInstance(),
           factory);
-    cChecker = checker;
+    mChecker = checker;
   }
 
 
@@ -68,7 +68,7 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
 
       final ModularLanguageInclusionChecker checker=
         new ModularLanguageInclusionChecker(convertedModel, getFactory(),
-                                             cChecker );
+                                             mChecker );
       checker.setModel(convertedModel);
 
       final VerificationResult result;
@@ -89,5 +89,16 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
     }
   }
 
-  private final ControllabilityChecker cChecker;
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return mChecker.supportsNondeterminism();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private final ControllabilityChecker mChecker;
 }

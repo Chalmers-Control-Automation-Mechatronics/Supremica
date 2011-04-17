@@ -373,6 +373,14 @@ public class OPConflictChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   /**
    * Initialises required variables to default values if the user has not

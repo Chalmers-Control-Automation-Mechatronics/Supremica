@@ -54,7 +54,7 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
                  LanguageInclusionKindTranslator.getInstance(),
                  LanguageInclusionDiagnostics.getInstance(),
                  factory);
-           cChecker = checker;
+           mChecker = checker;
          }
 
 
@@ -77,7 +77,7 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
         convertedModel = builder.createSingularModel(hib);
         final ModularLanguageInclusionChecker checker=
          new ModularLanguageInclusionChecker(convertedModel, getFactory(),
-                                              cChecker );
+                                              mChecker );
         checker.setModel(convertedModel);
         final VerificationResult result;
         try {
@@ -106,6 +106,14 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
   public EventProxy getFailedAnswer()
   {
     return mFailedAnswer;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return mChecker.supportsNondeterminism();
   }
 
 
@@ -178,5 +186,5 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
 
   private List<VerificationResult> mCheckerStats;
 
-  private final ControllabilityChecker cChecker;
+  private final ControllabilityChecker mChecker;
 }

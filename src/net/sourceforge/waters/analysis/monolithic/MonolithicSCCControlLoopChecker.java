@@ -141,6 +141,14 @@ public class MonolithicSCCControlLoopChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
   public static void setLoopDetector(final CLDetector newDetector)
   {

@@ -125,6 +125,14 @@ public class ModularLanguageInclusionChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private boolean setFailedResult(final TraceProxy counterexample,
                                   final AutomatonProxy property)

@@ -220,6 +220,14 @@ public class ProjectingNonBlockingCheckerB
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
   public void setNodeLimit(final int limit)

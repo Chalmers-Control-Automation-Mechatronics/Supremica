@@ -84,7 +84,7 @@ implements SafetyProjectionBuilder
       setUp();
       final int limit = getNodeLimit();
       final ProductDESProxy model = getModel();
-      states = new HashMap<StateCouple, StateCouple>(limit);
+      states = new HashMap<StateTuple, StateTuple>(limit);
       trans = new ArrayList<TransitionProxy>();
       events = model.getEvents().toArray(new EventProxy[model.getEvents().size()]);
       if(mPrintData){
@@ -188,10 +188,10 @@ implements SafetyProjectionBuilder
       }
       // Time to start building the automaton
       mNumberOfStates = 1;
-      StateCouple currentState = new StateCouple(setStates);
+      StateTuple currentState = new StateTuple(setStates);
       currentState.setName(0);
       states.put(currentState, currentState);
-      mCoupleQueue = new ArrayDeque<StateCouple>(100);
+      mCoupleQueue = new ArrayDeque<StateTuple>(100);
       mCoupleQueue.offer(currentState);
       int silentTransitionCounter = 0;
       int size = 0;
@@ -350,7 +350,19 @@ implements SafetyProjectionBuilder
 
   }
 
-  public boolean exploreSyncProduct(final StateCouple state, final boolean forbidden)
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private boolean exploreSyncProduct(final StateTuple state,
+                                     final boolean forbidden)
     throws OverflowException
   {
     boolean result = false;
@@ -389,7 +401,7 @@ implements SafetyProjectionBuilder
         }
       }
       result = true;
-      final StateCouple successor = new StateCouple(suc);
+      final StateTuple successor = new StateTuple(suc);
       mDisabled.remove(events[i]);
       Integer target;
       if(states.containsKey(successor)){
@@ -714,14 +726,14 @@ implements SafetyProjectionBuilder
   private Set<EventProxy> mHide;
   private Set<EventProxy> mForbidden;
   private Set<EventProxy> mDisabled;
-  private Map<StateCouple, StateCouple> states;
+  private Map<StateTuple, StateTuple> states;
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;
   private int[][][] mTransitions;
   private List<int[]> newtrans = new ArrayList<int[]>();
   private CollectionDeterministic newStates;
   private int mNumberOfStates;
-  private Deque<StateCouple> mCoupleQueue;
+  private Deque<StateTuple> mCoupleQueue;
   private Deque<DeterministicState> mDeterministicQueue;
   private Map<DeterministicState, DeterministicState> mDetRecord;
   private Map<Integer, DeterministicState> mNonDetRecord;

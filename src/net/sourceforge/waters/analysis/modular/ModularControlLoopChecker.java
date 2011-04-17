@@ -143,6 +143,17 @@ public class ModularControlLoopChecker
     }
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void updateResult(final AutomataGroup newGroup)
   {
     if (newGroup.rerun())

@@ -49,6 +49,14 @@ public abstract class NativeModelAnalyser
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
   //# Native Methods
   public native void requestAbort();
 

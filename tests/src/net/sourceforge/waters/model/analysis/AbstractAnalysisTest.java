@@ -158,9 +158,17 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     if (doc instanceof ProductDESProxy) {
       assertTrue("Can't apply bindings to ProductDES!",
                  bindings == null || bindings.isEmpty());
-      return (ProductDESProxy) doc;
+      final ProductDESProxy des = (ProductDESProxy) doc;
+      final DeterministicProductDESChecker checker =
+        DeterministicProductDESChecker.getInstance();
+      mProductDESIsDeterministic = checker.isDeterministic(des);
+      return des;
     } else if (doc instanceof ModuleProxy) {
       final ModuleProxy module = (ModuleProxy) doc;
+      final DeterministicModuleChecker checker =
+        DeterministicModuleChecker.getInstance();
+      mProductDESIsDeterministic =
+        checker.isDeterministic(module, mDocumentManager);
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
       configure(compiler);
@@ -303,6 +311,11 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     mDocumentManager.saveAs(module, modfilename);
   }
 
+  protected boolean isProductDESDeterministic()
+  {
+    return mProductDESIsDeterministic;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -312,5 +325,7 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
   private ProductDESImporter mProductDESImporter;
+
+  private boolean mProductDESIsDeterministic;
 
 }

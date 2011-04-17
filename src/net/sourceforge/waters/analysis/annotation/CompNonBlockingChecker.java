@@ -64,7 +64,7 @@ import org.supremica.log.LoggerFactory;
 
 
 /**
- * The projectiong controllability check algorithm.
+ * The projecting controllability check algorithm.
  *
  * @author Simon Ware
  */
@@ -225,6 +225,14 @@ public class CompNonBlockingChecker
     stats += "Bisimulation: " + mBISIMulation + " mBITIME: " + mBITIME + "\n";
     stats += "Time: " + mTime + "\n";
     return stats;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
   }
 
 

@@ -247,6 +247,14 @@ public class Projection2
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   @Override
   protected void setUp()

@@ -213,6 +213,14 @@ public class OPSearchAutomatonSimplifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Overrides for
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalsyser
   protected void setUp()

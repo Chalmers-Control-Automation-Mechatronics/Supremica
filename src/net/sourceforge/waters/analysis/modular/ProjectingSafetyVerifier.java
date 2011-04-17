@@ -322,6 +322,14 @@ public class ProjectingSafetyVerifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
   protected void addStatistics()

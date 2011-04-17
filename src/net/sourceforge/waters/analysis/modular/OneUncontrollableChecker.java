@@ -103,6 +103,14 @@ public class OneUncontrollableChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
   @Override
   protected void addStatistics()

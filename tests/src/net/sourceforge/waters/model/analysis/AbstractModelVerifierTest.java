@@ -25,8 +25,8 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 {
 
-  // #########################################################################
-  // # Overrides for base class junit.framework.TestCase
+  //#########################################################################
+  //# Overrides for base class junit.framework.TestCase
   public AbstractModelVerifierTest()
   {
   }
@@ -45,8 +45,9 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     setNodeLimit();
   }
 
-  // #########################################################################
-  // # Instantiating and Checking Modules
+
+  //#########################################################################
+  //# Instantiating and Checking Modules
   protected void runModelVerifier(final String group, final String name,
                                   final List<ParameterBindingProxy> bindings,
                                   final boolean expect) throws Exception
@@ -83,8 +84,9 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     runModelVerifier(filename, bindings, expect);
   }
 
-  // #########################################################################
-  // # Checking Instantiated Product DES problems
+
+  //#########################################################################
+  //# Checking Instantiated Product DES problems
   protected void runModelVerifier(final String group, final String name,
                                   final boolean expect) throws Exception
   {
@@ -151,9 +153,10 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     return mModelVerifier;
   }
 
-  // #########################################################################
-  // # To be Overridden/Used by Subclasses
-/**
+
+  //#########################################################################
+  //# To be Overridden/Used by Subclasses
+  /**
    * Performs preliminary checks on the counterexample.
    * This method performs some simple checks on the counterexample to make
    * sure that it can be saved. The more advanced semantic checks are
@@ -244,8 +247,8 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     return filename;
   }
 
-  // #########################################################################
-  // # To be Provided by Subclasses
+  //#########################################################################
+  //# To be Provided by Subclasses
   /**
    * Creates an instance of the model verifier under test. This method
    * instantiates the class of the model verifier tested by the particular
@@ -272,25 +275,32 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     mModelVerifier.setModel(des);
   }
 
-  // #########################################################################
-  // # Auxiliary Methods
+  //#########################################################################
+  //# Auxiliary Methods
   protected void runModelVerifierWithBindings(final ProductDESProxy des,
                                               final boolean expect)
       throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
-    configureModelVerifier(des);
-    final boolean result = mModelVerifier.run();
-    TraceProxy counterexample = null;
-    if (!result) {
-      counterexample = mModelVerifier.getCounterExample();
-      precheckCounterExample(counterexample);
-      saveCounterExample(counterexample);
-    }
-    assertEquals("Wrong result from model checker: got " + result
-        + " but should have been " + expect + "!", expect, result);
-    if (!expect) {
-      checkCounterExample(des, counterexample);
+    try {
+      configureModelVerifier(des);
+      final boolean result = mModelVerifier.run();
+      TraceProxy counterexample = null;
+      if (!result) {
+        counterexample = mModelVerifier.getCounterExample();
+        precheckCounterExample(counterexample);
+        saveCounterExample(counterexample);
+      }
+      assertEquals("Wrong result from model checker: got " + result +
+                   " but should have been " + expect + "!", expect, result);
+      if (!expect) {
+        checkCounterExample(des, counterexample);
+      }
+    } catch (final NondeterministicDESException exception) {
+      if (mModelVerifier.supportsNondeterminism() ||
+          isProductDESDeterministic()) {
+        throw exception;
+      }
     }
     getLogger().info("Done " + des.getName());
   }
@@ -306,8 +316,9 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     }
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private JAXBTraceMarshaller mTraceMarshaller;
   private ModelVerifier mModelVerifier;
   private List<ParameterBindingProxy> mBindings;

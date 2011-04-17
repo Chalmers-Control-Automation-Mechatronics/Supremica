@@ -171,6 +171,14 @@ public class ModularControllabilityChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
   protected boolean setFailedResult(final TraceProxy counterexample)

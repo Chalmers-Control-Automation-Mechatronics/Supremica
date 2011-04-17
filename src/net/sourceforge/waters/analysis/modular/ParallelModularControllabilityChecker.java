@@ -250,6 +250,17 @@ public class ParallelModularControllabilityChecker
     return true;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private ParallelRun check(final ParallelRun run, final Collection<AutomatonProxy> changed)
   {
     final Collection<AutomatonProxy> changed2 = new ArrayList<AutomatonProxy>(changed);
