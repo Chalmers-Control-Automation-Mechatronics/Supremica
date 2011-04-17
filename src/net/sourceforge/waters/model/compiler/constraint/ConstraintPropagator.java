@@ -64,8 +64,9 @@ public class ConstraintPropagator
     mNegator = RelationNormalizationRule.createNegatingRule(factory, optable);
     mNormalizationRules = new SimplificationRule[] {
       AndEliminationRule.createRule(factory, optable),
-      mNormalizer,
       RelationNormalizationRule.createNegativeRule(factory, optable),
+      SumSimplificationRule.createRule(factory, optable),
+      mNormalizer,
       TrueEliminationRule.createRule(factory, optable),
       FalseEliminationRule.createRule(factory, optable),
       DoubleNegationRule.createRule(factory, optable),
@@ -382,6 +383,16 @@ public class ConstraintPropagator
   boolean isAtomicValue(final SimpleExpressionProxy expr)
   {
     return mSimpleExpressionCompiler.isAtomicValue(expr, mContext);
+  }
+
+  boolean isVariable(final SimpleExpressionProxy expr)
+  {
+    if (expr instanceof IdentifierProxy) {
+      final IdentifierProxy ident = (IdentifierProxy) expr;
+      return mContext.getVariableRange(ident) != null;
+    } else {
+      return false;
+    }
   }
 
   CompiledRange estimateRange(final SimpleExpressionProxy expr)

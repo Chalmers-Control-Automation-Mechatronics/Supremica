@@ -53,8 +53,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * <LI>{@link UnaryExpressionProxy}</LI>
  * </OL>
  * <P>The operator ordering can be given using an {@link OperatorTable}, or
- * the the alphabetic ordering by the operator names will be used as
- * default.</P>
+ * the alphabetic ordering by the operator names will be used as default.</P>
  *
  * @author Robi Malik
  */
@@ -123,7 +122,7 @@ public class ExpressionComparator
 
   //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-  public Integer visitBinaryExpressionProxy(BinaryExpressionProxy expr1)
+  public Integer visitBinaryExpressionProxy(final BinaryExpressionProxy expr1)
   {
     final BinaryExpressionProxy expr2 = (BinaryExpressionProxy) mExpr2;
     final BinaryOperator op1 = expr1.getOperator();

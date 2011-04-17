@@ -114,7 +114,7 @@ public class CompiledIntRange implements CompiledRange
       final CompiledIntRange intrange = (CompiledIntRange) range;
       return intersection(intrange);
     } else {
-      return this;
+      return this;  // TODO BUG? Should this not be empty?
     }
   }
 
@@ -169,7 +169,7 @@ public class CompiledIntRange implements CompiledRange
       return new CompiledIntRange(mLower, mUpper - 1);
     } else {
       return this;
-    }      
+    }
   }
 
 
@@ -204,5 +204,5 @@ public class CompiledIntRange implements CompiledRange
   //# Data Members
   private final int mLower;
   private final int mUpper;
-    
+
 }

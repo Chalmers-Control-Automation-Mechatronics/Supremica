@@ -145,12 +145,22 @@ public class ConstraintPropagatorTest extends TestCase
   }
 
   public void testPropagate_negliteral_2()
+  throws EvalException, ParseException
+{
+  addBooleanVariable("a");
+  addBooleanVariable("b'");
+  final String[] constraints = {"!b'", "a==b'"};
+  final String[] expected = {"!a", "!b'"};
+  testPropagate(constraints, expected);
+}
+
+  public void testPropagate_increment()
     throws EvalException, ParseException
   {
-    addBooleanVariable("a");
-    addBooleanVariable("b'");
-    final String[] constraints = {"!b'", "a==b'"};
-    final String[] expected = {"!a", "!b'"};
+    addBooleanVariable("v");
+    addBooleanVariable("v'");
+    final String[] constraints = {"v' == v+1"};
+    final String[] expected = {"!v", "v'"};
     testPropagate(constraints, expected);
   }
 

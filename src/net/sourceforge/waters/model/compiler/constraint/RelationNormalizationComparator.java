@@ -21,9 +21,9 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * <P>The expression comparator used to normalise equations.  Positive
+ * <P>The expression comparator used to normalise equations. Positive
  * primed literals are sorted first, followed by positive unprimed
- * literals, followed by all other expression in the ordering given by the
+ * literals, followed by all other expressions in the ordering given by the
  * operator table. This ordering ensures that assignments are normalised as
  * <CODE>x'=x</CODE> and not <CODE>x=x'</CODE>.</P>
  *
@@ -39,7 +39,7 @@ class RelationNormalizationComparator
   RelationNormalizationComparator(final CompilerOperatorTable optable,
                                   final VariableContext context)
   {
-    super(optable); 
+    super(optable);
     mVisitor = new LiteralTypeVisitor(optable, context);
   }
 
