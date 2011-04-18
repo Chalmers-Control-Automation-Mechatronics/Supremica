@@ -83,7 +83,7 @@ public class XmlRpcClientLite
 	/**
 	 * Construct a XML-RPC client with this URL.
 	 */
-	public XmlRpcClientLite(URL url)
+	public XmlRpcClientLite(final URL url)
 	{
 		super(url);
 	}
@@ -91,7 +91,7 @@ public class XmlRpcClientLite
 	/**
 	 * Construct a XML-RPC client for the URL represented by this String.
 	 */
-	public XmlRpcClientLite(String url)
+	public XmlRpcClientLite(final String url)
 		throws MalformedURLException
 	{
 		super(url);
@@ -100,7 +100,7 @@ public class XmlRpcClientLite
 	/**
 	 * Construct a XML-RPC client for the specified hostname and port.
 	 */
-	public XmlRpcClientLite(String hostname, int port)
+	public XmlRpcClientLite(final String hostname, final int port)
 		throws MalformedURLException
 	{
 		super(hostname, port);
@@ -112,12 +112,12 @@ public class XmlRpcClientLite
 	 * @return
 	 * @throws IOException
 	 */
-	synchronized Worker getWorker(boolean async)
+	synchronized Worker getWorker(final boolean async)
 		throws IOException
 	{
 		try
 		{
-			Worker w = (Worker) pool.pop();
+			final Worker w = (Worker) pool.pop();
 
 			if (async)
 			{
@@ -130,7 +130,7 @@ public class XmlRpcClientLite
 
 			return w;
 		}
-		catch (EmptyStackException x)
+		catch (final EmptyStackException x)
 		{
 			if (workers < XmlRpc.getMaxThreads())
 			{
@@ -175,11 +175,10 @@ public class XmlRpcClientLite
 		 * @throws XmlRpcException
 		 * @throws IOException
 		 */
-		@SuppressWarnings("unchecked")
-		Object execute(String method, Vector<Comparable> params)
+		Object execute(final String method, final Vector<Comparable<?>> params)
 			throws XmlRpcException, IOException
 		{
-			long now = System.currentTimeMillis();
+			final long now = System.currentTimeMillis();
 
 			fault = false;
 
@@ -194,12 +193,12 @@ public class XmlRpcClientLite
 					buffer.reset();
 				}
 
-				XmlWriter writer = new XmlWriter(buffer, encoding);
+				final XmlWriter writer = new XmlWriter(buffer, encoding);
 
 				writeRequest(writer, method, params);
 				writer.flush();
 
-				byte[] request = buffer.toByteArray();
+				final byte[] request = buffer.toByteArray();
 
 				// and send it to the server
 				if (client == null)
@@ -215,7 +214,7 @@ public class XmlRpcClientLite
 				{
 					in = client.sendRequest(request);
 				}
-				catch (IOException iox)
+				catch (final IOException iox)
 				{
 
 					// if we get an exception while sending the request,
@@ -256,14 +255,14 @@ public class XmlRpcClientLite
 					throw new Exception(errorMsg);
 				}
 			}
-			catch (IOException iox)
+			catch (final IOException iox)
 			{
 
 				// this is a lower level problem,  client could not talk to
 				// server for some reason.
 				throw iox;
 			}
-			catch (Exception x)
+			catch (final Exception x)
 			{
 
 				// same as above, but exception has to be converted to
@@ -292,13 +291,13 @@ public class XmlRpcClientLite
 
 				try
 				{
-					Hashtable<?, ?> f = (Hashtable<?, ?>) result;
-					String faultString = (String) f.get("faultString");
-					int faultCode = Integer.parseInt(f.get("faultCode").toString());
+					final Hashtable<?, ?> f = (Hashtable<?, ?>) result;
+					final String faultString = (String) f.get("faultString");
+					final int faultCode = Integer.parseInt(f.get("faultCode").toString());
 
 					exception = new XmlRpcException(faultCode, faultString.trim());
 				}
-				catch (Exception x)
+				catch (final Exception x)
 				{
 					throw new XmlRpcException(0, "Server returned an invalid fault response.");
 				}
@@ -336,7 +335,7 @@ public class XmlRpcClientLite
 		 * @param url
 		 * @throws IOException
 		 */
-		public HttpClient(URL url)
+		public HttpClient(final URL url)
 			throws IOException
 		{
 			hostname = url.getHost();
@@ -382,7 +381,7 @@ public class XmlRpcClientLite
 			{
 				socket.close();
 			}
-			catch (Exception ignore) {}
+			catch (final Exception ignore) {}
 		}
 
 		/**
@@ -391,7 +390,7 @@ public class XmlRpcClientLite
 		 * @return
 		 * @throws IOException
 		 */
-		public InputStream sendRequest(byte[] request)
+		public InputStream sendRequest(final byte[] request)
 			throws IOException
 		{
 			output.write(("POST " + uri + " HTTP/1.0\r\n").getBytes());
@@ -427,10 +426,10 @@ public class XmlRpcClientLite
 
 			try
 			{
-				StringTokenizer tokens = new StringTokenizer(line);
-				String httpversion = tokens.nextToken();
-				String statusCode = tokens.nextToken();
-				String statusMsg = tokens.nextToken("\n\r");
+				final StringTokenizer tokens = new StringTokenizer(line);
+				final String httpversion = tokens.nextToken();
+				final String statusCode = tokens.nextToken();
+				final String statusMsg = tokens.nextToken("\n\r");
 
 				keepalive = XmlRpc.getKeepAlive() && "HTTP/1.1".equals(httpversion);
 
@@ -439,11 +438,11 @@ public class XmlRpcClientLite
 					throw new IOException("Unexpected Response from Server: " + statusMsg);
 				}
 			}
-			catch (IOException iox)
+			catch (final IOException iox)
 			{
 				throw iox;
 			}
-			catch (Exception x)
+			catch (final Exception x)
 			{
 
 				// x.printStackTrace ();
@@ -533,18 +532,17 @@ public class XmlRpcClientLite
 	/**
 	 * Just for testing.
 	 */
-	@SuppressWarnings("unchecked")
-	public static void main(String args[])
+	public static void main(final String args[])
 		throws Exception
 	{
 
 		// XmlRpc.setDebug (true);
 		try
 		{
-			String url = args[0];
-			String method = args[1];
-			XmlRpcClientLite client = new XmlRpcClientLite(url);
-			Vector<Comparable> v = new Vector<Comparable>();
+			final String url = args[0];
+			final String method = args[1];
+			final XmlRpcClientLite client = new XmlRpcClientLite(url);
+			final Vector<Comparable<?>> v = new Vector<Comparable<?>>();
 
 			for (int i = 2; i < args.length; i++)
 			{
@@ -552,7 +550,7 @@ public class XmlRpcClientLite
 				{
 					v.addElement(new Integer(Integer.parseInt(args[i])));
 				}
-				catch (NumberFormatException nfx)
+				catch (final NumberFormatException nfx)
 				{
 					v.addElement(args[i]);
 				}
@@ -563,12 +561,12 @@ public class XmlRpcClientLite
 			{
 				System.out.println(client.execute(method, v));
 			}
-			catch (Exception ex)
+			catch (final Exception ex)
 			{
 				System.err.println("Error: " + ex.getMessage());
 			}
 		}
-		catch (Exception x)
+		catch (final Exception x)
 		{
 			System.err.println(x);
 			System.err.println("Usage: java org.apache.xmlrpc.XmlRpcClient " + "<url> <method> <arg> ....");

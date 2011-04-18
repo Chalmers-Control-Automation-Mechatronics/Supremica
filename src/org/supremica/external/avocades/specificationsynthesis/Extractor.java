@@ -31,7 +31,7 @@ public class Extractor
 		public Restriction() {}
 
 		@SuppressWarnings("unchecked")
-		public Restriction(String id, String name, ArrayList<ArrayList<String>> r)
+		public Restriction(final String id, final String name, final ArrayList<ArrayList<String>> r)
 		{
 			opId = id;
 			opName = name;
@@ -61,36 +61,36 @@ public class Extractor
 *
 ******************************************************/
 
-public Document extractRestrictions(Document sup)
+public Document extractRestrictions(final Document sup)
 {
 	relationsDoc = new Document(relations);
-	Element root = sup.getRootElement();
-	List<?> automaton = root.getChildren("Automaton");
-	Iterator<?> autIter = automaton.iterator();
-	Element theSupervisor = (Element) autIter.next();
+	final Element root = sup.getRootElement();
+	final List<?> automaton = root.getChildren("Automaton");
+	final Iterator<?> autIter = automaton.iterator();
+	final Element theSupervisor = (Element) autIter.next();
 
-	List<?> eventsList = theSupervisor.getChildren("Events");
-	Iterator<?> eventsIter = eventsList.iterator();
-	Element events = (Element) eventsIter.next();
+	final List<?> eventsList = theSupervisor.getChildren("Events");
+	final Iterator<?> eventsIter = eventsList.iterator();
+	final Element events = (Element) eventsIter.next();
 
-	List<?> eventList = events.getChildren("Event");
-	List<Restriction> restrList = new ArrayList<Restriction>();
+	final List<?> eventList = events.getChildren("Event");
+	final List<Restriction> restrList = new ArrayList<Restriction>();
 
 	/* opMatch contains a matching between operation names and start-event IDs. In each place lies an arrayList containing two strings, the operation name in place 0 and the corresponding start-event ID in place 1. */
-	List<List<String>> opMatch = new ArrayList<List<String>>();
+	final List<List<String>> opMatch = new ArrayList<List<String>>();
 
 	int i = 0;
-	for(Iterator<?> eventIter = eventList.iterator(); eventIter.hasNext(); )
+	for(final Iterator<?> eventIter = eventList.iterator(); eventIter.hasNext(); )
 	{
-		Element event = (Element) eventIter.next();
-		String eventLabel = event.getAttributeValue("label");
+		final Element event = (Element) eventIter.next();
+		final String eventLabel = event.getAttributeValue("label");
 		if(eventLabel.substring(0,2).equals("st"))
 		{
 			//System.out.println("start " + eventLabel);
 
-			String eventId = event.getAttributeValue("id");
-			String opName = eventLabel.substring(2);
-			List<String> opAndEvent = new ArrayList<String>();
+			final String eventId = event.getAttributeValue("id");
+			final String opName = eventLabel.substring(2);
+			final List<String> opAndEvent = new ArrayList<String>();
 			opAndEvent.add(0,opName);
 			opAndEvent.add(1,eventId);
 			opMatch.add(i, opAndEvent);
@@ -103,27 +103,27 @@ public Document extractRestrictions(Document sup)
 	}
 
 	/* For all operations, find the restrictions for their starting. */
-	for(Iterator<List<String>> matchIter = opMatch.iterator(); matchIter.hasNext(); )
+	for(final Iterator<List<String>> matchIter = opMatch.iterator(); matchIter.hasNext(); )
 	{
-		Restriction restr = new Restriction();
-		ArrayList<?> m = (ArrayList<?>) matchIter.next();
-		String eventId = (String) m.get(1);
+		final Restriction restr = new Restriction();
+		final ArrayList<?> m = (ArrayList<?>) matchIter.next();
+		final String eventId = (String) m.get(1);
 
 		Object dummy = m.get(1);
-		String opId = dummy.toString(); // Get id of the operation
+		final String opId = dummy.toString(); // Get id of the operation
 		dummy = m.get(0);
-		String opName = dummy.toString();
+		final String opName = dummy.toString();
 		restr.opId = opId;
 		restr.opName = opName;
 		//System.out.println("***** opId " + opId +" opName " + opName + "*****");
 
 		/* Get the supervisor states where eventId is enabled, e.g. q0 and q2 */
-		List<String> enabledInSupStates = getSupervisorStates(theSupervisor, eventId);
+		final List<String> enabledInSupStates = getSupervisorStates(theSupervisor, eventId);
 
 		//System.out.println("Klar med getSupStates");
 		/* Find the corresponding states in each operation model, e.g. q0 corresponds to O1 (id=2) being in init and O2 (id=3) being in init, and q2 corresponds to O1 (id=2) being in comp and O2 (id=3) being in exec*/
 		//Restriction buildRestriction(enabledInSupStates, eventId, opMatch);
-		List<ArrayList<String>> enabledInModelStates = getModelStates(enabledInSupStates, eventId, opMatch);
+		final List<ArrayList<String>> enabledInModelStates = getModelStates(enabledInSupStates, eventId, opMatch);
 
 		//System.out.println("Klar med getModelStates");
 
@@ -147,12 +147,13 @@ public Document extractRestrictions(Document sup)
 
 
 	@SuppressWarnings("unused")
+  final
 	ArrayList<Restriction> simpleRestr = simplify((ArrayList<Restriction>) restrList);
 
 	int k=1;
-	for(Iterator<Restriction> f = restrList.iterator(); f.hasNext(); )
+	for(final Iterator<Restriction> f = restrList.iterator(); f.hasNext(); )
 		{
-			Restriction ff = f.next();
+			final Restriction ff = f.next();
 			System.out.println("******** Restriction " + k + " ********");
 			System.out.println("******** Efter simplify *******");
 			k++;
@@ -176,45 +177,45 @@ public Document extractRestrictions(Document sup)
 *
 ******************************************************/
 
-public ArrayList<String> getSupervisorStates(Element sup, String eventId)
+public ArrayList<String> getSupervisorStates(final Element sup, final String eventId)
 {
 	//ArrayList enabledInStateIds = new ArrayList();
-	ArrayList<String> enabledInStates = new ArrayList<String>();
+	final ArrayList<String> enabledInStates = new ArrayList<String>();
 
-	List<?> statesList = sup.getChildren("States");
-	Iterator<?> statesIter = statesList.iterator();
-	Element states = (Element) statesIter.next();
+	final List<?> statesList = sup.getChildren("States");
+	final Iterator<?> statesIter = statesList.iterator();
+	final Element states = (Element) statesIter.next();
 
-	List<?> transitionsList = sup.getChildren("Transitions");
-	Iterator<?> transitionsIter = transitionsList.iterator();
-	Element transitions = (Element) transitionsIter.next();
+	final List<?> transitionsList = sup.getChildren("Transitions");
+	final Iterator<?> transitionsIter = transitionsList.iterator();
+	final Element transitions = (Element) transitionsIter.next();
 
-	List<?> stateList = states.getChildren("State");
-	List<?> transList = transitions.getChildren("Transition");
+	final List<?> stateList = states.getChildren("State");
+	final List<?> transList = transitions.getChildren("Transition");
 
 	/* Find state ID where eventID is enabled. */
-	for(Iterator<?> transIter = transList.iterator(); transIter.hasNext(); )
+	for(final Iterator<?> transIter = transList.iterator(); transIter.hasNext(); )
 	{
-		Element trans = (Element) transIter.next();
-		String evId = trans.getAttributeValue("event");
+		final Element trans = (Element) transIter.next();
+		final String evId = trans.getAttributeValue("event");
 		if(evId.equals(eventId))
 		{
-			String source = trans.getAttributeValue("source"); // Id of supervisor state
+			final String source = trans.getAttributeValue("source"); // Id of supervisor state
 			//System.out.println("found event " + evId + " present in state with id " + source);
 
-			Iterator<?> stateIter = stateList.iterator();
+			final Iterator<?> stateIter = stateList.iterator();
 			boolean found = false;
 			while( !found && stateIter.hasNext() )
 			{
 
-				Element state = (Element) stateIter.next();
-				String stId = state.getAttributeValue("id");
+				final Element state = (Element) stateIter.next();
+				final String stId = state.getAttributeValue("id");
 				//System.out.println("Letar i statelistan. stId="+ stId);
 				if(stId.equals(source))
 				{
 					found = true;
 
-					String stName = state.getAttributeValue("name");
+					final String stName = state.getAttributeValue("name");
 					//System.out.println("Hittat state id " + stName);
 					enabledInStates.add(stName);
 				}
@@ -242,7 +243,7 @@ public ArrayList<String> getSupervisorStates(Element sup, String eventId)
 *
 ******************************************************/
 
-public ArrayList<ArrayList<String>> getModelStates(List<String> supStates, String eventId, List<List<String>> match)
+public ArrayList<ArrayList<String>> getModelStates(final List<String> supStates, final String eventId, final List<List<String>> match)
 {
 	/* For each of the operations in the system, find out what state it has in each of the supervisor states listed in supStates. Create an entry that contains the operation id, and then an ordered list of its states. The first state corresponds to the first */
 
@@ -250,31 +251,31 @@ System.out.println("******** getModelStates *******");
 
 System.out.println("Entry for "+ eventId);
 
-	ArrayList<ArrayList<String>> modelStates = new ArrayList<ArrayList<String>>();
-	char stateSeparator = '.';
+	final ArrayList<ArrayList<String>> modelStates = new ArrayList<ArrayList<String>>();
+	final char stateSeparator = '.';
 	int i = 0;
 	// For all operations
-	for(Iterator<List<String>> matchIter = match.iterator(); matchIter.hasNext(); )
+	for(final Iterator<List<String>> matchIter = match.iterator(); matchIter.hasNext(); )
 	{
-		ArrayList<String> operationStates = new ArrayList<String>();
-		ArrayList<?> m = (ArrayList<?>) matchIter.next();
+		final ArrayList<String> operationStates = new ArrayList<String>();
+		final ArrayList<?> m = (ArrayList<?>) matchIter.next();
 		Object dummy = m.get(1);
-		String opId = dummy.toString(); // Get id of the operation
+		final String opId = dummy.toString(); // Get id of the operation
 		dummy = m.get(0);
-		String opName = dummy.toString();
+		final String opName = dummy.toString();
 		operationStates.add(0, opId); // Put id and name in restriction list
 		operationStates.add(1, opName);
 		//System.out.println("Finding states of operation "+ opName);
 
 		/* For each of the states where eventId is enabled, extract the states of all operations */
 		int place = 2;
-		for(Iterator<String> stateIter = supStates.iterator(); stateIter.hasNext(); )
+		for(final Iterator<String> stateIter = supStates.iterator(); stateIter.hasNext(); )
 		{
-			String supStateName = stateIter.next();
+			final String supStateName = stateIter.next();
 			//System.out.println("Enabled in sup state "+ supStateName);
 			String opStateName;
-			int index = supStateName.indexOf(opName);
-			int indexSeparator = supStateName.indexOf(stateSeparator, index);
+			final int index = supStateName.indexOf(opName);
+			final int indexSeparator = supStateName.indexOf(stateSeparator, index);
 			//System.out.println("sep " + indexSeparator);
 
 			if(indexSeparator > index)
@@ -309,24 +310,24 @@ System.out.println("Entry for "+ eventId);
 *
 ******************************************************/
 @SuppressWarnings("unchecked")
-public ArrayList<Restriction> simplify(ArrayList<Restriction> operationList)
+public ArrayList<Restriction> simplify(final ArrayList<Restriction> operationList)
 {
 	ArrayList<Restriction> simpleRestr = new ArrayList<Restriction>();
 	simpleRestr = (ArrayList<Restriction>) operationList.clone();
 
 	/* Remove the restriction O_init from the entry for O. */
-	for(Iterator<Restriction> restrIter = simpleRestr.iterator(); restrIter.hasNext(); )
+	for(final Iterator<Restriction> restrIter = simpleRestr.iterator(); restrIter.hasNext(); )
 	{
-		Restriction restr = restrIter.next();
-		String opName = restr.opName;
-		ArrayList<ArrayList<String>> rList = (ArrayList<ArrayList<String>>) restr.restrictions;
-		Iterator<ArrayList<String>> rIter = rList.iterator();
+		final Restriction restr = restrIter.next();
+		final String opName = restr.opName;
+		final ArrayList<ArrayList<String>> rList = (ArrayList<ArrayList<String>>) restr.restrictions;
+		final Iterator<ArrayList<String>> rIter = rList.iterator();
 		boolean found = false;
 		int placeRList = 0;
 		while( rIter.hasNext() && !found )
 		{
-			ArrayList<?> oneRestr = rIter.next();
-			String name = (String) oneRestr.get(1);
+			final ArrayList<?> oneRestr = rIter.next();
+			final String name = (String) oneRestr.get(1);
 			if( name.equals(opName) )
 			{
 				// The restriction entry to be removed has been found
@@ -340,12 +341,12 @@ public ArrayList<Restriction> simplify(ArrayList<Restriction> operationList)
 	}
 
 	/* Replace O_init->string OR O_exec->string OR O_comp->string with O_- -> string. */
-	ArrayList<Restriction> temp = (ArrayList<Restriction>) simpleRestr.clone();
+	final ArrayList<Restriction> temp = (ArrayList<Restriction>) simpleRestr.clone();
 	simpleRestr.clear();
-	for(Iterator<Restriction> restrIter = temp.iterator(); restrIter.hasNext(); )
+	for(final Iterator<Restriction> restrIter = temp.iterator(); restrIter.hasNext(); )
 	{
-		Restriction restr = restrIter.next();
-		Restriction oneSimpleRestr = simplifyOneOperation(restr);
+		final Restriction restr = restrIter.next();
+		final Restriction oneSimpleRestr = simplifyOneOperation(restr);
 		simpleRestr.add(oneSimpleRestr);
 		//System.out.println("************ Simplified ****** " + oneSimpleRestr.opName);
 		//printStringList(oneSimpleRestr.restrictions);
@@ -363,23 +364,23 @@ public ArrayList<Restriction> simplify(ArrayList<Restriction> operationList)
 *
 ******************************************************/
 @SuppressWarnings("unchecked")
-public Restriction simplifyOneOperation(Restriction restr)
+public Restriction simplifyOneOperation(final Restriction restr)
 {
 
 	/* Replace unnecessary restrictions with a - (instead of init/exec/comp). For example, if there are three restrictions, where O2 is in O2_init in all of them, whereas O1 is in O1_init, O1_exec and O1_comp respectively, then this can be simplified to one restriction where O2 is in O2_init and O1 is in - (don't care). */
 
-	String stateIndicator = "_";
-	String firstState = stateIndicator.concat("init");
-	String secondState = stateIndicator.concat("exec");
-	String thirdState = stateIndicator.concat("comp");
-	String dontCareState = stateIndicator.concat("-");
+	final String stateIndicator = "_";
+	final String firstState = stateIndicator.concat("init");
+	final String secondState = stateIndicator.concat("exec");
+	final String thirdState = stateIndicator.concat("comp");
+	final String dontCareState = stateIndicator.concat("-");
 
 	System.out.println("\n********** SimplifyOneOperation ***********");
-	String op = (String) restr.opName;
+	final String op = (String) restr.opName;
 	System.out.println("Simplify restrictions for operation " + op);
 
 	// Restrictions for starting one operation (call it Op)
-	Restriction simpleRestr = new Restriction(restr.opId, restr.opName, (ArrayList<ArrayList<String>>) restr.restrictions);
+	final Restriction simpleRestr = new Restriction(restr.opId, restr.opName, (ArrayList<ArrayList<String>>) restr.restrictions);
 
 
 	System.out.println("At start, restrictions are ");
@@ -388,24 +389,24 @@ public Restriction simplifyOneOperation(Restriction restr)
 
 
 	ArrayList<ArrayList<String>> restrictions = (ArrayList<ArrayList<String>>) simpleRestr.restrictions;
-	int noOfRestr = restrictions.size();
+	final int noOfRestr = restrictions.size();
 	int i = 0;
 
 	// Work with one restriction entry at a time, i.e. one operation at a time
 	while(i < noOfRestr)
 	{
-		ArrayList<Set> otherStatesList = new ArrayList<Set>(); //Each entry contains a set
-		ArrayList<HashSet<String>> allStatesList = new ArrayList<HashSet<String>>();   //Each entry contains a set
+		final ArrayList<Set<?>> otherStatesList = new ArrayList<Set<?>>(); //Each entry contains a set
+		final ArrayList<HashSet<String>> allStatesList = new ArrayList<HashSet<String>>();   //Each entry contains a set
 		String opName = new String();
 
 		//Get the restr (operation) we are currently working with. List containing strings.
-		ArrayList<String> states = restrictions.get(i);
+		final ArrayList<String> states = restrictions.get(i);
 		int stateNumber = -1;
 
 		/* For all states of the operation, e.g. O1_init, O1_init, O1_comp, O1_init etc. build two lists. allStatesList that in each entry contains a string for each alternative state combination, and otherStatesList that in each entry contains a string representing the states of the other operations (e.g. all but O1). */
-		for(Iterator<String> stateIter = states.iterator(); stateIter.hasNext(); )
+		for(final Iterator<String> stateIter = states.iterator(); stateIter.hasNext(); )
 		{
-			String stateName = stateIter.next();
+			final String stateName = stateIter.next();
 			if(stateNumber == 2)
 			{
 				opName = stateName.substring(0, stateName.indexOf(stateIndicator)); // e.g. O1
@@ -451,36 +452,36 @@ public Restriction simplifyOneOperation(Restriction restr)
 		printSetList(otherStatesList);
 		System.out.println("*********************************");*/
 
-		int noOfRestrEntrys = states.size();
-		String rem = "rem", keep = "keep";
-		ArrayList<HashSet<?>> treated = new ArrayList<HashSet<?>>();
-		ArrayList<String> remove = new ArrayList<String>();
+		final int noOfRestrEntrys = states.size();
+		final String rem = "rem", keep = "keep";
+		final ArrayList<HashSet<?>> treated = new ArrayList<HashSet<?>>();
+		final ArrayList<String> remove = new ArrayList<String>();
 		for(int ii=0; ii<noOfRestrEntrys; ii++)
 		{
 			remove.add(keep);
 		}
 
 		int indF, indS, indT;
-		for(Iterator<Set> otherIter = otherStatesList.iterator(); otherIter.hasNext(); )
+		for(final Iterator<Set<?>> otherIter = otherStatesList.iterator(); otherIter.hasNext(); )
 		{
 			//System.out.println("Inside other-loop");
-			HashSet<?> other = (HashSet<?>) otherIter.next();
+			final HashSet<?> other = (HashSet<?>) otherIter.next();
 			//String other = (String) otherIter.next();
 
 			// Only check each restriction string once.
 			if( !treated.contains(other) )
 			{
 				//Set first = new HashSet(other);
-				HashSet<String> first = new HashSet<String>();
-				HashSet<String> second = new HashSet<String>();
-				HashSet<String> third = new HashSet<String>();
+				final HashSet<String> first = new HashSet<String>();
+				final HashSet<String> second = new HashSet<String>();
+				final HashSet<String> third = new HashSet<String>();
 
 //System.out.println("hit0");
 				// Funkar inte med clone eller constructorn
-				for(Iterator<?> oIter = other.iterator(); oIter.hasNext(); )
+				for(final Iterator<?> oIter = other.iterator(); oIter.hasNext(); )
 				{
 					//System.out.println("hit");
-					String n = (String) oIter.next();
+					final String n = (String) oIter.next();
 					//System.out.println("n= " + n);
 					first.add(n);
 					second.add(n);
@@ -518,7 +519,7 @@ public Restriction simplifyOneOperation(Restriction restr)
 					states.add(indF+2, adding);*/
 
 					states.remove(indF+2);
-					String adding = opName.concat(dontCareState);
+					final String adding = opName.concat(dontCareState);
 					System.out.println("Add dont care: " + adding);
 					states.add(indF+2, adding);
 
@@ -574,7 +575,7 @@ public Restriction simplifyOneOperation(Restriction restr)
 * Restriction instance.
 *
 ******************************************************/
-public HashSet<String> getStates(int index, ArrayList<ArrayList<String>> restrictions)
+public HashSet<String> getStates(final int index, final ArrayList<ArrayList<String>> restrictions)
 {
 	if(index<2)
 	{
@@ -582,14 +583,14 @@ public HashSet<String> getStates(int index, ArrayList<ArrayList<String>> restric
 		return null;
 	}
 
-	HashSet<String> c = new HashSet<String>();
+	final HashSet<String> c = new HashSet<String>();
 	//String states = new String();
 	//ArrayList states = new ArrayList();
 	//int i = 0;
-	for(Iterator<ArrayList<String>> rIter = restrictions.iterator(); rIter.hasNext(); )
+	for(final Iterator<ArrayList<String>> rIter = restrictions.iterator(); rIter.hasNext(); )
 	{
-		ArrayList<?> oneOperation = rIter.next();
-		String temp = (String) oneOperation.get(index);
+		final ArrayList<?> oneOperation = rIter.next();
+		final String temp = (String) oneOperation.get(index);
 		//states.add(i, temp);
 		//System.out.println("getStates, temp = " + temp);
 		//states = states.concat(temp);
@@ -607,7 +608,7 @@ public HashSet<String> getStates(int index, ArrayList<ArrayList<String>> restric
 *
 *
 ******************************************************/
-public ArrayList<ArrayList<String>> removeStates(int index, ArrayList<ArrayList<String>> restrictionList)
+public ArrayList<ArrayList<String>> removeStates(final int index, final ArrayList<ArrayList<String>> restrictionList)
 {
 	if(index<2)
 	{
@@ -615,11 +616,11 @@ public ArrayList<ArrayList<String>> removeStates(int index, ArrayList<ArrayList<
 		return null;
 	}
 
-	ArrayList<ArrayList<String>> newRestrList = new ArrayList<ArrayList<String>>();
+	final ArrayList<ArrayList<String>> newRestrList = new ArrayList<ArrayList<String>>();
 	int i = 0;
-	for(Iterator<ArrayList<String>> rIter = restrictionList.iterator(); rIter.hasNext(); )
+	for(final Iterator<ArrayList<String>> rIter = restrictionList.iterator(); rIter.hasNext(); )
 	{
-		ArrayList<String> oneOperation = rIter.next();
+		final ArrayList<String> oneOperation = rIter.next();
 		oneOperation.remove(index);
 		newRestrList.add(i, oneOperation);
 		i++;
@@ -636,35 +637,35 @@ public ArrayList<ArrayList<String>> removeStates(int index, ArrayList<ArrayList<
 *
 ******************************************************/
 
-public void buildRelationsDoc(String eventName, List<?> unsafeStates)
+public void buildRelationsDoc(final String eventName, final List<?> unsafeStates)
 {
 	/* Om - finns i restriktionsuttrycket ar den operationen ointressant. */
-	Element event_interlocking = new Element("Event_interlocking");
+	final Element event_interlocking = new Element("Event_interlocking");
 	event_interlocking.setAttribute("id", eventName);
 	relations.addContent(event_interlocking);
 
-	Element event = new Element("Event");
+	final Element event = new Element("Event");
 	event_interlocking.addContent(event);
 
-	Element restriction = new Element("Restriction");
+	final Element restriction = new Element("Restriction");
 	event.addContent(restriction);
 
-	Element or = new Element("Or");
+	final Element or = new Element("Or");
 	restriction.addContent(or);
 
-	for(Iterator<?> unsafeIter = unsafeStates.iterator(); unsafeIter.hasNext(); )
+	for(final Iterator<?> unsafeIter = unsafeStates.iterator(); unsafeIter.hasNext(); )
 	{
-		Set<?> oneUnsafe = (HashSet<?>) unsafeIter.next();
+		final Set<?> oneUnsafe = (HashSet<?>) unsafeIter.next();
 
-		Element and = new Element("And");
+		final Element and = new Element("And");
 		or.addContent(and);
 		System.out.println("HIT " + oneUnsafe.toString());
-		for(Iterator<?> oneUnsafeIter = oneUnsafe.iterator(); oneUnsafeIter.hasNext(); )
+		for(final Iterator<?> oneUnsafeIter = oneUnsafe.iterator(); oneUnsafeIter.hasNext(); )
 		{
-			ArrayList<?> oneState = (ArrayList<?>) oneUnsafeIter.next();
-			String stateName = (String) oneState.get(0);
-			String stateId = (String) oneState.get(1);
-			Element state = new Element("State");
+			final ArrayList<?> oneState = (ArrayList<?>) oneUnsafeIter.next();
+			final String stateName = (String) oneState.get(0);
+			final String stateId = (String) oneState.get(1);
+			final Element state = new Element("State");
 			state.setAttribute("name", stateName);
 			state.setAttribute("id", stateId);
 			and.addContent(state);
@@ -676,16 +677,16 @@ public void buildRelationsDoc(String eventName, List<?> unsafeStates)
 
 /*****************************************************/
 
-	public void printSetList(List<HashSet<String>> v)
+	public void printSetList(final List<HashSet<String>> v)
 	{
 
 		int i=1;
-		for(Iterator<HashSet<String>> e = v.iterator(); e.hasNext(); )
+		for(final Iterator<HashSet<String>> e = v.iterator(); e.hasNext(); )
 		{
-			Set<?> vv = e.next();
+			final Set<?> vv = e.next();
 			System.out.println("Rad " + i);
 			i++;
-			for(Iterator<?> ee = vv.iterator(); ee.hasNext(); )
+			for(final Iterator<?> ee = vv.iterator(); ee.hasNext(); )
 			{
 				System.out.println(ee.next());
 			}
@@ -694,15 +695,15 @@ public void buildRelationsDoc(String eventName, List<?> unsafeStates)
 	}
 /*****************************************************/
 
-	public void printList(List<ArrayList<String>> v)
+	public void printList(final List<ArrayList<String>> v)
 	{
 		int i=1;
-		for(Iterator<ArrayList<String>> e = v.iterator(); e.hasNext(); )
+		for(final Iterator<ArrayList<String>> e = v.iterator(); e.hasNext(); )
 		{
-			List<?> vv = e.next();
+			final List<?> vv = e.next();
 			System.out.println("Rad " + i);
 			i++;
-			for(Iterator<?> ee = vv.iterator(); ee.hasNext(); )
+			for(final Iterator<?> ee = vv.iterator(); ee.hasNext(); )
 			{
 				System.out.println(ee.next());
 			}
@@ -712,11 +713,11 @@ public void buildRelationsDoc(String eventName, List<?> unsafeStates)
 
 /*****************************************************/
 
-	public void printStringList(List<ArrayList<String>> v)
+	public void printStringList(final List<ArrayList<String>> v)
 	{
 		System.out.println();
 		int i=1;
-		for(Iterator<ArrayList<String>> e = v.iterator(); e.hasNext(); )
+		for(final Iterator<ArrayList<String>> e = v.iterator(); e.hasNext(); )
 		{
 			//System.out.println("Rad " + i);
 			System.out.println(e.next());
@@ -727,9 +728,9 @@ public void buildRelationsDoc(String eventName, List<?> unsafeStates)
 
 /*****************************************************/
 
-	public void printStringSet(Set<String> v)
+	public void printStringSet(final Set<String> v)
 	{
-		for(Iterator<String> ee = v.iterator(); ee.hasNext(); )
+		for(final Iterator<String> ee = v.iterator(); ee.hasNext(); )
 		{
 			System.out.println(ee.next());
 		}

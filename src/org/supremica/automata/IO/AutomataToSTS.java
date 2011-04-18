@@ -51,6 +51,7 @@ package org.supremica.automata.IO;
 
 import java.io.*;
 import java.util.*;
+
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -67,40 +68,39 @@ public class AutomataToSTS
 {
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AutomataToSTS.class);
-    private Automata automata;
+    private final Automata automata;
     @SuppressWarnings("unused")
-	private boolean includeCost = true;
-    
-    public AutomataToSTS(Automata automata)
+	private final boolean includeCost = true;
+
+    public AutomataToSTS(final Automata automata)
     {
         this.automata = automata;
 
     }
-    
-    public AutomataToSTS(Automaton automaton)
+
+    public AutomataToSTS(final Automaton automaton)
     {
-        this.automata = new Automata();  
+        this.automata = new Automata();
         this.automata.addAutomaton(automaton);
     }
-    
-    @SuppressWarnings("unchecked")
-	public void serialize(PrintWriter pw)
+
+	public void serialize(final PrintWriter pw)
     {
         pw.println("root = plant");
-        String[][] root = new String[automata.size()+1][];
+        final String[][] root = new String[automata.size()+1][];
         root[0] = new String[automata.size()+1];
         root[0][0] = "plant = AND { ";
         String initState = "";
-        String memories = "";
-        ArrayList<Object> markedStates = new ArrayList<Object>();
+        final String memories = "";
+        final ArrayList<Set<?>> markedStates = new ArrayList<Set<?>>();
         HashSet<String> tempMarkedStates = new HashSet<String>();
         for(int i = 0; i<automata.size(); i++)
         {
-            Automaton aut = automata.getAutomatonAt(i);
-            String aut_name = aut.getName().replace(" ", "_").replace(",", "");
+            final Automaton aut = automata.getAutomatonAt(i);
+            final String aut_name = aut.getName().replace(" ", "_").replace(",", "");
             initState += (i+"#"+aut.getInitialState().getName()+" ");
             root[i+1] = new String[3+aut.nbrOfTransitions()];
-            
+
             root[0][0] += aut_name;
             if(i < (automata.size()-1))
                 root[0][0] += ", ";
@@ -111,8 +111,8 @@ public class AutomataToSTS
             root[0][i+1] = aut_name+" = OR { ";
             for(int j = 0; j<aut.nbrOfStates();j++)
             {
-                State state = aut.getStateWithIndex(j);
-                String state_name = (i+"#"+state.getName()).replace(" ", "_");
+                final State state = aut.getStateWithIndex(j);
+                final String state_name = (i+"#"+state.getName()).replace(" ", "_");
                 if(state.isAccepting())
                 {
                     tempMarkedStates.add(state_name);
@@ -122,13 +122,13 @@ public class AutomataToSTS
                     root[0][i+1] += ", ";
             }
             root[0][i+1] += " }";
-            
+
             markedStates.add(tempMarkedStates);
 
             root[i+1][0] = aut_name;
             root[i+1][1] = "{";
             root[i+1][2] = "{";
-            for(EventProxy e:aut.getEvents())
+            for(final EventProxy e:aut.getEvents())
             {
                 if(e.getKind() == EventKind.CONTROLLABLE)
                 {
@@ -146,7 +146,7 @@ public class AutomataToSTS
             root[i+1][1] += "}";
             root[i+1][2] += "}";
             int k = 0;
-            for(TransitionProxy trans: aut.getTransitions())
+            for(final TransitionProxy trans: aut.getTransitions())
             {
                 root[i+1][3+k] = "["+(i+"#"+trans.getSource().getName()).replace(" ", "_")+" "+trans.getEvent().getName().replace(" ", "_")+" "+(i+"#"+trans.getTarget().getName()).replace(" ", "_")+"]";
                 k++;
@@ -158,7 +158,7 @@ public class AutomataToSTS
             if(i == 0)
                 pw.println("{");
             int j = 0;
-            for(String s:root[i])
+            for(final String s:root[i])
             {
                 if(i != 0 && j == 3)
                     pw.println("{");
@@ -176,16 +176,16 @@ public class AutomataToSTS
 
         // marked states
         pw.print("{");
-        Set<Set<Object>> monMarkedStates = cartesianProduct(markedStates);
+        final Set<Set<Object>> monMarkedStates = cartesianProduct(markedStates);
         int j = 0;
-		for(Set hs: monMarkedStates)
+		for(final Set<?> hs: monMarkedStates)
 		{
-			Iterator it = hs.iterator();
+			final Iterator<?> it = hs.iterator();
             String mss = "";
 			while(it.hasNext())
 				mss += (it.next()+" ");
             mss = mss.trim();
-            
+
             pw.print(" {");
             pw.print(mss);
             pw.print("} ");
@@ -204,9 +204,9 @@ public class AutomataToSTS
         pw.close();
     }
 
-    public void createSpec(PrintWriter pw)
+    public void createSpec(final PrintWriter pw)
     {
-        SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
+        final SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
         synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
         synthesizerOptions.setPurge(false);
@@ -231,12 +231,12 @@ public class AutomataToSTS
         pw.print("{");
         for(int i = 0; i<automata.size(); i++)
         {
-            Automaton aut = automata.getAutomatonAt(i);
-            for(State state:aut)
+            final Automaton aut = automata.getAutomatonAt(i);
+            for(final State state:aut)
             {
                 if(state.isForbidden())
                 {
-                    StringTokenizer st = new StringTokenizer((i+"#"+state.getName()).replace(" ", "_"),".");
+                    final StringTokenizer st = new StringTokenizer((i+"#"+state.getName()).replace(" ", "_"),".");
                     String temp = "";
                     pw.print("{");
                     while(st.hasMoreTokens())
@@ -258,39 +258,39 @@ public class AutomataToSTS
         pw.close();
     }
 
-    public void createSpec(String fileName)
+    public void createSpec(final String fileName)
     throws IOException
     {
         createSpec(new PrintWriter(new FileWriter(fileName)));
     }
 
-    public void createSpec(File theFile)
+    public void createSpec(final File theFile)
     throws IOException
     {
         createSpec(theFile.getAbsolutePath());
     }
-    
-    public void serialize(String fileName)
+
+    public void serialize(final String fileName)
     throws IOException
     {
         serialize(new PrintWriter(new FileWriter(fileName)));
     }
-    
-    public void serialize(File theFile)
+
+    public void serialize(final File theFile)
     throws IOException
     {
         serialize(theFile.getAbsolutePath());
     }
-    
+
     public String serialize()
     {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
         serialize(pw);
         return sw.toString();
     }
-    
-	public static Set<Set<Object>> cartesianProduct(ArrayList<Object> sets)
+
+	public static Set<Set<Object>> cartesianProduct(final ArrayList<Set<?>> sets)
 	{
 		if (sets.size() < 2)
 			throw new IllegalArgumentException(
@@ -299,16 +299,15 @@ public class AutomataToSTS
 		return _cartesianProduct(0, sets);
 	}
 
-	@SuppressWarnings("unchecked")
-	private static Set<Set<Object>> _cartesianProduct(int index, ArrayList<Object> sets)
+	private static Set<Set<Object>> _cartesianProduct(final int index, final ArrayList<Set<?>> sets)
 	{
-		Set<Set<Object>> ret = new HashSet<Set<Object>>();
+		final Set<Set<Object>> ret = new HashSet<Set<Object>>();
 		if (index == sets.size()) {
 			ret.add(new HashSet<Object>());
 		} else {
-			for (Object obj : (HashSet)sets.get(index)) {
+			for (final Object obj : sets.get(index)) {
 
-				for (Set<Object> set : _cartesianProduct(index+1, sets)) {
+				for (final Set<Object> set : _cartesianProduct(index+1, sets)) {
 					set.add(obj);
 					ret.add(set);
 				}

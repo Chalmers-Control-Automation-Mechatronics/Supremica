@@ -9,6 +9,7 @@
 
 package org.supremica.automata.algorithms.Guard;
 import java.util.*;
+
 import org.supremica.automata.*;
 
 /**
@@ -16,7 +17,7 @@ import org.supremica.automata.*;
  * @author Sajed
  */
 public class GuardGenerator {
-    
+
     Automaton automaton;
     String AND = "&";
     String OR = "|";
@@ -24,60 +25,59 @@ public class GuardGenerator {
     //Compute the guards as allowed or forbidden expressions
     boolean AF;
     /** Creates a new instance of GuardGenerator */
-    public GuardGenerator(Automaton automaton, boolean AF) {
+    public GuardGenerator(final Automaton automaton, final boolean AF) {
         this.automaton = automaton;
         this.AF = AF;
     }
-    
-    public String extractGuard(LabeledEvent event)
+
+    public String extractGuard(final LabeledEvent event)
     {
         String output = "";
-        TreeSet<String> states = getAllowedStates(event);
-        Iterator<String> stateItr = states.iterator();
+        final TreeSet<String> states = getAllowedStates(event);
+        final Iterator<String> stateItr = states.iterator();
         TreeSet<String> tsAND = new TreeSet<String>();
-        TreeSet<String> tsOR = new TreeSet<String>();
+        final TreeSet<String> tsOR = new TreeSet<String>();
         while(stateItr.hasNext())
         {
             tsAND = new TreeSet<String>();
-            String currState = ""+stateItr.next();
-            StringTokenizer st = new StringTokenizer(currState, nameSep);
+            final String currState = ""+stateItr.next();
+            final StringTokenizer st = new StringTokenizer(currState, nameSep);
             while(st.hasMoreTokens())
             {
                 tsAND.add(st.nextToken());
             }
             tsOR.add(operand(AND,tsAND));
         }
-        
+
         output = operand(OR,tsOR);
-        
+
         return output;
-        
+
     }
-    
-    public TreeSet<String> getAllowedStates(LabeledEvent event)
+
+    public TreeSet<String> getAllowedStates(final LabeledEvent event)
     {
-        TreeSet<String> output = new TreeSet<String>();
-        Iterator<Arc> arcItr = automaton.arcIterator();
+        final TreeSet<String> output = new TreeSet<String>();
+        final Iterator<Arc> arcItr = automaton.arcIterator();
         while(arcItr.hasNext())
         {
-            Arc arc = arcItr.next();
+            final Arc arc = arcItr.next();
             if(arc.getEvent().getName().equals(event.getName()))
                 output.add(arc.getSource().getName());
         }
         return output;
     }
-    
-    @SuppressWarnings("unchecked")
-    public String operand(String opr, TreeSet terms)
+
+    public String operand(final String opr, final TreeSet<?> terms)
     {
-        Iterator<TreeSet> itr = terms.iterator();
+        final Iterator<?> itr = terms.iterator();
         String output = "";
         if(opr.equals(AND))
             output += "(";
         while(itr.hasNext())
         {
             output += ""+itr.next();
-            
+
             if(itr.hasNext())
                 output += opr;
         }
@@ -85,5 +85,5 @@ public class GuardGenerator {
             output += ")";
         return output;
     }
-    
+
 }

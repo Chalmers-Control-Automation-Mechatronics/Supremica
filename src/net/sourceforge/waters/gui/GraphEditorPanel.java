@@ -4465,13 +4465,12 @@ public class GraphEditorPanel
         (WatersDataFlavor.IDENTIFIER_LIST);
     }
 
-    @SuppressWarnings("unchecked")
 	private boolean isContainingAll(final EventListExpressionProxy elist)
     {
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
       final List<? extends Proxy> list = elist.getEventList();
-      final ProxyAccessorSet<Proxy> map = new ProxyAccessorHashSet(eq, list);
+      final ProxyAccessorSet<Proxy> map = new ProxyAccessorHashSet<Proxy>(eq, list);
       return map.containsAll(mTransferData);
     }
 

@@ -63,31 +63,30 @@ import org.supremica.automata.*;
 import org.supremica.util.SupremicaException;
 
 /** This class generates an IEC-61499 function block
- *  application implementing the automata in the 
+ *  application implementing the automata in the
  *  current project.
  */
-@SuppressWarnings("unchecked")
 public class AutomataToIEC61499
 {
 
 	private static final String xmlnsLibraryElementString = "xmlns=\"http://www.holobloc.com/xml/LibraryElement\" ";
 	private static Logger logger = LoggerFactory.createLogger(AutomataToIEC61499.class);
-	private Project theProject;
-	private Alphabet allEvents;
+	private final Project theProject;
+	private final Alphabet allEvents;
 	private boolean comments = false;
 	private boolean useXmlns = true;
-	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private PrintWriter pw;
 
 
 	// Constructor
-	public AutomataToIEC61499(Project theProject)
+	public AutomataToIEC61499(final Project theProject)
 	{
 		this.theProject = theProject;
 		allEvents = this.theProject.setIndices();
 	}
 
-	private AutomataToIEC61499(Project theProject,boolean comments, boolean useXmlns)
+	private AutomataToIEC61499(final Project theProject,final boolean comments, final boolean useXmlns)
 	{
 		this.theProject = theProject;
 		allEvents = this.theProject.setIndices();
@@ -101,34 +100,34 @@ public class AutomataToIEC61499
 		comments = true;
 	}
 
-	public void useXmlNameSpace(boolean use)
+	public void useXmlNameSpace(final boolean use)
 	{
 		useXmlns = use;
 	}
 
-	public void setPrintWriter(PrintWriter pw)
+	public void setPrintWriter(final PrintWriter pw)
 	{
 		this.pw = pw;
 	}
 
-	public void printSources(File file)
+	public void printSources(final File file)
 	{
 
-		String systemName = file.getName().substring(0,file.getName().length()-4);
+		final String systemName = file.getName().substring(0,file.getName().length()-4);
 
 		try
 		{
 
 			// First generate FBs for all models
-			for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext();)
+			for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext();)
 			{
-				Project tempProject = new Project();
+				final Project tempProject = new Project();
 
 				tempProject.addAutomaton((Automaton) autIt.next());
 
-				File tmpFile = new File(file.getParent() + "/" + tempProject.getAutomatonAt(0).getName() + ".fbt");
+				final File tmpFile = new File(file.getParent() + "/" + tempProject.getAutomatonAt(0).getName() + ".fbt");
 
-				AutomataToIEC61499 tempToIEC61499 = new AutomataToIEC61499(tempProject,comments,useXmlns);
+				final AutomataToIEC61499 tempToIEC61499 = new AutomataToIEC61499(tempProject,comments,useXmlns);
 
 				tempToIEC61499.setPrintWriter(new PrintWriter(new FileWriter(tmpFile)));
 
@@ -210,7 +209,7 @@ public class AutomataToIEC61499
 			pw.close();
 
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			e.printStackTrace(System.err);
 		}
@@ -229,7 +228,7 @@ public class AutomataToIEC61499
 		{
 			printAlgorithmDeclarations();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error(ex);
 		}
@@ -284,9 +283,9 @@ public class AutomataToIEC61499
 		pw.println("      <Event Name=\"INIT\" Type=\"INIT_EVENT\" />");
 		pw.println("      <Event Name=\"RESET\" />");
 		pw.println("      <Event Name=\"OCCURRED\" >");
-		for(Iterator alphIt=allEvents.iterator(); alphIt.hasNext();)
+		for(final Iterator<?> alphIt=allEvents.iterator(); alphIt.hasNext();)
 		{
-			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+			final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			pw.println("        <With Var=\"EI_" + currEvent.getLabel()+ "\" />");
 		}
 		pw.println("      </Event>");
@@ -300,9 +299,9 @@ public class AutomataToIEC61499
 		pw.println("    <EventOutputs>");
 		pw.println("      <Event Name=\"INITO\" Type=\"INIT_EVENT\" />");
 		pw.println("      <Event Name=\"DONE\" >");
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		for (final Iterator<?> alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
-			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+			final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			pw.println("        <With Var=\"EO_" + currEvent.getLabel()+ "\" />");
 		}
 		pw.println("      </Event>");
@@ -314,9 +313,9 @@ public class AutomataToIEC61499
 		// bool type. Only one should be TRUE when the OCCURRED event happens but if several are TRUE
 		// all of the transitions will take place. The user have to make shure that this is possible!
 		pw.println("    <InputVars>");
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		for (final Iterator<?> alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
-			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+			final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			if (comments)
 			{
 				pw.println("      <!-- " + currEvent.getLabel() + " -->");
@@ -329,9 +328,9 @@ public class AutomataToIEC61499
 		// The output_variable_list. Output variables represent the automaton events that
 		// are enabled after the transition. More than one of tese can be true when the DONE event occurres.
 		pw.println("    <OutputVars>");
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		for (final Iterator<?> alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
-			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+			final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			if (comments)
 			{
 				pw.println("      <!-- " + currEvent.getLabel() + " -->");
@@ -355,14 +354,14 @@ public class AutomataToIEC61499
 		pw.println("    <InternalVars>");
 
 		// State variables
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton) autIt.next();
+			final Automaton currAutomaton = (Automaton) autIt.next();
 			currAutomaton.getSynchIndex();
-			for (Iterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+			for (final Iterator<?> stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
 			{
-				State currState = (State) stateIt.next();
-				int currStateIndex = currState.getSynchIndex();
+				final State currState = (State) stateIt.next();
+				final int currStateIndex = currState.getSynchIndex();
 				if (comments)
 				{
 					pw.println("      <!-- " + currState.getName() + " -->");
@@ -415,7 +414,7 @@ public class AutomataToIEC61499
 
 	}
 
-	private void printStartAlgorithm(String name)
+	private void printStartAlgorithm(final String name)
 	{
 		pw.println("    <Algorithm Name=\"" + name + "\">");
 		pw.println("      <Other Language=\"Java\" Text=\"");
@@ -453,14 +452,14 @@ public class AutomataToIEC61499
 		}
 
 		// Set all state variables to FALSE
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton) autIt.next();
+			final Automaton currAutomaton = (Automaton) autIt.next();
 			currAutomaton.getSynchIndex();
-			for (Iterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+			for (final Iterator<?> stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
 			{
-				State currState = (State) stateIt.next();
-				int currStateIndex = currState.getSynchIndex();
+				final State currState = (State) stateIt.next();
+				final int currStateIndex = currState.getSynchIndex();
 
 				pw.println("        Q_" + currStateIndex + (useXmlns ?  "" : ".value") + " = false;");
 			}
@@ -474,13 +473,13 @@ public class AutomataToIEC61499
 		}
 
 		// Then set the initital states to TRUE
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext();)
 		{
-			Automaton currAutomaton = (Automaton) autIt.next();
+			final Automaton currAutomaton = (Automaton) autIt.next();
 
 			if (currAutomaton.getInitialState() == null)
 			{
-				String errMessage = "AutomataToIEC61499.printAlgorithmDeclarations: " + "all automata must have an initial state but automaton " + currAutomaton.getName() + "doesn't";
+				final String errMessage = "AutomataToIEC61499.printAlgorithmDeclarations: " + "all automata must have an initial state but automaton " + currAutomaton.getName() + "doesn't";
 
 				logger.error(errMessage);
 
@@ -504,10 +503,10 @@ public class AutomataToIEC61499
 		}
 
 		// Iterate over all events and make transitions for the enabled events
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		for (final Iterator<?> alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
-			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getIndex();
+			final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+			final int currEventIndex = currEvent.getIndex();
 
 			if (comments)
 			{
@@ -517,14 +516,14 @@ public class AutomataToIEC61499
 			pw.println("        if (EI_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + " &#38;&#38; EO_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + ")");
 			pw.println("        {");
 
-			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+			for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext();)
 			{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				Alphabet theAlphabet = currAutomaton.getAlphabet();
+				final Automaton currAutomaton = (Automaton) autIt.next();
+				final Alphabet theAlphabet = currAutomaton.getAlphabet();
 				currAutomaton.getSynchIndex();
 				if (theAlphabet.contains(currEvent.getLabel()))
 				{
-					LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
+					final LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
 
 					if (currAutomatonEvent == null)
 					{
@@ -533,18 +532,18 @@ public class AutomataToIEC61499
 
 					boolean previousState = false;
 
-					for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
+					for (final Iterator<?> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
 					{
-						State currState = (State) stateIt.next();
-						int currStateIndex = currState.getSynchIndex();
-						State toState = currState.nextState(currAutomatonEvent);
+						final State currState = (State) stateIt.next();
+						final int currStateIndex = currState.getSynchIndex();
+						final State toState = currState.nextState(currAutomatonEvent);
 
 						if (toState == null)
 						{
 							throw new SupremicaException("AutomataToIEC61499.printAlgorithmDeclarations: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 						}
 
-						int toStateIndex = toState.getSynchIndex();
+						final int toStateIndex = toState.getSynchIndex();
 
 						if (currState != toState)
 						{
@@ -593,31 +592,31 @@ public class AutomataToIEC61499
 		printStartAlgorithm("COMP_ENABLED");
 
 		// Iterate over all events and compute which events that are enabled
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+		for (final Iterator<?> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			while (alphIt.hasNext())
 			{
-				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+				final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				if (comments)
 				{
 					pw.println("        &#47;* Enabled condition for event " + currEvent.getLabel() + " *&#47; &#13;&#10;");
 				}
 				pw.print("        EO_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + " = ");
 
-				for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+				for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext(); )
 				{
-					Automaton currAutomaton = (Automaton) autIt.next();
-					Alphabet currAlphabet = currAutomaton.getAlphabet();
+					final Automaton currAutomaton = (Automaton) autIt.next();
+					final Alphabet currAlphabet = currAutomaton.getAlphabet();
 					currAutomaton.getSynchIndex();
 					if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
 					{    // Find all states that enable this event
 
 						boolean previousState = false;
 
-						for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
+						for (final Iterator<?> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
 						{
-							State currState = (State) stateIt.next();
-							int currStateIndex = currState.getSynchIndex();
+							final State currState = (State) stateIt.next();
+							final int currStateIndex = currState.getSynchIndex();
 
 							if (previousState)
 							{
@@ -660,7 +659,7 @@ public class AutomataToIEC61499
 	}
 
 
-	private void printSyncFB(String sysName)
+	private void printSyncFB(final String sysName)
 	{
 
 		// BeginProgram
@@ -689,12 +688,12 @@ public class AutomataToIEC61499
 		pw.println("  <InterfaceList>");
 		pw.println("    <EventInputs>");
 		pw.println("      <Event Name=\"ENABLED\" >");
-		for(Iterator autIt=theProject.iterator();autIt.hasNext();)
+		for(final Iterator<?> autIt=theProject.iterator();autIt.hasNext();)
 		{
-			Automaton tmpAut = (Automaton) autIt.next();
-			for(Iterator alphIt=tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
+			final Automaton tmpAut = (Automaton) autIt.next();
+			for(final Iterator<?> alphIt=tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
 			{
-				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+				final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				pw.println("        <With Var=\"EI_" + tmpAut.getName() + "_" + currEvent.getLabel()+ "\" />");
 			}
 		}
@@ -706,12 +705,12 @@ public class AutomataToIEC61499
 		// The only output event is DONE.
 		pw.println("    <EventOutputs>");
 		pw.println("      <Event Name=\"DONE\" >");
-		for(Iterator autIt=theProject.iterator();autIt.hasNext();)
+		for(final Iterator<?> autIt=theProject.iterator();autIt.hasNext();)
 		{
-			Automaton tmpAut = (Automaton) autIt.next();
-			for(Iterator alphIt=tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
+			final Automaton tmpAut = (Automaton) autIt.next();
+			for(final Iterator<?> alphIt=tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
 			{
-				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+				final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				pw.println("        <With Var=\"EO_" + tmpAut.getName() + "_" + currEvent.getLabel()+ "\" />");
 			}
 		}
@@ -721,12 +720,12 @@ public class AutomataToIEC61499
 
 		// The input_variable_list.
 		pw.println("    <InputVars>");
-		for(Iterator autIt=theProject.iterator();autIt.hasNext();)
+		for(final Iterator<?> autIt=theProject.iterator();autIt.hasNext();)
 		{
-			Automaton tmpAut = (Automaton) autIt.next();
-			for (Iterator alphIt = tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
+			final Automaton tmpAut = (Automaton) autIt.next();
+			for (final Iterator<?> alphIt = tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
 			{
-				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+				final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				if (comments)
 				{
 					pw.println("      <!-- " + tmpAut.getName() + currEvent.getLabel() + " -->");
@@ -739,12 +738,12 @@ public class AutomataToIEC61499
 
 		// The output_variable_list.
 		pw.println("    <OutputVars>");
-		for(Iterator autIt=theProject.iterator();autIt.hasNext();)
+		for(final Iterator<?> autIt=theProject.iterator();autIt.hasNext();)
 		{
-			Automaton tmpAut = (Automaton) autIt.next();
-			for (Iterator alphIt = tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
+			final Automaton tmpAut = (Automaton) autIt.next();
+			for (final Iterator<?> alphIt = tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
 			{
-				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+				final LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				if (comments)
 				{
 					pw.println("      <!-- " + tmpAut.getName() + currEvent.getLabel() + " -->");
@@ -776,19 +775,19 @@ public class AutomataToIEC61499
 		// SYNC algorithm
 		printStartAlgorithm("SYNC");
 
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext();)
 		{
-			Automaton curAut = (Automaton) autIt.next();
-			for (Iterator alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
+			final Automaton curAut = (Automaton) autIt.next();
+			for (final Iterator<?> alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
 			{
-				LabeledEvent curEv = (LabeledEvent) alphIt.next();
+				final LabeledEvent curEv = (LabeledEvent) alphIt.next();
 				pw.print("        EO_" + curAut.getName() + "_" + curEv.getLabel() + " = ");
-				for (Iterator innerAutIt = theProject.iterator(); innerAutIt.hasNext();)
+				for (final Iterator<?> innerAutIt = theProject.iterator(); innerAutIt.hasNext();)
 				{
-					Automaton tmpAut = (Automaton) innerAutIt.next();
-					for (Iterator innerAlphIt = tmpAut.getAlphabet().iterator(); innerAlphIt.hasNext();)
+					final Automaton tmpAut = (Automaton) innerAutIt.next();
+					for (final Iterator<?> innerAlphIt = tmpAut.getAlphabet().iterator(); innerAlphIt.hasNext();)
 					{
-						LabeledEvent tmpEv = (LabeledEvent) innerAlphIt.next();
+						final LabeledEvent tmpEv = (LabeledEvent) innerAlphIt.next();
 						if(tmpEv.getLabel().equals(curEv.getLabel()))
 						{
 							pw.print("EI_" + tmpAut.getName() + "_" + tmpEv.getLabel() + " &#38;&#38; ");
@@ -807,7 +806,7 @@ public class AutomataToIEC61499
 	}
 
 
-	private void printSystem(String name)
+	private void printSystem(final String name)
 	{
 
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -827,9 +826,9 @@ public class AutomataToIEC61499
         pw.println("        <FB Name=\"merge\" Type=\"E_MERGE" + theProject.size() + "\" />");
         pw.println("        <FB Name=\"split\" Type=\"E_SPLIT" + theProject.size() + "\" />");
 		// Model FBs
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext();)
 		{
-			Automaton curAut = (Automaton) autIt.next();
+			final Automaton curAut = (Automaton) autIt.next();
 			pw.println("        <FB Name=\"" + curAut.getName()+ "_inst\" Type=\"" + curAut.getName() + "\" />");
 		}
         pw.println("        <FB Name=\"" + name + "_SYNC_inst\" Type=\"" + name + "_SYNC\" />");
@@ -840,10 +839,10 @@ public class AutomataToIEC61499
 		boolean first_model = true;
 		String firstName;
 		String prevName = "";
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext();)
 		{
-			Automaton curAut = (Automaton) autIt.next();
-			String curName = curAut.getName();
+			final Automaton curAut = (Automaton) autIt.next();
+			final String curName = curAut.getName();
 
 			if (first_model)
 			{
@@ -865,16 +864,16 @@ public class AutomataToIEC61499
 
 		}
 		int signal = 1;
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext();)
 		{
-			Automaton curAut = (Automaton) autIt.next();
+			final Automaton curAut = (Automaton) autIt.next();
 			pw.println("          <Connection Source=\"" + curAut.getName() + "_inst.DONE\" Destination=\"merge.EI" + signal + "\" />");
 			signal = signal + 1;
 		}
 		signal = 1;
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext();)
 		{
-			Automaton curAut = (Automaton) autIt.next();
+			final Automaton curAut = (Automaton) autIt.next();
 			pw.println("          <Connection Source=\"split.EO" + signal + "\" Destination=\"" + curAut.getName() + "_inst.OCCURRED\" />");
 			signal = signal + 1;
 		}
@@ -887,20 +886,20 @@ public class AutomataToIEC61499
 
 		// Data Connections
 		pw.println("        <DataConnections>");
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+		for (final Iterator<?> autIt = theProject.iterator(); autIt.hasNext();)
 		{
-			Automaton curAut = (Automaton) autIt.next();
-			String aut = curAut.getName();
-			for (Iterator alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
+			final Automaton curAut = (Automaton) autIt.next();
+			final String aut = curAut.getName();
+			for (final Iterator<?> alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
 			{
-				LabeledEvent curEv = (LabeledEvent) alphIt.next();
-				String ev = curEv.getLabel();
+				final LabeledEvent curEv = (LabeledEvent) alphIt.next();
+				final String ev = curEv.getLabel();
 				pw.println("          <Connection Source=\"" + name + "_SYNC_inst.EO_" + aut + "_" + ev + "\" Destination=\"" + aut + "_inst.EI_" + ev + "\" />");
 			}
-			for (Iterator alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
+			for (final Iterator<?> alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
 			{
-				LabeledEvent curEv = (LabeledEvent) alphIt.next();
-				String ev = curEv.getLabel();
+				final LabeledEvent curEv = (LabeledEvent) alphIt.next();
+				final String ev = curEv.getLabel();
 				pw.println("          <Connection Source=\"" + aut + "_inst.EO_" + ev + "\" Destination=\"" + name + "_SYNC_inst.EI_" + aut + "_" + ev + "\" />");
 			}
 		}
@@ -917,7 +916,7 @@ public class AutomataToIEC61499
 		pw.println("</System>");
 	}
 
-	private void printMerge(int size)
+	private void printMerge(final int size)
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		if (!useXmlns)
@@ -962,7 +961,7 @@ public class AutomataToIEC61499
 		pw.println("</FBType>");
 	}
 
-	private void printSplit(int size)
+	private void printSplit(final int size)
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		if (!useXmlns)

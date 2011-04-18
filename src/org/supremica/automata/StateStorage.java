@@ -57,7 +57,6 @@ import java.util.*;
  * reachable states in the AutomataSynchronizerExecuterAlgorithm.
  * The state in this storage must be of the form int[].
  **/
-@SuppressWarnings("unchecked")
 public interface StateStorage
 {
 	/**
@@ -87,5 +86,5 @@ public interface StateStorage
 	/**
 	 * Returns an iterator for all states in the storage
 	 */
-	public Iterator iterator();
+	public Iterator<?> iterator();
 }

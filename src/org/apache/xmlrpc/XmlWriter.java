@@ -124,7 +124,7 @@ class XmlWriter
 	 * @throws UnsupportedEncodingException Encoding unrecognized.
 	 * @throws IOException Problem writing.
 	 */
-	public XmlWriter(OutputStream out, String enc)
+	public XmlWriter(final OutputStream out, final String enc)
 		throws UnsupportedEncodingException, IOException
 	{
 
@@ -145,7 +145,7 @@ class XmlWriter
 	 * @return The XML encoding (if a mapping is available);
 	 * otherwise, the encoding as provided.
 	 */
-	protected static String canonicalizeEncoding(String javaEncoding)
+	protected static String canonicalizeEncoding(final String javaEncoding)
 	{
 		return encodings.getProperty(javaEncoding, javaEncoding);
 	}
@@ -160,8 +160,7 @@ class XmlWriter
 	 * parameter is passed to this method (not supported by the <a
 	 * href="http://xml-rpc.com/spec">XML-RPC specification</a>).
 	 */
-	@SuppressWarnings("unchecked")
-	public void writeObject(Object obj)
+	public void writeObject(final Object obj)
 		throws XmlRpcException, IOException
 	{
 		startElement("value");
@@ -198,7 +197,7 @@ class XmlWriter
 		{
 			startElement("dateTime.iso8601");
 
-			Date d = (Date) obj;
+			final Date d = (Date) obj;
 
 			write(dateTool.format(d));
 			endElement("dateTime.iso8601");
@@ -214,7 +213,7 @@ class XmlWriter
 			startElement("array");
 			startElement("data");
 
-			Object[] array = (Object[]) obj;
+			final Object[] array = (Object[]) obj;
 
 			for (int i = 0; i < array.length; i++)
 			{
@@ -229,8 +228,8 @@ class XmlWriter
 			startElement("array");
 			startElement("data");
 
-			Vector array = (Vector) obj;
-			int size = array.size();
+			final Vector<?> array = (Vector<?>) obj;
+			final int size = array.size();
 
 			for (int i = 0; i < size; i++)
 			{
@@ -244,12 +243,12 @@ class XmlWriter
 		{
 			startElement("struct");
 
-			Hashtable struct = (Hashtable) obj;
+			final Hashtable<?,?> struct = (Hashtable<?,?>) obj;
 
-			for (Enumeration e = struct.keys(); e.hasMoreElements(); )
+			for (final Enumeration<?> e = struct.keys(); e.hasMoreElements(); )
 			{
-				String key = (String) e.nextElement();
-				Object value = struct.get(key);
+				final String key = (String) e.nextElement();
+				final Object value = struct.get(key);
 
 				startElement("member");
 				startElement("name");
@@ -272,7 +271,7 @@ class XmlWriter
 	/**
 	 * This is used to write out the Base64 output...
 	 */
-	protected void write(byte[] byteData)
+	protected void write(final byte[] byteData)
 		throws IOException
 	{
 		for (int i = 0; i < byteData.length; i++)
@@ -286,7 +285,7 @@ class XmlWriter
 	 * @param elem
 	 * @throws IOException
 	 */
-	protected void startElement(String elem)
+	protected void startElement(final String elem)
 		throws IOException
 	{
 		write('<');
@@ -299,7 +298,7 @@ class XmlWriter
 	 * @param elem
 	 * @throws IOException
 	 */
-	protected void endElement(String elem)
+	protected void endElement(final String elem)
 		throws IOException
 	{
 		write(CLOSING_TAG_START);
@@ -312,7 +311,7 @@ class XmlWriter
 	 * @param elem
 	 * @throws IOException
 	 */
-	protected void emptyElement(String elem)
+	protected void emptyElement(final String elem)
 		throws IOException
 	{
 		write('<');
@@ -327,14 +326,14 @@ class XmlWriter
 	 * @exception XmlRpcException Unsupported character data found.
 	 * @exception IOException Problem writing data.
 	 */
-	protected void chardata(String text)
+	protected void chardata(final String text)
 		throws XmlRpcException, IOException
 	{
-		int l = text.length();
+		final int l = text.length();
 
 		for (int i = 0; i < l; i++)
 		{
-			char c = text.charAt(i);
+			final char c = text.charAt(i);
 
 			switch (c)
 			{

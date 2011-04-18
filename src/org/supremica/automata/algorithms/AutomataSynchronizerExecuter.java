@@ -171,9 +171,6 @@ public final class AutomataSynchronizerExecuter
     //private AutomataOnlineSynchronizer coExecuter = null;
     private AutomataSynchronizerExecuter coExecuter = null;
 
-    /** For "one event at a time"-execution. */
-    private final int currUncontrollableEvent = -1;
-
     /** For stopping of thread. */
     private boolean stopRequested = false;
 
@@ -695,10 +692,7 @@ public final class AutomataSynchronizerExecuter
                 // it will be excluded in the total synchronization...  or not.
                 if (rememberUncontrollable)
                 {
-                    if ((currUncontrollableEvent == -1) || (currUncontrollableEvent == problemEvent))
-                    {
-                        potentiallyUncontrollableStates.add(automataIndices, currState, problemPlant, problemEvent);
-                    }
+                  potentiallyUncontrollableStates.add(automataIndices, currState, problemPlant, problemEvent);
                 }
 
                 // Forbid uncontrollable state?

@@ -48,7 +48,7 @@
  */
 
 /**
- * The EOPInitialRow class describes the initial state of the EOP and alarm type and delay for 
+ * The EOPInitialRow class describes the initial state of the EOP and alarm type and delay for
  * the initial state check.
  *
  * Created: Thu Nov 02 12:22 2006
@@ -70,7 +70,7 @@ public class EOPInitialRow extends EOPRow implements Cloneable
     private Map<EOPExternalComponent, String> ExternalComponentToStateMap;
     private String alarmType;
     private String alarmDelay;
-    
+
     public EOPInitialRow()
     {
 	super();
@@ -79,56 +79,56 @@ public class EOPInitialRow extends EOPRow implements Cloneable
 	alarmDelay = null;
     }
 
-    public void setAlarmType(String alarmType)
+    public void setAlarmType(final String alarmType)
     {
 	this.alarmType = alarmType;
     }
-    
+
     public String getAlarmType()
     {
 	return alarmType;
     }
 
-    public void setAlarmDelay(String alarmDelay)
+    public void setAlarmDelay(final String alarmDelay)
     {
 	this.alarmDelay = alarmDelay;
     }
-    
+
     public String getAlarmDelay()
     {
 	return alarmDelay;
     }
 
-    public void addExternalComponentToState(EOPExternalComponent component, String state)
+    public void addExternalComponentToState(final EOPExternalComponent component, final String state)
     {
 	ExternalComponentToStateMap.put(component, state);
     }
 
-    public Map<EOPExternalComponent, String> getExternalComponentToStateMap() 
+    public Map<EOPExternalComponent, String> getExternalComponentToStateMap()
     {
 	return ExternalComponentToStateMap;
     }
 
-    public Object clone() 
+    public Object clone()
     {
 	EOPInitialRow clone = null;
 	try
 	    {
 		clone =(EOPInitialRow) super.clone(); // Create space and clone the trivial data
-		// The maps and sets has to be cloned separately since we want to be able to 
+		// The maps and sets has to be cloned separately since we want to be able to
 		// remove elements from the cloned maps and not effect the original maps.
-		clone.sensorToStateMap = (Map) ((HashMap) this.sensorToStateMap).clone();
-		clone.actuatorToStateMap = (Map) ((HashMap) this.actuatorToStateMap).clone();
-		clone.variableToValueMap = (Map) ((HashMap) this.variableToValueMap).clone();
-		clone.zoneToStateMap = (Map) ((HashMap) this.zoneToStateMap).clone();
-		clone.ExternalComponentToStateMap = (Map) ((Hashtable) this.ExternalComponentToStateMap).clone();
+		clone.sensorToStateMap = (Map<String,String>) ((HashMap<?,?>) this.sensorToStateMap).clone();
+		clone.actuatorToStateMap = (Map<String,String>) ((HashMap<?,?>) this.actuatorToStateMap).clone();
+		clone.variableToValueMap = (Map<String,String>) ((HashMap<?,?>) this.variableToValueMap).clone();
+		clone.zoneToStateMap = (Map<String,String>) ((HashMap<?,?>) this.zoneToStateMap).clone();
+		clone.ExternalComponentToStateMap = (Map<EOPExternalComponent,String>) ((Hashtable<EOPExternalComponent,String>) this.ExternalComponentToStateMap).clone();
 		// The order of the original map may be changed when elements are removed from the cloned hashmap
 		// but this does not matter since the order is not important.
 	    }
-	catch (CloneNotSupportedException e)
+	catch (final CloneNotSupportedException e)
 	    {
 		System.err.println("The EOPInitialRow could not be cloned!");
-	    } 
+	    }
 	return clone;
     }
 
@@ -136,52 +136,52 @@ public class EOPInitialRow extends EOPRow implements Cloneable
     public void removeUnimportantStates()
     {
 	// Sensors
-	for (Iterator sensorIter = sensorToStateMap.entrySet().iterator(); sensorIter.hasNext();)
+	for (final Iterator<?> sensorIter = sensorToStateMap.entrySet().iterator(); sensorIter.hasNext();)
 	{
-	    Entry currentSensorToState = (Entry) sensorIter.next();
+	    final Entry<?,?> currentSensorToState = (Entry<?,?>) sensorIter.next();
 	    if ( ( (String) currentSensorToState.getValue() ).equals(EOP.IGNORE_TOKEN))
 	    {
 		sensorIter.remove();
 	    }
 	}
 	// Actuators
-	for (Iterator actuatorIter = actuatorToStateMap.entrySet().iterator(); actuatorIter.hasNext();)
+	for (final Iterator<?> actuatorIter = actuatorToStateMap.entrySet().iterator(); actuatorIter.hasNext();)
 	{
-	    Entry currentActuatorToState = (Entry) actuatorIter.next();
+	    final Entry<?,?> currentActuatorToState = (Entry<?,?>) actuatorIter.next();
 	    if ( ( (String) currentActuatorToState.getValue() ).equals(EOP.IGNORE_TOKEN))
 	    {
 		actuatorIter.remove();
 	    }
 	}
 	// Variables
- 	for (Iterator variableIter = variableToValueMap.entrySet().iterator(); variableIter.hasNext();)
+ 	for (final Iterator<?> variableIter = variableToValueMap.entrySet().iterator(); variableIter.hasNext();)
  	{
- 	    Entry currentVariableToValue = (Entry) variableIter.next();
+ 	    final Entry<?,?> currentVariableToValue = (Entry<?,?>) variableIter.next();
  	    if ( ( (String) currentVariableToValue.getValue() ).equals(EOP.IGNORE_TOKEN))
  	    {
  		variableIter.remove();
  	    }
  	}
 	// Zones
-	for (Iterator zoneIter = zoneToStateMap.entrySet().iterator(); zoneIter.hasNext();)
+	for (final Iterator<?> zoneIter = zoneToStateMap.entrySet().iterator(); zoneIter.hasNext();)
 	{
-	    Entry currentZoneToState = (Entry) zoneIter.next();
+	    final Entry<?,?> currentZoneToState = (Entry<?,?>) zoneIter.next();
 	    if ( ( (String) currentZoneToState.getValue() ).equals(EOP.IGNORE_TOKEN))
 	    {
 		zoneIter.remove();
 	    }
 	}
 	// External varibles
-	for (Iterator externalIter = ExternalComponentToStateMap.entrySet().iterator(); externalIter.hasNext();)
+	for (final Iterator<?> externalIter = ExternalComponentToStateMap.entrySet().iterator(); externalIter.hasNext();)
 	{
-	    Entry ExternalComponentToState = (Entry) externalIter.next();
+	    final Entry<?,?> ExternalComponentToState = (Entry<?,?>) externalIter.next();
 	    if ( ( (String) ExternalComponentToState.getValue() ).equals(EOP.IGNORE_TOKEN))
 	    {
 		externalIter.remove();
 	    }
 	}
-	
-	
+
+
     }
-    
+
 }

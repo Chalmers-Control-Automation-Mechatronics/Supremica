@@ -21,30 +21,28 @@ import java.util.*;
  */
 public class AutomataSSPCExporter
 {
-	private File file;
-	private String path;
-	@SuppressWarnings("unchecked")
-	private HashMap<Comparable, Comparable> fileMap, eventMap;
+	private final File file;
+	private final String path;
+	private final HashMap<Comparable<?>, Comparable<?>> fileMap, eventMap;
 	private int event_count = 0, state_count;
 
 	/** save the automata to disk, use 'file' for the system (project) file name */
-	@SuppressWarnings("unchecked")
-	public AutomataSSPCExporter(Automata automata, String file)
+	public AutomataSSPCExporter(final Automata automata, final String file)
 		throws IOException
 	{
 		this.file = new File(file);
 		this.path = this.file.getParent();
-		this.fileMap = new HashMap<Comparable, Comparable>();
-		this.eventMap = new HashMap<Comparable, Comparable>();
+		this.fileMap = new HashMap<Comparable<?>, Comparable<?>>();
+		this.eventMap = new HashMap<Comparable<?>, Comparable<?>>();
 
-		PrintWriter system = new PrintWriter(new FileOutputStream(file));
-		PrintWriter plant = new PrintWriter(new FileOutputStream(file + ".plant"));
-		PrintWriter spec = new PrintWriter(new FileOutputStream(file + ".spec"));
+		final PrintWriter system = new PrintWriter(new FileOutputStream(file));
+		final PrintWriter plant = new PrintWriter(new FileOutputStream(file + ".plant"));
+		final PrintWriter spec = new PrintWriter(new FileOutputStream(file + ".spec"));
 
-		for (Iterator<?> autIt = automata.iterator(); autIt.hasNext(); )
+		for (final Iterator<?> autIt = automata.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-			String name = getName(currAutomaton);
+			final Automaton currAutomaton = (Automaton) autIt.next();
+			final String name = getName(currAutomaton);
 
 			system.println(name + ".fsm");
 			saveOne(currAutomaton, name);
@@ -62,7 +60,7 @@ public class AutomataSSPCExporter
 	}
 
 	/** map event-label -> unique-integer */
-	private int getEvent(String name)
+	private int getEvent(final String name)
 	{
 		Integer ret = (Integer) eventMap.get(name);
 
@@ -77,20 +75,20 @@ public class AutomataSSPCExporter
 	}
 
 	/** map Automaton -> filename */
-	private String getName(Automaton a)
+	private String getName(final Automaton a)
 	{
-		String ret = (String) fileMap.get(a);
+		final String ret = (String) fileMap.get(a);
 
 		if (ret == null)
 		{
-			String name = trim(a.getName());
+			final String name = trim(a.getName());
 
 			for (int x = 1; ; x++)
 			{
-				String name2 = (x == 1)
+				final String name2 = (x == 1)
 							   ? name
 							   : (name + x);    // try 'X', 'X2', 'X3' etc...
-				File file2 = new File(path, name2 + ".fsm");
+				final File file2 = new File(path, name2 + ".fsm");
 
 				if (!file2.exists())
 				{
@@ -105,7 +103,7 @@ public class AutomataSSPCExporter
 	}
 
 	/** remove bad chars and the extension (hopefully :) */
-	private String trim(String x)
+	private String trim(final String x)
 	{
 		int len = x.lastIndexOf('.');
 
@@ -114,11 +112,11 @@ public class AutomataSSPCExporter
 			len = x.length();
 		}
 
-		StringBuffer sb = new StringBuffer(len);
+		final StringBuffer sb = new StringBuffer(len);
 
 		for (int i = 0; i < len; i++)
 		{
-			char c = x.charAt(i);
+			final char c = x.charAt(i);
 
 			sb.append(isGood(c)
 					  ? c
@@ -129,37 +127,37 @@ public class AutomataSSPCExporter
 	}
 
 	/** what chars we like */
-	private boolean isGood(char c)
+	private boolean isGood(final char c)
 	{
 		return (((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')) || (c == '_'));
 	}
 
 	/** save one automaton to file  */
-	private void saveOne(Automaton a, String name)
+	private void saveOne(final Automaton a, final String name)
 		throws IOException
 	{
-		File file2 = new File(path, name + ".fsm");
-		PrintWriter me = new PrintWriter(new FileOutputStream(file2));
-		HashMap<State, Integer> stateMap = new HashMap<State, Integer>(); // String -> Integer map
+		final File file2 = new File(path, name + ".fsm");
+		final PrintWriter me = new PrintWriter(new FileOutputStream(file2));
+		final HashMap<State, Integer> stateMap = new HashMap<State, Integer>(); // String -> Integer map
 
 
 		me.println("FSM " + name);
 		me.println();
 
 		// 1. build the state map
-		for (Iterator<?> states = a.stateIterator(); states.hasNext(); )
+		for (final Iterator<?> states = a.stateIterator(); states.hasNext(); )
 		{
-			State state = (State) states.next();
-			Integer num = state_count++;
+			final State state = (State) states.next();
+			final Integer num = state_count++;
 			stateMap.put(state, num);
 		}
 
 		// dump the state/transition list
-		for (Iterator<?> states = a.stateIterator(); states.hasNext(); )
+		for (final Iterator<?> states = a.stateIterator(); states.hasNext(); )
 		{
-			State state = (State) states.next();
+			final State state = (State) states.next();
 
-			Integer num = stateMap.get(state);
+			final Integer num = stateMap.get(state);
 			me.print("\tSTATE " + num.intValue() );
 
 
@@ -175,15 +173,15 @@ public class AutomataSSPCExporter
 
 			me.println();
 
-			for (Iterator<Arc> arcIt = state.outgoingArcsIterator();
+			for (final Iterator<Arc> arcIt = state.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
-				Arc arc = arcIt.next();
+				final Arc arc = arcIt.next();
 
 				// String tname = arc.getLabel();
-				int tname = getEvent(arc.getLabel());
-				State toState = arc.getToState();
-				Integer toInt = stateMap.get(toState);
+				final int tname = getEvent(arc.getLabel());
+				final State toState = arc.getToState();
+				final Integer toInt = stateMap.get(toState);
 				me.println("\t\tTRANSITION " + tname + " TO " + toInt.intValue() );
 			}
 
@@ -192,9 +190,9 @@ public class AutomataSSPCExporter
 
 		// dump uncontrollable list
 		int count = 0;
-		for (Iterator<LabeledEvent> ei = a.eventIterator(); ei.hasNext(); )
+		for (final Iterator<LabeledEvent> ei = a.eventIterator(); ei.hasNext(); )
 		{
-			LabeledEvent le = ei.next();
+			final LabeledEvent le = ei.next();
 
 			if (!le.isControllable())
 			{

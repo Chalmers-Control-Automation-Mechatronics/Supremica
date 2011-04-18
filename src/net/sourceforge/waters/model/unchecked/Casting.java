@@ -26,7 +26,7 @@ import java.util.Set;
  * @author Robi Malik
  */
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Casting {
 
   /**

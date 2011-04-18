@@ -12,8 +12,7 @@ public class ArrayHelper
     private ArrayHelper()
     {
     }
-    
-     @SuppressWarnings("unchecked")
+
 	public static String arrayToString(Object array)
      {
          if (array == null)
@@ -25,19 +24,19 @@ public class ArrayHelper
              Object obj = null;
              if (array instanceof Hashtable)
              {
-                 array = ((Hashtable)array).entrySet().toArray();
+                 array = ((Hashtable<?,?>)array).entrySet().toArray();
              }
              else if (array instanceof HashSet)
              {
-                 array = ((HashSet)array).toArray();
+                 array = ((HashSet<?>)array).toArray();
              }
              else if (array instanceof Collection)
              {
-                 array = ((Collection)array).toArray();
+                 array = ((Collection<?>)array).toArray();
              }
-             int length = Array.getLength(array);
-             int lastItem = length - 1;
-             StringBuffer sb = new StringBuffer("[");
+             final int length = Array.getLength(array);
+             final int lastItem = length - 1;
+             final StringBuffer sb = new StringBuffer("[");
              for (int i = 0; i < length; i++)
              {
                  obj = Array.get(array, i);

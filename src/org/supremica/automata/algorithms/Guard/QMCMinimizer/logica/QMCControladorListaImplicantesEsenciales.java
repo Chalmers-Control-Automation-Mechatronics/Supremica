@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.supremica.automata.algorithms.Guard.QMCMinimizer.logica;
 
@@ -30,26 +30,25 @@ public class QMCControladorListaImplicantesEsenciales extends MouseAdapter {
     JList listaCabecerasFilasImplicantes;
     QMCInicio aplicacion;
     QMCAlgoritmo algoritmo;
-    
-    public QMCControladorListaImplicantesEsenciales(QMCInicio aplicacion, QMCAlgoritmo algoritmo)
+
+    public QMCControladorListaImplicantesEsenciales(final QMCInicio aplicacion, final QMCAlgoritmo algoritmo)
     {
         this.aplicacion = aplicacion;
         this.algoritmo = algoritmo;
     }
-    
+
     /**
      * Implementación del método mouseClicked que realiza las comprobaciones pertinentes
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
-    @SuppressWarnings("unchecked")
-    public void mouseClicked(MouseEvent e)
+    public void mouseClicked(final MouseEvent e)
     {
         listaCabecerasFilasImplicantes = (JList)e.getSource();
-        index = listaCabecerasFilasImplicantes.locationToIndex(e.getPoint());                                    
+        index = listaCabecerasFilasImplicantes.locationToIndex(e.getPoint());
         item = (QMCImplicanteBean)listaCabecerasFilasImplicantes.getModel().getElementAt(index);
         item.setEsencial(!item.isEsencial());
-      
-        
+
+
         // Accion de marcado
         if(item.isEsencial())
         {
@@ -57,17 +56,17 @@ public class QMCControladorListaImplicantesEsenciales extends MouseAdapter {
             if(QMCUtilLogica.compruebaImplicanteEsencial(algoritmo.getListaImplicantesPrimos(), index))
             {
                // Marca los terminos que cubre el implicantes seleccionado
-               item.marcaTerminosCubiertos(algoritmo.getListaTerminosInteractivos(), true);                             
+               item.marcaTerminosCubiertos(algoritmo.getListaTerminosInteractivos(), true);
                // Refresca la cabecera
                aplicacion.getTablaImplicantesEsenciales().getTableHeader().repaint();
             }
             else
-            {                         
+            {
                 // muestra dialogo error
                 JOptionPane.showMessageDialog(null, "El implicante primo seleccionado no es esencial", "Implicante esencial incorrecto", JOptionPane.ERROR_MESSAGE);
                 // desmarca la seleccion
-                item.setEsencial(false);                          
-            }                          
+                item.setEsencial(false);
+            }
         }
         // Accion de desmarcado
         else
@@ -77,9 +76,9 @@ public class QMCControladorListaImplicantesEsenciales extends MouseAdapter {
             // Renueva las marcas del resto de terminos
             QMCUtilFormateo.renuevaMarcas(algoritmo.getListaImplicantesInteractivos(), algoritmo.getListaTerminosInteractivos());
             aplicacion.getTablaImplicantesEsenciales().getTableHeader().repaint();
-        }                          
-        Rectangle rect = listaCabecerasFilasImplicantes.getCellBounds(index, index);
+        }
+        final Rectangle rect = listaCabecerasFilasImplicantes.getCellBounds(index, index);
         listaCabecerasFilasImplicantes.repaint(rect);
-    }    
+    }
 
 }

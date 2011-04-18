@@ -64,24 +64,23 @@ import java.util.Vector;
  * @since 1.2
  */
 
-@SuppressWarnings("unchecked")
 public class XmlRpcRequest
 {
 	protected final String methodName;
-	protected final Vector<Comparable> parameters;
+	protected final Vector<Comparable<?>> parameters;
 
-	public XmlRpcRequest(String methodName, Vector<Comparable> parameters)
+	public XmlRpcRequest(final String methodName, final Vector<Comparable<?>> parameters)
 	{
 		this.parameters = parameters;
 		this.methodName = methodName;
 	}
 
-	public Vector<Comparable> getParameters()
+	public Vector<Comparable<?>> getParameters()
 	{
 		return parameters;
 	}
 
-	public Object getParameter(int index)
+	public Object getParameter(final int index)
 	{
 		return parameters.elementAt(index);
 	}

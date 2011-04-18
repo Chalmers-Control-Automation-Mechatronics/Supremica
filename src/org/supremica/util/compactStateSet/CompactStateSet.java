@@ -49,33 +49,33 @@
  */
 package org.supremica.util.compactStateSet;
 
+import org.supremica.automata.State;
 import org.supremica.automata.StateStorage;
 import java.util.*;
 
-@SuppressWarnings("unchecked")
 public class CompactStateSet
 	implements StateStorage
 {
 	@SuppressWarnings("unused")
-	private StateCompressor compressor;
+	private final StateCompressor compressor;
 	@SuppressWarnings("unused")
-	private int nbrOfStatesInEachBlock;
+	private final int nbrOfStatesInEachBlock;
 	@SuppressWarnings("unused")
-	private StateBlocks stateBlocks;
+	private final StateBlocks stateBlocks;
 	@SuppressWarnings("unused")
-	private HashMap stateToPositionMap;
+	private final HashMap<?,?> stateToPositionMap;
 
-	public CompactStateSet(StateCompressor compressor)
+	public CompactStateSet(final StateCompressor compressor)
 	{
 		this(compressor, 1024);
 	}
 
-	public CompactStateSet(StateCompressor compressor, int nbrOfStatesInEachBlock)
+	public CompactStateSet(final StateCompressor compressor, final int nbrOfStatesInEachBlock)
 	{
 		this.compressor = compressor;
 		this.nbrOfStatesInEachBlock = nbrOfStatesInEachBlock;
 		this.stateBlocks = new StateBlocks(compressor, nbrOfStatesInEachBlock);
-		this.stateToPositionMap = new HashMap();
+		this.stateToPositionMap = new HashMap<Object,Object>();
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class CompactStateSet
 	 * that entry. Otherwise add theArray
 	 * and return null.
 	 */
-	public int[] add(int[] theArray)
+	public int[] add(final int[] theArray)
 	{
 		return null;
 	}
@@ -107,7 +107,7 @@ public class CompactStateSet
 	/**
 	 * Returns an int[] if it exists otherwise null
 	 */
-	public int[] get(int[] theArray)
+	public int[] get(final int[] theArray)
 	{
 		return null;
 	}
@@ -115,7 +115,7 @@ public class CompactStateSet
 	/**
 	 * Returns an iterator for all states in the storage
 	 */
-	public Iterator iterator()
+	public Iterator<State> iterator()
 	{
 		return null;
 	}

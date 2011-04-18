@@ -74,16 +74,16 @@ public class AutomatonExplorer
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AutomatonExplorer.class);
-    private Automaton theAutomaton;
-    private BorderLayout layout = new BorderLayout();
-    private JPanel contentPane;
-    private JMenuBar menuBar = new JMenuBar();
-    private StateViewer stateViewer;
-    private ExplorerController controller;
+    private final Automaton theAutomaton;
+    private final BorderLayout layout = new BorderLayout();
+    private final JPanel contentPane;
+    private final JMenuBar menuBar = new JMenuBar();
+    private final StateViewer stateViewer;
+    private final ExplorerController controller;
     @SuppressWarnings("unused")
-	private VisualProject theProject;
+	private final VisualProject theProject;
 
-    public AutomatonExplorer(VisualProject theProject, Automaton theAutomaton)
+    public AutomatonExplorer(final VisualProject theProject, final Automaton theAutomaton)
     throws Exception
     {
         this.theProject = theProject;
@@ -102,7 +102,7 @@ public class AutomatonExplorer
         Utility.setupFrame(this, 400, 500);
         addWindowListener(new WindowAdapter()
         {
-            public void windowClosing(WindowEvent e)
+            public void windowClosing(final WindowEvent e)
             {
                 setVisible(false);
 
@@ -110,7 +110,7 @@ public class AutomatonExplorer
             }
         });
 
-        State currState = theAutomaton.getInitialState();
+        final State currState = theAutomaton.getInitialState();
         if (currState == null)
         {
             throw new SupremicaException("No initial state");
@@ -140,17 +140,17 @@ public class AutomatonExplorer
         setJMenuBar(menuBar);
 
         // File
-        JMenu menuFile = new JMenu();
+        final JMenu menuFile = new JMenu();
         menuFile.setText("File");
         menuFile.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menuFile);
 
         // File.Close
-        JMenuItem menuFileClose = new JMenuItem("Close");
+        final JMenuItem menuFileClose = new JMenuItem("Close");
         menuFile.add(menuFileClose);
         menuFileClose.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 setVisible(false);
 
@@ -159,18 +159,18 @@ public class AutomatonExplorer
         });
 
         // View
-        JMenu menuView = new JMenu();
+        final JMenu menuView = new JMenu();
         menuView.setText("View");
         menuView.setMnemonic(KeyEvent.VK_V);
         menuBar.add(menuView);
 
         // View.EpsilonClosure
-        JCheckBoxMenuItem menuViewEpsilonClosure = new JCheckBoxMenuItem("Consider Epsilon Closure");
+        final JCheckBoxMenuItem menuViewEpsilonClosure = new JCheckBoxMenuItem("Consider Epsilon Closure");
         menuViewEpsilonClosure.setSelected(stateViewer.getConsiderEpsilonClosure());
         menuView.add(menuViewEpsilonClosure);
         menuViewEpsilonClosure.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 stateViewer.setConsiderEpsilonClosure(!stateViewer.getConsiderEpsilonClosure());
                 stateViewer.update();
@@ -178,12 +178,12 @@ public class AutomatonExplorer
         });
 
         // View.OutgoingStateNames
-        JCheckBoxMenuItem menuViewOutgoingStateNames = new JCheckBoxMenuItem("Show Outgoing State Names");
+        final JCheckBoxMenuItem menuViewOutgoingStateNames = new JCheckBoxMenuItem("Show Outgoing State Names");
         menuViewOutgoingStateNames.setSelected(stateViewer.getShowOutgoingStateNames());
         menuView.add(menuViewOutgoingStateNames);
         menuViewOutgoingStateNames.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 stateViewer.setShowOutgoingStateNames(!stateViewer.getShowOutgoingStateNames());
                 stateViewer.update();
@@ -191,12 +191,12 @@ public class AutomatonExplorer
         });
 
         // View.IncomingStateNames
-        JCheckBoxMenuItem menuViewIncomingStateNames = new JCheckBoxMenuItem("Show Incoming State Names");
+        final JCheckBoxMenuItem menuViewIncomingStateNames = new JCheckBoxMenuItem("Show Incoming State Names");
         menuViewIncomingStateNames.setSelected(stateViewer.getShowIncomingStateNames());
         menuView.add(menuViewIncomingStateNames);
         menuViewIncomingStateNames.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 stateViewer.setShowIncomingStateNames(!stateViewer.getShowIncomingStateNames());
                 stateViewer.update();
@@ -204,12 +204,12 @@ public class AutomatonExplorer
         });
     }
 
-    public void setState(State theState)
+    public void setState(final State theState)
     {
         stateViewer.setCurrState(theState);
     }
 
-    public void updated(Object o)
+    public void updated(final Object o)
     {
         if (o == theAutomaton)
         {
@@ -217,32 +217,32 @@ public class AutomatonExplorer
         }
     }
 
-    public void stateAdded(Automaton aut, State q)
+    public void stateAdded(final Automaton aut, final State q)
     {
         updated(aut);
     }
 
-    public void stateRemoved(Automaton aut, State q)
+    public void stateRemoved(final Automaton aut, final State q)
     {
         updated(aut);
     }
 
-    public void arcAdded(Automaton aut, Arc a)
+    public void arcAdded(final Automaton aut, final Arc a)
     {
         updated(aut);
     }
 
-    public void arcRemoved(Automaton aut, Arc a)
+    public void arcRemoved(final Automaton aut, final Arc a)
     {
         updated(aut);
     }
 
-    public void attributeChanged(Automaton aut)
+    public void attributeChanged(final Automaton aut)
     {
         updated(aut);
     }
 
-    public void automatonRenamed(Automaton aut, String oldName)
+    public void automatonRenamed(final Automaton aut, final String oldName)
     {
         updated(aut);
     }
@@ -254,18 +254,18 @@ class StateViewer
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(StateViewer.class);
-    private Automaton theAutomaton;
+    private final Automaton theAutomaton;
     private State currState;
-    private EventList forwardEvents;
-    private EventList backwardEvents;
+    private final EventList forwardEvents;
+    private final EventList backwardEvents;
     private ExplorerController controller;
-    private StateDisplayer stateDisplayer;
-    private JSplitPane eventSplitter;
-    private JSplitPane stateEventSplitter;
-    private LinkedList<State> prevStates = new LinkedList<State>();
-    private LinkedList<State> nextStates = new LinkedList<State>();
+    private final StateDisplayer stateDisplayer;
+    private final JSplitPane eventSplitter;
+    private final JSplitPane stateEventSplitter;
+    private final LinkedList<State> prevStates = new LinkedList<State>();
+    private final LinkedList<State> nextStates = new LinkedList<State>();
 
-    public StateViewer(Automaton theAutomaton)
+    public StateViewer(final Automaton theAutomaton)
     {
         setLayout(new BorderLayout());
 
@@ -289,17 +289,17 @@ class StateViewer
         stateEventSplitter.setDividerLocation(0.6);
     }
 
-    public void setCurrState(State newState)
+    public void setCurrState(final State newState)
     {
         setCurrState(newState, false);
     }
 
-    private void setCurrState(State newState, boolean isUndo)
+    private void setCurrState(final State newState, final boolean isUndo)
     {
         setCurrState(newState, isUndo, true);
     }
 
-    public void setCurrState(State newState, boolean isUndo, boolean forward)
+    public void setCurrState(final State newState, final boolean isUndo, final boolean forward)
     {
         if (!isUndo)
         {
@@ -339,7 +339,7 @@ class StateViewer
     {
         if (prevStates.size() > 0)
         {
-            State newState = (State) prevStates.removeLast();
+            final State newState = (State) prevStates.removeLast();
 
             nextStates.addFirst(currState);
             setCurrState(newState, true);
@@ -355,7 +355,7 @@ class StateViewer
     {
         if (nextStates.size() > 0)
         {
-            State newState = (State) nextStates.removeFirst();
+            final State newState = (State) nextStates.removeFirst();
 
             prevStates.addLast(currState);
             setCurrState(newState, true);
@@ -375,7 +375,7 @@ class StateViewer
         controller.update();
     }
 
-    public void setController(ExplorerController controller)
+    public void setController(final ExplorerController controller)
     {
         this.controller = controller;
     }
@@ -386,7 +386,7 @@ class StateViewer
      *  if the current state is not initial. Otherwise, the method initializes the
      *  current and accumulated costs.
      */
-    public void updateCosts(State currState, State newState)
+    public void updateCosts(final State currState, final State newState)
     {
         if (currState instanceof CompositeState)
         {
@@ -406,7 +406,7 @@ class StateViewer
         // Should be the same forward and backwards... should be static, that is... well, well.
         return forwardEvents.getConsiderEpsilonClosure();
     }
-    public void setConsiderEpsilonClosure(boolean bool)
+    public void setConsiderEpsilonClosure(final boolean bool)
     {
         forwardEvents.setConsiderEpsilonClosure(bool);
         backwardEvents.setConsiderEpsilonClosure(bool);
@@ -416,7 +416,7 @@ class StateViewer
     {
         return forwardEvents.getShowStateName();
     }
-    public void setShowOutgoingStateNames(boolean bool)
+    public void setShowOutgoingStateNames(final boolean bool)
     {
         forwardEvents.setShowStateName(bool);
     }
@@ -425,7 +425,7 @@ class StateViewer
     {
         return backwardEvents.getShowStateName();
     }
-    public void setShowIncomingStateNames(boolean bool)
+    public void setShowIncomingStateNames(final boolean bool)
     {
         backwardEvents.setShowStateName(bool);
     }
@@ -435,17 +435,17 @@ class EventList
     extends JPanel
 {
     private static final long serialVersionUID = 1L;
-    private boolean forward;
+    private final boolean forward;
     @SuppressWarnings("unused")
-	private boolean showStateId = false;
+	private final boolean showStateId = false;
     @SuppressWarnings("unused")
-	private Automaton theAutomaton;
+	private final Automaton theAutomaton;
     private State currState;
-    private StateViewer stateViewer;
-    private EventListModel eventsList;
-    private JList theList;
+    private final StateViewer stateViewer;
+    private final EventListModel eventsList;
+    private final JList theList;
 
-    public EventList(StateViewer stateViewer, Automaton theAutomaton, boolean forward)
+    public EventList(final StateViewer stateViewer, final Automaton theAutomaton, final boolean forward)
     {
         setLayout(new BorderLayout());
 
@@ -455,7 +455,7 @@ class EventList
         eventsList = new EventListModel(theAutomaton, forward);
         theList = new JList(eventsList);
 
-        JScrollPane scrollPanel = new JScrollPane(theList);
+        final JScrollPane scrollPanel = new JScrollPane(theList);
 
         theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -470,7 +470,7 @@ class EventList
             label = "Incoming events";
         }
 
-        JLabel jLabel = new JLabel(label);
+        final JLabel jLabel = new JLabel(label);
 
         // jLabel.setOpaque(true);
         // jLabel.setBackground(Color.yellow);
@@ -478,15 +478,15 @@ class EventList
         add(scrollPanel, BorderLayout.CENTER);
         theList.addMouseListener(new MouseAdapter()
         {
-            public void mouseClicked(MouseEvent e)
+            public void mouseClicked(final MouseEvent e)
             {
                 if (e.getClickCount() == 2)
                 {
-                    int index = theList.locationToIndex(e.getPoint());
+                    final int index = theList.locationToIndex(e.getPoint());
 
                     if (index >= 0)
                     {
-                        State newState = eventsList.getStateAt(index);
+                        final State newState = eventsList.getStateAt(index);
 
                         updateStateViewer(newState);
                     }
@@ -499,7 +499,7 @@ class EventList
     {
         return eventsList.getShowStateName();
     }
-    public void setShowStateName(boolean showState)
+    public void setShowStateName(final boolean showState)
     {
         eventsList.setShowStateName(showState);
     }
@@ -508,12 +508,12 @@ class EventList
     {
         return eventsList.getConsiderEpsilonClosure();
     }
-    public void setConsiderEpsilonClosure(boolean bool)
+    public void setConsiderEpsilonClosure(final boolean bool)
     {
         eventsList.setConsiderEpsilonClosure(bool);
     }
 
-    public void setCurrState(State currState)
+    public void setCurrState(final State currState)
     {
         this.currState = currState;
 
@@ -526,7 +526,7 @@ class EventList
         eventsList.setCurrState(currState);
     }
 
-    private void updateStateViewer(State newState)
+    private void updateStateViewer(final State newState)
     {
         stateViewer.setCurrState(newState, false, forward);
     }
@@ -542,23 +542,23 @@ class EventListModel
     //private ArrayList currArcs = new ArrayList();
 
     /** Sorts the arcs in a TreeMap with the same key for equivalent arcs (epsilon closure) */
-    private TreeMap<String,Arc> currArcs = new TreeMap<String,Arc>();
-    private boolean forward;
+    private final TreeMap<String,Arc> currArcs = new TreeMap<String,Arc>();
+    private final boolean forward;
     @SuppressWarnings("unused")
-	private Automaton theAutomaton;
+	private final Automaton theAutomaton;
     @SuppressWarnings("unused")
-	private Alphabet theAlphabet;
+	private final Alphabet theAlphabet;
     private boolean showState = false;
     private boolean considerEpsilonClosure = false;
 
-    public EventListModel(Automaton theAutomaton, boolean forward)
+    public EventListModel(final Automaton theAutomaton, final boolean forward)
     {
         this.forward = forward;
         this.theAutomaton = theAutomaton;
         this.theAlphabet = theAutomaton.getAlphabet();
     }
 
-    public void setCurrState(State currState)
+    public void setCurrState(final State currState)
     {
         this.currState = currState;
 
@@ -569,7 +569,7 @@ class EventListModel
     {
         return showState;
     }
-    public void setShowStateName(boolean showState)
+    public void setShowStateName(final boolean showState)
     {
         this.showState = showState;
     }
@@ -578,15 +578,14 @@ class EventListModel
     {
         return considerEpsilonClosure;
     }
-    public void setConsiderEpsilonClosure(boolean bool)
+    public void setConsiderEpsilonClosure(final boolean bool)
     {
         this.considerEpsilonClosure = bool;
     }
 
-    @SuppressWarnings("unchecked")
     public void update()
     {
-        Iterator arcIt;
+        Iterator<Arc> arcIt;
 
         if (forward)
         {
@@ -615,7 +614,7 @@ class EventListModel
 
         while (arcIt.hasNext())
         {
-            Arc currArc = (Arc) arcIt.next();
+            final Arc currArc = arcIt.next();
 
             //currArcs.add(currArc);
             if (forward)
@@ -640,15 +639,15 @@ class EventListModel
         return currArcs.size();
     }
 
-    public Object getElementAt(int index)
+    public Object getElementAt(final int index)
     {
         //Arc currArc = (Arc) currArcs.get(index);
-        Arc currArc = (Arc) currArcs.values().toArray()[index];
+        final Arc currArc = (Arc) currArcs.values().toArray()[index];
 
         // String eventId = currArc.getEventId();
-        org.supremica.automata.LabeledEvent currEvent = currArc.getEvent();
+        final org.supremica.automata.LabeledEvent currEvent = currArc.getEvent();
 
-        StringBuffer responseString = new StringBuffer();
+        final StringBuffer responseString = new StringBuffer();
         boolean terminateFont = false;
 
         if (nextStateAssociated(currArc))
@@ -689,7 +688,7 @@ class EventListModel
         return responseString.toString();
     }
 
-    private boolean nextStateAssociated(Arc currArc)
+    private boolean nextStateAssociated(final Arc currArc)
     {
         if (forward)
         {
@@ -698,13 +697,13 @@ class EventListModel
                 return false;
             }
 
-            State nextState = currArc.getToState();
+            final State nextState = currArc.getToState();
 
             return nextState == currState.getAssociatedState();
         }
         else
         {
-            State nextState = currArc.getFromState();
+            final State nextState = currArc.getFromState();
 
             if ((nextState == null) || (nextState.getAssociatedState() == null))
             {
@@ -715,10 +714,10 @@ class EventListModel
         }
     }
 
-    public State getStateAt(int index)
+    public State getStateAt(final int index)
     {
         //Arc currArc = (Arc) currArcs.get(index);
-        Arc currArc = (Arc) currArcs.values().toArray()[index];
+        final Arc currArc = (Arc) currArcs.values().toArray()[index];
         State newState;
 
         if (forward)
@@ -738,19 +737,19 @@ class StateDisplayer
     extends JPanel
 {
     private static final long serialVersionUID = 1L;
-    private StateViewer stateViewer;
+    private final StateViewer stateViewer;
     @SuppressWarnings("unused")
-	private Automaton theAutomaton;
-    private JCheckBox isInitialBox = new JCheckBox("initial");
-    private JCheckBox isAcceptingBox = new JCheckBox("accepting");
+	private final Automaton theAutomaton;
+    private final JCheckBox isInitialBox = new JCheckBox("initial");
+    private final JCheckBox isAcceptingBox = new JCheckBox("accepting");
     //private JCheckBox isMutuallyAcceptingBox = new JCheckBox("mutually accepting");
-    private JCheckBox isForbiddenBox = new JCheckBox("forbidden");
-    private JLabel stateCost = new JLabel();
-    private JLabel stateId = new JLabel();
-    private JLabel stateName = new JLabel();
-    private JLabel currentCosts = new JLabel();
+    private final JCheckBox isForbiddenBox = new JCheckBox("forbidden");
+    private final JLabel stateCost = new JLabel();
+    private final JLabel stateId = new JLabel();
+    private final JLabel stateName = new JLabel();
+    private final JLabel currentCosts = new JLabel();
 
-    private void changeStateAccepting(boolean b)
+    private void changeStateAccepting(final boolean b)
     {
         stateViewer.getCurrState().setAccepting(b);
     }
@@ -760,25 +759,25 @@ class StateDisplayer
         stateViewer.getCurrState().setMutuallyAccepting(b);
     }
 */
-    private void changeStateForbidden(boolean b)
+    private void changeStateForbidden(final boolean b)
     {
         stateViewer.getCurrState().setForbidden(b);
     }
 
-    public StateDisplayer(StateViewer stateViewer, Automaton theAutomaton)
+    public StateDisplayer(final StateViewer stateViewer, final Automaton theAutomaton)
     {
         setLayout(new BorderLayout());
 
         this.stateViewer = stateViewer;
         this.theAutomaton = theAutomaton;
 
-        JLabel header = new JLabel("Current state");
+        final JLabel header = new JLabel("Current state");
 
         // header.setOpaque(true);
         // header.setBackground(Color.yellow);
         add(header, BorderLayout.NORTH);
 
-        Box statusBox = new Box(BoxLayout.Y_AXIS);
+        final Box statusBox = new Box(BoxLayout.Y_AXIS);
 
         isInitialBox.setEnabled(false);
         isInitialBox.setBackground(Color.white);
@@ -787,7 +786,7 @@ class StateDisplayer
         isAcceptingBox.setBackground(Color.white);
         isAcceptingBox.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 changeStateAccepting(((JCheckBox) e.getSource()).isSelected());
             }
@@ -797,7 +796,7 @@ class StateDisplayer
         isForbiddenBox.setBackground(Color.white);
         isForbiddenBox.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 changeStateForbidden(((JCheckBox) e.getSource()).isSelected());
             }
@@ -808,11 +807,11 @@ class StateDisplayer
         statusBox.add(stateName);
         statusBox.add(currentCosts);
 
-        JScrollPane boxScroller = new JScrollPane(statusBox);
+        final JScrollPane boxScroller = new JScrollPane(statusBox);
 
         add(boxScroller, BorderLayout.CENTER);
 
-        JViewport vp = boxScroller.getViewport();
+        final JViewport vp = boxScroller.getViewport();
 
         vp.setBackground(Color.white);
     }
@@ -821,7 +820,7 @@ class StateDisplayer
      * This method sets the values of the graphical components building up the
      * stateDisplayer.
      */
-    public void setCurrState(State currState)
+    public void setCurrState(final State currState)
     {
         isInitialBox.setSelected(currState.isInitial());
         isAcceptingBox.setSelected(currState.isAccepting());
@@ -830,8 +829,8 @@ class StateDisplayer
 
         if (currState instanceof CompositeState)
         {
-            StringBuffer str = new StringBuffer();
-            double[] costs = ((CompositeState) currState).getCurrentCosts();
+            final StringBuffer str = new StringBuffer();
+            final double[] costs = ((CompositeState) currState).getCurrentCosts();
 
             for (int i = 0; i < costs.length - 1; i++)
             {
@@ -857,13 +856,13 @@ class ExplorerController
 {
     private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(ExplorerController.class);
-    private StateViewer stateViewer;
-    private Automaton theAutomaton;
-    private JButton undoButton;
-    private JButton redoButton;
-    private VisualProject theProject;
+    private final StateViewer stateViewer;
+    private final Automaton theAutomaton;
+    private final JButton undoButton;
+    private final JButton redoButton;
+    private final VisualProject theProject;
 
-    public ExplorerController(VisualProject theProject, StateViewer stateViewer, Automaton theAutomaton)
+    public ExplorerController(final VisualProject theProject, final StateViewer stateViewer, final Automaton theAutomaton)
     {
         setLayout(new BorderLayout());
 
@@ -871,12 +870,12 @@ class ExplorerController
         this.stateViewer = stateViewer;
         this.theAutomaton = theAutomaton;
 
-        Box redoBox = new Box(BoxLayout.X_AXIS);
-        ImageIcon forwardImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
-        ImageIcon backwardImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
-        ImageIcon homeImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
-        ImageIcon findImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/general/Find24.gif"));
-        ImageIcon routeImg = new ImageIcon(ExplorerController.class.getResource("/icons/Route24.gif"));
+        final Box redoBox = new Box(BoxLayout.X_AXIS);
+        final ImageIcon forwardImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
+        final ImageIcon backwardImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
+        final ImageIcon homeImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
+        final ImageIcon findImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/general/Find24.gif"));
+        final ImageIcon routeImg = new ImageIcon(ExplorerController.class.getResource("/icons/Route24.gif"));
 
         undoButton = new JButton(backwardImg);
 
@@ -886,15 +885,15 @@ class ExplorerController
 
         redoButton.setToolTipText("Forward");
 
-        JButton resetButton = new JButton(homeImg);
+        final JButton resetButton = new JButton(homeImg);
 
         resetButton.setToolTipText("Go to the initial state");
 
-        JButton findButton = new JButton(findImg);
+        final JButton findButton = new JButton(findImg);
 
         findButton.setToolTipText("Search for a state");
 
-        JButton routeButton = new JButton(routeImg);
+        final JButton routeButton = new JButton(routeImg);
 
         routeButton.setToolTipText("Find shortest path from the initial state to this state and mark the corresponding events in blue.");
         redoBox.add(Box.createHorizontalGlue());
@@ -913,59 +912,59 @@ class ExplorerController
         add(redoBox, BorderLayout.NORTH);
         undoButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 undo_actionPerformed(e);
             }
         });
         redoButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 redo_actionPerformed(e);
             }
         });
         resetButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 reset_actionPerformed(e);
             }
         });
         findButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 find_actionPerformed(e);
             }
         });
         routeButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 route_actionPerformed(e);
             }
         });
     }
 
-    public void reset_actionPerformed(ActionEvent e)
+    public void reset_actionPerformed(final ActionEvent e)
     {
         stateViewer.goToInitialState();
     }
 
-    public void undo_actionPerformed(ActionEvent e)
+    public void undo_actionPerformed(final ActionEvent e)
     {
         stateViewer.undoState();
     }
 
-    public void redo_actionPerformed(ActionEvent e)
+    public void redo_actionPerformed(final ActionEvent e)
     {
         stateViewer.redoState();
     }
 
-    public void find_actionPerformed(ActionEvent e)
+    public void find_actionPerformed(final ActionEvent e)
     {
-        Automata theAutomata = new Automata();
+        final Automata theAutomata = new Automata();
 
         theAutomata.addAutomaton(theAutomaton);
 
@@ -973,23 +972,23 @@ class ExplorerController
         {
             ActionMan.findStates.execute(theProject, theAutomata);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error(ex.toString());
             logger.debug(ex.getStackTrace());
         }
     }
 
-    public void route_actionPerformed(ActionEvent e)
+    public void route_actionPerformed(final ActionEvent e)
     {
         try
         {
-            LabelTrace trace = theAutomaton.getTrace(stateViewer.getCurrState());
+            final LabelTrace trace = theAutomaton.getTrace(stateViewer.getCurrState());
 
 //                      logger.info("Trace to state " + stateViewer.getCurrState().getId() + ": " + trace);
             logger.info("Trace to state " + stateViewer.getCurrState().getName() + ": " + trace);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error when performing route: ", ex);
             logger.debug(ex.getStackTrace());

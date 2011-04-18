@@ -13,7 +13,7 @@ import org.supremica.gui.Utility;
  * @author Anders Röding
  * @author Henrik Staberg
  */
-@SuppressWarnings("unchecked")
+
 public class BallTrackView
 	extends JFrame
 
@@ -31,32 +31,32 @@ public class BallTrackView
 	private static final String imageFileWithoutText = "background.gif";
 	private boolean imageWithText = true;    //Because bgImage will contain this image from the beginning
 	private Image bgImage = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithText));
-	private Image bgImageTemp = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithoutText));
+	private final Image bgImageTemp = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithoutText));
 
 	/**Maximum number of balls allowed*/
 	static final int maxNrOfBalls = 20;
 
 	/**size of window*/
-	private int size;
+	private final int size;
 
 	/**This BallTrackView must be aware of a RouteController
 	 * to be able to add balls*/
-	private RouteController rController;
+	private final RouteController rController;
 
 	// private int nrOfBalls = 0;
-	private java.util.List balls;    // keep track of the balls
+	private java.util.List<Ball> balls;    // keep track of the balls
 	public JButton insSmallBall, insLargeBall, delBall, changeImage,
 				   manuellStart, autoStart, nodStop, larmKvitt;
 	public JPanel south = new JPanel();    //panel to collect the button panels
 	public JPanel simButtons = new JPanel();    //panel for buttons used to simulate the BallTrack
 	public JPanel realButtons = new JPanel();    //panel for buttons simulating real life actions
 	public Canvas canvas = new Canvas();    //Canvas used to paint simualtor images
-	private JMenuBar menuBar;
+	private final JMenuBar menuBar;
 
 	/**Constructor BallTrackView initialises a view for a ball track
 	 * @param framesize the heigth of the window
 	 */
-	public BallTrackView(int framesize, RouteController rcont)
+	public BallTrackView(final int framesize, final RouteController rcont)
 	{
 		menuBar = new JMenuBar();
 
@@ -71,7 +71,7 @@ public class BallTrackView
 		setTitle("Ballprocess Simulator");
 		setVisible(true);
 
-		Container contentPane = getContentPane();
+		final Container contentPane = getContentPane();
 
 		contentPane.setLayout(new BorderLayout());
 		contentPane.setBackground(Color.white);
@@ -92,7 +92,7 @@ public class BallTrackView
 		{
 			bildsLaddningKontroll.waitForAll();
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			System.exit(-1);
 		}
@@ -162,76 +162,76 @@ public class BallTrackView
 		//Add mouseListener to the buttons
 		insSmallBall.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mouseClicked(final MouseEvent e)
 			{
 				insSmallBall_mouseClicked(e);
 			}
 		});
 		insLargeBall.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mouseClicked(final MouseEvent e)
 			{
 				insLargeBall_mouseClicked(e);
 			}
 		});
 		delBall.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mouseClicked(final MouseEvent e)
 			{
 				delBall_mouseClicked(e);
 			}
 		});
 		changeImage.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mouseClicked(final MouseEvent e)
 			{
 				changeImage_mouseClicked(e);
 			}
 		});
 		manuellStart.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mousePressed(MouseEvent e)
+			public void mousePressed(final MouseEvent e)
 			{
 				manuellStart_mousePressed(e);
 			}
 
-			public void mouseReleased(MouseEvent e)
+			public void mouseReleased(final MouseEvent e)
 			{
 				manuellStart_mouseReleased(e);
 			}
 		});
 		autoStart.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mousePressed(MouseEvent e)
+			public void mousePressed(final MouseEvent e)
 			{
 				autoStart_mousePressed(e);
 			}
 
-			public void mouseReleased(MouseEvent e)
+			public void mouseReleased(final MouseEvent e)
 			{
 				autoStart_mouseReleased(e);
 			}
 		});
 		nodStop.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mousePressed(MouseEvent e)
+			public void mousePressed(final MouseEvent e)
 			{
 				nodStop_mousePressed(e);
 			}
 
-			public void mouseReleased(MouseEvent e)
+			public void mouseReleased(final MouseEvent e)
 			{
 				nodStop_mouseReleased(e);
 			}
 		});
 		larmKvitt.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mousePressed(MouseEvent e)
+			public void mousePressed(final MouseEvent e)
 			{
 				larmKvitt_mousePressed(e);
 			}
 
-			public void mouseReleased(MouseEvent e)
+			public void mouseReleased(final MouseEvent e)
 			{
 				larmKvitt_mouseReleased(e);
 			}
@@ -249,22 +249,22 @@ public class BallTrackView
 		pack();    //Paint the components (buttons) the first time
 	}
 
-	void insSmallBall_mouseClicked(MouseEvent e)
+	void insSmallBall_mouseClicked(final MouseEvent e)
 	{
 		rController.addSmallBall();
 	}
 
-	void insLargeBall_mouseClicked(MouseEvent e)
+	void insLargeBall_mouseClicked(final MouseEvent e)
 	{
 		rController.addLargeBall();
 	}
 
-	void delBall_mouseClicked(MouseEvent e)
+	void delBall_mouseClicked(final MouseEvent e)
 	{
 		rController.delBall();
 	}
 
-	void changeImage_mouseClicked(MouseEvent e)
+	void changeImage_mouseClicked(final MouseEvent e)
 	{
 		if (imageWithText)
 		{
@@ -278,60 +278,60 @@ public class BallTrackView
 		}
 	}
 
-	void manuellStart_mousePressed(MouseEvent e)
+	void manuellStart_mousePressed(final MouseEvent e)
 	{
 		rController.setOutSignals(24, false);
 	}
 
-	void manuellStart_mouseReleased(MouseEvent e)
+	void manuellStart_mouseReleased(final MouseEvent e)
 	{
 		rController.setOutSignals(24, true);
 	}
 
-	void autoStart_mousePressed(MouseEvent e)
+	void autoStart_mousePressed(final MouseEvent e)
 	{
 		rController.setOutSignals(23, false);
 	}
 
-	void autoStart_mouseReleased(MouseEvent e)
+	void autoStart_mouseReleased(final MouseEvent e)
 	{
 		rController.setOutSignals(23, true);
 	}
 
-	void nodStop_mousePressed(MouseEvent e) {}
+	void nodStop_mousePressed(final MouseEvent e) {}
 
-	void nodStop_mouseReleased(MouseEvent e) {}
+	void nodStop_mouseReleased(final MouseEvent e) {}
 
-	void larmKvitt_mousePressed(MouseEvent e) {}
+	void larmKvitt_mousePressed(final MouseEvent e) {}
 
-	void larmKvitt_mouseReleased(MouseEvent e) {}
+	void larmKvitt_mouseReleased(final MouseEvent e) {}
 
 	private void initMenubar()
 	{
 		setJMenuBar(menuBar);
 
 		// File
-		JMenu menuFile = new JMenu();
+		final JMenu menuFile = new JMenu();
 
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 
 		// File.Close
-		JMenuItem menuFileClose = new JMenuItem();
+		final JMenuItem menuFileClose = new JMenuItem();
 
 		menuFileClose.setText("Close");
 		menuFile.add(menuFileClose);
 		menuBar.add(menuFile);
 		menuFileClose.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void actionPerformed(final ActionEvent e)
 			{
 				close();
 			}
 		});
 	}
 
-	public void exit_mouseClicked(MouseEvent e)
+	public void exit_mouseClicked(final MouseEvent e)
 	{
 		close();
 	}
@@ -355,16 +355,13 @@ public class BallTrackView
 	{
 		boolean colliding;
 
-		for (Iterator i = balls.iterator(); i.hasNext(); )
+		for (final Iterator<Ball> i = balls.iterator(); i.hasNext(); )
 		{
-			Ball b = (Ball) i.next();
-
+			final Ball b = i.next();
 			colliding = false;
-
-			for (Iterator j = balls.iterator(); j.hasNext(); )
+			for (final Iterator<Ball> j = balls.iterator(); j.hasNext(); )
 			{
-				Ball c = (Ball) j.next();
-
+				final Ball c = j.next();
 				if (!b.equals(c))
 				{
 					if (b.collisionRisk(c))
@@ -373,7 +370,6 @@ public class BallTrackView
 					}
 				}
 			}
-
 			b.allowMove(!colliding);
 		}
 	}
@@ -382,7 +378,7 @@ public class BallTrackView
 	 * to avoid blinking
 	 * @param g the graphics pen
 	 */
-	public void update(Graphics g)
+	public void update(final Graphics g)
 	{
 		paint(g);
 	}
@@ -390,10 +386,10 @@ public class BallTrackView
 	/**Paint paints all balls and the background
 	 * @param g the graphics pen
 	 */
-	public void paint(Graphics gr)
+	public void paint(final Graphics gr)
 	{
-		Image im = createImage(500, 458);
-		Graphics g = im.getGraphics();
+		final Image im = createImage(500, 458);
+		final Graphics g = im.getGraphics();
 
 		// get the balls to be painted
 		balls = rController.getAllBalls();
@@ -417,15 +413,15 @@ public class BallTrackView
 		paintArm(g);
 
 		// paint the balls
-		for (Iterator i = balls.iterator(); i.hasNext(); )
+		for (final Iterator<Ball> i = balls.iterator(); i.hasNext(); )
 		{
-			Ball b = (Ball) i.next();
+			final Ball b = i.next();
 
 			b.paint(g);
 		}
 
 		//paint the simulator buffer to the canvas
-		Graphics gN = canvas.getGraphics();
+		final Graphics gN = canvas.getGraphics();
 
 		if (gN != null)
 		{
@@ -449,11 +445,11 @@ public class BallTrackView
 	@SuppressWarnings("unused")
 	private int stepInUpper;    //Number of step in lift leg
 	private int centerX;    //Center of the cylinders
-	private int radiusX = 3;    //Radius of lift "bar"
-	private int radiusTopX = 8;    //Radius of the top part of lift
+	private final int radiusX = 3;    //Radius of lift "bar"
+	private final int radiusTopX = 8;    //Radius of the top part of lift
 
 	//Int taken from radius of a big ball
-	private int topHeight = 2;    //Height of carrier
+	private final int topHeight = 2;    //Height of carrier
 	@SuppressWarnings("unused")
 	private int yPos;    //position of the lifts vertical
 	private int lowerY;    //position of the lower "station"
@@ -474,16 +470,16 @@ public class BallTrackView
 	//Variables used when painting the PortVakt
 	// taken from background picture
 	//The menubar takes some space as well
-	private int inPortVaktUpperX = 104;
-	private int inPortVaktUpperY = 310;
-	private int inPortVaktDepth = 36;
-	private int utPortVaktUpperX = 122;
-	private int utPortVaktUpperY = 311;
-	private int utPortVaktDepth = 35;
-	private int portLenght = 10;    //Value taken to fit the balls
-	private int portWidth = 2;
+	private final int inPortVaktUpperX = 104;
+	private final int inPortVaktUpperY = 310;
+	private final int inPortVaktDepth = 36;
+	private final int utPortVaktUpperX = 122;
+	private final int utPortVaktUpperY = 311;
+	private final int utPortVaktDepth = 35;
+	private final int portLenght = 10;    //Value taken to fit the balls
+	private final int portWidth = 2;
 
-	private void paintPortVakt(Graphics g)
+	private void paintPortVakt(final Graphics g)
 	{
 
 		//Paint the lower part of inPortVakt
@@ -511,11 +507,11 @@ public class BallTrackView
 	//Variables for use when painting the MatLyft
 	private int parts = 0;    //Steps in leg 2
 	private int vert = 0;    //vertical differance in leg 2
-	private int maxHeightY = 88;    //Maximum height of lift
-	private int baseHeight = 10;    //Height allways visible
+	private final int maxHeightY = 88;    //Maximum height of lift
+	private final int baseHeight = 10;    //Height allways visible
 	private boolean NotOnTop = true;    //True when the level is != 15
 
-	private void paintMatLyft(Graphics g)
+	private void paintMatLyft(final Graphics g)
 	{
 		centerX = 285;
 		lowerY = 339;    //top of the cylinder in picture
@@ -578,7 +574,7 @@ public class BallTrackView
 	 */
 
 	//Variables for use when painting the UrMatning
-	public void paintUrMatning(Graphics g)
+	public void paintUrMatning(final Graphics g)
 	{
 		upperX = 265;    //X value of right side of cylinder
 		upperY = 238;    //Y value of the upper side of the bar
@@ -601,9 +597,9 @@ public class BallTrackView
 	 */
 
 	//Variables for use when painting the Hiss
-	private int lengthVisible = 23;
+	private final int lengthVisible = 23;
 
-	private void paintHiss(Graphics g)
+	private void paintHiss(final Graphics g)
 	{
 		level = rController.hissLevel();
 		lowerY = RouteController.movements[4].startPos[1];
@@ -619,21 +615,21 @@ public class BallTrackView
 
 	//paintUrVan1 differs from paintUrVan2 because the
 	//the lift reaches higher than the cylinder...
-	public void paintUrVan1(Graphics g)
+	public void paintUrVan1(final Graphics g)
 	{
-		int ballX = RouteController.movements[4].endPos[0];
-		int ballY = RouteController.movements[4].endPos[1];
+		final int ballX = RouteController.movements[4].endPos[0];
+		final int ballY = RouteController.movements[4].endPos[1];
 
 		level = rController.hissLevel();
 
-		int space = 1;
+		final int space = 1;
 
 		width = 5;
 
-		int length0 = 7;
-		int length1 = 9;
-		int length2 = 12;
-		int length3 = 14;
+		final int length0 = 7;
+		final int length1 = 9;
+		final int length2 = 12;
+		final int length3 = 14;
 
 		if (!rController.getInSignal(7))
 		{
@@ -647,7 +643,7 @@ public class BallTrackView
 		}
 	}
 
-	public void paintUrVan2(Graphics g)
+	public void paintUrVan2(final Graphics g)
 	{
 		upperX = 433;    //X value of right side of cylinder
 		upperY = 52;    //Y value of the upper side of the bar
@@ -665,7 +661,7 @@ public class BallTrackView
 		}
 	}
 
-	public void paintLyftVan1(Graphics g)
+	public void paintLyftVan1(final Graphics g)
 	{
 		upperX = 236;    //X value of right side of bar
 		lowerY = 160;    //Y value of the lower side of the bar
@@ -683,7 +679,7 @@ public class BallTrackView
 		}
 	}
 
-	public void paintLyftVan2(Graphics g)
+	public void paintLyftVan2(final Graphics g)
 	{
 		upperX = 235;
 		lowerY = 90;
@@ -707,14 +703,14 @@ public class BallTrackView
 
 	//Variables for use in painting the Arm
 	private int angel = 0;    //Angel of the arm horisontal
-	private int xLeftPos = 40;    //Start possition to the right for Arm
-	private int xCenterPos = 145;    //Horisontal Center possition for Arm
-	private int xDiff1 = (xCenterPos - xLeftPos);
-	private int proppSize = 14;
-	private int proppHeight = 10;
-	private int proppDepth = 2;
+	private final int xLeftPos = 40;    //Start possition to the right for Arm
+	private final int xCenterPos = 145;    //Horisontal Center possition for Arm
+	private final int xDiff1 = (xCenterPos - xLeftPos);
+	private final int proppSize = 14;
+	private final int proppHeight = 10;
+	private final int proppDepth = 2;
 
-	private void paintArm(Graphics g)
+	private void paintArm(final Graphics g)
 	{
 		lowerY = 151;
 		level = rController.armLevel();    //Arm vertical

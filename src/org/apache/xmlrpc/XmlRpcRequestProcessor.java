@@ -69,7 +69,7 @@ import java.util.Vector;
 public class XmlRpcRequestProcessor
 	extends XmlRpc
 {
-	private Vector<Object> requestParams;
+	private final Vector<Object> requestParams;
 
 	/**
 	 * Creates a new instance.
@@ -87,7 +87,7 @@ public class XmlRpcRequestProcessor
 	 * @throws ParseFailed if unable to parse the request.
 	 */
 	@SuppressWarnings("unchecked")
-  public XmlRpcRequest processRequest(InputStream is)
+  public XmlRpcRequest processRequest(final InputStream is)
 	{
 		long now = 0;
 
@@ -102,7 +102,7 @@ public class XmlRpcRequestProcessor
 			{
 				parse(is);
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
 				throw new ParseFailed(e);
 			}
@@ -119,7 +119,7 @@ public class XmlRpcRequestProcessor
 				throw new ParseFailed(errorMsg);
 			}
 
-			return new XmlRpcRequest(methodName, (Vector<Comparable>) requestParams.clone());
+			return new XmlRpcRequest(methodName, (Vector<Comparable<?>>) requestParams.clone());
 		}
 		finally
 		{
@@ -138,7 +138,7 @@ public class XmlRpcRequestProcessor
 	 *
 	 * @param what The parameter parsed from the request.
 	 */
-	protected void objectParsed(Object what)
+	protected void objectParsed(final Object what)
 	{
 		requestParams.addElement(what);
 	}

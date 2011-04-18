@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 
 package org.supremica.automata.algorithms.Guard.QMCMinimizer.util;
@@ -16,50 +16,48 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCImplicante
  *  Fecha 5/04/2006
  *
  */
-@SuppressWarnings("unchecked")
+
 public class QMCUtilLogica {
-    
-   
-    
+
     /**
      * Motodo que calcula si un nomero es potencia de dos o no
-     * @param valorDec 
+     * @param valorDec
      */
-    public static boolean esPotencia2(int diferencia)
+    public static boolean esPotencia2(final int diferencia)
     {
-                
+
         boolean potenciaDe2;
-         
+
         potenciaDe2 = true;
-        
+
         if (diferencia <=0) return false;
-        
+
         double mitadDouble = (double) diferencia;
         long mitadLong = (long) diferencia;
-        
+
         while (true){
 
             if (mitadLong == 1) break;
-            
+
             mitadDouble = ( (double) mitadDouble ) / 2.0;
             mitadLong = ( (long) mitadLong ) / 2l;
-            
+
             if ( mitadDouble != (double) mitadLong ) {
                 potenciaDe2 = false;
                 break;
             }
-            
+
         }
         return potenciaDe2;
     }
-    
+
     /**
      * Motodo que calcula el logaritmo en base 2 de un nomero dado
-     * @param valorDec 
+     * @param valorDec
      */
-    public static int log2(int valorDec) {
-        
-        
+    public static int log2(final int valorDec) {
+
+
         double mitadDouble = (double) valorDec;
         long mitadLong = (long) valorDec;
         int i = 0;
@@ -71,23 +69,23 @@ public class QMCUtilLogica {
         }
         return i;
     }
-   
+
     /**
      * Motodo que comprueba si dos adyacencias tienen la misma coordenada vacua
      * @param adyacenciaIndMayor
      * @param adyacenciaIndMenor
-     * 
+     *
      */
-    public static boolean esMismaCoordenadaVacua (QMCBinarioBean adyacenciaIndMayor, QMCBinarioBean adyacenciaIndMenor)
+    public static boolean esMismaCoordenadaVacua (final QMCBinarioBean adyacenciaIndMayor, final QMCBinarioBean adyacenciaIndMenor)
     {
         boolean misma;
         String coordenadasVacuasMayor, coordenadasVacuasMenor;
         StringTokenizer cvMayor, cvMenor;
-                        
+
         coordenadasVacuasMayor = adyacenciaIndMayor.getCoordenadasVacuas();
         coordenadasVacuasMenor = adyacenciaIndMenor.getCoordenadasVacuas();
         misma = true;
-        
+
         if(coordenadasVacuasMayor == null)
         {
             return misma;
@@ -99,61 +97,62 @@ public class QMCUtilLogica {
         {
             if(!cvMayor.nextToken().equals(cvMenor.nextToken()))
             {
-                misma = false;            
+                misma = false;
                 break;
             }
         }
-        return misma;          
+        return misma;
     }
 
     /**
-     * Motodo que ordena el arrayList de terminos en funcion del indice 
+     * Motodo que ordena el arrayList de terminos en funcion del indice
      * @param terminos Los terminos a ordenar.
      * @return terminosOrdenados Los terminos ordenados.
      */
-    public static ArrayList ordenaArrayListTerminos(ArrayList terminos)
+    public static ArrayList<QMCBinarioBean> ordenaArrayListTerminos
+      (final ArrayList<QMCBinarioBean> terminos)
     {
         // Ordenacion por insercion de la lista de terminos
-        ArrayList terminosOrdenados;
-        int i, j, numFilas; 
+        ArrayList<QMCBinarioBean> terminosOrdenados;
+        int i, j, numFilas;
         QMCBinarioBean termino;
-                     
+
         numFilas = terminos.size();
-        terminosOrdenados = new ArrayList(terminos);
-                       
+        terminosOrdenados = new ArrayList<QMCBinarioBean>(terminos);
+
         for(i=1; i<numFilas;i++)
         {
-            termino = (QMCBinarioBean)terminosOrdenados.get(i);
+            termino = terminosOrdenados.get(i);
             j = i - 1;
-            while ((j >= 0) && (termino.getIndice() < ((QMCBinarioBean)terminosOrdenados.get(j)).getIndice()))
+            while ((j >= 0) && (termino.getIndice() < terminosOrdenados.get(j).getIndice()))
             {
                 terminosOrdenados.set(j + 1,terminosOrdenados.get(j));
                 j--;
                 if(j == -1)
                 {
-                    break;  
+                    break;
                 }
             }
-            terminosOrdenados.set(j + 1, termino);               
+            terminosOrdenados.set(j + 1, termino);
         }
-            
+
         return terminosOrdenados;
     }
-    
-    
+
+
     /**
      * Motodo que genera un array de las posiciones que ocupan los terminos de un array dado en otro array de terminos base
      * @param terminos array que contiene todos los terminos de la funcion
      * @param adyacencia String que contiene los terminos de una adyacencia
      * @return posiciones array de las posiciones relativas
      */
-    public static int[] generaArrayPosiciones(Object [] terminos, String adyacencia)
+    public static int[] generaArrayPosiciones(final Object [] terminos, final String adyacencia)
     {
         StringTokenizer terminosAdyacencia;
         int x;
         int [] posiciones;
         String termino;
-     
+
         terminosAdyacencia = new StringTokenizer(adyacencia,"-");
         posiciones = new int[terminosAdyacencia.countTokens()];
         x = 0;
@@ -167,46 +166,48 @@ public class QMCUtilLogica {
         {
             termino = terminosAdyacencia.nextToken();
             // Recorre la lista de terminos base
-            for(int pos = 0; pos<terminos.length; pos++)       
-            {                       
+            for(int pos = 0; pos<terminos.length; pos++)
+            {
                 if(String.valueOf(terminos[pos]).equals(termino))
                 {
                     // Array de posiciones del implicante
                     posiciones[x]=pos;
                     x++;
                     break;
-                }                
-            }        
-        }           
+                }
+            }
+        }
         return posiciones;
     }
-    
+
     /**
      * Motodo que devuelve el producto de dos sumas booleanas
      * @param factor1 primer ArrayList de sumandos
      * @param factor2 segundo ArrayList de sumandos
      * @return producto ArrayList de sumandos resultantes del producto de los factores
-     */     
-    public static ArrayList multiplicaSumasBooleanas(ArrayList factor1, ArrayList factor2)
+     */
+    public static ArrayList<String>
+      multiplicaSumasBooleanas(final ArrayList<String> factor1,
+                               final ArrayList<String> factor2)
     {
-        ArrayList producto = new ArrayList();
+        final ArrayList<String> producto = new ArrayList<String>();
         String cadena = "";
         for(int i=0; i<factor1.size();i++)
         {
             for(int j=0; j<factor2.size(); j++)
             {
-                cadena = multiplicaProductosBooleanos((String)factor1.get(i),(String)factor2.get(j));                
+                cadena = multiplicaProductosBooleanos(factor1.get(i),factor2.get(j));
                 producto.add(cadena);
-            }            
+            }
         }
         // Realiza simplificacion booleana entre los sumandos del producto resultante
         int i,j;
         boolean absorcion;
-        
+
         i = 0;
         j = 1;
-       
-        
+
+
         while(i<producto.size())
         {
             absorcion = false;
@@ -214,55 +215,55 @@ public class QMCUtilLogica {
             {
                 // CADENA CONTENIDA ABSORVE A CADENA CONTENEDORA (Absorcion suma)
                 // Absorve la segunda cadena
-                if(contieneTerminos((String)producto.get(j),(String)producto.get(i))==1)
-                {                    
+                if(contieneTerminos(producto.get(j),producto.get(i))==1)
+                {
                     producto.remove(j);
                 }
                 // Absorve la primera
-                else if(contieneTerminos((String)producto.get(j),(String)producto.get(i))==0)
-                {                    
+                else if(contieneTerminos(producto.get(j),producto.get(i))==0)
+                {
                     producto.remove(i);
                     absorcion = true;
                 }
                 // No hay absorcion, avanza
                 else
-                {                
+                {
                     j++;
-                }                
-            }       
+                }
+            }
             if(!absorcion)
             {
                 i++;
                 j=i+1;
-            }            
+            }
         }
-       
+
         return producto;
     }
-    
+
     /**
      * Motodo que compara dos cadenas de terminos e indica si una de las dos cadenas contiene todos los terminos de la otra
      * @param cadena1
      * @param cadena2
      * @return cadenaContenida numero de la cadena que es contenida en la otra. Devuelve -1 si ninguna de las dos se contienen
      */
-    public static int contieneTerminos(String cadena1, String cadena2)
+    public static int contieneTerminos(final String cadena1, final String cadena2)
     {
-        int cadenaContenida;        
+        int cadenaContenida;
         String cadenaPequeoa, cadenaGrande;
-        
+
         if(cadena1.length()>cadena2.length())
         {
             cadenaGrande = cadena1;
             cadenaPequeoa = cadena2;
-            cadenaContenida = 1; 
+            cadenaContenida = 1;
         }
         else
         {
             cadenaGrande = cadena2;
             cadenaPequeoa = cadena1;
             cadenaContenida = 0;
-        }       
+        }
         for(int i=0; i<cadenaPequeoa.length() && cadenaContenida!=-1; i++)
         {
             if(cadenaGrande.indexOf(cadenaPequeoa.charAt(i))==-1)
@@ -270,7 +271,7 @@ public class QMCUtilLogica {
                 cadenaContenida = -1;
             }
         }
-        
+
         return cadenaContenida;
     }
     /**
@@ -279,7 +280,7 @@ public class QMCUtilLogica {
      * @param cadena2 producto de variables
      * @return
      */
-    public static String multiplicaProductosBooleanos(String cadena1, String cadena2)
+    public static String multiplicaProductosBooleanos(String cadena1, final String cadena2)
     {
         String cadena;
         // Elimina todos los elementos de la cadena1 que aparezcan en la cadena2
@@ -290,41 +291,43 @@ public class QMCUtilLogica {
         cadena = cadena1+cadena2;
         return cadena;
     }
-    
+
     /**
      * Metodo que extrae un implicante de la lista dado su nombre
      * @param implicantes
      * @param nombre
      * @return implicante
      */
-    public static QMCImplicanteBean buscaImplicante(ArrayList implicantes, char nombre)
+    public static QMCImplicanteBean buscaImplicante
+      (final ArrayList<QMCImplicanteBean> implicantes, final char nombre)
     {
         QMCImplicanteBean implicante = new QMCImplicanteBean();
-        
+
         for(int j=0;j<implicantes.size();j++)
-        {            
-            implicante = (QMCImplicanteBean)implicantes.get(j);            
+        {
+            implicante = implicantes.get(j);
             if(nombre==implicante.getNombre())
-            {                     
+            {
                 return implicante;
             }
         }
         return implicante;
     }
-    
+
     /**
      * Devuelve la posicion de la adyacencia buscada dentro de su lista contenedora
      * @param listaAdyacencias
      * @param posiciones posiciones de las adyacencias que generan la adyacencia buscada
      * @return posicion
      */
-    public static int buscaAdyacencia(ArrayList listaAdyacencias, String posiciones)
+    public static int buscaAdyacencia(final ArrayList<QMCBinarioBean> listaAdyacencias,
+                                      final String posiciones)
     {
         QMCBinarioBean adyacencia;
         int posicion = 0;
         while(posicion<listaAdyacencias.size())
         {
-            adyacencia = (QMCBinarioBean)listaAdyacencias.get(posicion);
+            adyacencia = listaAdyacencias.get(posicion);
             if(posiciones.equals(adyacencia.getPosicion()))
             {
                 return posicion;
@@ -334,19 +337,20 @@ public class QMCUtilLogica {
         // si no se encuentra
         return posicion = -1;
     }
-    
+
     /**
      * Comprueba si todos los terminos estan cubiertos
      * @param terminosLista
      * @return
      */
-    public static boolean compruebaTerminosCubiertos(ArrayList terminosLista)
-    {        
+    public static boolean compruebaTerminosCubiertos
+      (final ArrayList<QMCBinarioBean> terminosLista)
+    {
         boolean terminosTodosCubiertos = true;
         QMCBinarioBean adyacencia;
         for(int i=0;i<terminosLista.size();i++)
-        {            
-            adyacencia = (QMCBinarioBean)terminosLista.get(i);
+        {
+            adyacencia = terminosLista.get(i);
             if(!adyacencia.isCubierta())
             {
                 terminosTodosCubiertos = false;
@@ -365,10 +369,10 @@ public class QMCUtilLogica {
         boolean repetidas;
         char var1, var2;
         int j;
-        
+
         variables = variables.replace(",","");
         repetidas = false;
-        
+
         for(int i=0;i<variables.length();i++)
         {
             var1 = variables.charAt(i);
@@ -384,7 +388,7 @@ public class QMCUtilLogica {
                 j++;
             }
         }
-        return repetidas;       
+        return repetidas;
     }
     /**
      * Metodo que comprueba si la cadena de variables introducida es suficiente para cubrir el numero de terminos dado
@@ -392,49 +396,51 @@ public class QMCUtilLogica {
      * @param terminos
      * @return suficientes
      */
-    public static boolean variablesSuficientes (String variables, String terminos)
+    public static boolean variablesSuficientes (String variables, final String terminos)
     {
         String ultimoTermino = "";
-        boolean suficientes = false;        
+        boolean suficientes = false;
         variables = variables.replace(",","");
-        StringTokenizer st = new StringTokenizer(terminos,",");
-        
+        final StringTokenizer st = new StringTokenizer(terminos,",");
+
         while (st.hasMoreTokens())
         {
-            ultimoTermino = st.nextToken();            
+            ultimoTermino = st.nextToken();
         }
         if(Math.pow(2,variables.length())> Integer.parseInt(ultimoTermino))
         {
-            suficientes = true;      
+            suficientes = true;
         }
-        return suficientes;       
+        return suficientes;
     }
-    
+
     /**
-     * Comprueba todas las condiciones de adyacencia entre dos terminos o dos adyacencias 
+     * Comprueba todas las condiciones de adyacencia entre dos terminos o dos adyacencias
      * @param posicionMenor
      * @param posicionMayor
      * @param listaAdyacencias
      * @return codigo de error devuelto en caso de que se incumpla alguna de las condiciones de adyacencia
      */
-    public static String compruebaAdyacencia (int posicionMenor, int posicionMayor, ArrayList listaAdyacencias)
+    public static String compruebaAdyacencia(final int posicionMenor,
+                                             final int posicionMayor,
+                                             final ArrayList<QMCBinarioBean> listaAdyacencias)
     {
         String comprobacion;
         StringTokenizer st;
         QMCBinarioBean adyacenciaMenor, adyacenciaMayor;
         int termAdyacenciaMenor, termAdyacenciaMayor;
-        
-        adyacenciaMenor = (QMCBinarioBean)listaAdyacencias.get(posicionMenor);
-        adyacenciaMayor = (QMCBinarioBean)listaAdyacencias.get(posicionMayor);
-        
+
+        adyacenciaMenor = listaAdyacencias.get(posicionMenor);
+        adyacenciaMayor = listaAdyacencias.get(posicionMayor);
+
         st = new StringTokenizer(adyacenciaMenor.getValorDec(),"-");
         termAdyacenciaMenor = Integer.parseInt(st.nextToken());
-        
+
         st = new StringTokenizer(adyacenciaMayor.getValorDec(),"-");
         termAdyacenciaMayor = Integer.parseInt(st.nextToken());
-        
+
         comprobacion = "Correcta";
-        
+
         if(adyacenciaMayor.getIndice()-adyacenciaMenor.getIndice()==1)
         {
             if(termAdyacenciaMayor>termAdyacenciaMenor)
@@ -445,67 +451,64 @@ public class QMCUtilLogica {
                     {
                         return comprobacion;
                     }
-                    else 
+                    else
                     {
                         comprobacion = "Las coordenadas vacuas no coinciden";
-                    }                    
+                    }
                 }
                 else
                 {
                     comprobacion = "La diferencia entre terminos no es una potencia de 2";
                 }
             }
-            else 
+            else
             {
                 // El primer termino es mayor que el segundo
                 comprobacion = "El primer termino es mayor que el segundo";
             }
         }
         else
-        {             
+        {
             comprobacion = "La diferencia entre indices es distinta de 1";
         }
-        return comprobacion;        
+        return comprobacion;
     }
-    
-    public static boolean compruebaImplicanteEsencial(ArrayList listaImplicantes, int posicion)
-    {       
+
+    public static boolean compruebaImplicanteEsencial
+      (final ArrayList<QMCImplicanteBean> listaImplicantes, final int posicion)
+    {
         QMCImplicanteBean implicante;
-        
-        implicante = (QMCImplicanteBean)listaImplicantes.get(posicion);
-        if(implicante.isEsencial())
-        {
-            return true;
-        }
-        return false;   
+        implicante = listaImplicantes.get(posicion);
+        return implicante.isEsencial();
     }
-    
+
     /**
      * Comprueba si la cadena de implicantes dada existe como parte de la solucion
      * @param listaCadenasImplicantes
      * @param cadenaImplicantesElegidos
      * @return
      */
-    public static String compruebaImplicantesNoEsenciales(ArrayList listaCadenasImplicantes, String cadenaImplicantesElegidos)
+    public static String compruebaImplicantesNoEsenciales
+      (final ArrayList<String> listaCadenasImplicantes, String cadenaImplicantesElegidos)
     {
         String comprobacion, cadena;
-        comprobacion = "correcto";        
-        
-        cadena = (String)listaCadenasImplicantes.get(0);
+        comprobacion = "correcto";
+
+        cadena = listaCadenasImplicantes.get(0);
         cadenaImplicantesElegidos = cadenaImplicantesElegidos.replace("f = ","");
-        cadenaImplicantesElegidos = cadenaImplicantesElegidos.replace(" + ","");        
+        cadenaImplicantesElegidos = cadenaImplicantesElegidos.replace(" + ","");
         // Es expresion minima
         if(cadena.length() == cadenaImplicantesElegidos.length())
         {
             for(int i=0;i<listaCadenasImplicantes.size();i++)
             {
-                cadena = (String)listaCadenasImplicantes.get(i);
+                cadena = listaCadenasImplicantes.get(i);
                 // Cubre todos los terminos
                 if(contieneTerminos(cadenaImplicantesElegidos, cadena)!=-1)
                 {
                     comprobacion = "correcto";
-                    return comprobacion;                                        
-                }                             
+                    return comprobacion;
+                }
                 else
                 {
                     comprobacion = "No cubren todos los terminos";
@@ -515,14 +518,14 @@ public class QMCUtilLogica {
         else if(cadena.length() > cadenaImplicantesElegidos.length())
         {
             comprobacion = "No cubren todos los terminos" ;
-        }       
+        }
         else
         {
             comprobacion = "No es expresion monima";
         }
-        return comprobacion;        
-    }   
-    
+        return comprobacion;
+    }
+
     /**
      * Motodo que busca la posicion de la adyacencia formada por los terminos de las filas 1 y 2
      * @param listaAdyacenciasAnterior
@@ -531,34 +534,37 @@ public class QMCUtilLogica {
      * @param fila2
      * @return posicion
      */
-    public static int buscaAdyacenciaCorrespondiente(ArrayList listaAdyacenciasAnterior, ArrayList listaAdyacenciasActual, int fila1, int fila2)
+    public static int buscaAdyacenciaCorrespondiente
+      (final ArrayList<QMCBinarioBean> listaAdyacenciasAnterior,
+       final ArrayList<QMCBinarioBean> listaAdyacenciasActual,
+       final int fila1, final int fila2)
     {
     	int pos;
-    	boolean contiene;    	
+    	boolean contiene;
     	String valorDec1, valorDec2, valorDec12, termino;
     	StringTokenizer stPosibleAdyacencia, stAdyacencia;
     	QMCBinarioBean adyacencia;
-    	
-    	valorDec1 = ((QMCBinarioBean)listaAdyacenciasAnterior.get(fila1)).getValorDec();
-    	valorDec2 = ((QMCBinarioBean)listaAdyacenciasAnterior.get(fila2)).getValorDec();
-    	valorDec12 = valorDec1+"-"+valorDec2;    	
+
+    	valorDec1 = listaAdyacenciasAnterior.get(fila1).getValorDec();
+    	valorDec2 = listaAdyacenciasAnterior.get(fila2).getValorDec();
+    	valorDec12 = valorDec1+"-"+valorDec2;
     	pos = -1;
     	contiene = false;
-    	
+
     	// Busca en la lista de adyacencias miesntras no encuentre
     	while(pos<listaAdyacenciasActual.size()-1 && !contiene)
     	{
     		pos++;
-    		adyacencia = (QMCBinarioBean)listaAdyacenciasActual.get(pos);
+    		adyacencia = listaAdyacenciasActual.get(pos);
     		stPosibleAdyacencia = new StringTokenizer(valorDec12,"-");
     		contiene = true;
-    		
+
     		// Compara adyacencias
     		while(stPosibleAdyacencia.hasMoreTokens() && contiene)
     		{
     			stAdyacencia = new StringTokenizer(adyacencia.getValorDec(),"-");
     			termino = stPosibleAdyacencia.nextToken();
-    			
+
     			// Comprueba un termino con el resto
     			while(stAdyacencia.hasMoreTokens())
     			{
@@ -569,14 +575,14 @@ public class QMCUtilLogica {
     				}
     				else
     				{
-    					contiene = false;    					
+    					contiene = false;
     				}
-    			}    			
-    		}    		
-    	}    	
+    			}
+    		}
+    	}
     	return pos;
     }
-    
+
 }
 
 

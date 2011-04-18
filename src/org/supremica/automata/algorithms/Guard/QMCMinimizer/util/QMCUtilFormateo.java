@@ -140,8 +140,8 @@ public class QMCUtilFormateo
      * Formatea el arrayList del primer paso en una matriz compatible con la tabla destino
      * @param terminos
      */
-    @SuppressWarnings("unchecked")
-    public static String[][] generaMatrizTerminos(final ArrayList terminos, final boolean minimizacionAuto) {
+    public static String[][] generaMatrizTerminos(final ArrayList<QMCBinarioBean> terminos,
+                                                  final boolean minimizacionAuto) {
 
         int numFilas;
         String matrizTerminos [][];
@@ -176,8 +176,8 @@ public class QMCUtilFormateo
      * Formatea la lista de terminos ordenados en una matriz compatible con la tabla destino
      * @param terminos
      */
-    @SuppressWarnings("unchecked")
-    public static Object[][] generaMatrizTerminosOrdenados(final ArrayList terminos, final boolean minimizacionAuto)
+    public static Object[][] generaMatrizTerminosOrdenados(final ArrayList<QMCBinarioBean> terminos,
+                                                           final boolean minimizacionAuto)
     {
         //Boolean usado;
         QMCBinarioBean termino, terminoAnt;
@@ -211,8 +211,8 @@ public class QMCUtilFormateo
      * Formatea la lista de adyacencias en una matriz compatible con la tabla destino
      * @param adyacencias
      */
-    @SuppressWarnings("unchecked")
-    public static Object[][] generaMatrizAdyacencias (final ArrayList adyacencias, final boolean minimizacionAuto)
+    public static Object[][] generaMatrizAdyacencias
+      (final ArrayList<QMCBinarioBean> adyacencias, final boolean minimizacionAuto)
     {
 
         QMCBinarioBean adyacencia, adyacenciaAnt;
@@ -248,15 +248,15 @@ public class QMCUtilFormateo
      * Formatea la lista de implicantes primos en una matriz compatible con la tabla destino
      * @return implicantes
      */
-    @SuppressWarnings("unchecked")
-    public static Object[][] generaMatrizImplicantes (final ArrayList implicantes)
+    public static Object[][] generaMatrizImplicantes
+      (final ArrayList<QMCImplicanteBean> implicantes)
     {
         final Object [][] matrizImplicantesPrimos = new Object [implicantes.size()][4];
         QMCImplicanteBean implicante;
 
         for(int i=0; i<implicantes.size(); i++)
         {
-            implicante = (QMCImplicanteBean)implicantes.get(i);
+            implicante = implicantes.get(i);
 
             matrizImplicantesPrimos[i][0] = String.valueOf(implicante.getOrden());
             matrizImplicantesPrimos[i][1] = implicante.getTerminos();
@@ -273,8 +273,8 @@ public class QMCUtilFormateo
      * @return matrizImplicantes
      */
 
-    @SuppressWarnings("unchecked")
-    public static Object [][] generaMatrizImplicantesEsenciales(final ArrayList listaImplicantes, final Object [] terminos)
+    public static Object [][] generaMatrizImplicantesEsenciales
+      (final ArrayList<QMCImplicanteBean> listaImplicantes, final Object [] terminos)
     {
         final Object [][] matrizImplicantes = new Object[listaImplicantes.size()][terminos.length];
         int [] posiciones;
@@ -283,7 +283,7 @@ public class QMCUtilFormateo
 
         for(int i=0;i<listaImplicantes.size();i++)
         {
-            implicante = (QMCImplicanteBean)listaImplicantes.get(i);
+            implicante = listaImplicantes.get(i);
             posiciones = implicante.getPosicionesTerminos();
             x = 0;
             for(int j=0;j<terminos.length;j++)
@@ -326,8 +326,8 @@ public class QMCUtilFormateo
      * @param implicantesPrimos
      * @return cadena
      */
-    @SuppressWarnings("unchecked")
-    public static String generaCadenaImplicantesEsenciales(final ArrayList implicantesPrimos, final char forma)
+    public static String generaCadenaImplicantesEsenciales
+      (final ArrayList<QMCImplicanteBean> implicantesPrimos, final char forma)
     {
         String cadena = "f = ";
         QMCImplicanteBean implicante;
@@ -351,7 +351,7 @@ public class QMCUtilFormateo
 
         for(int i=0;i<implicantesPrimos.size();i++)
         {
-            implicante = (QMCImplicanteBean)implicantesPrimos.get(i);
+            implicante = implicantesPrimos.get(i);
             if(implicante.isEsencial())
             {
                 cadena+=implicante.getNombre()+union;
@@ -365,8 +365,8 @@ public class QMCUtilFormateo
      * @param solucionesMinimas
      * @return
      */
-    @SuppressWarnings("unchecked")
-    public static String[] generaArrayImplicantesNoEsenciales(final ArrayList solucionesMinimas, final char forma)
+    public static String[] generaArrayImplicantesNoEsenciales
+      (final ArrayList<String> solucionesMinimas, final char forma)
     {
         String [] gruposImplicantesNoEsenciales;
         String grupo;
@@ -384,7 +384,7 @@ public class QMCUtilFormateo
 
         for(int i=0;i<solucionesMinimas.size();i++)
         {
-            grupo = (String)solucionesMinimas.get(i);
+            grupo = solucionesMinimas.get(i);
             gruposImplicantesNoEsenciales[i] = "";
 
             for(int j=0; j<grupo.length();j++)
@@ -404,8 +404,8 @@ public class QMCUtilFormateo
     * @param forma
     * @return expresionAlgebraica
     */
-    @SuppressWarnings("unchecked")
-    public static String generaExpresionBooleana(final String [] variables, final ArrayList listaTerminos, final char forma)
+    public static String generaExpresionBooleana
+      (final String [] variables, final ArrayList<?> listaTerminos, final char forma)
     {
 
         String binarioTermino, variablesFuncion, complemento, noComplemento, concatTerms, simbolo, terminoAlg, expresionAlg;
@@ -503,8 +503,8 @@ public class QMCUtilFormateo
      * @param listaImplicantes
      * @param listaTerminos
      */
-    @SuppressWarnings("unchecked")
-    public static void renuevaMarcas(final ArrayList listaImplicantes, final ArrayList listaTerminos)
+    public static void renuevaMarcas(final ArrayList<QMCImplicanteBean> listaImplicantes,
+                                     final ArrayList<QMCBinarioBean> listaTerminos)
     {
         QMCImplicanteBean implicante;
         for(int i=0;i<listaImplicantes.size();i++)
@@ -533,8 +533,7 @@ public class QMCUtilFormateo
         return cadenaSeparada;
     }
 
-    @SuppressWarnings("unchecked")
-    public static String copiaTabla(final Enumeration columnas)
+    public static String copiaTabla(final Enumeration<?> columnas)
     {
         final String tablaSerializada = "";
         return tablaSerializada;

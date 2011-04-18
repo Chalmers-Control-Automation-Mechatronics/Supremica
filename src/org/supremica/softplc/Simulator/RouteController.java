@@ -46,17 +46,17 @@ public class RouteController
 		new Movement(new int[]{ 48, 310 }, new int[]{ 98, 314 }, 25)
 	};
 
-	public int getParts(int leg)
+	public int getParts(final int leg)
 	{
 		return movements[leg].parts;
 	}
 
-	public int getHori(int leg)
+	public int getHori(final int leg)
 	{
 		return (movements[leg].endPos[0] - movements[leg].startPos[0]);
 	}
 
-	public int getVert(int leg)
+	public int getVert(final int leg)
 	{
 		return (movements[leg].endPos[1] - movements[leg].startPos[1]);
 	}
@@ -65,16 +65,16 @@ public class RouteController
 	private boolean[] inSignals = new boolean[18];
 
 	// outputs from simulator [27] -- 4 signals are not used ([8],[9],[18],[19])
-	private boolean[] outSignals = new boolean[27];
+	private final boolean[] outSignals = new boolean[27];
 
 	//used when buttons are pressed on the simulator (manual start, auto start etc)
-	public void setOutSignals(int signal, boolean value)
+	public void setOutSignals(final int signal, final boolean value)
 	{
 		outSignals[signal] = value;
 	}
 
 	// keeps track of which balls are in each leg
-	private List[] legBallList = new List[nrOfLegs];
+	private final List<Ball>[] legBallList = new List[nrOfLegs];
 
 	/**takes a step
 	 */
@@ -83,21 +83,21 @@ public class RouteController
 	// range 0 - movement[2].parts
 	private int matlyftLevel = 0;
 	@SuppressWarnings("unused")
-	private int matlyftLength = -getVert(2);
+	private final int matlyftLength = -getVert(2);
 
 	// range 0 - (movement[4].parts + movement[5].parts)
 	private int hissLevel = 0;
-	private int hissLength = -(getVert(4) + getVert(5));
-	private int hissVan1Length = -getVert(4);
+	private final int hissLength = -(getVert(4) + getVert(5));
+	private final int hissVan1Length = -getVert(4);
 
 	// range 0 - (movement[10].parts || movements[11].parts)
 	private int armLevel = 0;
-	private int armVertLength = getVert(10);
-	private int armVertVan1Length = getVert(11);
+	private final int armVertLength = getVert(10);
+	private final int armVertVan1Length = getVert(11);
 
 	// range 0 - movement[8].parts (or movement[9].parts)
 	private int armAngle = 0;
-	private int armHoriLength = -getHori(9);
+	private final int armHoriLength = -getHori(9);
 
 	public int matlyftLevel()
 	{
@@ -119,13 +119,13 @@ public class RouteController
 		return armAngle;
 	}
 
-	private BTSim signals;
+	private final BTSim signals;
 	private static final int framesize = 500;
 	BallTrackView view = null;    //new BallTrackView(framesize, this);
 
 	public void addSmallBall()
 	{
-		Ball ball = new Ball(1);
+		final Ball ball = new Ball(1);
 
 		ball.moveInit(movements[12].startPos, movements[12].endPos, movements[12].move);
 		legBallList[12].add(ball);
@@ -133,7 +133,7 @@ public class RouteController
 
 	public void addLargeBall()
 	{
-		Ball ball = new Ball(2);
+		final Ball ball = new Ball(2);
 
 		ball.moveInit(movements[12].startPos, movements[12].endPos, movements[12].move);
 		legBallList[12].add(ball);
@@ -143,34 +143,32 @@ public class RouteController
 	{
 		if (!legBallList[13].isEmpty())
 		{
-			Ball ball = (Ball) legBallList[13].get(0);
+			final Ball ball = (Ball) legBallList[13].get(0);
 
 			if (ball.finishedLeg())
 			{
-				((LinkedList) legBallList[13]).removeFirst();
+				legBallList[13].remove(0);
 			}
 		}
 	}
 
-    public List getAllBalls()
+    public List<Ball> getAllBalls()
 	{
-		LinkedList list = new LinkedList();
-
+		final List<Ball> list = new LinkedList<Ball>();
 		for (int j = 0; j < nrOfLegs; j++)
 		{
-			for (Iterator i = legBallList[j].iterator(); i.hasNext(); )
+			for (final Iterator<Ball> i = legBallList[j].iterator(); i.hasNext(); )
 			{
 				list.add(i.next());
 			}
 		}
-
 		return list;
 	}
 
 	/**getInSignal returns specified insignal
 	 * from the array of all insignals
 	 */
-	public boolean getInSignal(int sig)
+	public boolean getInSignal(final int sig)
 	{
 		inSignals = signals.getInSignals();
 
@@ -188,7 +186,7 @@ public class RouteController
 	/**Lite kommentar kanske ;)
 	 *
 	 */
-	public RouteController(boolean[] outs, BTSim sigs)
+	public RouteController(final boolean[] outs, final BTSim sigs)
 	{
 		System.arraycopy(outs, 0, outSignals, 0, outSignals.length);
 
@@ -196,7 +194,7 @@ public class RouteController
 
 		for (int i = 0; i < legBallList.length; i++)
 		{
-			legBallList[i] = new LinkedList();
+			legBallList[i] = new LinkedList<Ball>();
 		}
 
 		this.addLargeBall();
@@ -221,7 +219,7 @@ public class RouteController
 			{
 				step();
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
 				System.err.println(e + "345");
 			}
@@ -230,7 +228,7 @@ public class RouteController
 			{
 				Thread.sleep(50);
 			}
-			catch (InterruptedException e) {}
+			catch (final InterruptedException e) {}
 		}
 	}
 
@@ -366,7 +364,7 @@ public class RouteController
 		{
 			moveBallsInLeg(13);
 
-			Ball b = (Ball) legBallList[13].get(0);
+			final Ball b = (Ball) legBallList[13].get(0);
 
 			if (b.finishedLeg() && move_13_0())
 			{
@@ -379,7 +377,7 @@ public class RouteController
 		{
 			moveBallsInLeg(12);
 
-			Ball b = (Ball) legBallList[12].get(0);
+			final Ball b = (Ball) legBallList[12].get(0);
 
 			if (b.finishedLeg() && move_12_13())
 			{
@@ -391,7 +389,7 @@ public class RouteController
 		// leg 9
 		if (!legBallList[9].isEmpty())
 		{
-			Ball b = (Ball) legBallList[9].get(0);
+			final Ball b = (Ball) legBallList[9].get(0);
 
 			//!Sug  => Sug error
 			if (!inSignals[16])
@@ -406,7 +404,7 @@ public class RouteController
 				else if (armAngle == armHoriLength) {}    //Not yeat possible to deliver back the ball!
 				else
 				{
-					Exception e = new SupremicaException("Ball dropped (11)");
+					final Exception e = new SupremicaException("Ball dropped (11)");
 
 					System.err.println(e);
 					JOptionPane.showMessageDialog(null, "Ball dropped (11), Program Will be ended");
@@ -414,7 +412,7 @@ public class RouteController
 				}
 			}
 
-			int x = movements[9].endPos[0] + armAngle;
+			final int x = movements[9].endPos[0] + armAngle;
 			int y = movements[11].endPos[1] - armLevel;
 
 			if (b.getRadius() == Ball.SMALL_BALL)
@@ -430,7 +428,7 @@ public class RouteController
 		{
 			moveBallsInLeg(7);
 
-			Ball b = (Ball) legBallList[7].get(0);
+			final Ball b = (Ball) legBallList[7].get(0);
 
 			if (b.finishedLeg() && move_7_9())
 			{
@@ -443,7 +441,7 @@ public class RouteController
 		{
 			moveBallsInLeg(6);
 
-			Ball b = (Ball) legBallList[6].get(0);
+			final Ball b = (Ball) legBallList[6].get(0);
 
 			if (b.finishedLeg() && move_6_8())
 			{
@@ -458,16 +456,16 @@ public class RouteController
 			//UtVån 1 eller Hissen på väg upp, nära UtVån2 samt att UtVån2
 			if (inSignals[7] || ((inSignals[5] && inSignals[6]) && inSignals[11] && (hissLevel == (hissLength - 7))) && (hissLevel != hissLength))
 			{
-				Exception e = new SupremicaException("Error in handling of UtVån1 UtVån2 (5)");
+				final Exception e = new SupremicaException("Error in handling of UtVån1 UtVån2 (5)");
 
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Error in handling of UtVån1 UtVån2 (5), Program Will be ended");
 				System.exit(-1);
 			}
 
-			Ball b = (Ball) legBallList[5].get(0);
-			int x = movements[4].startPos[0];
-			int y = movements[4].startPos[1] - hissLevel;
+			final Ball b = (Ball) legBallList[5].get(0);
+			final int x = movements[4].startPos[0];
+			final int y = movements[4].startPos[1] - hissLevel;
 
 			b.setCoord(x, y);
 
@@ -480,9 +478,9 @@ public class RouteController
 		//leg4
 		if (!legBallList[4].isEmpty())
 		{
-			Ball b = (Ball) legBallList[4].get(0);
-			int x = movements[4].startPos[0];
-			int y = movements[4].startPos[1] - hissLevel;
+			final Ball b = (Ball) legBallList[4].get(0);
+			final int x = movements[4].startPos[0];
+			final int y = movements[4].startPos[1] - hissLevel;
 
 			b.setCoord(x, y);
 
@@ -493,7 +491,7 @@ public class RouteController
 				//hissen nära UtVån1 när UtVån satt
 				if (inSignals[7] && inSignals[5] && (hissLevel > (hissVan1Length - 7)))
 				{
-					Exception e = new SupremicaException("Error in handling of UtVån1 (4)");
+					final Exception e = new SupremicaException("Error in handling of UtVån1 (4)");
 
 					System.err.println(e);
 					JOptionPane.showMessageDialog(null, "Error in handling of UtVån1 (4), Program Will be ended");
@@ -517,7 +515,7 @@ public class RouteController
 				//UtVån 1 eller Hissen på väg upp, nära UtVån2 samt att UtVån2 satt
 				if (inSignals[7] || (inSignals[5] && inSignals[6] && inSignals[11] && (hissLevel == (hissLength - 8))))
 				{
-					Exception e = new SupremicaException("Error in handling of UtVån1 or UtVån2 (5)");
+					final Exception e = new SupremicaException("Error in handling of UtVån1 or UtVån2 (5)");
 
 					System.err.println(e);
 					JOptionPane.showMessageDialog(null, "Error in handling of UtVån1 or UtVån2 (5)Program Will be ended");
@@ -540,7 +538,7 @@ public class RouteController
 		{
 			moveBallsInLeg(3);
 
-			Ball b = (Ball) legBallList[3].get(0);
+			final Ball b = (Ball) legBallList[3].get(0);
 
 			if (b.finishedLeg() && move_3_4())
 			{
@@ -549,11 +547,11 @@ public class RouteController
 		}
 
 		// leg 2
-		int lowerY = 327;
+		final int lowerY = 327;
 
 		if (!legBallList[2].isEmpty())
 		{
-			Ball b = (Ball) legBallList[2].get(0);
+			final Ball b = (Ball) legBallList[2].get(0);
 
 			//The ball will hit the urMatning bar
 			if (((matlyftLevel == (movements[2].parts - 2)) && inSignals[2] && inSignals[3]) ||
@@ -561,7 +559,7 @@ public class RouteController
 			//The ball will hit the measureHead
 			((matlyftLevel == (movements[2].parts - 2)) && inSignals[2] && inSignals[4]))
 			{
-				Exception e = new SupremicaException("Error in handling top of matLyft (2)");
+				final Exception e = new SupremicaException("Error in handling top of matLyft (2)");
 
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Error in handling top of matLyft (2), program will be ended!");
@@ -573,12 +571,12 @@ public class RouteController
 			}
 			else
 			{
-				int x = b.getPosition()[0];
-				int parts = getParts(2);
-				int vert = getVert(2);
-				float partLength = (matlyftLevel * (vert / parts));
-				int partLengthInt = new Float(partLength).intValue();
-				int y = lowerY + partLengthInt;
+				final int x = b.getPosition()[0];
+				final int parts = getParts(2);
+				final int vert = getVert(2);
+				final float partLength = (matlyftLevel * (vert / parts));
+				final int partLengthInt = new Float(partLength).intValue();
+				final int y = lowerY + partLengthInt;
 
 				b.setCoord(x, y);
 			}
@@ -589,7 +587,7 @@ public class RouteController
 		{
 			moveBallsInLeg(1);
 
-			Ball b = (Ball) legBallList[1].get(0);
+			final Ball b = (Ball) legBallList[1].get(0);
 
 			if (b.finishedLeg() && move_1_2())
 			{
@@ -602,7 +600,7 @@ public class RouteController
 		{
 			moveBallsInLeg(0);
 
-			Ball b = (Ball) legBallList[0].get(0);
+			final Ball b = (Ball) legBallList[0].get(0);
 
 			if (b.finishedLeg() && move_0_1())
 			{
@@ -623,14 +621,13 @@ public class RouteController
 	 *  ball calls the method move in the class Ball.
 	 *  @param index is the current leg.
 	 */
-	private void moveBallsInLeg(int index)
+	private void moveBallsInLeg(final int index)
 	{
 		if ((index != 6) && (index != 7))
 		{
-			for (Iterator i = legBallList[index].iterator(); i.hasNext(); )
+			for (final Iterator<Ball> i = legBallList[index].iterator(); i.hasNext(); )
 			{
-				Ball b = (Ball) i.next();
-
+				final Ball b = i.next();
 				b.move();
 			}
 		}
@@ -638,9 +635,9 @@ public class RouteController
 		//We have to check if LyftVån1 is set
 		else if (index == 6)
 		{
-			for (Iterator i = legBallList[index].iterator(); i.hasNext(); )
+			for (final Iterator<Ball> i = legBallList[index].iterator(); i.hasNext(); )
 			{
-				Ball b = (Ball) i.next();
+				final Ball b = i.next();
 
 				//LyftVån1
 				if (inSignals[10])
@@ -660,9 +657,9 @@ public class RouteController
 		//We have to check if LyftVån2 is set
 		else if (index == 7)
 		{
-			for (Iterator i = legBallList[index].iterator(); i.hasNext(); )
+			for (final Iterator<Ball> i = legBallList[index].iterator(); i.hasNext(); )
 			{
-				Ball b = (Ball) i.next();
+				final Ball b = (Ball) i.next();
 
 				//LyftVån2
 				if (inSignals[12])
@@ -684,8 +681,7 @@ public class RouteController
 	{
 		if (inSignals[0] && legBallList[0].isEmpty())
 		{
-			legBallList[0].add(((LinkedList) legBallList[13]).removeFirst());
-
+			legBallList[0].add(legBallList[13].remove(0));
 			return true;
 		}
 
@@ -696,11 +692,9 @@ public class RouteController
 	{
 		if (inSignals[1])
 		{
-			legBallList[1].add(((LinkedList) legBallList[0]).removeFirst());
-
+			legBallList[1].add(legBallList[0].remove(0));
 			return true;
 		}
-
 		return false;
 	}
 
@@ -711,15 +705,14 @@ public class RouteController
 		{
 			if (inSignals[2])
 			{
-				legBallList[2].add(((LinkedList) legBallList[1]).removeFirst());
-
+				legBallList[2].add(legBallList[1].remove(0));
 				return true;
 			}
 		}
 
 		if (matlyftLevel != 0)
 		{
-			Exception e = new SupremicaException("Elevator not down (1-2)");
+			final Exception e = new SupremicaException("Elevator not down (1-2)");
 
 			System.err.println(e);
 			JOptionPane.showMessageDialog(null, "Elevator not down (1-2)");
@@ -738,7 +731,7 @@ public class RouteController
 		{
 			if (inSignals[4])
 			{
-				Exception e = new SupremicaException("Error using Mät (2)");
+				final Exception e = new SupremicaException("Error using Mät (2)");
 
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Error using Mät (2)");
@@ -746,9 +739,7 @@ public class RouteController
 
 				//throw new SupremicaException("Error using Mät (2)");
 			}
-
-			legBallList[3].add(((LinkedList) legBallList[2]).removeFirst());
-
+			legBallList[3].add(legBallList[2].remove(0));
 			return true;
 		}
 
@@ -762,15 +753,14 @@ public class RouteController
 		{
 			if (inSignals[5])
 			{
-				legBallList[4].add(((LinkedList) legBallList[3]).removeFirst());
-
+				legBallList[4].add(legBallList[3].remove(0));
 				return true;
 			}
 		}
 
 		if (hissLevel != 0)
 		{
-			Exception e = new SupremicaException("Elevator not down (3-4)");
+			final Exception e = new SupremicaException("Elevator not down (3-4)");
 
 			System.err.println(e);
 			JOptionPane.showMessageDialog(null, "Elevator not down (3-4)");
@@ -782,12 +772,10 @@ public class RouteController
 
 	private boolean move_4_6()
 	{
-
 		// HissVån1 & KulaVån1 & UtVån1
 		if (outSignals[11] && outSignals[12] && inSignals[7])
 		{
-			legBallList[6].add(((LinkedList) legBallList[4]).removeFirst());
-
+			legBallList[6].add(legBallList[4].remove(0));
 			return true;
 		}
 
@@ -796,12 +784,10 @@ public class RouteController
 
 	private boolean move_5_7()
 	{
-
 		// HissVån2 & KulaVån2 & UtVån2
 		if (outSignals[14] && outSignals[15] && inSignals[11])
 		{
-			legBallList[7].add(((LinkedList) legBallList[4]).removeFirst());
-
+			legBallList[7].add(legBallList[4].remove(0));
 			return true;
 		}
 
@@ -811,69 +797,55 @@ public class RouteController
 	private boolean move_6_8()
 		throws Exception
 	{
-
 		// ArmVån1 && Sug && LyftVån1
 		if (outSignals[20] && inSignals[16] && inSignals[10])
 		{
 			if (outSignals[22])
 			{
-				Exception e = new SupremicaException("Never two balls in the arm (6)");
-
+				final Exception e = new SupremicaException("Never two balls in the arm (6)");
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Never two balls in the arm (6)");
 				System.exit(-1);
 			}
-
-			legBallList[9].add(((LinkedList) legBallList[6]).removeFirst());
-
+			legBallList[9].add(legBallList[6].remove(0));
 			return true;
 		}
-
 		return false;
 	}
 
 	private boolean move_7_9()
 		throws Exception
 	{
-
 		// ArmVån2 && Sug && LyftVån2
 		if (outSignals[21] && inSignals[16] && inSignals[12])
 		{
 			if (outSignals[22])
 			{
-				Exception e = new SupremicaException("Never two balls in the arm (7)");
-
+				final Exception e = new SupremicaException("Never two balls in the arm (7)");
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Never two balls in the arm (7)");
 				System.exit(-1);
 			}
-
-			legBallList[9].add(((LinkedList) legBallList[7]).removeFirst());
-
+			legBallList[9].add(legBallList[7].remove(0));
 			return true;
 		}
-
 		return false;
 	}
 
 	private boolean move_11_12()
 	{
-
 		// !Sug
 		if (!inSignals[16])
 		{
-			legBallList[12].add(((LinkedList) legBallList[9]).removeFirst());
-
+			legBallList[12].add(legBallList[9].remove(0));
 			return true;
 		}
-
 		return false;
 	}
 
 	private boolean move_12_13()
 	{
-		legBallList[13].add(((LinkedList) legBallList[12]).removeFirst());
-
+		legBallList[13].add(legBallList[12].remove(0));
 		return true;
 	}
 
@@ -881,10 +853,9 @@ public class RouteController
 	{
 		outSignals[0] = !legBallList[0].isEmpty();    // KulaPortvakt
 		outSignals[1] = matlyftLevel == 0;    // MätlyftNere
-
 		if (!legBallList[1].isEmpty() && outSignals[1])    // KulaMätlyft
 		{
-			outSignals[2] = ((Ball) ((LinkedList) legBallList[1]).getFirst()).finishedLeg();
+			outSignals[2] = legBallList[1].get(0).finishedLeg();
 		}
 		else
 		{
@@ -893,15 +864,15 @@ public class RouteController
 
 		outSignals[3] = matlyftLevel == movements[2].parts;    // MätlyftUppe
 		outSignals[4] = outSignals[3] &&!legBallList[2].isEmpty();    // KulaMätstation
-		outSignals[5] = inSignals[4] && outSignals[4] && ((Ball) (((LinkedList) legBallList[2]).getFirst())).getRadius() == Ball.BIG_BALL;    // StorKula
-		outSignals[6] = inSignals[4] && outSignals[4] && ((Ball) (((LinkedList) legBallList[2]).getFirst())).getRadius() == Ball.SMALL_BALL;    // LitenKula
+		outSignals[5] = inSignals[4] && outSignals[4] && legBallList[2].get(0).getRadius() == Ball.BIG_BALL;    // StorKula
+		outSignals[6] = inSignals[4] && outSignals[4] && legBallList[2].get(0).getRadius() == Ball.SMALL_BALL;    // LitenKula
 		outSignals[7] = hissLevel == 0;    // HissNere
 		outSignals[8] = false;    //Not Used
 		outSignals[9] = false;    //Not Used
 
 		if (!legBallList[3].isEmpty() && outSignals[7])    // KulaHiss
 		{
-			outSignals[10] = ((Ball) ((LinkedList) legBallList[3]).getFirst()).finishedLeg();
+			outSignals[10] = legBallList[3].get(0).finishedLeg();
 		}
 		else
 		{
@@ -910,10 +881,10 @@ public class RouteController
 
 		outSignals[11] = hissLevel == hissVan1Length;    // HissVån1
 		outSignals[12] = outSignals[11] &&!legBallList[4].isEmpty();    // KulaVån1
-		outSignals[13] = !legBallList[6].isEmpty() && ((Ball) ((LinkedList) legBallList[6]).getFirst()).finishedLeg();    // PlockaVån1
+		outSignals[13] = !legBallList[6].isEmpty() && legBallList[6].get(0).finishedLeg();    // PlockaVån1
 		outSignals[14] = hissLevel == hissLength;    // HissVån2
 		outSignals[15] = outSignals[14] &&!legBallList[4].isEmpty();    // KulaVån2
-		outSignals[16] = !legBallList[7].isEmpty() && ((Ball) ((LinkedList) legBallList[7]).getFirst()).finishedLeg();    // PlockaVån2
+		outSignals[16] = !legBallList[7].isEmpty() && legBallList[7].get(0).finishedLeg();    // PlockaVån2
 		outSignals[17] = (armLevel == 0) && (armAngle == 0);    // ArmHemma
 		outSignals[18] = false;    //Not Used
 		outSignals[19] = false;    //Not Used

@@ -80,7 +80,7 @@ public class XmlRpcResponseProcessor
 	 * @param encoding The output encoding.
 	 * @return byte[] The XML-RPC response.
 	 */
-	public byte[] processResponse(Object responseParam, String encoding)
+	public byte[] processResponse(final Object responseParam, final String encoding)
 		throws IOException, UnsupportedEncodingException, XmlRpcException
 	{
 		long now = 0;
@@ -92,8 +92,8 @@ public class XmlRpcResponseProcessor
 
 		try
 		{
-			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			XmlWriter writer = new XmlWriter(buffer, encoding);
+			final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			final XmlWriter writer = new XmlWriter(buffer, encoding);
 
 			writeResponse(responseParam, writer);
 			writer.flush();
@@ -117,7 +117,7 @@ public class XmlRpcResponseProcessor
 	 * @param encoding The output encoding.
 	 * @return byte[] The XML-RPC response.
 	 */
-	public byte[] processException(Exception x, String encoding)
+	public byte[] processException(final Exception x, final String encoding)
 	{
 		if (XmlRpc.debug)
 		{
@@ -129,29 +129,29 @@ public class XmlRpcResponseProcessor
 		// It is possible that something is in the buffer
 		// if there were an exception during the writeResponse()
 		// call above.
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		XmlWriter writer = null;
 
 		try
 		{
 			writer = new XmlWriter(buffer, encoding);
 		}
-		catch (UnsupportedEncodingException encx)
+		catch (final UnsupportedEncodingException encx)
 		{
 			System.err.println("XmlRpcServer attempted to use " + "unsupported encoding: " + encx);
 
 			// NOTE: If we weren't already using the default
 			// encoding, we could try it here.
 		}
-		catch (IOException iox)
+		catch (final IOException iox)
 		{
 			System.err.println("XmlRpcServer experienced I/O error " + "writing error response: " + iox);
 		}
 
-		String message = x.toString();
+		final String message = x.toString();
 
 		// Retrieve XmlRpcException error code(if possible).
-		int code = (x instanceof XmlRpcException)
+		final int code = (x instanceof XmlRpcException)
 				   ? ((XmlRpcException) x).code
 				   : 0;
 
@@ -160,7 +160,7 @@ public class XmlRpcResponseProcessor
 			writeError(code, message, writer);
 			writer.flush();
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 
 			// Unlikely to occur, as we just sent a struct
@@ -176,7 +176,7 @@ public class XmlRpcResponseProcessor
 	/**
 	 * Writes an XML-RPC response to the XML writer.
 	 */
-	void writeResponse(Object param, XmlWriter writer)
+	void writeResponse(final Object param, final XmlWriter writer)
 		throws XmlRpcException, IOException
 	{
 		writer.startElement("methodResponse");
@@ -193,13 +193,12 @@ public class XmlRpcResponseProcessor
 	/**
 	 * Writes an XML-RPC error response to the XML writer.
 	 */
-	@SuppressWarnings("unchecked")
-	void writeError(int code, String message, XmlWriter writer)
+	void writeError(final int code, final String message, final XmlWriter writer)
 		throws XmlRpcException, IOException
 	{
 
 		// System.err.println("error: "+message);
-		Hashtable<String, Comparable> h = new Hashtable<String, Comparable>();
+		final Hashtable<String, Comparable<?>> h = new Hashtable<String, Comparable<?>>();
 
 		h.put("faultCode", new Integer(code));
 		h.put("faultString", message);

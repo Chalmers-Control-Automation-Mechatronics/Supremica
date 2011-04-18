@@ -18,29 +18,29 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.util.QMCUtilFormateo
  *  Fecha 13/02/2006
  *
  */
-@SuppressWarnings("unchecked")
+
 public class QMCAlgoritmo {
 
 
 
-    private ArrayList arrayListasAdyacencias;
-    private ArrayList listaAdyacenciasActual;
-    private ArrayList listaAdyacenciasAnterior;
+    private ArrayList<ArrayList<QMCBinarioBean>> arrayListasAdyacencias;
+    private ArrayList<QMCBinarioBean> listaAdyacenciasActual;
+    private ArrayList<QMCBinarioBean> listaAdyacenciasAnterior;
 
-    private ArrayList listaImplicantesPrimos;
-    private ArrayList listaImplicantesReducida;
+    private ArrayList<QMCImplicanteBean> listaImplicantesPrimos;
+    private ArrayList<QMCImplicanteBean> listaImplicantesReducida;
 
-    private ArrayList listaTerminosImplicantes;
-    private ArrayList listaTerminosNoCubiertos;
+    private ArrayList<QMCBinarioBean> listaTerminosImplicantes;
+    private ArrayList<QMCBinarioBean> listaTerminosNoCubiertos;
 
-    private ArrayList listaSolucionesMinimas;
-    private ArrayList listaImplicantesSolucion;
+    private ArrayList<String> listaSolucionesMinimas;
+    private ArrayList<QMCImplicanteBean> listaImplicantesSolucion;
 
     private Object [][] matrizImplicantesEsenciales;
     private Object [][] matrizImplicantesReducida;
 
-    private ArrayList listaImplicantesInteractivos;
-    private ArrayList listaTerminosInteractivos;
+    private ArrayList<QMCImplicanteBean> listaImplicantesInteractivos;
+    private ArrayList<QMCBinarioBean> listaTerminosInteractivos;
 
     private boolean terminosTodosCubiertos;
     private boolean minimizable;
@@ -54,9 +54,9 @@ public class QMCAlgoritmo {
      * Metodo que establece un array con las listas de adyacencias marcadas de todos los ordenes
      * @param terminos lista de terminos a partir de los cuales se generaran las diversas listas de adyacencias.
      */
-    public void setArrayListasAdyacencias(ArrayList terminos)
+    public void setArrayListasAdyacencias(final ArrayList<QMCBinarioBean> terminos)
     {
-        ArrayList adyacencias, adyacenciasOrdenSuperior;
+        ArrayList<QMCBinarioBean> adyacencias, adyacenciasOrdenSuperior;
 
         QMCBinarioBean adyacenciaIndMenor, adyacenciaIndMayor;
         QMCBinarioBean adyacenciaNueva;
@@ -69,16 +69,16 @@ public class QMCAlgoritmo {
         int j,x;
         boolean existenAdyacenciasSuperiores;
 
-        arrayListasAdyacencias = new ArrayList();
+        arrayListasAdyacencias = new ArrayList<ArrayList<QMCBinarioBean>>();
         existenAdyacenciasSuperiores = true;
         x = 0;
-        adyacencias = new ArrayList(QMCUtilLogica.ordenaArrayListTerminos(terminos));
+        adyacencias = new ArrayList<QMCBinarioBean>(QMCUtilLogica.ordenaArrayListTerminos(terminos));
 
 
         while(existenAdyacenciasSuperiores)
         {
 
-            adyacenciasOrdenSuperior = new ArrayList();
+            adyacenciasOrdenSuperior = new ArrayList<QMCBinarioBean>();
             existenAdyacenciasSuperiores = false;
             for(int i=0;i<adyacencias.size();i++)
             {
@@ -185,7 +185,7 @@ public class QMCAlgoritmo {
             // actualiza la lista de adyacencias anteriores usadas (checks)
             arrayListasAdyacencias.set(x,adyacencias);
             adyacencias = adyacenciasOrdenSuperior;
-            adyacenciasOrdenSuperior = new ArrayList();
+            adyacenciasOrdenSuperior = new ArrayList<QMCBinarioBean>();
             x++;
         }
         minimizable = true;
@@ -200,15 +200,17 @@ public class QMCAlgoritmo {
      * Método que introduce la lista de adyacenciasActual.
      * @param orden El orden de la lista de adyacencias a establecer como actual.
      */
-    public void setListaAdyacenciasActual(int orden)
+    public void setListaAdyacenciasActual(final int orden)
     {
-        listaAdyacenciasActual = (ArrayList)arrayListasAdyacencias.get(orden);
+        listaAdyacenciasActual = arrayListasAdyacencias.get(orden);
     }
 
     /**
      * @param listaAdyacenciasAnterior The listaAdyacenciasAnterior to set.
      */
-    public void setListaAdyacenciasAnterior(ArrayList listaAdyacenciasAnterior) {
+    public void setListaAdyacenciasAnterior
+      (final ArrayList<QMCBinarioBean> listaAdyacenciasAnterior)
+    {
         this.listaAdyacenciasAnterior = listaAdyacenciasAnterior;
     }
 
@@ -218,15 +220,15 @@ public class QMCAlgoritmo {
      * Método que estable la lista de implicantes primos
      * @param array de terminos.
      */
-    public void setListaImplicantesPrimos(String[] terminos)
+    public void setListaImplicantesPrimos(final String[] terminos)
     {
-        ArrayList listaAdyacencias;
+        ArrayList<?> listaAdyacencias;
         QMCBinarioBean adyacencia;
         QMCImplicanteBean implicante;
 
-        listaAdyacencias = new ArrayList();
-        listaImplicantesPrimos = new ArrayList();
-        listaImplicantesSolucion = new ArrayList();
+        listaAdyacencias = new ArrayList<Object>();
+        listaImplicantesPrimos = new ArrayList<QMCImplicanteBean>();
+        listaImplicantesSolucion = new ArrayList<QMCImplicanteBean>();
         char nombreImplicante = 65;
 
         //Object [] posiciones;
@@ -239,7 +241,7 @@ public class QMCAlgoritmo {
         // Recorre las listas empezando por las adyacencias mayores
         for(int i=arrayListasAdyacencias.size()-1;i>=0; i--)
         {
-            listaAdyacencias =(ArrayList)arrayListasAdyacencias.get(i);
+            listaAdyacencias =(ArrayList<?>)arrayListasAdyacencias.get(i);
             for(int j=listaAdyacencias.size()-1;j>=0;j--)
             {
                 adyacencia = (QMCBinarioBean)listaAdyacencias.get(j);
@@ -317,9 +319,9 @@ public class QMCAlgoritmo {
      * Genera la lista de terminos sin indiferencias
      * @param terminos the listaTerminosImplicantes to set.
      */
-    public void setListaTerminosImplicantes(ArrayList terminos)
+    public void setListaTerminosImplicantes(final ArrayList<?> terminos)
     {
-        listaTerminosImplicantes = new ArrayList();
+        listaTerminosImplicantes = new ArrayList<QMCBinarioBean>();
         QMCBinarioBean termino;
         for(int i=0;i<terminos.size(); i++)
         {
@@ -337,7 +339,7 @@ public class QMCAlgoritmo {
      */
     public void setListaTerminosNoCubiertos()
     {
-        listaTerminosNoCubiertos = new ArrayList();
+        listaTerminosNoCubiertos = new ArrayList<QMCBinarioBean>();
         QMCBinarioBean termino;
         int x = 0;
         for(int i=0;i<listaTerminosImplicantes.size();i++)
@@ -360,7 +362,7 @@ public class QMCAlgoritmo {
      */
     public void setListaImplicantesReducida()
     {
-        listaImplicantesReducida = new ArrayList();
+        listaImplicantesReducida = new ArrayList<QMCImplicanteBean>();
         QMCImplicanteBean implicante;
         int x = 0;
         for(int i=0;i<listaImplicantesPrimos.size();i++)
@@ -380,13 +382,15 @@ public class QMCAlgoritmo {
         // METODO DE PETRICK
 
         // Paso 1: Genera para cada termino la lista de los implicantes que los cubren
-        ArrayList listaGruposImplicantes, grupoImplicantes, resultado;
-        listaGruposImplicantes = new ArrayList();
+        ArrayList<ArrayList<String>> listaGruposImplicantes;
+        ArrayList<String> grupoImplicantes;
+        ArrayList<String> resultado;
+        listaGruposImplicantes = new ArrayList<ArrayList<String>>();
 
         for(int j=0;j<matrizImplicantesReducida[0].length;j++)
         {
             // cambio de columna (termino)
-            grupoImplicantes = new ArrayList();
+            grupoImplicantes = new ArrayList<String>();
             for(int i=0;i<matrizImplicantesReducida.length; i++)
             {
                 if(matrizImplicantesReducida[i][j]=="X")
@@ -399,10 +403,11 @@ public class QMCAlgoritmo {
         }
 
         // Paso 2: Multiplicacion booleana de todos los grupos (obtencion de soluciones)
-        resultado = (ArrayList)listaGruposImplicantes.get(0);
+        resultado = listaGruposImplicantes.get(0);
         for(int i=1; i<listaGruposImplicantes.size();i++)
         {
-            resultado = (ArrayList)QMCUtilLogica.multiplicaSumasBooleanas(resultado,(ArrayList)listaGruposImplicantes.get(i));
+            resultado = QMCUtilLogica.multiplicaSumasBooleanas(resultado,
+                                                               listaGruposImplicantes.get(i));
         }
 
         // Paso 3: Análisis de la lista resultante en busca de las soluciones mínimas
@@ -417,17 +422,17 @@ public class QMCAlgoritmo {
                 tamanoMin = tamano;
             }
         }
-        listaSolucionesMinimas = new ArrayList();
+        listaSolucionesMinimas = new ArrayList<String>();
         for(int i=0;i<resultado.size();i++)
         {
-            tamano = ((String)resultado.get(i)).length();
+            tamano = resultado.get(i).length();
             if(tamano==tamanoMin)
             {
                 listaSolucionesMinimas.add(resultado.get(i));
             }
         }
         // Marca tabla Implicantes reducida (solucion por defecto)
-        String solucion = (String)listaSolucionesMinimas.get(0);
+        final String solucion = listaSolucionesMinimas.get(0);
         for(int i=0; i<solucion.length();i++)
         {
             implicante = QMCUtilLogica.buscaImplicante(listaImplicantesReducida,solucion.charAt(i));
@@ -442,9 +447,9 @@ public class QMCAlgoritmo {
      * Para una única Solucion minima (Modo interactivo)
      * @param listaSolucionesMinimas The listaSolucionesMinimas to set.
      */
-    public void setListaSolucionesMinimas(String cadenaSolucionMinima)
+    public void setListaSolucionesMinimas(final String cadenaSolucionMinima)
     {
-        listaSolucionesMinimas = new ArrayList();
+        listaSolucionesMinimas = new ArrayList<String>();
         listaSolucionesMinimas.add(cadenaSolucionMinima);
     }
 
@@ -452,7 +457,7 @@ public class QMCAlgoritmo {
      * Añade los implicantes de la cadena a la solucion final para marcar los terminos que cubren y generar la expresión algebraica
      * @param listaImplicantesSolucion The listaImplicantesSolucion to set.
      */
-    public void setListaImplicantesSolucion(String cadenaImplicantesSolucion)
+    public void setListaImplicantesSolucion(final String cadenaImplicantesSolucion)
     {
         QMCImplicanteBean implicante;
         int j,x, numEsenciales;
@@ -500,11 +505,11 @@ public class QMCAlgoritmo {
      * Método que genera la lista de Implicantes interactivos
      * @param listaImplicantesInteractivos The listaImplicantesInteractivos to set.
      */
-    public void setListaImplicantesInteractivos(ArrayList listaImplicantes)
+    public void setListaImplicantesInteractivos(final ArrayList<?> listaImplicantes)
     {
 
         QMCImplicanteBean implicante, implicanteInteract;
-        listaImplicantesInteractivos = new ArrayList();
+        listaImplicantesInteractivos = new ArrayList<QMCImplicanteBean>();
         for(int i=0;i<listaImplicantes.size();i++)
         {
             implicante = (QMCImplicanteBean)listaImplicantes.get(i);
@@ -519,11 +524,11 @@ public class QMCAlgoritmo {
      * Método que genera un ArrayList de términos interactivos
      * @param listaTerminosInteractivos The listaTerminosInteractivos to set.
      */
-    public void setListaTerminosInteractivos(ArrayList listaTerminos)
+    public void setListaTerminosInteractivos(final ArrayList<?> listaTerminos)
     {
 
         QMCBinarioBean termino, terminoInteract;
-        listaTerminosInteractivos = new ArrayList();
+        listaTerminosInteractivos = new ArrayList<QMCBinarioBean>();
         for(int i=0;i<listaTerminos.size();i++)
         {
             termino = (QMCBinarioBean)listaTerminos.get(i);
@@ -537,7 +542,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de ArrayList de adyacencias
      * @return arrayListasAdyacencias.
      */
-    public ArrayList getArrayListasAdyacencias() {
+    public ArrayList<ArrayList<QMCBinarioBean>> getArrayListasAdyacencias() {
         return arrayListasAdyacencias;
     }
 
@@ -546,7 +551,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de adyacencias actual
      * @return listaAdyacenciasActual.
      */
-    public ArrayList getListaAdyacenciasActual() {
+    public ArrayList<QMCBinarioBean> getListaAdyacenciasActual() {
         return listaAdyacenciasActual;
     }
 
@@ -554,7 +559,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de implicantes primos
      * @return listaImplicantes.
      */
-    public ArrayList getListaImplicantesPrimos() {
+    public ArrayList<QMCImplicanteBean> getListaImplicantesPrimos() {
         return listaImplicantesPrimos;
     }
 
@@ -571,7 +576,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de terminos objeto de implicantes
      * @return listaTerminosImplicantes
      */
-    public ArrayList getListaTerminosImplicantes(){
+    public ArrayList<QMCBinarioBean> getListaTerminosImplicantes(){
         return listaTerminosImplicantes;
     }
 
@@ -579,7 +584,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de terminos no cubiertos
      * @return listaTerminosNoCubiertos.
      */
-    public ArrayList getListaTerminosNoCubiertos() {
+    public ArrayList<QMCBinarioBean> getListaTerminosNoCubiertos() {
         return listaTerminosNoCubiertos;
     }
 
@@ -588,7 +593,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de implicantes reducida
      * @return listaImplicantesReducida.
      */
-    public ArrayList getListaImplicantesReducida() {
+    public ArrayList<QMCImplicanteBean> getListaImplicantesReducida() {
         return listaImplicantesReducida;
     }
 
@@ -623,7 +628,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de soluciones minimas
      * @return listaSolucionesMinimas.
      */
-    public ArrayList getListaSolucionesMinimas() {
+    public ArrayList<String> getListaSolucionesMinimas() {
         return listaSolucionesMinimas;
     }
 
@@ -631,7 +636,7 @@ public class QMCAlgoritmo {
      * Devueve un arrayList de implicantes pertenecientes a la solucion
      * @return  listaImplicantesSolucion.
      */
-    public ArrayList getListaImplicantesSolucion() {
+    public ArrayList<QMCImplicanteBean> getListaImplicantesSolucion() {
         return listaImplicantesSolucion;
     }
 
@@ -639,7 +644,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de objetos implicantes vacios
      * @return listaImplicantesInteractivos.
      */
-    public ArrayList getListaImplicantesInteractivos() {
+    public ArrayList<QMCImplicanteBean> getListaImplicantesInteractivos() {
         return listaImplicantesInteractivos;
     }
 
@@ -647,7 +652,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de objetos termino vacios
      * @return listaTerminosInteractivos.
      */
-    public ArrayList getListaTerminosInteractivos() {
+    public ArrayList<QMCBinarioBean> getListaTerminosInteractivos() {
         return listaTerminosInteractivos;
     }
 
@@ -655,7 +660,7 @@ public class QMCAlgoritmo {
      * Devuelve un ArrayList de adyacencias de orden anterior
      * @return listaAdyacenciasAnterior.
      */
-    public ArrayList getListaAdyacenciasAnterior() {
+    public ArrayList<QMCBinarioBean> getListaAdyacenciasAnterior() {
         return listaAdyacenciasAnterior;
     }
 

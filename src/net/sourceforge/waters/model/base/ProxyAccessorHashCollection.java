@@ -190,6 +190,7 @@ public class ProxyAccessorHashCollection<P extends Proxy>
 
     //#######################################################################
     //# Equality and HashCode
+    @SuppressWarnings("unchecked")
     public boolean equals(final Object partner)
     {
       if (partner instanceof ProxyAccessorHashCollection<?>.Accessor<?>) {

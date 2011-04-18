@@ -72,7 +72,6 @@ public interface XmlRpcHandler
 	/**
 	 * Return the result, or throw an Exception if something went wrong.
 	 */
-	@SuppressWarnings("unchecked")
-	public Object execute(String method, Vector<Comparable> params)
+	public Object execute(String method, Vector<Comparable<?>> params)
 		throws Exception;
 }

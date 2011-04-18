@@ -69,10 +69,10 @@ import java.util.Vector;
 public class Invoker
 	implements XmlRpcHandler
 {
-	private Object invokeTarget;
-	private Class<?> targetClass;
+	private final Object invokeTarget;
+	private final Class<?> targetClass;
 
-	public Invoker(Object target)
+	public Invoker(final Object target)
 	{
 		invokeTarget = target;
 		targetClass = (invokeTarget instanceof Class<?>)
@@ -88,8 +88,7 @@ public class Invoker
 	/**
 	 * main method, sucht methode in object, wenn gefunden dann aufrufen.
 	 */
-	@SuppressWarnings("unchecked")
-	public Object execute(String methodName, Vector<Comparable> params)
+	public Object execute(String methodName, final Vector<Comparable<?>> params)
 		throws Exception
 	{
 
@@ -130,7 +129,7 @@ public class Invoker
 
 		// The last element of the XML-RPC method name is the Java
 		// method name.
-		int dot = methodName.lastIndexOf('.');
+		final int dot = methodName.lastIndexOf('.');
 
 		if ((dot > -1) && (dot + 1 < methodName.length()))
 		{
@@ -153,11 +152,11 @@ public class Invoker
 		}
 
 		// Wenn nicht da dann entsprechende Exception returnen
-		catch (NoSuchMethodException nsm_e)
+		catch (final NoSuchMethodException nsm_e)
 		{
 			throw nsm_e;
 		}
-		catch (SecurityException s_e)
+		catch (final SecurityException s_e)
 		{
 			throw s_e;
 		}
@@ -176,15 +175,15 @@ public class Invoker
 		{
 			returnValue = method.invoke(invokeTarget, argValues);
 		}
-		catch (IllegalAccessException iacc_e)
+		catch (final IllegalAccessException iacc_e)
 		{
 			throw iacc_e;
 		}
-		catch (IllegalArgumentException iarg_e)
+		catch (final IllegalArgumentException iarg_e)
 		{
 			throw iarg_e;
 		}
-		catch (InvocationTargetException it_e)
+		catch (final InvocationTargetException it_e)
 		{
 			if (XmlRpc.debug)
 			{
@@ -192,7 +191,7 @@ public class Invoker
 			}
 
 			// check whether the thrown exception is XmlRpcException
-			Throwable t = it_e.getTargetException();
+			final Throwable t = it_e.getTargetException();
 
 			if (t instanceof XmlRpcException)
 			{

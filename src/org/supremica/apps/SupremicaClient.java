@@ -50,6 +50,7 @@
 package org.supremica.apps;
 
 import java.util.*;
+
 import org.apache.xmlrpc.*;
 import org.supremica.properties.Config;
 import org.supremica.log.*;
@@ -60,15 +61,14 @@ public class SupremicaClient
 
 	private SupremicaClient() {}
 
-	@SuppressWarnings("unchecked")
-    public static void main(String[] args)
+    public static void main(final String[] args)
 		throws Exception
 	{
-		XmlRpcClient xmlrpc = new XmlRpcClient("http://localhost:" + Config.XML_RPC_PORT.get());
+		final XmlRpcClient xmlrpc = new XmlRpcClient("http://localhost:" + Config.XML_RPC_PORT.get());
 
 		// this method return a vector of strings
-		Vector params = new Vector();
-		Vector resultVec = (Vector) xmlrpc.execute("getAutomataIdentities", params);
+		final Vector<Comparable<?>> params = new Vector<Comparable<?>>();
+		final Vector<?> resultVec = (Vector<?>) xmlrpc.execute("getAutomataIdentities", params);
 
 		logger.info(resultVec);
 
@@ -76,14 +76,10 @@ public class SupremicaClient
 		for (int i = 0; i < resultVec.size(); i++)
 		{
 			params.clear();
-
-			Vector innerArg = new Vector();
-
-			innerArg.add(resultVec.get(i));
-			params.add(innerArg);
-
-			String currAutomata = (String) xmlrpc.execute("getAutomata", params);
-
+			final Vector<Comparable<?>> innerArg = new Vector<Comparable<?>>();
+			innerArg.add((Comparable<?>) resultVec.get(i));
+			params.add((Comparable<?>) innerArg);
+			final String currAutomata = (String) xmlrpc.execute("getAutomata", params);
 			logger.info(currAutomata);
 		}
 	}

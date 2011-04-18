@@ -71,7 +71,7 @@ import java.util.Vector;
 public class MultiCall
 	implements ContextXmlRpcHandler
 {
-	public Object execute(String method, Vector<?> params, XmlRpcContext context)
+	public Object execute(final String method, final Vector<?> params, final XmlRpcContext context)
 		throws Exception
 	{
 		if ("multicall".equals(method))
@@ -83,32 +83,33 @@ public class MultiCall
 	}
 
 	@SuppressWarnings("unchecked")
-	public Vector<Serializable> multicall(Vector<?> requests, XmlRpcContext context)
+	public Vector<Serializable> multicall(final Vector<?> requests, final XmlRpcContext context)
 	{
-		Vector<Serializable> response = new Vector<Serializable>();
+		final Vector<Serializable> response = new Vector<Serializable>();
 		XmlRpcRequest request;
 
 		for (int i = 0; i < requests.size(); i++)
 		{
 			try
 			{
-				Hashtable<?, ?> call = (Hashtable<?, ?>) requests.elementAt(i);
+				final Hashtable<?, ?> call = (Hashtable<?, ?>) requests.elementAt(i);
 
-				request = new XmlRpcRequest((String) call.get("methodName"), (Vector<Comparable>) call.get("params"));
+				request = new XmlRpcRequest((String) call.get("methodName"), (Vector<Comparable<?>>) call.get("params"));
 
-				Object handler = context.getHandlerMapping().getHandler(request.getMethodName());
-				Vector<Object> v = new Vector<Object>();
+				final Object handler = context.getHandlerMapping().getHandler(request.getMethodName());
+				final Vector<Object> v = new Vector<Object>();
 
 				v.addElement(XmlRpcWorker.invokeHandler(handler, request, context));
 				response.addElement(v);
 			}
-			catch (Exception x)
+			catch (final Exception x)
 			{
-				String message = x.toString();
-				int code = ((x instanceof XmlRpcException)
+				final String message = x.toString();
+				final int code = ((x instanceof XmlRpcException)
 							? ((XmlRpcException) x).code
 							: 0);
-				Hashtable<String, Comparable> h = new Hashtable<String, Comparable>();
+				final Hashtable<String, Comparable<?>> h =
+				  new Hashtable<String, Comparable<?>>();
 
 				h.put("faultString", message);
 				h.put("faultCode", new Integer(code));

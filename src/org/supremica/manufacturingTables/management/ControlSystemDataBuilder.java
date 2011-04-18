@@ -49,7 +49,7 @@
 
 /**
  * The ControlSystemDataBuilder class is used to load a Factory
- * application, defined by XML- files, into a Java-representation. This medium-level 
+ * application, defined by XML- files, into a Java-representation. This medium-level
  * Java-representation can then be transformed to different PLC programs.
  *
  *
@@ -68,7 +68,6 @@ import org.supremica.manufacturingTables.xsd.rop.*;
 //import net.sourceforge.fuber.xsd.libraryelement.*;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 
-@SuppressWarnings("unchecked")
 public class ControlSystemDataBuilder
 {
 
@@ -84,63 +83,63 @@ public class ControlSystemDataBuilder
     public static final char END_EXPR_TOKEN = ')';
     public static final char DELIMIT_TOKEN = ',';
     public static final char BLANK_TOKEN = ' ';
-    
+
     public ControlSystemDataBuilder()
     {
 	nbrOfBlanks = 0;
 	blanks = null;
 	manufacturingCell = null;
     }
-    
+
     public ManufacturingCell getManufacturingCell()
     {
 	return manufacturingCell;
     }
-    
-    public void buildCOP(ROP COP)
+
+    public void buildCOP(final ROP COP)
     {
 	// Variable to keep track of the indentation, just for now for printing the XML code
 	nbrOfBlanks = 0;
 	blanks = "                                                                              ";
-	
-	
+
+
 	// Check ROP Type (ROP or COP)
 	if (!COP.getType().value().equals("COP"))
 	{
 	    System.err.println("This is not a COP!");
 	    return;
 	}
-	
-	else 
+
+	else
 	{
 	    // ROP
-	    System.out.println(blanks.substring(0,nbrOfBlanks) + "<ROP id=\"" + COP.getId() + "\" " + "type=\"" + COP.getType() +  "\">"); 
+	    System.out.println(blanks.substring(0,nbrOfBlanks) + "<ROP id=\"" + COP.getId() + "\" " + "type=\"" + COP.getType() +  "\">");
 	    nbrOfBlanks++;
-	    
+
 	    // Create COPData
-	    String cellName = manufacturingCell.getName().substring(manufacturingCell.getName().length()-3, manufacturingCell.getName().length());
-	    String machineName = cellName + COP.getMachine(); 
+	    final String cellName = manufacturingCell.getName().substring(manufacturingCell.getName().length()-3, manufacturingCell.getName().length());
+	    final String machineName = cellName + COP.getMachine();
 	    // 	(The COP has shorter names not containing the last of the cell name)
-	    
-	    COPData COPData = new COPData(COP.getId(), machineName);
-	    
+
+	    final COPData COPData = new COPData(COP.getId(), machineName);
+
 	    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Machine>" + COP.getMachine() + "</Machine>");
-	    
-	    // Comment	    
+
+	    // Comment
 	    if (COP.getComment()!=null)
 	    {
 		COPData.setComment(COP.getComment());
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Comment>" + COP.getComment() + "</Comment>"); 
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Comment>" + COP.getComment() + "</Comment>");
 	    }
-	    
+
 	    // Register the COP to the manufacturing cell
 	    manufacturingCell.registerCOP(COPData);
-	    
+
 	    // Relation
-	    Relation relation = COP.getRelation();
-	    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Relation type=\"" + relation.getType() +  "\">"); 
+	    final Relation relation = COP.getRelation();
+	    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Relation type=\"" + relation.getType() +  "\">");
 	    nbrOfBlanks++;
-	    
+
 	    // Check the type of the relation
 	    if (!relation.getType().value().equals("Sequence"))
 	    {
@@ -149,66 +148,66 @@ public class ControlSystemDataBuilder
 	    else
 	    {
 		// Activities
-		for (Iterator<Activity> activityIter = relation.getActivity().iterator(); activityIter.hasNext();)
+		for (final Iterator<Activity> activityIter = relation.getActivity().iterator(); activityIter.hasNext();)
 		{
 		    // Current Activity
-		    Activity activity = activityIter.next();
+		    final Activity activity = activityIter.next();
 		    // Create COP Activity and add to COPData
-		    COPActivity COPActivity = new COPActivity(activity.getOperation());
+		    final COPActivity COPActivity = new COPActivity(activity.getOperation());
 		    COPData.addCOPActivity(COPActivity);
- 
-		    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Activity>"); 
+
+		    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Activity>");
 		    nbrOfBlanks++;
-		    
+
 		    // Precondition
-		    Precondition precondition = activity.getPrecondition(); 
+		    final Precondition precondition = activity.getPrecondition();
 		    if (precondition!= null)
 		    {
-			System.out.println(blanks.substring(0,nbrOfBlanks) + "<Precondition>"); 
+			System.out.println(blanks.substring(0,nbrOfBlanks) + "<Precondition>");
 			nbrOfBlanks++;
-			
+
 			// Predecessors
-			for (Iterator<OperationReferenceType> predecessorIter = precondition.getPredecessor().iterator(); predecessorIter.hasNext();)
+			for (final Iterator<OperationReferenceType> predecessorIter = precondition.getPredecessor().iterator(); predecessorIter.hasNext();)
 			{
 			    // Current Predecessor (are kinds of OperationReferences)
-			    OperationReferenceType predecessor = (OperationReferenceType) predecessorIter.next();
+			    final OperationReferenceType predecessor = predecessorIter.next();
 			    // Create predecessor and add to COP activity
-			    Predecessor predecessorData = new Predecessor( predecessor.getOperation(), cellName + predecessor.getMachine() ); 
+			    final Predecessor predecessorData = new Predecessor( predecessor.getOperation(), cellName + predecessor.getMachine() );
 			    COPActivity.addPredecessor(predecessorData);
 
-			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Predecessor>"); 
+			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Predecessor>");
 			    nbrOfBlanks++;
-			    
+
 			    // Machine
-			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Machine>" + predecessor.getMachine() + "</Machine>"); 
+			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Machine>" + predecessor.getMachine() + "</Machine>");
 			    // Operation in predecessor
-			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Operation>" + predecessor.getOperation() + "</Operation>"); 
-			    
+			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Operation>" + predecessor.getOperation() + "</Operation>");
+
 			    nbrOfBlanks--;
-			    System.out.println(blanks.substring(0,nbrOfBlanks) + "</Predecessor>"); 
+			    System.out.println(blanks.substring(0,nbrOfBlanks) + "</Predecessor>");
 			}
-			
+
 	        	nbrOfBlanks--;
-			System.out.println(blanks.substring(0,nbrOfBlanks) + "</Precondition>"); 
-			
+			System.out.println(blanks.substring(0,nbrOfBlanks) + "</Precondition>");
+
 		    }
 		    // Operation in current Machine
 		    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Operation>" + activity.getOperation() + "</Operation>");
-		    
+
 		    nbrOfBlanks--;
-		    System.out.println(blanks.substring(0,nbrOfBlanks) + "</Activity>"); 
+		    System.out.println(blanks.substring(0,nbrOfBlanks) + "</Activity>");
 		}
-		
+
         	nbrOfBlanks--;
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "</Relation>"); 
-		
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "</Relation>");
+
 	    }
-	    
+
 	    nbrOfBlanks--;
-	    System.out.println(blanks.substring(0,nbrOfBlanks) + "</ROP>"); 
+	    System.out.println(blanks.substring(0,nbrOfBlanks) + "</ROP>");
 	}
     }
-    
+
 //     // Hack, that converts the operation name to an int.
 //     // If the operation name really was an int, the value will be unchanged.
 //     // This is to allow the user to use any operation names in the COPs, but
@@ -226,43 +225,43 @@ public class ControlSystemDataBuilder
 // 	}
 // 	return op;
 //     }
-    
-    public void buildEOP(org.supremica.manufacturingTables.xsd.eop.Operation operation)
+
+    public void buildEOP(final org.supremica.manufacturingTables.xsd.eop.Operation operation)
     {
 	// Variable to keep track of the indentation, just for now for printing the XML code
 	nbrOfBlanks = 0;
 	blanks = "                                                                              ";
 
 	// Operation
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Operation opID=\"" + operation.getOpID().intValue() + "\">"); 
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Operation opID=\"" + operation.getOpID().intValue() + "\">");
 	nbrOfBlanks++;
 
-	// Create EOPData	
-	EOPData EOPData = new EOPData(operation.getOpID(), operation.getType());
+	// Create EOPData
+	final EOPData EOPData = new EOPData(operation.getOpID(), operation.getType());
 
 	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Type>" + operation.getType() + "</Type>");
 
 	if (operation.getComment()!=null)
 	    {
 		EOPData.setComment(operation.getComment());
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Comment>" + operation.getComment() + "</Comment>"); 
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Comment>" + operation.getComment() + "</Comment>");
 	    }
-	
+
 	// Register EOP to the correct machine
-	String machineName = manufacturingCell.getName().substring(manufacturingCell.getName().length()-3, manufacturingCell.getName().length()) + operation.getMachine(); 
+	final String machineName = manufacturingCell.getName().substring(manufacturingCell.getName().length()-3, manufacturingCell.getName().length()) + operation.getMachine();
 	// (The EOP has shorter names not containing the last of the cell name)
-	
+
 	if (manufacturingCell.getMachine(machineName)==null)
 	    {
 		System.err.println("The machine " + machineName + " was not found!");
 		return;
 	    }
 	manufacturingCell.getMachine(machineName).registerEOP(EOPData);
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Machine>" + operation.getMachine() + "</Machine>"); 
-	
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Machine>" + operation.getMachine() + "</Machine>");
+
 	// EOP
-	EOP EOP = operation.getEOP();
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<EOP>"); 
+	final EOP EOP = operation.getEOP();
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<EOP>");
 	nbrOfBlanks++;
 
 
@@ -270,31 +269,31 @@ public class ControlSystemDataBuilder
 	// to the ones used in the initial state and the action.
 
 	// InternalComponents
-	InternalComponents internalComponents = EOP.getInternalComponents();
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<InternalComponents>"); 
+	final InternalComponents internalComponents = EOP.getInternalComponents();
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<InternalComponents>");
 	nbrOfBlanks++;
-	for (Iterator<String> actuatorIter = internalComponents.getActuator().iterator(); actuatorIter.hasNext();)
+	for (final Iterator<String> actuatorIter = internalComponents.getActuator().iterator(); actuatorIter.hasNext();)
 	    {
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + (String) actuatorIter.next() + "</Actuator>"); 
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + actuatorIter.next() + "</Actuator>");
 	    }
-	for (Iterator<String> sensorIter = internalComponents.getSensor().iterator(); sensorIter.hasNext();)
+	for (final Iterator<String> sensorIter = internalComponents.getSensor().iterator(); sensorIter.hasNext();)
 	    {
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + (String) sensorIter.next() + "</Sensor>"); 
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + sensorIter.next() + "</Sensor>");
 	    }
-	for (Iterator<String> variableIter = internalComponents.getVariable().iterator(); variableIter.hasNext();)
+	for (final Iterator<String> variableIter = internalComponents.getVariable().iterator(); variableIter.hasNext();)
 	    {
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + (String) variableIter.next() + "</Variable>"); 
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + variableIter.next() + "</Variable>");
 	    }
 	nbrOfBlanks--;
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "</InternalComponents>"); 
-	
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "</InternalComponents>");
+
 	// ExternalComponents
-	ExternalComponents externalComponents = EOP.getExternalComponents();
+	final ExternalComponents externalComponents = EOP.getExternalComponents();
 	if (externalComponents != null)
 	{
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponents>"); 
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponents>");
 	    nbrOfBlanks++;
-	    for (Iterator<?> variableIter = externalComponents.getExternalComponent().iterator(); variableIter.hasNext();)
+	    for (final Iterator<?> variableIter = externalComponents.getExternalComponent().iterator(); variableIter.hasNext();)
 	    {
 	    	variableIter.next();
 		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponent>");
@@ -305,107 +304,111 @@ public class ControlSystemDataBuilder
 		//System.out.println(blanks.substring(0,nbrOfBlanks) + "</ExternalComponent>");
 	    }
 	    nbrOfBlanks--;
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</ExternalComponents>"); 
-	}	
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</ExternalComponents>");
+	}
 
 	// Zones
-	org.supremica.manufacturingTables.xsd.eop.Zones zones = EOP.getZones();
+	final org.supremica.manufacturingTables.xsd.eop.Zones zones = EOP.getZones();
 	if (zones != null)
 	{
-	    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zones>"); 
+	    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zones>");
 	    nbrOfBlanks++;
-	    for (Iterator<String> zoneIter = zones.getZone().iterator(); zoneIter.hasNext();)
+	    for (final Iterator<String> zoneIter = zones.getZone().iterator(); zoneIter.hasNext();)
 	    {
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zone>" + (String) zoneIter.next() + "</Zone>"); 
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zone>" + zoneIter.next() + "</Zone>");
 	    }
 	    nbrOfBlanks--;
-	    System.out.println(blanks.substring(0,nbrOfBlanks) + "</Zones>"); 
+	    System.out.println(blanks.substring(0,nbrOfBlanks) + "</Zones>");
 	}
-	
+
 	// InitialState
-	InitialState initialState = EOP.getInitialState();
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<InitialState>"); 
+	final InitialState initialState = EOP.getInitialState();
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<InitialState>");
 	nbrOfBlanks++;
-	
+
 	// Create and set InitialRow
-	EOPInitialRowData initialRow = new EOPInitialRowData(); 
+	final EOPInitialRowData initialRow = new EOPInitialRowData();
 	EOPData.setEOPInitialRow(initialRow);
-	
+
 	//   ActuatorValue
-	for (Iterator<ActuatorValue> actuatorIter = initialState.getActuatorValue().iterator(); actuatorIter.hasNext();)
+	for (final Iterator<ActuatorValue> actuatorIter = initialState.getActuatorValue().iterator(); actuatorIter.hasNext();)
 	{
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ActuatorValue>"); 
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ActuatorValue>");
 	    nbrOfBlanks++;
-	    ActuatorValue actuatorValue = (ActuatorValue) actuatorIter.next();
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + actuatorValue.getActuator() + "</Actuator>"); 
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + actuatorValue.getValue() + "</Value>"); 
+	    final ActuatorValue actuatorValue = actuatorIter.next();
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + actuatorValue.getActuator() + "</Actuator>");
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + actuatorValue.getValue() + "</Value>");
 	    nbrOfBlanks--;
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</ActuatorValue>"); 
-	    
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</ActuatorValue>");
+
 	    // Add actuatorToState
 	    //String actuatorName = machineName.substring( machineName.length()-3, machineName.length() ) + actuatorValue.getActuator();
-	    String actuatorName = operation.getMachine() + actuatorValue.getActuator();
+	    final String actuatorName = operation.getMachine() + actuatorValue.getActuator();
 	    // (The EOP has shorter actuator names not containing the machine name)
 	    initialRow.addActuatorToState(actuatorName, actuatorValue.getValue());
 	}
-	
+
 	//   SensorValue
-	for (Iterator<SensorValue> sensorIter = initialState.getSensorValue().iterator(); sensorIter.hasNext();)
+	for (final Iterator<SensorValue> sensorIter = initialState.getSensorValue().iterator(); sensorIter.hasNext();)
 	{
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<SensorValue>"); 
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<SensorValue>");
 	    nbrOfBlanks++;
-	    SensorValue sensorValue = (SensorValue) sensorIter.next();
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + sensorValue.getSensor() + "</Sensor>"); 
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + sensorValue.getValue() + "</Value>"); 
+	    final SensorValue sensorValue = sensorIter.next();
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + sensorValue.getSensor() + "</Sensor>");
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + sensorValue.getValue() + "</Value>");
 	    nbrOfBlanks--;
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</SensorValue>"); 
-	    
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</SensorValue>");
+
 	    // Add sensorToState
-	    String sensorName = operation.getMachine() + sensorValue.getSensor(); 
+	    final String sensorName = operation.getMachine() + sensorValue.getSensor();
 	    // (The EOP has shorter sensor names not containing the last of the machine name)
 	    initialRow.addSensorToState(sensorName, sensorValue.getValue());
 	}
 
 	//   VariableValue
-	for (Iterator variableIter = initialState.getVariableValue().iterator(); variableIter.hasNext();)
+	for (final Iterator<VariableValue> variableIter =
+	     initialState.getVariableValue().iterator(); variableIter.hasNext();)
 	{
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<VariableValue>"); 
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<VariableValue>");
 	    nbrOfBlanks++;
-	    VariableValue variableValue = (VariableValue) variableIter.next();
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + variableValue.getVariable() + "</Variable>"); 
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + variableValue.getValue() + "</Value>"); 
+	    final VariableValue variableValue = variableIter.next();
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + variableValue.getVariable() + "</Variable>");
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + variableValue.getValue() + "</Value>");
 	    nbrOfBlanks--;
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</VariableValue>"); 
-	    
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</VariableValue>");
+
 	    // Add variableToValue
-	    String variableName = operation.getMachine() + variableValue.getVariable();
+	    final String variableName = operation.getMachine() + variableValue.getVariable();
 
 	    // (The EOP has shorter variable names not containing the last of the machine name)
 	    initialRow.addVariableToValue(variableName, variableValue.getValue());
 	}
-	
+
 	//   ZoneStates
-	for (Iterator zoneIter = initialState.getZoneState().iterator(); zoneIter.hasNext();)
+	for (final Iterator<ZoneState> zoneIter = initialState.getZoneState().iterator();
+	     zoneIter.hasNext();)
 	    {
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<ZoneState>"); 
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<ZoneState>");
 		nbrOfBlanks++;
-		ZoneState zoneState = (ZoneState) zoneIter.next();
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zone>" + zoneState.getZone() + "</Zone>"); 
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<State>" + zoneState.getState() + "</State>"); 
+		final ZoneState zoneState = zoneIter.next();
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zone>" + zoneState.getZone() + "</Zone>");
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<State>" + zoneState.getState() + "</State>");
 		nbrOfBlanks--;
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "</ZoneState>"); 
-		
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "</ZoneState>");
+
 		// Add zoneToState
 		initialRow.addZoneToState(zoneState.getZone(), zoneState.getState());
 	    }
-	
+
 	//   ExternalComponentValue
-	for (Iterator externalIter = initialState.getExternalComponentValue().iterator(); externalIter.hasNext();)
+	for (final Iterator<ExternalComponentValue> externalIter =
+	       initialState.getExternalComponentValue().iterator();
+	     externalIter.hasNext();)
 	{
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponentValue>"); 
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponentValue>");
 	    nbrOfBlanks++;
-	    ExternalComponentValue externalComponentValue = (ExternalComponentValue) externalIter.next();
-	    ExternalComponent externalComponent = externalComponentValue.getExternalComponent();
+	    final ExternalComponentValue externalComponentValue = externalIter.next();
+	    final ExternalComponent externalComponent = externalComponentValue.getExternalComponent();
 
 	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponent>");
 	    nbrOfBlanks++;
@@ -414,146 +417,146 @@ public class ControlSystemDataBuilder
 	    nbrOfBlanks--;
 	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</ExternalComponent>");
 
-	    String extMachineName = manufacturingCell.getName().substring(manufacturingCell.getName().length()-3, manufacturingCell.getName().length()) + externalComponent.getMachine(); 
+	    final String extMachineName = manufacturingCell.getName().substring(manufacturingCell.getName().length()-3, manufacturingCell.getName().length()) + externalComponent.getMachine();
 	// (The EOP has shorter names not containing the last of the cell name)
-	    EOPExternalComponentData externalComponentData= new EOPExternalComponentData(externalComponent.getComponent(), extMachineName);
+	    final EOPExternalComponentData externalComponentData= new EOPExternalComponentData(externalComponent.getComponent(), extMachineName);
 
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + externalComponentValue.getValue() + "</Value>"); 
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + externalComponentValue.getValue() + "</Value>");
 	    nbrOfBlanks--;
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</ExternalComponentValue>"); 
-	    
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</ExternalComponentValue>");
+
 	    // Add ExternalComponentToState
 	    initialRow.addExternalComponentToState(externalComponentData, externalComponentValue.getValue());
 	}
-	
+
 	//   InitialStateCheck
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<InitialStateCheck>"); 
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<InitialStateCheck>");
 	nbrOfBlanks++;
-	InitialStateCheck initialStateCheck = initialState.getInitialStateCheck();
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<AlarmType>" + initialStateCheck.getAlarmType() + "</AlarmType>"); 
-	
+	final InitialStateCheck initialStateCheck = initialState.getInitialStateCheck();
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<AlarmType>" + initialStateCheck.getAlarmType() + "</AlarmType>");
+
 	// Set AlarmType
 	initialRow.setAlarmType(initialStateCheck.getAlarmType());
 
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<AlarmDelay>" + initialStateCheck.getAlarmDelay() + "</AlarmDelay>"); 
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<AlarmDelay>" + initialStateCheck.getAlarmDelay() + "</AlarmDelay>");
 
 	// Set AlarmDelay
 	initialRow.setAlarmDelay(initialStateCheck.getAlarmDelay());
 
 	nbrOfBlanks--;
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "</InitialStateCheck>"); 
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "</InitialStateCheck>");
 
 	nbrOfBlanks--;
-	System.out.println(blanks.substring(0,nbrOfBlanks) + "</InitialState>"); 
+	System.out.println(blanks.substring(0,nbrOfBlanks) + "</InitialState>");
 
 
  	// Actions
- 	for (Iterator actionIter = EOP.getAction().iterator(); actionIter.hasNext();)
+ 	for (final Iterator<Action> actionIter = EOP.getAction().iterator(); actionIter.hasNext();)
 	{
-	    Action action = (Action) actionIter.next();
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Action actionNbr=\"" + action.getActionNbr().intValue() + "\">"); 
+	    final Action action = actionIter.next();
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<Action actionNbr=\"" + action.getActionNbr().intValue() + "\">");
 	    nbrOfBlanks++;
-	    
+
 	    // Create and add ActionRow
-	    EOPActionRowData actionRow = new EOPActionRowData(); 
+	    final EOPActionRowData actionRow = new EOPActionRowData();
 	    EOPData.addEOPActionRow(actionRow);
-	    
+
 	    //   ActuatorValue
-	    for (Iterator actuatorIter = action.getActuatorValue().iterator(); actuatorIter.hasNext();)
+	    for (final Iterator<ActuatorValue> actuatorIter = action.getActuatorValue().iterator(); actuatorIter.hasNext();)
 	    {
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<ActuatorValue>"); 
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<ActuatorValue>");
 		nbrOfBlanks++;
-		ActuatorValue actuatorValue = (ActuatorValue) actuatorIter.next();
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + actuatorValue.getActuator() + "</Actuator>"); 
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + actuatorValue.getValue() + "</Value>"); 
+		final ActuatorValue actuatorValue = actuatorIter.next();
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + actuatorValue.getActuator() + "</Actuator>");
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + actuatorValue.getValue() + "</Value>");
 		nbrOfBlanks--;
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "</ActuatorValue>"); 
-		
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "</ActuatorValue>");
+
 		// Add actuatorToState
-		String actuatorName = operation.getMachine() + actuatorValue.getActuator(); 
+		final String actuatorName = operation.getMachine() + actuatorValue.getActuator();
 		// (The EOP has shorter actuator names not containing the last of the machine name)
 		actionRow.addActuatorToState(actuatorName, actuatorValue.getValue());
 	    }
-	    
+
 	    //   SensorValue
-	    for (Iterator sensorIter = action.getSensorValue().iterator(); sensorIter.hasNext();)
+	    for (final Iterator<SensorValue> sensorIter = action.getSensorValue().iterator(); sensorIter.hasNext();)
 	    {
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<SensorValue>"); 
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<SensorValue>");
 		nbrOfBlanks++;
-		SensorValue sensorValue = (SensorValue) sensorIter.next();
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + sensorValue.getSensor() + "</Sensor>"); 
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + sensorValue.getValue() + "</Value>"); 
+		final SensorValue sensorValue = sensorIter.next();
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + sensorValue.getSensor() + "</Sensor>");
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + sensorValue.getValue() + "</Value>");
 		nbrOfBlanks--;
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "</SensorValue>"); 
-		
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "</SensorValue>");
+
 		// Add sensorToState
-		String sensorName = operation.getMachine() + sensorValue.getSensor(); 
+		final String sensorName = operation.getMachine() + sensorValue.getSensor();
 		// (The EOP has shorter sensor names not containing the last of the machine name)
 		actionRow.addSensorToState(sensorName, sensorValue.getValue());
 	    }
 
 	    //   VariableValue
-	    for (Iterator variableIter = action.getVariableValue().iterator(); variableIter.hasNext();)
+	    for (final Iterator<VariableValue> variableIter = action.getVariableValue().iterator(); variableIter.hasNext();)
 	    {
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<VariableValue>"); 
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<VariableValue>");
 		nbrOfBlanks++;
-		VariableValue variableValue = (VariableValue) variableIter.next();
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + variableValue.getVariable() + "</Variable>"); 
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + variableValue.getValue() + "</Value>"); 
+		final VariableValue variableValue = variableIter.next();
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + variableValue.getVariable() + "</Variable>");
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + variableValue.getValue() + "</Value>");
 		nbrOfBlanks--;
-		//System.out.println(blanks.substring(0,nbrOfBlanks) + "</VariableValue>"); 
-		
+		//System.out.println(blanks.substring(0,nbrOfBlanks) + "</VariableValue>");
+
 		// Add variableToValue
-		String variableName = operation.getMachine() + variableValue.getVariable(); 
+		final String variableName = operation.getMachine() + variableValue.getVariable();
 		// (The EOP has shorter variable names not containing the last of the machine name)
 		actionRow.addVariableToValue(variableName, variableValue.getValue());
 	    }
-	    
+
 	    //   ZoneStates
-	    for (Iterator zoneIter = action.getZoneState().iterator(); zoneIter.hasNext();)
+	    for (final Iterator<ZoneState> zoneIter = action.getZoneState().iterator(); zoneIter.hasNext();)
 	    {
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<ZoneState>"); 
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<ZoneState>");
 		nbrOfBlanks++;
-		ZoneState zoneState = (ZoneState) zoneIter.next();
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zone>" + zoneState.getZone() + "</Zone>"); 
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<State>" + zoneState.getState() + "</State>"); 
+		final ZoneState zoneState = zoneIter.next();
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zone>" + zoneState.getZone() + "</Zone>");
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<State>" + zoneState.getState() + "</State>");
 		nbrOfBlanks--;
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "</ZoneState>"); 
-		
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "</ZoneState>");
+
 		// Add zoneToState
 		actionRow.addZoneToState(zoneState.getZone(), zoneState.getState());
 	    }
-	    
-// 	    // Add bookingZones and unbookingZones in private method. 
+
+// 	    // Add bookingZones and unbookingZones in private method.
 // 	    if ( !parseZoneString( action.getZones(), actionRow ) )
 // 	    {
 // 		return;
 // 	    }
-	    
+
 	    nbrOfBlanks--;
-	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</Action>"); 
+	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "</Action>");
 	}
-	
+
 	nbrOfBlanks--;
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "</EOP>"); 
-	
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "</EOP>");
+
 	nbrOfBlanks--;
-	//System.out.println(blanks.substring(0,nbrOfBlanks) + "</Operation>"); 
+	//System.out.println(blanks.substring(0,nbrOfBlanks) + "</Operation>");
     }
-    
+
 //     private boolean parseZoneString( String zoneString, EOPActionRowData actionRow)
-//     { 
-// 	// Add bookingZones and unbookingZones. 
+//     {
+// 	// Add bookingZones and unbookingZones.
 // 	boolean bookingZones = false;
 // 	boolean unbookingZones = false;
-// 	char previousChar = END_EXPR_TOKEN; 
+// 	char previousChar = END_EXPR_TOKEN;
 // 	// I allways check that the current character is the expected compared to the previous.
-// 	// It is OK with a new booking or unbooking substring after the previuos one has 
+// 	// It is OK with a new booking or unbooking substring after the previuos one has
 // 	// ended (ends with an END_EXPR_TOKEN).
-	
+
 // 	// A zone string typically looks like "u(1,2,20)" or "b(5,12)". It is OK with
 // 	// string like  "u(1,20)b(5,12)" and whitespaces between digits and tokens
-// 	// are also OK, but ignored. 
+// 	// are also OK, but ignored.
 // 	for (int i = 0; i < zoneString.length(); i++)
 // 	    {
 // 		// no booking or unbooking
@@ -561,7 +564,7 @@ public class ControlSystemDataBuilder
 // 		    {
 // 			break;
 // 		    }
-		
+
 // 		// booking zones
 // 		else if ( zoneString.charAt(i) == BOOKING_TOKEN && previousChar == END_EXPR_TOKEN )
 // 		    {
@@ -572,29 +575,29 @@ public class ControlSystemDataBuilder
 // 		    {
 // 			unbookingZones = true;
 // 		    }
-		
+
 // 		// start (sub)expression
-// 		else if ( zoneString.charAt(i) == START_EXPR_TOKEN && ( previousChar == UNBOOKING_TOKEN 
+// 		else if ( zoneString.charAt(i) == START_EXPR_TOKEN && ( previousChar == UNBOOKING_TOKEN
 // 									   || previousChar == BOOKING_TOKEN ) )
 // 		    {
 // 			// This is OK as expected but nothing happens
-// 		    }			
+// 		    }
 // 		// end (sub)expression
 // 		else if ( zoneString.charAt(i)  == END_EXPR_TOKEN && Character.isDigit(previousChar) )
 // 		    {
 // 			unbookingZones = false;
 // 			bookingZones = false;
-// 		    }		
+// 		    }
 // 		// delimiter
 // 		else if ( zoneString.charAt(i) == DELIMIT_TOKEN && Character.isDigit(previousChar) )
 // 		    {
 // 			// This is OK as expected but nothing happens
-// 		    }	
+// 		    }
 // 		// A number with one or more digits
-// 		else if ( Character.isDigit( zoneString.charAt(i) ) && ( previousChar == DELIMIT_TOKEN 
+// 		else if ( Character.isDigit( zoneString.charAt(i) ) && ( previousChar == DELIMIT_TOKEN
 // 									 || previousChar == START_EXPR_TOKEN ) )
 // 		{
-// 		    String number = zoneString.substring(i, i+1); 
+// 		    String number = zoneString.substring(i, i+1);
 // 		    while ( i < zoneString.length()-1 && Character.isDigit( zoneString.charAt(i+1) ) )
 // 		    {
 // 			i++;
@@ -616,7 +619,7 @@ public class ControlSystemDataBuilder
 // 			return false;
 // 		    }
 // 		}
-// 		// Blank 
+// 		// Blank
 // 		else if ( zoneString.charAt(i) == BLANK_TOKEN )
 // 		{
 // 		    // Shall not make this the previous character since it is not important
@@ -631,8 +634,8 @@ public class ControlSystemDataBuilder
 // 	    }
 // 	return true;
 //     }
-    
-	public void buildPLCData(Factory factory)
+
+	public void buildPLCData(final Factory factory)
     {
 
 	// Variable to keep track of the indentation, just for now for printing the XML code
@@ -649,19 +652,19 @@ public class ControlSystemDataBuilder
 
 	// Areas
 	nbrOfBlanks++;
-	Areas areas = factory.getAreas();
+	final Areas areas = factory.getAreas();
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "<Areas>");
 
 	// Nbr of Areas
-	List areaList = areas.getArea();
+	final List<Area> areaList = areas.getArea();
 	nbrOfBlanks++;
 
 	// For now the controlprogram is for just one cell and I assume that the Factory only
 	// contains one cell
 
-	for (Iterator areaIter = areaList.iterator();areaIter.hasNext();)
+	for (final Iterator<Area> areaIter = areaList.iterator();areaIter.hasNext();)
 	    {
-		Area currentArea = (Area) areaIter.next();
+		final Area currentArea = areaIter.next();
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Area name=\"" + currentArea.getName() + "\">");
 		if(currentArea.getDescription()!=null)
 		    {
@@ -669,21 +672,21 @@ public class ControlSystemDataBuilder
 		    }
 		// Cells
 		nbrOfBlanks++;
-		Cells cells = currentArea.getCells();
+		final Cells cells = currentArea.getCells();
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Cells>");
 
 		// Nbr of Cells
-		List cellList = cells.getCell();
+		final List<Cell> cellList = cells.getCell();
 		nbrOfBlanks++;
 
-		for (Iterator cellIter = cellList.iterator();cellIter.hasNext();)
+		for (final Iterator<Cell> cellIter = cellList.iterator();cellIter.hasNext();)
 		    {
-			Cell currentCell = (Cell) cellIter.next();
+			final Cell currentCell = cellIter.next();
 			System.out.println(blanks.substring(0,nbrOfBlanks) + "<Cell name=\"" + currentCell.getName() + "\">");
 			nbrOfBlanks++;
 
 			//Creating the ManufacturingCell
-			manufacturingCell = new ManufacturingCell( currentCell.getName(), new Coordinator(), 
+			manufacturingCell = new ManufacturingCell( currentCell.getName(), new Coordinator(),
 								  new Mailbox() );
 
 
@@ -693,15 +696,15 @@ public class ControlSystemDataBuilder
 			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + currentCell.getDescription() + "</Description>");
 			    manufacturingCell.setDescription(currentCell.getDescription());
 			}
-			
+
 			// Zones
 			if (currentCell.getZones()!=null)
 			{
 			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zones>");
 			    nbrOfBlanks++;
-			    for (Iterator zoneIter = currentCell.getZones().getZone().iterator(); zoneIter.hasNext();)
+			    for (final Iterator<String> zoneIter = currentCell.getZones().getZone().iterator(); zoneIter.hasNext();)
 			    {
-				String zone = (String) zoneIter.next();
+				final String zone = zoneIter.next();
 				System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zone>" + zone + "</Zone>");
 				manufacturingCell.addZone(new ZoneData(zone));
 			    }
@@ -728,14 +731,14 @@ public class ControlSystemDataBuilder
 
     }
 
-    private void buildMachines(Machines machines, ManufacturingCell manufacturingCell)
+    private void buildMachines(final Machines machines, final ManufacturingCell manufacturingCell)
     {
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "<Machines>");
 
 	// Nbr of Machines
-	List machineList = machines.getMachine();
+	final List<Machine> machineList = machines.getMachine();
 	nbrOfBlanks++;
-	for (Iterator machineIter = machineList.iterator();machineIter.hasNext();)
+	for (final Iterator<Machine> machineIter = machineList.iterator();machineIter.hasNext();)
 	    {
 		buildMachine((org.supremica.manufacturingTables.xsd.factory.Machine) machineIter.next(), manufacturingCell);
 	    }
@@ -743,14 +746,14 @@ public class ControlSystemDataBuilder
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "</Machines>");
     }
 
-    private void buildMachine(org.supremica.manufacturingTables.xsd.factory.Machine machine, ManufacturingCell manufacturingCell)
+    private void buildMachine(final org.supremica.manufacturingTables.xsd.factory.Machine machine, final ManufacturingCell manufacturingCell)
     {
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "<Machine machineType=\"" + machine.getType() + "\" " + "name=\"" + machine.getName() + "\" ownControlSystem=\"" + machine.getOwnControlSystem() + "\">");
 	nbrOfBlanks++;
 
 	// Create Machine, MachineController and Mailbox and add the Machine to the cell
-	MachineController machineController = new MachineController();
-	Mailbox mailbox = new Mailbox();
+	final MachineController machineController = new MachineController();
+	final Mailbox mailbox = new Mailbox();
 	// Check if the machine has own control system or not
 	boolean ownControlSystem = false;
 	if ( machine.getOwnControlSystem().value().equals("Yes") )
@@ -765,10 +768,10 @@ public class ControlSystemDataBuilder
 	{
 	    System.err.println("You must state whether the machine has own control system or not!");
 	}
-	
 
-	MachineData machineData = new MachineData(machine.getName(), machine.getType().value(), machineController, mailbox, ownControlSystem); 
-	
+
+	final MachineData machineData = new MachineData(machine.getName(), machine.getType().value(), machineController, mailbox, ownControlSystem);
+
 	manufacturingCell.addMachine(machineData);
 
 	// Description
@@ -783,55 +786,54 @@ public class ControlSystemDataBuilder
 	    {
 		buildVariables(machine.getVariables(), machineData);
 	    }
-	
+
 	// Equipment
 	if (machine.getEquipment()!=null)
 	    {
 		buildEquipment(machine.getEquipment(), machineData);
 	    }
-	
+
 	nbrOfBlanks--;
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "</Machine>");
     }
 
-    private void buildVariables(Variables variables, MachineData machineData)
+    private void buildVariables(final Variables variables, final MachineData machineData)
     {
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variables>");
-	
-	// Nbr of Variables
-	List variableList = variables.getVariable();
-	nbrOfBlanks++;
-	for (Iterator variableIter = variableList.iterator(); variableIter.hasNext(); )
-	    {
-		org.supremica.manufacturingTables.xsd.factory.Variable variable = (org.supremica.manufacturingTables.xsd.factory.Variable) variableIter.next();
 
-		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable name=\"" + variable.getName() + "\">");		
-		VariableData variableData = new VariableData(variable.getName());
-		
-		Values values = variable.getValues();
+	// Nbr of Variables
+	final List<Variable> variableList = variables.getVariable();
+	nbrOfBlanks++;
+	for (final Iterator<Variable> variableIter = variableList.iterator(); variableIter.hasNext(); )
+    {
+		final Variable variable = variableIter.next();
+		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable name=\"" + variable.getName() + "\">");
+		final VariableData variableData = new VariableData(variable.getName());
+
+		final Values values = variable.getValues();
 		nbrOfBlanks++;
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Values>");
-		
+
 		// Nbr of Values
-		List valueList = values.getValue();
+		final List<String> valueList = values.getValue();
 		nbrOfBlanks++;
-		for (Iterator valueIter = valueList.iterator(); valueIter.hasNext(); )
+		for (final Iterator<String> valueIter = valueList.iterator(); valueIter.hasNext(); )
 		    {
 			// Since there is a class Value this XML simpletype should be represented by a Value object,
 			// but it is a String.
 			// In JABX version 2.0 there will be an opportunity to set mapSimpleTypeDef="true" and that will
 			// hopefully sort this out
 			//Value value = (Value) valueIter.next();
-			String value = (String) valueIter.next();
-			
+			final String value = valueIter.next();
+
 			//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + value.getValue() + "</Value>");
 			System.out.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + value + "</Value>");
-			
+
 			variableData.addValue(value);
 		    }
 		nbrOfBlanks--;
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "</Values>");
-		
+
 		machineData.addVariable(variableData);
 		// Initial value
 		variableData.setInitialValue(variable.getInitialValue());
@@ -845,30 +847,30 @@ public class ControlSystemDataBuilder
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "</Variables>");
     }
 
-    // The EquipmentContainer (interface) upperLevelEquipment could be either a machine 
+    // The EquipmentContainer (interface) upperLevelEquipment could be either a machine
     // (org.supremica.manufacturingTables.controlsystemdata.Machine)
-    // or an Actuator and the current Equipment should be added to the corresponding 
+    // or an Actuator and the current Equipment should be added to the corresponding
     // upperLevelEquipment Equipment or Machine.
-    private void buildEquipment(org.supremica.manufacturingTables.xsd.factory.Equipment equip, EquipmentContainer upperLevelEquipment)
+    private void buildEquipment(final org.supremica.manufacturingTables.xsd.factory.Equipment equip, final EquipmentContainer upperLevelEquipment)
     {
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "<Equipment>");
 
 	// Nbr of EquipmentEntities
-	List equipList = equip.getEquipmentEntity();
+	final List<EquipmentEntity> equipList = equip.getEquipmentEntity();
 	nbrOfBlanks++;
-	for (Iterator equipIter = equipList.iterator();equipIter.hasNext();)
+	for (final Iterator<EquipmentEntity> equipIter = equipList.iterator();equipIter.hasNext();)
 	    {
-		EquipmentEntity currentEquip = (EquipmentEntity) equipIter.next();
+		final EquipmentEntity currentEquip = equipIter.next();
 		buildEquipmentEntity(currentEquip, upperLevelEquipment);
 	    }
 	nbrOfBlanks--;
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "</Equipment>");
     }
-    
-    // The EquipmentContainer upperLevelEquipment could be either a machine 
+
+    // The EquipmentContainer upperLevelEquipment could be either a machine
     // (org.supremica.manufacturingTables.controlsystemdata.Machine)
     // or an Actuator and the current Equipment should be added to the corresponding Equipment or Machine.
-    private void buildEquipmentEntity(EquipmentEntity equipEnt, EquipmentContainer upperLevelEquipment)
+    private void buildEquipmentEntity(final EquipmentEntity equipEnt, final EquipmentContainer upperLevelEquipment)
     {
 	org.supremica.manufacturingTables.controlsystemdata.Equipment equipment = null;
 	// Sensors and Actuators are separated.
@@ -877,7 +879,7 @@ public class ControlSystemDataBuilder
 		equipment = new org.supremica.manufacturingTables.controlsystemdata.Sensor(equipEnt.getName());
 		upperLevelEquipment.addSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) equipment);
 	    }
-	
+
 	else if (equipEnt.getType().value().equals("Actuator"))
 	    {
 		equipment = new org.supremica.manufacturingTables.controlsystemdata.Actuator(equipEnt.getName());
@@ -888,81 +890,81 @@ public class ControlSystemDataBuilder
 		System.err.println("The EquipmentEntity is neither a sensor nor an actuator!!!!");
 		return;
 	    }
-	
+
 	// The following should be performed fore both sensors and actuators
-	
+
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "<EquipmentEntity equipmentType=\"" + equipEnt.getType() + "\" " + "name=\"" + equipEnt.getName() + "\">");
 	nbrOfBlanks++;
-	
-	
+
+
 	// Description
 	if (equipEnt.getDescription()!=null)
 	    {
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + equipEnt.getDescription() + "</Description>");
 		equipment.setDescription(equipEnt.getDescription());
-		
+
 	    }
-	
-	
+
+
 	// States
-	States states = equipEnt.getStates();
+	final States states = equipEnt.getStates();
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "<States>");
 	// Nbr of States
-	List stateList = states.getState();
+	final List<String> stateList = states.getState();
 	nbrOfBlanks++;
-	for (Iterator stateIter = stateList.iterator();stateIter.hasNext();)
+	for (final Iterator<String> stateIter = stateList.iterator();stateIter.hasNext();)
 	    {
 		// Since there is a class State this XML simpletype should be represented by a State object,
 		// but it is a String, as for the Value above.
 		//State currentState = (State) stateIter.next();
-		String currentState = (String) stateIter.next();
+		final String currentState = stateIter.next();
 		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<State>" + currentState.getValue() + "</State>");
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<State>" + currentState + "</State>");
-		
+
 		equipment.addState(currentState);
 	    }
 	nbrOfBlanks--;
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "</States>");
-	
-	// Elements (Optional for an actuator, a sensor must have elements or lower level sensors. This is 
+
+	// Elements (Optional for an actuator, a sensor must have elements or lower level sensors. This is
 	// however not checked here.)
 	if (equipEnt.getElements()!=null)
 	    {
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Elements>");
-		
+
 		// Nbr of Elements
-		// It may be hard to imagine an EquipmentEntity having more than one Elements 
+		// It may be hard to imagine an EquipmentEntity having more than one Elements
 		// but for now I divide it this way.
-		List elementList = equipEnt.getElements().getElement();
+		final List<Element> elementList = equipEnt.getElements().getElement();
 		nbrOfBlanks++;
-		for (Iterator elementIter = elementList.iterator();elementIter.hasNext();)
+		for (final Iterator<Element> elementIter = elementList.iterator();elementIter.hasNext();)
 		    {
-			org.supremica.manufacturingTables.xsd.factory.Element currentElement = (org.supremica.manufacturingTables.xsd.factory.Element) elementIter.next();
+			final Element currentElement = elementIter.next();
 			printElement(currentElement);
 			equipment.addHardwareConnection(currentElement.getName());
 		    }
 		nbrOfBlanks--;
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "</Elements>");
 	    }
-	
-	// Lower level Equipment, could be possible even for sensors consisting of sensors, but not 
+
+	// Lower level Equipment, could be possible even for sensors consisting of sensors, but not
 	// sensors consisting of actuators. This is however not checked here.
 	if (equipEnt.getEquipment()!=null)
 	    {
 		buildEquipment(equipEnt.getEquipment(), equipment);
 	    }
-	
+
 	nbrOfBlanks--;
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "</EquipmentEntity>");
     }
-    
-    
-    // For printing the element data. 
-    private void printElement(org.supremica.manufacturingTables.xsd.factory.Element element)
+
+
+    // For printing the element data.
+    private void printElement(final org.supremica.manufacturingTables.xsd.factory.Element element)
     {
 	System.out.println(blanks.substring(0,nbrOfBlanks) + "<Element name=\"" + element.getName() + "\">");
 	nbrOfBlanks++;
-	
+
 	// Description, this is not added to the ControlSystemData
 	if (element.getDescription()!=null)
 	    {

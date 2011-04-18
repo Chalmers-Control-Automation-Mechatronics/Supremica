@@ -28,8 +28,7 @@ public class QMCControladorTablaTerminos extends MouseAdapter {
     QMCFuncion funcion;
     QMCBinarioBean termino, terminoListaOrdenada;
     JTable tablaTerminos;
-    @SuppressWarnings("unchecked")
-    ArrayList listaTerminos, listaTerminosOrdenados;
+    ArrayList<?> listaTerminos, listaTerminosOrdenados;
     int contador, fila, columna;
     String tipoTermino;
     boolean check;
