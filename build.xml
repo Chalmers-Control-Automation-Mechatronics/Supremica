@@ -774,6 +774,7 @@ Class-Path: ${manifest.pathlist}</echo>
                     <exclude name="**/TestPackage*.java"/>
                     <exclude name="**/Abstract*.java"/>
                     <exclude name="**/Native*.java"/>
+                    <exclude name="**/Large*Test.java"/>
                     <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
