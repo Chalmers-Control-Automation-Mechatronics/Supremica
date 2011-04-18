@@ -154,7 +154,7 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
     public boolean equals(final Object partner)
     {
       if (partner instanceof ProxyAccessorHashMap<?,?>.Accessor<?>) {
-        final Accessor<?> accessor = (Accessor<?>) partner;
+        final Accessor<PP> accessor = (Accessor<PP>) partner;
         return mEquality.equals(mProxy, accessor.mProxy);
       } else {
         return false;

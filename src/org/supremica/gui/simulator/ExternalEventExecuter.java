@@ -30,13 +30,16 @@ class ExternalEventExecuter
 
         public int index;
         public LabeledEvent event;
-        public boolean external, pending;
+        public boolean external;
+        // pending;
     }
     ;
 
     private final Stack<EventWrapper> pending_events;    // what I really need is a queue :)
+    /*
 	@SuppressWarnings("unused")
-  private final Automata theAutomata;
+    private final Automata theAutomata;
+    */
     private final Alphabet theAlphabet;
     private final int events_size;
     private final EventWrapper[] events;    // int --> EventWrapper
@@ -48,7 +51,7 @@ class ExternalEventExecuter
 
         logger.info("Using external exectuer");
 
-        theAutomata = eventModel.getAutomata();
+        //theAutomata = eventModel.getAutomata();
         theAlphabet = eventModel.getAlphabet();
         pending_events = new Stack<EventWrapper>();
         events_size = theAlphabet.size();
@@ -118,8 +121,9 @@ class ExternalEventExecuter
         native_fire(ew.index);
     }
 
+    /*
     @SuppressWarnings("unused")
-  private void from_native_fire(final int index)
+    private void from_native_fire(final int index)
     {
         if ((index >= 0) && (index < events_size))
         {
@@ -138,6 +142,7 @@ class ExternalEventExecuter
             }
         }
     }
+    */
 
     protected synchronized void update_event_queue()
     {
@@ -154,7 +159,7 @@ class ExternalEventExecuter
                     logger.warn("Failed to execute event: " + ew.event.getLabel());
                 }
 
-                ew.pending = false;
+                //ew.pending = false;
 
                 return;
             }

@@ -194,7 +194,7 @@ public class ProxyAccessorHashCollection<P extends Proxy>
     public boolean equals(final Object partner)
     {
       if (partner instanceof ProxyAccessorHashCollection<?>.Accessor<?>) {
-        final Accessor<?> accessor = (Accessor<?>) partner;
+        final Accessor<PP> accessor = (Accessor<PP>) partner;
         return mEquality.equals(mProxy, accessor.mProxy);
       } else {
         return false;

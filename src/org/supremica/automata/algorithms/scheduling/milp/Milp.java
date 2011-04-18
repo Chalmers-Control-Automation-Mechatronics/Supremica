@@ -1293,8 +1293,7 @@ public class Milp
     }
 
     //TO BE DEPRECATED
-	@SuppressWarnings("rawtypes")
-  private void createExternalPrecedenceConstraints(final Automaton currSpec)
+    private void createExternalPrecedenceConstraints(final Automaton currSpec)
     throws Exception
     {
         // Get the name of the specification and replace some characters that the GLPK-solver would not accept
@@ -1368,7 +1367,7 @@ public class Milp
 
         // Partition eventsInfo into allPlantStates. Every super-array of allPlantStates
         // contains info about one plantState and its altPaths
-        final ArrayList<ArrayList> allPPlantStates = new ArrayList<ArrayList>();
+        final ArrayList<ArrayList<int[]>> allPPlantStates = new ArrayList<ArrayList<int[]>>();
         for (final int[] info : precedingEventsInfo)
         {
             if (info.length == 1)
@@ -1380,7 +1379,7 @@ public class Milp
                 allPPlantStates.get(allPPlantStates.size()-1).add(info);
             }
         }
-        final ArrayList<ArrayList> allFPlantStates = new ArrayList<ArrayList>();
+        final ArrayList<ArrayList<int[]>> allFPlantStates = new ArrayList<ArrayList<int[]>>();
         for (final int[] info : followingEventsInfo)
         {
             if (info.length == 1)
@@ -1470,13 +1469,13 @@ public class Milp
         }
 
         // Get every possible (precedence-)event sequence (of maximal length)
-        final ArrayList<ArrayList> allAlternatingPlantStatesInfo = getEveryAlternatingOrdering(allPPlantStates, allFPlantStates);
+        final ArrayList<ArrayList<ArrayList<int[]>>> allAlternatingPlantStatesInfo = getEveryAlternatingOrdering(allPPlantStates, allFPlantStates);
 
         //temp
-        for (final ArrayList<ArrayList> arr : allAlternatingPlantStatesInfo)
+        for (final ArrayList<ArrayList<int[]>> arr : allAlternatingPlantStatesInfo)
         {
             addToMessages("New arr", SchedulingConstants.MESSAGE_TYPE_WARN);
-            for (final ArrayList subarr : arr)
+            for (final ArrayList<int[]> subarr : arr)
             {
                 String str = "";
                 for (final Object subsub : subarr)
@@ -1522,7 +1521,7 @@ public class Milp
             final ArrayList<int[]> checkedPPlantStates = new ArrayList<int[]>();
             final ArrayList<int[]> checkedFPlantStates = new ArrayList<int[]>();
             ArrayList<int[]> currCheckedPlantStates = null;
-            ArrayList<ArrayList> currAllPlantStates = null;
+            ArrayList<ArrayList<int[]>> currAllPlantStates = null;
             for (int i = 0; i < currAlternatingPlantStateInfoArray.size(); i++)
             {
                 // Check if the current event is "preceding" or "following"
@@ -1784,7 +1783,7 @@ public class Milp
             // a constraint, "0 >= alt_paths - M*(x -  f_case) is added. This makes
             // sure that the paths leading to the corresponding plant-state is never
             // reached if this variable ordering (case) is chosen.
-            final ArrayList<ArrayList> allPlantStates = new ArrayList<ArrayList>(allPPlantStates);
+            final ArrayList<ArrayList<int[]>> allPlantStates = new ArrayList<ArrayList<int[]>>(allPPlantStates);
             allPlantStates.addAll(allFPlantStates);
             for (final ArrayList<int[]> unusedPlantStateInfo : allPlantStates)
             {
@@ -3292,17 +3291,18 @@ public class Milp
         return permutations;
     }
 
-    @SuppressWarnings("rawtypes")
-    private void getEveryOrdering(final ArrayList<ArrayList> toOrder,
-            final ArrayList<ArrayList> currOrder, final ArrayList<ArrayList> allOrderings)
+    private void getEveryOrdering
+      (final ArrayList<ArrayList<int[]>> allPPlantStates,
+       final ArrayList<ArrayList<int[]>> newCurrOrder2,
+       final ArrayList<ArrayList<ArrayList<int[]>>> allOrderings)
     {
-        if (toOrder.size() > 1)
+        if (allPPlantStates.size() > 1)
         {
-            for (final Iterator<ArrayList> it = toOrder.iterator(); it.hasNext();)
+            for (final Iterator<ArrayList<int[]>> it = allPPlantStates.iterator(); it.hasNext();)
             {
-                final ArrayList elem = it.next();
-                final ArrayList<ArrayList> newToOrder = new ArrayList<ArrayList>(toOrder);
-                final ArrayList<ArrayList> newCurrOrder = new ArrayList<ArrayList>(currOrder);
+                final ArrayList<int[]> elem = it.next();
+                final ArrayList<ArrayList<int[]>> newToOrder = new ArrayList<ArrayList<int[]>>(allPPlantStates);
+                final ArrayList<ArrayList<int[]>> newCurrOrder = new ArrayList<ArrayList<int[]>>(newCurrOrder2);
                 newToOrder.remove(elem);
                 newCurrOrder.add(elem);
                 getEveryOrdering(newToOrder, newCurrOrder, allOrderings);
@@ -3310,8 +3310,8 @@ public class Milp
         }
         else
         {
-            currOrder.add(toOrder.get(0));
-            allOrderings.add(currOrder);
+            newCurrOrder2.add(allPPlantStates.get(0));
+            allOrderings.add(newCurrOrder2);
         }
     }
 
@@ -3363,42 +3363,45 @@ public class Milp
 //    }
 
     //TODO: DEPRECATED
-    @SuppressWarnings("rawtypes")
-    private ArrayList<ArrayList> getEveryAlternatingOrdering(final ArrayList<ArrayList> toOrder1, final ArrayList<ArrayList> toOrder2)
+    private ArrayList<ArrayList<ArrayList<int[]>>> getEveryAlternatingOrdering
+      (final ArrayList<ArrayList<int[]>> allPPlantStates,
+       final ArrayList<ArrayList<int[]>> allFPlantStates)
     {
         //test
-        for (int i = 0; i < toOrder1.size(); i++)
+        for (int i = 0; i < allPPlantStates.size(); i++)
         {
-            final int[] plantStateInOrder1 = (int[]) toOrder1.get(i).get(0);
-            for (int j = 0; j < toOrder2.size(); j++)
+            final int[] plantStateInOrder1 = (int[]) allPPlantStates.get(i).get(0);
+            for (int j = 0; j < allFPlantStates.size(); j++)
             {
-                final int[] plantStateInOrder2 = (int[]) toOrder2.get(j).get(0);
+                final int[] plantStateInOrder2 = (int[]) allFPlantStates.get(j).get(0);
                 if ((plantStateInOrder1[0] == plantStateInOrder2[0]) && (plantStateInOrder1[1] == plantStateInOrder2[1]))
                 {
-                    final ArrayList<ArrayList> newToOrder1 = new ArrayList<ArrayList>(toOrder1);
-                    final ArrayList<ArrayList> newToOrder2 = new ArrayList<ArrayList>(toOrder2);
+                    final ArrayList<ArrayList<int[]>> newToOrder1 = new ArrayList<ArrayList<int[]>>(allPPlantStates);
+                    final ArrayList<ArrayList<int[]>> newToOrder2 = new ArrayList<ArrayList<int[]>>(allFPlantStates);
                     newToOrder1.remove(i);
                     newToOrder2.remove(j);
 
-                    final ArrayList<ArrayList> combinedAlternativeOrderings = getEveryAlternatingOrdering(toOrder1, newToOrder2);
-                    combinedAlternativeOrderings.addAll(getEveryAlternatingOrdering(newToOrder1, toOrder2));
+                    final ArrayList<ArrayList<ArrayList<int[]>>> combinedAlternativeOrderings = getEveryAlternatingOrdering(allPPlantStates, newToOrder2);
+                    combinedAlternativeOrderings.addAll(getEveryAlternatingOrdering(newToOrder1, allFPlantStates));
                     return combinedAlternativeOrderings;
                 }
             }
         }
 
-        final ArrayList<ArrayList> allOrderings1 = new ArrayList<ArrayList>();
-        final ArrayList<ArrayList> allOrderings2 = new ArrayList<ArrayList>();
-        getEveryOrdering(toOrder1, new ArrayList<ArrayList>(), allOrderings1);
-        getEveryOrdering(toOrder2, new ArrayList<ArrayList>(), allOrderings2);
+        final ArrayList<ArrayList<ArrayList<int[]>>> allOrderings1 = new ArrayList<ArrayList<ArrayList<int[]>>>();
+        final ArrayList<ArrayList<ArrayList<int[]>>> allOrderings2 = new ArrayList<ArrayList<ArrayList<int[]>>>();
+        getEveryOrdering(allPPlantStates, new ArrayList<ArrayList<int[]>>(), allOrderings1);
+        getEveryOrdering(allFPlantStates, new ArrayList<ArrayList<int[]>>(), allOrderings2);
 
-        final ArrayList<ArrayList> allCombinedOrderings = new ArrayList<ArrayList>();
-        for (final ArrayList<ArrayList> i1 : allOrderings1)
+        final ArrayList<ArrayList<ArrayList<int[]>>> allCombinedOrderings =
+          new ArrayList<ArrayList<ArrayList<int[]>>>();
+        for (final ArrayList<ArrayList<int[]>> i1 : allOrderings1)
         {
-            for (final ArrayList<ArrayList> i2 : allOrderings2)
+            for (final ArrayList<ArrayList<int[]>> i2 : allOrderings2)
             {
                 final int commonSize = Math.min(i1.size(), i2.size());
-                final ArrayList<ArrayList> combinedOrdering = new ArrayList<ArrayList>();
+                final ArrayList<ArrayList<int[]>> combinedOrdering =
+                  new ArrayList<ArrayList<int[]>>();
                 for (int i = 0; i < commonSize; i++)
                 {
                     combinedOrdering.add(i1.get(i));
