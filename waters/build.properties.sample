@@ -38,9 +38,9 @@ optimize=off
 #native.ostype = linux-gnu
 
 # For Windows, you need to install MinGW and SED.
-# First download and install MinGW from http://www.mingw.org/.
-# Make sure you include the C++ compiler and GNU Make in your installation.
-# Add the bin/ directory from the MinGW installation to your system path.
+# First download and install MinGW from http://tdm-gcc.tdragon.net/ .
+# Choose an installation type of "MinGW Stable, C/C++",
+# and also be sure to check 'Add to PATH'.
 # Second, download an sed binary from http://sed.sourceforge.net/,
 # for example super sed v3.59 for Windows by Paolo Bonzini.
 # Extract the executable and add it to MinGW's bin/ directory
