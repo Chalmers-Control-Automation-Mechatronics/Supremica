@@ -82,7 +82,7 @@ public class Milp
     /**
      * Contains the info about the nearest path splits above a given state. The
      * indices of the IntArrayTreeSet (this storage format is chosen to avoid
-     * storage of repetetive entries) are [plantsArrayIndex, stateIndex], while the
+     * storage of repetitive entries) are [plantsArrayIndex, stateIndex], while the
      * objects contained in the arrays contain pointers to the
      * [plantIndex, fromStateIndex, toStateIndex]-objects stored in altPathVariablesTree.
      */
@@ -165,11 +165,11 @@ public class Milp
     private String externalConstraints = "";
 
     /**
-     * The constraints preventing circular wait situations du to cross-booking of
+     * The constraints preventing circular wait situations due to cross-booking of
      * zones. A simple example of this is when R_i first books Z_k and then Z_l
-     * (without unboking Z_k), while R_j does the reverse (Z_l -> Z_k),
+     * (without unbooking Z_k), while R_j does the reverse (Z_l -> Z_k),
      * the robot robot ordering should then be the same for Z_k and
-     * Z_l to avoid deadlock. This is taken care of during the optimization, but
+     * Z_l to avoid deadlock. This is taken care of during the optimisation, but
      * with the help of these constraints, the search field is narrowed, which
      * should decrease the running time. Also, approximative solutions are easier
      * to obtains using these constraints.
@@ -194,7 +194,7 @@ public class Milp
 
     /**
      * This value is higher than 1 if the total time risk exceeding the bigM-value.
-     * In that case, each statetime-value is divised by timeThroughBigMApprox.
+     * In that case, each statetime-value is divided by timeThroughBigMApprox.
      */
     private double timeThroughBigMApprox = 1;
 
