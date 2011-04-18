@@ -35,7 +35,8 @@ class ExternalEventExecuter
     ;
 
     private final Stack<EventWrapper> pending_events;    // what I really need is a queue :)
-	private final Automata theAutomata;
+	@SuppressWarnings("unused")
+  private final Automata theAutomata;
     private final Alphabet theAlphabet;
     private final int events_size;
     private final EventWrapper[] events;    // int --> EventWrapper
@@ -117,7 +118,8 @@ class ExternalEventExecuter
         native_fire(ew.index);
     }
 
-	private void from_native_fire(final int index)
+    @SuppressWarnings("unused")
+  private void from_native_fire(final int index)
     {
         if ((index >= 0) && (index < events_size))
         {

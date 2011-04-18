@@ -223,7 +223,7 @@ class XmlWriter
 			endElement("data");
 			endElement("array");
 		}
-		else if (obj instanceof Vector)
+		else if (obj instanceof Vector<?>)
 		{
 			startElement("array");
 			startElement("data");
@@ -239,7 +239,7 @@ class XmlWriter
 			endElement("data");
 			endElement("array");
 		}
-		else if (obj instanceof Hashtable)
+		else if (obj instanceof Hashtable<?,?>)
 		{
 			startElement("struct");
 

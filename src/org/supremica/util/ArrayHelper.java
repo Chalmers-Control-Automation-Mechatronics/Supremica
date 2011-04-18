@@ -22,15 +22,15 @@ public class ArrayHelper
          else
          {
              Object obj = null;
-             if (array instanceof Hashtable)
+             if (array instanceof Hashtable<?,?>)
              {
                  array = ((Hashtable<?,?>)array).entrySet().toArray();
              }
-             else if (array instanceof HashSet)
+             else if (array instanceof HashSet<?>)
              {
                  array = ((HashSet<?>)array).toArray();
              }
-             else if (array instanceof Collection)
+             else if (array instanceof Collection<?>)
              {
                  array = ((Collection<?>)array).toArray();
              }

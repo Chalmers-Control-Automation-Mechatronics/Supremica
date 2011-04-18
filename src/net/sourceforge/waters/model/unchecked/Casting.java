@@ -26,14 +26,14 @@ import java.util.Set;
  * @author Robi Malik
  */
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings("unchecked")
 public class Casting {
 
   /**
    * Converts a untyped class to a typed class.
    */
   public static <T>
-    Class<T> toClass(final Class clazz)
+    Class<T> toClass(final Class<?> clazz)
   {
     return (Class<T>) clazz;
   }
@@ -42,7 +42,7 @@ public class Casting {
    * Converts a untyped iterator to a typed iterator.
    */
   public static <E>
-    Iterator<E> toIterator(final Iterator iterator)
+    Iterator<E> toIterator(final Iterator<?> iterator)
   {
     return (Iterator<E>) iterator;
   }
@@ -51,7 +51,7 @@ public class Casting {
    * Converts a untyped collection to a typed collection.
    */
   public static <E>
-    Collection<E> toCollection(final Collection collection)
+    Collection<E> toCollection(final Collection<?> collection)
   {
     return (Collection<E>) collection;
   }
@@ -60,7 +60,7 @@ public class Casting {
    * Converts a untyped list to a typed list.
    */
   public static <E>
-    List<E> toList(final List list)
+    List<E> toList(final List<?> list)
   {
     return (List<E>) list;
   }
@@ -78,7 +78,7 @@ public class Casting {
    * Converts a untyped set to a typed set.
    */
   public static <E>
-    Set<E> toSet(final Set set)
+    Set<E> toSet(final Set<?> set)
   {
     return (Set<E>) set;
   }
@@ -96,7 +96,7 @@ public class Casting {
    * Converts a untyped map to a typed map.
    */
   public static <K,V>
-    Map<K,V> toMap(final Map map)
+    Map<K,V> toMap(final Map<?,?> map)
   {
     return (Map<K,V>) map;
   }
