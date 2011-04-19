@@ -197,6 +197,7 @@ public class EventDisParDepSets {
             if(anEdge.getGuardActionBlock() != null)
                 guards = anEdge.getGuardActionBlock().getGuards();
             if (guards != null && guards.size() > 0) {
+                manager.localOverflows = manager.getZeroBDD();
                 forwardGuardBDD = manager.guard2BDD(guards.get(0));
             }
             sourceBDD.andWith(destBDD);

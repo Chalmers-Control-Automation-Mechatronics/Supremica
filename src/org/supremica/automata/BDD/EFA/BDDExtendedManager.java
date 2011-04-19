@@ -188,7 +188,6 @@ public class BDDExtendedManager
 
     SupremicaBDDBitVector expr2BDDBitVec(final SimpleExpressionProxy expr, final boolean guardAction)
     {
-//        System.err.println("reached: "+expr.toString());
         if(expr instanceof UnaryExpressionProxy)
         {
             final UnaryExpressionProxy unExpr = (UnaryExpressionProxy)expr;
@@ -206,7 +205,6 @@ public class BDDExtendedManager
             {
                 throw new IllegalArgumentException("Type of operator not known!");
             }
-
         }
         else if(expr instanceof BinaryExpressionProxy)
         {

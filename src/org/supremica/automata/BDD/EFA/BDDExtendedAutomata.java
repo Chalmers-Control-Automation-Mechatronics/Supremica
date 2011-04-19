@@ -8,6 +8,8 @@ package org.supremica.automata.BDD.EFA;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.math.BigInteger;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -160,6 +163,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
     TIntArrayList plantUncontrollableEventIndexList;
     TIntArrayList specUncontrollableEventIndexList;
+
+    String pathRoot = "";//C:/Users/sajed/Desktop/MDD_files/";
 
 
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final  EditorSynthesizerOptions options)
@@ -391,6 +396,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
 
 //        System.out.println("number of transitions: "+((BDDMonolithicTransitions)bddTransitions).transitionForwardBDD.pathCount());
+    }
+
+    public void setPathRoot(String pr)
+    {
+        pathRoot = pr;
     }
 
     public void initializeVariable(final VariableComponentProxy var)
@@ -715,6 +725,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             //nbrOfReachableStates = nbrOfStatesBDD(reachableStatesBDD);
             final IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
             nbrOfReachableStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
+
+
 //            logger.info("Number of reachable states in the closed-loop system: "+nbrOfReachableStates);
         }
         return reachableStatesBDD;
@@ -829,6 +841,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                 final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
                 nbrOfNonblockingStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
             }
+
+
+            IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
+            nbrOfNonblockingStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
 
             nbrOfBlockingStates = nbrOfReachableStates - nbrOfNonblockingStates;
         }
@@ -957,7 +973,100 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         return output;
     }
 
-    public BigInteger nbrOfStatesIDD(final IDD idd, final HashSet<String> elementsInIDD, final HashMap<IDDNode,BigInteger> cache)
+    public void BDD2IDD2PS(final BDD bdd, final BDD validStatesBDD, final String fileName)
+    {
+        final String absPathDot = pathRoot+standardizePathAddress(fileName)+".dot";
+        final String absPathPs = pathRoot+standardizePathAddress(fileName)+".ps";
+        generateDOT(generateIDD(bdd, validStatesBDD), absPathDot);
+        final Runtime rt = Runtime.getRuntime();
+        try{
+            final Process proc1 = rt.exec("dot -Tps "+absPathDot+" -o "+absPathPs);
+            proc1.waitFor();
+            proc1.exitValue();
+            final Process proc2 = rt.exec("cmd /C del "+absPathDot);
+            proc2.waitFor();
+            proc2.exitValue();
+        }catch(final Exception e) {System.out.println(e);}
+
+    }
+
+    public void IDD2DOT(final BufferedWriter out, final IDD idd, final HashSet<IDD> visited)
+    {
+        final IDDNode root = idd.getRoot();
+        try
+        {
+            if(!visited.contains(idd))
+            {
+                out.write(""+root.getID()+" [label=\""+root.getName()+"\"];");
+                out.newLine();
+                visited.add(idd);
+
+                for(final IDD child:idd.getChildren())
+                {
+                    String temp = ""+root.getID()+" -> "+child.getRoot().getID()+" [label=\"";
+                    final ArrayList<String> label = idd.labelOfChild(child);
+                    if(label.size() > 0)
+                        temp += label.get(0);
+                    for(int i = 1;i < label.size(); i++)
+                    {
+                        temp += ("|" + label.get(i));
+                    }
+
+                    out.write(temp+"\"];");
+                    out.newLine();
+                    IDD2DOT(out, child, visited);
+
+                }
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error("IDD to DOT: " + e.getMessage());
+        }
+    }
+
+    public String standardizePathAddress(String path)
+    {
+        String sPath = path.replace('/' , '_');
+        sPath = sPath.replace('\\', '_');
+        sPath = sPath.replace(':', '_');
+        sPath = sPath.replace('*', '_');
+        sPath = sPath.replace('"', '_');
+        sPath = sPath.replace('<', '_');
+        sPath = sPath.replace('>', '_');
+        sPath = sPath.replace('|', '_');
+        return sPath;
+    }
+
+    public void generateDOT(final IDD idd, String path)
+    {
+        try
+        {
+            final FileWriter fstream = new FileWriter(path);
+            final BufferedWriter out = new BufferedWriter(fstream);
+            out.write("digraph G {");
+            out.newLine();
+            out.write("size = \"7.5,10\"");
+            out.newLine();
+//            out.write("0 [shape=box, label=\"0\", style=filled, shape=box, height=0.3, width=0.3];");
+//            out.newLine();
+            out.write("1 [shape=box, label=\"1\", style=filled, shape=box, height=0.3, width=0.3];");
+            out.newLine();
+            final HashSet<IDD> visited = new HashSet<IDD>();
+            if(idd.nbrOfNodes() > 1)
+            {
+                IDD2DOT(out, idd, visited);
+            }
+            out.write("}");
+            out.close();
+        }
+        catch (final Exception e)
+        {
+           logger.error("IDD to DOT: " + e.getMessage());
+        }
+    }
+
+    public BigInteger nbrOfStatesIDD(IDD idd, HashSet<String> elementsInIDD, HashMap<IDDNode,BigInteger> cache)
     {
         elementsInIDD.add(idd.getRoot().getName());
         if(idd.isOneTerminal())

@@ -13,8 +13,11 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.Action;
@@ -29,6 +32,7 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
+import org.supremica.automata.algorithms.Guard.QMCMinimizerSupremica;
 import org.supremica.gui.EditorSynthesizerDialog;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
@@ -71,6 +75,20 @@ public class EditorSynthesizerAction
 
     public void doAction()
     {
+        //QMC minimizer test
+        List<String> variables = new ArrayList<String>();
+/*
+        variables.add("vR1");
+        variables.add("vR2");
+  
+        List<Integer> minTerms = new ArrayList<Integer>();
+        minTerms.add(0);
+        minTerms.add(1);
+        List<Integer> dontCareTerms = new ArrayList<Integer>();
+        QMCMinimizerSupremica qmc = new QMCMinimizerSupremica(variables, minTerms, dontCareTerms);
+        System.err.println(qmc.minimize());
+*/
+
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
 
         final int nbrOfComponents = module.getComponentList().size();
