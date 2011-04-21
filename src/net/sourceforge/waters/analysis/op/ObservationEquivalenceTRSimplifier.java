@@ -336,6 +336,11 @@ public class ObservationEquivalenceTRSimplifier implements
           listTauPreds.clear();
         }
       }
+      final Logger logger = getLogger();
+      if (logger.isDebugEnabled()) {
+        final String msg = "Size of tau-closure: " + numtrans;
+        logger.debug(msg);
+      }
     }
   }
 

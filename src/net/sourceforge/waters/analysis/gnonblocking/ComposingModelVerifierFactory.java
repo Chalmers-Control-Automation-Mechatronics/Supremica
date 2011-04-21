@@ -30,8 +30,27 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
 {
 
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Singleton Pattern
+  public static ComposingModelVerifierFactory getInstance()
+  {
+    return SingletonHolder.INSTANCE;
+  }
+
+  public static ComposingModelVerifierFactory getInstance
+    (final List<String> cmdline)
+  {
+    return new ComposingModelVerifierFactory(cmdline);
+  }
+
+  private static class SingletonHolder {
+    private static final ComposingModelVerifierFactory INSTANCE =
+      new ComposingModelVerifierFactory();
+  }
+
+
+  //#########################################################################
+  //# Constructors
   private ComposingModelVerifierFactory()
   {
   }
@@ -47,64 +66,45 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
     addArgument(new PreSelectingHeuristicArgument());
   }
 
-  // #########################################################################
-  // # Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
-  public ComposingControllabilityChecker createControllabilityChecker(
-                                                                      final ProductDESProxyFactory factory)
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  public ComposingControllabilityChecker createControllabilityChecker
+    (final ProductDESProxyFactory factory)
   {
     return new ComposingControllabilityChecker(factory);
   }
 
-  public CompositionalGeneralisedConflictChecker createConflictChecker(
-                                                                       final ProductDESProxyFactory factory)
+  public CompositionalGeneralisedConflictChecker createConflictChecker
+    (final ProductDESProxyFactory factory)
   {
     return new CompositionalGeneralisedConflictChecker(null, factory);
   }
 
-  public ComposingLanguageInclusionChecker createLanguageInclusionChecker(
-                                                                          final ProductDESProxyFactory factory)
+  public ComposingLanguageInclusionChecker createLanguageInclusionChecker
+    (final ProductDESProxyFactory factory)
   {
     return new ComposingLanguageInclusionChecker(factory);
   }
 
-  // #########################################################################
-  // #########################################################################
-  // # Class Variables
-  private static ComposingModelVerifierFactory theInstance = null;
 
-  // # Factory Instantiation
-  public static ComposingModelVerifierFactory getInstance()
-  {
-    if (theInstance == null) {
-      theInstance = new ComposingModelVerifierFactory();
-    }
-    return theInstance;
-  }
-
-  public static ComposingModelVerifierFactory getInstance(
-                                                          final List<String> cmdline)
-  {
-    return new ComposingModelVerifierFactory(cmdline);
-  }
-
-
-  // #########################################################################
-  // # Inner Class FinalStateLimitArgument
+  //#########################################################################
+  //# Inner Class FinalStateLimitArgument
   private static class FinalStateLimitArgument extends
       CommandLineArgumentInteger
   {
 
-    // #######################################################################
-    // # Constructors
+    //#######################################################################
+    //# Constructors
     private FinalStateLimitArgument()
     {
       super("-fslimit",
           "Maximum number of states constructed in final composition");
     }
 
-    // #######################################################################
-    // # Overrides for Abstract Base Class
-    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
@@ -122,23 +122,23 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
   }
 
 
-  // #########################################################################
-  // # Inner Class InternalStateLimitArgument
+  //#########################################################################
+  //# Inner Class InternalStateLimitArgument
   private static class InternalStateLimitArgument extends
       CommandLineArgumentInteger
   {
 
-    // #######################################################################
-    // # Constructors
+    //#######################################################################
+    //# Constructors
     private InternalStateLimitArgument()
     {
       super("-islimit",
           "Maximum number of states constructed in abstraction attempts");
     }
 
-    // #######################################################################
-    // # Overrides for Abstract Base Class
-    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
@@ -156,23 +156,23 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
   }
 
 
-  // #########################################################################
-  // # Inner Class FinalTransitionLimitArgument
+  //#########################################################################
+  //# Inner Class FinalTransitionLimitArgument
   private static class FinalTransitionLimitArgument extends
       CommandLineArgumentInteger
   {
 
-    // #######################################################################
-    // # Constructors
+    //#######################################################################
+    //# Constructors
     private FinalTransitionLimitArgument()
     {
       super("-ftlimit",
           "Maximum number of states constructed in final composition");
     }
 
-    // #######################################################################
-    // # Overrides for Abstract Base Class
-    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
@@ -190,23 +190,23 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
   }
 
 
-  // #########################################################################
-  // # Inner Class InternalTransitionLimitArgument
+  //#########################################################################
+  //# Inner Class InternalTransitionLimitArgument
   private static class InternalTransitionLimitArgument extends
       CommandLineArgumentInteger
   {
 
-    // #######################################################################
-    // # Constructors
+    //#######################################################################
+    //# Constructors
     private InternalTransitionLimitArgument()
     {
       super("-itlimit",
           "Maximum number of states constructed in abstraction attempts");
     }
 
-    // #######################################################################
-    // # Overrides for Abstract Base Class
-    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
@@ -222,20 +222,23 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
     }
 
   }
-  // #########################################################################
-  // # Inner Class HeuristicArgument
-  private static class PreSelectingHeuristicArgument extends CommandLineArgumentString
+
+
+  //#########################################################################
+  //# Inner Class HeuristicArgument
+  private static class PreSelectingHeuristicArgument
+    extends CommandLineArgumentString
   {
-    // ##addArgument(new SelectingHeuristicArgument());#####################################################################
-    // # Constructors
+    //#######################################################################
+    //# Constructors
     private PreSelectingHeuristicArgument()
     {
       super("-pheur", "PreSelecting Heuristic adopted in composing candidate selection");
     }
 
-    // #######################################################################
-    // # Overrides for Abstract Base Class
-    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final String name = getValue();
@@ -249,39 +252,37 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
         CompositionalGeneralisedConflictChecker.PreselectingHeuristic heuristic = null;
         if (name.equalsIgnoreCase("minT")) {
           heuristic = composer.createHeuristicMinT();
+        } else if (name.equalsIgnoreCase("minTa")) {
+          heuristic = composer.createHeuristicMinTa();
+        } else if (name.equalsIgnoreCase("maxS")) {
+          heuristic = composer.createHeuristicMaxS();
+        } else if (name.equalsIgnoreCase("mustL")) {
+          heuristic = composer.createHeuristicMustL();
         } else {
-                     if (name.equalsIgnoreCase("maxS") ){
-                       heuristic = composer.createHeuristicMaxS();
-                     }
-                     else{
-                           if (name.equalsIgnoreCase("mustL")){
-                                  heuristic = composer.createHeuristicMustL();
-                                 }
-                           else{
-                                 fail("Unknown PreSelecting heuristic '" + name + "'! Choose from the following : 1)minT 2)maxS 3)mustL.");
-                               }
-                         }
-               }
-
-           composer.setPreselectingHeuristic(heuristic);
+          fail("Unknown Preselecting heuristic '" + name +
+               "'! Choose from the following : minT, minTa, maxS, mustL.");
         }
+        composer.setPreselectingHeuristic(heuristic);
       }
+    }
   }
 
-  // #########################################################################
-  // # Inner Class HeuristicArgument
-  private static class SelectingHeuristicArgument extends CommandLineArgumentString
+
+  //#########################################################################
+  //# Inner Class HeuristicArgument
+  private static class SelectingHeuristicArgument
+    extends CommandLineArgumentString
   {
-    // #######################################################################
-    // # Constructors
+    //#######################################################################
+    //# Constructors
     private SelectingHeuristicArgument()
     {
       super("-heur", "Heuristic adopted in composing candidate selection");
     }
 
-    // #######################################################################
-    // # Overrides for Abstract Base Class
-    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final String name = getValue();
@@ -295,32 +296,17 @@ public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
         CompositionalGeneralisedConflictChecker.SelectingHeuristic heuristic = null;
         if (name.equalsIgnoreCase("maxl")) {
           heuristic = composer.createHeuristicMaxL();
+        } else if (name.equalsIgnoreCase("maxc")) {
+          heuristic = composer.createHeuristicMaxC();
+        } else if (name.equalsIgnoreCase("minS")) {
+          heuristic = composer.createHeuristicMinS();
         } else {
-                     if (name.equalsIgnoreCase("maxc") ){
-                       heuristic = composer.createHeuristicMaxC();
-                     }
-                     else{
-                           if (name.equalsIgnoreCase("minS")){
-                                  heuristic = composer.createHeuristicMinS();
-                                 }
-                           else{
-                                 fail("Unknown heuristic '" + name + "'! Choose from the following : 1)maxl 2)maxc 3)mins.");
-                               }
-                         }
-               }
-
-           composer.setSelectingHeuristic(heuristic);
+          fail("Unknown heuristic '" + name +
+               "'! Choose from the following : 1)maxl 2)maxc 3)mins.");
         }
+        composer.setSelectingHeuristic(heuristic);
       }
-
-
-
-
-
-  // #########################################################################
-  // # Class Variables
-  //private static ComposingModelVerifierFactory theInstance = null;
-
+    }
   }
 
-  }
+}

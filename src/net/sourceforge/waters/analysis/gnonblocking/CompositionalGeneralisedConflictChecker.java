@@ -644,29 +644,35 @@ public class CompositionalGeneralisedConflictChecker extends
     final Logger logger = getLogger();
     AutomatonProxy abstractedAut = autToAbstract;
     for (final AbstractionRule rule : mAbstractionRules) {
-      if (logger.isDebugEnabled()) {
-        final String msg =
-            "Applying " + ProxyTools.getShortClassName(rule) + " to automaton "
-                + abstractedAut.getName() + " with "
-                + abstractedAut.getStates().size() + " states and "
-                + abstractedAut.getTransitions().size() + " transitions ...";
-        logger.debug(msg);
+      try {
+        if (logger.isDebugEnabled()) {
+          final String msg =
+            "Applying " + ProxyTools.getShortClassName(rule) +
+            " to automaton " + abstractedAut.getName() + " with " +
+            abstractedAut.getStates().size() + " states and " +
+            abstractedAut.getTransitions().size() + " transitions ...";
+          logger.debug(msg);
+        }
+        abstractedAut = rule.applyRule(autToAbstract, tau);
+        if (logger.isDebugEnabled()) {
+          final String msg =
+            "Finished " + ProxyTools.getShortClassName(rule) +
+            " for automaton " + abstractedAut.getName() + ", now " +
+            abstractedAut.getStates().size() + " states and " +
+            abstractedAut.getTransitions().size() + " transitions.";
+          logger.debug(msg);
+        }
+        if (autToAbstract != abstractedAut) {
+          final Step step = rule.createStep(this, abstractedAut);
+          mTemporaryModifyingSteps.add(step);
+        }
+        autToAbstract = abstractedAut;
+      } catch (final OutOfMemoryError error) {
+        System.gc();
+        throw new OverflowException(error);
+      } finally {
+        rule.cleanup();
       }
-      abstractedAut = rule.applyRule(autToAbstract, tau);
-      if (logger.isDebugEnabled()) {
-        final String msg =
-            "Finished " + ProxyTools.getShortClassName(rule)
-                + " for automaton " + abstractedAut.getName() + ", now "
-                + abstractedAut.getStates().size() + " states and "
-                + abstractedAut.getTransitions().size() + " transitions.";
-        logger.debug(msg);
-      }
-      if (autToAbstract != abstractedAut) {
-        final Step step = rule.createStep(this, abstractedAut);
-        mTemporaryModifyingSteps.add(step);
-      }
-      autToAbstract = abstractedAut;
-      rule.cleanup();
     }
     return abstractedAut;
   }
