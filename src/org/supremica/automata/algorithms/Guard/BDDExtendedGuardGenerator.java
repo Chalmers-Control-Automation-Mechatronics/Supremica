@@ -14,16 +14,10 @@
 
 package org.supremica.automata.algorithms.Guard;
 
-import org.supremica.automata.BDD.EFA.IDDNode;
-import org.supremica.automata.BDD.EFA.IDD;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -36,6 +30,7 @@ import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedManager;
 import org.supremica.automata.BDD.EFA.BDDMonolithicEdges;
+import org.supremica.automata.BDD.EFA.IDD;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.log.Logger;
@@ -89,6 +84,7 @@ public class BDDExtendedGuardGenerator {
     private boolean applyIndependentHeuristics = false;
     private boolean generateIDD_PS = false;
 
+    @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
 
     String bestStateSet = "";
@@ -143,7 +139,7 @@ public class BDDExtendedGuardGenerator {
             backwardMonolithicTransitionsBDD = ((BDDMonolithicEdges) bddTransitions).getMonolithicEdgesBackwardWithEventsBDD();
 
 
-            computeStatesEnablingSigma();            
+            computeStatesEnablingSigma();
 
             computeSafeStatesEnablingSigma();
 //        System.err.println("safe states enabling "+eventName+": "+bddAutomata.nbrOfStatesBDD(safeStatesEnablingSigmaBDD));
@@ -452,7 +448,7 @@ public class BDDExtendedGuardGenerator {
                     fileName += "_forbidden";
 
                 if(generateIDD_PS)
-                {                 
+                {
                     automataBDD.BDD2IDD2PS(goodBDD, safeStatesEnablingSigmaBDD, fileName);
                 }
 
@@ -469,17 +465,17 @@ public class BDDExtendedGuardGenerator {
         int localNbrOfTerms = 0;
         String expr = "";
         final String symbol = automataBDD.getLocVarSuffix();
-        boolean flag = allowedForbidden ^ isComp;
+        final boolean flag = allowedForbidden ^ isComp;
 
         ArrayList<String> incrementalSeq = new ArrayList<String>();
         final ArrayList<String> setTemp = new ArrayList<String>(set);
         String inEq="";
-        int inEqLength = Integer.MAX_VALUE;        
+        int inEqLength = Integer.MAX_VALUE;
         if(!isAutomaton)
         {
             boolean firstTime = true;
             do{
-                int setSize = setTemp.size();
+                final int setSize = setTemp.size();
                 incrementalSeq = isIncrementalSeq(setTemp);
                 setTemp.removeAll(incrementalSeq);
                 inEq = seq2inEqual(incrementalSeq, variable, theAutomata.getMinValueofVar(variable), theAutomata.getMaxValueofVar(variable), flag);
@@ -494,7 +490,7 @@ public class BDDExtendedGuardGenerator {
                         inEqLength = 1+setTemp.size();
                     }
                 }
-            
+
                 if(inEqLength < setSize)
                 {
                     set = new ArrayList<String>(setTemp);
@@ -516,7 +512,7 @@ public class BDDExtendedGuardGenerator {
 
         if(!set.isEmpty())
         {
-            String ex = variable+(isAutomaton?symbol:"")+(flag?EQUAL:NEQUAL)+set.get(0).replaceAll(" ", "");
+            final String ex = variable+(isAutomaton?symbol:"")+(flag?EQUAL:NEQUAL)+set.get(0).replaceAll(" ", "");
             if(expr.isEmpty())
                 expr = ex;
             else
@@ -824,12 +820,12 @@ public class BDDExtendedGuardGenerator {
 
     private void disjunctivelyComputeMustAllowedStates() {
 
-        int eventIndex = automataBDD.getEventIndex(eventName);
+        final int eventIndex = automataBDD.getEventIndex(eventName);
 
-        BDD safeStatesWithEvent = safeStatesBDD.and(sigmaBDD);
+        final BDD safeStatesWithEvent = safeStatesBDD.and(sigmaBDD);
         BDD tmp = manager.getZeroBDD();
 
-        Iterator<BDDExtendedAutomaton> auItr = automataBDD.iterator();
+        final Iterator<BDDExtendedAutomaton> auItr = automataBDD.iterator();
         BDDExtendedAutomaton anAutomaton;
 
         while(auItr.hasNext()){
@@ -848,12 +844,12 @@ public class BDDExtendedGuardGenerator {
 
     private void disjunctivelyComputeMustForbiddenStates() {
 
-        int eventIndex = automataBDD.getEventIndex(eventName);
+        final int eventIndex = automataBDD.getEventIndex(eventName);
 
-        BDD reachableStatesWithEvent = automataBDD.getReachableStates().and(sigmaBDD);
+        final BDD reachableStatesWithEvent = automataBDD.getReachableStates().and(sigmaBDD);
         BDD tmp = manager.getZeroBDD();
 
-        Iterator<BDDExtendedAutomaton> auItr = automataBDD.iterator();
+        final Iterator<BDDExtendedAutomaton> auItr = automataBDD.iterator();
         BDDExtendedAutomaton anAutomaton;
 
         while(auItr.hasNext()){

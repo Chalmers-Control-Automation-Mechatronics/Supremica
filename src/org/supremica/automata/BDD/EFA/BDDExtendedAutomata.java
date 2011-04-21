@@ -8,10 +8,10 @@ package org.supremica.automata.BDD.EFA;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.math.BigInteger;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -51,7 +50,6 @@ import org.supremica.log.LoggerFactory;
 
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
-    @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
 
     BDDExtendedManager manager;
@@ -398,7 +396,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 //        System.out.println("number of transitions: "+((BDDMonolithicTransitions)bddTransitions).transitionForwardBDD.pathCount());
     }
 
-    public void setPathRoot(String pr)
+    public void setPathRoot(final String pr)
     {
         pathRoot = pr;
     }
@@ -843,7 +841,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             }
 
 
-            IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
+            final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
             nbrOfNonblockingStates = nbrOfStatesIDD(idd, new HashSet<String>(), new HashMap<IDDNode, BigInteger>()).longValue();
 
             nbrOfBlockingStates = nbrOfReachableStates - nbrOfNonblockingStates;
@@ -1025,7 +1023,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
     }
 
-    public String standardizePathAddress(String path)
+    public String standardizePathAddress(final String path)
     {
         String sPath = path.replace('/' , '_');
         sPath = sPath.replace('\\', '_');
@@ -1038,7 +1036,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         return sPath;
     }
 
-    public void generateDOT(final IDD idd, String path)
+    public void generateDOT(final IDD idd, final String path)
     {
         try
         {
@@ -1066,7 +1064,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
     }
 
-    public BigInteger nbrOfStatesIDD(IDD idd, HashSet<String> elementsInIDD, HashMap<IDDNode,BigInteger> cache)
+    public BigInteger nbrOfStatesIDD(final IDD idd, final HashSet<String> elementsInIDD, final HashMap<IDDNode,BigInteger> cache)
     {
         elementsInIDD.add(idd.getRoot().getName());
         if(idd.isOneTerminal())
