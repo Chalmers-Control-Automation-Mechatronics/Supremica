@@ -112,7 +112,9 @@ public class OPConflictChecker
                            final ProductDESProxyFactory factory)
   {
     super(model, marking, factory);
-    mMethod = Method.OEQ;
+    mAbstractionMethod = AbstractionMethod.OEQ;
+    mPreselectingMethod = PreselectingMethod.MustL;
+    mSelectingMethod = SelectingMethod.MinS;
     mInternalStepNodeLimit = super.getNodeLimit();
     mInternalStepTransitionLimit = super.getTransitionLimit();
   }
@@ -120,14 +122,58 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Configuration
-  public void setMethod(final Method method)
+  /**
+   * Sets the abstraction strategy to be used to simplify automata.
+   * @see AbstractionMethod
+   */
+  public void setAbstractionMethod(final AbstractionMethod method)
   {
-    mMethod = method;
+    mAbstractionMethod = method;
   }
 
-  public Method getMethod()
+  /**
+   * Gets the abstraction strategy used to simplify automata.
+   * @see AbstractionMethod
+   */
+  public AbstractionMethod getAbstractionMethod()
   {
-    return mMethod;
+    return mAbstractionMethod;
+  }
+
+  /**
+   * Sets the preselecting heuristics to be used to choose candidates.
+   * @see PreselectingMethod
+   */
+  public void setPreselectingMethod(final PreselectingMethod method)
+  {
+    mPreselectingMethod = method;
+  }
+
+  /**
+   * Sets the preselecting heuristics used to choose candidates.
+   * @see PreselectingMethod
+   */
+  public PreselectingMethod getPreselectingMethod()
+  {
+    return mPreselectingMethod;
+  }
+
+  /**
+   * Sets the selecting heuristics used to choose candidates.
+   * @see SelectingMethod
+   */
+  public SelectingMethod getSelectingMethod()
+  {
+    return mSelectingMethod;
+  }
+
+  /**
+   * Sets the selecting heuristics to be used to choose candidates.
+   * @see SelectingMethod
+   */
+  public void setSelectingMethod(final SelectingMethod method)
+  {
+    mSelectingMethod = method;
   }
 
   public void setNodeLimit(final int limit)
@@ -246,76 +292,6 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Heuristics
-  public HeuristicMinT createHeuristicMinT()
-  {
-    return new HeuristicMinT();
-  }
-
-  public HeuristicMaxS createHeuristicMaxS()
-  {
-    return new HeuristicMaxS();
-  }
-
-  public HeuristicMustL createHeuristicMustL()
-  {
-    return new HeuristicMustL();
-  }
-
-  public HeuristicMaxL createHeuristicMaxL()
-  {
-    return new HeuristicMaxL();
-  }
-
-  public HeuristicMaxC createHeuristicMaxC()
-  {
-    return new HeuristicMaxC();
-  }
-
-  public HeuristicMinS createHeuristicMinS()
-  {
-    return new HeuristicMinS();
-  }
-
-  public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
-  {
-    mPreselectingHeuristic = heuristic;
-  }
-
-  /**
-   * Defines the preferred candidate selection heuristics.
-   */
-  public void setSelectingHeuristic(final SelectingHeuristic heuristic)
-  {
-    final List<SelectingHeuristic> list = new ArrayList<SelectingHeuristic>(3);
-    list.add(heuristic);
-    if (heuristic instanceof HeuristicMaxL) {
-      list.add(new HeuristicMaxC());
-      list.add(new HeuristicMinS());
-    } else if (heuristic instanceof HeuristicMaxC) {
-      list.add(new HeuristicMaxL());
-      list.add(new HeuristicMinS());
-    } else if (heuristic instanceof HeuristicMinS) {
-      list.add(new HeuristicMaxL());
-      list.add(new HeuristicMaxC());
-    }
-    setSelectingHeuristic(list);
-  }
-
-  /**
-   * Defines the list of candidate selection heuristics in the chosen order.
-   * @param heuristicList
-   *          The first item in the list should be the first heuristic used to
-   *          select a candidate to compose, the last item in the list should be
-   *          the last option.
-   */
-  public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
-  {
-    mSelectingHeuristics = new SelectingComparator(heuristicList);
-  }
-
-
-  //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException
   {
@@ -336,7 +312,7 @@ public class OPConflictChecker
           candidates = mPreselectingHeuristic.findCandidates();
           while (!candidates.isEmpty()) {
             final Candidate candidate =
-              Collections.min(candidates, mSelectingHeuristics);
+              Collections.min(candidates, mSelectingHeuristic);
             try {
               mEventHasDisappeared = false;
               applyCandidate(candidate);
@@ -395,35 +371,9 @@ public class OPConflictChecker
     result.setNumberOfStates(0.0);
     final EventProxy marking = getUsedMarkingProposition();
     mPropositions = Collections.singletonList(marking);
-    if (mPreselectingHeuristic == null) {
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
-      setPreselectingHeuristic(defaultHeuristic);
-    }
-    if (mSelectingHeuristics == null) {
-      final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
-      setSelectingHeuristic(defaultHeuristic);
-    }
-    switch (mMethod) {
-    case OEQ:
-      mAbstractionRule = new ObservationEquivalenceAbstractionRule
-        (ObservationEquivalenceTRSimplifier.Equivalence.
-         OBSERVATION_EQUIVALENCE);
-      break;
-    case OP:
-      mAbstractionRule = new ObserverProjectionAbstractionRule();
-      break;
-    case OPSEARCH:
-      mAbstractionRule = new OPSearchAbstractionRule();
-      break;
-    case WOEQ:
-      mAbstractionRule = new ObservationEquivalenceAbstractionRule
-        (ObservationEquivalenceTRSimplifier.Equivalence.
-         WEAK_OBSERVATION_EQUIVALENCE);
-      break;
-    default:
-      throw new IllegalStateException("Unknown method " + mMethod + " in " +
-                                      ProxyTools.getShortClassName(this) + "!");
-    }
+    mAbstractionRule = mAbstractionMethod.createAbstractionRule(this);
+    mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
+    mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
     setupSynchronousProductBuilder();
     setupMonolithicConflictChecker();
     mModifyingSteps = new ArrayList<AbstractionStep>();
@@ -1149,37 +1099,208 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Enumeration Method
+  //# Inner Enumeration AbstractionMethod
   /**
    * The configuration setting to determine the abstraction method applied
    * to intermediate automata during compositional nonblocking verification.
    */
-  public enum Method
+  public enum AbstractionMethod
   {
     /**
      * Automata are minimised according to <I>observation equivalence</I>.
      */
-    OEQ,
+    OEQ {
+      public AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      {
+        return checker.new ObservationEquivalenceAbstractionRule
+                            (ObservationEquivalenceTRSimplifier.Equivalence.
+                             OBSERVATION_EQUIVALENCE);
+      }
+    },
     /**
      * Automata are minimised according using <I>observer projection</I>.
      * The present implementation determines a coarsest causal reporter
      * map satisfying the observer property. Nondeterminism in the projected
      * automata is not resolved, nondeterministic abstraction are used instead.
      */
-    OP,
+    OP {
+      public AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      {
+        return checker.new ObserverProjectionAbstractionRule();
+      }
+    },
     /**
      * Automata are minimised according using an <I>observer projection</I>
      * obtained by the OP-search algorithm presented in the paper by
      * P. Pena, J.E.R. Cury, R. Malik, and S. Lafortune in WODES 2010.
      */
-    OPSEARCH,
+    OPSEARCH {
+      public AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      {
+        return checker.new OPSearchAbstractionRule();
+      }
+    },
     /**
      * Automata are minimised according to <I>weak observation equivalence</I>.
      * Initial states and markings are not saturated, silent transitions
      * are retained instead in a bid to reduce the overall number of
      * transitions.
      */
-    WOEQ
+    WOEQ {
+      public AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      {
+        return checker.new ObservationEquivalenceAbstractionRule
+                            (ObservationEquivalenceTRSimplifier.Equivalence.
+                             WEAK_OBSERVATION_EQUIVALENCE);
+      }
+    };
+
+    public abstract AbstractionRule createAbstractionRule
+      (OPConflictChecker checker);
+  }
+
+
+  //#########################################################################
+  //# Inner Enumeration PreselectingMethod
+  /**
+   * The configuration setting to determine the {@link PreselectingHeuristic}
+   * used to choose candidates during compositional verification. The
+   * preselecting represents the first step of candidate selection. It generates
+   * a list of candidates, from which the best candidate is to be chosen by the
+   * selecting heuristic in the second step.
+   *
+   * @see SelectingMethod
+   */
+  public enum PreselectingMethod
+  {
+    /**
+     * Every set of automata with at least one local event is considered
+     * as a candidate.
+     */
+    MustL {
+      public PreselectingHeuristic createHeuristic
+        (final OPConflictChecker checker)
+      {
+        return checker.new HeuristicMustL();
+      }
+    },
+    /**
+     * Candidates are produced by pairing the automaton with the most states to
+     * every other automaton in the model.
+     */
+    MaxS {
+      public PreselectingHeuristic createHeuristic
+        (final OPConflictChecker checker)
+      {
+        return checker.new HeuristicMaxS();
+      }
+    },
+    /**
+     * Candidates are produced by pairing the automaton with the fewest
+     * transitions to every other automaton in the model.
+     */
+    MinT {
+      public PreselectingHeuristic createHeuristic
+        (final OPConflictChecker checker)
+      {
+        return checker.new HeuristicMinT();
+      }
+    };
+
+    public abstract PreselectingHeuristic createHeuristic
+      (OPConflictChecker checker);
+  }
+
+
+  //#########################################################################
+  //# Inner Enumeration SelectingMethod
+  /**
+   * <P>The configuration setting to determine the selecting heuristic
+   * used to choose candidates during compositional verification.</P>
+   *
+   * <P>The selecting represents the second step of candidate selection.
+   * It chooses the best candidate from a list of candidates generated
+   * by the {@link PreselectingHeuristic} in the first step.</P>
+   *
+   * <P>Selection is implemented using a {@link Comparator}. The smallest
+   * candidate according to the defined ordering gets selected.</P>
+   *
+   * @see PreselectingMethod
+   */
+  public enum SelectingMethod
+  {
+    /**
+     * Chooses the candidate with the highest proportion of local events.
+     */
+    MaxL {
+      public Comparator<Candidate> createSingleHeuristic
+        (final OPConflictChecker checker)
+      {
+        return checker.new HeuristicMaxL();
+      }
+    },
+    /**
+     * Chooses the candidate with the highest proportion of common events.
+     * An event is considered as common if it is used by at least two
+     * automata of the candidate.
+     */
+    MaxC {
+      public Comparator<Candidate> createSingleHeuristic
+        (final OPConflictChecker checker)
+      {
+        return checker.new HeuristicMaxC();
+      }
+    },
+    /**
+     * Chooses the candidate with the minimum estimated number of states
+     * in the synchronous product.
+     */
+    MinS {
+      public Comparator<Candidate> createSingleHeuristic
+        (final OPConflictChecker checker)
+      {
+        return checker.new HeuristicMinS();
+      }
+    };
+
+    /**
+     * Creates the selecting heuristic implementing this method.
+     * This returns an implementation of only one heuristic, which
+     * may consider two candidates as equal.
+     * @param checker The conflict checker requesting and using the
+     *                heuristic.
+     */
+    public abstract Comparator<Candidate> createSingleHeuristic
+      (OPConflictChecker checker);
+
+    /**
+     * Creates a selecting heuristic that gives preferences to this method.
+     * The returned heuristic first compares candidates according to this
+     * selection methods. If two candidates are found equal, all other
+     * selection heuristics are used, in the order in which they are
+     * defined in the enumeration. If the candidates are equal under
+     * all heuristics, they are compared based on their names. This
+     * guarantees that no two candidates are equal.
+     * @param checker The conflict checker requesting and using the
+     *                heuristic.
+     */
+    public Comparator<Candidate> createHeuristic
+      (final OPConflictChecker checker)
+    {
+      final int count = values().length;
+      final List<Comparator<Candidate>> list =
+        new ArrayList<Comparator<Candidate>>(count);
+      Comparator<Candidate> heu = createSingleHeuristic(checker);
+      list.add(heu);
+      for (final SelectingMethod method : values()) {
+        if (method != this) {
+          heu = method.createSingleHeuristic(checker);
+          list.add(heu);
+        }
+      }
+      return checker.new SelectingComparator(list);
+    }
+
   }
 
 
@@ -1406,8 +1527,8 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicPairing
-  private abstract class HeuristicPairing
+  //# Inner Class PairingHeuristic
+  private abstract class PairingHeuristic
     implements PreselectingHeuristic, Comparator<AutomatonProxy>
   {
 
@@ -1464,9 +1585,9 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicPairing
+  //# Inner Class HeuristicMinT
   private class HeuristicMinT
-    extends HeuristicPairing
+    extends PairingHeuristic
   {
 
     //#######################################################################
@@ -1497,7 +1618,7 @@ public class OPConflictChecker
    * every other automaton in the model.
    */
   private class HeuristicMaxS
-    extends HeuristicPairing
+    extends PairingHeuristic
   {
 
     //#######################################################################
@@ -1556,7 +1677,7 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Constructor
-    private SelectingComparator(final List<SelectingHeuristic> list)
+    private SelectingComparator(final List<Comparator<Candidate>> list)
     {
       mHeuristics = list;
     }
@@ -1565,7 +1686,7 @@ public class OPConflictChecker
     //# Interface java.util.Comparator<Candidate>
     public int compare(final Candidate cand1, final Candidate cand2)
     {
-      for (final SelectingHeuristic heu : mHeuristics) {
+      for (final Comparator<Candidate> heu : mHeuristics) {
         final int result = heu.compare(cand1, cand2);
         if (result != 0) {
           return result;
@@ -1576,7 +1697,7 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Data Members
-    private final List<SelectingHeuristic> mHeuristics;
+    private final List<Comparator<Candidate>> mHeuristics;
 
   }
 
@@ -1611,10 +1732,6 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Inner Class HeuristicMaxL
-  /**
-   * Performs step 2 of the approach to select the automata to compose. The
-   * chosen candidate is the one with the highest proportion of local events.
-   */
   private class HeuristicMaxL extends SelectingHeuristic
   {
 
@@ -1631,10 +1748,6 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Inner Class HeuristicMaxC
-  /**
-   * Performs step 2 of the approach to select the automata to compose. The
-   * chosen candidate is the one with the highest proportion of common events.
-   */
   private class HeuristicMaxC extends SelectingHeuristic
   {
 
@@ -1642,9 +1755,8 @@ public class OPConflictChecker
     //# Overrides for SelectingHeuristic
     double getHeuristicValue(final Candidate candidate)
     {
-      final int local = candidate.getLocalEventCount();
-      final int total = candidate.getLocalEventCount();
-      return - (double) (total - local) / (double) total;
+      return - (double) candidate.getCommonEventCount() /
+               (double) candidate.getNumberOfEvents();
     }
 
   }
@@ -2677,9 +2789,9 @@ public class OPConflictChecker
   private int mInternalStepNodeLimit;
   private int mInternalStepTransitionLimit;
 
-  private Method mMethod;
-  private PreselectingHeuristic mPreselectingHeuristic;
-  private Comparator<Candidate> mSelectingHeuristics;
+  private AbstractionMethod mAbstractionMethod;
+  private PreselectingMethod mPreselectingMethod;
+  private SelectingMethod mSelectingMethod;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
 
@@ -2703,6 +2815,8 @@ public class OPConflictChecker
   private Set<List<AutomatonProxy>> mOverflowCandidates;
   private int mNumOverflows;
   private AbstractionRule mAbstractionRule;
+  private PreselectingHeuristic mPreselectingHeuristic;
+  private Comparator<Candidate> mSelectingHeuristic;
   private SynchronousProductBuilder mCurrentSynchronousProductBuilder;
   private ConflictChecker mCurrentMonolithicConflictChecker;
 

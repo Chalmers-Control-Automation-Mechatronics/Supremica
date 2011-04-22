@@ -44,8 +44,8 @@ public class ObservationEquivalenceConflictCheckerTest extends
   {
     final OPConflictChecker checker =
       new OPConflictChecker(factory);
-    checker.setMethod
-      (OPConflictChecker.Method.OEQ);
+    checker.setAbstractionMethod
+      (OPConflictChecker.AbstractionMethod.OEQ);
     checker.setInternalStepNodeLimit(5000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);

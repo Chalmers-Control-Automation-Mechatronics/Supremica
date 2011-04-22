@@ -10,7 +10,6 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.io.PrintStream;
-import java.util.EnumSet;
 import java.util.Iterator;
 
 
@@ -89,14 +88,16 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
   protected void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
-      try {
-        final String value = iter.next();
-        mValue = Enum.valueOf(mEnumerationClass, value);
-      } catch (final IllegalArgumentException exception) {
-        System.err.println("Bad value for " + getName() + " option!");
-        dumpEnumeration(System.err, 0);
-        System.exit(1);
+      final String name = iter.next();
+      for (final E value : mEnumerationClass.getEnumConstants()) {
+        if (value.toString().equalsIgnoreCase(name)) {
+          mValue = value;
+          return;
+        }
       }
+      System.err.println("Bad value for " + getName() + " option!");
+      dumpEnumeration(System.err, 0);
+      System.exit(1);
     } else {
       failMissingValue();
     }
@@ -115,10 +116,9 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
   {
     doIndent(stream, indent);
     stream.println("Possible values are:");
-    final EnumSet<E> set = EnumSet.allOf(mEnumerationClass);
     int column = 0;
     boolean first = true;
-    for (final E item : set) {
+    for (final E item : mEnumerationClass.getEnumConstants()) {
       final String label = item.toString();
       final int len = label.length();
       if (first) {

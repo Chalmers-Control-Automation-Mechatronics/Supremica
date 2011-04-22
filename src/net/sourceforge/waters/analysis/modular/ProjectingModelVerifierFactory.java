@@ -59,7 +59,9 @@ public class ProjectingModelVerifierFactory
   private ProjectingModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
-    addArgument(new MethodArgument());
+    addArgument(new AbstractionMethodArgument());
+    addArgument(new PreselectingMethodArgument());
+    addArgument(new SelectingMethodArgument());
     addArgument(ModularHeuristicFactory.getMethodArgument());
     addArgument(ModularHeuristicFactory.getPreferenceArgument());
     addArgument(new FinalStateLimitArgument());
@@ -225,17 +227,17 @@ public class ProjectingModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class MethodArgument
-  private static class MethodArgument
-    extends CommandLineArgumentEnum<OPConflictChecker.Method>
+  //# Inner Class AbstractionMethodArgument
+  private static class AbstractionMethodArgument
+    extends CommandLineArgumentEnum<OPConflictChecker.AbstractionMethod>
   {
 
     //#######################################################################
     //# Constructors
-    private MethodArgument()
+    private AbstractionMethodArgument()
     {
       super("-method", "Abstraction method used for conflict check",
-            OPConflictChecker.Method.class);
+            OPConflictChecker.AbstractionMethod.class);
     }
 
     //#######################################################################
@@ -243,11 +245,75 @@ public class ProjectingModelVerifierFactory
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
-      final OPConflictChecker.Method method = getValue();
+      final OPConflictChecker.AbstractionMethod method = getValue();
       if (verifier instanceof OPConflictChecker) {
         final OPConflictChecker composer =
             (OPConflictChecker) verifier;
-        composer.setMethod(method);
+        composer.setAbstractionMethod(method);
+      } else {
+        fail(getName() + " option only supported for conflict check!");
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class PreselectingMethodArgument
+  private static class PreselectingMethodArgument
+    extends CommandLineArgumentEnum<OPConflictChecker.PreselectingMethod>
+  {
+
+    //#######################################################################
+    //# Constructors
+    private PreselectingMethodArgument()
+    {
+      super("-presel", "Preselecting heuristic for candidate selection",
+            OPConflictChecker.PreselectingMethod.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final OPConflictChecker.PreselectingMethod method = getValue();
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer =
+            (OPConflictChecker) verifier;
+        composer.setPreselectingMethod(method);
+      } else {
+        fail(getName() + " option only supported for conflict check!");
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class SelectingMethodArgument
+  private static class SelectingMethodArgument
+    extends CommandLineArgumentEnum<OPConflictChecker.SelectingMethod>
+  {
+
+    //#######################################################################
+    //# Constructors
+    private SelectingMethodArgument()
+    {
+      super("-sel", "Selecting heuristic for candidate selection",
+            OPConflictChecker.SelectingMethod.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final OPConflictChecker.SelectingMethod method = getValue();
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer =
+            (OPConflictChecker) verifier;
+        composer.setSelectingMethod(method);
       } else {
         fail(getName() + " option only supported for conflict check!");
       }

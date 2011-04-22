@@ -42,7 +42,7 @@ public class OPSearchConflictCheckerTest extends
     (final ProductDESProxyFactory factory)
   {
     final OPConflictChecker checker = new OPConflictChecker(factory);
-    checker.setMethod(OPConflictChecker.Method.OPSEARCH);
+    checker.setAbstractionMethod(OPConflictChecker.AbstractionMethod.OPSEARCH);
     checker.setInternalStepNodeLimit(50000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);
