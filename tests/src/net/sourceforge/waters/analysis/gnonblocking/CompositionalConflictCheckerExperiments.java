@@ -142,7 +142,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
     final List<AbstractionRule> ruleList = new LinkedList<AbstractionRule>();
     final ProductDESProxyFactory factory = mVerifier.getFactory();
     final EventProxy alpha = mVerifier.getUsedPreconditionMarkingProposition();
-    mVerifier.setGeneralisedPrecondition(alpha);
+    mVerifier.setPreconditionMarking(alpha);
     final EventProxy omega = mVerifier.getUsedMarkingProposition();
     final List<EventProxy> propositions = new ArrayList<EventProxy>(2);
     propositions.add(alpha);

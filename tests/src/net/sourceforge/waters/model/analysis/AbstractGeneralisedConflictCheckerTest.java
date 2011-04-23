@@ -222,7 +222,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
           && event.getKind() == EventKind.PROPOSITION) {
         mAlpha = event;
         final ConflictChecker modelVer = getModelVerifier();
-        modelVer.setGeneralisedPrecondition(event);
+        modelVer.setPreconditionMarking(event);
         return;
       }
     }

@@ -76,7 +76,7 @@ public class SICProperty6Verifier extends AbstractSICConflictChecker
       checker.setModel(convertedModel);
       checker.setMarkingProposition(defaultMark);
       final EventProxy preMark = builder.getGeneralisedPrecondition();
-      checker.setGeneralisedPrecondition(preMark);
+      checker.setPreconditionMarking(preMark);
       final VerificationResult result;
       try {
         checker.run();

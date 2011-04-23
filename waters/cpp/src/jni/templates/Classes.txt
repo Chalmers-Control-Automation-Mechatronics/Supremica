@@ -251,7 +251,7 @@ glue class NativeSafetyVerifier extends NativeModelVerifier {
 }
 
 glue class NativeConflictChecker extends NativeModelVerifier {
-  glue EventProxy getGeneralisedPrecondition();
+  glue EventProxy getPreconditionMarking();
   glue EventProxy getUsedMarkingProposition();
   glue KindTranslator getKindTranslator();
 }

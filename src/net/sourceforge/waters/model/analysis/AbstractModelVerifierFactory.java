@@ -171,7 +171,7 @@ public abstract class AbstractModelVerifierFactory
       if (premarkingname != null) {
         final EventProxy premarking =
           AbstractConflictChecker.getMarkingProposition(model, premarkingname);
-        cchecker.setGeneralisedPrecondition(premarking);
+        cchecker.setPreconditionMarking(premarking);
       }
     }
   }

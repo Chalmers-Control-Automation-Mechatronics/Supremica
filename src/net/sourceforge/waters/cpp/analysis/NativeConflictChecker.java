@@ -147,13 +147,13 @@ public class NativeConflictChecker
     return mMarking;
   }
 
-  public void setGeneralisedPrecondition(final EventProxy marking)
+  public void setPreconditionMarking(final EventProxy marking)
   {
     mPreconditionMarking = marking;
     clearAnalysisResult();
   }
 
-  public EventProxy getGeneralisedPrecondition()
+  public EventProxy getPreconditionMarking()
   {
     return mPreconditionMarking;
   }

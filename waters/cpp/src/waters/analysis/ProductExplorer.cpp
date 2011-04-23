@@ -781,7 +781,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
         gchecker.getKindTranslatorGlue(&cache);
       jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
       jni::EventGlue premarking =
-        gchecker.getGeneralisedPreconditionGlue(&cache);
+        gchecker.getPreconditionMarkingGlue(&cache);
       waters::ProductExplorerFinalizer finalizer(gchecker);
       waters::ProductExplorer* checker =
         finalizer.createProductExplorer(translator, premarking,

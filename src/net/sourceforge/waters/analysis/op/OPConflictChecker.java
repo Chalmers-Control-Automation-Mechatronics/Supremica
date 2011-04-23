@@ -122,13 +122,16 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Configuration
-  /**
-   * Sets the abstraction strategy to be used to simplify automata.
-   * @see AbstractionMethod
-   */
-  public void setAbstractionMethod(final AbstractionMethod method)
+  @Override
+  public EventProxy getPreconditionMarking()
   {
-    mAbstractionMethod = method;
+    return mPreconditionMarking;
+  }
+
+  @Override
+  public void setPreconditionMarking(final EventProxy alpha)
+  {
+    mPreconditionMarking = alpha;
   }
 
   /**
@@ -141,12 +144,12 @@ public class OPConflictChecker
   }
 
   /**
-   * Sets the preselecting heuristics to be used to choose candidates.
-   * @see PreselectingMethod
+   * Sets the abstraction strategy to be used to simplify automata.
+   * @see AbstractionMethod
    */
-  public void setPreselectingMethod(final PreselectingMethod method)
+  public void setAbstractionMethod(final AbstractionMethod method)
   {
-    mPreselectingMethod = method;
+    mAbstractionMethod = method;
   }
 
   /**
@@ -156,6 +159,15 @@ public class OPConflictChecker
   public PreselectingMethod getPreselectingMethod()
   {
     return mPreselectingMethod;
+  }
+
+  /**
+   * Sets the preselecting heuristics to be used to choose candidates.
+   * @see PreselectingMethod
+   */
+  public void setPreselectingMethod(final PreselectingMethod method)
+  {
+    mPreselectingMethod = method;
   }
 
   /**
@@ -176,21 +188,6 @@ public class OPConflictChecker
     mSelectingMethod = method;
   }
 
-  public void setNodeLimit(final int limit)
-  {
-    setInternalStepNodeLimit(limit);
-    setFinalStepNodeLimit(limit);
-  }
-
-  public void setInternalStepNodeLimit(final int limit)
-  {
-    mInternalStepNodeLimit = limit;
-  }
-
-  public void setFinalStepNodeLimit(final int limit)
-  {
-    super.setNodeLimit(limit);
-  }
 
   public int getNodeLimit()
   {
@@ -199,14 +196,30 @@ public class OPConflictChecker
     return Math.max(limit1, limit2);
   }
 
+  public void setNodeLimit(final int limit)
+  {
+    setInternalStepNodeLimit(limit);
+    setFinalStepNodeLimit(limit);
+  }
+
   public int getInternalStepNodeLimit()
   {
     return mInternalStepNodeLimit;
   }
 
+  public void setInternalStepNodeLimit(final int limit)
+  {
+    mInternalStepNodeLimit = limit;
+  }
+
   public int getFinalStepNodeLimit()
   {
     return super.getNodeLimit();
+  }
+
+  public void setFinalStepNodeLimit(final int limit)
+  {
+    super.setNodeLimit(limit);
   }
 
   @Override
@@ -216,9 +229,9 @@ public class OPConflictChecker
     setInternalStepTransitionLimit(limit);
   }
 
-  public void setInternalStepTransitionLimit(final int limit)
+  public int getFinalStepTransitionLimit()
   {
-    mInternalStepTransitionLimit = limit;
+    return super.getTransitionLimit();
   }
 
   public void setFinalStepTransitionLimit(final int limit)
@@ -231,9 +244,9 @@ public class OPConflictChecker
     return mInternalStepTransitionLimit;
   }
 
-  public int getFinalStepTransitionLimit()
+  public void setInternalStepTransitionLimit(final int limit)
   {
-    return super.getTransitionLimit();
+    mInternalStepTransitionLimit = limit;
   }
 
 
@@ -286,6 +299,8 @@ public class OPConflictChecker
       mCurrentMonolithicConflictChecker.setKindTranslator(translator);
       final EventProxy marking = getUsedMarkingProposition();
       mCurrentMonolithicConflictChecker.setMarkingProposition(marking);
+      mCurrentMonolithicConflictChecker.setPreconditionMarking
+        (mPreconditionMarking);
     }
     return mCurrentMonolithicConflictChecker;
   }
@@ -301,13 +316,16 @@ public class OPConflictChecker
       simplify(true);
 
       Collection<Candidate> candidates;
-      boolean nonblocking = true;
       outer:
       do {
         subsystem:
         do {
-          if (isTriviallyNonblockingSubsystem()) {
-            continue outer;
+          if (checkSubsystemTrivial()) {
+            if (mGotGlobalResult) {
+              break outer;
+            } else {
+              continue outer;
+            }
           }
           candidates = mPreselectingHeuristic.findCandidates();
           while (!candidates.isEmpty()) {
@@ -328,17 +346,16 @@ public class OPConflictChecker
             }
           }
         } while (!candidates.isEmpty());
-        nonblocking = runMonolithicConflictCheck();
-      } while (nonblocking && popEventDisjointSubsystem());
+        runMonolithicConflictCheck();
+      } while (!mGotGlobalResult && popEventDisjointSubsystem());
 
-      if (nonblocking) {
+      if (mPreliminaryCounterexample == null) {
         return setSatisfiedResult();
       } else {
         restoreAutomata();
-        final ConflictTraceProxy trace0 =
-          mCurrentMonolithicConflictChecker.getCounterExample();
-        final ConflictTraceProxy trace1 = expandTrace(trace0);
-        return setFailedResult(trace1);
+        final ConflictTraceProxy trace =
+          expandTrace(mPreliminaryCounterexample);
+        return setFailedResult(trace);
       }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -352,7 +369,7 @@ public class OPConflictChecker
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
-    return false;
+    return mAbstractionMethod.supportsNondeterminism();
   }
 
 
@@ -368,9 +385,16 @@ public class OPConflictChecker
     super.setUp();
     final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(0.0);
-    result.setNumberOfStates(0.0);
+    result.setNumberOfTransitions(0.0);
     final EventProxy marking = getUsedMarkingProposition();
-    mPropositions = Collections.singletonList(marking);
+    if (mPreconditionMarking == null) {
+      mPropositions = Collections.singletonList(marking);
+    } else {
+      final EventProxy[] markings = new EventProxy[2];
+      markings[0] = marking;
+      markings[1] = mPreconditionMarking;
+      mPropositions = Arrays.asList(markings);
+    }
     mAbstractionRule = mAbstractionMethod.createAbstractionRule(this);
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
     mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
@@ -379,6 +403,7 @@ public class OPConflictChecker
     mModifyingSteps = new ArrayList<AbstractionStep>();
     mNumOverflows = 0;
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
+    mGotGlobalResult = false;
   }
 
   protected void tearDown()
@@ -387,12 +412,13 @@ public class OPConflictChecker
     mCurrentSynchronousProductBuilder = null;
     mCurrentMonolithicConflictChecker = null;
     mCurrentAutomata = null;
+    mPropositionStatusMap = null;
     mCurrentEvents = null;
     mEventInfoMap = null;
     mDirtyAutomata = null;
     mRedundantEvents = null;
     mPostponedSubsystems = null;
-    mProcessedAutomata = null;
+    mProcessedSubsystems = null;
     mModifyingSteps = null;
     mUsedEventNames = null;
     mOverflowCandidates = null;
@@ -413,6 +439,7 @@ public class OPConflictChecker
     final int numAutomata = automata.size();
     final KindTranslator translator = getKindTranslator();
     mCurrentAutomata = new ArrayList<AutomatonProxy>(numAutomata);
+    mPropositionStatusMap = new TObjectByteHashMap<AutomatonProxy>(numAutomata);
     final int numEvents = model.getEvents().size();
     mCurrentEvents = new THashSet<EventProxy>(numEvents);
     mEventInfoMap = new HashMap<EventProxy,EventInfo>(numEvents);
@@ -439,7 +466,7 @@ public class OPConflictChecker
       }
     }
     mPostponedSubsystems = new LinkedList<SubSystem>();
-    mProcessedAutomata = new LinkedList<AutomatonProxy>();
+    mProcessedSubsystems = new LinkedList<SubSystem>();
   }
 
   private void updateEventsToAutomata(final AutomatonProxy autToAdd,
@@ -483,6 +510,9 @@ public class OPConflictChecker
 
   private void removeEventsToAutomata(final Collection<AutomatonProxy> victims)
   {
+    for (final AutomatonProxy aut : victims) {
+      mPropositionStatusMap.remove(aut);
+    }
     mRedundantEvents.clear();
     final Set<EventProxy> eventsToRemove = new THashSet<EventProxy>();
     for (final EventProxy event : mCurrentEvents) {
@@ -690,10 +720,11 @@ public class OPConflictChecker
     if (mPostponedSubsystems.isEmpty()) {
       return false;
     } else {
-      mProcessedAutomata.addAll(mCurrentAutomata);
-      final SubSystem task = Collections.min(mPostponedSubsystems);
-      mPostponedSubsystems.remove(task);
-      loadSubSystem(task);
+      final SubSystem current = new SubSystem(mCurrentEvents, mCurrentAutomata);
+      mProcessedSubsystems.add(current);
+      final SubSystem next = Collections.min(mPostponedSubsystems);
+      mPostponedSubsystems.remove(next);
+      loadSubSystem(next);
       return true;
     }
   }
@@ -706,27 +737,17 @@ public class OPConflictChecker
 
   private void restoreAutomata()
   {
-    mCurrentAutomata.addAll(mProcessedAutomata);
+    for (final SubSystem task : mProcessedSubsystems) {
+      final Collection<AutomatonProxy> automata = task.getAutomata();
+      mCurrentAutomata.addAll(automata);
+    }
     for (final SubSystem task : mPostponedSubsystems) {
       final Collection<AutomatonProxy> automata = task.getAutomata();
       mCurrentAutomata.addAll(automata);
     }
   }
 
-  private boolean isTriviallyNonblockingSubsystem()
-    throws EventNotFoundException
-  {
-    final EventProxy marking = getUsedMarkingProposition();
-    for (final AutomatonProxy aut : mCurrentAutomata) {
-      final Collection<EventProxy> alphabet = aut.getEvents();
-      if (alphabet.contains(marking)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private boolean runMonolithicConflictCheck()
+  private void runMonolithicConflictCheck()
     throws AnalysisException
   {
     final EventProxy marking = getUsedMarkingProposition();
@@ -742,7 +763,12 @@ public class OPConflictChecker
     final VerificationResult result =
       mCurrentMonolithicConflictChecker.getAnalysisResult();
     recordStatistics(result);
-    return result.isSatisfied();
+    if (!result.isSatisfied()) {
+      mPreliminaryCounterexample =
+        mCurrentMonolithicConflictChecker.getCounterExample();
+      checkAlphaReachable(false);
+      mGotGlobalResult = true;
+    }
   }
 
   private ProductDESProxy createDES(final List<EventProxy> events,
@@ -751,6 +777,159 @@ public class OPConflictChecker
     final ProductDESProxyFactory factory = getFactory();
     final String name = Candidate.getCompositionName(automata);
     return factory.createProductDESProxy(name, events, automata);
+  }
+
+
+  //#########################################################################
+  //# Proposition Analysis
+  private boolean checkSubsystemTrivial()
+    throws EventNotFoundException
+  {
+    final byte status = getSubsystemPropositionStatus();
+    if ((status & NONE_ALPHA) != 0) {
+      // The global system is nonblocking.
+      return mGotGlobalResult = true;
+    } else if ((status & ALL_OMEGA) != 0) {
+      // This subsystem is trivially nonblocking.
+      return true;
+    } else if ((status & NONE_OMEGA) != 0) {
+      // The global system is blocking if and only if alpha is reachable
+      checkAlphaReachable((status & ALL_ALPHA) == 0);
+      return mGotGlobalResult = true;
+    } else {
+      return false;
+    }
+  }
+
+  private byte getSubsystemPropositionStatus()
+    throws EventNotFoundException
+  {
+    byte all = ALL_ALPHA | ALL_OMEGA;
+    byte none = 0;
+    for (final AutomatonProxy aut : mCurrentAutomata) {
+      final byte autStatus = getPropositionStatus(aut);
+      if ((autStatus & NONE_ALPHA) != 0) {
+        return NONE_ALPHA;
+      } else if ((autStatus & NONE_OMEGA) != 0) {
+        if (mPreconditionMarking == null) {
+          return ALL_ALPHA | NONE_OMEGA;
+        } else {
+          all &= ~ALL_OMEGA;
+          none |= NONE_OMEGA;
+        }
+      } else {
+        all &= autStatus;
+      }
+    }
+    return (byte) (all | none);
+  }
+
+  private byte getPropositionStatus(final AutomatonProxy aut)
+    throws EventNotFoundException
+  {
+    if (mPropositionStatusMap.containsKey(aut)) {
+      return mPropositionStatusMap.get(aut);
+    } else {
+      final byte status = computePropositionStatus(aut);
+      mPropositionStatusMap.put(aut, status);
+      return status;
+    }
+  }
+
+  private byte computePropositionStatus(final AutomatonProxy aut)
+    throws EventNotFoundException
+  {
+    final EventProxy alpha = mPreconditionMarking;
+    final EventProxy omega = getUsedMarkingProposition();
+    boolean usesAlpha = false;
+    boolean usesOmega = false;
+
+    for (final EventProxy event : aut.getEvents()) {
+      if (event == omega) {
+        usesOmega = true;
+        if (usesAlpha || alpha == null) {
+          break;
+        }
+      } else if (event == alpha) {
+        usesAlpha = true;
+        if (usesOmega) {
+          break;
+        }
+      }
+    }
+
+    boolean noneAlpha = usesAlpha;
+    boolean allAlpha = usesAlpha;
+    boolean noneOmega = usesOmega;
+    boolean allOmega = usesOmega;
+    boolean hasinit = false;
+    for (final StateProxy state : aut.getStates()) {
+      hasinit |= state.isInitial();
+      boolean containsAlpha = !usesAlpha;
+      boolean containsOmega = !usesOmega;
+      for (final EventProxy prop : state.getPropositions()) {
+        if (prop == omega) {
+          containsOmega = true;
+          noneOmega = false;
+          if (hasinit && containsAlpha) {
+            break;
+          }
+        } else if (prop == alpha) {
+          containsAlpha = false;
+          noneAlpha = false;
+          if (hasinit && containsOmega) {
+            break;
+          }
+        }
+      }
+      if (usesAlpha && !containsAlpha) {
+        allAlpha = false;
+      }
+      if (usesOmega && !containsOmega) {
+        allOmega = false;
+      }
+      if (hasinit && !noneAlpha && !allAlpha && !noneOmega && !allOmega) {
+        break;
+      }
+    }
+
+    byte result = 0;
+    if (!hasinit) {
+      result |= NONE_ALPHA;
+    } else if (!usesAlpha || allAlpha) {
+      result |= ALL_ALPHA;
+    } else if (noneAlpha) {
+      result |= NONE_ALPHA;
+    }
+    if (!usesOmega || allOmega) {
+      result |= ALL_OMEGA;
+    } else if (noneOmega) {
+      result |= NONE_OMEGA;
+    }
+    return result;
+  }
+
+
+  //#########################################################################
+  //# Alpha-Reachability Check
+  private boolean checkAlphaReachable(final boolean includeCurrent)
+  {
+    if (mPreconditionMarking == null) {
+      if (mPreliminaryCounterexample == null) {
+        mPreliminaryCounterexample = createInitialStateTrace();
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private ConflictTraceProxy createInitialStateTrace()
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy model = getModel();
+    final String name = model.getName() + ":initial";
+    return factory.createConflictTraceProxy(name, model, null, null);
   }
 
 
@@ -931,7 +1110,7 @@ public class OPConflictChecker
       int prefix = 0;
       while (!mUsedEventNames.add(name)) {
         prefix++;
-        name = Candidate.getCompositionName("tau:" + prefix, automata);
+        name = Candidate.getCompositionName("tau" + prefix + ":", automata);
       }
       return factory.createEventProxy(name, EventKind.UNCONTROLLABLE, false);
     }
@@ -1110,7 +1289,7 @@ public class OPConflictChecker
      * Automata are minimised according to <I>observation equivalence</I>.
      */
     OEQ {
-      public AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.new ObservationEquivalenceAbstractionRule
                             (ObservationEquivalenceTRSimplifier.Equivalence.
@@ -1124,7 +1303,7 @@ public class OPConflictChecker
      * automata is not resolved, nondeterministic abstraction are used instead.
      */
     OP {
-      public AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.new ObserverProjectionAbstractionRule();
       }
@@ -1135,9 +1314,14 @@ public class OPConflictChecker
      * P. Pena, J.E.R. Cury, R. Malik, and S. Lafortune in WODES 2010.
      */
     OPSEARCH {
-      public AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.new OPSearchAbstractionRule();
+      }
+
+      boolean supportsNondeterminism()
+      {
+        return false;
       }
     },
     /**
@@ -1147,7 +1331,7 @@ public class OPConflictChecker
      * transitions.
      */
     WOEQ {
-      public AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.new ObservationEquivalenceAbstractionRule
                             (ObservationEquivalenceTRSimplifier.Equivalence.
@@ -1155,8 +1339,13 @@ public class OPConflictChecker
       }
     };
 
-    public abstract AbstractionRule createAbstractionRule
+    abstract AbstractionRule createAbstractionRule
       (OPConflictChecker checker);
+
+    boolean supportsNondeterminism()
+    {
+      return true;
+    }
   }
 
 
@@ -1178,7 +1367,7 @@ public class OPConflictChecker
      * as a candidate.
      */
     MustL {
-      public PreselectingHeuristic createHeuristic
+      PreselectingHeuristic createHeuristic
         (final OPConflictChecker checker)
       {
         return checker.new HeuristicMustL();
@@ -1189,7 +1378,7 @@ public class OPConflictChecker
      * every other automaton in the model.
      */
     MaxS {
-      public PreselectingHeuristic createHeuristic
+      PreselectingHeuristic createHeuristic
         (final OPConflictChecker checker)
       {
         return checker.new HeuristicMaxS();
@@ -1200,15 +1389,14 @@ public class OPConflictChecker
      * transitions to every other automaton in the model.
      */
     MinT {
-      public PreselectingHeuristic createHeuristic
+      PreselectingHeuristic createHeuristic
         (final OPConflictChecker checker)
       {
         return checker.new HeuristicMinT();
       }
     };
 
-    public abstract PreselectingHeuristic createHeuristic
-      (OPConflictChecker checker);
+    abstract PreselectingHeuristic createHeuristic(OPConflictChecker checker);
   }
 
 
@@ -1233,7 +1421,7 @@ public class OPConflictChecker
      * Chooses the candidate with the highest proportion of local events.
      */
     MaxL {
-      public Comparator<Candidate> createSingleHeuristic
+      Comparator<Candidate> createSingleHeuristic
         (final OPConflictChecker checker)
       {
         return checker.new HeuristicMaxL();
@@ -1245,7 +1433,7 @@ public class OPConflictChecker
      * automata of the candidate.
      */
     MaxC {
-      public Comparator<Candidate> createSingleHeuristic
+      Comparator<Candidate> createSingleHeuristic
         (final OPConflictChecker checker)
       {
         return checker.new HeuristicMaxC();
@@ -1256,7 +1444,7 @@ public class OPConflictChecker
      * in the synchronous product.
      */
     MinS {
-      public Comparator<Candidate> createSingleHeuristic
+      Comparator<Candidate> createSingleHeuristic
         (final OPConflictChecker checker)
       {
         return checker.new HeuristicMinS();
@@ -1270,7 +1458,7 @@ public class OPConflictChecker
      * @param checker The conflict checker requesting and using the
      *                heuristic.
      */
-    public abstract Comparator<Candidate> createSingleHeuristic
+    abstract Comparator<Candidate> createSingleHeuristic
       (OPConflictChecker checker);
 
     /**
@@ -1284,8 +1472,7 @@ public class OPConflictChecker
      * @param checker The conflict checker requesting and using the
      *                heuristic.
      */
-    public Comparator<Candidate> createHeuristic
-      (final OPConflictChecker checker)
+    Comparator<Candidate> createHeuristic(final OPConflictChecker checker)
     {
       final int count = values().length;
       final List<Comparator<Candidate>> list =
@@ -1792,7 +1979,7 @@ public class OPConflictChecker
     //# Rule Application
     abstract ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
                                                   final EventProxy tau)
-    throws AnalysisException;
+      throws AnalysisException;
 
     //#######################################################################
     //# Auxiliary Methods
@@ -2785,6 +2972,7 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Data Members
+  private EventProxy mPreconditionMarking;
   private Collection<EventProxy> mPropositions;
   private int mInternalStepNodeLimit;
   private int mInternalStepTransitionLimit;
@@ -2796,6 +2984,7 @@ public class OPConflictChecker
   private ConflictChecker mMonolithicConflictChecker;
 
   private List<AutomatonProxy> mCurrentAutomata;
+  private TObjectByteHashMap<AutomatonProxy> mPropositionStatusMap;
   private Collection<EventProxy> mCurrentEvents;
   private Map<EventProxy,EventInfo> mEventInfoMap =
       new HashMap<EventProxy,EventInfo>();
@@ -2809,11 +2998,14 @@ public class OPConflictChecker
    */
   private boolean mEventHasDisappeared;
   private Collection<SubSystem> mPostponedSubsystems;
-  private Collection<AutomatonProxy> mProcessedAutomata;
+  private Collection<SubSystem> mProcessedSubsystems;
   private List<AbstractionStep> mModifyingSteps;
   private Set<String> mUsedEventNames;
   private Set<List<AutomatonProxy>> mOverflowCandidates;
   private int mNumOverflows;
+  private boolean mGotGlobalResult;
+  private ConflictTraceProxy mPreliminaryCounterexample;
+
   private AbstractionRule mAbstractionRule;
   private PreselectingHeuristic mPreselectingHeuristic;
   private Comparator<Candidate> mSelectingHeuristic;
@@ -2829,5 +3021,10 @@ public class OPConflictChecker
   private static final byte ONLY_SELFLOOP = 1;
   private static final byte NOT_ONLY_SELFLOOP = 2;
   private static final byte BLOCKED = 3;
+
+  private static final byte NONE_OMEGA = 0x01;
+  private static final byte ALL_OMEGA = 0x02;
+  private static final byte NONE_ALPHA = 0x04;
+  private static final byte ALL_ALPHA = 0x08;
 
 }

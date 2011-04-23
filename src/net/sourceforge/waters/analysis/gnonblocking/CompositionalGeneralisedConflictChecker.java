@@ -193,30 +193,30 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   @Override
-  public void setGeneralisedPrecondition(final EventProxy marking)
+  public void setPreconditionMarking(final EventProxy marking)
   {
-    super.setGeneralisedPrecondition(marking);
+    super.setPreconditionMarking(marking);
     mUsedPreconditionMarking = null;
   }
 
   /**
    * Gets the precondition marking proposition to be used. This method returns
    * the marking proposition specified by the
-   * {@link #setGeneralisedPrecondition(EventProxy)
+   * {@link #setPreconditionMarking(EventProxy)
    * setGeneralisedPrecondition()} method, if non-null, or creates an alpha
    * marking if the model does not contain one.
    */
   protected EventProxy getUsedPreconditionMarkingProposition()
   {
     if (mUsedPreconditionMarking == null) {
-      if (getGeneralisedPrecondition() == null) {
+      if (getPreconditionMarking() == null) {
         final ProductDESProxyFactory factory = getFactory();
         final EventProxy alpha =
             factory.createEventProxy(":alpha", EventKind.PROPOSITION);
 
         mUsedPreconditionMarking = alpha;
       } else {
-        mUsedPreconditionMarking = getGeneralisedPrecondition();
+        mUsedPreconditionMarking = getPreconditionMarking();
       }
     }
     return mUsedPreconditionMarking;
@@ -310,7 +310,7 @@ public class CompositionalGeneralisedConflictChecker extends
       // final ConflictChecker checker = new MonolithicConflictChecker(model,
       // getUsedMarkingProposition(), getFactory());
       checker
-          .setGeneralisedPrecondition(getUsedPreconditionMarkingProposition());
+          .setPreconditionMarking(getUsedPreconditionMarkingProposition());
       checker.setNodeLimit(mFinalStepNodeLimit);
       checker.setTransitionLimit(mFinalStepTransitionLimit);
       final boolean result = checker.run();
