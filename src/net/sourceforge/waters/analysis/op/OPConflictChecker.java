@@ -32,14 +32,19 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.gnonblocking.Candidate;
+import net.sourceforge.waters.analysis.modular.ProjectingLanguageInclusionChecker;
+import net.sourceforge.waters.analysis.modular.Projection2;
+import net.sourceforge.waters.analysis.modular.SafetyProjectionBuilder;
 import net.sourceforge.waters.analysis.monolithic.
   MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
+import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
@@ -51,6 +56,7 @@ import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -261,8 +267,20 @@ public class OPConflictChecker
     mMonolithicConflictChecker = checker;
   }
 
+  public void setCompositionalLanguageInclusionChecker
+    (final LanguageInclusionChecker checker)
+  {
+    mCompositionalLanguageInclusionChecker = checker;
+  }
 
-  private SynchronousProductBuilder setupSynchronousProductBuilder()
+  public void setLanguageInclusionConflictChecker
+    (final LanguageInclusionChecker checker)
+  {
+    mMonolithicLanguageInclusionChecker = checker;
+  }
+
+
+  private void setupSynchronousProductBuilder()
   {
     if (mCurrentSynchronousProductBuilder == null) {
       if (mSynchronousProductBuilder == null) {
@@ -278,10 +296,9 @@ public class OPConflictChecker
       final int tlimit = getInternalStepTransitionLimit();
       mCurrentSynchronousProductBuilder.setTransitionLimit(tlimit);
     }
-    return mCurrentSynchronousProductBuilder;
   }
 
-  private ConflictChecker setupMonolithicConflictChecker()
+  private void setupMonolithicConflictChecker()
     throws EventNotFoundException
   {
     if (mCurrentMonolithicConflictChecker == null) {
@@ -302,7 +319,36 @@ public class OPConflictChecker
       mCurrentMonolithicConflictChecker.setPreconditionMarking
         (mPreconditionMarking);
     }
-    return mCurrentMonolithicConflictChecker;
+  }
+
+  private void setupLanguageInclusionCheckers()
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    if (mCurrentMonolithicLanguageInclusionChecker == null) {
+      if (mMonolithicLanguageInclusionChecker == null) {
+        mCurrentMonolithicLanguageInclusionChecker =
+          new NativeLanguageInclusionChecker(factory);
+      } else {
+        mCurrentMonolithicLanguageInclusionChecker =
+          mMonolithicLanguageInclusionChecker;
+      }
+      final int nlimit = getFinalStepNodeLimit();
+      mCurrentMonolithicLanguageInclusionChecker.setNodeLimit(nlimit);
+      final int tlimit = getFinalStepTransitionLimit();
+      mCurrentMonolithicLanguageInclusionChecker.setTransitionLimit(tlimit);
+    }
+    if (mCurrentCompositionalLanguageInclusionChecker == null) {
+      if (mCompositionalLanguageInclusionChecker == null) {
+        final SafetyProjectionBuilder projector = new Projection2(factory);
+        mCurrentCompositionalLanguageInclusionChecker =
+          new ProjectingLanguageInclusionChecker
+            (factory, mCompositionalLanguageInclusionChecker,
+             projector, mInternalStepNodeLimit);
+      } else {
+        mCurrentCompositionalLanguageInclusionChecker =
+          mCompositionalLanguageInclusionChecker;
+      }
+    }
   }
 
 
@@ -400,6 +446,7 @@ public class OPConflictChecker
     mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
     setupSynchronousProductBuilder();
     setupMonolithicConflictChecker();
+    setupLanguageInclusionCheckers();
     mModifyingSteps = new ArrayList<AbstractionStep>();
     mNumOverflows = 0;
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
@@ -411,6 +458,8 @@ public class OPConflictChecker
     mPropositions = null;
     mCurrentSynchronousProductBuilder = null;
     mCurrentMonolithicConflictChecker = null;
+    mCurrentCompositionalLanguageInclusionChecker = null;
+    mCurrentMonolithicLanguageInclusionChecker = null;
     mCurrentAutomata = null;
     mPropositionStatusMap = null;
     mCurrentEvents = null;
@@ -783,7 +832,7 @@ public class OPConflictChecker
   //#########################################################################
   //# Proposition Analysis
   private boolean checkSubsystemTrivial()
-    throws EventNotFoundException
+    throws AnalysisException
   {
     final byte status = getSubsystemPropositionStatus();
     if ((status & NONE_ALPHA) != 0) {
@@ -811,15 +860,9 @@ public class OPConflictChecker
       if ((autStatus & NONE_ALPHA) != 0) {
         return NONE_ALPHA;
       } else if ((autStatus & NONE_OMEGA) != 0) {
-        if (mPreconditionMarking == null) {
-          return ALL_ALPHA | NONE_OMEGA;
-        } else {
-          all &= ~ALL_OMEGA;
-          none |= NONE_OMEGA;
-        }
-      } else {
-        all &= autStatus;
+        none |= NONE_OMEGA;
       }
+      all &= autStatus;
     }
     return (byte) (all | none);
   }
@@ -913,6 +956,7 @@ public class OPConflictChecker
   //#########################################################################
   //# Alpha-Reachability Check
   private boolean checkAlphaReachable(final boolean includeCurrent)
+    throws AnalysisException
   {
     if (mPreconditionMarking == null) {
       if (mPreliminaryCounterexample == null) {
@@ -920,7 +964,79 @@ public class OPConflictChecker
       }
       return true;
     } else {
+      final ProductDESProxyFactory factory = getFactory();
+      final KindTranslator translator = getKindTranslator();
+      final PropositionPropertyBuilder builder =
+        new PropositionPropertyBuilder(factory,
+                                       mPreconditionMarking,
+                                       translator);
+      final List<ConflictTraceProxy> traces =
+        new LinkedList<ConflictTraceProxy>();
+      if (includeCurrent) {
+        if (!isAlphaReachable(builder, mCurrentEvents,
+                              mCurrentAutomata, traces)) {
+          return false;
+        }
+      }
+      for (final SubSystem subsys : mPostponedSubsystems) {
+        if (!isAlphaReachable(builder, subsys, traces)) {
+          return false;
+        }
+      }
+      for (final SubSystem subsys : mProcessedSubsystems) {
+        if (!isAlphaReachable(builder, subsys, traces)) {
+          return false;
+        }
+      }
+      // TODO Merge the traces ...
+      if (mPreliminaryCounterexample == null) {
+        mPreliminaryCounterexample = traces.iterator().next();
+      }
+      return true;
+    }
+  }
+
+  private boolean isAlphaReachable(final PropositionPropertyBuilder builder,
+                                   final SubSystem subsys,
+                                   final List<ConflictTraceProxy> traces)
+    throws AnalysisException
+  {
+    final Collection<EventProxy> events = subsys.getEvents();
+    final List<AutomatonProxy> automata = subsys.getAutomata();
+    return isAlphaReachable(builder, events, automata, traces);
+  }
+
+  private boolean isAlphaReachable(final PropositionPropertyBuilder builder,
+                                   final Collection<EventProxy> events,
+                                   final List<AutomatonProxy> automata,
+                                   final List<ConflictTraceProxy> traces)
+    throws AnalysisException
+  {
+    final List<EventProxy> eventList = new ArrayList<EventProxy>(events);
+    Collections.sort(eventList);
+    final ProductDESProxy des = createDES(eventList, automata);
+    builder.setInputModel(des);
+    builder.run();
+    final ProductDESProxy languageInclusionModel = builder.getOutputModel();
+    final KindTranslator languageInclusionTranslator =
+      builder.getKindTranslator();
+    final LanguageInclusionChecker checker;
+    if (languageInclusionModel.getAutomata().size() > 2) {
+      checker = mCurrentCompositionalLanguageInclusionChecker;
+    } else {
+      checker = mCurrentMonolithicLanguageInclusionChecker;
+    }
+    checker.setKindTranslator(languageInclusionTranslator);
+    checker.setModel(languageInclusionModel);
+    if (checker.run()) {
       return false;
+    } else {
+      final SafetyTraceProxy languageInclusionTrace =
+        checker.getCounterExample();
+      final ConflictTraceProxy conflictTrace =
+        builder.getConvertedConflictTrace(languageInclusionTrace);
+      traces.add(conflictTrace);
+      return true;
     }
   }
 
@@ -1138,6 +1254,7 @@ public class OPConflictChecker
       TraceChecker.checkCounterExample(traceSteps, check, true);
       */
     }
+    // TODO Extend to alpha state.
     final ProductDESProxyFactory factory = getFactory();
     final String tracename = getTraceName();
     final ProductDESProxy model = getModel();
@@ -2982,6 +3099,8 @@ public class OPConflictChecker
   private SelectingMethod mSelectingMethod;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
+  private LanguageInclusionChecker mCompositionalLanguageInclusionChecker;
+  private LanguageInclusionChecker mMonolithicLanguageInclusionChecker;
 
   private List<AutomatonProxy> mCurrentAutomata;
   private TObjectByteHashMap<AutomatonProxy> mPropositionStatusMap;
@@ -3011,6 +3130,9 @@ public class OPConflictChecker
   private Comparator<Candidate> mSelectingHeuristic;
   private SynchronousProductBuilder mCurrentSynchronousProductBuilder;
   private ConflictChecker mCurrentMonolithicConflictChecker;
+  private LanguageInclusionChecker
+    mCurrentCompositionalLanguageInclusionChecker;
+  private LanguageInclusionChecker mCurrentMonolithicLanguageInclusionChecker;
 
 
   //#########################################################################

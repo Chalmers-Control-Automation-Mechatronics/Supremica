@@ -8,7 +8,7 @@
 //###########################################################################
 
 
-package net.sourceforge.waters.analysis.gnonblocking;
+package net.sourceforge.waters.analysis.op;
 
 
 import gnu.trove.THashSet;
@@ -53,6 +53,13 @@ public class PropositionPropertyBuilder
                                     final KindTranslator translator)
   {
     this(null, null, factory, translator);
+  }
+
+  public PropositionPropertyBuilder(final ProductDESProxyFactory factory,
+                                    final EventProxy prop,
+                                    final KindTranslator translator)
+  {
+    this(null, prop, factory, translator);
   }
 
   public PropositionPropertyBuilder(final ProductDESProxy model,
@@ -146,7 +153,12 @@ public class PropositionPropertyBuilder
     final String comment =
       "Automatically generated to test whether " + desname +
       " has a reachable state marked " + propname + ".";
-    final Collection<EventProxy> events = mInputModel.getEvents();
+    final Collection<EventProxy> inputEvents = mInputModel.getEvents();
+    final int numEvents = inputEvents.size() + 1;
+    final Collection<EventProxy> outputEvents =
+      new ArrayList<EventProxy>(numEvents);
+    outputEvents.addAll(inputEvents);
+    outputEvents.add(mProposition);
     final Collection<AutomatonProxy> inputAutomata = mInputModel.getAutomata();
     final int numAutomata = inputAutomata.size();
     final Collection<String> autnames = new THashSet<String>(numAutomata);
@@ -173,7 +185,7 @@ public class PropositionPropertyBuilder
     final AutomatonProxy spec = createPropertyAutomaton();
     outputAutomata.add(spec);
     mOutputModel = mFactory.createProductDESProxy(name, comment, null,
-                                                  events, outputAutomata);
+                                                  outputEvents, outputAutomata);
     mKindTranslator = new PropositionKindTranslator(mParentKindTranslator,
                                                     mProposition, spec);
     return mOutputModel;
