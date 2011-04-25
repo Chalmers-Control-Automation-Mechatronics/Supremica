@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import gnu.trove.HashFunctions;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
@@ -1080,7 +1081,23 @@ public class OPConflictChecker
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy model = getModel();
     final String name = model.getName() + ":initial";
-    return factory.createConflictTraceProxy(name, model, null, null);
+    final String comment = "Initial state trace";
+    final int numAutomata = model.getAutomata().size();
+    final Collection<AutomatonProxy> automata =
+      new ArrayList<AutomatonProxy>(numAutomata);
+    automata.addAll(mCurrentAutomata);
+    for (final SubSystem subsys : mPostponedSubsystems) {
+      final Collection<AutomatonProxy> moreAutomata = subsys.getAutomata();
+      automata.addAll(moreAutomata);
+    }
+    for (final SubSystem subsys : mProcessedSubsystems) {
+      final Collection<AutomatonProxy> moreAutomata = subsys.getAutomata();
+      automata.addAll(moreAutomata);
+    }
+    final TraceStepProxy step = factory.createTraceStepProxy(null);
+    final List<TraceStepProxy> steps = Collections.singletonList(step);
+    return factory.createConflictTraceProxy
+      (name, comment, null, model, automata, steps, ConflictKind.CONFLICT);
   }
 
   private ConflictTraceProxy mergeLanguageInclusionTraces
@@ -1196,8 +1213,7 @@ public class OPConflictChecker
       tau = syncStep.getHiddenEvent();
     }
     recordStatistics(aut);
-    final ObservationEquivalenceStep simpStep =
-      mAbstractionRule.applyRule(aut, tau);
+    final MergeStep simpStep = mAbstractionRule.applyRule(aut, tau);
     if (syncStep != null || simpStep != null) {
       if (syncStep != null) {
         mModifyingSteps.add(syncStep);
@@ -1355,7 +1371,7 @@ public class OPConflictChecker
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
     return factory.createConflictTraceProxy(tracename,
-                                            trace.getComment(),
+                                            null,  // comment?
                                             null,
                                             model,
                                             automata,
@@ -2189,8 +2205,8 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Rule Application
-    abstract ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
-                                                  final EventProxy tau)
+    abstract MergeStep applyRule(final AutomatonProxy aut,
+                                 final EventProxy tau)
       throws AnalysisException;
 
     //#######################################################################
@@ -2249,10 +2265,9 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Rule Application
-    ObservationEquivalenceStep applyRule
-      (final AutomatonProxy aut,
-       final EventProxy tau)
-    throws AnalysisException
+    ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
+                                         final EventProxy tau)
+      throws AnalysisException
     {
       final EventEncoding eventEnc =
         new EventEncoding(aut, tau, mPropositions,
@@ -2571,10 +2586,9 @@ public class OPConflictChecker
         autMap.put(result, original);
       }
       final ProductDESProxyFactory factory = getFactory();
-      final int numSteps = steps.size();
-      final List<TraceStepProxy> newSteps =
-        new ArrayList<TraceStepProxy>(numSteps);
-      for (final TraceStepProxy step : steps) {
+      final ListIterator<TraceStepProxy> iter = steps.listIterator();
+      while (iter.hasNext()) {
+        final TraceStepProxy step = iter.next();
         final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
         final int size = stepMap.size();
         final Map<AutomatonProxy,StateProxy> newStepMap =
@@ -2592,16 +2606,16 @@ public class OPConflictChecker
         final EventProxy event = step.getEvent();
         final TraceStepProxy newStep =
           factory.createTraceStepProxy(event, newStepMap);
-        newSteps.add(newStep);
+        iter.set(newStep);
       }
-      return newSteps;
+      return steps;
     }
 
   }
 
 
   //#########################################################################
-  //# Inner Class CompositionStep
+  //# Inner Class HidingStep
   private class HidingStep extends AbstractionStep
   {
 
@@ -2646,11 +2660,10 @@ public class OPConflictChecker
       final int convertedNumAutomata =
         steps.iterator().next().getStateMap().size() +
         originalAutomata.size() - 1;
-      final int numSteps = steps.size();
-      final List<TraceStepProxy> convertedSteps =
-          new ArrayList<TraceStepProxy>(numSteps);
       Map<AutomatonProxy,StateProxy> previousMap = null;
-      for (final TraceStepProxy step : steps) {
+      final ListIterator<TraceStepProxy> iter = steps.listIterator();
+      while (iter.hasNext()) {
+        final TraceStepProxy step = iter.next();
         final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
         final Map<AutomatonProxy,StateProxy> convertedStepMap =
           new HashMap<AutomatonProxy,StateProxy>(convertedNumAutomata);
@@ -2668,10 +2681,10 @@ public class OPConflictChecker
         }
         final TraceStepProxy convertedStep =
           factory.createTraceStepProxy(event, convertedStepMap);
-        convertedSteps.add(convertedStep);
+        iter.set(convertedStep);
         previousMap = convertedStepMap;
       }
-      return convertedSteps;
+      return steps;
     }
 
     private EventProxy findEvent(final Map<AutomatonProxy,StateProxy> sources,
@@ -2731,25 +2744,35 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class ObservationEquivalenceStep
-  private class ObservationEquivalenceStep extends AbstractionStep
+  //# Inner Class MergeStep
+  /**
+   * An abstraction step in which the result automaton is obtained by
+   * merging states of the original automaton (automaton quotient).
+   */
+  private abstract class MergeStep extends AbstractionStep
   {
 
     //#######################################################################
     //# Constructor
-    private ObservationEquivalenceStep
-      (final AutomatonProxy resultAut,
-       final AutomatonProxy originalAut,
-       final EventProxy tau,
-       final StateEncoding originalStateEnc,
-       final List<int[]> partition,
-       final StateEncoding resultStateEnc)
+    MergeStep(final AutomatonProxy resultAut,
+              final AutomatonProxy originalAut,
+              final EventProxy tau,
+              final StateEncoding originalStateEnc,
+              final List<int[]> partition,
+              final StateEncoding resultStateEnc)
     {
       super(resultAut, originalAut);
       mTau = tau;
       mOriginalStateEncoding = originalStateEnc;
       mPartition = partition;
       mReverseOutputStateMap = resultStateEnc.getStateCodeMap();
+    }
+
+    //#######################################################################
+    //# Simple Access
+    ListBufferTransitionRelation getTransitionRelation()
+    {
+      return mTransitionRelation;
     }
 
     //#######################################################################
@@ -2772,13 +2795,12 @@ public class OPConflictChecker
         convertCrucialSteps(crucialSteps);
       mTargetSet = null;
       mergeTraceSteps(traceSteps, convertedSteps);
-      mTransitionRelation = null;
       mEventEncoding = null;
+      mTransitionRelation = null;
       return traceSteps;
     }
 
-    private List<SearchRecord> getCrucialSteps
-      (final List<TraceStepProxy> traceSteps)
+    List<SearchRecord> getCrucialSteps(final List<TraceStepProxy> traceSteps)
     {
       final AutomatonProxy resultAutomaton = getResultAutomaton();
       final int tau = EventEncoding.TAU;
@@ -2806,7 +2828,7 @@ public class OPConflictChecker
           if (crucialEventID != tau) {
             final int crucialStateID = mReverseOutputStateMap.get(crucialState);
             record =
-              new SearchRecord(crucialStateID, false, crucialEventID, null);
+              new SearchRecord(crucialStateID, 0, crucialEventID, null);
             crucialSteps.add(record);
           }
           // 2) Record new event and target state.
@@ -2817,149 +2839,20 @@ public class OPConflictChecker
       }
       // Add step to last target state.
       final int crucialStateID = mReverseOutputStateMap.get(crucialState);
-      record = new SearchRecord(crucialStateID, false, crucialEventID, null);
+      record = new SearchRecord(crucialStateID, 0, crucialEventID, null);
       crucialSteps.add(record);
       // Add final step to reach alpha.
       if (mPreconditionMarkingID >= 0) {
-        record = new SearchRecord(-1, false, tau, null);
+        record = new SearchRecord(-1, 0, tau, null);
         crucialSteps.add(record);
       }
       return crucialSteps;
     }
 
-    private List<SearchRecord> convertCrucialSteps
-      (final List<SearchRecord> crucialSteps)
-    {
-      final List<SearchRecord> foundSteps = new LinkedList<SearchRecord>();
-      int state = -1;
-      for (final SearchRecord crucialStep : crucialSteps) {
-        SearchRecord found = convertCrucialStep(state, crucialStep);
-        state = found.getState();
-        // Append the found search records in reverse order to the result
-        final int end = foundSteps.size();
-        final ListIterator<SearchRecord> iter = foundSteps.listIterator(end);
-        while (found.getPredecessor() != null) {
-          iter.add(found);
-          iter.previous();
-          found = found.getPredecessor();
-        }
-      }
-      return foundSteps;
-    }
+    abstract List<SearchRecord> convertCrucialSteps
+      (final List<SearchRecord> crucialSteps);
 
-    /**
-     * Finds a partial trace in the original automaton before observation
-     * equivalence. This method computes a sequence of tau transitions, followed
-     * by a transition with the given event, followed by another sequence of tau
-     * transitions linking the source state to some state in the class of the
-     * target state in the simplified automaton.
-     * @param originalSource
-     *         State number of the source state in the original automaton,
-     *         or -1 to request a search starting from all initial states.
-     * @param crucialStep
-     *         Search containing code of the event and state number of the
-     *         target state in the simplified automaton (code of state
-     *         class), with -1 request search for an alpha-marked state.
-     * @return Search record describing the trace from source to
-     *         target, in reverse order. The last entry in the list represents
-     *         the first step after the source state, with its event and target
-     *         state. The first step has a target state in the given target
-     *         class. Events in the list can only be tau or the given event.
-     */
-    private SearchRecord convertCrucialStep(final int originalSource,
-                                            final SearchRecord crucialStep)
-    {
-      setupTarget(crucialStep);
-      // The crucial event may be tau, but only for the first or last step.
-      final int tau = EventEncoding.TAU;
-      final int crucialEvent = crucialStep.getEvent();
-      // There are two types of search records, representing the states
-      // reached before or after execution of the crucial event, except
-      // when the crucial event is tau. If the crucial event is tau, only
-      // search states after the crucial event are considered, so a search
-      // using only tau transitions is performed.
-      final TIntHashSet visited0 =
-        crucialEvent != tau ? new TIntHashSet() : null;
-      final TIntHashSet visited1 = new TIntHashSet();
-      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
-      if (originalSource >= 0) {
-        // Normal search starting from known state.
-        if (crucialEvent == tau) {
-          final SearchRecord record =
-            new SearchRecord(originalSource, true, -1, null);
-          if (isTargetState(originalSource)) {
-            return record;
-          }
-          open.add(record);
-          visited1.add(originalSource);
-        } else {
-          final SearchRecord record = new SearchRecord(originalSource);
-          open.add(record);
-          visited0.add(originalSource);
-        }
-      } else {
-        // Start from initial state. The dummy record ensures that the first
-        // real search record will later be included in the trace.
-        final SearchRecord dummy = new SearchRecord(-1);
-        final int numStates = mTransitionRelation.getNumberOfStates();
-        for (int state = 0; state < numStates; state++) {
-          if (mTransitionRelation.isInitial(state)) {
-            if (crucialEvent == tau) {
-              final SearchRecord record =
-                new SearchRecord(state, true, -1, dummy);
-              if (isTargetState(state)) {
-                return record;
-              }
-              open.add(record);
-              visited1.add(state);
-            } else {
-              final SearchRecord record =
-                new SearchRecord(state, false, -1, dummy);
-              open.add(record);
-              visited0.add(state);
-            }
-          }
-        }
-      }
-      final TransitionIterator iter =
-        mTransitionRelation.createSuccessorsReadOnlyIterator();
-      while (true) {
-        final SearchRecord current = open.remove();
-        final int source = current.getState();
-        final boolean hasEvent = current.hasProperEvent();
-        final TIntHashSet visited = hasEvent ? visited1 : visited0;
-        iter.reset(source, tau);
-        while (iter.advance()) {
-          final int target = iter.getCurrentTargetState();
-          if (!visited.contains(target)) {
-            final SearchRecord record =
-              new SearchRecord(target, hasEvent, tau, current);
-            if (hasEvent && isTargetState(target)) {
-              return record;
-            }
-            open.add(record);
-            visited.add(target);
-          }
-        }
-        if (!hasEvent) {
-          iter.reset(source, crucialEvent);
-          while (iter.advance()) {
-            final int target = iter.getCurrentTargetState();
-            if (!visited1.contains(target)) {
-              final SearchRecord record =
-                new SearchRecord(target, true, crucialEvent, current);
-              if (isTargetState(target)) {
-                return record;
-              }
-              open.add(record);
-              visited1.add(target);
-            }
-          }
-        }
-      }
-    }
-
-    private void setupTarget(final SearchRecord crucialStep)
+    void setupTarget(final SearchRecord crucialStep)
     {
       final int targetClass = crucialStep.getState();
       if (targetClass >= 0) {
@@ -2970,19 +2863,26 @@ public class OPConflictChecker
       }
     }
 
-    private boolean isTargetState(final int state)
+    boolean isTargetState(final int state)
     {
       if (mTargetSet != null) {
         return mTargetSet.contains(state);
-      } else if (mPreconditionMarkingID < 0) {
+      } else {
+        return isTraceEndState(state);
+      }
+    }
+
+    boolean isTraceEndState(final int state)
+    {
+      if (mPreconditionMarkingID < 0) {
         return true;
       } else {
         return mTransitionRelation.isMarked(state, mPreconditionMarkingID);
       }
     }
 
-    private void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
-                                 final List<SearchRecord> convertedSteps)
+    void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
+                         final List<SearchRecord> convertedSteps)
     {
       final int tau = EventEncoding.TAU;
       final ProductDESProxyFactory factory = getFactory();
@@ -3108,6 +3008,288 @@ public class OPConflictChecker
 
 
   //#########################################################################
+  //# Inner Class ObservationEquivalenceStep
+  /**
+   * An abstraction step in which the result automaton is obtained by
+   * merging observation equivalent or weakly observation equivalent states.
+   * This class provides more efficient trace computation than is possible
+   * for a general merge.
+   */
+  private class ObservationEquivalenceStep extends MergeStep
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ObservationEquivalenceStep(final AutomatonProxy resultAut,
+                                       final AutomatonProxy originalAut,
+                                       final EventProxy tau,
+                                       final StateEncoding originalStateEnc,
+                                       final List<int[]> partition,
+                                       final StateEncoding resultStateEnc)
+    {
+      super(resultAut, originalAut, tau,
+            originalStateEnc, partition, resultStateEnc);
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    @Override
+    List<SearchRecord> convertCrucialSteps
+      (final List<SearchRecord> crucialSteps)
+    {
+      final List<SearchRecord> foundSteps = new LinkedList<SearchRecord>();
+      int state = -1;
+      for (final SearchRecord crucialStep : crucialSteps) {
+        SearchRecord found = convertCrucialStep(state, crucialStep);
+        state = found.getState();
+        // Append the found search records in reverse order to the result
+        final int end = foundSteps.size();
+        final ListIterator<SearchRecord> iter = foundSteps.listIterator(end);
+        while (found.getPredecessor() != null) {
+          iter.add(found);
+          iter.previous();
+          found = found.getPredecessor();
+        }
+      }
+      return foundSteps;
+    }
+
+    /**
+     * Finds a partial trace in the original automaton before observation
+     * equivalence. This method computes a sequence of tau transitions, followed
+     * by a transition with the given event, followed by another sequence of tau
+     * transitions linking the source state to some state in the class of the
+     * target state in the simplified automaton.
+     * @param originalSource
+     *         State number of the source state in the original automaton,
+     *         or -1 to request a search starting from all initial states.
+     * @param crucialStep
+     *         Search containing code of the event and state number of the
+     *         target state in the simplified automaton (code of state
+     *         class), with -1 request search for an alpha-marked state.
+     * @return Search record describing the trace from source to
+     *         target, in reverse order. The last entry in the list represents
+     *         the first step after the source state, with its event and target
+     *         state. The first step has a target state in the given target
+     *         class. Events in the list can only be tau or the given event.
+     */
+    private SearchRecord convertCrucialStep(final int originalSource,
+                                            final SearchRecord crucialStep)
+    {
+      setupTarget(crucialStep);
+      // The crucial event may be tau, but only for the first or last step.
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int tau = EventEncoding.TAU;
+      final int crucialEvent = crucialStep.getEvent();
+      // There are two types of search records, representing the states
+      // reached before or after execution of the crucial event, except
+      // when the crucial event is tau. If the crucial event is tau, only
+      // search states after the crucial event are considered, so a search
+      // using only tau transitions is performed.
+      final Set<SearchRecord> visited = new THashSet<SearchRecord>();
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      if (originalSource >= 0) {
+        // Normal search starting from known state.
+        final SearchRecord record;
+        if (crucialEvent == tau) {
+          record = new SearchRecord(originalSource, 1, -1, null);
+          if (isTargetState(originalSource)) {
+            return record;
+          }
+        } else {
+          record = new SearchRecord(originalSource);
+        }
+        visited.add(record);
+        open.add(record);
+      } else {
+        // Start from initial state. The dummy record ensures that the first
+        // real search record will later be included in the trace.
+        final SearchRecord dummy = new SearchRecord(-1);
+        final int numStates = rel.getNumberOfStates();
+        for (int state = 0; state < numStates; state++) {
+          if (rel.isInitial(state)) {
+            final SearchRecord record;
+            if (crucialEvent == tau) {
+              record = new SearchRecord(state, 1, -1, dummy);
+              if (isTargetState(state)) {
+                return record;
+              }
+            } else {
+              record = new SearchRecord(state, 0, -1, dummy);
+            }
+            visited.add(record);
+            open.add(record);
+          }
+        }
+      }
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      while (true) {
+        final SearchRecord current = open.remove();
+        final int source = current.getState();
+        final int depth = current.getDepth();
+        final boolean hasEvent = depth > 0;
+        iter.reset(source, tau);
+        while (iter.advance()) {
+          final int target = iter.getCurrentTargetState();
+          final SearchRecord record =
+            new SearchRecord(target, depth, tau, current);
+          if (hasEvent && isTargetState(target)) {
+            return record;
+          } else if (visited.add(record)) {
+            open.add(record);
+          }
+        }
+        if (!hasEvent) {
+          iter.reset(source, crucialEvent);
+          while (iter.advance()) {
+            final int target = iter.getCurrentTargetState();
+            final SearchRecord record =
+              new SearchRecord(target, 1, crucialEvent, current);
+            if (isTargetState(target)) {
+              return record;
+            } else if (visited.add(record)) {
+              open.add(record);
+            }
+          }
+        }
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class ConflictEquivalenceStep
+  /**
+   * An abstraction step in which the result automaton is obtained by
+   * merging states in such a way that generalised conflict equivalence
+   * is preserved. This class supports all conflict preserving merge
+   * operations. Trace computation is achieved by breadth-first search,
+   * with complexity O(|<I>s</I>||<I>Q</I>|) where |<I>s</I>| is the
+   * length of the trace of the abstracted automaton and |<I>Q</I>| is the
+   * number of states of the original automaton.
+   */
+  @SuppressWarnings("unused")
+  private class ConflictEquivalenceStep extends MergeStep
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ConflictEquivalenceStep(final AutomatonProxy resultAut,
+                                    final AutomatonProxy originalAut,
+                                    final EventProxy tau,
+                                    final StateEncoding originalStateEnc,
+                                    final List<int[]> partition,
+                                    final StateEncoding resultStateEnc)
+    {
+      super(resultAut, originalAut, tau,
+            originalStateEnc, partition, resultStateEnc);
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    @Override
+    List<SearchRecord> convertCrucialSteps
+      (final List<SearchRecord> crucialSteps)
+    {
+      int len = crucialSteps.size();
+      SearchRecord last = crucialSteps.get(len - 1);
+      if (last.getState() < 0) {
+        len--;
+        last = crucialSteps.get(len - 1);
+      }
+      setupTarget(last);
+      final SearchRecord[] crucialArray = new SearchRecord[len];
+      int index = 0;
+      for (final SearchRecord crucialStep : crucialSteps) {
+        if (index >= len) {
+          break;
+        }
+        crucialArray[index++] = crucialStep;
+      }
+      SearchRecord found = convertCrucialSteps(crucialArray);
+      // Append the found search records in reverse order to the result
+      final List<SearchRecord> foundSteps = new LinkedList<SearchRecord>();
+      while (found.getPredecessor() != null) {
+        foundSteps.add(0, found);
+        found = found.getPredecessor();
+      }
+      return foundSteps;
+    }
+
+    SearchRecord convertCrucialSteps(final SearchRecord[] crucialSteps)
+    {
+      final int tau = EventEncoding.TAU;
+      final int len = crucialSteps.length;
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final Set<SearchRecord> visited = new THashSet<SearchRecord>();
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final boolean firstEnd =
+        crucialSteps.length == 1 && crucialSteps[0].getEvent() == tau;
+      // The dummy record ensures that the first
+      // real search record will later be included in the trace.
+      final SearchRecord dummy = new SearchRecord(-1);
+      final int numStates = rel.getNumberOfStates();
+      for (int state = 0; state < numStates; state++) {
+        if (rel.isInitial(state)) {
+          final SearchRecord record;
+          if (firstEnd && isTargetState(state)) {
+            record = new SearchRecord(state, 1, -1, dummy);
+            if (isTraceEndState(state)) {
+              return record;
+            }
+          } else {
+            record = new SearchRecord(state, 0, -1, dummy);
+          }
+          visited.add(record);
+          open.add(record);
+        }
+      }
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      while (true) {
+        final SearchRecord current = open.remove();
+        final int source = current.getState();
+        final int depth = current.getDepth();
+        iter.reset(source, tau);
+        while (iter.advance()) {
+          final int target = iter.getCurrentTargetState();
+          int nextDepth = depth;
+          if (nextDepth == crucialSteps.length && isTargetState(target)) {
+            nextDepth++;
+          }
+          final SearchRecord record =
+            new SearchRecord(target, nextDepth, tau, current);
+          if (nextDepth > crucialSteps.length && isTraceEndState(target)) {
+            return record;
+          } else if (visited.add(record)) {
+            open.add(record);
+          }
+        }
+        if (depth < crucialSteps.length) {
+          final int event = crucialSteps[depth].getEvent();
+          iter.reset(source, event);
+          while (iter.advance()) {
+            final int target = iter.getCurrentTargetState();
+            int nextDepth = depth + 1;
+            if (nextDepth == crucialSteps.length && isTargetState(target)) {
+              nextDepth++;
+            }
+            final SearchRecord record =
+              new SearchRecord(target, nextDepth, event, current);
+            if (nextDepth > crucialSteps.length && isTraceEndState(target)) {
+              return record;
+            } else if (visited.add(record)) {
+              open.add(record);
+            }
+          }
+        }
+      }
+    }
+
+  }
+
+
+  //#########################################################################
   //# Inner Class OneAutomatonStateMap
   private class OneAutomatonStateMap
     implements SynchronousProductStateMap
@@ -3169,28 +3351,28 @@ public class OPConflictChecker
     //# Constructors
     SearchRecord(final int state)
     {
-      this(state, false, -1, null);
+      this(state, 0, -1, null);
     }
 
-    SearchRecord(final int state, final boolean hasEvent, final int event,
+    SearchRecord(final int state, final int depth, final int event,
                  final SearchRecord pred)
     {
       mState = state;
-      mHasProperEvent = hasEvent;
+      mDepth = depth;
       mEvent = event;
       mPredecessor = pred;
     }
 
     //#######################################################################
     //# Getters
-    boolean hasProperEvent()
-    {
-      return mHasProperEvent;
-    }
-
     int getState()
     {
       return mState;
+    }
+
+    int getDepth()
+    {
+      return mDepth;
     }
 
     SearchRecord getPredecessor()
@@ -3204,9 +3386,35 @@ public class OPConflictChecker
     }
 
     //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public String toString()
+    {
+      return
+        "{state=" + mState + "; event=" + mEvent + "; depth=" + mDepth + "}";
+    }
+
+    @Override
+    public boolean equals(final Object other)
+    {
+      if (other.getClass() == getClass()) {
+        final SearchRecord record = (SearchRecord) other;
+        return mState == record.mState && mDepth == record.mDepth;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public int hashCode()
+    {
+      return HashFunctions.hash(mState) + 5 * HashFunctions.hash(mDepth);
+    }
+
+    //#######################################################################
     //# Data Members
     private final int mState;
-    private final boolean mHasProperEvent;
+    private final int mDepth;
     private final int mEvent;
     private final SearchRecord mPredecessor;
   }
