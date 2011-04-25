@@ -25,15 +25,20 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
+ * A set of automata considered for possible composition in compositional
+ * verification algorithms. In addition to storing the automata and local
+ * events, this class provides some support to evaluate different heuristics
+ * for candidate selection.
+ *
+ * @see CompositionalGeneralisedConflictChecker
  * @author Rachel Francis
  */
 
 public class Candidate implements Comparable<Candidate>
 {
 
-  // #########################################################################
-  // # Constructor
-
+  //#########################################################################
+  //# Constructor
   /**
    * Creates a new candidate.
    *
@@ -51,8 +56,9 @@ public class Candidate implements Comparable<Candidate>
     countEvents();
   }
 
-  // #########################################################################
-  // # Simple Access
+
+  //#########################################################################
+  //# Simple Access
   /**
    * Gets the number of automata in this candidate.
    */
@@ -124,8 +130,9 @@ public class Candidate implements Comparable<Candidate>
     return mEventCount;
   }
 
-  // #########################################################################
-  // # Interface java.util.Comparable<Candidate>
+
+  //#########################################################################
+  //# Interface java.util.Comparable<Candidate>
   /**
    * Implements default candidate ordering. If both candidates have different
    * numbers of automata, the candidate with fewer automata is considered
@@ -154,8 +161,9 @@ public class Candidate implements Comparable<Candidate>
     return 0;
   }
 
-  // #########################################################################
-  // # Overrides for java.lang.Object
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
   public String toString()
   {
     return getCompositionName(mAutomata).replaceAll(":", "-");
@@ -181,8 +189,25 @@ public class Candidate implements Comparable<Candidate>
     return mAutomata.hashCode();
   }
 
-  // #########################################################################
-  // # Model Creation
+
+  //#########################################################################
+  //# Subsumption
+  /**
+   * Returns whether this candidate strictly subsumes the given candidate.
+   * A candidate A subsumes strictly another candidate B, if every automaton
+   * of A also is an automaton of B, and A and B are not equal.
+   */
+  public boolean subsumes(final Candidate other)
+  {
+    final List<AutomatonProxy> otherAutomata = other.getAutomata();
+    return
+      mAutomata.size() < otherAutomata.size() &&
+      otherAutomata.containsAll(mAutomata);
+  }
+
+
+  //#########################################################################
+  //# Model Creation
   /**
    * Creates a product DES containing all the automata and events in this
    * candidate.
@@ -190,18 +215,19 @@ public class Candidate implements Comparable<Candidate>
    * @param factory
    *          The factory to be used to create the proxies.
    */
-  public ProductDESProxy createProductDESProxy(
-                                               final ProductDESProxyFactory factory)
+  public ProductDESProxy createProductDESProxy
+    (final ProductDESProxyFactory factory)
   {
     final String name = toString();
     final Collection<EventProxy> events = getAllEvents();
-    return factory
-        .createProductDESProxy(name, "Automatically created from candidate.",
-                               null, events, mAutomata);
+    return factory.createProductDESProxy
+             (name, "Automatically created from candidate.",
+              null, events, mAutomata);
   }
 
-  // #########################################################################
-  // # Auxiliary Methods
+
+  //#########################################################################
+  //# Auxiliary Methods
   /**
    * Returns an ordered list of all events in the automata of this candidate,
    * including propositions.
@@ -257,8 +283,9 @@ public class Candidate implements Comparable<Candidate>
     }
   }
 
-  // #########################################################################
-  // # Static Methods
+
+  //#########################################################################
+  //# Static Methods
   /**
    * Calculates a name that can be given to a synchronous product automaton.
    *
@@ -300,8 +327,9 @@ public class Candidate implements Comparable<Candidate>
     return buffer.toString();
   }
 
-  // #########################################################################
-  // # Invocation
+
+  //#########################################################################
+  //# Data Members
   private final List<AutomatonProxy> mAutomata;
   private Set<EventProxy> mLocalEvents;
   private int mCommonEvents;

@@ -15,6 +15,7 @@ import net.sourceforge.waters.analysis.op.OPConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -59,15 +60,16 @@ public class ProjectingModelVerifierFactory
   private ProjectingModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
-    addArgument(new AbstractionMethodArgument());
-    addArgument(new PreselectingMethodArgument());
-    addArgument(new SelectingMethodArgument());
-    addArgument(ModularHeuristicFactory.getMethodArgument());
-    addArgument(ModularHeuristicFactory.getPreferenceArgument());
     addArgument(new FinalStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
     addArgument(new FinalTransitionLimitArgument());
     addArgument(new InternalTransitionLimitArgument());
+    addArgument(new AbstractionMethodArgument());
+    addArgument(new PreselectingMethodArgument());
+    addArgument(new SelectingMethodArgument());
+    addArgument(new SubsumptionArgument());
+    addArgument(ModularHeuristicFactory.getMethodArgument());
+    addArgument(ModularHeuristicFactory.getPreferenceArgument());
   }
 
 
@@ -119,8 +121,7 @@ public class ProjectingModelVerifierFactory
     {
       final int limit = getValue();
       if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer =
-            (OPConflictChecker) verifier;
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
         composer.setFinalStepNodeLimit(limit);
       } else {
         verifier.setNodeLimit(limit);
@@ -151,8 +152,7 @@ public class ProjectingModelVerifierFactory
     {
       final int limit = getValue();
       if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer =
-            (OPConflictChecker) verifier;
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
         composer.setInternalStepNodeLimit(limit);
       } else {
         verifier.setNodeLimit(limit);
@@ -183,8 +183,7 @@ public class ProjectingModelVerifierFactory
     {
       final int limit = getValue();
       if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer =
-            (OPConflictChecker) verifier;
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
         composer.setFinalStepTransitionLimit(limit);
       } else {
         verifier.setTransitionLimit(limit);
@@ -215,8 +214,7 @@ public class ProjectingModelVerifierFactory
     {
       final int limit = getValue();
       if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer =
-            (OPConflictChecker) verifier;
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
         composer.setInternalStepTransitionLimit(limit);
       } else {
         verifier.setTransitionLimit(limit);
@@ -247,8 +245,7 @@ public class ProjectingModelVerifierFactory
     {
       final OPConflictChecker.AbstractionMethod method = getValue();
       if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer =
-            (OPConflictChecker) verifier;
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
         composer.setAbstractionMethod(method);
       } else {
         fail(getName() + " option only supported for conflict check!");
@@ -279,8 +276,7 @@ public class ProjectingModelVerifierFactory
     {
       final OPConflictChecker.PreselectingMethod method = getValue();
       if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer =
-            (OPConflictChecker) verifier;
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
         composer.setPreselectingMethod(method);
       } else {
         fail(getName() + " option only supported for conflict check!");
@@ -311,9 +307,36 @@ public class ProjectingModelVerifierFactory
     {
       final OPConflictChecker.SelectingMethod method = getValue();
       if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer =
-            (OPConflictChecker) verifier;
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
         composer.setSelectingMethod(method);
+      } else {
+        fail(getName() + " option only supported for conflict check!");
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class SubsumptionArgument
+  private static class SubsumptionArgument extends CommandLineArgumentFlag
+  {
+
+    //#######################################################################
+    //# Constructors
+    private SubsumptionArgument()
+    {
+      super("-sub", "Check for subsumption in selecting heuristics");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
+        composer.setSubumptionEnabled(true);
       } else {
         fail(getName() + " option only supported for conflict check!");
       }

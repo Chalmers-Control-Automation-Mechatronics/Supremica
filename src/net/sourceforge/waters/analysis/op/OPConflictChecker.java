@@ -63,6 +63,8 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * A compositional conflict checker that uses only observation equivalence
@@ -121,6 +123,7 @@ public class OPConflictChecker
     mAbstractionMethod = AbstractionMethod.OEQ;
     mPreselectingMethod = PreselectingMethod.MustL;
     mSelectingMethod = SelectingMethod.MinS;
+    mSubsumptionEnabled = false;
     mInternalStepNodeLimit = super.getNodeLimit();
     mInternalStepTransitionLimit = super.getTransitionLimit();
   }
@@ -192,6 +195,30 @@ public class OPConflictChecker
   public void setSelectingMethod(final SelectingMethod method)
   {
     mSelectingMethod = method;
+  }
+
+  /**
+   * Returns whether subsumption is enabled in the selecting heuristic.
+   * @see #setSubumptionEnabled(boolean)
+   * @see SelectingMethod
+   */
+  public boolean isSubsumptionEnabled()
+  {
+    return mSubsumptionEnabled;
+  }
+
+  /**
+   * Sets whether subsumption is enabled in the selecting heuristic.
+   * If subsumption is enabled, and the heuristic returns a candidate that
+   * is subsumed by another candidate, the a new candidate will be selected
+   * from the list of all preselected candidates that subsume the originally
+   * selected candidate. The selection heuristics will be used again to
+   * resolve ties.
+   * @see PreselectingMethod
+   */
+  public void setSubumptionEnabled(final boolean enable)
+  {
+    mSubsumptionEnabled = enable;
   }
 
 
@@ -375,8 +402,7 @@ public class OPConflictChecker
           }
           candidates = mPreselectingHeuristic.findCandidates();
           while (!candidates.isEmpty()) {
-            final Candidate candidate =
-              Collections.min(candidates, mSelectingHeuristic);
+            final Candidate candidate = selectCandidate(candidates);
             try {
               mEventHasDisappeared = false;
               applyCandidate(candidate);
@@ -799,6 +825,15 @@ public class OPConflictChecker
   private void runMonolithicConflictCheck()
     throws AnalysisException
   {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      double estimate = 1.0;
+      for (final AutomatonProxy aut : mCurrentAutomata) {
+        estimate *= aut.getStates().size();
+      }
+      logger.debug("Monolithically composing " + mCurrentAutomata.size() +
+                   " automata, estimated " + estimate + " states.");
+    }
     final EventProxy marking = getUsedMarkingProposition();
     final int numEvents = mCurrentEvents.size() + 1;
     final List<EventProxy> events = new ArrayList<EventProxy>(numEvents);
@@ -1080,6 +1115,32 @@ public class OPConflictChecker
     steps.set(0, initStep);
     return factory.createConflictTraceProxy(name, null, null, model, automata,
                                             steps, ConflictKind.CONFLICT);
+  }
+
+
+  //#########################################################################
+  //# Candidate Selection
+  /**
+   * Performs the second step of candidate selection.
+   * @param  preselected  List of preselected candidates from step&nbsp;1.
+   * @return Preferred candidate from the given list, taking subsumption
+   *         into account.
+   */
+  private Candidate selectCandidate(final Collection<Candidate> preselected)
+  {
+    final Candidate result = Collections.min(preselected, mSelectingHeuristic);
+    if (mSubsumptionEnabled) {
+      final Collection<Candidate> subsumedBy = new LinkedList<Candidate>();
+      for (final Candidate candidate : preselected) {
+        if (candidate.subsumes(result)) {
+          subsumedBy.add(candidate);
+        }
+      }
+      if (!subsumedBy.isEmpty()) {
+        return selectCandidate(subsumedBy);
+      }
+    }
+    return result;
   }
 
 
@@ -3161,6 +3222,7 @@ public class OPConflictChecker
   private AbstractionMethod mAbstractionMethod;
   private PreselectingMethod mPreselectingMethod;
   private SelectingMethod mSelectingMethod;
+  private boolean mSubsumptionEnabled;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
   private LanguageInclusionChecker mCompositionalLanguageInclusionChecker;
