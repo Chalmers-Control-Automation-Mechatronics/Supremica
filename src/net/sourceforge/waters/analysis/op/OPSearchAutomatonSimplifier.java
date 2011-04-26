@@ -978,6 +978,7 @@ public class OPSearchAutomatonSimplifier
       new ObservationEquivalenceTRSimplifier(rel);
     simp.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+    simp.setAppliesPartitionAutomatically(false);
     final boolean change = simp.run();
     if (force || change) {
       final List<int[]> partition = simp.getResultPartition();

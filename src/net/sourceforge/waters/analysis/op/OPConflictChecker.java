@@ -519,7 +519,26 @@ public class OPConflictChecker
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     chain.add(bisimulator);
-    return new TRSimplifierAbstractionRule(chain);
+    return new StandardTRSimplifierAbstractionRule(chain);
+  }
+
+  private AbstractionRule createGeneralisedNonblockingAbstractionChain()
+    throws EventNotFoundException
+  {
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.Equivalence.
+                               OBSERVATION_EQUIVALENCE);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+    chain.add(bisimulator);
+    return new GeneralisedTRSimplifierAbstractionRule(chain);
   }
 
 
@@ -1535,6 +1554,18 @@ public class OPConflictChecker
   public enum AbstractionMethod
   {
     /**
+     * Minimisation is performed according to a sequence of abstraction rules
+     * for generalised nonblocking proposed in the paper by R. Malik and
+     * R. Leduc in ICCA&nbsp;2009.
+     */
+    GNB {
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+        throws EventNotFoundException
+      {
+        return checker.createGeneralisedNonblockingAbstractionChain();
+      }
+    },
+    /**
      * Automata are minimised according to <I>observation equivalence</I>.
      */
     OEQ {
@@ -1591,7 +1622,8 @@ public class OPConflictChecker
     };
 
     abstract AbstractionRule createAbstractionRule
-      (OPConflictChecker checker);
+      (OPConflictChecker checker)
+      throws EventNotFoundException;
 
     boolean supportsNondeterminism()
     {
@@ -2237,14 +2269,13 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Inner Class TRSimplifierAbstractionRule
-  private class TRSimplifierAbstractionRule
+  private abstract class TRSimplifierAbstractionRule
     extends AbstractionRule
   {
 
     //#######################################################################
     //# Constructor
-    private TRSimplifierAbstractionRule
-      (final TransitionRelationSimplifier simplifier)
+    TRSimplifierAbstractionRule(final TransitionRelationSimplifier simplifier)
     {
       mSimplifier = simplifier;
     }
@@ -2255,9 +2286,7 @@ public class OPConflictChecker
       throws AnalysisException
     {
       try {
-        final EventEncoding eventEnc =
-          new EventEncoding(aut, tau, mPropositions,
-                            EventEncoding.FILTER_PROPOSITIONS);
+        final EventEncoding eventEnc = createEventEncoding(aut, tau);
         final StateEncoding inputStateEnc = new StateEncoding(aut);
         final int config = mSimplifier.getPreferredConfiguration();
         final ListBufferTransitionRelation rel =
@@ -2270,12 +2299,12 @@ public class OPConflictChecker
         if (mSimplifier.run()) {
           rel.removeTauSelfLoops();
           rel.removeProperSelfLoopEvents();
-          rel.removeRedundantPropositions();
           if (rel.getNumberOfStates() == numStates &&
               rel.getNumberOfTransitions() == numTrans &&
               rel.getNumberOfMarkings() == numMarkings) {
             return null;
           }
+          rel.removeRedundantPropositions();
           final ProductDESProxyFactory factory = getFactory();
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy convertedAut =
@@ -2299,9 +2328,118 @@ public class OPConflictChecker
     }
 
     //#######################################################################
+    //# Simple Access
+    TransitionRelationSimplifier getSimplifier()
+    {
+      return mSimplifier;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    abstract EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                               final EventProxy tau);
+
+    //#######################################################################
     //# Data Members
     private final TransitionRelationSimplifier mSimplifier;
 
+  }
+
+  //#########################################################################
+  //# Inner Class StandardTRSimplifierAbstractionRule
+  private class StandardTRSimplifierAbstractionRule
+    extends TRSimplifierAbstractionRule
+  {
+
+    //#######################################################################
+    //# Constructor
+    private StandardTRSimplifierAbstractionRule
+      (final TransitionRelationSimplifier simplifier)
+    {
+      super(simplifier);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    @Override
+    EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                      final EventProxy tau)
+    {
+      return new EventEncoding(aut, tau, mPropositions,
+                               EventEncoding.FILTER_PROPOSITIONS);
+
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class GeneralisedTRSimplifierAbstractionRule
+  private class GeneralisedTRSimplifierAbstractionRule
+    extends TRSimplifierAbstractionRule
+  {
+
+    //#######################################################################
+    //# Constructor
+    private GeneralisedTRSimplifierAbstractionRule
+      (final ChainTRSimplifier simplifier)
+      throws EventNotFoundException
+    {
+      super(simplifier);
+      final EventProxy[] props = new EventProxy[2];
+      mUsedDefaultMarking = props[0] = getUsedMarkingProposition();
+      if (mPreconditionMarking == null) {
+        final ProductDESProxyFactory factory = getFactory();
+        mUsedPreconditionMarking = props[1] =
+          factory.createEventProxy(":alpha", EventKind.PROPOSITION);
+      } else {
+        mUsedPreconditionMarking = props[1] = mPreconditionMarking;
+      }
+      mPropositions = Arrays.asList(props);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    @Override
+    ChainTRSimplifier getSimplifier()
+    {
+      return (ChainTRSimplifier) super.getSimplifier();
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    @Override
+    EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                      final EventProxy tau)
+    {
+      final EventEncoding eventEnc =
+        new EventEncoding(aut, tau, mPropositions,
+                          EventEncoding.FILTER_PROPOSITIONS);
+      mPreconditionMarkingID = eventEnc.getEventCode(mUsedPreconditionMarking);
+      if (mPreconditionMarkingID < 0) {
+        mPreconditionMarkingID =
+          eventEnc.addEvent(mUsedPreconditionMarking, true);
+      }
+      mDefaultMarkingID = eventEnc.getEventCode(mUsedDefaultMarking);
+      if (mDefaultMarkingID < 0) {
+        mDefaultMarkingID = eventEnc.addEvent(mUsedDefaultMarking, true);
+      }
+      final ChainTRSimplifier simplifier = getSimplifier();
+      for (final TransitionRelationSimplifier step : simplifier.getSteps()) {
+        if (step instanceof AbstractGeneralisedTRSimplifier) {
+          final AbstractGeneralisedTRSimplifier gen =
+            (AbstractGeneralisedTRSimplifier) step;
+          gen.setPropositions(mPreconditionMarkingID, mDefaultMarkingID);
+        }
+      }
+      return eventEnc;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final List<EventProxy> mPropositions;
+    private EventProxy mUsedPreconditionMarking;
+    private final EventProxy mUsedDefaultMarking;
+    private int mPreconditionMarkingID;
+    private int mDefaultMarkingID;
   }
 
 

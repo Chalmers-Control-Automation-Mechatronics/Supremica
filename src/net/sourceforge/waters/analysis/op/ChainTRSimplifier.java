@@ -44,6 +44,11 @@ public class ChainTRSimplifier
 
   //#########################################################################
   //# Configuration
+  List<TransitionRelationSimplifier> getSteps()
+  {
+    return mSteps;
+  }
+
   void add(final TransitionRelationSimplifier step)
   {
     mSteps.add(step);
