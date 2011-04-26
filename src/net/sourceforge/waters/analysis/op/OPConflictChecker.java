@@ -503,6 +503,27 @@ public class OPConflictChecker
 
 
   //#########################################################################
+  //# Chains
+  private AbstractionRule createObservationEquivalenceChain
+    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
+  {
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+    chain.add(bisimulator);
+    return new TRSimplifierAbstractionRule(chain);
+  }
+
+
+  //#########################################################################
   //# Events+Automata Maps
   /**
    * Maps the events in the model to a set of the automata that contain the
@@ -1519,9 +1540,10 @@ public class OPConflictChecker
     OEQ {
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
-        return checker.new ObservationEquivalenceAbstractionRule
-                            (ObservationEquivalenceTRSimplifier.Equivalence.
-                             OBSERVATION_EQUIVALENCE);
+        final ObservationEquivalenceTRSimplifier.Equivalence equivalence =
+          ObservationEquivalenceTRSimplifier.Equivalence.
+          OBSERVATION_EQUIVALENCE;
+        return checker.createObservationEquivalenceChain(equivalence);
       }
     },
     /**
@@ -1561,9 +1583,10 @@ public class OPConflictChecker
     WOEQ {
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
-        return checker.new ObservationEquivalenceAbstractionRule
-                            (ObservationEquivalenceTRSimplifier.Equivalence.
-                             WEAK_OBSERVATION_EQUIVALENCE);
+        final ObservationEquivalenceTRSimplifier.Equivalence equivalence =
+          ObservationEquivalenceTRSimplifier.Equivalence.
+          WEAK_OBSERVATION_EQUIVALENCE;
+        return checker.createObservationEquivalenceChain(equivalence);
       }
     };
 
@@ -2209,108 +2232,76 @@ public class OPConflictChecker
                                  final EventProxy tau)
       throws AnalysisException;
 
-    //#######################################################################
-    //# Auxiliary Methods
-    List<int[]> applySimplifier
-      (final TransitionRelationSimplifier simplifier,
-       final ListBufferTransitionRelation rel)
-    throws AnalysisException
-    {
-      simplifier.run();
-      if (simplifier.applyResultPartition()) {
-        rel.removeTauSelfLoops();
-        rel.removeProperSelfLoopEvents();
-        rel.removeRedundantPropositions();
-        return simplifier.getResultPartition();
-      } else {
-        return null;
-      }
-    }
-
-    List<int[]> combinePartitions(final List<int[]> first,
-                                  final List<int[]> second)
-    {
-      final int secondSize = second.size();
-      final List<int[]> result = new ArrayList<int[]>(secondSize);
-      final TIntArrayList current = new TIntArrayList();
-      for (final int[] clazz2 : second) {
-        for (final int state2 : clazz2) {
-          final int[] clazz1 = first.get(state2);
-          for (final int state1 : clazz1) {
-            current.add(state1);
-          }
-        }
-        result.add(current.toNativeArray());
-        current.clear();
-      }
-      return result;
-    }
-
   }
 
 
   //#########################################################################
-  //# Inner Class ObservationEquivalenceAbstractionRule
-  private class ObservationEquivalenceAbstractionRule
+  //# Inner Class TRSimplifierAbstractionRule
+  private class TRSimplifierAbstractionRule
     extends AbstractionRule
   {
 
     //#######################################################################
     //# Constructor
-    private ObservationEquivalenceAbstractionRule
-      (final ObservationEquivalenceTRSimplifier.Equivalence eq)
+    private TRSimplifierAbstractionRule
+      (final TransitionRelationSimplifier simplifier)
     {
-      mEquivalence = eq;
+      mSimplifier = simplifier;
     }
 
     //#######################################################################
-    //# Rule Application
-    ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
-                                         final EventProxy tau)
+    //# Overrides for AbstractionRule
+    MergeStep applyRule(final AutomatonProxy aut, final EventProxy tau)
       throws AnalysisException
     {
-      final EventEncoding eventEnc =
-        new EventEncoding(aut, tau, mPropositions,
-                          EventEncoding.FILTER_PROPOSITIONS);
-      final StateEncoding inputStateEnc = new StateEncoding(aut);
-      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
-        (aut, eventEnc, inputStateEnc,
-         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-      final TransitionRelationSimplifier loopRemover =
-        new TauLoopRemovalTRSimplifier(rel);
-      final List<int[]> loopPartition = applySimplifier(loopRemover, rel);
-      final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier(rel);
-      bisimulator.setEquivalence(mEquivalence);
-      bisimulator.setTransitionRemovalMode
-        (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-      bisimulator.setMarkingMode
-        (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-      final List<int[]> bisimPartition = applySimplifier(bisimulator, rel);
-      if (loopPartition != null || bisimPartition != null) {
-        final ProductDESProxyFactory factory = getFactory();
-        final StateEncoding outputStateEnc = new StateEncoding();
-        final AutomatonProxy convertedAut =
-          rel.createAutomaton(factory, eventEnc, outputStateEnc);
-        final List<int[]> partition;
-        if (loopPartition == null) {
-          partition = bisimPartition;
-        } else if (bisimPartition == null) {
-          partition = loopPartition;
+      try {
+        final EventEncoding eventEnc =
+          new EventEncoding(aut, tau, mPropositions,
+                            EventEncoding.FILTER_PROPOSITIONS);
+        final StateEncoding inputStateEnc = new StateEncoding(aut);
+        final int config = mSimplifier.getPreferredConfiguration();
+        final ListBufferTransitionRelation rel =
+          new ListBufferTransitionRelation(aut, eventEnc,
+                                           inputStateEnc, config);
+        final int numStates = rel.getNumberOfStates();
+        final int numTrans = rel.getNumberOfTransitions();
+        final int numMarkings = rel.getNumberOfMarkings();
+        mSimplifier.setTransitionRelation(rel);
+        if (mSimplifier.run()) {
+          rel.removeTauSelfLoops();
+          rel.removeProperSelfLoopEvents();
+          rel.removeRedundantPropositions();
+          if (rel.getNumberOfStates() == numStates &&
+              rel.getNumberOfTransitions() == numTrans &&
+              rel.getNumberOfMarkings() == numMarkings) {
+            return null;
+          }
+          final ProductDESProxyFactory factory = getFactory();
+          final StateEncoding outputStateEnc = new StateEncoding();
+          final AutomatonProxy convertedAut =
+            rel.createAutomaton(factory, eventEnc, outputStateEnc);
+          final List<int[]> partition = mSimplifier.getResultPartition();
+          if (mSimplifier.isObservationEquivalentAbstraction()) {
+            return new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                                  inputStateEnc, partition,
+                                                  outputStateEnc);
+          } else {
+            return new ConflictEquivalenceStep(convertedAut, aut, tau,
+                                               inputStateEnc, partition,
+                                               outputStateEnc);
+          }
         } else {
-          partition = combinePartitions(loopPartition, bisimPartition);
+          return null;
         }
-        return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                              inputStateEnc, partition,
-                                              outputStateEnc);
-      } else {
-        return null;
+      } finally {
+        mSimplifier.reset();
       }
     }
 
     //#######################################################################
     //# Data Members
-    private final ObservationEquivalenceTRSimplifier.Equivalence mEquivalence;
+    private final TransitionRelationSimplifier mSimplifier;
+
   }
 
 
@@ -2341,6 +2332,7 @@ public class OPConflictChecker
       final int codeOfVTau = eventEnc.getEventCode(vtau);
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(rel);
+      bisimulator.setAppliesPartitionAutomatically(false);
       final List<int[]> partition =
         applySimplifier(bisimulator, rel, codeOfVTau);
       if (partition != null) {
@@ -2855,11 +2847,14 @@ public class OPConflictChecker
     void setupTarget(final SearchRecord crucialStep)
     {
       final int targetClass = crucialStep.getState();
-      if (targetClass >= 0) {
+      if (targetClass < 0) {
+        mTargetSet = null;
+      } else if (mPartition == null) {
+        mTargetSet = new TIntHashSet(1);
+        mTargetSet.add(targetClass);
+      } else {
         final int[] targetArray = mPartition.get(targetClass);
         mTargetSet = new TIntHashSet(targetArray);
-      } else {
-        mTargetSet = null;
       }
     }
 
@@ -3169,7 +3164,6 @@ public class OPConflictChecker
    * length of the trace of the abstracted automaton and |<I>Q</I>| is the
    * number of states of the original automaton.
    */
-  @SuppressWarnings("unused")
   private class ConflictEquivalenceStep extends MergeStep
   {
 
@@ -3220,7 +3214,6 @@ public class OPConflictChecker
     SearchRecord convertCrucialSteps(final SearchRecord[] crucialSteps)
     {
       final int tau = EventEncoding.TAU;
-      final int len = crucialSteps.length;
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final Set<SearchRecord> visited = new THashSet<SearchRecord>();
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();

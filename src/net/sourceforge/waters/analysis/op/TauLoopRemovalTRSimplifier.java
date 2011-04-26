@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis Algorithms
+//# PACKAGE: net.sourceforge.waters.analysis.op
+//# CLASS:   TauLoopRemovalTRSimplifier
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.TIntArrayList;
@@ -7,32 +16,29 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
+
 
 public class TauLoopRemovalTRSimplifier
-  implements TransitionRelationSimplifier
+  extends AbstractTRSimplifier
 {
 
   //#########################################################################
   //# Constructor
+  public TauLoopRemovalTRSimplifier()
+  {
+  }
+
   public TauLoopRemovalTRSimplifier(final ListBufferTransitionRelation rel)
   {
-    mTransitionRelation = rel;
+    super(rel);
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
-  public ListBufferTransitionRelation getTransitionRelation()
-  {
-    return mTransitionRelation;
-  }
-
-  public void setTransitionRelation(final ListBufferTransitionRelation rel)
-  {
-    mTransitionRelation = rel;
-  }
-
   public boolean run()
+    throws AnalysisException
   {
     setUp();
     boolean modified = false;
@@ -41,13 +47,14 @@ public class TauLoopRemovalTRSimplifier
         tarjan(s);
       }
     }
+    final ListBufferTransitionRelation rel = getTransitionRelation();
     if (modified || !mToBeMerged.isEmpty()) {
-      final int numStates = mTransitionRelation.getNumberOfStates();
-      mResultPartition = new ArrayList<int[]>(numStates);
+      final int numStates = rel.getNumberOfStates();
+      List<int[]> partition = new ArrayList<int[]>(numStates);
       final BitSet merged = new BitSet(numStates);
       for (final TIntArrayList merge : mToBeMerged) {
         final int[] array = merge.toNativeArray();
-        mResultPartition.add(array);
+        partition.add(array);
         modified |= array.length > 1;
         for (final int s : array) {
           merged.set(s);
@@ -55,36 +62,38 @@ public class TauLoopRemovalTRSimplifier
       }
       if (modified) {
         for (int s = 0; s < numStates; s++) {
-          if (mTransitionRelation.isReachable(s) && !merged.get(s)) {
+          if (rel.isReachable(s) && !merged.get(s)) {
             final int[] array = new int[1];
             array[0] = s;
-            mResultPartition.add(array);
+            partition.add(array);
           }
         }
+        setResultPartitionList(partition);
+        applyResultPartition();
       } else {
-        mResultPartition = null;
+        partition = null;
       }
     }
     return modified;
   }
 
-  public boolean applyResultPartition()
-  {
-    mTransitionRelation.merge(mResultPartition);
-    return mResultPartition != null;
-  }
 
-  public List<int[]> getResultPartition()
+  @Override
+  public boolean isObservationEquivalentAbstraction()
   {
-    return mResultPartition;
+    return true;
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void setUp()
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected void setUp()
+    throws AnalysisException
   {
-    final int numStates = mTransitionRelation.getNumberOfStates();
+    super.setUp();
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
     mIndex = 1;
     mTarjan = new int[numStates];
     mLowLink = new int[numStates];
@@ -93,15 +102,19 @@ public class TauLoopRemovalTRSimplifier
     mToBeMerged = new ArrayList<TIntArrayList>();
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void tarjan(final int state)
   {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
     mTarjan[state] = mIndex;
     mLowLink[state] = mIndex;
     mIndex++;
     mOnstack[state] = true;
     mStack.push(state);
     final TransitionIterator iter =
-      mTransitionRelation.createAnyReadOnlyIterator(state, EventEncoding.TAU);
+      rel.createAnyReadOnlyIterator(state, EventEncoding.TAU);
     while (iter.advance()) {
       final int suc = iter.getCurrentToState();
       if(mOnstack[suc]) {
@@ -132,9 +145,6 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private ListBufferTransitionRelation mTransitionRelation;
-  private List<int[]> mResultPartition;
-
   private int mIndex;
   private int[] mTarjan;
   private int[] mLowLink;

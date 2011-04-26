@@ -115,8 +115,7 @@ class ObservationEquivalenceRule extends AbstractionRule
         new ObservationEquivalenceTRSimplifier(mTr);
     bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
     bisimulator.setTransitionLimit(mTransitionLimit);
-    bisimulator.run();
-    final boolean modified = bisimulator.applyResultPartition();
+    final boolean modified = bisimulator.run();
     if (modified) {
       mPartition = bisimulator.getResultPartition();
       mTr.removeTauSelfLoops();

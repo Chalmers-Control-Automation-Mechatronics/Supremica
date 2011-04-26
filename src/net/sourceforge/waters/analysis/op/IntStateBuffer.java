@@ -227,6 +227,26 @@ public class IntStateBuffer
   }
 
   /**
+   * Gets the total number of markings in this state buffer.
+   * Each instance of a proposition marking a reachable state counts
+   * as marking.
+   */
+  public int getNumberOfMarkings()
+  {
+    int result = 0;
+    for (int prop = 0; prop < getNumberOfPropositions(); prop++) {
+      if (isUsedProposition(prop)) {
+        for (int state = 0; state < getNumberOfStates(); state++) {
+          if (isReachable(state) && isMarked(state, prop)) {
+            result++;
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
    * Gets a number that identifies the complete set of markings for the
    * given state.
    * @param  state   ID of the state to be examined.

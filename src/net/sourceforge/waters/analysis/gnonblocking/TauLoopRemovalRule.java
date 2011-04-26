@@ -66,7 +66,6 @@ class TauLoopRemovalRule extends AbstractionRule
     final boolean modified = tauLoopRemover.run();
     if (modified) {
       mPartition = tauLoopRemover.getResultPartition();
-      mTr.merge(mPartition);
       mTr.removeTauSelfLoops();
       mTr.removeProperSelfLoopEvents();
       final ProductDESProxyFactory factory = getFactory();

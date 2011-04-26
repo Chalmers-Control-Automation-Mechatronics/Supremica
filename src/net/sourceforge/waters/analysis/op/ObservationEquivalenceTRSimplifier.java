@@ -19,7 +19,6 @@ import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -34,42 +33,52 @@ import org.apache.log4j.Logger;
  * @author Simon Ware, Rachel Francis, Robi Malik
  */
 
-public class ObservationEquivalenceTRSimplifier implements
-    TransitionRelationSimplifier
+public class ObservationEquivalenceTRSimplifier
+  extends AbstractTRSimplifier
 {
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new bisimulation simplifier without a transition relation.
+   */
+  public ObservationEquivalenceTRSimplifier()
+  {
+    this(null);
+  }
+
   /**
    * Creates a new bisimulation simplifier for the given transition relation.
    */
   public ObservationEquivalenceTRSimplifier
     (final ListBufferTransitionRelation rel)
   {
-    mTransitionRelation = rel;
+    super(rel);
     if (rel != null) {
-      mNumStates = mTransitionRelation.getNumberOfStates();
-      mNumEvents = mTransitionRelation.getNumberOfProperEvents();
+      mNumStates = rel.getNumberOfStates();
+      mNumEvents = rel.getNumberOfProperEvents();
     }
     mEquivalence = Equivalence.OBSERVATION_EQUIVALENCE;
     mTransitionRemovalMode = TransitionRemoval.NONTAU;
     mMarkingMode = MarkingMode.UNCHANGED;
     mTransitionLimit = Integer.MAX_VALUE;
+    mAppliesPartitionAutomatically = true;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
-  public ListBufferTransitionRelation getTransitionRelation()
+  @Override
+  public int getPreferredConfiguration()
   {
-    return mTransitionRelation;
+    return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
   public void setTransitionRelation(final ListBufferTransitionRelation rel)
   {
-    mTransitionRelation = rel;
-    mNumStates = mTransitionRelation.getNumberOfStates();
-    mNumEvents = mTransitionRelation.getNumberOfProperEvents();
+    super.setTransitionRelation(rel);
+    mNumStates = rel.getNumberOfStates();
+    mNumEvents = rel.getNumberOfProperEvents();
   }
 
 
@@ -164,7 +173,6 @@ public class ObservationEquivalenceTRSimplifier implements
    * number of transitions (including stored silent transitions of the
    * transitive closure) that will be constructed. An attempt to store more
    * transitions leads to an {@link OverflowException}.
-   *
    * @param limit
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
    *          unlimited number of transitions.
@@ -176,7 +184,6 @@ public class ObservationEquivalenceTRSimplifier implements
 
   /**
    * Gets the transition limit.
-   *
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
   public int getTransitionLimit()
@@ -184,18 +191,40 @@ public class ObservationEquivalenceTRSimplifier implements
     return mTransitionLimit;
   }
 
+  /**
+   * Sets whether this simplifier applies the computed partition automatically.
+   * If set to <CODE>true</CODE> (the default), then any partition computed
+   * by a call to {@link #run()} will immediately be applied to the
+   * transition relation. Otherwise, states have to be merged manually
+   * by calling {@link #applyResultPartition()}.
+   */
+  public void setAppliesPartitionAutomatically(final boolean apply)
+  {
+    mAppliesPartitionAutomatically = apply;
+  }
+
+  /**
+   * Gets whether this simplifier applies the computed partition automatically.
+   * @see #setAppliesPartitionAutomatically(boolean) setAppliesPartitionAutomatically()
+   */
+  public boolean getAppliesPartitionAutomatically()
+  {
+    return mAppliesPartitionAutomatically;
+  }
+
 
   //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException
   {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       final String msg =
           "ENTER " + ProxyTools.getShortClassName(this) + ".run(): "
-              + mTransitionRelation.getName() + " with "
-              + mTransitionRelation.getNumberOfReachableStates()
-              + " states and " + mTransitionRelation.getNumberOfTransitions()
+              + rel.getName() + " with "
+              + rel.getNumberOfReachableStates()
+              + " states and " + rel.getNumberOfTransitions()
               + " transitions ...";
       logger.debug(msg);
     }
@@ -229,6 +258,9 @@ public class ObservationEquivalenceTRSimplifier implements
     }
 
     buildResultPartition();
+    if (mAppliesPartitionAutomatically) {
+      applyResultPartition();
+    }
 
     if (logger.isDebugEnabled()) {
       final String msg =
@@ -250,12 +282,14 @@ public class ObservationEquivalenceTRSimplifier implements
    *         transitions or markings.
    * @see TransitionRemoval
    */
-  public boolean applyResultPartition() throws OverflowException
+  @Override
+  public void applyResultPartition()
+    throws AnalysisException
   {
+    super.applyResultPartition();
     final boolean doTau;
     final boolean doNonTau;
-    if (mResultPartition != null) {
-      mTransitionRelation.merge(mResultPartition);
+    if (getResultPartition() != null) {
       doTau = doNonTau = mTransitionRemovalMode != TransitionRemoval.NONE;
     } else {
       doNonTau = mTransitionRemovalMode == TransitionRemoval.AFTER;
@@ -265,25 +299,29 @@ public class ObservationEquivalenceTRSimplifier implements
       mergeTauPredecessors();
       removeRedundantTransitions(doTau, doNonTau);
     }
-    return mHasModifications;
   }
 
-  /**
-   * Gets the partition resulting from the last call to {@link #run()}.
-   * @return A list of classes constituting the partition, or <CODE>null</CODE>.
-   *         <CODE>null</CODE> may be returned to indicate a trivial partition,
-   *         i.e., no states are merged. Otherwise each array in the returned
-   *         list represents a class of equivalent state codes.
-   */
-  public List<int[]> getResultPartition()
+  @Override
+  public boolean isObservationEquivalentAbstraction()
   {
-    return mResultPartition;
+    return true;
+  }
+
+  @Override
+  public void reset()
+  {
+    super.reset();
+    mTauPreds = null;
+    mWS = null;
+    mWC = null;
+    mP = null;
+    mStateToClass = null;
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void setUp() throws OverflowException
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  protected void setUp() throws OverflowException
   {
     if (mEquivalence == Equivalence.WEAK_OBSERVATION_EQUIVALENCE) {
       mFirstSplitEvent = EventEncoding.NONTAU;
@@ -299,19 +337,23 @@ public class ObservationEquivalenceTRSimplifier implements
     setUpInitialPartition(partition);
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void setUpTauPredecessors() throws OverflowException
   {
     if (mTauPreds == null && mEquivalence != Equivalence.BISIMULATION) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
       final int tau = EventEncoding.TAU;
       final TransitionIterator iter =
-          mTransitionRelation.createPredecessorsReadOnlyIterator();
-      int numtrans = mTransitionRelation.getNumberOfTransitions();
+          rel.createPredecessorsReadOnlyIterator();
+      int numtrans = rel.getNumberOfTransitions();
       final TIntHashSet hashTauPreds = new TIntHashSet();
       final TIntArrayList listTauPreds = new TIntArrayList();
       final TIntStack stack = new TIntStack();
       mTauPreds = new int[mNumStates][];
       for (int s = 0; s < mNumStates; s++) {
-        if (mTransitionRelation.isReachable(s)) {
+        if (rel.isReachable(s)) {
           hashTauPreds.add(s);
           listTauPreds.add(s);
           stack.push(s);
@@ -348,21 +390,22 @@ public class ObservationEquivalenceTRSimplifier implements
   {
     if (mTauPreds == null) {
       setUpTauPredecessors();
-    } else if (mResultPartition != null &&
+    } else if (getResultPartition() != null &&
                mEquivalence != Equivalence.BISIMULATION) {
+      final List<int[]> partition = getResultPartition();
       final int[] classMap = new int[mNumStates];
       int c = 0;
-      for (final int[] clazz : mResultPartition) {
+      for (final int[] clazz : partition) {
         for (final int s : clazz) {
           classMap[s] = c;
         }
         c++;
       }
-      final int numClasses = mResultPartition.size();
+      final int numClasses = partition.size();
       final int[][] newTauPreds = new int[numClasses][];
       final TIntHashSet set = new TIntHashSet();
       c = 0;
-      for (final int[] clazz : mResultPartition) {
+      for (final int[] clazz : partition) {
         for (final int s : clazz) {
           for (final int pred : mTauPreds[s]) {
             final int predClass = classMap[pred];
@@ -383,11 +426,12 @@ public class ObservationEquivalenceTRSimplifier implements
   {
     if (doTau || doNonTau) {
       setUpTauPredecessors();
+      final ListBufferTransitionRelation rel = getTransitionRelation();
       final int tau = EventEncoding.TAU;
       final TransitionIterator iter0 =
-        mTransitionRelation.createAllTransitionsModifyingIterator();
+        rel.createAllTransitionsModifyingIterator();
       final TransitionIterator iter2 =
-        mTransitionRelation.createPredecessorsReadOnlyIterator();
+        rel.createPredecessorsReadOnlyIterator();
       trans:
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
@@ -427,24 +471,25 @@ public class ObservationEquivalenceTRSimplifier implements
   {
     setUpTauPredecessors();
     if (mInitialPartition == null) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
       final long[] markings;
       if (mMarkingMode == MarkingMode.SATURATE) {
         markings = null;
       } else {
         markings = new long[mNumStates];
         for (int state = 0; state < mNumStates; state++) {
-          if (mTransitionRelation.isReachable(state)) {
-            markings[state] = mTransitionRelation.getAllMarkings(state);
+          if (rel.isReachable(state)) {
+            markings[state] = rel.getAllMarkings(state);
           }
         }
       }
       final TransitionIterator transIter =
         getPredecessorIterator(0, EventEncoding.TAU);
       for (int state = 0; state < mNumStates; state++) {
-        if (mTransitionRelation.isReachable(state)) {
+        if (rel.isReachable(state)) {
           final long marking;
           if (markings == null) {
-            marking = mTransitionRelation.getAllMarkings(state);
+            marking = rel.getAllMarkings(state);
           } else {
             marking = markings[state];
           }
@@ -455,15 +500,15 @@ public class ObservationEquivalenceTRSimplifier implements
               switch (mMarkingMode) {
               case MINIMIZE:
                 mHasModifications |=
-                  mTransitionRelation.removeMarkings(pred, marking);
+                  rel.removeMarkings(pred, marking);
                 // fall through ...
               case UNCHANGED:
                 markings[pred] =
-                  mTransitionRelation.mergeMarkings(marking, markings[pred]);
+                  rel.mergeMarkings(marking, markings[pred]);
                 break;
               case SATURATE:
                 mHasModifications |=
-                  mTransitionRelation.addMarkings(pred, marking);
+                  rel.addMarkings(pred, marking);
                 break;
               }
             }
@@ -473,10 +518,10 @@ public class ObservationEquivalenceTRSimplifier implements
       final TLongObjectHashMap<TIntArrayList> prepartition =
           new TLongObjectHashMap<TIntArrayList>();
       for (int state = 0; state < mNumStates; state++) {
-        if (mTransitionRelation.isReachable(state)) {
+        if (rel.isReachable(state)) {
           final long marking;
           if (markings == null) {
-            marking = mTransitionRelation.getAllMarkings(state);
+            marking = rel.getAllMarkings(state);
           } else {
             marking = markings[state];
           }
@@ -526,11 +571,12 @@ public class ObservationEquivalenceTRSimplifier implements
 
     // builds set of initial states (includes states reachable via tau
     // transitions from an initial state)
+    final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter =
       getPredecessorIterator(0, EventEncoding.TAU);
     final TIntHashSet initialStates = new TIntHashSet();
     for (int stateCode = 0; stateCode < mNumStates; stateCode++) {
-      if (mTransitionRelation.isInitial(stateCode)) {
+      if (rel.isInitial(stateCode)) {
         initialStates.add(stateCode);
         iter.resetState(stateCode);
         while (iter.advance()) {
@@ -581,7 +627,8 @@ public class ObservationEquivalenceTRSimplifier implements
                                                     final int event)
   {
     if (mEquivalence == Equivalence.BISIMULATION) {
-      return mTransitionRelation.createPredecessorsReadOnlyIterator(state, event);
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      return rel.createPredecessorsReadOnlyIterator(state, event);
     } else if (event == EventEncoding.TAU) {
       return new TauClosureTransitionIterator(state);
     } else {
@@ -649,13 +696,14 @@ public class ObservationEquivalenceTRSimplifier implements
   {
     final int numClasses = mP.size();
     if (numClasses == mNumStates) {
-      mResultPartition = null;
+      setResultPartitionList(null);
     } else {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
       int nextCode = 0;
       final int[] index = new int[numClasses];
       final int[][] partition = new int[numClasses][];
       for (int state = 0; state < mNumStates; state++) {
-        if (mTransitionRelation.isReachable(state)) {
+        if (rel.isReachable(state)) {
           final SimpleEquivalenceClass sec = mStateToClass[state];
           int code = sec.getCode();
           if (code < 0) {
@@ -667,7 +715,7 @@ public class ObservationEquivalenceTRSimplifier implements
           partition[code][i] = state;
         }
       }
-      mResultPartition = Arrays.asList(partition);
+      setResultPartitionArray(partition);
     }
   }
 
@@ -1084,7 +1132,8 @@ public class ObservationEquivalenceTRSimplifier implements
     //# Constructor
     private ProperEventClosureTransitionIterator()
     {
-      mInnerIterator = mTransitionRelation.createPredecessorsReadOnlyIterator();
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mInnerIterator = rel.createPredecessorsReadOnlyIterator();
       mVisited = new TIntHashSet();
       reset();
     }
@@ -1092,7 +1141,8 @@ public class ObservationEquivalenceTRSimplifier implements
     private ProperEventClosureTransitionIterator(final int target,
                                                  final int event)
     {
-      mInnerIterator = mTransitionRelation.createPredecessorsReadOnlyIterator();
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mInnerIterator = rel.createPredecessorsReadOnlyIterator();
       mVisited = new TIntHashSet();
       reset(target, event);
     }
@@ -1169,9 +1219,9 @@ public class ObservationEquivalenceTRSimplifier implements
 
     public void remove()
     {
-      throw new UnsupportedOperationException(ProxyTools
-          .getShortClassName(this)
-          + " does not support transition removal!");
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition removal!");
     }
 
     //#######################################################################
@@ -1351,12 +1401,12 @@ public class ObservationEquivalenceTRSimplifier implements
 
   //#########################################################################
   //# Data Members
-  private ListBufferTransitionRelation mTransitionRelation;
   private Collection<int[]> mInitialPartition;
   private Equivalence mEquivalence;
   private TransitionRemoval mTransitionRemovalMode;
   private MarkingMode mMarkingMode;
   private int mTransitionLimit;
+  private boolean mAppliesPartitionAutomatically;
 
   private int mNumStates;
   private int mNumEvents;
@@ -1367,7 +1417,6 @@ public class ObservationEquivalenceTRSimplifier implements
   private THashSet<ComplexEquivalenceClass> mWC;
   private THashSet<SimpleEquivalenceClass> mP;
   private SimpleEquivalenceClass[] mStateToClass;
-  private List<int[]> mResultPartition;
   private boolean mHasModifications;
 
 

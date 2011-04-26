@@ -313,6 +313,16 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Gets the total number of markings in this state buffer.
+   * Each instance of a proposition marking a reachable state counts
+   * as marking.
+   */
+  public int getNumberOfMarkings()
+  {
+    return mStateBuffer.getNumberOfMarkings();
+  }
+
+  /**
    * Gets the initial status of the given state.
    * @return <CODE>true</CODE> if the state is an initial state,
    *         <CODE>false</CODE> otherwise.
