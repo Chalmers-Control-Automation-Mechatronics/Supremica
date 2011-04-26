@@ -11,7 +11,7 @@ public class ExchangeTreeNode extends CommonTree
 		mEx = token.getText();
 	}
 	public String toString(){
-		return "Exchange Node :"+super.toString();
+		return "Exchange";
 	}
 	private final String mEx;
 	public String getValue()

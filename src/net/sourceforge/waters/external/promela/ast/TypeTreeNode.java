@@ -11,7 +11,7 @@ public class TypeTreeNode extends CommonTree
 		mType = token.getText();
 	}
 	public String toString(){
-		return "Type Node :"+super.toString();
+		return "Type";
 	}
 	private final String mType;
 	public String getValue()

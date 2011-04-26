@@ -11,7 +11,7 @@ public class ConstantTreeNode extends CommonTree
 		mValue = Integer.parseInt(token.getText());
 	}
 	public String toString(){
-		return "Constant Node :"+super.toString();
+		return "Constant";
 	}
 	private final int mValue;
 	public int getValue()

@@ -11,7 +11,7 @@ public class ProctypeTreeNode extends CommonTree
 		mProc = token.getText();
 	}
 	public String toString(){
-		return "Proctype Node :"+super.toString();
+		return "Proctype";
 	}
 	private final String mProc;
 	public String getValue()
