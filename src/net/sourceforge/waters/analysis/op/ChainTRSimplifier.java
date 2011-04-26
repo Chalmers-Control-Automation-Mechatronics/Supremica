@@ -16,6 +16,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.ProxyTools;
+
+import org.apache.log4j.Logger;
 
 
 public class ChainTRSimplifier
@@ -72,14 +75,27 @@ public class ChainTRSimplifier
   public boolean run()
     throws AnalysisException
   {
+    final Logger logger = getLogger();
     setUp();
     mIsObservationEquivalentAbstraction = true;
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (logger.isDebugEnabled()) {
+      logger.debug(rel.getName());
+      logger.debug(rel.getNumberOfStates() + " states, " +
+                   rel.getNumberOfTransitions() + " transitions");
+    }
     boolean result = false;
     for (final TransitionRelationSimplifier step : mSteps) {
       try {
+        if (logger.isDebugEnabled()) {
+          logger.debug(ProxyTools.getShortClassName(step) + " ...");
+        }
         step.setTransitionRelation(rel);
         if (step.run()) {
+          if (logger.isDebugEnabled()) {
+            logger.debug(rel.getNumberOfStates() + " states, " +
+                         rel.getNumberOfTransitions() + " transitions");
+          }
           result = true;
           mIsObservationEquivalentAbstraction &=
             step.isObservationEquivalentAbstraction();

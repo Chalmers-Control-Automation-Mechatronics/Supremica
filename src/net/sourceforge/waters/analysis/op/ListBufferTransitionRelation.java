@@ -1329,36 +1329,33 @@ public class ListBufferTransitionRelation
    *                  {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
    */
   public void reconfigure(final int config)
+    throws OverflowException
   {
-    try {
-      checkConfig(config);
-      final int numEvents = getNumberOfProperEvents();
-      final int numStates = getNumberOfStates();
-      if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
-        if (mPredecessorBuffer != null) {
-          mSuccessorBuffer =
-            new OutgoingTransitionListBuffer(numEvents, numStates);
-          mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
-        } else {
-          throw createNoBufferException("predecessor");
-        }
+    checkConfig(config);
+    final int numEvents = getNumberOfProperEvents();
+    final int numStates = getNumberOfStates();
+    if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
+      if (mPredecessorBuffer != null) {
+        mSuccessorBuffer =
+          new OutgoingTransitionListBuffer(numEvents, numStates);
+        mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
+      } else {
+        throw createNoBufferException("predecessor");
       }
-      if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
-        if (mSuccessorBuffer != null) {
-          mPredecessorBuffer =
-            new IncomingTransitionListBuffer(numEvents, numStates);
-          mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
-        } else {
-          throw createNoBufferException("successor");
-        }
+    }
+    if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
+      if (mSuccessorBuffer != null) {
+        mPredecessorBuffer =
+          new IncomingTransitionListBuffer(numEvents, numStates);
+        mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
+      } else {
+        throw createNoBufferException("successor");
       }
-      if ((config & CONFIG_SUCCESSORS) == 0) {
-        mSuccessorBuffer = null;
-      } else if ((config & CONFIG_PREDECESSORS) == 0) {
-        mPredecessorBuffer = null;
-      }
-    } catch (final OverflowException exception) {
-      throw new WatersRuntimeException(exception);
+    }
+    if ((config & CONFIG_SUCCESSORS) == 0) {
+      mSuccessorBuffer = null;
+    } else if ((config & CONFIG_PREDECESSORS) == 0) {
+      mPredecessorBuffer = null;
     }
   }
 

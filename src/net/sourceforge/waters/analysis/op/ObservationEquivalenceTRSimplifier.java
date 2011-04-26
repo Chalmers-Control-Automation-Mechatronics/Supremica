@@ -217,18 +217,6 @@ public class ObservationEquivalenceTRSimplifier
   //# Invocation
   public boolean run() throws AnalysisException
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final Logger logger = getLogger();
-    if (logger.isDebugEnabled()) {
-      final String msg =
-          "ENTER " + ProxyTools.getShortClassName(this) + ".run(): "
-              + rel.getName() + " with "
-              + rel.getNumberOfReachableStates()
-              + " states and " + rel.getNumberOfTransitions()
-              + " transitions ...";
-      logger.debug(msg);
-    }
-
     setUp();
 
     while (true) {
@@ -249,11 +237,6 @@ public class ObservationEquivalenceTRSimplifier
     assert numClasses <= mNumStates;
     mHasModifications |= numClasses != mNumStates;
     if (!mHasModifications) {
-      if (logger.isDebugEnabled()) {
-        final String msg =
-            "EXIT " + ProxyTools.getShortClassName(this) + ".run(): no change.";
-        logger.debug(msg);
-      }
       return false;
     }
 
@@ -262,12 +245,6 @@ public class ObservationEquivalenceTRSimplifier
       applyResultPartition();
     }
 
-    if (logger.isDebugEnabled()) {
-      final String msg =
-          "EXIT " + ProxyTools.getShortClassName(this) + ".run(): " +
-          numClasses + " equivalence classes found.";
-      logger.debug(msg);
-    }
     return true;
   }
 
@@ -311,6 +288,7 @@ public class ObservationEquivalenceTRSimplifier
   public void reset()
   {
     super.reset();
+    mInitialPartition = null;
     mTauPreds = null;
     mWS = null;
     mWC = null;
@@ -1259,14 +1237,6 @@ public class ObservationEquivalenceTRSimplifier
 
   }
 
-  //#########################################################################
-  //# Logging
-  private Logger getLogger()
-  {
-    final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
-  }
-
 
   //#########################################################################
   //# Inner Enumeration Equivalence
@@ -1346,7 +1316,7 @@ public class ObservationEquivalenceTRSimplifier
      * silent transitions. This option only is guaranteed to work correctly if
      * the input automaton does not contain any loops of silent events. If this
      * cannot be guaranteed, consider using {@link #NONTAU} instead. The second
-     * pass is performed in addition, if a non-trivial has been found.
+     * pass is performed in addition, if a non-trivial partition has been found.
      */
     ALL,
     /**
@@ -1401,7 +1371,6 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private Collection<int[]> mInitialPartition;
   private Equivalence mEquivalence;
   private TransitionRemoval mTransitionRemovalMode;
   private MarkingMode mMarkingMode;
@@ -1410,6 +1379,7 @@ public class ObservationEquivalenceTRSimplifier
 
   private int mNumStates;
   private int mNumEvents;
+  private Collection<int[]> mInitialPartition;
 
   private int mFirstSplitEvent;
   private int[][] mTauPreds;

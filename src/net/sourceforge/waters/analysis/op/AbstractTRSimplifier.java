@@ -14,6 +14,8 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
+import org.apache.log4j.Logger;
+
 
 public abstract class AbstractTRSimplifier
   implements TransitionRelationSimplifier
@@ -56,7 +58,7 @@ public abstract class AbstractTRSimplifier
 
   public boolean isObservationEquivalentAbstraction()
   {
-    return false;
+    return mResultPartition == null;
   }
 
   public void reset()
@@ -72,6 +74,10 @@ public abstract class AbstractTRSimplifier
     throws AnalysisException
   {
     mResultPartition = null;
+    final int config = getPreferredConfiguration();
+    if (config != 0) {
+      mTransitionRelation.reconfigure(config);
+    }
   }
 
   protected void setResultPartitionList(final List<int[]> partition)
@@ -92,6 +98,15 @@ public abstract class AbstractTRSimplifier
     throws AnalysisException
   {
     mTransitionRelation.merge(mResultPartition);
+  }
+
+
+  //#########################################################################
+  //# Logging
+  protected Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
   }
 
 

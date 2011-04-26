@@ -538,6 +538,9 @@ public class OPConflictChecker
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     chain.add(bisimulator);
+    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+      new NonAlphaDeterminisationTRSimplifier(bisimulator);
+    chain.add(nonAlphaDeterminiser);
     return new GeneralisedTRSimplifierAbstractionRule(chain);
   }
 

@@ -9,16 +9,14 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntArrayList;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.op.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.StateEncoding;
-import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -31,8 +29,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
 {
-  // #######################################################################
-  // # Constructor
+
+  //#########################################################################
+  //# Constructor
   DeterminisationOfNonAlphaStatesRule(final ProductDESProxyFactory factory)
   {
     this(factory, null);
@@ -48,24 +47,25 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     mTransitionLimit = Integer.MAX_VALUE;
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#########################################################################
+  //# Rule Application
   /**
    * Sets the mode which redundant transitions are to be removed.
-   *
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
-  public void setTransitionRemovalMode(final TransitionRemoval mode)
+  public void setTransitionRemovalMode
+    (final ObservationEquivalenceTRSimplifier.TransitionRemoval mode)
   {
     mTransitionRemovalMode = mode;
   }
 
   /**
    * Gets the mode which redundant transitions are to be removed.
-   *
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
-  public TransitionRemoval getTransitionRemovalMode()
+  public ObservationEquivalenceTRSimplifier.TransitionRemoval
+    getTransitionRemovalMode()
   {
     return mTransitionRemovalMode;
   }
@@ -77,7 +77,6 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
    * algorithm. An attempt to store more transitions leads to an
    * {@link net.sourceforge.waters.model.analysis.OverflowException
    * OverflowException}.
-   *
    * @param limit
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
    *          unlimited number of transitions.
@@ -89,7 +88,6 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
 
   /**
    * Gets the transition limit.
-   *
    * @see {@link #setTransitionLimit(int) setTransitionLimit()}
    */
   public int getTransitionLimit()
@@ -97,8 +95,9 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     return mTransitionLimit;
   }
 
-  // #######################################################################
-  // # Configuration
+
+  //#########################################################################
+  //# Configuration
   EventProxy getAlphaMarking()
   {
     return mAlphaMarking;
@@ -109,11 +108,12 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     mAlphaMarking = alphaMarking;
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#########################################################################
+  //# Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
-      throws AnalysisException
+    throws AnalysisException
   {
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
       return autToAbstract;
@@ -122,40 +122,35 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     mAutToAbstract = autToAbstract;
     final EventEncoding eventEnc =
         new EventEncoding(autToAbstract, tau, getPropositions(),
-            EventEncoding.FILTER_PROPOSITIONS);
+                          EventEncoding.FILTER_PROPOSITIONS);
+    final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
     mInputEncoding = new StateEncoding(autToAbstract);
-    mTr =
-        new ListBufferTransitionRelation(autToAbstract, eventEnc,
-            mInputEncoding, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    mTr.reverse();
+    mTr = new ListBufferTransitionRelation
+            (autToAbstract, eventEnc,
+             mInputEncoding, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(mTr);
     bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
     bisimulator.setTransitionLimit(mTransitionLimit);
-    final Collection<int[]> initPartition = createInitialPartition(eventEnc);
-    if (initPartition == null) {
-      return autToAbstract;
-    }
-    bisimulator.setInitialPartition(initPartition);
-    bisimulator.refineInitialPartitionBasedOnInitialStates();
-    final boolean modified = bisimulator.run();
-    if (modified) {
-      mPartition = bisimulator.getResultPartition();
+    final NonAlphaDeterminisationTRSimplifier simplifier =
+      new NonAlphaDeterminisationTRSimplifier(bisimulator, mTr);
+    simplifier.setPropositions(alphaCode, -1);
+    if (simplifier.run()) {
+      mPartition = simplifier.getResultPartition();
       mTr.removeTauSelfLoops();
       mTr.removeProperSelfLoopEvents();
       mTr.removeRedundantPropositions();
       final ProductDESProxyFactory factory = getFactory();
       mOutputEncoding = new StateEncoding();
-      mTr.reverse();
       return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
     }
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep(
-                                                          final CompositionalGeneralisedConflictChecker checker,
-                                                          final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy abstractedAut)
   {
     return checker.createDeterminisationOfNonAlphaStatesStep(abstractedAut,
                                                              mAutToAbstract,
@@ -163,43 +158,6 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
                                                              mInputEncoding,
                                                              mPartition,
                                                              mOutputEncoding);
-  }
-
-  /**
-   * Creates an initial partition. This includes a separate equivalence class
-   * for every state marked alpha, and an equivalence class which contains all
-   * the remaining states.
-   *
-   * @param eventEnc
-   * @return A collection containing int[] of equivalence classes.
-   */
-  private Collection<int[]> createInitialPartition(final EventEncoding eventEnc)
-  {
-    final List<int[]> initialPartition = new ArrayList<int[]>();
-    final int numStates = mTr.getNumberOfStates();
-
-    final TIntArrayList remainingStates = new TIntArrayList();
-    final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
-
-    for (int stateCode = 0; stateCode < numStates; stateCode++) {
-      if (mTr.isMarked(stateCode, alphaCode)) {
-        // creates a separate equivalence class for every state marked alpha
-        final int[] alphaClass = new int[1];
-        alphaClass[0] = stateCode;
-        initialPartition.add(alphaClass);
-      } else {
-        // creates an equivalence class for all states which don't fit into the
-        // above two categories
-        remainingStates.add(stateCode);
-      }
-    }
-    if (remainingStates.size() == 0) {
-      return null;
-    }
-    final int[] remainingStatesArray = remainingStates.toNativeArray();
-    initialPartition.add(remainingStatesArray);
-
-    return initialPartition;
   }
 
   public void cleanup()
@@ -211,9 +169,11 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     mAutToAbstract = null;
   }
 
-  // #######################################################################
-  // # Data Members
-  private ObservationEquivalenceTRSimplifier.TransitionRemoval mTransitionRemovalMode;
+
+  //#########################################################################
+  //# Data Members
+  private ObservationEquivalenceTRSimplifier.TransitionRemoval
+    mTransitionRemovalMode;
   private int mTransitionLimit;
 
   private AutomatonProxy mAutToAbstract;
