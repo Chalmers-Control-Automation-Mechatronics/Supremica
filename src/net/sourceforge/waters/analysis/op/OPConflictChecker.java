@@ -526,20 +526,31 @@ public class OPConflictChecker
     throws EventNotFoundException
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final TransitionRelationSimplifier loopRemover =
+    final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
+    final AlphaRemovalTRSimplifier alphaRemover =
+      new AlphaRemovalTRSimplifier();
+    chain.add(alphaRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.Equivalence.
-                               OBSERVATION_EQUIVALENCE);
+    bisimulator.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
     bisimulator.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     chain.add(bisimulator);
+    final ObservationEquivalenceTRSimplifier revBisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    revBisimulator.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+    revBisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    revBisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-      new NonAlphaDeterminisationTRSimplifier(bisimulator);
+      new NonAlphaDeterminisationTRSimplifier(revBisimulator);
     chain.add(nonAlphaDeterminiser);
     return new GeneralisedTRSimplifierAbstractionRule(chain);
   }

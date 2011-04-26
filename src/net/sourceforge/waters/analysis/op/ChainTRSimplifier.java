@@ -82,7 +82,8 @@ public class ChainTRSimplifier
     if (logger.isDebugEnabled()) {
       logger.debug(rel.getName());
       logger.debug(rel.getNumberOfStates() + " states, " +
-                   rel.getNumberOfTransitions() + " transitions");
+                   rel.getNumberOfTransitions() + " transitions, " +
+                   rel.getNumberOfMarkings() + " markings.");
     }
     boolean result = false;
     for (final TransitionRelationSimplifier step : mSteps) {
@@ -94,7 +95,8 @@ public class ChainTRSimplifier
         if (step.run()) {
           if (logger.isDebugEnabled()) {
             logger.debug(rel.getNumberOfStates() + " states, " +
-                         rel.getNumberOfTransitions() + " transitions");
+                         rel.getNumberOfTransitions() + " transitions, " +
+                         rel.getNumberOfMarkings() + " markings.");
           }
           result = true;
           mIsObservationEquivalentAbstraction &=
