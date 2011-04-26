@@ -44,6 +44,7 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.marshaller.ProductDESToModuleUnmarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
@@ -93,6 +94,8 @@ public class DocumentContainerManager
       new SupremicaMarshaller();
     final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
       new ValidUnmarshaller(factory, opTable);
+    final ProxyUnmarshaller<ModuleProxy> desUnmarshaller =
+      new ProductDESToModuleUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller =
       new HISCUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller =
@@ -111,6 +114,7 @@ public class DocumentContainerManager
     // (shows up in the file-open dialog)
     mDocumentManager.registerUnmarshaller(moduleMarshaller);
     mDocumentManager.registerUnmarshaller(supremicaUnmarshaller);
+    mDocumentManager.registerUnmarshaller(desUnmarshaller);
     mDocumentManager.registerUnmarshaller(validUnmarshaller);
     mDocumentManager.registerUnmarshaller(hiscUnmarshaller);
     mDocumentManager.registerUnmarshaller(umdesUnmarshaller);
@@ -120,7 +124,8 @@ public class DocumentContainerManager
     mModuleImporters =
       new LinkedList<CopyingProxyUnmarshaller<ModuleProxy>>();
     final File mazeinputs = null;
-    final CopyingProxyUnmarshaller<ModuleProxy> despotImporter = new DESpotImporter(factory, mDocumentManager);
+    final CopyingProxyUnmarshaller<ModuleProxy> despotImporter =
+      new DESpotImporter(factory, mDocumentManager);
     final CopyingProxyUnmarshaller<ModuleProxy> mazeImporter =
       new MazeCompiler(mazeinputs, factory, mDocumentManager);
     mModuleImporters.add(despotImporter);

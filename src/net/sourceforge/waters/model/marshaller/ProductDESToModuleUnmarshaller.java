@@ -25,6 +25,15 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import org.xml.sax.SAXException;
 
 
+/**
+ * A utility to load a product DES (<CODE>.wdes</CODE>) file as a module.
+ * This marshaller combines a {@link JAXBProductDESMarshaller} with
+ * a {@link ProductDESImporter} to load a product DES and directly as a
+ * module.
+ *
+ * @author Robi Malik
+ */
+
 public class ProductDESToModuleUnmarshaller
   implements ProxyUnmarshaller<ModuleProxy>
 {
