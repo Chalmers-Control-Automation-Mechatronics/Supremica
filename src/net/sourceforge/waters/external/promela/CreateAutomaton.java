@@ -40,6 +40,7 @@ public class CreateAutomaton
     ranges.add(range);
     ranges.add(range);
 
+    @SuppressWarnings("unused")
     final EventDeclProxy event = factory.createEventDeclProxy(ename,EventKind.CONTROLLABLE,true,ScopeKind.LOCAL,ranges,null,null);
   }
 

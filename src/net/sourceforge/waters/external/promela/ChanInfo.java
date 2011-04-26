@@ -1,17 +1,26 @@
 package net.sourceforge.waters.external.promela;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
 
 public class ChanInfo{
     private int send_count;
     private int rec_count;
     private final int datalength;
+    @SuppressWarnings("unused")
     private final int typelength;
-    private ArrayList<String> type;
-    private final ArrayList<ArrayList<String>> msg = new ArrayList<ArrayList<String>>();
-    private final Hashtable<String,ArrayList<ArrayList<String>>> message= new Hashtable<String,ArrayList<ArrayList<String>>>();
+    @SuppressWarnings("unused")
+    private List<String> type;
+    private final List<List<String>> msg = new ArrayList<List<String>>();
+    @SuppressWarnings("unused")
+    private final Map<String,List<List<String>>> message =
+      new HashMap<String,List<List<String>>>();
+    @SuppressWarnings("unused")
     private final String name;
+
     public ChanInfo(final String n, final int type,final int data){
         send_count = 0;
         rec_count = 0;
@@ -26,7 +35,7 @@ public class ChanInfo{
         send_count++;
     }
 
-    public ArrayList getValue(){
+    public List<List<String>> getValue(){
         return msg;
     }
     public int getdataLength(){

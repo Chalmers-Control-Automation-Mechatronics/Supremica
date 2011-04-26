@@ -8,8 +8,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import net.sourceforge.waters.external.promela.parse.PromelaLexer;
-import net.sourceforge.waters.external.promela.parse.PromelaParser;
+import net.sourceforge.waters.external.promela.parser.PromelaLexer;
+import net.sourceforge.waters.external.promela.parser.PromelaParser;
 
 import org.anarres.cpp.InputLexerSource;
 import org.anarres.cpp.LexerException;
