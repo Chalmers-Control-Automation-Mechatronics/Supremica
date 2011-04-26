@@ -29,6 +29,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.external.despot.DESpotImporter;
+import net.sourceforge.waters.external.promela.PromelaUnmarshaller;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.observer.ContainerSwitchEvent;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -92,16 +93,18 @@ public class DocumentContainerManager
       new SupremicaUnmarshaller(factory);
     final ProxyMarshaller<Project> supremicaMarshaller =
       new SupremicaMarshaller();
-    final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
-      new ValidUnmarshaller(factory, opTable);
     final ProxyUnmarshaller<ModuleProxy> desUnmarshaller =
       new ProductDESToModuleUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller =
       new HISCUnmarshaller(factory);
+    final ProxyUnmarshaller<ModuleProxy> promelaUnmarshaller =
+      new PromelaUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller =
       new UMDESUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
       new ADSUnmarshaller(factory);
+    final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
+      new ValidUnmarshaller(factory, opTable);
     final ProductDESProxyFactory desfactory =
       ProductDESElementFactory.getInstance();
     final JAXBTraceMarshaller traceMarshaller =
@@ -115,10 +118,11 @@ public class DocumentContainerManager
     mDocumentManager.registerUnmarshaller(moduleMarshaller);
     mDocumentManager.registerUnmarshaller(supremicaUnmarshaller);
     mDocumentManager.registerUnmarshaller(desUnmarshaller);
-    mDocumentManager.registerUnmarshaller(validUnmarshaller);
     mDocumentManager.registerUnmarshaller(hiscUnmarshaller);
+    mDocumentManager.registerUnmarshaller(promelaUnmarshaller);
     mDocumentManager.registerUnmarshaller(umdesUnmarshaller);
     mDocumentManager.registerUnmarshaller(adsUnmarshaller);
+    mDocumentManager.registerUnmarshaller(validUnmarshaller);
 
     mProductDESImporter = new ProductDESImporter(factory);
     mModuleImporters =

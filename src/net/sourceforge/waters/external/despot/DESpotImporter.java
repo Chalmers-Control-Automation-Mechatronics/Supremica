@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.external.despot
+//# CLASS:   TTCTImporter
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.external.despot;
 
 import java.awt.geom.Point2D;
@@ -59,6 +68,11 @@ import org.xml.sax.SAXException;
 
 
 /**
+ * A tool to import hierarchical models created by DESpot into the IDE.
+ * This importer uses Waters module instantiation to preserve the hierarchical
+ * structure of the DESpot models. Annotations are used to record HISC
+ * interface and event types.
+ *
  * @author Rachel Francis
  */
 
