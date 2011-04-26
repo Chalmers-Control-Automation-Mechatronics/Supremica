@@ -29,6 +29,7 @@
   <path id="antlr.runtime.classpath">
     <pathelement location="${antlr.runtime.jar}"/>
     <pathelement location="${anarres.jar}"/>
+    <pathelement location="${trove.jar}"/>
   </path>
   <path id="jaxb.classpath">
     <pathelement location="${activation.jar}"/>
@@ -146,7 +147,7 @@
     <javac srcdir="${supremica.src}" destdir="${waters.classes}"
            includes="net/sourceforge/waters/model/unchecked/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
- 	       includeantruntime="false"/>
+           includeantruntime="false"/>
   </target>
 
   <target name="jaxb-jar" depends="jaxb-compile"
@@ -168,7 +169,7 @@
     <mkdir dir="${waters.classes}"/>
     <javac sourcepath="" srcdir="${supremica.src}" destdir="${waters.classes}" 
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
-     	   includeantruntime="false">
+           includeantruntime="false">
       <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
@@ -246,7 +247,7 @@
     <javac srcdir="${src}" destdir="${waters.classes}" 
            includes="net/sourceforge/waters/build/jniglue/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
- 	       includeantruntime="false">
+               includeantruntime="false">
       <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
     </javac>
@@ -294,7 +295,7 @@
            includes="net/sourceforge/waters/**/*.java"
            excludes="net/sourceforge/waters/gui/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
- 	       includeantruntime="false">
+               includeantruntime="false">
       <classpath>
         <path refid="waters.compile.classpath"/>
         <pathelement location="${waters.jar}"/>
