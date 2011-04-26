@@ -107,6 +107,7 @@ moduleRule
 		| utypeRule //-> ^(UTYPENODE utypeRule)
 		| mtypeRule //-> ^(MTYPENODE mtypeRule)
 		| decl_lstRule //-> ^(DECLARATIONSNODE decl_lstRule)
+		| channelRule
     | CSTATE STRING STRING (STRING)?
     | CTRACK STRING STRING
     | CCODEBLOCK
@@ -304,7 +305,7 @@ arg_lstRule
 @init  { paraphrases.push("in send argument"); }
 @after { paraphrases.pop(); }
 	:	any_exprRule (COMMA any_exprRule)*
-		-> ^(any_exprRule any_exprRule*)
+		-> (any_exprRule)+
 	;
 
 decl_lstRule
@@ -333,8 +334,10 @@ optionsRule
 	;
 
 ivarRule
-	:	NAME (ALTPARENOPEN constRule ALTPARENCLOSE)? (ASSIGN (any_exprRule | ch_initRule))?
-		-> ^(NAME (constRule)? (any_exprRule)? (ch_initRule)? )
+	:	NAME (ALTPARENOPEN constRule ALTPARENCLOSE)? (ASSIGN (any_exprRule) )?
+		-> ^(NAME (constRule)? (any_exprRule)? )  //(ch_initRule)?
+	//|	NAME ASSIGN ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typeRule (COMMA typeRule)* BLOCKEND (SEMICOLON)*
+	//	-> ^(NAME STATEMENT constRule typeRule*)
 	;
 
 /*
@@ -385,17 +388,26 @@ pollRule
 	:	varrefRule QUESTIONMARK (ALTPARENOPEN recv_argsRule ALTPARENCLOSE | QUESTIONMARK ALTPARENOPEN recv_argsRule ALTPARENCLOSE)
 	;
 //modified
-ch_initRule
-	:	ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
-		-> ^(CHAN_STATE constRule typenameRule* )
-	;
+//ch_initRule
+//	:	ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
+//		-> ^(STATEMENT constRule typenameRule* )
+//	;
 	
 typenameRule
 	:	BIT | BOOL | BYTE | SHORT 
-		| INT -> ^(INT<TypeTreeNode>)
+		| INT 
 		| MTYPE 
-		| CHAN -> ^(CHAN<TypeTreeNode>)
 		| unameRule
+	;
+typeRule
+	: 	CHAN
+	;
+
+channelRule
+@init  { paraphrases.push("in channel definition"); }
+@after { paraphrases.pop(); }
+	:	CHAN NAME (ASSIGN)? ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
+		-> ^(CHAN<TypeTreeNode> NAME ^(STATEMENT constRule typenameRule*) )
 	;
 
 unameRule
