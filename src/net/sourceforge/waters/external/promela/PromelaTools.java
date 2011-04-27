@@ -12,8 +12,13 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
+import net.sourceforge.waters.external.promela.ast.ExchangeTreeNode;
+import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
+import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
 import net.sourceforge.waters.external.promela.parser.PromelaLexer;
 import net.sourceforge.waters.external.promela.parser.PromelaParser;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -37,7 +42,7 @@ public class PromelaTools {
     private String preprocessedCode = null;
     //hashtable to store chan informations
     private final Hashtable<String, ChanInfo> chan = new Hashtable<String,ChanInfo>();
-
+    private final Hashtable<String, ArrayList<List<String>>> component = new Hashtable<String,ArrayList<List<String>>>();
     // ---------------------------------------------------------------
 
     public void parseString(final String promelaCode) throws IOException {
@@ -126,74 +131,109 @@ public class PromelaTools {
         return chan;
     }
     private void collectMsg(final CommonTree t){
-        if(t!=null){
-
-            if(t.getText().equals("chan")){
-                final CommonTree tr1 = (CommonTree)t.getChild(1);
-                final String name = t.getChild(0).getText();
-                final int length = Integer.parseInt(tr1.getChild(0).getText());
-                final int datalength = tr1.getChildCount()-2;
-                chan.put(name,new ChanInfo(name, length, datalength));
 
 
+      if(t!=null){
+
+          if(t.getText().equals("chan")){
+              final CommonTree tr1 = (CommonTree)t.getChild(1);
+              final String name = t.getChild(0).getText();
+              final int length = Integer.parseInt(tr1.getChild(0).getText());
+              final int datalength = tr1.getChildCount()-2;
+              chan.put(name,new ChanInfo(name, length, datalength));
+
+
+          }
+
+          if(t instanceof ProctypeTreeNode){
+
+            final ArrayList<List<String>> componentLabels = new ArrayList<List<String>>();
+            final String proctypeName = t.getText();
+            if(!component.containsKey(proctypeName)){
+              component.put(proctypeName,componentLabels);
             }
+              for(int b =0;b<t.getChildCount();b++){
 
-            if(t.toString().equals("Proctype")){
-                for(int b =0;b<t.getChildCount();b++){
+                  if(t.getChild(b).toString().equals("STATEMENT")){
+                  final CommonTree tr = (CommonTree)t.getChild(b);
 
-                    if(t.getChild(b).toString().equals("STATEMENT")){
-                    final CommonTree tr = (CommonTree)t.getChild(b);
-
-                    for(int a=0;a<tr.getChildCount();a++){
-                      final CommonTree childA = (CommonTree) tr.getChild(a);
-                      if(childA.toString().equals("Exchange")){
-                          if(childA.getText().equals("!")|| tr.getChild(a).getText().equals("!!")){
+                  for(int a=0;a<tr.getChildCount();a++){
+                    final CommonTree childA = (CommonTree) tr.getChild(a);
+                   // if(childA.toString().equals("Exchange")){
+                    if(childA instanceof ExchangeTreeNode){
+                        if(childA.getText().equals("!")|| tr.getChild(a).getText().equals("!!")){
 
 
-                          final ArrayList<String> data =new ArrayList<String>();
-                          final StringBuilder sb = new StringBuilder();
-                          sb.append(childA.getChild(0).getText());
-                         // sb.append(childA.getText()+"[");
-                          chan.get(childA.getChild(0).getText()).incSendnumber();
-                          final CommonTree msgargs = (CommonTree) childA.getChild(1);
-                    /*      if(childA.getChild(1).toString().equals("Constant") )
-                              {
-                                  getdata(sb,(CommonTree)tr.getChild(a).getChild(1),data);
+                        final ArrayList<String> data =new ArrayList<String>();
 
-                              }
-                      */
-                          for(int y = 0; y <msgargs.getChildCount();y++){
-                            final CommonTree childY = (CommonTree) msgargs.getChild(y);
-                            if(childY instanceof ConstantTreeNode){
-                              sb.append("[");
-                              sb.append(childY.getText());
-                              sb.append("]");
-                              data.add(childY.getText());
-                            }
+                        final StringBuilder sb = new StringBuilder();
+                        sb.append(childA.getChild(0).getText());
+                        final String n = childA.getChild(0).getText();
+                       // sb.append(childA.getText()+"[");
+                        chan.get(childA.getChild(0).getText()).incSendnumber();
+                        final CommonTree msgargs = (CommonTree) childA.getChild(1); //message statement
+
+                        final ArrayList<String> labels = new ArrayList<String>();
+                        //add event name
+                        labels.add(n);
+
+                        for(int y = 0; y <msgargs.getChildCount();y++){
+                          final CommonTree childY = (CommonTree) msgargs.getChild(y);
+
+
+                          if(childY instanceof ConstantTreeNode){
+
+                            sb.append("[");
+                            sb.append(childY.getText());
+                            sb.append("]");
+                            data.add(childY.getText());
+
+                            //add all event data
+                            labels.add(childY.getText());
+
                           }
-                          //testing event output
-                 //         System.out.println(sb.toString());
 
-                          //store proctype name and relevant data into hashtable
-                          chan.get(childA.getChild(0).getText()).storeMsg(data);
+                        }
 
-                          }
-                          if(childA.getText().equals("?")|| tr.getChild(a).getText().equals("??")){
-                            chan.get(childA.getChild(0).getText()).incRecnumber();
-                          }
-                      }
+                        //store proctype name and relevant data into hashtable
+                        chan.get(childA.getChild(0).getText()).storeMsg(data);
+
+                        //add this event info to event list
+                        componentLabels.add(labels);
+
+                        }
+                        //still need to handle recieve statement
+                        if(childA.getText().equals("?")|| tr.getChild(a).getText().equals("??")){
+                          chan.get(childA.getChild(0).getText()).incRecnumber();
+                        }
                     }
-                    }
-                }
+                  }
+                    component.put(proctypeName, componentLabels);
+                  }
 
-            }
-            for(int i = 0; i < t.getChildCount();i++){
+              }
 
-                collectMsg((CommonTree)t.getChild(i));
+          }
+          if(t instanceof InitialTreeNode){
+            final CommonTree childI = (CommonTree) t.getChild(0);
+            if(childI.getChild(0).getText().equals("atomic")){
+              final ArrayList<String> temp = new ArrayList<String>();
+              temp.add("init");
+              //insert this particular event into first place of event label list, for each component
+              for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
+                entry.getValue().add(0,temp);
 
-            }
-        }
-    }
+              }
+
+          }
+          }
+          for(int i = 0; i < t.getChildCount();i++){
+
+              collectMsg((CommonTree)t.getChild(i));
+
+          }
+      }
+  }
     @SuppressWarnings("unused")
     private void print_chan(){
        // System.out.println(chan.get("name").getValue().toString());
@@ -204,7 +244,11 @@ public class PromelaTools {
         System.out.println(name+" "+chan.get(name).getValue());
       }
     }
-
+    private void print_label(){
+      for(final Map.Entry<String,ArrayList<List<String>>> entry: component.entrySet()){
+        System.out.println(entry.getKey()+": "+entry.getValue());
+      }
+    }
  ///////////
     private CommonTree parseInternal(final Preprocessor preProcessor) throws IOException,
             LexerException, RecognitionException {
@@ -246,6 +290,7 @@ public class PromelaTools {
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
             collectMsg(t);
+            print_label();
             //print_chan();
             //printTree(t,0);
 

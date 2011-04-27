@@ -176,7 +176,7 @@ initRule
 @init  { paraphrases.push("in init definition"); }
 @after { paraphrases.pop(); }
 	:	INIT (priorityRule)? BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
-		-> ^(INIT sequenceRule)
+		-> ^(INIT<InitialTreeNode> sequenceRule)
 	;
 
 priorityRule

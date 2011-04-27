@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.external.promela;
 
+
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +26,9 @@ import java.util.Map;
 
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
+
+import net.sourceforge.waters.external.promela.ast.*;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
@@ -151,7 +155,7 @@ public class PromelaUnmarshaller
     final InputStream stream = url.openStream();
     CommonTree ast = null;
     try {
-      // TODO Parse the stream ...
+
       final PromelaTools tool = new PromelaTools();
       ast = tool.parseStream(stream);
     } catch (final LexerException exception) {
@@ -162,6 +166,7 @@ public class PromelaUnmarshaller
       stream.close();
     }
     collectMsg(ast);
+
     final ModuleProxy module = constructModule(uri);
     return module;
   }
@@ -190,6 +195,9 @@ public class PromelaUnmarshaller
       events.add(event);
     }
     // Create automata ...
+    final List<Proxy> components = new ArrayList<Proxy>();
+
+
     final ModuleProxy module =
       mFactory.createModuleProxy(name, comment, null,
                                  null, events, null, null);
@@ -222,7 +230,7 @@ public class PromelaUnmarshaller
 
         }
 
-        if(t.toString().equals("Proctype")){
+        if(t instanceof ProctypeTreeNode){
             for(int b =0;b<t.getChildCount();b++){
 
                 if(t.getChild(b).toString().equals("STATEMENT")){
@@ -230,7 +238,8 @@ public class PromelaUnmarshaller
 
                 for(int a=0;a<tr.getChildCount();a++){
                   final CommonTree childA = (CommonTree) tr.getChild(a);
-                  if(childA.toString().equals("Exchange")){
+                 // if(childA.toString().equals("Exchange")){
+                  if(childA instanceof ExchangeTreeNode){
                       if(childA.getText().equals("!")|| tr.getChild(a).getText().equals("!!")){
 
 
@@ -240,12 +249,7 @@ public class PromelaUnmarshaller
                      // sb.append(childA.getText()+"[");
                       chan.get(childA.getChild(0).getText()).incSendnumber();
                       final CommonTree msgargs = (CommonTree) childA.getChild(1);
-                /*      if(childA.getChild(1).toString().equals("Constant") )
-                          {
-                              getdata(sb,(CommonTree)tr.getChild(a).getChild(1),data);
 
-                          }
-                  */
                       for(int y = 0; y <msgargs.getChildCount();y++){
                         final CommonTree childY = (CommonTree) msgargs.getChild(y);
                         if(childY instanceof ConstantTreeNode){
@@ -271,6 +275,9 @@ public class PromelaUnmarshaller
             }
 
         }
+       // if(t instanceof InitTreeNode){
+
+        //}
         for(int i = 0; i < t.getChildCount();i++){
 
             collectMsg((CommonTree)t.getChild(i));
