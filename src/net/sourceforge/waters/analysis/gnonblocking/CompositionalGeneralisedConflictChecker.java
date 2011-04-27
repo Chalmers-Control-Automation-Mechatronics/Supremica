@@ -51,6 +51,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
@@ -307,6 +308,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final ConflictChecker checker =
           new NativeConflictChecker(model, getUsedMarkingProposition(),
               getFactory());
+     //MarshallingTools.saveModule(model, "/research/vaibhav/sic5_changes_automaton/increased_islimit/4_40k/4_model.wdes");
       // final ConflictChecker checker = new MonolithicConflictChecker(model,
       // getUsedMarkingProposition(), getFactory());
       checker
