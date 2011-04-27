@@ -1416,6 +1416,8 @@ public class OPConflictChecker
 
     final Collection<AutomatonProxy> check =
       new THashSet<AutomatonProxy>(trace.getAutomata());
+    TraceChecker.checkCounterExample(traceSteps, check,
+                                     mPreconditionMarking, true);
 
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();

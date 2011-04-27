@@ -195,10 +195,6 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   {
     assertSame("Product DES in trace is not the original model!",
                des, trace.getProductDES());
-    /*
-     * Sorry, Rachel, but this is a real bug that needs to be fixed
-     * in CompositionalGeneralisedConflictChecker.
-     */
     final String desName = des.getName();
     final String traceName = trace.getName();
     assertTrue("Trace name '" + traceName + "' does not match model name '" +

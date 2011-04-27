@@ -265,10 +265,11 @@ public class TraceChecker
           for (final TransitionProxy trans : transitions) {
             if (trans.getSource() == current && trans.getEvent() == event) {
               assertTrue(next == null,
-                "The counterexample does not contain a target state " +
-                "for the nondeterministic transition in automaton " +
-                aut.getName() + " from source state " + current.getName() +
-                " with event " + event.getName() + "!");
+                         "The counterexample does not contain a target state " +
+                         "for the nondeterministic transition in automaton " +
+                         aut.getName() + " from source state " +
+                         current.getName() + " with event " +
+                         event.getName() + "!");
               next = trans.getTarget();
             }
           }
@@ -282,16 +283,18 @@ public class TraceChecker
         if (events.contains(event)) {
           boolean found = false;
           for (final TransitionProxy trans : transitions) {
-            if (trans.getSource() == current && trans.getEvent() == event
-                && trans.getTarget() == target) {
+            if (trans.getSource() == current &&
+                trans.getEvent() == event &&
+                trans.getTarget() == target) {
               found = true;
+              break;
             }
           }
           assertTrue(found,
-            "There is no transition from state " + current.getName() +
-            " to state " + target.getName() + " with event " +
-            event.getName() + " in automaton " + aut.getName() +
-            " as specified in the counterexample trace!");
+                     "There is no transition from state " + current.getName() +
+                     " to state " + target.getName() + " with event " +
+                     event.getName() + " in automaton " + aut.getName() +
+                     " as specified in the counterexample trace!");
           current = target;
         } else {
           assertTrue(current == target,

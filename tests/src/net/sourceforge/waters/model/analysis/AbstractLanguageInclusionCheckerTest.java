@@ -23,6 +23,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
@@ -88,6 +89,17 @@ public abstract class AbstractLanguageInclusionCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "verriegel4counter1.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- nondeterministic
+  public void testHISC8nd() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nondeterministic";
+    final String name = "hisc8nd.wmod";
     runModelVerifier(group, dir, name, false);
   }
 
@@ -484,26 +496,26 @@ public abstract class AbstractLanguageInclusionCheckerTest
     super.checkCounterExample(des, trace);
     final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
 
-    final List<EventProxy> eventlist = counterexample.getEvents();
-    final int len = eventlist.size();
-    assertTrue("Empty Counterexample!", len > 0);
+    final List<TraceStepProxy> steps = counterexample.getTraceSteps();
+    final int len = steps.size();
+    assertTrue("Empty Counterexample!", len > 1);
 
     final Collection<AutomatonProxy> automata = des.getAutomata();
     boolean rejected = false;
     for (final AutomatonProxy aut : automata) {
       final ComponentKind kind = aut.getKind();
-      final int accepted = checkCounterExample(aut, eventlist);
+      final int accepted = checkCounterExample(aut, steps);
       switch (kind) {
       case PLANT:
       case SPEC:
-	assertTrue("Counterexample not accepted by automaton " +
-		   aut.getName() + "!", accepted == len);
+        assertTrue("Counterexample not accepted by automaton " +
+                   aut.getName() + "!", accepted == len);
         break;
       case PROPERTY:
-	assertFalse("Counterexample rejected too early (step " + accepted +
-		    ") by property " + aut.getName() + "!",
-		    accepted < len - 1);
-	rejected |= (accepted == len - 1);
+        assertFalse("Counterexample rejected too early (step " + accepted +
+                    ") by property " + aut.getName() + "!",
+                    accepted < len - 1);
+        rejected |= (accepted == len - 1);
         break;
       default:
         break;
@@ -513,36 +525,75 @@ public abstract class AbstractLanguageInclusionCheckerTest
   }
 
   private int checkCounterExample(final AutomatonProxy aut,
-                                  final List<EventProxy> counterexample)
+                                  final List<TraceStepProxy> counterexample)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
-
-    int steps = -1;
+    int steps = 0;
     StateProxy current = null;
-    for (final StateProxy state : states) {
-      if (state.isInitial()) {
-        current = state;
-        break;
-      }
-    }
-    if (current == null) {
-      return steps;
-    }
-    for (final EventProxy event : counterexample) {
-      steps++;
-      if (events.contains(event)) {
-        boolean found = false;
-        for (final TransitionProxy trans : transitions) {
-          if (trans.getSource()== current && trans.getEvent() == event) {
-            current = trans.getTarget();
-            found = true;
-            break;
+    for (final TraceStepProxy step : counterexample) {
+      final EventProxy event = step.getEvent();
+      final StateProxy preset = step.getStateMap().get(aut);
+      if (event == null) { // initial step
+        if (preset == null) {
+          StateProxy found = null;
+          for (final StateProxy state : states) {
+            if (state.isInitial()) {
+              assertNull
+                ("Counterexample specifies no initial state for automaton " +
+                 aut.getName() + ", which has more than one initial state!",
+                 found);
+              found = state;
+            }
           }
+          if (found == null) {
+            return steps;
+          }
+          current = found;
+        } else {
+          assertTrue
+            ("Initial state " + preset.getName() +
+             " in counterexample is not an initial state of automaton " +
+             aut.getName() + "!", preset.isInitial());
+          current = preset;
         }
-        if (!found) {
-          return steps;
+      } else { // transition step
+        steps++;
+        if (events.contains(event)) {
+          if (preset == null) {
+            StateProxy found = null;
+            for (final TransitionProxy trans : transitions) {
+              if (trans.getSource() == current && trans.getEvent() == event) {
+                assertNull
+                  ("Counterexample specifies no successor state for the " +
+                   "nondeterministic transition from state " +
+                   current.getName() + " with event " + event.getName() +
+                   " in automaton " + aut.getName() + "!", found);
+                found = trans.getTarget();
+              }
+            }
+            if (found == null) {
+              return steps;
+            }
+            current = found;
+          } else {
+            boolean found = false;
+            for (final TransitionProxy trans : transitions) {
+              if (trans.getSource() == current &&
+                  trans.getEvent() == event &&
+                  trans.getTarget() == preset) {
+                found = true;
+                break;
+              }
+            }
+            assertTrue
+              ("There is no transition from state " + current.getName() +
+               " to state " + preset.getName() + " with event " +
+               event.getName() + " in automaton " + aut.getName() +
+               " as specified in the counterexample!", found);
+            current = preset;
+          }
         }
       }
     }
