@@ -78,6 +78,14 @@ public interface TransitionRelationSimplifier
   public boolean isObservationEquivalentAbstraction();
 
   /**
+   * Returns whether the last call to {@link #run()} has removed any
+   * markings of the given proposition. If precondition markings have
+   * been changed, the caller may have to take special precautions to
+   * find a suitable counterexample end state.
+   */
+  public boolean isReducedMarking(final int propID);
+
+  /**
    * Cleans up. This method removes all temporary data and results
    * associated with any previous call to {@link #run()}.
    */

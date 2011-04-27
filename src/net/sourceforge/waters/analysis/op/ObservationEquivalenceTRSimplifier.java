@@ -299,8 +299,9 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
-  protected void setUp() throws OverflowException
+  protected void setUp() throws AnalysisException
   {
+    super.setUp();
     if (mEquivalence == Equivalence.WEAK_OBSERVATION_EQUIVALENCE) {
       mFirstSplitEvent = EventEncoding.NONTAU;
     } else {

@@ -85,6 +85,8 @@ public class ChainTRSimplifier
                    rel.getNumberOfTransitions() + " transitions, " +
                    rel.getNumberOfMarkings() + " markings.");
     }
+    final int numProps = rel.getNumberOfPropositions();
+    mReducedMarkings = new boolean[numProps];
     boolean result = false;
     for (final TransitionRelationSimplifier step : mSteps) {
       try {
@@ -101,6 +103,9 @@ public class ChainTRSimplifier
           result = true;
           mIsObservationEquivalentAbstraction &=
             step.isObservationEquivalentAbstraction();
+          for (int prop = 0; prop < numProps; prop++) {
+            mReducedMarkings[prop] |= step.isReducedMarking(prop);
+          }
           final List<int[]> partition = step.getResultPartition();
           mergePartitions(partition);
         }
@@ -115,6 +120,12 @@ public class ChainTRSimplifier
   public boolean isObservationEquivalentAbstraction()
   {
     return mIsObservationEquivalentAbstraction;
+  }
+
+  @Override
+  public boolean isReducedMarking(final int propID)
+  {
+    return mReducedMarkings[propID];
   }
 
   @Override
@@ -160,5 +171,6 @@ public class ChainTRSimplifier
   //# Data Members
   private final List<TransitionRelationSimplifier> mSteps;
   private boolean mIsObservationEquivalentAbstraction;
+  private boolean[] mReducedMarkings;
 
 }

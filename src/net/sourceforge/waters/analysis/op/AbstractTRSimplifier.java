@@ -61,6 +61,11 @@ public abstract class AbstractTRSimplifier
     return mResultPartition == null;
   }
 
+  public boolean isReducedMarking(final int propID)
+  {
+    return false;
+  }
+
   public void reset()
   {
     mTransitionRelation = null;

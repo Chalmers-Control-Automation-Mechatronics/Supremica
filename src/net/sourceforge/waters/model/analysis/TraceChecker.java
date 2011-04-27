@@ -128,7 +128,7 @@ public class TraceChecker
     assertTrue(trace.getAutomata().contains(aut),
                "Automaton " + aut.getName() + " is not mentioned in trace!");
     final List<TraceStepProxy> steps = trace.getTraceSteps();
-    return checkCounterExample(steps, aut, sat);
+    return checkCounterExample(steps, aut, null, sat);
   }
 
   /**
@@ -161,8 +161,32 @@ public class TraceChecker
      final Collection<AutomatonProxy> automata,
      final boolean sat)
   {
+    checkCounterExample(steps, automata, null, sat);
+  }
+
+  /**
+   * Checks whether the given list of trace steps is accepted by each of
+   * the given automata.
+   * @param  steps    List of trace steps to be checked.
+   * @param  automata Collection of automata for which the trace steps are to
+   *                  be checked.
+   * @param  prop     Proposition that is expected to mark the end state of
+   *                  the trace, or <CODE>null</CODE>. This can be used to
+   *                  verify generalised nonblocking traces.
+   * @param  sat      A flag, indicating that the trace is expected to be
+   *                  saturated. If true, any missing step entry for the
+   *                  any of the given automata will also lead to an exception.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static void checkCounterExample
+    (final List<TraceStepProxy> steps,
+     final Collection<AutomatonProxy> automata,
+     final EventProxy prop,
+     final boolean sat)
+  {
     for (final AutomatonProxy aut : automata) {
-      checkCounterExample(steps, aut, sat);
+      checkCounterExample(steps, aut, prop, sat);
     }
   }
 
@@ -177,7 +201,7 @@ public class TraceChecker
   public static StateProxy checkCounterExample(final List<TraceStepProxy> steps,
                                                final AutomatonProxy aut)
   {
-    return checkCounterExample(steps, aut, false);
+    return checkCounterExample(steps, aut, null, false);
   }
 
   /**
@@ -185,6 +209,9 @@ public class TraceChecker
    * automaton.
    * @param  steps    List of trace steps to be checked.
    * @param  aut      The automaton for which the trace is to be checked.
+   * @param  prop     Proposition that is expected to mark the end state of
+   *                  the trace, or <CODE>null</CODE>. This can be used to
+   *                  verify generalised nonblocking traces.
    * @param  sat      A flag, indicating that the trace is expected to be
    *                  saturated. If true, any missing step entry for the
    *                  given automaton will also lead to an exception.
@@ -195,6 +222,7 @@ public class TraceChecker
    */
   public static StateProxy checkCounterExample(final List<TraceStepProxy> steps,
                                                final AutomatonProxy aut,
+                                               final EventProxy prop,
                                                final boolean sat)
   {
     final Collection<EventProxy> events = aut.getEvents();
@@ -273,6 +301,13 @@ public class TraceChecker
             aut.getName() + "!");
         }
       }
+    }
+    if (prop != null && events.contains(prop)) {
+      final Collection<EventProxy> props = current.getPropositions();
+      assertTrue(props.contains(prop),
+                 "The counterexample's end state " + current.getName() +
+                 " for automaton " + aut.getName() + " is not marked " +
+                 " by the proposition " + prop.getName() + "!");
     }
     // returns the end state of the counterexample trace
     return current;

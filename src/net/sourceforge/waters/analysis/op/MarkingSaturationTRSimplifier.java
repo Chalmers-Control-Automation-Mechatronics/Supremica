@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.op
-//# CLASS:   AlphaRemovalTRSimplifier
+//# CLASS:   MarkingSaturationTRSimplifier
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -14,25 +14,30 @@ import gnu.trove.TIntStack;
 import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
- * A transition relation simplifier implementation of the alpha-removal rule.
+ * A transition relation simplifier to saturate an automaton with markings.
+ * Markings are added to all states from where a marked state can be
+ * reached silently, for all propositions in the automaton. This simplifier
+ * assumes that the input automaton does not contain any loops of silent
+ * transitions.
  *
- * @author Rachel Francis, Robi Malik
+ * @author Robi Malik
  */
 
-public class AlphaRemovalTRSimplifier
-  extends AbstractGeneralisedTRSimplifier
+public class MarkingSaturationTRSimplifier
+  extends AbstractTRSimplifier
 {
 
   //#########################################################################
   //# Constructors
-  AlphaRemovalTRSimplifier()
+  MarkingSaturationTRSimplifier()
   {
   }
 
-  AlphaRemovalTRSimplifier(final ListBufferTransitionRelation rel)
+  MarkingSaturationTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -47,6 +52,7 @@ public class AlphaRemovalTRSimplifier
   }
 
   public boolean run()
+    throws AnalysisException
   {
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -56,36 +62,37 @@ public class AlphaRemovalTRSimplifier
       // No tau transitions - no simplification
       return false;
     }
+    setUp();
 
-    // Visit all alpha-marked states. For each of them, to a depth-first
-    // search, removing alpha-markings from all states other than the start
-    // state of the search.
-    final int alphaID = getPreconditionMarkingID();
+    // For each proposition, visit all marked states. For each of them, do
+    // a depth-first search following all tau-transitions, adding markings to
+    // all states encountered.
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     final int numStates = rel.getNumberOfStates();
-    final TIntHashSet reachableStates = new TIntHashSet();
+    final TIntHashSet visitedStates = new TIntHashSet();
     final TIntStack unvisitedStates = new TIntStack();
     boolean modified = false;
-    for (int stateID = 0; stateID < numStates; stateID++) {
-      if (rel.isMarked(stateID, alphaID)) {
-        unvisitedStates.push(stateID);
-        reachableStates.add(stateID);
-        while (unvisitedStates.size() > 0) {
-          final int newStateID = unvisitedStates.pop();
-          if (newStateID != stateID && rel.isMarked(newStateID, alphaID)) {
-            rel.setMarked(newStateID, alphaID, false);
-            modified = true;
-          }
-          iter.reset(newStateID, tauID);
-          while (iter.advance()) {
-            final int predID = iter.getCurrentSourceState();
-            if (reachableStates.add(predID)) {
-              unvisitedStates.push(predID);
+    for (int prop = 0; prop < rel.getNumberOfPropositions(); prop++) {
+      for (int stateID = 0; stateID < numStates; stateID++) {
+        if (rel.isMarked(stateID, prop) && visitedStates.add(stateID)) {
+          unvisitedStates.push(stateID);
+          while (unvisitedStates.size() > 0) {
+            final int newStateID = unvisitedStates.pop();
+            if (!rel.isMarked(newStateID, prop)) {
+              rel.setMarked(newStateID, prop, true);
+              modified = true;
+            }
+            iter.reset(newStateID, tauID);
+            while (iter.advance()) {
+              final int predID = iter.getCurrentSourceState();
+              if (visitedStates.add(predID)) {
+                unvisitedStates.push(predID);
+              }
             }
           }
         }
-        reachableStates.clear();
       }
+      visitedStates.clear();
     }
     return modified;
   }

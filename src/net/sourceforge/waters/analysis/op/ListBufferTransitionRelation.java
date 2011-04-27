@@ -291,6 +291,11 @@ public class ListBufferTransitionRelation
     }
   }
 
+  public int getNumberOfPropositions()
+  {
+    return mStateBuffer.getNumberOfPropositions();
+  }
+
 
   //#########################################################################
   //# State Access
@@ -313,7 +318,7 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Gets the total number of markings in this state buffer.
+   * Gets the total number of markings in this transition relation.
    * Each instance of a proposition marking a reachable state counts
    * as marking.
    */

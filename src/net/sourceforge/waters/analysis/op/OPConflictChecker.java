@@ -20,6 +20,7 @@ import gnu.trove.TObjectIntHashMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,6 +50,7 @@ import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -370,7 +372,7 @@ public class OPConflictChecker
         final SafetyProjectionBuilder projector = new Projection2(factory);
         mCurrentCompositionalLanguageInclusionChecker =
           new ProjectingLanguageInclusionChecker
-            (factory, mCompositionalLanguageInclusionChecker,
+            (factory, mCurrentMonolithicLanguageInclusionChecker,
              projector, mInternalStepNodeLimit);
       } else {
         mCurrentCompositionalLanguageInclusionChecker =
@@ -487,6 +489,7 @@ public class OPConflictChecker
     mCurrentMonolithicConflictChecker = null;
     mCurrentCompositionalLanguageInclusionChecker = null;
     mCurrentMonolithicLanguageInclusionChecker = null;
+    mPreconditionMarkingRecovery = null;
     mCurrentAutomata = null;
     mPropositionStatusMap = null;
     mCurrentEvents = null;
@@ -526,12 +529,20 @@ public class OPConflictChecker
     throws EventNotFoundException
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final ChainTRSimplifier recovery = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
-    final AlphaRemovalTRSimplifier alphaRemover =
-      new AlphaRemovalTRSimplifier();
+    recovery.add(loopRemover);
+    final MarkingRemovalTRSimplifier alphaRemover =
+      new MarkingRemovalTRSimplifier();
     chain.add(alphaRemover);
+    recovery.add(alphaRemover);
+    mPreconditionMarkingRecovery =
+      new GeneralisedTRSimplifierAbstractionRule(recovery);
+    final OmegaRemovalTRSimplifier omegaRemover =
+      new OmegaRemovalTRSimplifier();
+    chain.add(omegaRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
@@ -539,19 +550,14 @@ public class OPConflictChecker
     bisimulator.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    chain.add(bisimulator);
-    final ObservationEquivalenceTRSimplifier revBisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    revBisimulator.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
-    revBisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    revBisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-      new NonAlphaDeterminisationTRSimplifier(revBisimulator);
+      new NonAlphaDeterminisationTRSimplifier(bisimulator);
     chain.add(nonAlphaDeterminiser);
+    chain.add(bisimulator);
+    final MarkingSaturationTRSimplifier saturator =
+      new MarkingSaturationTRSimplifier();
+    chain.add(saturator);
     return new GeneralisedTRSimplifierAbstractionRule(chain);
   }
 
@@ -1401,24 +1407,25 @@ public class OPConflictChecker
   //#########################################################################
   //# Trace Computation
   private ConflictTraceProxy expandTrace(final ConflictTraceProxy trace)
-    throws OverflowException
+    throws AnalysisException
   {
     List<TraceStepProxy> traceSteps = getSaturatedTraceSteps(trace);
     final int size = mModifyingSteps.size();
     final ListIterator<AbstractionStep> iter =
       mModifyingSteps.listIterator(size);
-    /*
+
     final Collection<AutomatonProxy> check =
       new THashSet<AutomatonProxy>(trace.getAutomata());
-    */
+
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
-      /*
+
       check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
-      TraceChecker.checkCounterExample(traceSteps, check, true);
-      */
+      TraceChecker.checkCounterExample(traceSteps, check,
+                                       mPreconditionMarking, true);
+
     }
     final ProductDESProxyFactory factory = getFactory();
     final String tracename = getTraceName();
@@ -2324,14 +2331,15 @@ public class OPConflictChecker
           final AutomatonProxy convertedAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
           final List<int[]> partition = mSimplifier.getResultPartition();
+          final boolean reduced = hasReducedPreconditionMarking();
           if (mSimplifier.isObservationEquivalentAbstraction()) {
             return new ObservationEquivalenceStep(convertedAut, aut, tau,
                                                   inputStateEnc, partition,
-                                                  outputStateEnc);
+                                                  reduced, outputStateEnc);
           } else {
             return new ConflictEquivalenceStep(convertedAut, aut, tau,
                                                inputStateEnc, partition,
-                                               outputStateEnc);
+                                               reduced, outputStateEnc);
           }
         } else {
           return null;
@@ -2352,6 +2360,8 @@ public class OPConflictChecker
     //# Auxiliary Methods
     abstract EventEncoding createEventEncoding(final AutomatonProxy aut,
                                                final EventProxy tau);
+
+    abstract boolean hasReducedPreconditionMarking();
 
     //#######################################################################
     //# Data Members
@@ -2383,6 +2393,13 @@ public class OPConflictChecker
                                EventEncoding.FILTER_PROPOSITIONS);
 
     }
+
+    @Override
+    boolean hasReducedPreconditionMarking()
+    {
+      return false;
+    }
+
   }
 
   //#########################################################################
@@ -2418,6 +2435,11 @@ public class OPConflictChecker
       return (ChainTRSimplifier) super.getSimplifier();
     }
 
+    int getPreconditionMarkingID()
+    {
+      return mPreconditionMarkingID;
+    }
+
     //#######################################################################
     //# Auxiliary Methods
     @Override
@@ -2445,6 +2467,52 @@ public class OPConflictChecker
         }
       }
       return eventEnc;
+    }
+
+    @Override
+    boolean hasReducedPreconditionMarking()
+    {
+      final ChainTRSimplifier simplifier = getSimplifier();
+      return simplifier.isReducedMarking(mPreconditionMarkingID);
+    }
+
+    BitSet recoverMarkings(final AutomatonProxy aut, final EventProxy tau)
+      throws AnalysisException
+    {
+      try {
+        final EventEncoding eventEnc = createEventEncoding(aut, tau);
+        final StateEncoding inputStateEnc = new StateEncoding(aut);
+        final ChainTRSimplifier simplifier = getSimplifier();
+        final int config = simplifier.getPreferredConfiguration();
+        final ListBufferTransitionRelation rel =
+          new ListBufferTransitionRelation(aut, eventEnc,
+                                           inputStateEnc, config);
+        final int origNumStates = rel.getNumberOfStates();
+        simplifier.setTransitionRelation(rel);
+        simplifier.run();
+        final BitSet result = new BitSet(origNumStates);
+        final List<int[]> partition = simplifier.getResultPartition();
+        if (partition == null) {
+          for (int state = 0; state < origNumStates; state++) {
+            if (rel.isMarked(state, mPreconditionMarkingID)) {
+              result.set(state);
+            }
+          }
+        } else {
+          final int reducedNumStates = rel.getNumberOfStates();
+          for (int state = 0; state < reducedNumStates; state++) {
+            if (rel.isMarked(state, mPreconditionMarkingID)) {
+              for (final int member : partition.get(state)) {
+                result.set(member);
+              }
+            }
+          }
+        }
+        return result;
+      } finally {
+        final ChainTRSimplifier simplifier = getSimplifier();
+        simplifier.reset();
+      }
     }
 
     //#######################################################################
@@ -2690,7 +2758,7 @@ public class OPConflictChecker
      * Assumes that a saturated trace is being passed.
      */
     abstract List<TraceStepProxy> convertTraceSteps
-      (final List<TraceStepProxy> steps) throws OverflowException;
+      (final List<TraceStepProxy> steps) throws AnalysisException;
 
     //#######################################################################
     //# Data Members
@@ -2903,12 +2971,14 @@ public class OPConflictChecker
               final EventProxy tau,
               final StateEncoding originalStateEnc,
               final List<int[]> partition,
+              final boolean reduced,
               final StateEncoding resultStateEnc)
     {
       super(resultAut, originalAut);
       mTau = tau;
       mOriginalStateEncoding = originalStateEnc;
       mPartition = partition;
+      mHasReducedPreconditionMarking = reduced;
       mReverseOutputStateMap = resultStateEnc.getStateCodeMap();
     }
 
@@ -2923,14 +2993,13 @@ public class OPConflictChecker
     //# Trace Computation
     List<TraceStepProxy> convertTraceSteps
       (final List<TraceStepProxy> traceSteps)
-      throws OverflowException
+      throws AnalysisException
     {
       final AutomatonProxy originalAutomaton = getOriginalAutomaton();
       mEventEncoding =
         new EventEncoding(originalAutomaton, mTau, mPropositions,
                           EventEncoding.FILTER_PROPOSITIONS);
-      mPreconditionMarkingID =
-        mEventEncoding.getEventCode(mPreconditionMarking);
+      recoverPreconditionMarking();
       mTransitionRelation = new ListBufferTransitionRelation
         (originalAutomaton, mEventEncoding, mOriginalStateEncoding,
          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
@@ -2938,6 +3007,7 @@ public class OPConflictChecker
       final List<SearchRecord> convertedSteps =
         convertCrucialSteps(crucialSteps);
       mTargetSet = null;
+      mRecoveredPreconditionMarking = null;
       mergeTraceSteps(traceSteps, convertedSteps);
       mEventEncoding = null;
       mTransitionRelation = null;
@@ -3023,6 +3093,8 @@ public class OPConflictChecker
     {
       if (mPreconditionMarkingID < 0) {
         return true;
+      } else if (mRecoveredPreconditionMarking != null) {
+        return mRecoveredPreconditionMarking.get(state);
       } else {
         return mTransitionRelation.isMarked(state, mPreconditionMarkingID);
       }
@@ -3110,6 +3182,23 @@ public class OPConflictChecker
     }
 
     //#######################################################################
+    //# Trace Computation
+    void recoverPreconditionMarking()
+      throws AnalysisException
+    {
+      if (mHasReducedPreconditionMarking) {
+        final AutomatonProxy aut = getOriginalAutomaton();
+        mPreconditionMarkingID =
+          mPreconditionMarkingRecovery.getPreconditionMarkingID();
+        mRecoveredPreconditionMarking =
+          mPreconditionMarkingRecovery.recoverMarkings(aut, mTau);
+      } else {
+        mPreconditionMarkingID =
+          mEventEncoding.getEventCode(mPreconditionMarking);
+      }
+    }
+
+    //#######################################################################
     //# Data Members
     /**
      * The event that was hidden from the original automaton,
@@ -3126,6 +3215,11 @@ public class OPConflictChecker
      * Each entry lists states of the input encoding that have been merged.
      */
     private final List<int[]> mPartition;
+    /**
+     * A flag, indicated that the precondition markings have been reduced
+     * during abstraction and need to be recovered for trace expansion.
+     */
+    private final boolean mHasReducedPreconditionMarking;
     /**
      * Reverse encoding of output states. Maps states in output automaton
      * (simplified automaton) to state code in output transition relation.
@@ -3151,6 +3245,12 @@ public class OPConflictChecker
      * Only used when expanding trace.
      */
     private TIntHashSet mTargetSet;
+    /**
+     * Recovered precondition marking, if needed.
+     * @see #mHasReducedPreconditionMarking
+     */
+    private BitSet mRecoveredPreconditionMarking;
+
   }
 
 
@@ -3166,7 +3266,7 @@ public class OPConflictChecker
   {
 
     //#######################################################################
-    //# Constructor
+    //# Constructors
     private ObservationEquivalenceStep(final AutomatonProxy resultAut,
                                        final AutomatonProxy originalAut,
                                        final EventProxy tau,
@@ -3174,8 +3274,20 @@ public class OPConflictChecker
                                        final List<int[]> partition,
                                        final StateEncoding resultStateEnc)
     {
+      this(resultAut, originalAut, tau,
+           originalStateEnc, partition, false, resultStateEnc);
+    }
+
+    private ObservationEquivalenceStep(final AutomatonProxy resultAut,
+                                       final AutomatonProxy originalAut,
+                                       final EventProxy tau,
+                                       final StateEncoding originalStateEnc,
+                                       final List<int[]> partition,
+                                       final boolean reduced,
+                                       final StateEncoding resultStateEnc)
+    {
       super(resultAut, originalAut, tau,
-            originalStateEnc, partition, resultStateEnc);
+            originalStateEnc, partition, reduced, resultStateEnc);
     }
 
     //#######################################################################
@@ -3326,10 +3438,11 @@ public class OPConflictChecker
                                     final EventProxy tau,
                                     final StateEncoding originalStateEnc,
                                     final List<int[]> partition,
+                                    final boolean reduced,
                                     final StateEncoding resultStateEnc)
     {
       super(resultAut, originalAut, tau,
-            originalStateEnc, partition, resultStateEnc);
+            originalStateEnc, partition, reduced, resultStateEnc);
     }
 
     //#######################################################################
@@ -3580,6 +3693,7 @@ public class OPConflictChecker
   private ConflictChecker mMonolithicConflictChecker;
   private LanguageInclusionChecker mCompositionalLanguageInclusionChecker;
   private LanguageInclusionChecker mMonolithicLanguageInclusionChecker;
+  private GeneralisedTRSimplifierAbstractionRule mPreconditionMarkingRecovery;
 
   private List<AutomatonProxy> mCurrentAutomata;
   private TObjectByteHashMap<AutomatonProxy> mPropositionStatusMap;
