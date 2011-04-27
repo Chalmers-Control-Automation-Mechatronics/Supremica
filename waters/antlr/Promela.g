@@ -41,6 +41,7 @@ tokens{
 	CONDITION;
 	REC;
 	SEN;
+	MESSAGE_ARGUMENTS;
 }
 
 @header {
@@ -261,14 +262,19 @@ receiveRule
 recv_argsRule
 @init  { paraphrases.push("in receive arguments"); }
 @after { paraphrases.pop(); }
-	: recv_argRule (PARENOPEN recv_argsRule PARENCLOSE) 
-		-> ^(recv_argRule recv_argsRule)
+	: recv_argRule (PARENOPEN recv_argListRule PARENCLOSE) 
+		-> ^(MESSAGE_ARGUMENTS recv_argRule recv_argListRule)
   	| recv_argRule (COMMA recv_argRule)*
-		-> ^(recv_argRule recv_argRule*)
+		-> ^(MESSAGE_ARGUMENTS recv_argRule recv_argRule*)
 //	->  ^(recv_argRule ivarRule)
-
-	
     ;
+
+recv_argListRule
+@init  { paraphrases.push("in receive argument"); }
+@after { paraphrases.pop(); }
+	:	recv_argRule (COMMA recv_argRule)*
+		-> (recv_argRule)+
+	;
 
 
 recv_argRule
@@ -297,7 +303,7 @@ send_argsRule
 @init  { paraphrases.push("in send arguments"); }
 @after { paraphrases.pop(); }
 	:	(any_exprRule PARENOPEN arg_lstRule PARENCLOSE) 
-		-> ^(any_exprRule arg_lstRule)
+		-> ^(MESSAGE_ARGUMENTS any_exprRule arg_lstRule)
 	    | arg_lstRule
     ;
 

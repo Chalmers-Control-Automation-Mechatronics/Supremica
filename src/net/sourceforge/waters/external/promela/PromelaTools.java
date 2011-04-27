@@ -3,16 +3,24 @@ package net.sourceforge.waters.external.promela;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
+import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.parser.PromelaLexer;
 import net.sourceforge.waters.external.promela.parser.PromelaParser;
+import net.sourceforge.waters.model.base.ProxyTools;
 
 import org.anarres.cpp.InputLexerSource;
 import org.anarres.cpp.LexerException;
+import org.anarres.cpp.LexerSource;
 import org.anarres.cpp.Preprocessor;
 import org.anarres.cpp.PreprocessorListener;
 import org.anarres.cpp.Source;
@@ -47,11 +55,25 @@ public class PromelaTools {
 
     // ---------------------------------------------------------------
 
+    public CommonTree parseStream(final InputStream input)
+      throws IOException, LexerException, RecognitionException
+    {
+      // final File f = new File(promelaFilename);
+      // final InputStream stream = new FileInputStream(f);
+      final Reader reader = new InputStreamReader(input);
+      final LexerSource source = new LexerSource(reader,true);
+      final Preprocessor preProcessor = new Preprocessor(source);
+      return parseInternal(preProcessor);
+    }
+
     public void parseFile(final String promelaFilename) throws IOException {
         Preprocessor preProcessor = null;
         try {
             final File f = new File(promelaFilename);
-            preProcessor = new Preprocessor(f);
+            final InputStream stream = new FileInputStream(f);
+            final Reader reader = new InputStreamReader(stream);
+            final LexerSource source = new LexerSource(reader,true);
+            preProcessor = new Preprocessor(source);
             parseInternal(preProcessor);
         } catch (final RecognitionException e) {
             final PromelaParserError error = new PromelaParserError(-1, -1, "Promela code cannot be recognized: " + e.getMessage(), true);
@@ -72,7 +94,8 @@ public class PromelaTools {
             sb = sb.append("   ");
         }
 
-        System.out.println(sb.toString() + t.token.getType() + ":" + t.toString());
+        System.out.println(sb.toString() + t.token.getType() + ":" +
+                           t.getText() + " <" + ProxyTools.getShortClassName(t) + ">");
 
         for ( int i = 0; i < t.getChildCount(); i++ ) {
 
@@ -83,6 +106,7 @@ public class PromelaTools {
     }
  ///////////
 
+    @SuppressWarnings("unused")
     private void getdata(final StringBuilder s,final CommonTree t,final ArrayList<String> a){
         if(!t.isNil()){
             s.append(t.getText());
@@ -97,10 +121,11 @@ public class PromelaTools {
         }
 
     }
+
     public Hashtable<String,ChanInfo> getchan(){
         return chan;
     }
-    private void print_Tree(final CommonTree t){
+    private void collectMsg(final CommonTree t){
         if(t!=null){
 
             if(t.getText().equals("chan")){
@@ -120,30 +145,41 @@ public class PromelaTools {
                     final CommonTree tr = (CommonTree)t.getChild(b);
 
                     for(int a=0;a<tr.getChildCount();a++){
-                      if(tr.getChild(a).toString().equals("Exchange")){
-                          if(tr.getChild(a).getText().equals("!")|| tr.getChild(a).getText().equals("!!")){
+                      final CommonTree childA = (CommonTree) tr.getChild(a);
+                      if(childA.toString().equals("Exchange")){
+                          if(childA.getText().equals("!")|| tr.getChild(a).getText().equals("!!")){
 
 
                           final ArrayList<String> data =new ArrayList<String>();
                           final StringBuilder sb = new StringBuilder();
-                          sb.append(tr.getChild(a).getChild(0).getText());
-                          sb.append(tr.getChild(a).getText()+"[");
-                          chan.get(tr.getChild(a).getChild(0).getText()).incsendnumber();
-
-                          if(tr.getChild(a).getChild(1).toString().equals("Constant") )
+                          sb.append(childA.getChild(0).getText());
+                         // sb.append(childA.getText()+"[");
+                          chan.get(childA.getChild(0).getText()).incSendnumber();
+                          final CommonTree msgargs = (CommonTree) childA.getChild(1);
+                    /*      if(childA.getChild(1).toString().equals("Constant") )
                               {
                                   getdata(sb,(CommonTree)tr.getChild(a).getChild(1),data);
 
                               }
+                      */
+                          for(int y = 0; y <msgargs.getChildCount();y++){
+                            final CommonTree childY = (CommonTree) msgargs.getChild(y);
+                            if(childY instanceof ConstantTreeNode){
+                              sb.append("[");
+                              sb.append(childY.getText());
+                              sb.append("]");
+                              data.add(childY.getText());
+                            }
+                          }
                           //testing event output
                  //         System.out.println(sb.toString());
 
                           //store proctype name and relevant data into hashtable
-                          chan.get(tr.getChild(a).getChild(0).getText()).storeMsg(data);
+                          chan.get(childA.getChild(0).getText()).storeMsg(data);
 
                           }
-                          if(tr.getChild(a).getText().equals("?")|| tr.getChild(a).getText().equals("??")){
-                            chan.get(tr.getChild(a).getChild(0).getText()).increcnumber();
+                          if(childA.getText().equals("?")|| tr.getChild(a).getText().equals("??")){
+                            chan.get(childA.getChild(0).getText()).incRecnumber();
                           }
                       }
                     }
@@ -153,17 +189,24 @@ public class PromelaTools {
             }
             for(int i = 0; i < t.getChildCount();i++){
 
-                print_Tree((CommonTree)t.getChild(i));
+                collectMsg((CommonTree)t.getChild(i));
 
             }
         }
     }
+    @SuppressWarnings("unused")
     private void print_chan(){
-        System.out.println(chan.get("name").getValue().toString());
+       // System.out.println(chan.get("name").getValue().toString());
+      //System.out.println(chan);
+      final Enumeration<String> e = chan.keys();
+      while(e.hasMoreElements()){
+        final String name = (String)e.nextElement();
+        System.out.println(name+" "+chan.get(name).getValue());
+      }
     }
 
  ///////////
-    private void parseInternal(final Preprocessor preProcessor) throws IOException,
+    private CommonTree parseInternal(final Preprocessor preProcessor) throws IOException,
             LexerException, RecognitionException {
         preProcessor.setListener(new PreprocessorListener() {
             public void handleError(final Source source, final int line, final int column, final String msg) {
@@ -186,7 +229,7 @@ public class PromelaTools {
         this.preprocessedCode = preprocessedText.toString();
 
         if (errors.size() > 0)
-            return;
+            return null;
 
         final PromelaLexer lexer = new PromelaLexer(new ANTLRReaderStream(
                 new StringReader(preprocessedText.toString())));
@@ -202,8 +245,8 @@ public class PromelaTools {
     */
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
-            print_Tree(t);
-            print_chan();
+            collectMsg(t);
+            //print_chan();
             //printTree(t,0);
 
             //System.out.println(t.toStringTree());
@@ -218,6 +261,7 @@ public class PromelaTools {
         } else {
             errors.addAll(parser.getErrors());
         }
+        return t;
     }
 
     // ---------------------------------------------------------------

@@ -1,57 +1,57 @@
 package net.sourceforge.waters.external.promela;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 
 public class ChanInfo{
-    private int send_count;
-    private int rec_count;
-    private final int datalength;
+    private int mSendCount;
+    private int mRecCount;
+    private final int mDataLength;
     @SuppressWarnings("unused")
-    private final int typelength;
+    private final int mTypeLength;
     @SuppressWarnings("unused")
     private List<String> type;
-    private final List<List<String>> msg = new ArrayList<List<String>>();
+    private final List<List<String>> mMsg = new ArrayList<List<String>>();
     @SuppressWarnings("unused")
     private final Map<String,List<List<String>>> message =
-      new HashMap<String,List<List<String>>>();
+      new Hashtable<String,List<List<String>>>();
     @SuppressWarnings("unused")
-    private final String name;
+    private final String mName;
 
     public ChanInfo(final String n, final int type,final int data){
-        send_count = 0;
-        rec_count = 0;
-        name = n;
-        datalength = data;
-        typelength = type;
+        mSendCount = 0;
+        mRecCount = 0;
+        mName = n;
+        mDataLength = data;
+        mTypeLength = type;
     }
 
     public void storeMsg(final ArrayList<String> list){
-        msg.add(list);
+        mMsg.add(list);
 
-        send_count++;
+        mSendCount++;
     }
 
     public List<List<String>> getValue(){
-        return msg;
+        return mMsg;
     }
-    public int getdataLength(){
-        return datalength;
+    public int getDataLength(){
+        return mDataLength;
     }
 
-    public int getsendnumber(){
-        return send_count;
+    public int getSendnumber(){
+        return mSendCount;
     }
-    public void incsendnumber(){
-        send_count++;
+    public void incSendnumber(){
+        mSendCount++;
     }
-    public void increcnumber(){
-        rec_count++;
+    public void incRecnumber(){
+        mRecCount++;
     }
-    public int getrecnumber(){
-        return rec_count;
+    public int getRecnumber(){
+        return mRecCount;
     }
 }

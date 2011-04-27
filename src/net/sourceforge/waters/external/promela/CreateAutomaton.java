@@ -2,6 +2,7 @@ package net.sourceforge.waters.external.promela;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -17,12 +18,14 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 public class CreateAutomaton
 {
-  public void createEvent(final String n, final ArrayList<String> a){
-    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+  final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+  final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
 
-    final IntConstantProxy c33 = factory.createIntConstantProxy(Integer.parseInt(a.get(0)));
-    final IntConstantProxy c124 = factory.createIntConstantProxy(Integer.parseInt(a.get(1)));
+  public void createEvent(final String n, final List<String> list){
+
+
+    final IntConstantProxy c33 = factory.createIntConstantProxy(Integer.parseInt(list.get(0)));
+    final IntConstantProxy c124 = factory.createIntConstantProxy(Integer.parseInt(list.get(1)));
 
     final Collection<SimpleExpressionProxy> index = new ArrayList<SimpleExpressionProxy>(2);
     index.add(c33);

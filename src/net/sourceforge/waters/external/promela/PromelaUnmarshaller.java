@@ -15,17 +15,30 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
 import javax.swing.filechooser.FileFilter;
 
+import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.anarres.cpp.LexerException;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.tree.CommonTree;
 
 
 /**
@@ -136,11 +149,19 @@ public class PromelaUnmarshaller
   {
     final URL url = uri.toURL();
     final InputStream stream = url.openStream();
+    CommonTree ast = null;
     try {
       // TODO Parse the stream ...
+      final PromelaTools tool = new PromelaTools();
+      ast = tool.parseStream(stream);
+    } catch (final LexerException exception) {
+      throw new WatersUnmarshalException(exception);
+    } catch (final RecognitionException exception) {
+      throw new WatersUnmarshalException(exception);
     } finally {
       stream.close();
     }
+    collectMsg(ast);
     final ModuleProxy module = constructModule(uri);
     return module;
   }
@@ -159,10 +180,19 @@ public class PromelaUnmarshaller
     }
     final String name = getModuleName(source);
     final String comment = "Imported from Promela file " + source + ".";
-    // TODO Create a real module ...
+    // Create event declarations ...
+    final List<EventDeclProxy> events = new ArrayList<EventDeclProxy>();
+    for (final Map.Entry<String,ChanInfo> entry : chan.entrySet()) {
+      final String key = entry.getKey();
+      //final ChanInfo info = entry.getValue();
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy(key);
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+      events.add(event);
+    }
+    // Create automata ...
     final ModuleProxy module =
       mFactory.createModuleProxy(name, comment, null,
-                                 null, null, null, null);
+                                 null, events, null, null);
     return module;
   }
 
@@ -179,7 +209,75 @@ public class PromelaUnmarshaller
     return filename.substring(start, end);
   }
 
+  private void collectMsg(final CommonTree t){
+    if(t!=null){
 
+        if(t.getText().equals("chan")){
+            final CommonTree tr1 = (CommonTree)t.getChild(1);
+            final String name = t.getChild(0).getText();
+            final int length = Integer.parseInt(tr1.getChild(0).getText());
+            final int datalength = tr1.getChildCount()-2;
+            chan.put(name,new ChanInfo(name, length, datalength));
+
+
+        }
+
+        if(t.toString().equals("Proctype")){
+            for(int b =0;b<t.getChildCount();b++){
+
+                if(t.getChild(b).toString().equals("STATEMENT")){
+                final CommonTree tr = (CommonTree)t.getChild(b);
+
+                for(int a=0;a<tr.getChildCount();a++){
+                  final CommonTree childA = (CommonTree) tr.getChild(a);
+                  if(childA.toString().equals("Exchange")){
+                      if(childA.getText().equals("!")|| tr.getChild(a).getText().equals("!!")){
+
+
+                      final ArrayList<String> data =new ArrayList<String>();
+                      final StringBuilder sb = new StringBuilder();
+                      sb.append(childA.getChild(0).getText());
+                     // sb.append(childA.getText()+"[");
+                      chan.get(childA.getChild(0).getText()).incSendnumber();
+                      final CommonTree msgargs = (CommonTree) childA.getChild(1);
+                /*      if(childA.getChild(1).toString().equals("Constant") )
+                          {
+                              getdata(sb,(CommonTree)tr.getChild(a).getChild(1),data);
+
+                          }
+                  */
+                      for(int y = 0; y <msgargs.getChildCount();y++){
+                        final CommonTree childY = (CommonTree) msgargs.getChild(y);
+                        if(childY instanceof ConstantTreeNode){
+                          sb.append("[");
+                          sb.append(childY.getText());
+                          sb.append("]");
+                          data.add(childY.getText());
+                        }
+                      }
+                      //testing event output
+             //         System.out.println(sb.toString());
+
+                      //store proctype name and relevant data into hashtable
+                      chan.get(childA.getChild(0).getText()).storeMsg(data);
+
+                      }
+                      if(childA.getText().equals("?")|| tr.getChild(a).getText().equals("??")){
+                        chan.get(childA.getChild(0).getText()).incRecnumber();
+                      }
+                  }
+                }
+                }
+            }
+
+        }
+        for(int i = 0; i < t.getChildCount();i++){
+
+            collectMsg((CommonTree)t.getChild(i));
+
+        }
+    }
+}
   //#########################################################################
   //# Data Members
   /**
@@ -191,7 +289,7 @@ public class PromelaUnmarshaller
   private File mOutputDir;
 
   private DocumentManager mDocumentManager;
-
+  private final Hashtable<String, ChanInfo> chan = new Hashtable<String,ChanInfo>();
 
   //#########################################################################
   //# Class Constants
