@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,10 +20,10 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -49,9 +51,15 @@ public class ModularLanguageInclusionChecker
 
   //#########################################################################
   //# Constructor
+  public ModularLanguageInclusionChecker(final ProductDESProxyFactory factory,
+                                         final SafetyVerifier checker)
+  {
+    this(null, factory, checker);
+  }
+
   public ModularLanguageInclusionChecker(final ProductDESProxy model,
                                          final ProductDESProxyFactory factory,
-                                         final ControllabilityChecker checker)
+                                         final SafetyVerifier checker)
   {
     super(model, factory);
     setKindTranslator(LanguageInclusionKindTranslator.getInstance());
@@ -91,18 +99,9 @@ public class ModularLanguageInclusionChecker
         getFactory().createProductDESProxy("prop", getModel().getEvents(),
                                            automata);
       mChecker.setModel(model);
-      mChecker.setKindTranslator(new KindTranslator()
-      {
-        public EventKind getEventKind(final EventProxy e)
-        {
-          return EventKind.UNCONTROLLABLE;
-        }
-
-        public ComponentKind getComponentKind(final AutomatonProxy a)
-        {
-          return properties.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
-        }
-      });
+      final KindTranslator chain =
+        new ChainKindTranslator(translator, properties);
+      mChecker.setKindTranslator(chain);
       mChecker.setNodeLimit(getNodeLimit() - mStates);
       if (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
@@ -141,7 +140,8 @@ public class ModularLanguageInclusionChecker
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
     final String propname = property.getName();
-    final String tracename = desname + '-' + propname;
+    final String cleanedname = propname.replaceAll(":", "-");
+    final String tracename = desname + '-' + cleanedname;
     final Collection<AutomatonProxy> automata = counterexample.getAutomata();
     final List<TraceStepProxy> steps = counterexample.getTraceSteps();
     final SafetyTraceProxy wrapper =
@@ -164,8 +164,51 @@ public class ModularLanguageInclusionChecker
 
 
   //#########################################################################
+  //# Inner Class ChainKindTranslator
+  private static class ChainKindTranslator implements KindTranslator
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ChainKindTranslator(final KindTranslator master,
+                                final Collection<AutomatonProxy> properties)
+    {
+      mMaster = master;
+      mProperties = new THashSet<AutomatonProxy>(properties);
+    }
+
+    //#######################################################################
+    //# Inner Class ChainKindTranslator
+    public ComponentKind getComponentKind(final AutomatonProxy aut)
+    {
+      if (mProperties.contains(aut)) {
+        return ComponentKind.SPEC;
+      } else {
+        return ComponentKind.PLANT;
+      }
+    }
+
+    public EventKind getEventKind(final EventProxy event)
+    {
+      final EventKind kind = mMaster.getEventKind(event);
+      if (kind == EventKind.CONTROLLABLE) {
+        return EventKind.UNCONTROLLABLE;
+      } else {
+        return kind;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final KindTranslator mMaster;
+    private final Collection<AutomatonProxy> mProperties;
+
+  }
+
+
+  //#########################################################################
   //# Data Members
-  private final ControllabilityChecker mChecker;
+  private final SafetyVerifier mChecker;
   private int mStates;
 
 

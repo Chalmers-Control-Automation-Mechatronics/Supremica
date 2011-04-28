@@ -34,9 +34,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.gnonblocking.Candidate;
-import net.sourceforge.waters.analysis.modular.ProjectingLanguageInclusionChecker;
-import net.sourceforge.waters.analysis.modular.Projection2;
-import net.sourceforge.waters.analysis.modular.SafetyProjectionBuilder;
+import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
 import net.sourceforge.waters.analysis.monolithic.
   MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -369,11 +367,9 @@ public class OPConflictChecker
     }
     if (mCurrentCompositionalLanguageInclusionChecker == null) {
       if (mCompositionalLanguageInclusionChecker == null) {
-        final SafetyProjectionBuilder projector = new Projection2(factory);
         mCurrentCompositionalLanguageInclusionChecker =
-          new ProjectingLanguageInclusionChecker
-            (factory, mCurrentMonolithicLanguageInclusionChecker,
-             projector, mInternalStepNodeLimit);
+          new ModularLanguageInclusionChecker
+            (factory, mCurrentMonolithicLanguageInclusionChecker);
       } else {
         mCurrentCompositionalLanguageInclusionChecker =
           mCompositionalLanguageInclusionChecker;
@@ -3493,13 +3489,15 @@ public class OPConflictChecker
       for (int state = 0; state < numStates; state++) {
         if (rel.isInitial(state)) {
           final SearchRecord record;
-          if (firstEnd && isTargetState(state)) {
+          if (!firstEnd) {
+            record = new SearchRecord(state, 0, -1, dummy);
+          } else if (!isTargetState(state)) {
             record = new SearchRecord(state, 1, -1, dummy);
+          } else {
+            record = new SearchRecord(state, 2, -1, dummy);
             if (isTraceEndState(state)) {
               return record;
             }
-          } else {
-            record = new SearchRecord(state, 0, -1, dummy);
           }
           visited.add(record);
           open.add(record);

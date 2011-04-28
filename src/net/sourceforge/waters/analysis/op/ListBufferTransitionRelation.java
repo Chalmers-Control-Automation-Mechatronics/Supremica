@@ -849,6 +849,42 @@ public class ListBufferTransitionRelation
     }
   }
 
+  /**
+   * Checks whether this transition relation represents a deterministic
+   * automaton.
+   * @throws IllegalStateException if the transition relation is not
+   *         configure with a successor buffer.
+   */
+  public boolean isDeterministic()
+  {
+    final int numStates = getNumberOfStates();
+    boolean hasinit = false;
+    for (int state = 0; state < numStates; state++) {
+      if (isInitial(state) && isReachable(state)) {
+        if (hasinit) {
+          return false;
+        }
+        hasinit = true;
+      }
+    }
+    if (mSuccessorBuffer == null) {
+      throw createNoBufferException("successor");
+    }
+    final TransitionIterator iter =
+      mSuccessorBuffer.createAllTransitionsReadOnlyIterator();
+    int state = -1;
+    int event = -1;
+    while (iter.advance()) {
+      if (state == iter.getCurrentSourceState() &&
+          event == iter.getCurrentEvent()) {
+        return false;
+      }
+      state = iter.getCurrentSourceState();
+      event = iter.getCurrentEvent();
+    }
+    return true;
+  }
+
 
   //#########################################################################
   //# Transition Modifications
