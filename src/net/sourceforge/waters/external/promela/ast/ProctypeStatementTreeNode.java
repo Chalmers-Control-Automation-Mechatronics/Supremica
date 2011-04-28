@@ -2,25 +2,24 @@ package net.sourceforge.waters.external.promela.ast;
 
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.*;
 
 public class ProctypeStatementTreeNode extends PromelaTreeNode
 {
   public ProctypeStatementTreeNode(final Token token){
     super(token);
     mProcState = token.getText();
-}
+  }
   public String toString(){
-      return "PROC_STATEMENT";
+    return "PROC_STATEMENT";
   }
   private final String mProcState;
   public String getValue()
   {
-      return mProcState;
+    return mProcState;
   }
-  void acceptVisitor(final PromelaVisitor visitor)
-  {
-    visitor.visitProcTypeStatement(this);
+   void acceptVisitor(final PromelaVisitor visitor)  {
+     visitor.visitProcTypeStatement(this);
 
-  }
+   }
 }

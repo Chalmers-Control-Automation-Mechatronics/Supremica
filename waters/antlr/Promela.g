@@ -146,7 +146,7 @@ proctypeRule
 		(enablerRule)? 
 		BLOCKBEGIN sequenceRule BLOCKEND 
 		(SEMICOLON)* 
-		-> ^(NAME<ProctypeTreeNode> NAME ^(PROC_STATEMENT<TypeTreeNode> sequenceRule))
+		-> ^(NAME<ProctypeTreeNode> NAME ^(PROCSTATE<ProctypeStatementTreeNode> sequenceRule))
     ;
 
 inlineRule
@@ -416,7 +416,7 @@ channelRule
 @init  { paraphrases.push("in channel definition"); }
 @after { paraphrases.pop(); }
 	:	CHAN NAME (ASSIGN)? ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
-		-> ^(CHAN<ChannelTreeNode> NAME ^(CHAN_STATEMENT<TypeTreeNode> constRule typenameRule*) )
+		-> ^(CHAN<ChannelTreeNode> NAME ^(CHANSTATE<ChannelStatementTreeNode> constRule typenameRule*) )
 	;													 
 
 unameRule
@@ -545,6 +545,10 @@ OD	:	'od';
 XR	:	'xr';
 XS	:	'xs';
 INIT:	'init';
+
+PROCSTATE:	'proc_state';
+CHANSTATE:	'chan_state';
+
 PRIORITY:	'priority';
 TYPEDEF:	'typedef';
 TRACE:		'trace';
