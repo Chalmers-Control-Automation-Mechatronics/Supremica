@@ -15,7 +15,6 @@ import java.io.IOException;
 public class PromelaTest
 {
 
-  @SuppressWarnings("unused")
   public static void main(final String[] args)
   {
     try {

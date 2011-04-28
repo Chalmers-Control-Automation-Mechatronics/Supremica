@@ -234,6 +234,7 @@ public class PromelaTools {
         System.out.println(name+" "+chan.get(name).getValue());
       }
     }
+    @SuppressWarnings("unused")
     private void print_label(){
       for(final Map.Entry<String,ArrayList<List<String>>> entry: component.entrySet()){
         System.out.println(entry.getKey()+": "+entry.getValue());
