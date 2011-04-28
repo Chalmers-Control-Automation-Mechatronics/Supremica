@@ -15,6 +15,7 @@ import gnu.trove.TIntIterator;
 
 import java.util.Collection;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -31,23 +32,27 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
     AbstractionRule
 {
-  // #######################################################################
-  // # Constructors
-  RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
-                                                           final ProductDESProxyFactory factory)
+
+  //#######################################################################
+  //# Constructors
+  RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
   }
 
-  RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
-                                                           final ProductDESProxyFactory factory,
-                                                           final Collection<EventProxy> propositions)
+  RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
   }
 
-  // #######################################################################
-  // # Configuration
+
+  //#######################################################################
+  //# Configuration
   EventProxy getAlphaMarking()
   {
     return mAlphaMarking;

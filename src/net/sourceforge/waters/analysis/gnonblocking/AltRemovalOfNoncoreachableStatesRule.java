@@ -19,6 +19,7 @@ import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.analysis.op.TransitionIterator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -38,21 +39,26 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
 {
-  // #######################################################################
-  // # Constructors
-  AltRemovalOfNoncoreachableStatesRule(final ProductDESProxyFactory factory)
-  {
-    this(factory, null);
-  }
 
+  //#######################################################################
+  //# Constructors
   AltRemovalOfNoncoreachableStatesRule(final ProductDESProxyFactory factory,
-                                       final Collection<EventProxy> propositions)
+                                       final KindTranslator translator)
   {
-    super(factory, propositions);
+    this(factory, translator, null);
   }
 
-  // #######################################################################
-  // # Configuration
+  AltRemovalOfNoncoreachableStatesRule
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final Collection<EventProxy> propositions)
+  {
+    super(factory, translator, propositions);
+  }
+
+
+  //#######################################################################
+  //# Configuration
   EventProxy getAlphaMarking()
   {
     return mAlphaMarking;
@@ -85,8 +91,9 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
 
     // Set up transition relation containing all transitions, indexed
     // by predecessor. Only include declared propositions.
+    final KindTranslator translator = getKindTranslator();
     final EventEncoding eventEnc =
-        new EventEncoding(autToAbstract, tau, getPropositions(),
+        new EventEncoding(autToAbstract, translator, tau, getPropositions(),
             EventEncoding.FILTER_PROPOSITIONS);
     final int alphaID = eventEnc.getEventCode(mAlphaMarking);
     final int defaultID = eventEnc.getEventCode(mDefaultMarking);

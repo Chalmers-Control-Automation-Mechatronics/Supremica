@@ -10,11 +10,13 @@
 package net.sourceforge.waters.analysis.modular;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -41,6 +43,10 @@ public interface ModularHeuristic
      Set<AutomatonProxy> nonComposedPlants,
      Set<AutomatonProxy> nonComposedSpecPlants,
      Set<AutomatonProxy> nonComposedSpecs,
-     TraceProxy counterExample,
-     KindTranslator translator);
+     TraceProxy counterExample);
+
+  public SafetyTraceProxy extendTrace(final ProductDESProxyFactory factory,
+                                      final SafetyTraceProxy trace,
+                                      final List<AutomatonProxy> automata);
+
 }

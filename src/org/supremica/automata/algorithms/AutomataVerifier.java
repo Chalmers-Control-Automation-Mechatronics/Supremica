@@ -58,6 +58,8 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.op.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -683,7 +685,7 @@ public class AutomataVerifier
                 logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
             }
 
-            // Make nbrOfAttempts attempts on prooving controllability and
+            // Make nbrOfAttempts attempts on proving controllability and
             // uncontrollability alternatingly and then give up
             final int nbrOfAttempts = verificationOptions.getNbrOfAttempts();
             stateAmount = 1;
@@ -1012,7 +1014,7 @@ public class AutomataVerifier
                     return;
                 }
 
-                // Initialize the synchronizationExecuters
+                // Initialise the synchronizationExecuters
                 synchronizationExecuters.clear();
 
                 for (int j = 0; j < synchronizationOptions.getNbrOfExecuters(); j++)
@@ -1022,7 +1024,7 @@ public class AutomataVerifier
                     synchronizationExecuters.add(currSynchronizationExecuter);
                 }
 
-                // Start all the synchronization executers and wait for completion
+                // Start all the synchronisation executers and wait for completion
                 // For the moment we assume that we only have one thread
                 for (int j = 0; j < synchronizationExecuters.size(); j++)
                 {
@@ -1142,8 +1144,8 @@ public class AutomataVerifier
     private boolean findUncontrollableStates(final int[] automataIndices)
     throws Exception
     {
-        // WOHOOPS! Eventuellt �r det listigt att g�ra ny onlinesynchronizer,
-        // med den nya automataIndices varje g�ng... t�nk p� det. FIXA!
+        // WOHOOPS! Eventuellt ?r det listigt att g?ra ny onlinesynchronizer,
+        // med den nya automataIndices varje g?ng... t?nk p? det. FIXA!
         if (uncontrollabilityCheckHelper == null)
         {
             final AutomataSynchronizerExecuter onlineSynchronizer = new AutomataSynchronizerExecuter(synchHelper);
@@ -1835,8 +1837,9 @@ public class AutomataVerifier
           hidden.add(event);
         }
       }
+      final KindTranslator translator = IdenticalKindTranslator.getInstance();
       final OPSearchAutomatonSimplifier simp =
-        new OPSearchAutomatonSimplifier(aut, hidden, factory);
+        new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
       simp.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
       return simp.run();
     }

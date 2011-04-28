@@ -22,6 +22,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -48,10 +49,16 @@ public class ModularControllabilityChecker
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
+  public ModularControllabilityChecker(final ProductDESProxyFactory factory,
+                                       final SafetyVerifier checker)
+  {
+    this(null, factory, checker, false);
+  }
+
   public ModularControllabilityChecker(final ProductDESProxy model,
                                        final ProductDESProxyFactory factory,
-                                       final ControllabilityChecker checker,
+                                       final SafetyVerifier checker,
                                        final boolean least)
   {
     super(model, factory);
@@ -95,15 +102,26 @@ public class ModularControllabilityChecker
         return a1.getName().compareTo(a2.getName());
       }
     });
-    for (final AutomatonProxy automaton : getModel().getAutomata()) {
-      switch (getKindTranslator().getComponentKind(automaton)) {
-        case PLANT :  plants.add(automaton);
-                      break;
-        case SPEC  :  specs.add(automaton);
-                      break;
-        default : break;
+
+    final ProductDESProxy des = getModel();
+    final Collection<AutomatonProxy> input = des.getAutomata();
+    final int numAutomata = input.size();
+    final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(numAutomata);
+    for (final AutomatonProxy aut : input) {
+      switch (getKindTranslator().getComponentKind(aut)) {
+      case PLANT:
+        automata.add(aut);
+        plants.add(aut);
+        break;
+      case SPEC:
+        automata.add(aut);
+        specs.add(aut);
+        break;
+      default:
+        break;
       }
     }
+
     while (!specs.isEmpty()) {
       final Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
       final Set<EventProxy> events = new HashSet<EventProxy>();
@@ -141,11 +159,13 @@ public class ModularControllabilityChecker
                          uncomposedplants,
                          uncomposedspecplants,
                          uncomposedspecs,
-                         mChecker.getCounterExample(),
-                         getKindTranslator());
+                         mChecker.getCounterExample());
         if (newComp == null) {
-          setFailedResult(mChecker.getCounterExample());
-          return false;
+          final ProductDESProxyFactory factory = getFactory();
+          final SafetyTraceProxy trace = mChecker.getCounterExample();
+          final SafetyTraceProxy extended =
+            heuristic.extendTrace(factory, trace, automata);
+          return setFailedResult(extended);
         }
         for (final AutomatonProxy automaton : newComp) {
           composition.add(automaton);
@@ -218,7 +238,7 @@ public class ModularControllabilityChecker
 
   //#########################################################################
   //# Data Members
-  private final ControllabilityChecker mChecker;
+  private final SafetyVerifier mChecker;
   private int mStates;
   private final boolean mLeast;
 

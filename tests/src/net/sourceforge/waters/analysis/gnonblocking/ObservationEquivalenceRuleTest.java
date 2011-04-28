@@ -13,6 +13,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -55,7 +57,8 @@ public class ObservationEquivalenceRuleTest
   protected ObservationEquivalenceRule createAbstractionRule
     (final ProductDESProxyFactory factory)
   {
-    return new ObservationEquivalenceRule(factory);
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    return new ObservationEquivalenceRule(factory, translator);
   }
 
   protected ObservationEquivalenceRule getAbstractionRule()

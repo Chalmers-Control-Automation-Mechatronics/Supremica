@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -26,25 +27,34 @@ import org.apache.log4j.Logger;
 
 public abstract class AbstractionRule
 {
-  // #######################################################################
-  // # Constructor
-  AbstractionRule(final ProductDESProxyFactory factory)
+  //#######################################################################
+  //# Constructor
+  AbstractionRule(final ProductDESProxyFactory factory,
+                  final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
   }
 
   AbstractionRule(final ProductDESProxyFactory factory,
+                  final KindTranslator translator,
                   final Collection<EventProxy> propositions)
   {
     mFactory = factory;
+    mKindTranslator = translator;
     mPropositions = propositions;
   }
 
-  // #######################################################################
-  // # Configuration
+
+  //#######################################################################
+  //# Configuration
   ProductDESProxyFactory getFactory()
   {
     return mFactory;
+  }
+
+  KindTranslator getKindTranslator()
+  {
+    return mKindTranslator;
   }
 
   Collection<EventProxy> getPropositions()
@@ -63,11 +73,12 @@ public abstract class AbstractionRule
     return ProxyTools.getShortClassName(this);
   }
 
-  // #########################################################################
-  // # Simple Access Methods
+
+  //#########################################################################
+  //# Simple Access Methods
   /**
-   * Returns a statistics class containing the statistics for the performance of
-   * this rule, usually over multiple runs.
+   * Returns a statistics object containing the statistics for the performance
+   * of this rule, usually over multiple runs.
    */
   public AbstractionRuleStatistics getStatistics()
   {
@@ -86,8 +97,9 @@ public abstract class AbstractionRule
     return stats;
   }
 
-  // #######################################################################
-  // # Invocation
+
+  //#######################################################################
+  //# Invocation
   CompositionalGeneralisedConflictChecker.Step applyRuleAndCreateStep(
                                                                       final CompositionalGeneralisedConflictChecker checker,
                                                                       final AutomatonProxy autToAbstract,
@@ -102,8 +114,9 @@ public abstract class AbstractionRule
     }
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#######################################################################
+  //# Rule Application
   /**
    * Applies this rule to the given automaton. Also accumulates statistics for
    * successive runs.
@@ -142,18 +155,22 @@ public abstract class AbstractionRule
 
   public abstract void cleanup();
 
-  // #########################################################################
-  // # Logging
+
+  //########################################################################
+  //# Logging
   Logger getLogger()
   {
     final Class<?> clazz = getClass();
     return Logger.getLogger(clazz);
   }
 
-  // #######################################################################
-  // # Data Members
+
+  //#######################################################################
+  //# Data Members
   private final ProductDESProxyFactory mFactory;
+  private final KindTranslator mKindTranslator;
   private Collection<EventProxy> mPropositions;
+
   private long mRunTime;
   private int mAppliedCount;
   private int mReductionCount;

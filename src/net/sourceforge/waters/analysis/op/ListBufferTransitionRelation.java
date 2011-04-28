@@ -17,6 +17,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -76,20 +77,23 @@ public class ListBufferTransitionRelation
   /**
    * Creates a new transition relation from the given automaton,
    * using default (temporary) state and event encodings.
-   * @param  aut      The automaton to be encoded.
-   * @param  config   Configuration flags defining which transition buffers
-   *                  are to be created. Should be one of
-   *                  {@link #CONFIG_SUCCESSORS},
-   *                  {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @param  aut         The automaton to be encoded.
+   * @param  config      Configuration flags defining which transition buffers
+   *                     are to be created. Should be one of
+   *                     {@link #CONFIG_SUCCESSORS},
+   *                     {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
    * @throws OverflowException if the automaton's number of states and events
    *         is too large to be encoded in the bit sizes used by the
    *         list buffer implementations.
    */
   public ListBufferTransitionRelation(final AutomatonProxy aut,
-                                      final int config)
+                                      final int config,
+                                      final KindTranslator translator)
     throws OverflowException
   {
-    this(aut, new EventEncoding(aut), config);
+    this(aut, new EventEncoding(aut, translator), config);
   }
 
   /**

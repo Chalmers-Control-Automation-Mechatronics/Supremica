@@ -15,6 +15,7 @@ import gnu.trove.TIntStack;
 
 import java.util.Collection;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -31,15 +32,17 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
 {
   // #######################################################################
   // # Constructors
-  RemovalOfNoncoreachableStatesRule(final ProductDESProxyFactory factory)
+  RemovalOfNoncoreachableStatesRule(final ProductDESProxyFactory factory,
+                                    final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
   }
 
   RemovalOfNoncoreachableStatesRule(final ProductDESProxyFactory factory,
+                                    final KindTranslator translator,
                                     final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
   }
 
   // #######################################################################

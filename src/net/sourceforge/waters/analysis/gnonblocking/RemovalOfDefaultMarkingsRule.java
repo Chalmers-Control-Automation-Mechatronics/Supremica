@@ -15,6 +15,7 @@ import gnu.trove.TIntStack;
 
 import java.util.Collection;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -30,21 +31,25 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 class RemovalOfDefaultMarkingsRule extends AbstractionRule
 {
-  // #######################################################################
-  // # Constructors
-  RemovalOfDefaultMarkingsRule(final ProductDESProxyFactory factory)
+
+  //#######################################################################
+  //# Constructors
+  RemovalOfDefaultMarkingsRule(final ProductDESProxyFactory factory,
+                               final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
   }
 
   RemovalOfDefaultMarkingsRule(final ProductDESProxyFactory factory,
+                               final KindTranslator translator,
                                final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
   }
 
-  // #######################################################################
-  // # Configuration
+
+  //#######################################################################
+  //# Configuration
   EventProxy getAlphaMarking()
   {
     return mAlphaMarking;

@@ -18,6 +18,7 @@ import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -29,25 +30,29 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 class ObservationEquivalenceRule extends AbstractionRule
 {
-  // #######################################################################
-  // # Constructor
-  ObservationEquivalenceRule(final ProductDESProxyFactory factory)
+
+  //#######################################################################
+  //# Constructor
+  ObservationEquivalenceRule(final ProductDESProxyFactory factory,
+                             final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
 
   }
 
   ObservationEquivalenceRule(final ProductDESProxyFactory factory,
+                             final KindTranslator translator,
                              final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
     mTransitionRemovalMode =
         ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
     mTransitionLimit = Integer.MAX_VALUE;
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#######################################################################
+  //# Rule Application
   /**
    * Sets the mode which redundant transitions are to be removed.
    *
@@ -103,8 +108,9 @@ class ObservationEquivalenceRule extends AbstractionRule
   {
     mTau = tau;
     mAutToAbstract = autToAbstract;
+    final KindTranslator translator = getKindTranslator();
     final EventEncoding eventEnc =
-        new EventEncoding(autToAbstract, tau, getPropositions(),
+        new EventEncoding(autToAbstract, translator, tau, getPropositions(),
             EventEncoding.FILTER_PROPOSITIONS);
     // final int codeOfTau = eventEnc.getEventCode(tau);
     mInputEncoding = new StateEncoding(autToAbstract);

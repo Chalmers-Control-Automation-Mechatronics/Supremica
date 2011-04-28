@@ -587,49 +587,53 @@ public class CompositionalGeneralisedConflictChecker extends
     mPropositions.add(omega);
 
     if (mAbstractionRules == null) {
+      final ProductDESProxyFactory factory = getFactory();
+      final KindTranslator translator = getKindTranslator();
       mAbstractionRules = new LinkedList<AbstractionRule>();
 
       final TauLoopRemovalRule tlrRule =
-          new TauLoopRemovalRule(getFactory(), mPropositions);
+          new TauLoopRemovalRule(factory, translator, mPropositions);
       mAbstractionRules.add(tlrRule);
 
       final ObservationEquivalenceRule oeRule =
-          new ObservationEquivalenceRule(getFactory(), mPropositions);
+          new ObservationEquivalenceRule(factory, translator, mPropositions);
       oeRule.setTransitionLimit(getInternalStepTransitionLimit());
       mAbstractionRules.add(oeRule);
 
       final RemovalOfAlphaMarkingsRule ramRule =
-          new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+          new RemovalOfAlphaMarkingsRule(factory, translator, mPropositions);
       ramRule.setAlphaMarking(alpha);
       mAbstractionRules.add(ramRule);
 
       final RemovalOfDefaultMarkingsRule rdmRule =
-          new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+          new RemovalOfDefaultMarkingsRule(factory, translator, mPropositions);
       rdmRule.setAlphaMarking(alpha);
       rdmRule.setDefaultMarking(omega);
       mAbstractionRules.add(rdmRule);
 
       final RemovalOfNoncoreachableStatesRule rnsRule =
-          new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+          new RemovalOfNoncoreachableStatesRule(factory, translator,
+                                                mPropositions);
       rnsRule.setAlphaMarking(alpha);
       rnsRule.setDefaultMarking(omega);
       mAbstractionRules.add(rnsRule);
 
       final DeterminisationOfNonAlphaStatesRule dnasRule =
-          new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+          new DeterminisationOfNonAlphaStatesRule(factory, translator,
+                                                  mPropositions);
       dnasRule.setAlphaMarking(alpha);
       dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
       mAbstractionRules.add(dnasRule);
 
       final AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
-          new AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-              mPropositions);
+          new AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule
+                (factory, translator, mPropositions);
       rttlnsRule.setAlphaMarking(alpha);
       mAbstractionRules.add(rttlnsRule);
 
       final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
           new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
-              getFactory(), mPropositions);
+              factory, translator, mPropositions);
       rttonsRule.setAlphaMarking(alpha);
       rttonsRule.setDefaultMarking(omega);
       mAbstractionRules.add(rttonsRule);

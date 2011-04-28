@@ -15,44 +15,47 @@ public class AllHeuristic
   extends AbstractModularHeuristic
 {
   private final ModularHeuristicFactory.Preference mType;
-	private final boolean foo = true;
-  
-  public AllHeuristic()
+
+  public AllHeuristic(final KindTranslator translator)
   {
-    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
+    this(translator, ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
-  
-  public AllHeuristic(ModularHeuristicFactory.Preference type)
+
+  public AllHeuristic(final KindTranslator translator,
+                      final ModularHeuristicFactory.Preference type)
   {
+    super(translator);
     mType = type;
   }
-  
-  public Collection<AutomatonProxy> heur(ProductDESProxy composition,
-                                         Set<AutomatonProxy> nonComposedPlants,
-                                         Set<AutomatonProxy> nonComposedSpecPlants,
-                                         Set<AutomatonProxy> nonComposedSpecs,
-                                         TraceProxy counterExample,
-                                         KindTranslator translator)
+
+  public Collection<AutomatonProxy> heur(final ProductDESProxy composition,
+                                         final Set<AutomatonProxy> nonComposedPlants,
+                                         final Set<AutomatonProxy> nonComposedSpecPlants,
+                                         final Set<AutomatonProxy> nonComposedSpecs,
+                                         final TraceProxy counterExample)
   {
-    Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>();
-    for (AutomatonProxy automaton : nonComposedPlants) {
-      if (accepts(automaton, counterExample) != counterExample.getEvents().size()) {
+    final Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>();
+    for (final AutomatonProxy automaton : nonComposedPlants) {
+      if (getNumberOfAcceptedEvents(automaton, counterExample) != counterExample.getEvents().size()) {
         automata.add(automaton);
       }
     }
-    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automata.isEmpty();
+    final boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automata.isEmpty();
     if (automata.size() == 0 || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
-      for (AutomatonProxy automaton : nonComposedSpecPlants) {
-        if (accepts(automaton, counterExample) != counterExample.getEvents().size()) {
+      for (final AutomatonProxy automaton : nonComposedSpecPlants) {
+        if (getNumberOfAcceptedEvents(automaton, counterExample) != counterExample.getEvents().size()) {
           automata.add(automaton);
         }
       }
     }
-    if (automata.size() == 0 || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
-      for (AutomatonProxy automaton : nonComposedSpecs) {
-        int i = accepts(automaton, counterExample);
+    if (automata.size() == 0 ||
+        mType == ModularHeuristicFactory.Preference.NOPREF ||
+        runspecs) {
+      final KindTranslator translator = getKindTranslator();
+      for (final AutomatonProxy automaton : nonComposedSpecs) {
+        final int i = getNumberOfAcceptedEvents(automaton, counterExample);
         if (i != counterExample.getEvents().size()
-            && translator.getEventKind(counterExample.getEvents().get(i)) 
+            && translator.getEventKind(counterExample.getEvents().get(i))
             == EventKind.CONTROLLABLE) {
           automata.add(automaton);
         }

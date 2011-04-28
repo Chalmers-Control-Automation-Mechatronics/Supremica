@@ -21,12 +21,14 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.analysis.op.TraceFinder;
 import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -168,8 +170,7 @@ public class ParallelModularControllabilityChecker
                             uncomposedplants,
                             uncomposedspecplants,
                             uncomposedspecs,
-                            mChecker.getCounterExample(),
-                            getKindTranslator());
+                            mChecker.getCounterExample());
           if (newComp == null) {
             mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
             setFailedResult(mChecker.getCounterExample());
@@ -261,7 +262,9 @@ public class ParallelModularControllabilityChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  private ParallelRun check(final ParallelRun run, final Collection<AutomatonProxy> changed)
+  private ParallelRun check(final ParallelRun run,
+                            final Collection<AutomatonProxy> changed)
+    throws OverflowException
   {
     final Collection<AutomatonProxy> changed2 = new ArrayList<AutomatonProxy>(changed);
     changed2.removeAll(run.mAdded);
@@ -280,7 +283,9 @@ public class ParallelModularControllabilityChecker
       return run;
     }
     for (final AutomatonProxy automaton : changed) {
-      if (!AbstractModularHeuristic.acc(automaton, run.mCounter)) {
+      final KindTranslator translator = getKindTranslator();
+      final TraceFinder finder = new TraceFinder(automaton, translator);
+      if (!finder.accepts(run.mCounter)) {
         return run;
       }
     }

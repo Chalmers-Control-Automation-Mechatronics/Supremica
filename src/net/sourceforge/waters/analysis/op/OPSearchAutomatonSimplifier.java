@@ -32,6 +32,7 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AutomatonResult;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -59,22 +60,27 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Constructors
-  public OPSearchAutomatonSimplifier(final ProductDESProxyFactory factory)
+  public OPSearchAutomatonSimplifier(final ProductDESProxyFactory factory,
+                                     final KindTranslator translator)
   {
-    super(factory);
+    this(null, factory, translator);
   }
 
   public OPSearchAutomatonSimplifier(final ProductDESProxy model,
-                                     final ProductDESProxyFactory factory)
+                                     final ProductDESProxyFactory factory,
+                                     final KindTranslator translator)
   {
     super(model, factory);
+    mKindTranslator = translator;
   }
 
   public OPSearchAutomatonSimplifier(final AutomatonProxy aut,
                                      final Collection<EventProxy> hidden,
-                                     final ProductDESProxyFactory factory)
+                                     final ProductDESProxyFactory factory,
+                                     final KindTranslator translator)
   {
     super(aut, factory);
+    mKindTranslator = translator;
     mOperationMode = Mode.MINIMIZE;
     mHiddenEvents = new THashSet<EventProxy>(hidden);
   }
@@ -998,7 +1004,7 @@ public class OPSearchAutomatonSimplifier
     for (final EventProxy event : mEvents) {
       events.add(event);
     }
-    mEventEncoding = new EventEncoding(events);
+    mEventEncoding = new EventEncoding(events, mKindTranslator);
     final int numProperEvents = mEventEncoding.getNumberOfProperEvents();
     final int numProps = mEventEncoding.getNumberOfPropositions();
     final int ocode = mEventEncoding.getEventCode(otau);
@@ -1848,6 +1854,7 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Data Members
+  private final KindTranslator mKindTranslator;
   private Mode mOperationMode;
   private Collection<EventProxy> mHiddenEvents;
   private Collection<EventProxy> mPropositions;

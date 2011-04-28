@@ -14,28 +14,29 @@ public class EarlyNotAcceptHeuristic
 {
   private final ModularHeuristicFactory.Preference mType;
 	private final boolean foo = true;
-  
-  public EarlyNotAcceptHeuristic()
+
+  public EarlyNotAcceptHeuristic(final KindTranslator translator)
   {
-    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
+    this(translator, ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
-  
-  public EarlyNotAcceptHeuristic(ModularHeuristicFactory.Preference type)
+
+  public EarlyNotAcceptHeuristic(final KindTranslator translator,
+                                 final ModularHeuristicFactory.Preference type)
   {
+    super(translator);
     mType = type;
   }
-  
-  public Collection<AutomatonProxy> heur(ProductDESProxy composition,
-                                         Set<AutomatonProxy> nonComposedPlants,
-                                         Set<AutomatonProxy> nonComposedSpecPlants,
-                                         Set<AutomatonProxy> nonComposedSpecs,
-                                         TraceProxy counterExample,
-                                         KindTranslator translator)
+
+  public Collection<AutomatonProxy> heur(final ProductDESProxy composition,
+                                         final Set<AutomatonProxy> nonComposedPlants,
+                                         final Set<AutomatonProxy> nonComposedSpecPlants,
+                                         final Set<AutomatonProxy> nonComposedSpecs,
+                                         final TraceProxy counterExample)
   {
     AutomatonProxy bestautomaton = null;
     int least = Integer.MAX_VALUE;
-    for (AutomatonProxy automaton : nonComposedPlants) {
-      int i = accepts(automaton, counterExample);
+    for (final AutomatonProxy automaton : nonComposedPlants) {
+      final int i = getNumberOfAcceptedEvents(automaton, counterExample);
       if (i != counterExample.getEvents().size()) {
         if (i <= least) {
           bestautomaton = automaton;
@@ -43,10 +44,10 @@ public class EarlyNotAcceptHeuristic
         }
       }
     }
-    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && bestautomaton == null;
+    final boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && bestautomaton == null;
     if (bestautomaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
-      for (AutomatonProxy automaton : nonComposedSpecPlants) {
-        int i = accepts(automaton, counterExample);
+      for (final AutomatonProxy automaton : nonComposedSpecPlants) {
+        final int i = getNumberOfAcceptedEvents(automaton, counterExample);
         if (i != counterExample.getEvents().size()) {
           if (i <= least) {
             bestautomaton = automaton;
@@ -56,10 +57,11 @@ public class EarlyNotAcceptHeuristic
       }
     }
     if (bestautomaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
-      for (AutomatonProxy automaton : nonComposedSpecs) {
-        int i = accepts(automaton, counterExample);
+      for (final AutomatonProxy automaton : nonComposedSpecs) {
+        final KindTranslator translator = getKindTranslator();
+        final int i = getNumberOfAcceptedEvents(automaton, counterExample);
         if (i != counterExample.getEvents().size()
-            && translator.getEventKind(counterExample.getEvents().get(i)) 
+            && translator.getEventKind(counterExample.getEvents().get(i))
             == EventKind.CONTROLLABLE) {
           if (i < least) {
             bestautomaton = automaton;

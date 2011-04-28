@@ -39,7 +39,20 @@ import org.apache.log4j.Logger;
 
 
 /**
- * The modular language inclusion check algorithm.
+ * <P>The modular language inclusion check algorithm.</P>
+ *
+ * <P>The modular language inclusion checker is a simple wrapper to
+ * split a model with several properties into several models with only
+ * one property each. Each model is checked individually by another safety
+ * verifier. If one check fails, language inclusion is found to be not
+ * satisfied, otherwise it is satisfied.</P>
+ *
+ * <P>The model verifier checking the individual properties can be
+ * configured. It typically is a {@link ModularControllabilityChecker}
+ * or {@link ProjectingControllabilityChecker}. The modular language
+ * inclusion checker is only useful for models with more than one
+ * property; if there is only one property, it will delegate the
+ * complete task to the secondary model verifier.</P>
  *
  * @author Simon Ware
  */

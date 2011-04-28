@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgument;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.unchecked.Casting;
@@ -49,7 +50,8 @@ public class ModularHeuristicFactory {
   //#########################################################################
   //# Creation of Heuristics
   public ModularHeuristic getHeuristic(final Method method,
-				       final Preference pref)
+                                       final Preference pref,
+                                       final KindTranslator translator)
   {
     try {
       final Class<? extends ModularHeuristicFactory> myclass = getClass();
@@ -58,8 +60,8 @@ public class ModularHeuristicFactory {
       final Class<?> lclass = myclass.getClassLoader().loadClass(fullname);
       final Class<ModularHeuristic> heuclass = Casting.toClass(lclass);
       final Constructor<ModularHeuristic> constr =
-	heuclass.getConstructor(Preference.class);
-      return constr.newInstance(pref);
+        heuclass.getConstructor(KindTranslator.class, Preference.class);
+      return constr.newInstance(translator, pref);
     } catch (final ClassNotFoundException exception) {
       throw new WatersRuntimeException(exception);
     } catch (final IllegalAccessException exception) {
@@ -112,7 +114,7 @@ public class ModularHeuristicFactory {
     }
   }
 
-    
+
   //#########################################################################
   //# Inner Class PreferenceArgument
   private static class PreferenceArgument
@@ -141,16 +143,16 @@ public class ModularHeuristicFactory {
 
   }
 
-    
+
   //#########################################################################
   //# Enumeration Types
   public enum Method {
-    All,                            
+    All,
     EarlyNotAccept,
-    LateNotAccept, 
-    MaxCommonEvents, 
+    LateNotAccept,
+    MaxCommonEvents,
     MaxCommonUncontrollableEvents,
-    MaxStates, 
+    MaxStates,
     MinEvents,
     MinNewEvents,
     MinStates,

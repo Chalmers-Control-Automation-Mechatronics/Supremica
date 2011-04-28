@@ -16,6 +16,7 @@ import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.analysis.op.TransitionIterator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -45,16 +46,18 @@ class AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
   //#########################################################################
   //# Constructors
   AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
-    (final ProductDESProxyFactory factory)
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
   }
 
   AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
     (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
      final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
   }
 
   //#########################################################################
@@ -89,7 +92,9 @@ class AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
     if (tau == null) {
       return autToAbstract;
     }
-    final EventEncoding eventEnc = new EventEncoding(autToAbstract, tau);
+    final KindTranslator translator = getKindTranslator();
+    final EventEncoding eventEnc =
+      new EventEncoding(autToAbstract, translator, tau);
     final int alphaID = eventEnc.getEventCode(mAlphaMarking);
     if (alphaID < 0) {
       return autToAbstract;

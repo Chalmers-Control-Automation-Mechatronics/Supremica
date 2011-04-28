@@ -15,46 +15,46 @@ public class MinEventsHeuristic
   extends AbstractModularHeuristic
 {
   private final ModularHeuristicFactory.Preference mType;
-	private final boolean foo = true;
-  
-  public MinEventsHeuristic()
+
+  public MinEventsHeuristic(final KindTranslator translator)
   {
-    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
+    this(translator, ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
-  
-  public MinEventsHeuristic(ModularHeuristicFactory.Preference type)
+
+  public MinEventsHeuristic(final KindTranslator translator,
+                            final ModularHeuristicFactory.Preference type)
   {
+    super(translator);
     mType = type;
   }
-  
-  public Collection<AutomatonProxy> heur(ProductDESProxy composition,
-                                         Set<AutomatonProxy> nonComposedPlants,
-                                         Set<AutomatonProxy> nonComposedSpecPlants,
-                                         Set<AutomatonProxy> nonComposedSpecs,
-                                         TraceProxy counterExample,
-                                         KindTranslator translator)
+
+  public Collection<AutomatonProxy> heur(final ProductDESProxy composition,
+                                         final Set<AutomatonProxy> nonComposedPlants,
+                                         final Set<AutomatonProxy> nonComposedSpecPlants,
+                                         final Set<AutomatonProxy> nonComposedSpecs,
+                                         final TraceProxy counterExample)
   {
     AutomatonProxy automaton = checkAutomata(false, nonComposedPlants,
                                              new MinEventsComparator(),
-                                             counterExample, translator);
-    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
+                                             counterExample);
+    final boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
     if (automaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
-      automaton = checkAutomata(automaton, false, nonComposedSpecPlants, 
+      automaton = checkAutomata(automaton, false, nonComposedSpecPlants,
                                 new MinEventsComparator(),
-                                counterExample, translator);
+                                counterExample);
     }
-    if (automaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || (runspecs && foo)) {
-      automaton = checkAutomata(automaton, true, nonComposedSpecs, 
+    if (automaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || runspecs) {
+      automaton = checkAutomata(automaton, true, nonComposedSpecs,
                                 new MinEventsComparator(),
-                                counterExample, translator);
+                                counterExample);
     }
     return automaton == null ? null : Collections.singleton(automaton);
   }
-  
+
   private static class MinEventsComparator
     implements Comparator<AutomatonProxy>
   {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
+    public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a2.getEvents().size() - a1.getEvents().size();
     }

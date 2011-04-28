@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -35,23 +36,27 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     AbstractionRule
 {
-  // #######################################################################
-  // # Constructors
-  RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(
-                                                     final ProductDESProxyFactory factory)
+
+  //#######################################################################
+  //# Constructors
+  RemovalOfTauTransitionsLeadingToNonAlphaStatesRule
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
   }
 
-  RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(
-                                                     final ProductDESProxyFactory factory,
-                                                     final Collection<EventProxy> propositions)
+  RemovalOfTauTransitionsLeadingToNonAlphaStatesRule
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
   }
 
-  // #######################################################################
-  // # Configuration
+
+  //#######################################################################
+  //# Configuration
   EventProxy getAlphaMarking()
   {
     return mAlphaMarking;

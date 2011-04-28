@@ -18,6 +18,7 @@ import net.sourceforge.waters.analysis.op.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -32,16 +33,18 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
 
   //#########################################################################
   //# Constructor
-  DeterminisationOfNonAlphaStatesRule(final ProductDESProxyFactory factory)
+  DeterminisationOfNonAlphaStatesRule(final ProductDESProxyFactory factory,
+                                      final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
 
   }
 
   DeterminisationOfNonAlphaStatesRule(final ProductDESProxyFactory factory,
+                                      final KindTranslator translator,
                                       final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
     mTransitionRemovalMode =
         ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
     mTransitionLimit = Integer.MAX_VALUE;
@@ -120,8 +123,9 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     }
     mTau = tau;
     mAutToAbstract = autToAbstract;
+    final KindTranslator translator = getKindTranslator();
     final EventEncoding eventEnc =
-        new EventEncoding(autToAbstract, tau, getPropositions(),
+        new EventEncoding(autToAbstract, translator, tau, getPropositions(),
                           EventEncoding.FILTER_PROPOSITIONS);
     final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
     mInputEncoding = new StateEncoding(autToAbstract);

@@ -110,8 +110,9 @@ public class IsomorphismChecker
   {
     if (aut1.getStates().size() != 0 || aut2.getStates().size() != 0) {
       setupEventMap(aut1, aut2);
+      final KindTranslator translator = IdenticalKindTranslator.getInstance();
       final AutomatonProxy aut = createTestAutomaton(aut1, aut2, true);
-      final EventEncoding eventEnc = new EventEncoding(aut);
+      final EventEncoding eventEnc = new EventEncoding(aut, translator);
       final StateEncoding stateEnc = new StateEncoding(aut);
       final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
         (aut, eventEnc, stateEnc,
@@ -140,8 +141,9 @@ public class IsomorphismChecker
   {
     if (aut1.getStates().size() != 0 || aut2.getStates().size() != 0) {
       setupEventMap(aut1, aut2);
+      final KindTranslator translator = IdenticalKindTranslator.getInstance();
       final AutomatonProxy aut = createTestAutomaton(aut1, aut2, false);
-      final EventEncoding eventEnc = new EventEncoding(aut);
+      final EventEncoding eventEnc = new EventEncoding(aut, translator);
       final StateEncoding stateEnc = new StateEncoding(aut);
       final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
         (aut, eventEnc, stateEnc,
@@ -172,8 +174,9 @@ public class IsomorphismChecker
   {
     if (aut1.getStates().size() != 0 || aut2.getStates().size() != 0) {
       setupEventMap(aut1, aut2);
+      final KindTranslator translator = IdenticalKindTranslator.getInstance();
       final AutomatonProxy aut = createTestAutomaton(aut1, aut2, false);
-      final EventEncoding eventEnc = new EventEncoding(aut, tau);
+      final EventEncoding eventEnc = new EventEncoding(aut, translator, tau);
       final StateEncoding stateEnc = new StateEncoding(aut);
       final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
         (aut, eventEnc, stateEnc,

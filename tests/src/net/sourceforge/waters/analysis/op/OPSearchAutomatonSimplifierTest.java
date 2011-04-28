@@ -12,7 +12,9 @@ package net.sourceforge.waters.analysis.op;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.IsomorphismChecker;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -45,7 +47,8 @@ public class OPSearchAutomatonSimplifierTest
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mSimplifier = new OPSearchAutomatonSimplifier(factory);
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    mSimplifier = new OPSearchAutomatonSimplifier(factory, translator);
     mSimplifier.setOutputName("result");
     mIsomorphismChecker = new IsomorphismChecker(factory, true);
   }

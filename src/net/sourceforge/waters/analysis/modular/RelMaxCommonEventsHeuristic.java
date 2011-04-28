@@ -16,67 +16,69 @@ public class RelMaxCommonEventsHeuristic
   extends AbstractModularHeuristic
 {
   private final ModularHeuristicFactory.Preference mType;
-  
-  public RelMaxCommonEventsHeuristic()
+
+  public RelMaxCommonEventsHeuristic(final KindTranslator translator)
   {
-    this(ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
+    this(translator, ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
   }
-  
-  public RelMaxCommonEventsHeuristic(ModularHeuristicFactory.Preference type)
+
+  public RelMaxCommonEventsHeuristic
+    (final KindTranslator translator,
+     final ModularHeuristicFactory.Preference type)
   {
+    super(translator);
     mType = type;
   }
-  
-  public Collection<AutomatonProxy> heur(ProductDESProxy composition,
-                                         Set<AutomatonProxy> nonComposedPlants,
-                                         Set<AutomatonProxy> nonComposedSpecPlants,
-                                         Set<AutomatonProxy> nonComposedSpecs,
-                                         TraceProxy counterExample,
-                                         KindTranslator translator)
+
+  public Collection<AutomatonProxy> heur(final ProductDESProxy composition,
+                                         final Set<AutomatonProxy> nonComposedPlants,
+                                         final Set<AutomatonProxy> nonComposedSpecPlants,
+                                         final Set<AutomatonProxy> nonComposedSpecs,
+                                         final TraceProxy counterExample)
   {
     AutomatonProxy automaton = checkAutomata(false, nonComposedPlants,
                                              new RelMaxEventComparator(composition),
-                                             counterExample, translator);
-    boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
+                                             counterExample);
+    final boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
     if (automaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
-      automaton = checkAutomata(automaton, false, nonComposedSpecPlants, 
+      automaton = checkAutomata(automaton, false, nonComposedSpecPlants,
                                 new RelMaxEventComparator(composition),
-                                counterExample, translator);
+                                counterExample);
     }
     if (automaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || runspecs) {
-      automaton = checkAutomata(automaton, true, nonComposedSpecs, 
+      automaton = checkAutomata(automaton, true, nonComposedSpecs,
                                 new RelMaxEventComparator(composition),
-                                counterExample, translator);
+                                counterExample);
     }
     return automaton == null ? null : Collections.singleton(automaton);
   }
-  
+
   private static class RelMaxEventComparator
     implements Comparator<AutomatonProxy>
   {
     private final Set<EventProxy> mEvents;
-    
-    public RelMaxEventComparator(ProductDESProxy composition)
+
+    public RelMaxEventComparator(final ProductDESProxy composition)
     {
       mEvents = composition.getEvents();
     }
-    
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
+
+    public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       int count1 = 0;
       int count2 = 0;
-      for (EventProxy e : a1.getEvents()) {
+      for (final EventProxy e : a1.getEvents()) {
         if (mEvents.contains(e)) {
           count1++;
         }
       }
-      for (EventProxy e : a2.getEvents()) {
+      for (final EventProxy e : a2.getEvents()) {
         if (mEvents.contains(e)) {
           count2++;
         }
       }
-      double c1 = (double)count1 / (double)a1.getEvents().size();
-      double c2 = (double)count2 / (double)a2.getEvents().size();
+      final double c1 = (double)count1 / (double)a1.getEvents().size();
+      final double c2 = (double)count2 / (double)a2.getEvents().size();
       if (c1 < c2) {
         return -1;
       } else if (c1 > c2) {

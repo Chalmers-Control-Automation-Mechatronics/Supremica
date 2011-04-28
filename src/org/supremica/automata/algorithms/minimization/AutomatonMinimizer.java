@@ -52,6 +52,8 @@ package org.supremica.automata.algorithms.minimization;
 import java.util.*;
 
 import net.sourceforge.waters.analysis.op.OPSearchAutomatonSimplifier;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -224,8 +226,9 @@ public class AutomatonMinimizer
               hidden.add(event);
             }
           }
+          final KindTranslator translator = IdenticalKindTranslator.getInstance();
           final OPSearchAutomatonSimplifier simp =
-            new OPSearchAutomatonSimplifier(aut, hidden, factory);
+            new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
           simp.run();
           final AutomatonProxy result = simp.getComputedAutomaton();
           if (result != aut) {

@@ -148,18 +148,21 @@ public class CullingControllabilityChecker
                            uncomposedplants,
                            uncomposedspecplants,
                            uncomposedspecs,
-                           counter,
-                           getKindTranslator());
+                           counter);
           if (newComp == null) {
             setFailedResult(mChecker.getCounterExample());
             return false;
           }
-          final Op op = new Op(ALL.heur(comp,
-                                  uncomposedplants,
-                                  uncomposedspecplants,
-                                  uncomposedspecs,
-                                  counter,
-                                  getKindTranslator()), newComp.iterator().next());
+          final KindTranslator translator = getKindTranslator();
+          final ModularHeuristic all =
+            new AllHeuristic(translator,
+                             ModularHeuristicFactory.Preference.NOPREF);
+          final Op op = new Op(all.heur(comp,
+                                        uncomposedplants,
+                                        uncomposedspecplants,
+                                        uncomposedspecs,
+                                        counter),
+                               newComp.iterator().next());
           final Set<AutomatonProxy> possible = new HashSet<AutomatonProxy>(op.others);
           possible.add(op.added);
           //CheckSuffix.checkSuffix(counter, possible, null);
@@ -278,8 +281,5 @@ public class CullingControllabilityChecker
   private final ControllabilityChecker mChecker;
   private final boolean mLeast;
   private int mStates;
-
-  private static final ModularHeuristic ALL =
-    new AllHeuristic(ModularHeuristicFactory.Preference.NOPREF);
 
 }

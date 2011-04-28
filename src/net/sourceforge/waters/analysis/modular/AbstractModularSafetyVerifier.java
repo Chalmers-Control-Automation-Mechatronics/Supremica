@@ -78,7 +78,9 @@ abstract class AbstractModularSafetyVerifier
   {
     final ModularHeuristicFactory factory =
       ModularHeuristicFactory.getInstance();
-    return factory.getHeuristic(mHeuristicMethod, mHeuristicPreference);
+    final KindTranslator translator = getKindTranslator();
+    return
+      factory.getHeuristic(mHeuristicMethod, mHeuristicPreference, translator);
   }
 
 

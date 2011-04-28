@@ -34,7 +34,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.gnonblocking.Candidate;
-import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
+import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
 import net.sourceforge.waters.analysis.monolithic.
   MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.TraceChecker;
@@ -368,7 +369,7 @@ public class OPConflictChecker
     if (mCurrentCompositionalLanguageInclusionChecker == null) {
       if (mCompositionalLanguageInclusionChecker == null) {
         mCurrentCompositionalLanguageInclusionChecker =
-          new ModularLanguageInclusionChecker
+          new ModularControllabilityChecker
             (factory, mCurrentMonolithicLanguageInclusionChecker);
       } else {
         mCurrentCompositionalLanguageInclusionChecker =
@@ -1112,7 +1113,7 @@ public class OPConflictChecker
     final ProductDESProxy languageInclusionModel = builder.getOutputModel();
     final KindTranslator languageInclusionTranslator =
       builder.getKindTranslator();
-    final LanguageInclusionChecker checker;
+    final SafetyVerifier checker;
     if (languageInclusionModel.getAutomata().size() > 2) {
       checker = mCurrentCompositionalLanguageInclusionChecker;
     } else {
@@ -1316,8 +1317,9 @@ public class OPConflictChecker
       "Candidate for hiding has more than one automaton!";
     final AutomatonProxy aut = automata.iterator().next();
     final ProductDESProxyFactory factory = getFactory();
+    final KindTranslator translator = getKindTranslator();
     final EventProxy tau = createSilentEvent(candidate, factory);
-    final EventEncoding eventEnc = new EventEncoding(aut, tau);
+    final EventEncoding eventEnc = new EventEncoding(aut, translator, tau);
     final Collection<EventProxy> local = candidate.getLocalEvents();
     for (final EventProxy event : local) {
       eventEnc.addSilentEvent(event);
@@ -2387,7 +2389,8 @@ public class OPConflictChecker
     EventEncoding createEventEncoding(final AutomatonProxy aut,
                                       final EventProxy tau)
     {
-      return new EventEncoding(aut, tau, mPropositions,
+      final KindTranslator translator = getKindTranslator();
+      return new EventEncoding(aut, translator, tau, mPropositions,
                                EventEncoding.FILTER_PROPOSITIONS);
 
     }
@@ -2444,8 +2447,9 @@ public class OPConflictChecker
     EventEncoding createEventEncoding(final AutomatonProxy aut,
                                       final EventProxy tau)
     {
+      final KindTranslator translator = getKindTranslator();
       final EventEncoding eventEnc =
-        new EventEncoding(aut, tau, mPropositions,
+        new EventEncoding(aut, translator, tau, mPropositions,
                           EventEncoding.FILTER_PROPOSITIONS);
       mPreconditionMarkingID = eventEnc.getEventCode(mUsedPreconditionMarking);
       if (mPreconditionMarkingID < 0) {
@@ -2537,10 +2541,11 @@ public class OPConflictChecker
     {
       final ProductDESProxyFactory factory = getFactory();
       final String name = "vtau:" + aut.getName();
+      final KindTranslator translator = getKindTranslator();
       final EventProxy vtau =
         factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
       final EventEncoding eventEnc =
-        new EventEncoding(aut, tau, mPropositions,
+        new EventEncoding(aut, translator, tau, mPropositions,
                           EventEncoding.FILTER_PROPOSITIONS);
       eventEnc.addEvent(vtau, false);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
@@ -2663,8 +2668,9 @@ public class OPConflictChecker
       }
       final ProductDESProxyFactory factory = getFactory();
       final Collection<EventProxy> hidden = Collections.singletonList(tau);
+      final KindTranslator translator = getKindTranslator();
       final OPSearchAutomatonSimplifier simplifier =
-        new OPSearchAutomatonSimplifier(aut, hidden, factory);
+        new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
       simplifier.setPropositions(mPropositions);
       simplifier.setOutputHiddenEvent(tau);
       simplifier.setNodeLimit(mInternalStepNodeLimit);
@@ -2994,8 +3000,9 @@ public class OPConflictChecker
       throws AnalysisException
     {
       final AutomatonProxy originalAutomaton = getOriginalAutomaton();
+      final KindTranslator translator = getKindTranslator();
       mEventEncoding =
-        new EventEncoding(originalAutomaton, mTau, mPropositions,
+        new EventEncoding(originalAutomaton, translator, mTau, mPropositions,
                           EventEncoding.FILTER_PROPOSITIONS);
       recoverPreconditionMarking();
       mTransitionRelation = new ListBufferTransitionRelation
@@ -3691,8 +3698,8 @@ public class OPConflictChecker
   private boolean mSubsumptionEnabled;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
-  private LanguageInclusionChecker mCompositionalLanguageInclusionChecker;
-  private LanguageInclusionChecker mMonolithicLanguageInclusionChecker;
+  private SafetyVerifier mCompositionalLanguageInclusionChecker;
+  private SafetyVerifier mMonolithicLanguageInclusionChecker;
   private GeneralisedTRSimplifierAbstractionRule mPreconditionMarkingRecovery;
 
   private List<AutomatonProxy> mCurrentAutomata;
@@ -3723,9 +3730,8 @@ public class OPConflictChecker
   private Comparator<Candidate> mSelectingHeuristic;
   private SynchronousProductBuilder mCurrentSynchronousProductBuilder;
   private ConflictChecker mCurrentMonolithicConflictChecker;
-  private LanguageInclusionChecker
-    mCurrentCompositionalLanguageInclusionChecker;
-  private LanguageInclusionChecker mCurrentMonolithicLanguageInclusionChecker;
+  private SafetyVerifier mCurrentCompositionalLanguageInclusionChecker;
+  private SafetyVerifier mCurrentMonolithicLanguageInclusionChecker;
 
 
   //#########################################################################

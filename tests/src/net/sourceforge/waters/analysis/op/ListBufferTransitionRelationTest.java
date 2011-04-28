@@ -16,7 +16,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.IsomorphismChecker;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -437,7 +439,8 @@ public class ListBufferTransitionRelationTest extends
                                final int config)
     throws Exception
   {
-    final EventEncoding enc = new EventEncoding(aut);
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    final EventEncoding enc = new EventEncoding(aut, translator);
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, enc, config);
     rel.setName("output");
@@ -469,8 +472,9 @@ public class ListBufferTransitionRelationTest extends
                                            final int config)
     throws Exception
   {
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final StateEncoding stateEnc = new StateEncoding(aut);
-    final EventEncoding eventEnc = new EventEncoding(aut);
+    final EventEncoding eventEnc = new EventEncoding(aut, translator);
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
     rel.checkIntegrity();
@@ -528,8 +532,9 @@ public class ListBufferTransitionRelationTest extends
                                              final int config)
     throws Exception
   {
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final StateEncoding stateEnc = new StateEncoding(aut);
-    final EventEncoding eventEnc = new EventEncoding(aut);
+    final EventEncoding eventEnc = new EventEncoding(aut, translator);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final IsomorphismChecker checker = new IsomorphismChecker(factory, false);
     final String autname = aut.getName();

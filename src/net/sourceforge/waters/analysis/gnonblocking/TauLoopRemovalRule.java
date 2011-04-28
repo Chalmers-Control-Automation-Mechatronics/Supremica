@@ -17,13 +17,14 @@ import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.analysis.op.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * Removes tau-loops. To acheive the best results this rule should be applied
+ * Removes tau-loops. To achieve the best results this rule should be applied
  * before any other abstraction rules.
  *
  * @author Rachel Francis
@@ -33,16 +34,18 @@ class TauLoopRemovalRule extends AbstractionRule
 {
   // #######################################################################
   // # Constructor
-  TauLoopRemovalRule(final ProductDESProxyFactory factory)
+  TauLoopRemovalRule(final ProductDESProxyFactory factory,
+                     final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
 
   }
 
   TauLoopRemovalRule(final ProductDESProxyFactory factory,
+                     final KindTranslator translator,
                      final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
   }
 
   // #######################################################################
@@ -53,8 +56,9 @@ class TauLoopRemovalRule extends AbstractionRule
   {
     mTau = tau;
     mAutToAbstract = autToAbstract;
+    final KindTranslator translator = getKindTranslator();
     final EventEncoding eventEnc =
-        new EventEncoding(autToAbstract, tau, getPropositions(),
+        new EventEncoding(autToAbstract, translator, tau, getPropositions(),
             EventEncoding.FILTER_PROPOSITIONS);
     mInputEncoding = new StateEncoding(autToAbstract);
     mTr =

@@ -9,17 +9,26 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import gnu.trove.THashSet;
+
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.op.TraceFinder;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -37,6 +46,23 @@ abstract class AbstractModularHeuristic
 {
 
   //#########################################################################
+  //# Constructor
+  AbstractModularHeuristic(final KindTranslator translator)
+  {
+    mKindTranslator = translator;
+    mTraceFinders = new HashMap<AutomatonProxy,TraceFinder>();
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  KindTranslator getKindTranslator()
+  {
+    return mKindTranslator;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.analysis.modular.ModularHeuristic
   public String getName()
   {
@@ -51,34 +77,92 @@ abstract class AbstractModularHeuristic
     }
   }
 
+  public SafetyTraceProxy extendTrace(final ProductDESProxyFactory factory,
+                                      final SafetyTraceProxy trace,
+                                      final List<AutomatonProxy> automata)
+  {
+    final Set<AutomatonProxy> oldAutomata =
+      new THashSet<AutomatonProxy>(trace.getAutomata());
+    boolean done = false;
+    boolean det = true;
+    for (final AutomatonProxy aut : automata) {
+      if (!oldAutomata.contains(aut)) {
+        done = false;
+        final TraceFinder finder = getTraceFinder(aut);
+        det &= finder.isDeterministic();
+      }
+    }
+    if (done) {
+      return trace;
+    }
+    final String name = trace.getName();
+    final String comment = trace.getComment();
+    final URI location = trace.getLocation();
+    final ProductDESProxy des = trace.getProductDES();
+    final List<TraceStepProxy> oldSteps = trace.getTraceSteps();
+    if (det) {
+      return factory.createSafetyTraceProxy(name, comment, location,
+                                            des, automata, oldSteps);
+    }
+    final int numSteps = oldSteps.size();
+    final List<TraceStepProxy> newSteps = new ArrayList<TraceStepProxy>(numSteps);
+    int depth = 0;
+    for (final TraceStepProxy oldStep : oldSteps) {
+      final EventProxy event = oldStep.getEvent();
+      final Map<AutomatonProxy,StateProxy> oldMap = oldStep.getStateMap();
+      Map<AutomatonProxy,StateProxy> newMap = null;
+      for (final AutomatonProxy aut : automata) {
+        if (!oldAutomata.contains(aut)) {
+          final TraceFinder finder = getTraceFinder(aut);
+          final StateProxy state = finder.getState(depth);
+          if (state != null) {
+            if (newMap == null) {
+              newMap = new HashMap<AutomatonProxy,StateProxy>(oldMap);
+            }
+            newMap.put(aut, state);
+          }
+        }
+      }
+      if (newMap == null) {
+        newSteps.add(oldStep);
+      } else {
+        final TraceStepProxy newStep =
+          factory.createTraceStepProxy(event, newMap);
+        newSteps.add(newStep);
+      }
+      depth++;
+    }
+    return factory.createSafetyTraceProxy(name, comment, location,
+                                          des, automata, newSteps);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
   AutomatonProxy checkAutomata(final boolean specs,
-			       final Set<AutomatonProxy> automata,
-			       final Comparator<AutomatonProxy> comp,
-			       final TraceProxy counterExample,
-			       final KindTranslator translator)
+                               final Set<AutomatonProxy> automata,
+                               final Comparator<AutomatonProxy> comp,
+                               final TraceProxy counterExample)
   {
     return checkAutomata
-      (null, specs, automata, comp, counterExample, translator);
+      (null, specs, automata, comp, counterExample);
   }
 
   AutomatonProxy checkAutomata(AutomatonProxy bestautomaton,
-			       final boolean specs,
-			       final Set<AutomatonProxy> automata,
-			       final Comparator<AutomatonProxy> comp,
-			       final TraceProxy counterExample,
-			       final KindTranslator translator)
+                               final boolean specs,
+                               final Set<AutomatonProxy> automata,
+                               final Comparator<AutomatonProxy> comp,
+                               final TraceProxy counterExample)
   {
     for (final AutomatonProxy automaton : automata) {
-      final int i = accepts(automaton, counterExample);
+      final KindTranslator translator = getKindTranslator();
+      final int i = getNumberOfAcceptedEvents(automaton, counterExample);
       if (i != counterExample.getEvents().size()) {
         if (!specs ||
-	    translator.getEventKind(counterExample.getEvents().get(i)) ==
-	    EventKind.CONTROLLABLE) {
+            translator.getEventKind(counterExample.getEvents().get(i)) ==
+              EventKind.CONTROLLABLE) {
           if (bestautomaton == null ||
-	      comp.compare(bestautomaton, automaton) < 0) {
+              comp.compare(bestautomaton, automaton) < 0) {
             bestautomaton = automaton;
           }
         }
@@ -86,82 +170,37 @@ abstract class AbstractModularHeuristic
     }
     return bestautomaton;
   }
-  
-  static boolean acc(final AutomatonProxy automaton,
-		     final TraceProxy counterExample)
+
+
+  //#########################################################################
+  //# Trace Checking
+  boolean accepts(final AutomatonProxy aut, final TraceProxy trace)
   {
-    return
-      counterExample.getEvents().size() ==
-      accepts(automaton, counterExample);
+    return trace.getEvents().size() == getNumberOfAcceptedEvents(aut, trace);
   }
-  
-  static int accepts(final AutomatonProxy automaton,
-		     final TraceProxy counterExample)
+
+  int getNumberOfAcceptedEvents(final AutomatonProxy aut,
+                                final TraceProxy trace)
   {
-    Map<Key, StateProxy> mapAutomaton = createMap(automaton);
-    int i = 0;
-    StateProxy state = null;
-    for (final StateProxy s : automaton.getStates()) {
-      if (s.isInitial()) {
-        state = s;
-        break;
-      }
-    }
-    for (final EventProxy e : counterExample.getEvents()) {
-      if (automaton.getEvents().contains(e)) {
-        final Key k = new Key(state, e);
-        state = mapAutomaton.get(k);
-        if (state == null) {
-          break;
-        }
-      }
-      i++;
-    }
-    return i;
+    final TraceFinder finder = getTraceFinder(aut);
+    return finder.getNumberOfAcceptedSteps(trace);
   }
-  
-  static Map<Key, StateProxy> createMap(final AutomatonProxy automaton) 
+
+  private TraceFinder getTraceFinder(final AutomatonProxy aut)
   {
-    final Map<Key, StateProxy> mapAutomaton =
-      new HashMap<Key, StateProxy>(automaton.getTransitions().size());
-    for (final TransitionProxy trans : automaton.getTransitions()) {
-      mapAutomaton.put(new Key(trans.getSource(), trans.getEvent()),
-		       trans.getTarget());
+    TraceFinder finder = mTraceFinders.get(aut);
+    if (finder == null) {
+      finder = new TraceFinder(aut, mKindTranslator);
+      mTraceFinders.put(aut, finder);
     }
-    return mapAutomaton;
+    return finder;
   }
 
 
   //#########################################################################
-  //# Inner Class Key
-  private static final class Key
-  {
-    private final StateProxy mSource;
-    private final EventProxy mEvent;
-    
-    public Key(StateProxy source, EventProxy event)
-    {
-      mSource = source;
-      mEvent = event;
-    }
-    
-    public boolean equals(Object o)
-    {
-      if (!(o instanceof Key)) {
-        return false;
-      }
-      Key k = (Key)o;
-      return k.mSource.equals(mSource) && mEvent.equals(k.mEvent);
-    }
-    
-    public int hashCode()
-    {
-      int hashCode = 17;
-      hashCode += 31 * mSource.hashCode();
-      hashCode += 31 * mEvent.hashCode();
-      return hashCode;
-    }
-  }
+  //# Data Members
+  private final KindTranslator mKindTranslator;
+  private final Map<AutomatonProxy,TraceFinder> mTraceFinders;
 
 
   //#########################################################################

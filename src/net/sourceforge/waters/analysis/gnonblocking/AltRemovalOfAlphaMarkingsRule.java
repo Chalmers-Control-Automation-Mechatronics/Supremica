@@ -22,6 +22,7 @@ import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.MemStateProxy;
 import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.analysis.op.TransitionIterator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -43,15 +44,17 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
 {
   // #######################################################################
   // # Constructors
-  AltRemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory)
+  AltRemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory,
+                                final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
   }
 
   AltRemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory,
+                                final KindTranslator translator,
                                 final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
   }
 
   // #######################################################################
@@ -86,11 +89,13 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
     // (indexed by predecessor only) and alpha markings. This is enough
     // to do the search, but we cannot use it to build a converted
     // automaton later.
+    final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> filter = new ArrayList<EventProxy>(2);
     filter.add(tau);
     filter.add(mAlphaMarking);
     final EventEncoding eventEnc =
-        new EventEncoding(autToAbstract, tau, filter, EventEncoding.FILTER_ALL);
+        new EventEncoding(autToAbstract, translator, tau,
+                          filter, EventEncoding.FILTER_ALL);
     final int tauID = EventEncoding.TAU;
     int alphaID = eventEnc.getEventCode(mAlphaMarking);
     if (alphaID < 0) {

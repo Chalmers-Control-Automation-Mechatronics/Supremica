@@ -16,6 +16,7 @@ import java.util.List;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -59,44 +60,57 @@ public class EventEncoding
    * Creates a new event encoding for the given automaton.
    * This method creates an event encoding for all events in the
    * given automaton, and with no silent event.
+   * @param  aut         The automaton to be encoded.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
    */
-  public EventEncoding(final AutomatonProxy aut)
+  public EventEncoding(final AutomatonProxy aut,
+                       final KindTranslator translator)
   {
-    this(aut, null);
+    this(aut, translator, null);
   }
 
   /**
    * Creates a new event encoding for the given automaton.
    * This method creates an event encoding for all events in the
    * given automaton.
-   * @param  aut     The automaton to be encoded.
-   * @param  tau     The silent event to be used,
-   *                 or <CODE>null</CODE> if none is to be configured.
+   * @param  aut         The automaton to be encoded.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
+   * @param  tau         The silent event to be used,
+   *                     or <CODE>null</CODE> if none is to be configured.
    */
-  public EventEncoding(final AutomatonProxy aut, final EventProxy tau)
+  public EventEncoding(final AutomatonProxy aut,
+                       final KindTranslator translator,
+                       final EventProxy tau)
   {
-    this(aut, tau, null, FILTER_NONE);
+    this(aut, translator, tau, null, FILTER_NONE);
   }
 
   /**
    * Creates a new event encoding for the given automaton.
    * This method creates an event encoding without any silent event.
    * @param  aut         The automaton to be encoded.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
    * @param  filter      A collection of events to restrict the encoding to.
    * @param  filterMode  Flags defining how the filter is to be used,
    *                     should be one of {@link #FILTER_PROPER_EVENTS},
    *                     {@link #FILTER_PROPOSITIONS}, or {@link #FILTER_ALL}.
    */
   public EventEncoding(final AutomatonProxy aut,
+                       final KindTranslator translator,
                        final Collection<EventProxy> filter,
                        final int filterMode)
   {
-    this(aut.getEvents(), filter, filterMode);
+    this(aut.getEvents(), translator, filter, filterMode);
   }
 
   /**
    * Creates a new event encoding for the given automaton.
    * @param  aut         The automaton to be encoded.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
    * @param  tau         The silent event to be used,
    *                     or <CODE>null</CODE> if none is to be configured.
    * @param  filter      A collection of events to restrict the encoding to.
@@ -105,21 +119,29 @@ public class EventEncoding
    *                     {@link #FILTER_PROPOSITIONS}, or {@link #FILTER_ALL}.
    */
   public EventEncoding(final AutomatonProxy aut,
+                       final KindTranslator translator,
                        final EventProxy tau,
                        final Collection<EventProxy> filter,
                        final int filterMode)
   {
-    this(aut.getEvents(), tau, filter, filterMode);
+    this(aut.getEvents(), translator, tau, filter, filterMode);
   }
 
   /**
    * Creates a new event encoding.
    * This method creates an event encoding consisting of all the given
    * events, and with no silent event.
+   * @param  events      Collection of events constituting the new encoding.
+   *                     Codes are assigned in the order given by the
+   *                     collection, with code {@link #TAU}&nbsp;(0) reserved
+   *                     to the silent event, even though it is not used.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
    */
-  public EventEncoding(final Collection<EventProxy> events)
+  public EventEncoding(final Collection<EventProxy> events,
+                       final KindTranslator translator)
   {
-    this(events, null, FILTER_NONE);
+    this(events, translator, null, FILTER_NONE);
   }
 
   /**
@@ -129,13 +151,16 @@ public class EventEncoding
    *                     Codes are assigned in the order given by the
    *                     collection, with code {@link #TAU}&nbsp;(0) reserved
    *                     to the silent event, even if it is not used.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
    * @param  tau         The silent event to be used,
    *                     or <CODE>null</CODE> if none is to be configured.
    */
   public EventEncoding(final Collection<EventProxy> events,
+                       final KindTranslator translator,
                        final EventProxy tau)
   {
-    this(events, tau, null, FILTER_NONE);
+    this(events, translator, tau, null, FILTER_NONE);
   }
 
   /**
@@ -145,16 +170,19 @@ public class EventEncoding
    *                     Codes are assigned in the order given by the
    *                     collection, with code {@link #TAU}&nbsp;(0) reserved
    *                     to the silent event, even though it is not used.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
    * @param  filter      A collection of events to restrict the encoding to.
    * @param  filterMode  Flags defining how the filter is to be used,
    *                     should be one of {@link #FILTER_PROPER_EVENTS},
    *                     {@link #FILTER_PROPOSITIONS}, or {@link #FILTER_ALL}.
    */
   public EventEncoding(final Collection<EventProxy> events,
+                       final KindTranslator translator,
                        final Collection<EventProxy> filter,
                        final int filterMode)
   {
-    this(events, null, filter, filterMode);
+    this(events, translator, null, filter, filterMode);
   }
 
   /**
@@ -163,6 +191,8 @@ public class EventEncoding
    *                     Codes are assigned in the order given by the
    *                     collection, with code {@link #TAU}&nbsp;(0) reserved
    *                     to the silent event, even if it is not used.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
    * @param  tau         The silent event to be used,
    *                     or <CODE>null</CODE> if none is to be configured.
    * @param  filter      A collection of events to restrict the encoding to.
@@ -171,6 +201,7 @@ public class EventEncoding
    *                     {@link #FILTER_PROPOSITIONS}, or {@link #FILTER_ALL}.
    */
   public EventEncoding(final Collection<EventProxy> events,
+                       final KindTranslator translator,
                        final EventProxy tau,
                        final Collection<EventProxy> filter,
                        final int filterMode)
@@ -185,7 +216,7 @@ public class EventEncoding
     }
     for (final EventProxy event : events) {
       if (event != tau) {
-        switch (event.getKind()) {
+        switch (translator.getEventKind(event)) {
         case CONTROLLABLE:
         case UNCONTROLLABLE:
           if ((filterMode & FILTER_PROPER_EVENTS) == 0 ||

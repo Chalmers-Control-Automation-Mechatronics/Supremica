@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -39,10 +41,12 @@ public class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRuleTest
   // #########################################################################
   // # Overrides for abstract base class
   // # net.sourceforge.waters.analysis.gnonblocking.AbstractAbstractionRuleTest
-  protected RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule createAbstractionRule(
-                                                                                           final ProductDESProxyFactory factory)
+  protected RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
+    createAbstractionRule(final ProductDESProxyFactory factory)
   {
-    return new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(factory);
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    return new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
+      (factory, translator);
   }
 
   protected void configureAbstractionRule(final ProductDESProxy des)

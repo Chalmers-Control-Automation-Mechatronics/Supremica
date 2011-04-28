@@ -16,6 +16,7 @@ import gnu.trove.TObjectIntHashMap;
 
 import java.util.Collection;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -28,21 +29,25 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 class RemovalOfAlphaMarkingsRule extends AbstractionRule
 {
-  // #######################################################################
-  // # Constructors
-  RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory)
+
+  //#######################################################################
+  //# Constructors
+  RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory,
+                             final KindTranslator translator)
   {
-    this(factory, null);
+    this(factory, translator, null);
   }
 
   RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory,
+                             final KindTranslator translator,
                              final Collection<EventProxy> propositions)
   {
-    super(factory, propositions);
+    super(factory, translator, propositions);
   }
 
-  // #######################################################################
-  // # Configuration
+
+  //#######################################################################
+  //# Configuration
   EventProxy getAlphaMarking()
   {
     return mAlphaMarking;
