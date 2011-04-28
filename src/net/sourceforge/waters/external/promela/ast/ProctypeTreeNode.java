@@ -1,10 +1,11 @@
 package net.sourceforge.waters.external.promela.ast;
 
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import net.sourceforge.waters.external.promela.PromelaVisitor;
 
-public class ProctypeTreeNode extends CommonTree
+import org.antlr.runtime.*;
+
+public class ProctypeTreeNode extends PromelaTreeNode
 {
 	public ProctypeTreeNode(final Token token){
 		super(token);
@@ -18,4 +19,10 @@ public class ProctypeTreeNode extends CommonTree
 	{
 		return mProc;
 	}
+  void acceptVisitor(final PromelaVisitor visitor)
+  {
+   visitor.visitProcType(this);
+
+  }
+
 }

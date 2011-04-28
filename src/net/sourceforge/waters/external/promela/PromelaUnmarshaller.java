@@ -219,6 +219,8 @@ public class PromelaUnmarshaller
   }
 
   private void collectMsg(final CommonTree t){
+
+
     if(t!=null){
 
         if(t.getText().equals("chan")){
@@ -232,6 +234,12 @@ public class PromelaUnmarshaller
         }
 
         if(t instanceof ProctypeTreeNode){
+
+          final ArrayList<List<String>> componentLabels = new ArrayList<List<String>>();
+          final String proctypeName = t.getText();
+          if(!component.containsKey(proctypeName)){
+            component.put(proctypeName,componentLabels);
+          }
             for(int b =0;b<t.getChildCount();b++){
 
                 if(t.getChild(b).toString().equals("STATEMENT")){
@@ -245,40 +253,73 @@ public class PromelaUnmarshaller
 
 
                       final ArrayList<String> data =new ArrayList<String>();
+
                       final StringBuilder sb = new StringBuilder();
                       sb.append(childA.getChild(0).getText());
+                      final String n = childA.getChild(0).getText();
                      // sb.append(childA.getText()+"[");
                       chan.get(childA.getChild(0).getText()).incSendnumber();
-                      final CommonTree msgargs = (CommonTree) childA.getChild(1);
+                      final CommonTree msgargs = (CommonTree) childA.getChild(1); //message statement
+
+                      final ArrayList<String> labels = new ArrayList<String>();
+                      //add event name
+                      labels.add(n);
 
                       for(int y = 0; y <msgargs.getChildCount();y++){
                         final CommonTree childY = (CommonTree) msgargs.getChild(y);
+
+
                         if(childY instanceof ConstantTreeNode){
+
                           sb.append("[");
                           sb.append(childY.getText());
                           sb.append("]");
                           data.add(childY.getText());
+
+                          //add all event data
+                          labels.add(childY.getText());
+
                         }
+
                       }
-                      //testing event output
-             //         System.out.println(sb.toString());
 
                       //store proctype name and relevant data into hashtable
                       chan.get(childA.getChild(0).getText()).storeMsg(data);
 
+                      //add this event info to event list
+                      componentLabels.add(labels);
+
                       }
+                      //still need to handle recieve statement
                       if(childA.getText().equals("?")|| tr.getChild(a).getText().equals("??")){
                         chan.get(childA.getChild(0).getText()).incRecnumber();
+                        //if it is receiving msgs, set it to null, since it can be anything in automaton
+                        componentLabels.add(null);
                       }
                   }
                 }
+                  //store in such a style A: [[init], [name, 33, 124], [name, 33, 121]]
+                  //or B: [[init], null]
+                  component.put(proctypeName, componentLabels);
                 }
+
             }
 
         }
-       // if(t instanceof InitTreeNode){
+        if(t instanceof InitialTreeNode){
+          final CommonTree childI = (CommonTree) t.getChild(0);
+          //if it is atomic, create "init" event for each proctype/component.
+          if(childI.getChild(0).getText().equals("atomic")){
+            final ArrayList<String> temp = new ArrayList<String>();
+            temp.add("init");
+            //insert this particular event into first place of event label list, for each component
+            for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
+              entry.getValue().add(0,temp);
 
-        //}
+            }
+
+        }
+        }
         for(int i = 0; i < t.getChildCount();i++){
 
             collectMsg((CommonTree)t.getChild(i));
@@ -298,7 +339,7 @@ public class PromelaUnmarshaller
 
   private DocumentManager mDocumentManager;
   private final Hashtable<String, ChanInfo> chan = new Hashtable<String,ChanInfo>();
-
+  private final Hashtable<String, ArrayList<List<String>>> component = new Hashtable<String,ArrayList<List<String>>>();
   //#########################################################################
   //# Class Constants
   private static final String PROMELA_EXTENSION = ".pml";

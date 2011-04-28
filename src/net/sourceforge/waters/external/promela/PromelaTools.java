@@ -15,10 +15,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
-import net.sourceforge.waters.external.promela.ast.ExchangeTreeNode;
-import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
-import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
+import net.sourceforge.waters.external.promela.ast.*;
+
 import net.sourceforge.waters.external.promela.parser.PromelaLexer;
 import net.sourceforge.waters.external.promela.parser.PromelaParser;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -135,7 +133,7 @@ public class PromelaTools {
 
       if(t!=null){
 
-          if(t.getText().equals("chan")){
+          if(t instanceof TypeTreeNode && t.getText().equals("chan")){
               final CommonTree tr1 = (CommonTree)t.getChild(1);
               final String name = t.getChild(0).getText();
               final int length = Integer.parseInt(tr1.getChild(0).getText());
@@ -166,10 +164,10 @@ public class PromelaTools {
 
                         final ArrayList<String> data =new ArrayList<String>();
 
-                        final StringBuilder sb = new StringBuilder();
-                        sb.append(childA.getChild(0).getText());
+                       // final StringBuilder sb = new StringBuilder();
+                       // sb.append(childA.getChild(0).getText());
                         final String n = childA.getChild(0).getText();
-                       // sb.append(childA.getText()+"[");
+
                         chan.get(childA.getChild(0).getText()).incSendnumber();
                         final CommonTree msgargs = (CommonTree) childA.getChild(1); //message statement
 
@@ -180,19 +178,13 @@ public class PromelaTools {
                         for(int y = 0; y <msgargs.getChildCount();y++){
                           final CommonTree childY = (CommonTree) msgargs.getChild(y);
 
-
                           if(childY instanceof ConstantTreeNode){
-
-                            sb.append("[");
-                            sb.append(childY.getText());
-                            sb.append("]");
+                          //  sb.append(childY.getText());
                             data.add(childY.getText());
-
+                            System.out.println(childY.getText());
                             //add all event data
                             labels.add(childY.getText());
-
                           }
-
                         }
 
                         //store proctype name and relevant data into hashtable
@@ -200,20 +192,21 @@ public class PromelaTools {
 
                         //add this event info to event list
                         componentLabels.add(labels);
-
                         }
+
                         //still need to handle recieve statement
                         if(childA.getText().equals("?")|| tr.getChild(a).getText().equals("??")){
                           chan.get(childA.getChild(0).getText()).incRecnumber();
+                          //final ArrayList<String> recEverything = new ArrayList<String>();
+                          componentLabels.add(null);
                         }
                     }
                   }
                     component.put(proctypeName, componentLabels);
                   }
-
               }
-
           }
+
           if(t instanceof InitialTreeNode){
             final CommonTree childI = (CommonTree) t.getChild(0);
             if(childI.getChild(0).getText().equals("atomic")){
@@ -222,15 +215,12 @@ public class PromelaTools {
               //insert this particular event into first place of event label list, for each component
               for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
                 entry.getValue().add(0,temp);
-
               }
+            }
+          }
 
-          }
-          }
           for(int i = 0; i < t.getChildCount();i++){
-
               collectMsg((CommonTree)t.getChild(i));
-
           }
       }
   }
@@ -290,7 +280,7 @@ public class PromelaTools {
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
             collectMsg(t);
-            print_label();
+           // print_label();
             //print_chan();
             //printTree(t,0);
 

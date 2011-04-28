@@ -1,27 +1,31 @@
 package net.sourceforge.waters.external.promela.ast;
 
 
+
+
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 
 import org.antlr.runtime.*;
+import org.antlr.runtime.tree.*;
 
-public class InitialTreeNode extends PromelaTreeNode
+public class ChannelTreeNode extends PromelaTreeNode
 {
-    public InitialTreeNode(final Token token){
+    public ChannelTreeNode(final Token token){
         super(token);
-        mInit = token.getText();
+        mType = token.getText();
     }
     public String toString(){
-        return "init";
+        return "chan";
     }
-    private final String mInit;
+    private final String mType;
     public String getValue()
     {
-        return mInit;
+        return mType;
     }
     void acceptVisitor(final PromelaVisitor visitor)
     {
-      visitor.visitInitial(this);
+      visitor.visitChannel(this);
 
     }
 }
+

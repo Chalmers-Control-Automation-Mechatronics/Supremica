@@ -10,9 +10,6 @@
 package net.sourceforge.waters.external.promela;
 
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
 
 
 public class PromelaTest
@@ -25,20 +22,7 @@ public class PromelaTest
       for (final String arg : args) {
         final PromelaTools promelaTools = new PromelaTools();
         promelaTools.parseFile(arg);
-        final Hashtable<String, ChanInfo> ch = promelaTools.getchan();
-        final CreateAutomaton cr = new CreateAutomaton();
-      //  cr.createEvent(n, a)
-        final Enumeration<String> e = ch.keys();
 
-        while(e.hasMoreElements()){
-          final String name = (String) e.nextElement();
-          final ChanInfo c = ch.get(name);
-          final int length = c.getDataLength();
-          final List<List<String>> a1 = c.getValue();
-          for(int i=0;i<a1.size();i++){
-            cr.createEvent(name, a1.get(i));
-          }
-        }
 
 
         if (promelaTools.isSyntacticallyCorrect()) {

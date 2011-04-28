@@ -1,10 +1,11 @@
 package net.sourceforge.waters.external.promela.ast;
 
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import net.sourceforge.waters.external.promela.PromelaVisitor;
 
-public class ExchangeTreeNode extends CommonTree
+import org.antlr.runtime.*;
+
+public class ExchangeTreeNode extends PromelaTreeNode
 {
 	public ExchangeTreeNode(final Token token){
 		super(token);
@@ -18,4 +19,8 @@ public class ExchangeTreeNode extends CommonTree
 	{
 		return mEx;
 	}
+    void acceptVisitor(final PromelaVisitor visitor)
+    {
+      visitor.visitExchange(this);
+    }
 }
