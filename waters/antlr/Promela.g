@@ -42,6 +42,8 @@ tokens{
 	REC;
 	SEN;
 	MESSAGE_ARGUMENTS;
+	CHAN_STATEMENT;
+	PROC_STATEMENT;
 }
 
 @header {
@@ -50,6 +52,7 @@ package net.sourceforge.waters.external.promela.parser;
 
 import net.sourceforge.waters.external.promela.ast.*;
 import net.sourceforge.waters.external.promela.PromelaParserError;
+
 }
 
 @lexer::header {
@@ -143,7 +146,7 @@ proctypeRule
 		(enablerRule)? 
 		BLOCKBEGIN sequenceRule BLOCKEND 
 		(SEMICOLON)* 
-		-> ^(NAME<ProctypeTreeNode> NAME sequenceRule)
+		-> ^(NAME<ProctypeTreeNode> NAME ^(PROC_STATEMENT<TypeTreeNode> sequenceRule))
     ;
 
 inlineRule
@@ -188,7 +191,7 @@ sequenceRule
 	:	// original: stepRule (';' stepRule)*
 //		(stepRule (';' | '-' '>')? )*
 		(stepRule (SEMICOLON)* (isguard=ARROW )? )*
-		->^(STATEMENT stepRule*)
+		->^(stepRule)*
 ;
 
 stepRule 
@@ -211,7 +214,7 @@ stmntRule
         | DO optionsRule OD
 		-> ^(DO<ConditionTreeNode> optionsRule)
         | ATOMIC BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
-		->^(ATOMIC sequenceRule)		
+		->^(ATOMIC<InitialStatementTreeNode> sequenceRule)		
 
         | DSTEP BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
         | BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
@@ -383,7 +386,7 @@ any_exprRule
 	  | (ENABLED|PCVALUE) PARENOPEN any_exprRule PARENCLOSE 
 	  | varrefRule ALTPARENOPEN any_exprRule ALTPARENCLOSE AT varrefRule
 	  | RUN NAME PARENOPEN (arg_lstRule)? PARENCLOSE (priorityRule)? 
-		-> ^(RUN NAME (arg_lstRule)? )
+		-> ^(RUN<RunTreeNode> NAME (arg_lstRule)? )
 	  
 	  
 	;
@@ -413,8 +416,8 @@ channelRule
 @init  { paraphrases.push("in channel definition"); }
 @after { paraphrases.pop(); }
 	:	CHAN NAME (ASSIGN)? ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
-		-> ^(CHAN<TypeTreeNode> NAME ^(STATEMENT constRule typenameRule*) )
-	;
+		-> ^(CHAN<ChannelTreeNode> NAME ^(CHAN_STATEMENT<TypeTreeNode> constRule typenameRule*) )
+	;													 
 
 unameRule
 	:	NAME

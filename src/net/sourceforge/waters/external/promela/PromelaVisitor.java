@@ -30,5 +30,7 @@ public class PromelaVisitor
   public void visitInitialStatement(final InitialStatementTreeNode t){
 
   }
+  public void visitRun(final RunTreeNode t){
 
+  }
 }

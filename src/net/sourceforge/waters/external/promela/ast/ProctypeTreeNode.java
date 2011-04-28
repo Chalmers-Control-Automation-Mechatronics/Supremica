@@ -19,10 +19,9 @@ public class ProctypeTreeNode extends PromelaTreeNode
 	{
 		return mProc;
 	}
-  void acceptVisitor(final PromelaVisitor visitor)
-  {
-   visitor.visitProcType(this);
-
-  }
+    void acceptVisitor(final PromelaVisitor visitor)
+    {
+        visitor.visitProcType(this);
+    }
 
 }

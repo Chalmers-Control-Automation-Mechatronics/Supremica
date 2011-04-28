@@ -1,12 +1,8 @@
 package net.sourceforge.waters.external.promela.ast;
 
-
-
-
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
 
 public class ChannelTreeNode extends PromelaTreeNode
 {

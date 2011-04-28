@@ -11,7 +11,6 @@ public class ChannelStatementTreeNode extends PromelaTreeNode
   {
     super(token);
     mChanState = token.getText();
-    // TODO Auto-generated constructor stub
   }
   public String toString(){
     return "CHAN_STATEMENT";
