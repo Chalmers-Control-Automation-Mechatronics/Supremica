@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="hisc8nd" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test to check whether a language inclusion checker can produce a correct counterexample when presented a nondeterministic model.
+This model is an abstraction computed when checking SIC property 5 of model hisc8_low2 in the despor/testHISC series with respect to answer event a2:2. It fails a language inclusion check with counterexample r1 :alpha, which should end in state S:1 in the nondeterministic plant Test:Aut.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="a1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="r1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name=":alpha"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="lsup7">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="lX1">
+                        <PointGeometry>
+                            <Point Y="48" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-14" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="lX2">
+                        <PointGeometry>
+                            <Point Y="144" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="0" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="lX2" Source="lX1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="95" X="76"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="lX1" Source="lX2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="96" X="52"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="lplnt7">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="lX1">
+                        <PointGeometry>
+                            <Point Y="32" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-7" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="lX2">
+                        <PointGeometry>
+                            <Point Y="128" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="lX2" Source="lX1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="80" X="92"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="lX1" Source="lX2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="79" X="68"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="ides4">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="iX1">
+                        <PointGeometry>
+                            <Point Y="48" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-2" X="-29"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="iX2">
+                        <PointGeometry>
+                            <Point Y="128" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="2" X="-29"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="iX2" Source="iX1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="88" X="54"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="iX1" Source="iX2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="88" X="74"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="iX2" Source="iX2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":alpha"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="130" X="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Test:Aut">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <PointGeometry>
+                            <Point Y="96" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="-25"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:1">
+                        <PointGeometry>
+                            <Point Y="192" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="0" X="-24"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S:0" Source="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a1"/>
+                            <SimpleIdentifier Name="r1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="60" X="146"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S:1" Source="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S:1" Source="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":alpha"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="192" X="154"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PROPERTY" Name="never::alpha">
+            <Graph>
+                <LabelBlock>
+                    <SimpleIdentifier Name=":alpha"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="31" X="80"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="never::alpha">
+                        <PointGeometry>
+                            <Point Y="58" X="58"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

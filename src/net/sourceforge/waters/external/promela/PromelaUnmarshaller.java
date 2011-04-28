@@ -195,6 +195,7 @@ public class PromelaUnmarshaller
       events.add(event);
     }
     // Create automata ...
+    @SuppressWarnings("unused")
     final List<Proxy> components = new ArrayList<Proxy>();
 
 
