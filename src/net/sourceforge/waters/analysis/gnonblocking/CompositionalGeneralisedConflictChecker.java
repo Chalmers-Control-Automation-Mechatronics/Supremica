@@ -1804,11 +1804,11 @@ public class CompositionalGeneralisedConflictChecker extends
         autToAbstract, tau, inputEnc, partition, outputEnc);
   }
 
-  public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep(
-                                                                                 final AutomatonProxy abstractedAut,
-                                                                                 final AutomatonProxy autToAbstract,
-                                                                                 final StateProxy[] originalStates,
-                                                                                 final TObjectIntHashMap<StateProxy> resultingStates)
+  public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep
+    (final AutomatonProxy abstractedAut,
+     final AutomatonProxy autToAbstract,
+     final StateProxy[] originalStates,
+     final TObjectIntHashMap<StateProxy> resultingStates)
   {
     return new RemovalOfMarkingsOrNoncoreachableStatesStep(abstractedAut,
         autToAbstract, originalStates, resultingStates);

@@ -1,34 +1,31 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   RemovalOfAlphaMarkingsRuleTest
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.op
+//# CLASS:   CoreachabilityTRSimplifierTest
 //###########################################################################
-//# $Id: RemovalOfAlphaMarkingsRuleTest.java 5431 2010-03-29 10:26:57Z robi $
+//# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.gnonblocking;
+package net.sourceforge.waters.analysis.op;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class RemovalOfNoncoreachableStatesRuleTest extends
-    AbstractAbstractionRuleTest
+public class CoreachabilityTRSimplifierTest
+  extends AbstractTRSimplifierTest
 {
 
-  // #########################################################################
-  // # Entry points in junit.framework.TestCase
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(RemovalOfNoncoreachableStatesRuleTest.class);
+        new TestSuite(CoreachabilityTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -37,33 +34,32 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     junit.textui.TestRunner.run(suite());
   }
 
+
   //#########################################################################
   //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.gnonblocking.AbstractAbstractionRuleTest
-  protected RemovalOfNoncoreachableStatesRule createAbstractionRule
-    (final ProductDESProxyFactory factory)
+  //# net.sourceforge.waters.analysis.op.AbstractTRSimplifierTest
+  @Override
+  protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    return new RemovalOfNoncoreachableStatesRule(factory, translator);
+    return new CoreachabilityTRSimplifier();
   }
 
-  protected void configureAbstractionRule(final ProductDESProxy des)
+  @Override
+  protected EventEncoding createEventEncoding(final ProductDESProxy des,
+                                              final AutomatonProxy aut)
   {
-    super.configureAbstractionRule(des);
-    final RemovalOfNoncoreachableStatesRule rule = getAbstractionRule();
-    final EventProxy alphaMarking = findEvent(des, ALPHA);
-    rule.setAlphaMarking(alphaMarking);
-    final EventProxy defaultMarking = findEvent(des, OMEGA);
-    rule.setDefaultMarking(defaultMarking);
+    return createEventEncodingWithPropositions(des, aut);
   }
 
-  protected RemovalOfNoncoreachableStatesRule getAbstractionRule()
+  @Override
+  protected void configureTransitionRelationSimplifier()
   {
-    return (RemovalOfNoncoreachableStatesRule) super.getAbstractionRule();
+    configureTransitionRelationSimplifierWithPropositions();
   }
 
-  // #########################################################################
-  // # Test Cases
+
+  //#########################################################################
+  //# Test Cases
   /**
    * <P>
    * Tests the model in file {supremica}/examples/waters/tests/abstraction/
@@ -86,9 +82,8 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
    *
    * <P>
    * After running the test, any automaton created by the rule is saved in
-   * {supremica }/logs/results/analysis/gnonblocking/
-   * RemovalOfNoncoreachableStatesRuleTest as a .des file (for text viewing) and
-   * as a .wmod file (to load into the IDE).
+   * {supremica }/logs/results/analysis/op/CoreachabilityTRSimplifierTest as
+   * a .des file (for text viewing) and as a .wmod file (to load into the IDE).
    * </P>
    */
   public void test_noncoreachableStatesRemoval_1() throws Exception
@@ -96,7 +91,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_1.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_noncoreachableStatesRemoval_2() throws Exception
@@ -104,7 +99,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_2.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_allStatesImplicitlyMarkedAlpha() throws Exception
@@ -112,7 +107,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_3.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_allStatesImplicitlyMarkedOmega() throws Exception
@@ -120,7 +115,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_4.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_unreachableLoop() throws Exception
@@ -128,7 +123,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_5.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_reachableLoop() throws Exception
@@ -136,7 +131,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_6.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_selfLoops() throws Exception
@@ -144,7 +139,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_7.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_noTransitions() throws Exception
@@ -152,7 +147,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_8.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_multipleIncomingTransitions() throws Exception
@@ -160,7 +155,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_9.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_multipleOutgoingTransitions() throws Exception
@@ -168,7 +163,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_10.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_reachableBeforeNotAfter() throws Exception
@@ -176,7 +171,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_11.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_stateWithReachableAndNonreachablePath() throws Exception
@@ -184,7 +179,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_12.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   /**

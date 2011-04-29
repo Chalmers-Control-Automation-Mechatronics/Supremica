@@ -1,0 +1,135 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.op
+//# CLASS:   CoreachabilityTRSimplifier
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.op;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntStack;
+
+import net.sourceforge.waters.model.analysis.AnalysisException;
+
+
+/**
+ * For a given Automaton applies an abstraction rule which removes states from
+ * which neither an alpha or omega state can be reached.
+ *
+ * @author Rachel Francis
+ */
+
+public class CoreachabilityTRSimplifier
+  extends AbstractGeneralisedTRSimplifier
+{
+
+  //#######################################################################
+  //# Constructors
+  public CoreachabilityTRSimplifier()
+  {
+    mCreatesPartition = false;
+  }
+
+  public CoreachabilityTRSimplifier(final ListBufferTransitionRelation rel)
+  {
+    super(rel);
+    mCreatesPartition = false;
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  public void setCreatesPartition(final boolean create)
+  {
+    mCreatesPartition = true;
+  }
+
+  public boolean getCreatesPartition()
+  {
+    return mCreatesPartition;
+  }
+
+
+  //#########################################################################
+  //# Rule Application
+  @Override
+  public int getPreferredConfiguration()
+  {
+    return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
+  }
+
+  public boolean run()
+    throws AnalysisException
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
+    final int alphaID = getPreconditionMarkingID();
+    final int defaultID = getDefaultMarkingID();
+    final int numStates = rel.getNumberOfStates();
+    final TIntHashSet reachableStates = new TIntHashSet(numStates);
+    final TIntStack unvisitedStates = new TIntStack();
+    // Creates a hash set of all states which can reach an omega marked or alpha
+    // marked state.
+    for (int sourceID = 0; sourceID < numStates; sourceID++) {
+      if ((rel.isMarked(sourceID, defaultID) ||
+           rel.isMarked(sourceID, alphaID)) &&
+          rel.isReachable(sourceID) &&
+          reachableStates.add(sourceID) ) {
+        unvisitedStates.push(sourceID);
+        while (unvisitedStates.size() > 0) {
+          final int newSource = unvisitedStates.pop();
+          iter.resetState(newSource);
+          while (iter.advance()) {
+            final int predID = iter.getCurrentSourceState();
+            if (rel.isReachable(predID) && reachableStates.add(predID)) {
+              unvisitedStates.push(predID);
+            }
+          }
+        }
+      }
+    }
+    // Remove states which cannot reach a state marked alpha or omega.
+    final int numReachable = reachableStates.size();
+    if (numReachable < numStates) {
+      boolean modified = false;
+      for (int sourceID = 0; sourceID < numStates; sourceID++) {
+        if (rel.isReachable(sourceID) && !reachableStates.contains(sourceID)) {
+          rel.setReachable(sourceID, false);
+          modified = true;
+        }
+      }
+      if (mCreatesPartition && modified) {
+        final List<int[]> partition = new ArrayList<int[]>(numReachable);
+        for (int sourceID = 0; sourceID < numStates; sourceID++) {
+          if (rel.isReachable(sourceID)) {
+            final int[] clazz = new int[1];
+            clazz[0] = sourceID;
+            partition.add(clazz);
+          }
+        }
+        setResultPartitionList(partition);
+      }
+      return modified;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean isObservationEquivalentAbstraction()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mCreatesPartition;
+
+}

@@ -1,24 +1,28 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   RemovalOfAlphaMarkingsRule
+//# CLASS:   RemovalOfNoncoreachableStatesRule
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
+import gnu.trove.TObjectIntHashMap;
 
 import java.util.Collection;
-import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+
+import net.sourceforge.waters.analysis.op.CoreachabilityTRSimplifier;
+import net.sourceforge.waters.analysis.op.EventEncoding;
+import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
@@ -30,8 +34,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 class RemovalOfNoncoreachableStatesRule extends AbstractionRule
 {
-  // #######################################################################
-  // # Constructors
+
+  //#########################################################################
+  //# Constructors
   RemovalOfNoncoreachableStatesRule(final ProductDESProxyFactory factory,
                                     final KindTranslator translator)
   {
@@ -45,8 +50,9 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     super(factory, translator, propositions);
   }
 
-  // #######################################################################
-  // # Configuration
+
+  //#########################################################################
+  //# Configuration
   EventProxy getAlphaMarking()
   {
     return mAlphaMarking;
@@ -67,92 +73,72 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     mDefaultMarking = defaultMarking;
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#########################################################################
+  //# Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
+      throws AnalysisException
   {
-    mAutToAbstract = autToAbstract;
-    if (!autToAbstract.getEvents().contains(mAlphaMarking)
-        || !autToAbstract.getEvents().contains(mDefaultMarking)) {
+    if (!autToAbstract.getEvents().contains(mAlphaMarking) ||
+        !autToAbstract.getEvents().contains(mDefaultMarking)) {
       return autToAbstract;
     }
-    boolean modified = false;
-    mTR =
-        new ObserverProjectionTransitionRelation(autToAbstract,
-            getPropositions());
-    final int alphaID = mTR.getEventInt(mAlphaMarking);
-    final int defaultID = mTR.getEventInt(mDefaultMarking);
-    final int numStates = mTR.getNumberOfStates();
-
-    final TIntHashSet reachableStates = new TIntHashSet();
-    final TIntStack unvisitedStates = new TIntStack();
-
-    // creates a hash set of all states which can reach an omega marked or alpha
-    // marked state
-    for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if ((mTR.isMarked(sourceID, defaultID) || mTR.isMarked(sourceID, alphaID))
-          && !reachableStates.contains(sourceID)
-          && mTR.hasPredecessors(sourceID)) {
-        unvisitedStates.push(sourceID);
-        reachableStates.add(sourceID);
-        while (unvisitedStates.size() > 0) {
-          final int newSource = unvisitedStates.pop();
-          final TIntHashSet[] predecessors = mTR.getAllPredecessors(newSource);
-          for (int e = 0; e < predecessors.length; e++) {
-            final TIntHashSet preds = predecessors[e];
-            if (preds != null) {
-              final TIntIterator iter = preds.iterator();
-              while (iter.hasNext()) {
-                final int predID = iter.next();
-                if (!reachableStates.contains(predID)
-                    && mTR.hasPredecessors(predID)) {
-                  reachableStates.add(predID);
-                  unvisitedStates.push(predID);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    // removes states which can not reach a state marked alpha or omega
-    for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (!reachableStates.contains(sourceID)) {
-        mTR.removeAllIncoming(sourceID);
-        modified = true;
-      }
-    }
+    mAutToAbstract = autToAbstract;
+    final KindTranslator translator = getKindTranslator();
+    final EventEncoding eventEnc =
+        new EventEncoding(autToAbstract, translator, tau, getPropositions(),
+                          EventEncoding.FILTER_PROPOSITIONS);
+    final int alphaID = eventEnc.getEventCode(mAlphaMarking);
+    final int defaultID = eventEnc.getEventCode(mDefaultMarking);
+    mInputEncoding = new StateEncoding(autToAbstract);
+    mTr = new ListBufferTransitionRelation
+                 (autToAbstract, eventEnc, mInputEncoding,
+                  ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final CoreachabilityTRSimplifier simplifier =
+        new CoreachabilityTRSimplifier(mTr);
+    simplifier.setPropositions(alphaID, defaultID);
+    final boolean modified = simplifier.run();
     if (modified) {
-      final int tauID = mTR.getEventInt(tau);
-      mTR.removeTauSelfLoops(tauID);
-      mTR.removeRedundantPropositions();
-      final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-      return convertedAut;
+      mTr.removeTauSelfLoops();
+      mTr.removeProperSelfLoopEvents();
+      mTr.removeRedundantPropositions();
+      final ProductDESProxyFactory factory = getFactory();
+      mOutputEncoding = new StateEncoding();
+      return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
     }
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep(
-                                                          final CompositionalGeneralisedConflictChecker checker,
-                                                          final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy abstractedAut)
   {
+    final StateProxy[] inputMap = mInputEncoding.getStatesArray();
+    final TObjectIntHashMap<StateProxy> outputMap =
+      mOutputEncoding.getStateCodeMap();
     return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
-                                               mTR.getOriginalIntToStateMap(),
-                                               mTR.getResultingStateToIntMap());
+                                               inputMap, outputMap);
   }
 
   public void cleanup()
   {
-    mTR = null;
     mAutToAbstract = null;
+    mTr = null;
+    mInputEncoding = null;
+    mOutputEncoding = null;
   }
 
-  // #######################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
   private AutomatonProxy mAutToAbstract;
-  private ObserverProjectionTransitionRelation mTR;
+
+  private ListBufferTransitionRelation mTr;
+  private StateEncoding mInputEncoding;
+  private StateEncoding mOutputEncoding;
+
 }
