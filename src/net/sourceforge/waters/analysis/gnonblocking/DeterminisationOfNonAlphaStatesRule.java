@@ -129,24 +129,22 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
                           EventEncoding.FILTER_PROPOSITIONS);
     final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
     mInputEncoding = new StateEncoding(autToAbstract);
-    mTr = new ListBufferTransitionRelation
-            (autToAbstract, eventEnc,
-             mInputEncoding, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+            (autToAbstract, eventEnc, mInputEncoding,
+             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier(mTr);
+        new ObservationEquivalenceTRSimplifier(rel);
     bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
     bisimulator.setTransitionLimit(mTransitionLimit);
     final NonAlphaDeterminisationTRSimplifier simplifier =
-      new NonAlphaDeterminisationTRSimplifier(bisimulator, mTr);
+      new NonAlphaDeterminisationTRSimplifier(bisimulator, rel);
     simplifier.setPropositions(alphaCode, -1);
     if (simplifier.run()) {
       mPartition = simplifier.getResultPartition();
-      mTr.removeTauSelfLoops();
-      mTr.removeProperSelfLoopEvents();
-      mTr.removeRedundantPropositions();
+      rel.removeRedundantPropositions();
       final ProductDESProxyFactory factory = getFactory();
       mOutputEncoding = new StateEncoding();
-      return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
+      return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
     }
@@ -166,7 +164,6 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
 
   public void cleanup()
   {
-    mTr = null;
     mInputEncoding = null;
     mPartition = null;
     mOutputEncoding = null;
@@ -183,7 +180,6 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   private AutomatonProxy mAutToAbstract;
   private EventProxy mAlphaMarking;
   private EventProxy mTau;
-  private ListBufferTransitionRelation mTr;
   private StateEncoding mInputEncoding;
   private List<int[]> mPartition;
   private StateEncoding mOutputEncoding;

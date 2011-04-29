@@ -32,8 +32,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 class TauLoopRemovalRule extends AbstractionRule
 {
-  // #######################################################################
-  // # Constructor
+
+  //#######################################################################
+  //# Constructor
   TauLoopRemovalRule(final ProductDESProxyFactory factory,
                      final KindTranslator translator)
   {
@@ -48,8 +49,9 @@ class TauLoopRemovalRule extends AbstractionRule
     super(factory, translator, propositions);
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#######################################################################
+  //# Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
       throws AnalysisException
@@ -66,12 +68,9 @@ class TauLoopRemovalRule extends AbstractionRule
             mInputEncoding, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final TauLoopRemovalTRSimplifier tauLoopRemover =
         new TauLoopRemovalTRSimplifier(mTr);
-
     final boolean modified = tauLoopRemover.run();
     if (modified) {
       mPartition = tauLoopRemover.getResultPartition();
-      mTr.removeTauSelfLoops();
-      mTr.removeProperSelfLoopEvents();
       final ProductDESProxyFactory factory = getFactory();
       mOutputEncoding = new StateEncoding();
       return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
@@ -99,8 +98,9 @@ class TauLoopRemovalRule extends AbstractionRule
     mAutToAbstract = null;
   }
 
-  // #######################################################################
-  // # Data Members
+
+  //#######################################################################
+  //# Data Members
   private AutomatonProxy mAutToAbstract;
   private EventProxy mTau;
   private ListBufferTransitionRelation mTr;

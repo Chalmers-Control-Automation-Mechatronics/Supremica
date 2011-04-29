@@ -62,7 +62,6 @@ public class ObservationEquivalenceTRSimplifier
     mTransitionRemovalMode = TransitionRemoval.NONTAU;
     mMarkingMode = MarkingMode.UNCHANGED;
     mTransitionLimit = Integer.MAX_VALUE;
-    mAppliesPartitionAutomatically = true;
   }
 
 
@@ -192,27 +191,6 @@ public class ObservationEquivalenceTRSimplifier
     return mTransitionLimit;
   }
 
-  /**
-   * Sets whether this simplifier applies the computed partition automatically.
-   * If set to <CODE>true</CODE> (the default), then any partition computed
-   * by a call to {@link #run()} will immediately be applied to the
-   * transition relation. Otherwise, states have to be merged manually
-   * by calling {@link #applyResultPartition()}.
-   */
-  public void setAppliesPartitionAutomatically(final boolean apply)
-  {
-    mAppliesPartitionAutomatically = apply;
-  }
-
-  /**
-   * Gets whether this simplifier applies the computed partition automatically.
-   * @see #setAppliesPartitionAutomatically(boolean) setAppliesPartitionAutomatically()
-   */
-  public boolean getAppliesPartitionAutomatically()
-  {
-    return mAppliesPartitionAutomatically;
-  }
-
 
   //#########################################################################
   //# Invocation
@@ -242,9 +220,7 @@ public class ObservationEquivalenceTRSimplifier
     }
 
     buildResultPartition();
-    if (mAppliesPartitionAutomatically) {
-      applyResultPartition();
-    }
+    applyResultPartitionAutomatically();
 
     return true;
   }
@@ -277,6 +253,9 @@ public class ObservationEquivalenceTRSimplifier
       mergeTauPredecessors();
       removeRedundantTransitions(doTau, doNonTau);
     }
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    rel.removeTauSelfLoops();
+    rel.removeProperSelfLoopEvents();
   }
 
   @Override
@@ -1394,7 +1373,6 @@ public class ObservationEquivalenceTRSimplifier
   private TransitionRemoval mTransitionRemovalMode;
   private MarkingMode mMarkingMode;
   private int mTransitionLimit;
-  private boolean mAppliesPartitionAutomatically;
 
   private int mNumStates;
   private int mNumEvents;

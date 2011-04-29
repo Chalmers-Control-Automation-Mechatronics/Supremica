@@ -68,6 +68,43 @@ public abstract class AbstractTRSimplifierTest
 
 
   //#########################################################################
+  //# Test Cases
+  /**
+   * <P>
+   * Tests the model in file {supremica}/examples/waters/tests/abstraction/
+   * empty_1.wmod.
+   * </P>
+   *
+   * <P>
+   * All test modules contain up to two automata, named "before" and "after".
+   * The automaton named "before" is required to be present, and defines the
+   * input automaton for the abstraction rule. The automaton "after" defines the
+   * expected result of abstraction. It may be missing, in which case the
+   * abstraction should have no effect and return the unchanged input automaton
+   * (the test expects the same object, not an identical copy).
+   * </P>
+   *
+   * <P>
+   * The names of critical events are expected to be "tau", ":alpha", and
+   * ":accepting", respectively.
+   * </P>
+   *
+   * <P>
+   * After running the test, any automaton created by the rule is saved in
+   * {supremica}/logs/results/analysis/op/{classname} as a .des file
+   * (for text viewing) and as a .wmod file (to load into the IDE).
+   * </P>
+   */
+  public void test_empty_1() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "empty_1.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+
+  //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier
     (final String group, final String name,
@@ -219,7 +256,7 @@ public abstract class AbstractTRSimplifierTest
       mIntegrityChecker.check(result, des);
       if (expected == null) {
         assertNull("Test expects no change, " +
-                   "but the object returned is not the same as the input!",
+                   "but the simplifier reports some change!",
                    result);
       } else {
         mIsomorphismChecker.checkIsomorphism(result, expected);

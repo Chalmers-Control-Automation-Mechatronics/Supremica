@@ -102,6 +102,16 @@ public class TauLoopRemovalTRSimplifier
     mToBeMerged = new ArrayList<TIntArrayList>();
   }
 
+  @Override
+  protected void applyResultPartition()
+    throws AnalysisException
+  {
+    super.applyResultPartition();
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    rel.removeTauSelfLoops();
+    rel.removeProperSelfLoopEvents();
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods

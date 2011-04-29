@@ -46,8 +46,23 @@ public interface TransitionRelationSimplifier
   /**
    * Sets a new transition relation to be modified by this simplifier.
    */
-  public void setTransitionRelation
-    (final ListBufferTransitionRelation rel);
+  public void setTransitionRelation(ListBufferTransitionRelation rel);
+
+
+  /**
+   * Sets whether this simplifier applies the computed partition automatically.
+   * If set to <CODE>true</CODE> (the default), then any partition computed
+   * by a call to {@link #run()} will immediately be applied to the
+   * transition relation. Otherwise, states have to be merged manually
+   * by calling {@link #applyResultPartition()}.
+   */
+  public void setAppliesPartitionAutomatically(boolean apply);
+
+  /**
+   * Gets whether this simplifier applies the computed partition automatically.
+   * @see #setAppliesPartitionAutomatically(boolean) setAppliesPartitionAutomatically()
+   */
+  public boolean getAppliesPartitionAutomatically();
 
   /**
    * Runs this simplifier.
@@ -83,7 +98,7 @@ public interface TransitionRelationSimplifier
    * been changed, the caller may have to take special precautions to
    * find a suitable counterexample end state.
    */
-  public boolean isReducedMarking(final int propID);
+  public boolean isReducedMarking(int propID);
 
   /**
    * Cleans up. This method removes all temporary data and results

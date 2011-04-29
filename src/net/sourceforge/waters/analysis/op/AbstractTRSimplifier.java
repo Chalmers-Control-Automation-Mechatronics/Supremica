@@ -30,6 +30,7 @@ public abstract class AbstractTRSimplifier
 
   public AbstractTRSimplifier(final ListBufferTransitionRelation rel)
   {
+    mAppliesPartitionAutomatically = true;
     mTransitionRelation = rel;
   }
 
@@ -49,6 +50,16 @@ public abstract class AbstractTRSimplifier
   public void setTransitionRelation(final ListBufferTransitionRelation rel)
   {
     mTransitionRelation = rel;
+  }
+
+  public void setAppliesPartitionAutomatically(final boolean apply)
+  {
+    mAppliesPartitionAutomatically = apply;
+  }
+
+  public boolean getAppliesPartitionAutomatically()
+  {
+    return mAppliesPartitionAutomatically;
   }
 
   public List<int[]> getResultPartition()
@@ -99,6 +110,14 @@ public abstract class AbstractTRSimplifier
     }
   }
 
+  protected void applyResultPartitionAutomatically()
+    throws AnalysisException
+  {
+    if (mAppliesPartitionAutomatically) {
+      applyResultPartition();
+    }
+  }
+
   protected void applyResultPartition()
     throws AnalysisException
   {
@@ -117,6 +136,7 @@ public abstract class AbstractTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mAppliesPartitionAutomatically;
   private ListBufferTransitionRelation mTransitionRelation;
   private List<int[]> mResultPartition;
 

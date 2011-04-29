@@ -2321,8 +2321,6 @@ public class OPConflictChecker
         final int numMarkings = rel.getNumberOfMarkings();
         mSimplifier.setTransitionRelation(rel);
         if (mSimplifier.run()) {
-          rel.removeTauSelfLoops();
-          rel.removeProperSelfLoopEvents();
           if (rel.getNumberOfStates() == numStates &&
               rel.getNumberOfTransitions() == numTrans &&
               rel.getNumberOfMarkings() == numMarkings) {

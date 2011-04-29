@@ -100,8 +100,9 @@ class ObservationEquivalenceRule extends AbstractionRule
     return mTransitionLimit;
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#######################################################################
+  //# Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
       throws AnalysisException
@@ -114,22 +115,20 @@ class ObservationEquivalenceRule extends AbstractionRule
             EventEncoding.FILTER_PROPOSITIONS);
     // final int codeOfTau = eventEnc.getEventCode(tau);
     mInputEncoding = new StateEncoding(autToAbstract);
-    mTr =
-        new ListBufferTransitionRelation(autToAbstract, eventEnc,
-            mInputEncoding, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+      (autToAbstract, eventEnc, mInputEncoding,
+       ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier(mTr);
+        new ObservationEquivalenceTRSimplifier(rel);
     bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
     bisimulator.setTransitionLimit(mTransitionLimit);
     final boolean modified = bisimulator.run();
     if (modified) {
       mPartition = bisimulator.getResultPartition();
-      mTr.removeTauSelfLoops();
-      mTr.removeProperSelfLoopEvents();
-      mTr.removeRedundantPropositions();
+      rel.removeRedundantPropositions();
       final ProductDESProxyFactory factory = getFactory();
       mOutputEncoding = new StateEncoding();
-      return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
+      return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
     }
@@ -147,21 +146,20 @@ class ObservationEquivalenceRule extends AbstractionRule
 
   public void cleanup()
   {
-    mTr = null;
     mInputEncoding = null;
     mPartition = null;
     mOutputEncoding = null;
     mAutToAbstract = null;
   }
 
-  // #######################################################################
-  // # Data Members
+
+  //#######################################################################
+  //# Data Members
   private ObservationEquivalenceTRSimplifier.TransitionRemoval mTransitionRemovalMode;
   private int mTransitionLimit;
 
   private AutomatonProxy mAutToAbstract;
   private EventProxy mTau;
-  private ListBufferTransitionRelation mTr;
   private StateEncoding mInputEncoding;
   private List<int[]> mPartition;
   private StateEncoding mOutputEncoding;

@@ -9,9 +9,6 @@
 
 package net.sourceforge.waters.analysis.op;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
 
@@ -33,31 +30,16 @@ public class CoreachabilityTRSimplifier
   //# Constructors
   public CoreachabilityTRSimplifier()
   {
-    mCreatesPartition = false;
   }
 
   public CoreachabilityTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
-    mCreatesPartition = false;
   }
 
 
   //#########################################################################
-  //# Configuration
-  public void setCreatesPartition(final boolean create)
-  {
-    mCreatesPartition = true;
-  }
-
-  public boolean getCreatesPartition()
-  {
-    return mCreatesPartition;
-  }
-
-
-  //#########################################################################
-  //# Rule Application
+  //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
   public int getPreferredConfiguration()
   {
@@ -105,17 +87,7 @@ public class CoreachabilityTRSimplifier
           modified = true;
         }
       }
-      if (mCreatesPartition && modified) {
-        final List<int[]> partition = new ArrayList<int[]>(numReachable);
-        for (int sourceID = 0; sourceID < numStates; sourceID++) {
-          if (rel.isReachable(sourceID)) {
-            final int[] clazz = new int[1];
-            clazz[0] = sourceID;
-            partition.add(clazz);
-          }
-        }
-        setResultPartitionList(partition);
-      }
+      applyResultPartitionAutomatically();
       return modified;
     } else {
       return false;
@@ -130,7 +102,14 @@ public class CoreachabilityTRSimplifier
 
 
   //#########################################################################
-  //# Data Members
-  private boolean mCreatesPartition;
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected void applyResultPartition()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    rel.removeUnreachableTransitions();
+    rel.removeTauSelfLoops();
+    rel.removeProperSelfLoopEvents();
+  }
 
 }

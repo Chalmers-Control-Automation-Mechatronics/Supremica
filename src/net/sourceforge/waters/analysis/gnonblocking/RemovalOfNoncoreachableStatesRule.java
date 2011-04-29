@@ -99,6 +99,7 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     final CoreachabilityTRSimplifier simplifier =
         new CoreachabilityTRSimplifier(rel);
     simplifier.setPropositions(alphaID, defaultID);
+    simplifier.setAppliesPartitionAutomatically(false);
     final boolean modified = simplifier.run();
     if (modified) {
       rel.removeTauSelfLoops();

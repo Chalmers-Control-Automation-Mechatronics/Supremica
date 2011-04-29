@@ -1271,9 +1271,7 @@ public class ListBufferTransitionRelation
   /**
    * Determines whether the given event is globally disabled in this transition
    * relation.
-   *
-   * @param event
-   *          The ID of the event to be tested.
+   * @param  event   The ID of the event to be tested.
    * @return <CODE>true</CODE> if the given event is disabled in every state.
    */
   public boolean isGloballyDisabled(final int event)
@@ -1290,9 +1288,7 @@ public class ListBufferTransitionRelation
   /**
    * Determines whether the given event is selflooped in this transition
    * relation.
-   *
-   * @param event
-   *          The ID of the event to be tested.
+   * @param  event   The ID of the event to be tested.
    * @return <CODE>true</CODE> if the given event is selflooped in every state,
    *         and appears on no other transitions.
    */
@@ -1410,7 +1406,7 @@ public class ListBufferTransitionRelation
    * Reverses this transition relation.
    * This method reverses all transitions by swapping their source and
    * target. Initial states and markings are not affected by this method.
-   * Reversing implemented by simple swapping the incoming and outgoing
+   * Reversing is implemented by simple swapping the incoming and outgoing
    * transition buffers, so the buffer configuration is also swapped by
    * this method.
    */
@@ -1434,6 +1430,9 @@ public class ListBufferTransitionRelation
    * If this results in the tau event being disabled, the tau event is
    * marked as unused. Tau events are recognised by their standard
    * code {@link EventEncoding#TAU}.
+   * Note that the creation of tau selfloops is suppressed by most transition
+   * relation methods, but it may still be useful to call removeTauSelfloops()
+   * to mark the tau event unused if possible.
    * @return <CODE>true</CODE> if all transitions with the tau event
    *         were selfloops and have been removed, <CODE>false</CODE>
    *         otherwise.
@@ -1459,23 +1458,46 @@ public class ListBufferTransitionRelation
 
   /**
    * Attempts to simplify the automaton by removing redundant selfloop events.
-   * This method searches for any non-tau events that are selflooped in all
-   * states of the transition relation, and removes any such events as unused
-   * and removes the selfloops from the transition relation.
+   * This method searches for any non-tau events that appear only as selfloops
+   * and are selflooped in all states of the transition relation, marks such
+   * events as unused, and removes the selfloops from the transition relation.
    * @return <CODE>true</CODE> if at least one event was removed,
    *         <CODE>false</CODE> otherwise.
    */
   public boolean removeProperSelfLoopEvents()
   {
     final int tau = EventEncoding.TAU;
-    boolean result = false;
+    boolean modified = false;
     for (int e = 0; e < getNumberOfProperEvents(); e++) {
       if (e != tau && mUsedEvents.get(e) && isPureSelfloopEvent(e)) {
         removeEvent(e);
-        result = true;
+        modified = true;
       }
     }
-    return result;
+    return modified;
+  }
+
+  /**
+   * Removes all unreachable transitions. A transition is considered
+   * unreachable if its source or target state is marked as unreachable.
+   * This methods visits every transition in the buffer, checks its
+   * reachability, and removes it if unreachable.
+   * @return <CODE>true</CODE> if at least one transition was removed,
+   *         <CODE>false</CODE> otherwise.
+   * @see #setReachable(int, boolean) setReachable()
+   */
+  public boolean removeUnreachableTransitions()
+  {
+    boolean modified = false;
+    final TransitionIterator iter = createAllTransitionsModifyingIterator();
+    while (iter.advance()) {
+      if (!isReachable(iter.getCurrentSourceState()) ||
+          !isReachable(iter.getCurrentTargetState())) {
+        iter.remove();
+        modified = true;
+      }
+    }
+    return modified;
   }
 
   /**
