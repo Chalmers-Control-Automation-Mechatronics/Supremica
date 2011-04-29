@@ -758,7 +758,8 @@ public abstract class TransitionListBuffer
   public TransitionIterator createAllTransitionsReadOnlyIterator
     (final int event)
   {
-    final TransitionIterator inner = createReadOnlyIterator(event);
+    final TransitionIterator inner = createReadOnlyIterator();
+    inner.resetEvent(event);
     return new AllTransitionsIterator(inner);
   }
 

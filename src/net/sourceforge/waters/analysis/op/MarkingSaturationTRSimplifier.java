@@ -74,7 +74,9 @@ public class MarkingSaturationTRSimplifier
     boolean modified = false;
     for (int prop = 0; prop < rel.getNumberOfPropositions(); prop++) {
       for (int stateID = 0; stateID < numStates; stateID++) {
-        if (rel.isMarked(stateID, prop) && visitedStates.add(stateID)) {
+        if (rel.isReachable(stateID) &&
+            rel.isMarked(stateID, prop) &&
+            visitedStates.add(stateID)) {
           unvisitedStates.push(stateID);
           while (unvisitedStates.size() > 0) {
             final int newStateID = unvisitedStates.pop();

@@ -371,13 +371,15 @@ public class ListBufferTransitionRelation
   /**
    * Sets the reachability status of the given state.
    * If a state is set to be unreachable, transitions linked to the state
-   * will be removed automatically.
+   * will be removed automatically, and the initial state status is
+   * removed.
    * @see #removeTransitions(int) removeTransitions()
    */
   public void setReachable(final int state, final boolean reachable)
   {
     mStateBuffer.setReachable(state, reachable);
     if (!reachable) {
+      mStateBuffer.setInitial(state, false);
       removeTransitions(state);
     }
   }

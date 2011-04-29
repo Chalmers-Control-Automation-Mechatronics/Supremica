@@ -540,6 +540,9 @@ public class OPConflictChecker
     final OmegaRemovalTRSimplifier omegaRemover =
       new OmegaRemovalTRSimplifier();
     chain.add(omegaRemover);
+    final CoreachabilityTRSimplifier nonCoreachableRemover =
+      new CoreachabilityTRSimplifier();
+    chain.add(nonCoreachableRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence

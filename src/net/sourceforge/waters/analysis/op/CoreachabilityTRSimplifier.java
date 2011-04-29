@@ -67,6 +67,7 @@ public class CoreachabilityTRSimplifier
   public boolean run()
     throws AnalysisException
   {
+    setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     final int alphaID = getPreconditionMarkingID();
