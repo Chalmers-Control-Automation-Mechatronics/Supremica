@@ -92,20 +92,21 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     final int alphaID = eventEnc.getEventCode(mAlphaMarking);
     final int defaultID = eventEnc.getEventCode(mDefaultMarking);
     mInputEncoding = new StateEncoding(autToAbstract);
-    mTr = new ListBufferTransitionRelation
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation
                  (autToAbstract, eventEnc, mInputEncoding,
                   ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final CoreachabilityTRSimplifier simplifier =
-        new CoreachabilityTRSimplifier(mTr);
+        new CoreachabilityTRSimplifier(rel);
     simplifier.setPropositions(alphaID, defaultID);
     final boolean modified = simplifier.run();
     if (modified) {
-      mTr.removeTauSelfLoops();
-      mTr.removeProperSelfLoopEvents();
-      mTr.removeRedundantPropositions();
+      rel.removeTauSelfLoops();
+      rel.removeProperSelfLoopEvents();
+      rel.removeRedundantPropositions();
       final ProductDESProxyFactory factory = getFactory();
       mOutputEncoding = new StateEncoding();
-      return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
+      return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
     }
@@ -125,7 +126,6 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
   public void cleanup()
   {
     mAutToAbstract = null;
-    mTr = null;
     mInputEncoding = null;
     mOutputEncoding = null;
   }
@@ -137,7 +137,6 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
   private EventProxy mDefaultMarking;
   private AutomatonProxy mAutToAbstract;
 
-  private ListBufferTransitionRelation mTr;
   private StateEncoding mInputEncoding;
   private StateEncoding mOutputEncoding;
 
