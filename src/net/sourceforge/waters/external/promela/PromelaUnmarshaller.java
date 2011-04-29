@@ -2,13 +2,12 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.external.promela
-//# CLASS:   TTCTImporter
+//# CLASS:   PromelaUnmarshaller
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.external.promela;
-
 
 
 import java.io.File;

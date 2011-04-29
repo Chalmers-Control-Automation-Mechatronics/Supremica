@@ -95,13 +95,36 @@ public class TraceFinder
    * @return The number of events in the trace accepted by the automaton.
    *         A return value of trace.{@link TraceProxy#getEvents()
    *         getEvents()}.size() indicates that the complete trace is
-   *         accepted.
+   *         accepted. A return value of -1 indicates that the automaton
+   *         has no initial state, and 0 indicates that the first event of
+   *         the trace is not eligible in any initial state.
    */
   public int getNumberOfAcceptedSteps(final TraceProxy trace)
   {
     if (mInitialStates.isEmpty()) {
+      // No initial state ...
       return -1;
+    } else if (mStateEncoding == null) {
+      // Deterministic automaton ...
+      final TransitionIterator iter =
+        mTransitionRelation.createSuccessorsReadOnlyIterator();
+      final SearchRecord record = mInitialStates.get(0);
+      int state = record.getState();
+      int depth = 0;
+      for (final EventProxy event : trace.getEvents()) {
+        final int eventID = mEventEncoding.getEventCode(event);
+        if (eventID >= 0) {
+          iter.reset(state, eventID);
+          if (!iter.advance()) {
+            break;
+          }
+          state = iter.getCurrentTargetState();
+        }
+        depth++;
+      }
+      return depth;
     } else {
+      // Nondeterministic automaton ...
       final List<EventProxy> events = trace.getEvents();
       List<SearchRecord> currentLevel =
         new ArrayList<SearchRecord>(mInitialStates);
@@ -135,31 +158,27 @@ public class TraceFinder
         }
         depth++;
       }
-      if (mStateEncoding == null) {
-        mPath = null;
-      } else {
-        mPath = new StateProxy[depth + 1];
-        int index = depth;
-        SearchRecord current = currentLevel.get(0);
-        int nextStateID = current.getState();
-        current = current.getPredecessor();
-        while (current != null) {
-          final int currentStateID = current.getState();
-          final EventProxy event = events.get(index - 1);
-          final int eventID = mEventEncoding.getEventCode(event);
-          if (eventID >= 0) {
-            iter.reset(currentStateID, eventID);
-            if (iter.advance() && iter.advance()) {
-              mPath[index] = mStateEncoding.getState(nextStateID);
-            }
-            nextStateID = currentStateID;
-            current = current.getPredecessor();
+      mPath = new StateProxy[depth + 1];
+      int index = depth;
+      SearchRecord current = currentLevel.get(0);
+      int nextStateID = current.getState();
+      current = current.getPredecessor();
+      while (current != null) {
+        final int currentStateID = current.getState();
+        final EventProxy event = events.get(index - 1);
+        final int eventID = mEventEncoding.getEventCode(event);
+        if (eventID >= 0) {
+          iter.reset(currentStateID, eventID);
+          if (iter.advance() && iter.advance()) {
+            mPath[index] = mStateEncoding.getState(nextStateID);
           }
-          index--;
+          nextStateID = currentStateID;
+          current = current.getPredecessor();
         }
-        if (mInitialStates.size() > 1) {
-          mPath[0] = mStateEncoding.getState(nextStateID);
-        }
+        index--;
+      }
+      if (mInitialStates.size() > 1) {
+        mPath[0] = mStateEncoding.getState(nextStateID);
       }
       return depth;
     }

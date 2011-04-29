@@ -35,8 +35,6 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
-
 
 /**
  * <P>The modular language inclusion check algorithm.</P>
@@ -140,7 +138,7 @@ public class ModularLanguageInclusionChecker
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
-    return false;
+    return mChecker.supportsNondeterminism();
   }
 
 
@@ -223,12 +221,5 @@ public class ModularLanguageInclusionChecker
   //# Data Members
   private final SafetyVerifier mChecker;
   private int mStates;
-
-
-  //#########################################################################
-  //# Static Class Variables
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER =
-    Logger.getLogger(ModularLanguageInclusionChecker.class);
 
 }

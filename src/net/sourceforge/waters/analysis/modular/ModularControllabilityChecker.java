@@ -34,8 +34,6 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
-
 
 /**
  * The modular controllability check algorithm.
@@ -194,13 +192,14 @@ public class ModularControllabilityChecker
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
-    return false;
+    return mChecker.supportsNondeterminism();
   }
 
 
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
   protected boolean setFailedResult(final TraceProxy counterexample)
   {
     final ProductDESProxyFactory factory = getFactory();
@@ -242,10 +241,4 @@ public class ModularControllabilityChecker
   private int mStates;
   private final boolean mLeast;
 
-
-  //#########################################################################
-  //# Static Class Variables
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER =
-    Logger.getLogger(ModularControllabilityChecker.class);
 }
