@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="alpharemoval_17" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Tests whether transitions with both tau and non-tau events are handled correctly.</ns2:Comment>
+<Module Name="alpharemoval_16a" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Tests whether selfloops are correctly handled and removed by the alpha-removal rule.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>
@@ -65,7 +65,7 @@
                             <Point Y="0" X="-27"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="3" X="-21"/>
+                            <Point Y="0" X="-20"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
@@ -80,9 +80,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S5">
-                        <EventList>
-                            <SimpleIdentifier Name=":alpha"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="112" X="128"/>
                         </PointGeometry>
@@ -96,7 +93,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="3"/>
+                                <Point Y="-12" X="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -104,7 +101,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-13"/>
+                                <Point Y="-19" X="-14"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -112,33 +109,36 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-5"/>
+                                <Point Y="-13" X="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Target="S4" Source="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="7"/>
-                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Target="S5" Source="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-9"/>
-                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S5">
+                    <Edge Target="S1" Source="S5">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-7"/>
+                                <Point Y="-8" X="-30"/>
                             </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S4" Source="S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S1" Source="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>
@@ -188,7 +188,7 @@
                             <Point Y="0" X="-27"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="-23"/>
+                            <Point Y="0" X="-20"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
@@ -200,14 +200,11 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S5">
-                        <EventList>
-                            <SimpleIdentifier Name=":alpha"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="112" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="-5"/>
+                            <Point Y="10" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -216,7 +213,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="4"/>
+                                <Point Y="-12" X="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -232,33 +229,31 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-3"/>
+                                <Point Y="-13" X="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Target="S4" Source="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="9"/>
-                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Target="S5" Source="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-8"/>
-                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S5">
+                    <Edge Target="S1" Source="S5">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-7"/>
+                                <Point Y="-8" X="-30"/>
                             </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S1" Source="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>

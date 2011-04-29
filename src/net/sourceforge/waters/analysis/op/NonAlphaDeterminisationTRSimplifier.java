@@ -16,6 +16,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -41,6 +42,27 @@ public class NonAlphaDeterminisationTRSimplifier
   {
     super(rel);
     mBisimulator = bisimulator;
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Sets the mode which redundant transitions are to be removed.
+   * @see ObservationEquivalenceTRSimplifier#TransitionRemoval
+   */
+  public void setTransitionRemovalMode(final TransitionRemoval mode)
+  {
+    mBisimulator.setTransitionRemovalMode(mode);
+  }
+
+  /**
+   * Gets the mode which redundant transitions are to be removed.
+   * @see ObservationEquivalenceTRSimplifier#TransitionRemoval
+   */
+  public TransitionRemoval getTransitionRemovalMode()
+  {
+    return mBisimulator.getTransitionRemovalMode();
   }
 
 

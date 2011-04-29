@@ -1,28 +1,25 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   ObservationEquivalenceRuleTest
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.op
+//# CLASS:   NonAlphaDeterminisationTRSimplifierTest
 //###########################################################################
-//# $Id: ObservationEquivalenceRuleTest.java 5455 2010-03-31 02:20:16Z robi $
+//# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.gnonblocking;
+package net.sourceforge.waters.analysis.op;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * A test for the determinsation of non alpha states rule (
- * {@link DeterminisationOfNonAlphaStatesRule}).
+ * A test for the determinisation of non alpha states rule
+ * ({@link NonAlphaDeterminisationTRSimplifier}).
  *
  * This test is to be used with caution because the same bisimulation module (
  * {@link net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier
@@ -32,19 +29,19 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * and test how silent events are handled by various configurations of the
  * bisimulation algorithm.
  *
- * @author Robi Malik and Rachel Francis
+ * @author Robi Malik, Rachel Francis
  */
 
-public class DeterminisationOfNonAlphaStatesRuleTest extends
-    AbstractAbstractionRuleTest
+public class NonAlphaDeterminisationTRSimplifierTest
+  extends AbstractTRSimplifierTest
 {
 
-  // #########################################################################
-  // # Entry points in junit.framework.TestCase
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(DeterminisationOfNonAlphaStatesRuleTest.class);
+        new TestSuite(NonAlphaDeterminisationTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -53,37 +50,40 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     junit.textui.TestRunner.run(suite());
   }
 
-  // #########################################################################
-  // # Overrides for abstract base class
-  // # net.sourceforge.waters.analysis.gnonblocking.AbstractAbstractionRuleTest
-  protected DeterminisationOfNonAlphaStatesRule createAbstractionRule
-    (final ProductDESProxyFactory factory)
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.op.AbstractTRSimplifierTest
+  @Override
+  protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    return new DeterminisationOfNonAlphaStatesRule(factory, translator);
+    final ObservationEquivalenceTRSimplifier oeq =
+      new ObservationEquivalenceTRSimplifier();
+    return new NonAlphaDeterminisationTRSimplifier(oeq);
   }
 
-  protected void configureAbstractionRule(final ProductDESProxy des)
+  @Override
+  protected EventEncoding createEventEncoding(final ProductDESProxy des,
+                                              final AutomatonProxy aut)
   {
-    super.configureAbstractionRule(des);
-    final DeterminisationOfNonAlphaStatesRule rule = getAbstractionRule();
-    final EventProxy alphaMarking = findEvent(des, ALPHA);
-    rule.setAlphaMarking(alphaMarking);
+    return createEventEncodingWithPropositions(des, aut);
   }
 
-  protected DeterminisationOfNonAlphaStatesRule getAbstractionRule()
+  @Override
+  protected void configureTransitionRelationSimplifier()
   {
-    return (DeterminisationOfNonAlphaStatesRule) super.getAbstractionRule();
+    configureTransitionRelationSimplifierWithPropositions();
   }
 
-  // #########################################################################
-  // # Test Cases
+
+  //#########################################################################
+  //# Test Cases
   public void test_determinisation_1() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_1.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_2() throws Exception
@@ -91,7 +91,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_2.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_3() throws Exception
@@ -99,18 +99,19 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_3.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_4() throws Exception
   {
-    final DeterminisationOfNonAlphaStatesRule rule = getAbstractionRule();
-    rule.setTransitionRemovalMode
+    final NonAlphaDeterminisationTRSimplifier simplifier =
+      (NonAlphaDeterminisationTRSimplifier) getTransitionRelationSimplifier();
+    simplifier.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_4.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_5() throws Exception
@@ -118,7 +119,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_5.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_6() throws Exception
@@ -126,7 +127,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_6.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_7() throws Exception
@@ -134,7 +135,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_7.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_8() throws Exception
@@ -142,7 +143,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_8.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_9() throws Exception
@@ -150,7 +151,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_9.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_10() throws Exception
@@ -158,7 +159,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_10.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_11() throws Exception
@@ -166,7 +167,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_11.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_12() throws Exception
@@ -174,7 +175,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_12.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_13() throws Exception
@@ -182,7 +183,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_13.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_14() throws Exception
@@ -190,7 +191,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_14.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_15() throws Exception
@@ -198,7 +199,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_15.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_16() throws Exception
@@ -206,7 +207,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_16.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_17() throws Exception
@@ -214,7 +215,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_17.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_18() throws Exception
@@ -222,7 +223,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_18.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_19() throws Exception
@@ -230,7 +231,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_19.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_20() throws Exception
@@ -238,7 +239,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_20.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_21() throws Exception
@@ -246,7 +247,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_21.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_22() throws Exception
@@ -254,7 +255,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_22.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_23() throws Exception
@@ -262,7 +263,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_23.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_24() throws Exception
@@ -270,7 +271,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_24.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_25() throws Exception
@@ -278,7 +279,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_25.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_26() throws Exception
@@ -286,7 +287,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_26.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_determinisation_27() throws Exception
@@ -294,7 +295,7 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_27.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   /**

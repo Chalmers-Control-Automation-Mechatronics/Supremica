@@ -76,6 +76,7 @@ public class ObservationEquivalenceTRSimplifier
 
   public void setTransitionRelation(final ListBufferTransitionRelation rel)
   {
+    reset();
     super.setTransitionRelation(rel);
     mNumStates = rel.getNumberOfStates();
     mNumEvents = rel.getNumberOfProperEvents();

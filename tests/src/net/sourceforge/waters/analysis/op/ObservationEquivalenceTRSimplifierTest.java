@@ -1,26 +1,23 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   AltObservationEquivalenceRuleTest
+//# PACKAGE: net.sourceforge.waters.analysis.op
+//# CLASS:   ObservationEquivalenceTRSimplifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.gnonblocking;
+package net.sourceforge.waters.analysis.op;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * A test for the observation equivalence rule (
- * {@link ObservationEquivalenceRule}).
+ * A test for the observation equivalence simplifier
+ * ({@link ObservationEquivalenceTRSimplifier}).
  *
  * This test is to be used with caution because the same bisimulation module
  * ({@link net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier
@@ -33,15 +30,15 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public class ObservationEquivalenceRuleTest
-  extends AbstractAbstractionRuleTest
+public class ObservationEquivalenceTRSimplifierTest
+  extends AbstractTRSimplifierTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
     final TestSuite testSuite =
-      new TestSuite(ObservationEquivalenceRuleTest.class);
+      new TestSuite(ObservationEquivalenceTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -53,17 +50,11 @@ public class ObservationEquivalenceRuleTest
 
   //#########################################################################
   //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.gnonblocking.AbstractAbstractionRuleTest
-  protected ObservationEquivalenceRule createAbstractionRule
-    (final ProductDESProxyFactory factory)
+  //# net.sourceforge.waters.analysis.op.AbstractTRSimplifierTest
+  @Override
+  protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    return new ObservationEquivalenceRule(factory, translator);
-  }
-
-  protected ObservationEquivalenceRule getAbstractionRule()
-  {
-    return (ObservationEquivalenceRule) super.getAbstractionRule();
+    return new ObservationEquivalenceTRSimplifier();
   }
 
 
@@ -74,7 +65,7 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_1.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_2() throws Exception
@@ -82,7 +73,7 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_2.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_3() throws Exception
@@ -90,18 +81,19 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_3.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_4() throws Exception
   {
-    final ObservationEquivalenceRule rule = getAbstractionRule();
-    rule.setTransitionRemovalMode
+    final ObservationEquivalenceTRSimplifier simplifier =
+      (ObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
+    simplifier.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_4.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_5() throws Exception
@@ -109,7 +101,7 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_5.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_6() throws Exception
@@ -117,7 +109,7 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_6.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_7() throws Exception
@@ -125,7 +117,7 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_7.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_8() throws Exception
@@ -133,7 +125,7 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_8.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_9() throws Exception
@@ -141,7 +133,7 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_9.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_10() throws Exception
@@ -149,29 +141,31 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_10.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_11() throws Exception
   {
-    final ObservationEquivalenceRule rule = getAbstractionRule();
-    rule.setTransitionRemovalMode
+    final ObservationEquivalenceTRSimplifier simplifier =
+      (ObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
+    simplifier.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_11.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_12() throws Exception
   {
-    final ObservationEquivalenceRule rule = getAbstractionRule();
-    rule.setTransitionRemovalMode
+    final ObservationEquivalenceTRSimplifier simplifier =
+      (ObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
+    simplifier.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_12.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_13() throws Exception
@@ -179,7 +173,7 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_13.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_oeq_14() throws Exception
@@ -187,12 +181,12 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_14.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   /**
-   * A test to see whether a single abstraction rule object can perform
-   * multiple abstractions in sequence.
+   * A test to see whether a single transition relation simplifier
+   * object can perform multiple abstractions in sequence.
    */
   public void testReentrant() throws Exception
   {

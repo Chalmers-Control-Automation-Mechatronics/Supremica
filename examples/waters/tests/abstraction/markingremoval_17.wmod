@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="alpharemoval_17" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Tests whether transitions with both tau and non-tau events are handled correctly.</ns2:Comment>
+<Module Name="markingremoval_17" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Tests whether transitions with both tau and non-tau events are handled correctly by the alpha/omega-removal rule.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>
@@ -170,9 +170,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S3">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="64" X="208"/>
                         </PointGeometry>
