@@ -625,10 +625,11 @@ public class CompositionalGeneralisedConflictChecker extends
       dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
       mAbstractionRules.add(dnasRule);
 
-      final AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
-          new AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule
+      final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
+          new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule
                 (factory, translator, mPropositions);
       rttlnsRule.setAlphaMarking(alpha);
+      rttlnsRule.setRestrictsToUnreachableStates(true);
       mAbstractionRules.add(rttlnsRule);
 
       final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
@@ -1814,24 +1815,35 @@ public class CompositionalGeneralisedConflictChecker extends
         autToAbstract, originalStates, resultingStates);
   }
 
-  public RemovalOfTauTransitionsStep createRemovalOfTauTransitionsStep(
-                                                                       final AutomatonProxy abstractedAut,
-                                                                       final AutomatonProxy autToAbstract,
-                                                                       final EventProxy tau,
-                                                                       final ObserverProjectionTransitionRelation tr)
+  public RemovalOfTauTransitionsStep createRemovalOfTauTransitionsStep
+    (final AutomatonProxy abstractedAut,
+     final AutomatonProxy autToAbstract,
+     final EventProxy tau,
+     final ObserverProjectionTransitionRelation tr)
   {
     return new RemovalOfTauTransitionsStep(abstractedAut, autToAbstract, tau,
         tr);
   }
 
+  public RemovalOfTauTransitionsStep createRemovalOfTauTransitionsStep
+    (final AutomatonProxy resultAut,
+     final AutomatonProxy originalAut,
+     final EventProxy tau,
+     final StateEncoding inputEnc,
+     final StateEncoding outputEnc)
+  {
+    return new RemovalOfTauTransitionsStep(resultAut, originalAut,
+                                           tau, inputEnc, outputEnc);
+  }
 
-  // #########################################################################
-  // # Inner Class Step
+
+  //#########################################################################
+  //# Inner Class Step
   abstract class Step
   {
 
-    // #######################################################################
-    // # Constructor
+    //#######################################################################
+    //# Constructor
     Step(final AutomatonProxy aut, final Collection<AutomatonProxy> originals)
     {
       mResultAutomaton = aut;
@@ -3008,8 +3020,8 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  // #########################################################################
-  // # Inner Class RemovalOfTauTransitionsLeadingToNonAlphaStatesStep
+  //#########################################################################
+  //# Inner Class RemovalOfTauTransitionsStep
   /**
    * This step class performs correct counterexample trace conversion for
    * {@link RemovalOfTauTransitionsLeadingToNonAlphaStatesRule} and.
@@ -3017,14 +3029,29 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private class RemovalOfTauTransitionsStep extends RemovalOfTransitionsStep
   {
-    RemovalOfTauTransitionsStep(final AutomatonProxy resultAut,
-                                final AutomatonProxy originalAut,
-                                final EventProxy tau,
-                                final ObserverProjectionTransitionRelation tr)
+
+    //#######################################################################
+    //# Constructors
+    private RemovalOfTauTransitionsStep(final AutomatonProxy resultAut,
+                                        final AutomatonProxy originalAut,
+                                        final EventProxy tau,
+                                        final StateEncoding inputEnc,
+                                        final StateEncoding outputEnc)
+    {
+      super(resultAut, originalAut, tau, inputEnc, outputEnc);
+    }
+
+    private RemovalOfTauTransitionsStep
+      (final AutomatonProxy resultAut,
+       final AutomatonProxy originalAut,
+       final EventProxy tau,
+       final ObserverProjectionTransitionRelation tr)
     {
       super(resultAut, originalAut, tau, tr);
     }
 
+    //#######################################################################
+    //# Trace Expansion
     /**
      * Creates the beginning of a trace by doing a breadth-first search to find
      * the correct initial state of the original automaton. Steps are added for

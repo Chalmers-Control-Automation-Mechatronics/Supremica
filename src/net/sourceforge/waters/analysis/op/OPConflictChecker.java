@@ -543,6 +543,10 @@ public class OPConflictChecker
     final CoreachabilityTRSimplifier nonCoreachableRemover =
       new CoreachabilityTRSimplifier();
     chain.add(nonCoreachableRemover);
+    final SilentIncomingTRSimplifier silentInRemover =
+      new SilentIncomingTRSimplifier();
+    silentInRemover.setRestrictsToUnreachableStates(true);
+    chain.add(silentInRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
