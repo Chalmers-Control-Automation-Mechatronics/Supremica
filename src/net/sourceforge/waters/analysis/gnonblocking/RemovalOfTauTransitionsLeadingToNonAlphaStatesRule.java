@@ -114,7 +114,7 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation
                  (autToAbstract, eventEnc, mInputEncoding,
-                  ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+                  ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final SilentIncomingTRSimplifier simplifier =
       new SilentIncomingTRSimplifier(rel);
     simplifier.setPropositions(alphaID, -1);

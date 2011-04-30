@@ -1,20 +1,21 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   RemovalOfAlphaMarkingsRule
+//# CLASS:   RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-
 import java.util.Collection;
-import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+
+import net.sourceforge.waters.analysis.op.EventEncoding;
+import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.op.OnlySilentOutgoingTRSimplifier;
+import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -29,11 +30,12 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  *
  * @author Rachel Francis
  */
-class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
-    AbstractionRule
+
+class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
+  extends AbstractionRule
 {
 
-  //#######################################################################
+  //#########################################################################
   //# Constructors
   RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
     (final ProductDESProxyFactory factory,
@@ -51,7 +53,7 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Configuration
   EventProxy getAlphaMarking()
   {
@@ -73,104 +75,73 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
     mDefaultMarking = defaultMarking;
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#########################################################################
+  //# Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
+  throws AnalysisException
   {
-    mAutToAbstract = autToAbstract;
-    boolean modified = false;
-    mTR =
-        new ObserverProjectionTransitionRelation(autToAbstract,
-            getPropositions());
-    final int tauID = mTR.getEventInt(tau);
-
-    final int alphaID = mTR.getEventInt(mAlphaMarking);
-    final int defaultID = mTR.getEventInt(mDefaultMarking);
-    if (tauID == -1 || alphaID == -1 || defaultID == -1) {
+    if (!autToAbstract.getEvents().contains(tau)) {
+      return autToAbstract;
+    }
+    final KindTranslator translator = getKindTranslator();
+    final EventEncoding eventEnc =
+        new EventEncoding(autToAbstract, translator, tau, getPropositions(),
+                          EventEncoding.FILTER_PROPOSITIONS);
+    final int alphaID = eventEnc.getEventCode(mAlphaMarking);
+    if (alphaID < 0) {
+      return autToAbstract;
+    }
+    final int omegaID = eventEnc.getEventCode(mDefaultMarking);
+    if (omegaID < 0) {
       return autToAbstract;
     }
     mTau = tau;
-
-    final int numStates = mTR.getNumberOfStates();
-
-    for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (!mTR.isMarked(sourceID, alphaID)
-          && !mTR.isMarked(sourceID, defaultID)) {
-
-        final TIntHashSet[] allSuccessors = mTR.getAllSuccessors(sourceID);
-        TIntHashSet tauSuccessors = null;
-        boolean nonTauSuccessors = false;
-        if (allSuccessors != null) {
-          for (int eventID = 0; eventID < allSuccessors.length; eventID++) {
-            if (eventID != tauID) {
-              final TIntHashSet succ = allSuccessors[eventID];
-              if (succ != null) {
-                nonTauSuccessors = true;
-                break;
-              }
-            } else {
-              tauSuccessors = allSuccessors[eventID];
-            }
-          }
-          if (!nonTauSuccessors && tauSuccessors != null) {
-            final TIntArrayList transToRemove =
-                new TIntArrayList(tauSuccessors.size());
-            final TIntIterator iter = tauSuccessors.iterator();
-            while (iter.hasNext()) {
-              final int targetID = iter.next();
-              transToRemove.add(targetID);
-            }
-            boolean unlink = false;
-            for (int i = 0; i < transToRemove.size(); i++) {
-              final int targetID = transToRemove.get(i);
-              if (sourceID != targetID) {
-                mTR.addAllPredeccessors(sourceID, targetID);
-                unlink = true;
-              }
-              mTR.removeTransition(sourceID, tauID, targetID);
-              modified = true;
-            }
-            if (unlink) {
-              mTR.removeAllIncoming(sourceID);
-              if (mTR.isInitial(sourceID)) {
-                mTR.makeInitialState(sourceID, false);
-              }
-            }
-          }
-        }
-      }
-    }
+    mAutToAbstract = autToAbstract;
+    mInputEncoding = new StateEncoding(autToAbstract);
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation
+                 (autToAbstract, eventEnc, mInputEncoding,
+                  ListBufferTransitionRelation.CONFIG_ALL);
+    final OnlySilentOutgoingTRSimplifier simplifier =
+      new OnlySilentOutgoingTRSimplifier(rel);
+    simplifier.setPropositions(alphaID, omegaID);
+    final boolean modified = simplifier.run();
     if (modified) {
-      mTR.removeTauSelfLoops(tauID);
-      mTR.removeRedundantPropositions();
-      final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-      return convertedAut;
+      rel.removeRedundantPropositions();
+      final ProductDESProxyFactory factory = getFactory();
+      mOutputEncoding = new StateEncoding();
+      return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
     }
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep(
-                                                          final CompositionalGeneralisedConflictChecker checker,
-                                                          final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy abstractedAut)
   {
-    return checker.createRemovalOfTauTransitionsStep(abstractedAut,
-                                                     mAutToAbstract, mTau, mTR);
+    return checker.createRemovalOfTauTransitionsStep
+      (abstractedAut, mAutToAbstract, mTau, mInputEncoding, mOutputEncoding);
   }
 
   public void cleanup()
   {
-    mTR = null;
     mAutToAbstract = null;
+    mInputEncoding = null;
+    mOutputEncoding = null;
   }
 
-  // #######################################################################
-  // # Data Members
-  private EventProxy mAlphaMarking;
+
+  //#########################################################################
+  //# Data Members
   private EventProxy mTau;
+  private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
+
   private AutomatonProxy mAutToAbstract;
-  private ObserverProjectionTransitionRelation mTR;
+  private StateEncoding mInputEncoding;
+  private StateEncoding mOutputEncoding;
 
 }

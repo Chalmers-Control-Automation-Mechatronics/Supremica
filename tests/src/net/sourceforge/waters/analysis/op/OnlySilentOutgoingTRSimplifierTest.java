@@ -1,26 +1,23 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   RemovalOfAlphaMarkingsRuleTest
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.op
+//# CLASS:   OnlySilentOutgoingTRSimplifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.gnonblocking;
+package net.sourceforge.waters.analysis.op;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRuleTest
-    extends AbstractAbstractionRuleTest
+public class OnlySilentOutgoingTRSimplifierTest
+  extends AbstractTRSimplifierTest
 {
 
   //#########################################################################
@@ -28,8 +25,7 @@ public class AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRuleTest
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(
-            AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRuleTest.class);
+      new TestSuite(OnlySilentOutgoingTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -41,137 +37,135 @@ public class AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRuleTest
 
   //#########################################################################
   //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.gnonblocking.AbstractAbstractionRuleTest
-  protected AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
-    createAbstractionRule(final ProductDESProxyFactory factory)
+  //# net.sourceforge.waters.analysis.op.AbstractTRSimplifierTest
+  protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    return new AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
-      (factory, translator);
+    final OnlySilentOutgoingTRSimplifier simplifier =
+      new OnlySilentOutgoingTRSimplifier();
+    return simplifier;
   }
 
-  protected void configureAbstractionRule(final ProductDESProxy des)
+  @Override
+  protected EventEncoding createEventEncoding(final ProductDESProxy des,
+                                              final AutomatonProxy aut)
   {
-    super.configureAbstractionRule(des);
-    final AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rule =
-        getAbstractionRule();
-    final EventProxy alphaMarking = findEvent(des, ALPHA);
-    rule.setAlphaMarking(alphaMarking);
-    final EventProxy defaultMarking = findEvent(des, OMEGA);
-    rule.setDefaultMarking(defaultMarking);
+    return createEventEncodingWithPropositions(des, aut);
   }
 
-  protected AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
-    getAbstractionRule()
+  @Override
+  protected void configureTransitionRelationSimplifier()
   {
-    return (AltRemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule)
-      super.getAbstractionRule();
+    configureTransitionRelationSimplifierWithPropositions();
   }
 
 
   //#########################################################################
   //# Test Cases
   public void test_tauTransRemovalFromNonAlpha_StateUnreachable()
-      throws Exception
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_1.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_tauTransRemovalFromNonAlpha_NoFurther() throws Exception
+  public void test_tauTransRemovalFromNonAlpha_NoFurther()
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_2.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_tauTransRemovalFromNonAlpha_tauAndNonTauOutgoingTransitions()
-      throws Exception
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_3.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_allStatesImplicitlyMarkedAlpha() throws Exception
+  public void test_allStatesImplicitlyMarkedAlpha()
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_8.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_allStatesImplicitlyMarkedOmega() throws Exception
+  public void test_allStatesImplicitlyMarkedOmega()
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_9.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_tauTransRemovalFromNonAlpha_TwoConsecutiveTauUnreachable()
-      throws Exception
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_7.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_tauTransRemovalFromNonAlpha_TwoTauOutgoing()
-      throws Exception
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_4.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_tauTransRemovalFromNonAlpha_multipleIncomingTransitions()
-      throws Exception
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_5.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_tauTransRemovalFromNonAlpha_tauLoopNoMarking()
-      throws Exception
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_10.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_tauTransRemovalFromNonAlpha_removalOfInitialState()
-      throws Exception
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_11.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   public void test_tauTransRemovalFromNonAlpha_nonRemovalOfStateWithNoOutgoingTransitions()
-      throws Exception
+  throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_12.wmod";
-    runAbstractionRule(group, subdir, name);
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
    */
-  public void testReentrant() throws Exception
+  public void testReentrant()
+  throws Exception
   {
     test_tauTransRemovalFromNonAlpha_StateUnreachable();
     test_tauTransRemovalFromNonAlpha_NoFurther();
