@@ -35,15 +35,15 @@ tokens{
 	PROCTYPENODE;
 	INITNODE;
 	TYPE;
-	CHAN_STATE;
 	STATEMENT;
 	MODULE_ROOT;
 	CONDITION;
 	REC;
 	SEN;
 	MESSAGE_ARGUMENTS;
-	CHAN_STATEMENT;
-	PROC_STATEMENT;
+	PROCSTATE=	'proc_state';
+	CHANSTATE=	'chan_state';
+	VARDEFINITION;
 }
 
 @header {
@@ -146,7 +146,7 @@ proctypeRule
 		(enablerRule)? 
 		BLOCKBEGIN sequenceRule BLOCKEND 
 		(SEMICOLON)* 
-		-> ^(NAME<ProctypeTreeNode> NAME ^(PROCSTATE<ProctypeStatementTreeNode> sequenceRule))
+		-> ^(NAME<ProctypeTreeNode> NAME ^(PROCTYPE<ProctypeStatementTreeNode> sequenceRule))
     ;
 
 inlineRule
@@ -179,7 +179,7 @@ initRule
 @init  { paraphrases.push("in init definition"); }
 @after { paraphrases.pop(); }
 	:	INIT (priorityRule)? BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
-		-> ^(INIT<InitialTreeNode> sequenceRule)
+		-> ^(INIT<InitialTreeNode> (priorityRule)? sequenceRule)
 	;
 
 priorityRule
@@ -191,7 +191,7 @@ sequenceRule
 	:	// original: stepRule (';' stepRule)*
 //		(stepRule (';' | '-' '>')? )*
 		(stepRule (SEMICOLON)* (isguard=ARROW )? )*
-		->^(stepRule)*
+		->( stepRule)*
 ;
 
 stepRule 
@@ -330,7 +330,7 @@ one_declRule
 @init  { paraphrases.push("in declaration"); }
 @after { paraphrases.pop(); }
 	:	(visibleRule)? typenameRule ivarRule (COMMA ivarRule)*
-		-> ^(typenameRule ivarRule*)
+		-> ^(VARDEFINITION typenameRule ivarRule+)
 	;
 
 optionsRule
@@ -403,10 +403,13 @@ pollRule
 //	;
 	
 typenameRule
-	:	BIT | BOOL | BYTE | SHORT 
+	:	BIT | BOOL
+		 | BYTE -> ^(BYTE<TypeTreeNode>)
+		 | SHORT 
 		| INT 
 		| MTYPE 
 		| unameRule
+		
 	;
 typeRule
 	: 	CHAN
@@ -415,8 +418,8 @@ typeRule
 channelRule
 @init  { paraphrases.push("in channel definition"); }
 @after { paraphrases.pop(); }
-	:	CHAN NAME (ASSIGN)? ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
-		-> ^(CHAN<ChannelTreeNode> NAME ^(CHANSTATE<ChannelStatementTreeNode> constRule typenameRule*) )
+	:	CHAN NAME (ASSIGN)?  ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
+		-> ^(CHAN<ChannelTreeNode> NAME ^( CHAN<ChannelStatementTreeNode> constRule typenameRule*) )
 	;													 
 
 unameRule
@@ -545,10 +548,6 @@ OD	:	'od';
 XR	:	'xr';
 XS	:	'xs';
 INIT:	'init';
-
-PROCSTATE:	'proc_state';
-CHANSTATE:	'chan_state';
-
 PRIORITY:	'priority';
 TYPEDEF:	'typedef';
 TRACE:		'trace';

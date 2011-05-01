@@ -197,8 +197,9 @@ public class PromelaTools {
                         //still need to handle recieve statement
                         if(childA.getText().equals("?")|| tr.getChild(a).getText().equals("??")){
                           chan.get(childA.getChild(0).getText()).incRecnumber();
-                          //final ArrayList<String> recEverything = new ArrayList<String>();
-                          componentLabels.add(null);
+                          final ArrayList<String> recEverything = new ArrayList<String>();
+                          recEverything.add("recieve");
+                          componentLabels.add(recEverything);
                         }
                     }
                   }
@@ -209,6 +210,7 @@ public class PromelaTools {
 
           if(t instanceof InitialTreeNode){
             final CommonTree childI = (CommonTree) t.getChild(0);
+
             if(childI.getChild(0).getText().equals("atomic")){
               final ArrayList<String> temp = new ArrayList<String>();
               temp.add("init");
@@ -280,10 +282,10 @@ public class PromelaTools {
     */
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
-            collectMsg(t);
+            //collectMsg(t);
            // print_label();
             //print_chan();
-            //printTree(t,0);
+            printTree(t,0);
 
             //System.out.println(t.toStringTree());
         //modified
