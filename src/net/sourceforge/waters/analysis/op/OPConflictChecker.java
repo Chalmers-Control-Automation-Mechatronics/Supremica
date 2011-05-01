@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   ObserverProjectionConflictChecker
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.op
+//# CLASS:   OPConflictChecker
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -69,8 +69,8 @@ import org.apache.log4j.Logger;
 
 
 /**
- * A compositional conflict checker that uses only observation equivalence
- * or observer projection for simplification steps.
+ * A compositional conflict checker that can be configured to use different
+ * abstraction sequences for its simplification steps.
  *
  * @author Robi Malik, Rachel Francis
  */
@@ -224,6 +224,7 @@ public class OPConflictChecker
   }
 
 
+  @Override
   public int getNodeLimit()
   {
     final int limit1 = getInternalStepNodeLimit();
@@ -231,6 +232,7 @@ public class OPConflictChecker
     return Math.max(limit1, limit2);
   }
 
+  @Override
   public void setNodeLimit(final int limit)
   {
     setInternalStepNodeLimit(limit);
@@ -343,8 +345,8 @@ public class OPConflictChecker
       mCurrentMonolithicConflictChecker.setTransitionLimit(tlimit);
       final KindTranslator translator = getKindTranslator();
       mCurrentMonolithicConflictChecker.setKindTranslator(translator);
-      final EventProxy marking = getUsedMarkingProposition();
-      mCurrentMonolithicConflictChecker.setMarkingProposition(marking);
+      mCurrentMonolithicConflictChecker.setMarkingProposition
+        (mCurrentDefaultMarking);
       mCurrentMonolithicConflictChecker.setPreconditionMarking
         (mPreconditionMarking);
     }
@@ -458,12 +460,12 @@ public class OPConflictChecker
     final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(0.0);
     result.setNumberOfTransitions(0.0);
-    final EventProxy marking = getUsedMarkingProposition();
+    mCurrentDefaultMarking = getUsedMarkingProposition();
     if (mPreconditionMarking == null) {
-      mPropositions = Collections.singletonList(marking);
+      mPropositions = Collections.singletonList(mCurrentDefaultMarking);
     } else {
       final EventProxy[] markings = new EventProxy[2];
-      markings[0] = marking;
+      markings[0] = mCurrentDefaultMarking;
       markings[1] = mPreconditionMarking;
       mPropositions = Arrays.asList(markings);
     }
@@ -488,7 +490,7 @@ public class OPConflictChecker
     mCurrentMonolithicLanguageInclusionChecker = null;
     mPreconditionMarkingRecovery = null;
     mCurrentAutomata = null;
-    mPropositionStatusMap = null;
+    mAutomatonInfoMap = null;
     mCurrentEvents = null;
     mEventInfoMap = null;
     mDirtyAutomata = null;
@@ -546,6 +548,7 @@ public class OPConflictChecker
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
+    chain.add(silentInRemover);
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     chain.add(silentOutRemover);
@@ -581,7 +584,7 @@ public class OPConflictChecker
     final int numAutomata = automata.size();
     final KindTranslator translator = getKindTranslator();
     mCurrentAutomata = new ArrayList<AutomatonProxy>(numAutomata);
-    mPropositionStatusMap = new TObjectByteHashMap<AutomatonProxy>(numAutomata);
+    mAutomatonInfoMap = new HashMap<AutomatonProxy,AutomatonInfo>(numAutomata);
     final int numEvents = model.getEvents().size();
     mCurrentEvents = new THashSet<EventProxy>(numEvents);
     mEventInfoMap = new HashMap<EventProxy,EventInfo>(numEvents);
@@ -653,7 +656,7 @@ public class OPConflictChecker
   private void removeEventsToAutomata(final Collection<AutomatonProxy> victims)
   {
     for (final AutomatonProxy aut : victims) {
-      mPropositionStatusMap.remove(aut);
+      mAutomatonInfoMap.remove(aut);
     }
     mRedundantEvents.clear();
     final Set<EventProxy> eventsToRemove = new THashSet<EventProxy>();
@@ -901,11 +904,10 @@ public class OPConflictChecker
       logger.debug("Monolithically composing " + mCurrentAutomata.size() +
                    " automata, estimated " + estimate + " states.");
     }
-    final EventProxy marking = getUsedMarkingProposition();
     final int numEvents = mCurrentEvents.size() + 1;
     final List<EventProxy> events = new ArrayList<EventProxy>(numEvents);
     events.addAll(mCurrentEvents);
-    events.add(marking);
+    events.add(mCurrentDefaultMarking);
     Collections.sort(events);
     final ProductDESProxy des = createDES(events, mCurrentAutomata);
     mCurrentMonolithicConflictChecker.setModel(des);
@@ -958,100 +960,31 @@ public class OPConflictChecker
     byte all = ALL_ALPHA | ALL_OMEGA;
     byte none = 0;
     for (final AutomatonProxy aut : mCurrentAutomata) {
-      final byte autStatus = getPropositionStatus(aut);
-      if ((autStatus & NONE_ALPHA) != 0) {
+      final AutomatonInfo info = getAutomatonInfo(aut);
+      if (info.isNeverPreconditionMarked()) {
         return NONE_ALPHA;
-      } else if ((autStatus & NONE_OMEGA) != 0) {
+      }
+      if (info.isNeverDefaultMarked()) {
         none |= NONE_OMEGA;
       }
-      all &= autStatus;
+      if (!info.isAlwaysDefaultMarked()) {
+        all &= ~ALL_OMEGA;
+      }
+      if (!info.isAlwaysPreconditionMarked()) {
+        all &= ~ALL_ALPHA;
+      }
     }
     return (byte) (all | none);
   }
 
-  private byte getPropositionStatus(final AutomatonProxy aut)
-    throws EventNotFoundException
+  private AutomatonInfo getAutomatonInfo(final AutomatonProxy aut)
   {
-    if (mPropositionStatusMap.containsKey(aut)) {
-      return mPropositionStatusMap.get(aut);
-    } else {
-      final byte status = computePropositionStatus(aut);
-      mPropositionStatusMap.put(aut, status);
-      return status;
+    AutomatonInfo info = mAutomatonInfoMap.get(aut);
+    if (info == null) {
+      info = new AutomatonInfo(aut);
+      mAutomatonInfoMap.put(aut, info);
     }
-  }
-
-  private byte computePropositionStatus(final AutomatonProxy aut)
-    throws EventNotFoundException
-  {
-    final EventProxy alpha = mPreconditionMarking;
-    final EventProxy omega = getUsedMarkingProposition();
-    boolean usesAlpha = false;
-    boolean usesOmega = false;
-
-    for (final EventProxy event : aut.getEvents()) {
-      if (event == omega) {
-        usesOmega = true;
-        if (usesAlpha || alpha == null) {
-          break;
-        }
-      } else if (event == alpha) {
-        usesAlpha = true;
-        if (usesOmega) {
-          break;
-        }
-      }
-    }
-
-    boolean noneAlpha = usesAlpha;
-    boolean allAlpha = usesAlpha;
-    boolean noneOmega = usesOmega;
-    boolean allOmega = usesOmega;
-    boolean hasinit = false;
-    for (final StateProxy state : aut.getStates()) {
-      hasinit |= state.isInitial();
-      boolean containsAlpha = !usesAlpha;
-      boolean containsOmega = !usesOmega;
-      for (final EventProxy prop : state.getPropositions()) {
-        if (prop == omega) {
-          containsOmega = true;
-          noneOmega = false;
-          if (hasinit && containsAlpha) {
-            break;
-          }
-        } else if (prop == alpha) {
-          containsAlpha = false;
-          noneAlpha = false;
-          if (hasinit && containsOmega) {
-            break;
-          }
-        }
-      }
-      if (usesAlpha && !containsAlpha) {
-        allAlpha = false;
-      }
-      if (usesOmega && !containsOmega) {
-        allOmega = false;
-      }
-      if (hasinit && !noneAlpha && !allAlpha && !noneOmega && !allOmega) {
-        break;
-      }
-    }
-
-    byte result = 0;
-    if (!hasinit) {
-      result |= NONE_ALPHA;
-    } else if (!usesAlpha || allAlpha) {
-      result |= ALL_ALPHA;
-    } else if (noneAlpha) {
-      result |= NONE_ALPHA;
-    }
-    if (!usesOmega || allOmega) {
-      result |= ALL_OMEGA;
-    } else if (noneOmega) {
-      result |= NONE_OMEGA;
-    }
-    return result;
+    return info;
   }
 
 
@@ -1680,6 +1613,7 @@ public class OPConflictChecker
      * as a candidate.
      */
     MustL {
+      @Override
       PreselectingHeuristic createHeuristic
         (final OPConflictChecker checker)
       {
@@ -1691,6 +1625,7 @@ public class OPConflictChecker
      * every other automaton in the model.
      */
     MaxS {
+      @Override
       PreselectingHeuristic createHeuristic
         (final OPConflictChecker checker)
       {
@@ -1702,10 +1637,24 @@ public class OPConflictChecker
      * transitions to every other automaton in the model.
      */
     MinT {
+      @Override
       PreselectingHeuristic createHeuristic
         (final OPConflictChecker checker)
       {
         return checker.new HeuristicMinT();
+      }
+    },
+    /**
+     * Candidates are produced by pairing the automaton with the fewest
+     * transitions connected to a precondition-marked state to every other
+     * automaton in the model.
+     */
+    MinTa {
+      @Override
+      PreselectingHeuristic createHeuristic
+        (final OPConflictChecker checker)
+      {
+        return checker.new HeuristicMinTAlpha();
       }
     };
 
@@ -1734,6 +1683,7 @@ public class OPConflictChecker
      * Chooses the candidate with the highest proportion of local events.
      */
     MaxL {
+      @Override
       Comparator<Candidate> createSingleHeuristic
         (final OPConflictChecker checker)
       {
@@ -1746,6 +1696,7 @@ public class OPConflictChecker
      * automata of the candidate.
      */
     MaxC {
+      @Override
       Comparator<Candidate> createSingleHeuristic
         (final OPConflictChecker checker)
       {
@@ -1753,16 +1704,45 @@ public class OPConflictChecker
       }
     },
     /**
+     * Chooses the candidate with the minimum estimated number of
+     * precondition-marked states in the synchronous product.
+     */
+    MinSa {
+      @Override
+      boolean isEnabled(final OPConflictChecker checker)
+      {
+        return checker.mPreconditionMarking != null;
+      }
+      @Override
+      Comparator<Candidate> createSingleHeuristic
+        (final OPConflictChecker checker)
+      {
+        return checker.new HeuristicMinSAlpha();
+      }
+    },
+    /**
      * Chooses the candidate with the minimum estimated number of states
      * in the synchronous product.
      */
     MinS {
+      @Override
       Comparator<Candidate> createSingleHeuristic
         (final OPConflictChecker checker)
       {
         return checker.new HeuristicMinS();
       }
     };
+
+    /**
+     * returns whether this heuristic is enabled in the current conflict
+     * checker configuration. Only enabled heuristics are included in a
+     * heuristics list returned by {@link
+     * #createSingleHeuristic(OPConflictChecker) createSingleHeuristic()}.
+     */
+    boolean isEnabled(final OPConflictChecker checker)
+    {
+      return true;
+    }
 
     /**
      * Creates the selecting heuristic implementing this method.
@@ -1777,7 +1757,7 @@ public class OPConflictChecker
     /**
      * Creates a selecting heuristic that gives preferences to this method.
      * The returned heuristic first compares candidates according to this
-     * selection methods. If two candidates are found equal, all other
+     * selection methods. If two candidates are found equal, all other enabled
      * selection heuristics are used, in the order in which they are
      * defined in the enumeration. If the candidates are equal under
      * all heuristics, they are compared based on their names. This
@@ -1787,13 +1767,12 @@ public class OPConflictChecker
      */
     Comparator<Candidate> createHeuristic(final OPConflictChecker checker)
     {
-      final int count = values().length;
       final List<Comparator<Candidate>> list =
-        new ArrayList<Comparator<Candidate>>(count);
+        new LinkedList<Comparator<Candidate>>();
       Comparator<Candidate> heu = createSingleHeuristic(checker);
       list.add(heu);
       for (final SelectingMethod method : values()) {
-        if (method != this) {
+        if (method != this && method.isEnabled(checker)) {
           heu = method.createSingleHeuristic(checker);
           list.add(heu);
         }
@@ -1874,6 +1853,153 @@ public class OPConflictChecker
     //# Data Members
     private final Collection<EventProxy> mEvents;
     private final List<AutomatonProxy> mAutomata;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class AutomatonInfo
+  /**
+   * A record to store information about an automaton.
+   * The automaton information record contains the number of precondition
+   * and default markings.
+   */
+  private class AutomatonInfo
+  {
+
+    //#######################################################################
+    //# Constructor
+    private AutomatonInfo(final AutomatonProxy aut)
+    {
+      mAutomaton = aut;
+      mNumPreconditionMarkedStates = mNumDefaultMarkedStates =
+        mNumPreconditionTransitions -1;
+    }
+
+    //#######################################################################
+    //# Access Methods
+    private boolean isNeverPreconditionMarked()
+    {
+      if (mNumPreconditionMarkedStates < 0) {
+        countPropositions();
+      }
+      return mNumPreconditionMarkedStates == 0;
+    }
+
+    private boolean isAlwaysPreconditionMarked()
+    {
+      if (mNumPreconditionMarkedStates < 0) {
+        countPropositions();
+      }
+      return mNumPreconditionMarkedStates == mAutomaton.getStates().size();
+    }
+
+    private int getNumberOfPreconditionMarkedStates()
+    {
+      if (mNumPreconditionMarkedStates < 0) {
+        countPropositions();
+      }
+      return mNumPreconditionMarkedStates;
+    }
+
+    private boolean isNeverDefaultMarked()
+    {
+      if (mNumDefaultMarkedStates < 0) {
+        countPropositions();
+      }
+      return mNumDefaultMarkedStates == 0;
+    }
+
+    private boolean isAlwaysDefaultMarked()
+    {
+      if (mNumDefaultMarkedStates < 0) {
+        countPropositions();
+      }
+      return mNumDefaultMarkedStates == mAutomaton.getStates().size();
+    }
+
+    private int getNumberOfPreconditionMarkedTransitions()
+    {
+      if (mNumPreconditionTransitions < 0) {
+        final Collection<TransitionProxy> transitions =
+          mAutomaton.getTransitions();
+        if (isNeverPreconditionMarked()) {
+          mNumPreconditionTransitions = 0;
+        } else if (isAlwaysPreconditionMarked()) {
+          mNumPreconditionTransitions = 2 * transitions.size();
+        } else {
+          final EventProxy alpha = mPreconditionMarking;
+          mNumPreconditionTransitions = 0;
+          for (final TransitionProxy trans : transitions) {
+            if (trans.getSource().getPropositions().contains(alpha)) {
+              mNumPreconditionTransitions++;
+            }
+            if (trans.getTarget().getPropositions().contains(alpha)) {
+              mNumPreconditionTransitions++;
+            }
+          }
+        }
+      }
+      return mNumPreconditionTransitions;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void countPropositions()
+    {
+      final EventProxy alpha = mPreconditionMarking;
+      final EventProxy omega = mCurrentDefaultMarking;
+      boolean usesAlpha = false;
+      boolean usesOmega = false;
+      for (final EventProxy event : mAutomaton.getEvents()) {
+        if (event == omega) {
+          usesOmega = true;
+          if (usesAlpha || alpha == null) {
+            break;
+          }
+        } else if (event == alpha) {
+          usesAlpha = true;
+          if (usesOmega) {
+            break;
+          }
+        }
+      }
+      final Collection<StateProxy> states = mAutomaton.getStates();
+      final int numStates = states.size();
+      mNumDefaultMarkedStates = usesOmega ? 0 : numStates;
+      mNumPreconditionMarkedStates = usesAlpha ? 0 : numStates;
+      boolean hasinit = false;
+      for (final StateProxy state : states) {
+        hasinit |= state.isInitial();
+        if (usesAlpha || usesOmega) {
+          boolean containsAlpha = false;
+          boolean containsOmega = false;
+          for (final EventProxy prop : state.getPropositions()) {
+            if (prop == omega) {
+              containsOmega = true;
+            } else if (prop == alpha) {
+              containsAlpha = true;
+            }
+          }
+          if (containsAlpha && usesAlpha) {
+            mNumPreconditionMarkedStates++;
+          }
+          if (containsOmega && usesOmega) {
+            mNumDefaultMarkedStates++;
+          }
+        }
+      }
+      if (!hasinit) {
+        mNumPreconditionMarkedStates = 0;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final AutomatonProxy mAutomaton;
+    private int mNumPreconditionMarkedStates;
+    private int mNumDefaultMarkedStates;
+    private int mNumPreconditionTransitions;
 
   }
 
@@ -2111,6 +2237,39 @@ public class OPConflictChecker
 
 
   //#########################################################################
+  //# Inner Class HeuristicMinTAlpha
+  private class HeuristicMinTAlpha
+    extends PairingHeuristic
+  {
+
+    //#######################################################################
+    //# Interface java.util.Comparator<AutomatonProxy>
+    public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
+    {
+      final int numalpha1 =
+        getAutomatonInfo(aut1).getNumberOfPreconditionMarkedTransitions();
+      final int numalpha2 =
+        getAutomatonInfo(aut2).getNumberOfPreconditionMarkedTransitions();
+      if (numalpha1 != numalpha2) {
+        return numalpha1 - numalpha2;
+      }
+      final int numtrans1 = aut1.getTransitions().size();
+      final int numtrans2 = aut2.getTransitions().size();
+      if (numtrans1 != numtrans2) {
+        return numtrans1 - numtrans2;
+      }
+      final int numstates1 = aut1.getStates().size();
+      final int numstates2 = aut2.getStates().size();
+      if (numstates1 != numstates2) {
+        return numstates1 - numstates2;
+      }
+      return aut1.compareTo(aut2);
+    }
+
+  }
+
+
+  //#########################################################################
   //# Inner Class HeuristicMaxS
   /**
    * Performs step 1 of the approach to select the automata to compose. A
@@ -2284,6 +2443,28 @@ public class OPConflictChecker
 
 
   //#########################################################################
+  //# Inner Class HeuristicMinSAlpha
+  private class HeuristicMinSAlpha extends SelectingHeuristic
+  {
+
+    //#######################################################################
+    //# Overrides for SelectingHeuristic
+    double getHeuristicValue(final Candidate candidate)
+    {
+      double product = 1.0;
+      for (final AutomatonProxy aut : candidate.getAutomata()) {
+        final AutomatonInfo info = getAutomatonInfo(aut);
+        product *= info.getNumberOfPreconditionMarkedStates();
+      }
+      final double totalEvents = candidate.getNumberOfEvents();
+      final double localEvents = candidate.getLocalEventCount();
+      return product * (totalEvents - localEvents) / totalEvents;
+    }
+
+  }
+
+
+  //#########################################################################
   //# Inner Class AbstractionRule
   private abstract class AbstractionRule
   {
@@ -2420,11 +2601,10 @@ public class OPConflictChecker
     //# Constructor
     private GeneralisedTRSimplifierAbstractionRule
       (final ChainTRSimplifier simplifier)
-      throws EventNotFoundException
     {
       super(simplifier);
       final EventProxy[] props = new EventProxy[2];
-      mUsedDefaultMarking = props[0] = getUsedMarkingProposition();
+      mUsedDefaultMarking = props[0] = mCurrentDefaultMarking;
       if (mPreconditionMarking == null) {
         final ProductDESProxyFactory factory = getFactory();
         mUsedPreconditionMarking = props[1] =
@@ -2486,7 +2666,7 @@ public class OPConflictChecker
     }
 
     BitSet recoverMarkings(final AutomatonProxy aut, final EventProxy tau)
-      throws AnalysisException
+    throws AnalysisException
     {
       try {
         final EventEncoding eventEnc = createEventEncoding(aut, tau);
@@ -3694,6 +3874,7 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Data Members
+  private EventProxy mCurrentDefaultMarking;
   private EventProxy mPreconditionMarking;
   private Collection<EventProxy> mPropositions;
   private int mInternalStepNodeLimit;
@@ -3710,7 +3891,7 @@ public class OPConflictChecker
   private GeneralisedTRSimplifierAbstractionRule mPreconditionMarkingRecovery;
 
   private List<AutomatonProxy> mCurrentAutomata;
-  private TObjectByteHashMap<AutomatonProxy> mPropositionStatusMap;
+  private Map<AutomatonProxy,AutomatonInfo> mAutomatonInfoMap;
   private Collection<EventProxy> mCurrentEvents;
   private Map<EventProxy,EventInfo> mEventInfoMap =
       new HashMap<EventProxy,EventInfo>();
