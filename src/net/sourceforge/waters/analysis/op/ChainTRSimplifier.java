@@ -81,7 +81,7 @@ public class ChainTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (logger.isDebugEnabled()) {
       logger.debug(rel.getName());
-      logger.debug(rel.getNumberOfStates() + " states, " +
+      logger.debug(rel.getNumberOfReachableStates() + " states, " +
                    rel.getNumberOfTransitions() + " transitions, " +
                    rel.getNumberOfMarkings() + " markings.");
     }
@@ -96,7 +96,7 @@ public class ChainTRSimplifier
         step.setTransitionRelation(rel);
         if (step.run()) {
           if (logger.isDebugEnabled()) {
-            logger.debug(rel.getNumberOfStates() + " states, " +
+            logger.debug(rel.getNumberOfReachableStates() + " states, " +
                          rel.getNumberOfTransitions() + " transitions, " +
                          rel.getNumberOfMarkings() + " markings.");
           }

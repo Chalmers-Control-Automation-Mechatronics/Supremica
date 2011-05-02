@@ -87,7 +87,6 @@ public class PromelaTools {
     }
 
     // ---------------------------------------------------------------
-    @SuppressWarnings("unused")
     private void printTree(final CommonTree t, final int indent) {
     if ( t != null ) {
 
@@ -128,23 +127,20 @@ public class PromelaTools {
     public Hashtable<String,ChanInfo> getchan(){
         return chan;
     }
-    private void collectMsg(final CommonTree t){
 
-
-      if(t!=null){
-
-          if(t instanceof TypeTreeNode && t.getText().equals("chan")){
+    @SuppressWarnings("unused")
+    private void collectMsg(final CommonTree t)
+    {
+      if (t!=null) {
+          if(t instanceof TypeTreeNode && t.getText().equals("chan")) {
               final CommonTree tr1 = (CommonTree)t.getChild(1);
               final String name = t.getChild(0).getText();
               final int length = Integer.parseInt(tr1.getChild(0).getText());
               final int datalength = tr1.getChildCount()-2;
               chan.put(name,new ChanInfo(name, length, datalength));
-
-
           }
 
-          if(t instanceof ProctypeTreeNode){
-
+          if(t instanceof ProctypeTreeNode) {
             final ArrayList<List<String>> componentLabels = new ArrayList<List<String>>();
             final String proctypeName = t.getText();
             if(!component.containsKey(proctypeName)){
