@@ -4,6 +4,13 @@
 3. Specification h_ManageIO:1 and plant h_QueryPalletAtIO:1 have been decomposed into two automata each, such that their synchronous composition gives the original automaton.
 4. Plants h_CapEL11:1, h_CapEL21:1, h_CapEL31:1 have been removed (changed to properties) as it was found by language inclusion check that they do not restrict the system behaviour.
 </ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="REQUIRED_PARAMETER" Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="16"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
     <EventDeclList>
         <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="ASDwnAS1:1"/>
@@ -98,12 +105,12 @@
         <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU1:1"/>
         <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU2:1"/>
         <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU4:1"/>
-        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="finishpallets:1">
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishpallets:1">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="startpallets:1">
+        <EventDecl Kind="CONTROLLABLE" Name="startpallets:1">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
             </ns2:AttributeMap>
@@ -3890,234 +3897,208 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="h_PalletType1In_syn:1">
+        <SimpleComponent Kind="PLANT" Name="h_PalletType1In_syn">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s0">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="176"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-22" X="-1"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="-9"/>
+                        </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="s1"/>
-                    <SimpleNode Name="s2"/>
-                    <SimpleNode Name="s3"/>
-                    <SimpleNode Name="s4"/>
-                    <SimpleNode Name="s5"/>
-                    <SimpleNode Name="s6"/>
-                    <SimpleNode Name="s7"/>
-                    <SimpleNode Name="s8"/>
-                    <SimpleNode Name="s9"/>
-                    <SimpleNode Name="s10"/>
-                    <SimpleNode Name="s11"/>
-                    <SimpleNode Name="s12"/>
-                    <SimpleNode Name="s13"/>
-                    <SimpleNode Name="s14"/>
-                    <SimpleNode Name="s15"/>
-                    <SimpleNode Name="s16"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Target="s0" Source="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="startpallets:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-37" X="-91"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="130" X="129"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="128" X="176"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="count_1in"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="count_1in"/>
+                                    <SimpleIdentifier Name="N"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="-91"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Target="s0" Source="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType1InIO:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-27" X="5"/>
+                            </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Target="s3" Source="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s4" Source="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s5" Source="s4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s6" Source="s5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s7" Source="s6">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s8" Source="s7">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s9" Source="s8">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s10" Source="s9">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s11" Source="s10">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s12" Source="s11">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s13" Source="s12">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s14" Source="s13">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s15" Source="s14">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s16" Source="s15">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s0" Source="s16">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="128" X="176"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="129" X="218"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="128" X="176"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="count_1in"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="count_1in"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="6"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="h_PalletType2In_syn:1">
+        <VariableComponent Name="count_1in">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="count_1in"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="h_PalletType2In_syn">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s0">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="176"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-22" X="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="13" X="-10"/>
+                        </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="s1"/>
-                    <SimpleNode Name="s2"/>
-                    <SimpleNode Name="s3"/>
-                    <SimpleNode Name="s4"/>
-                    <SimpleNode Name="s5"/>
-                    <SimpleNode Name="s6"/>
-                    <SimpleNode Name="s7"/>
-                    <SimpleNode Name="s8"/>
-                    <SimpleNode Name="s9"/>
-                    <SimpleNode Name="s10"/>
-                    <SimpleNode Name="s11"/>
-                    <SimpleNode Name="s12"/>
-                    <SimpleNode Name="s13"/>
-                    <SimpleNode Name="s14"/>
-                    <SimpleNode Name="s15"/>
-                    <SimpleNode Name="s16"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Target="s0" Source="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="startpallets:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-36" X="-90"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="131" X="129"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="128" X="176"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="count_2in"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="count_2in"/>
+                                    <SimpleIdentifier Name="N"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-89"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Target="s0" Source="s0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
+                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-27" X="5"/>
+                            </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Target="s3" Source="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s4" Source="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s5" Source="s4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s6" Source="s5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s7" Source="s6">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s8" Source="s7">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s9" Source="s8">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s10" Source="s9">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s11" Source="s10">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s12" Source="s11">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s13" Source="s12">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s14" Source="s13">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s15" Source="s14">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s16" Source="s15">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s0" Source="s16">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="128" X="176"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="130" X="221"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="128" X="176"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="count_2in"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="count_1in"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="6"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <VariableComponent Name="count_2in">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="count_2in"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="h_PalletOut_syn:1">
             <Graph>
                 <NodeList>
@@ -4125,209 +4106,106 @@
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="208"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-24" X="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="9" X="-8"/>
+                        </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="s1"/>
-                    <SimpleNode Name="s2"/>
-                    <SimpleNode Name="s3"/>
-                    <SimpleNode Name="s4"/>
-                    <SimpleNode Name="s5"/>
-                    <SimpleNode Name="s6"/>
-                    <SimpleNode Name="s7"/>
-                    <SimpleNode Name="s8"/>
-                    <SimpleNode Name="s9"/>
-                    <SimpleNode Name="s10"/>
-                    <SimpleNode Name="s11"/>
-                    <SimpleNode Name="s12"/>
-                    <SimpleNode Name="s13"/>
-                    <SimpleNode Name="s14"/>
-                    <SimpleNode Name="s15"/>
-                    <SimpleNode Name="s16"/>
-                    <SimpleNode Name="s17"/>
-                    <SimpleNode Name="s18"/>
-                    <SimpleNode Name="s19"/>
-                    <SimpleNode Name="s20"/>
-                    <SimpleNode Name="s21"/>
-                    <SimpleNode Name="s22"/>
-                    <SimpleNode Name="s23"/>
-                    <SimpleNode Name="s24"/>
-                    <SimpleNode Name="s25"/>
-                    <SimpleNode Name="s26"/>
-                    <SimpleNode Name="s27"/>
-                    <SimpleNode Name="s28"/>
-                    <SimpleNode Name="s29"/>
-                    <SimpleNode Name="s30"/>
-                    <SimpleNode Name="s31"/>
-                    <SimpleNode Name="s32"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Target="s0" Source="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-121"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="129" X="163"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="128" X="208"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&lt;">
+                                    <SimpleIdentifier Name="count_out"/>
+                                    <BinaryExpression Operator="*">
+                                        <IntConstant Value="2"/>
+                                        <SimpleIdentifier Name="N"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="count_out"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-5" X="-119"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s3" Source="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s4" Source="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s5" Source="s4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s6" Source="s5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s7" Source="s6">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s8" Source="s7">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s9" Source="s8">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s10" Source="s9">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s11" Source="s10">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s12" Source="s11">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s13" Source="s12">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s14" Source="s13">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s15" Source="s14">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s16" Source="s15">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s17" Source="s16">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s18" Source="s17">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s19" Source="s18">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s20" Source="s19">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s21" Source="s20">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s22" Source="s21">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s23" Source="s22">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s24" Source="s23">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s25" Source="s24">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s26" Source="s25">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s27" Source="s26">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s28" Source="s27">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s29" Source="s28">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s30" Source="s29">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s31" Source="s30">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s32" Source="s31">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s0" Source="s32">
+                    <Edge Target="s0" Source="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="finishpallets:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="6"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="128" X="208"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="129" X="250"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="count_out"/>
+                                    <BinaryExpression Operator="*">
+                                        <IntConstant Value="2"/>
+                                        <SimpleIdentifier Name="N"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="count_out"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="6"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <VariableComponent Name="count_out">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="*">
+                        <IntConstant Value="2"/>
+                        <SimpleIdentifier Name="N"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="count_out"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="h_IntfAssmbStn_AS2:1">
             <Graph>
                 <NodeList>
