@@ -87,6 +87,7 @@ public class PromelaTools {
     }
 
     // ---------------------------------------------------------------
+    @SuppressWarnings("unused")
     private void printTree(final CommonTree t, final int indent) {
     if ( t != null ) {
 
