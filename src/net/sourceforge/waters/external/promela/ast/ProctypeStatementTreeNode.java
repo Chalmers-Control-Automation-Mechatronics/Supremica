@@ -9,8 +9,8 @@ public class ProctypeStatementTreeNode extends PromelaTreeNode
 
   public ProctypeStatementTreeNode(final int token)
   {
-    super(null);
-    mProcState = null;
+    this((Token)new CommonToken(token,"ProcState"));
+    mProcState = "ProcState";
     // TODO Need int constructor
   }
 
@@ -28,11 +28,11 @@ public class ProctypeStatementTreeNode extends PromelaTreeNode
     return mProcState;
   }
 
-  void acceptVisitor(final PromelaVisitor visitor)
+  public void acceptVisitor(final PromelaVisitor visitor)
   {
     visitor.visitProcTypeStatement(this);
   }
 
-  private final String mProcState;
+  private String mProcState;
 
 }

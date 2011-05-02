@@ -29,6 +29,16 @@ public class ChanInfo{
         mTypeLength = type;
     }
 
+    public ChanInfo()
+    {
+      mTypeLength=0;
+      mName="";
+      mSendCount=0;
+      mRecCount=0;
+      mDataLength=0;
+      // TODO Auto-generated constructor stub
+    }
+
     public void storeMsg(final ArrayList<String> list){
         mMsg.add(list);
 

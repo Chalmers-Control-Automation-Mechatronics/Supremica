@@ -18,7 +18,7 @@ public class ChannelTreeNode extends PromelaTreeNode
     {
         return mType;
     }
-    void acceptVisitor(final PromelaVisitor visitor)
+    public void acceptVisitor(final PromelaVisitor visitor)
     {
       visitor.visitChannel(this);
 

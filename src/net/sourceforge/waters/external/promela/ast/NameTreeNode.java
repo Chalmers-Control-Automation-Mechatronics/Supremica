@@ -4,23 +4,22 @@ import net.sourceforge.waters.external.promela.PromelaVisitor;
 
 import org.antlr.runtime.*;
 
-public class RunTreeNode extends PromelaTreeNode
+public class NameTreeNode extends PromelaTreeNode
 {
-  public RunTreeNode(final Token token){
+  public NameTreeNode(final Token token){
     super(token);
-    mRun = token.getText();
+    mInitState = token.getText();
   }
   public String toString(){
-    return "run";
+      return "name";
   }
-  private final String mRun;
+  private final String mInitState;
   public String getValue()
   {
-    return mRun;
+      return mInitState;
   }
   public void acceptVisitor(final PromelaVisitor visitor)
-   {
-     visitor.visitRun(this);
-
-   }
+  {
+    visitor.visitName(this);
+  }
 }

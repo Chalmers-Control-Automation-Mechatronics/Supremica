@@ -1,10 +1,11 @@
 package net.sourceforge.waters.external.promela.ast;
 
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import net.sourceforge.waters.external.promela.PromelaVisitor;
 
-public class ConstantTreeNode extends CommonTree
+import org.antlr.runtime.*;
+
+public class ConstantTreeNode extends PromelaTreeNode
 {
 	public ConstantTreeNode(final Token token){
 		super(token);
@@ -18,4 +19,9 @@ public class ConstantTreeNode extends CommonTree
 	{
 		return mValue;
 	}
+  public void acceptVisitor(final PromelaVisitor visitor)
+  {
+    // TODO Auto-generated method stub
+    visitor.visitConstant(this);
+  }
 }

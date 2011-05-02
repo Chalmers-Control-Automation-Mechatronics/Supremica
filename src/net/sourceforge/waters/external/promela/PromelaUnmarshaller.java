@@ -248,7 +248,7 @@ public class PromelaUnmarshaller
                   final CommonTree childA = (CommonTree) tr.getChild(a);
                  // if(childA.toString().equals("Exchange")){
                   if(childA instanceof ExchangeTreeNode){
-                      if(childA.getText().equals("!")|| tr.getChild(a).getText().equals("!!")){
+                      if(childA.getText().equals("!")|| childA.getText().equals("!!")){
 
 
                       final ArrayList<String> data =new ArrayList<String>();
@@ -290,10 +290,12 @@ public class PromelaUnmarshaller
 
                       }
                       //still need to handle recieve statement
-                      if(childA.getText().equals("?")|| tr.getChild(a).getText().equals("??")){
+                      if(childA.getText().equals("?")|| childA.getText().equals("??")){
                         chan.get(childA.getChild(0).getText()).incRecnumber();
                         //if it is receiving msgs, set it to null, since it can be anything in automaton
-                        componentLabels.add(null);
+                        final ArrayList<String> recEverything = new ArrayList<String>();
+                        recEverything.add("recieve");
+                        componentLabels.add(recEverything);
                       }
                   }
                 }

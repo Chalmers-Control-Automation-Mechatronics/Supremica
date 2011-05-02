@@ -2,26 +2,26 @@ package net.sourceforge.waters.external.promela.ast;
 
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.*;
 
-public class ChannelStatementTreeNode extends PromelaTreeNode
+public class MsgTreeNode extends PromelaTreeNode
 {
-
-  public ChannelStatementTreeNode(final int token)
+  public MsgTreeNode(final int token)
   {
     // TODO Need int constructor
-    this((Token)new CommonToken(token,"ChanState"));
-    mChanState = "ChanState";
+    this((Token)new CommonToken(token,"MsgArgument"));
+    mChanState = "MsgArgument";
   }
 
-  public ChannelStatementTreeNode(final Token token)
+  public MsgTreeNode(final Token token)
   {
     super(token);
     mChanState = token.getText();
   }
 
   public String toString(){
-    return "CHAN_STATEMENT";
+    return "MsgArgument";
   }
 
   public String getValue()
@@ -31,7 +31,7 @@ public class ChannelStatementTreeNode extends PromelaTreeNode
 
   public void acceptVisitor(final PromelaVisitor visitor)
   {
-    visitor.visitChannelStatement(this);
+    visitor.visitMsg(this);
   }
 
   private String mChanState;

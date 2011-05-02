@@ -36,7 +36,7 @@ tokens{
 	INITNODE;
 	TYPE;
 	STATEMENT;
-	MODULE_ROOT;
+	MODULE_ROOT = 'Root';
 	CONDITION;
 	REC;
 	SEN;
@@ -96,7 +96,7 @@ specRule
 @init  { paraphrases.push("in specification"); }
 @after { paraphrases.pop(); }
 	:	moduleRule+ EOF
-		-> ^(MODULE_ROOT moduleRule*)
+		-> ^(MODULE_ROOT<ModuleTreeNode> moduleRule*)
 	;
 
 moduleRule
@@ -146,7 +146,7 @@ proctypeRule
 		(enablerRule)? 
 		BLOCKBEGIN sequenceRule BLOCKEND 
 		(SEMICOLON)* 
-		-> ^(NAME<ProctypeTreeNode> NAME ^(PROCTYPE<ProctypeStatementTreeNode> sequenceRule))
+		-> ^(NAME<ProctypeTreeNode> NAME<NameTreeNode> ^(PROCTYPE<ProctypeStatementTreeNode> sequenceRule))
     ;
 
 inlineRule
@@ -203,7 +203,7 @@ stepRule
 
 varrefRule
 	:	NAME (ALTPARENOPEN any_exprRule ALTPARENCLOSE)? (DOT varrefRule)?
-		
+		-> ^(NAME<NameTreeNode> (any_exprRule)? (varrefRule)?)
 	;
 //modified
 stmntRule
@@ -266,9 +266,9 @@ recv_argsRule
 @init  { paraphrases.push("in receive arguments"); }
 @after { paraphrases.pop(); }
 	: recv_argRule (PARENOPEN recv_argListRule PARENCLOSE) 
-		-> ^(MESSAGE_ARGUMENTS recv_argRule recv_argListRule)
+		-> ^(MESSAGE_ARGUMENTS<MsgTreeNode> recv_argRule recv_argListRule)
   	| recv_argRule (COMMA recv_argRule)*
-		-> ^(MESSAGE_ARGUMENTS recv_argRule recv_argRule*)
+		-> ^(MESSAGE_ARGUMENTS<MsgTreeNode> recv_argRule recv_argRule*)
 //	->  ^(recv_argRule ivarRule)
     ;
 
@@ -306,7 +306,7 @@ send_argsRule
 @init  { paraphrases.push("in send arguments"); }
 @after { paraphrases.pop(); }
 	:	(any_exprRule PARENOPEN arg_lstRule PARENCLOSE) 
-		-> ^(MESSAGE_ARGUMENTS any_exprRule arg_lstRule)
+		-> ^(MESSAGE_ARGUMENTS<MsgTreeNode> any_exprRule arg_lstRule)
 	    | arg_lstRule
     ;
 
@@ -330,7 +330,7 @@ one_declRule
 @init  { paraphrases.push("in declaration"); }
 @after { paraphrases.pop(); }
 	:	(visibleRule)? typenameRule ivarRule (COMMA ivarRule)*
-		-> ^(VARDEFINITION typenameRule ivarRule+)
+		-> ^(VARDEFINITION<VardefTreeNode> typenameRule ivarRule+)
 	;
 
 optionsRule
@@ -344,7 +344,7 @@ optionsRule
 
 ivarRule
 	:	NAME (ALTPARENOPEN constRule ALTPARENCLOSE)? (ASSIGN (any_exprRule) )?
-		-> ^(NAME (constRule)? (any_exprRule)? )  //(ch_initRule)?
+		-> ^(NAME<NameTreeNode> (constRule)? (any_exprRule)? )  //(ch_initRule)?
 	//|	NAME ASSIGN ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typeRule (COMMA typeRule)* BLOCKEND (SEMICOLON)*
 	//	-> ^(NAME STATEMENT constRule typeRule*)
 	;
@@ -386,7 +386,7 @@ any_exprRule
 	  | (ENABLED|PCVALUE) PARENOPEN any_exprRule PARENCLOSE 
 	  | varrefRule ALTPARENOPEN any_exprRule ALTPARENCLOSE AT varrefRule
 	  | RUN NAME PARENOPEN (arg_lstRule)? PARENCLOSE (priorityRule)? 
-		-> ^(RUN<RunTreeNode> NAME (arg_lstRule)? )
+		-> ^(RUN<RunTreeNode> NAME<NameTreeNode> (arg_lstRule)? (priorityRule)?)
 	  
 	  
 	;

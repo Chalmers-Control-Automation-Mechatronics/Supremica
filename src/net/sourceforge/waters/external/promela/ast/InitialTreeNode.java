@@ -19,7 +19,7 @@ public class InitialTreeNode extends PromelaTreeNode
     {
         return mInit;
     }
-    void acceptVisitor(final PromelaVisitor visitor)
+    public void acceptVisitor(final PromelaVisitor visitor)
     {
       visitor.visitInitial(this);
 

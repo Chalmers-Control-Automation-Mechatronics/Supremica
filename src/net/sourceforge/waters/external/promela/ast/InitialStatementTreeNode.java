@@ -20,7 +20,7 @@ public class InitialStatementTreeNode extends PromelaTreeNode
     {
         return mInitState;
     }
-    void acceptVisitor(final PromelaVisitor visitor)
+    public void acceptVisitor(final PromelaVisitor visitor)
     {
       visitor.visitInitialStatement(this);
     }

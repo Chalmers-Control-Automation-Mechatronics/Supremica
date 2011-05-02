@@ -183,7 +183,7 @@ public class PromelaTools {
                           }
                         }
 
-                        //store proctype name and relevant data into hashtable
+                        //store channel name and relevant data into hashtable
                         chan.get(childA.getChild(0).getText()).storeMsg(data);
 
                         //add this event info to event list
@@ -276,13 +276,15 @@ public class PromelaTools {
         PromelaWalker walker = new PromelaWalker(nodes);
         walker.specRule();
     */
+        final PromelaVisitor visitor = new PromelaVisitor();
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
             //collectMsg(t);
            // print_label();
             //print_chan();
-            printTree(t,0);
-
+            //printTree(t,0);
+            visitor.visitModule(t);
+            visitor.output();
             //System.out.println(t.toStringTree());
         //modified
         /*

@@ -9,17 +9,21 @@ public class ModuleTreeNode extends PromelaTreeNode
   public ModuleTreeNode(final Token token){
     super(token);
     mEx = token.getText();
-}
-public String toString(){
-    return "Module";
-}
-private final String mEx;
-public String getValue()
-{
-    return mEx;
-}
-void acceptVisitor(final PromelaVisitor visitor)
-{
-  visitor.visitModule(this);
-}
-}
+  }
+  public ModuleTreeNode(final int token){
+    this((Token)new CommonToken(token,"Root"));
+    mEx = "Root";
+  }
+  public String toString(){
+      return "Module";
+  }
+  private String mEx;
+  public String getValue()
+  {
+      return mEx;
+  }
+  public void acceptVisitor(final PromelaVisitor visitor)
+  {
+    visitor.visitModule(this);
+  }
+ }

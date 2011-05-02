@@ -19,7 +19,7 @@ public class ExchangeTreeNode extends PromelaTreeNode
 	{
 		return mEx;
 	}
-    void acceptVisitor(final PromelaVisitor visitor)
+    public void acceptVisitor(final PromelaVisitor visitor)
     {
       visitor.visitExchange(this);
     }

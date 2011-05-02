@@ -5,6 +5,8 @@ import net.sourceforge.waters.external.promela.PromelaVisitor;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 
+
+
 public abstract class PromelaTreeNode extends CommonTree
 {
   public PromelaTreeNode(final Token token)
@@ -12,5 +14,5 @@ public abstract class PromelaTreeNode extends CommonTree
     super(token);
   }
 
-  abstract void acceptVisitor(PromelaVisitor visitor);
+  public abstract void acceptVisitor(PromelaVisitor visitor);
 }
