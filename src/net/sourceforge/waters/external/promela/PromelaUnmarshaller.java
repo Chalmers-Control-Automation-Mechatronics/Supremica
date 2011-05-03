@@ -256,15 +256,20 @@ public class PromelaUnmarshaller
             final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
             final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
             eventList.add(event);
+            System.out.println("initial");
           }
           //check if its receiving
           else if(value.get(i).size()==1 && value.get(i).get(0).equals("receive")){
               //!!!to do ... when its receiving
-
+            final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("testing");
+            final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+            eventList.add(event);
+            System.out.println("testing");
           }
           //if it is normal event, create it
           else{
               //create specific index event, etc name[33][124]
+              System.out.println("normal");
               final String ename = value.get(i).get(0);
               final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(value.get(i).size()-1);
               for(int y=1;y<value.get(i).size();y++){

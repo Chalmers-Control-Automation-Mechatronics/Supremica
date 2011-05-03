@@ -114,7 +114,7 @@ public class PromelaVisitor
         final ArrayList<String> recEverything = new ArrayList<String>();
         //!!!!!!!!! how to solve where the send request come from@
 
-        recEverything.add("recieve");
+        recEverything.add("receive");
         componentLabels.add(recEverything);
       }
       component.put(proctypeName, componentLabels);
