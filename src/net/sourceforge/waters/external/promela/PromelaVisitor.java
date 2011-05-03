@@ -130,6 +130,11 @@ public class PromelaVisitor
   }
 
   public void visitInitial(final CommonTree t){
+   // final ArrayList<String> temp = new ArrayList<String>();
+    final ArrayList<List<String>> tempLabel = new ArrayList<List<String>>();
+    //temp.add("init");
+    //tempLabel.add(temp);
+    component.put("Init",tempLabel);
     count = 0;
     for(int i=0;i<t.getChildCount();i++){
       if(t instanceof PromelaTreeNode){
@@ -140,7 +145,9 @@ public class PromelaVisitor
   public void visitInitialStatement(final CommonTree t){
     if(t.getText().equals("atomic")){
       final ArrayList<String> temp = new ArrayList<String>();
+
       temp.add("init");
+
       atomic = true;
       //insert this particular event into first place of event label list, for each component
       for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
