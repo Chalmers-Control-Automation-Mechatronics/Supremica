@@ -12,8 +12,6 @@ public class ChanInfo{
     private final int mDataLength;
     @SuppressWarnings("unused")
     private final int mTypeLength;
-    @SuppressWarnings("unused")
-    //private List<String> type;
     private final List<List<String>> mMsg = new ArrayList<List<String>>();
     @SuppressWarnings("unused")
     private final Map<String,List<List<String>>> message =

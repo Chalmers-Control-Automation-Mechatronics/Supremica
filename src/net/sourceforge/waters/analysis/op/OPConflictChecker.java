@@ -2508,7 +2508,7 @@ public class OPConflictChecker
         final int numMarkings = rel.getNumberOfMarkings();
         mSimplifier.setTransitionRelation(rel);
         if (mSimplifier.run()) {
-          if (rel.getNumberOfStates() == numStates &&
+          if (rel.getNumberOfReachableStates() == numStates &&
               rel.getNumberOfTransitions() == numTrans &&
               rel.getNumberOfMarkings() == numMarkings) {
             return null;
