@@ -94,17 +94,17 @@ public class PromelaVisitor
         ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
       }
 
-      //store proctype name and relevant data into hashtable
+      //store channel name and relevant data into hashtable
       chan.get(chanName).storeMsg(data);
 
       //add this event info to event list
       componentLabels.add(labels);
 
       }
-      //recieve statement
+      //receive statement
       if(t.getText().equals("?")|| t.getText().equals("??")){
        // chan.get(proctypeName).incRecnumber();
-        //if it is receiving msgs, set it to null, since it can be anything in automaton
+        //if it is receiving messages, set it to default string receive
         final ArrayList<String> recEverything = new ArrayList<String>();
         //!!!!!!!!! how to solve where the send request come from@
 
@@ -158,13 +158,24 @@ public class PromelaVisitor
       eventData.put(newKey,component.get(proctypeName));
     }
   }
-  public void output(){
-    for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
-      System.out.println(entry.getKey()+"->"+entry.getValue());
 
-    }
-  }
   public void visitName(final CommonTree t){
 
   }
+
+  public Hashtable<String, ChanInfo> getChan(){
+    return chan;
+
+  }
+
+  public Hashtable<String, ArrayList<List<String>>> getComponent(){
+    return component;
+  }
+
+  public void output(){
+    for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
+      System.out.println(entry.getKey()+"->"+entry.getValue());
+    }
+  }
+
 }

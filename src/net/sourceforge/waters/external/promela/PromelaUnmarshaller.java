@@ -19,14 +19,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.filechooser.FileFilter;
 
 
-import net.sourceforge.waters.external.promela.ast.*;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -164,7 +162,10 @@ public class PromelaUnmarshaller
     } finally {
       stream.close();
     }
-    collectMsg(ast);
+
+    visitor.visitModule(ast);
+    visitor.output();
+
 
     final ModuleProxy module = constructModule(uri);
     return module;
@@ -186,7 +187,7 @@ public class PromelaUnmarshaller
     final String comment = "Imported from Promela file " + source + ".";
     // Create event declarations ...
     final List<EventDeclProxy> events = new ArrayList<EventDeclProxy>();
-    for (final Map.Entry<String,ChanInfo> entry : chan.entrySet()) {
+    for (final Map.Entry<String,ChanInfo> entry : visitor.getChan().entrySet()) {
       final String key = entry.getKey();
       //final ChanInfo info = entry.getValue();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy(key);
@@ -217,117 +218,7 @@ public class PromelaUnmarshaller
     return filename.substring(start, end);
   }
 
-  private void collectMsg(final CommonTree t){
 
-
-    if(t!=null){
-
-        if(t.getText().equals("chan")){
-            final CommonTree tr1 = (CommonTree)t.getChild(1);
-            final String name = t.getChild(0).getText();
-            final int length = Integer.parseInt(tr1.getChild(0).getText());
-            final int datalength = tr1.getChildCount()-2;
-            chan.put(name,new ChanInfo(name, length, datalength));
-
-
-        }
-
-        if(t instanceof ProctypeTreeNode){
-
-          final ArrayList<List<String>> componentLabels = new ArrayList<List<String>>();
-          final String proctypeName = t.getText();
-          if(!component.containsKey(proctypeName)){
-            component.put(proctypeName,componentLabels);
-          }
-            for(int b =0;b<t.getChildCount();b++){
-
-                if(t.getChild(b).toString().equals("STATEMENT")){
-                final CommonTree tr = (CommonTree)t.getChild(b);
-
-                for(int a=0;a<tr.getChildCount();a++){
-                  final CommonTree childA = (CommonTree) tr.getChild(a);
-                 // if(childA.toString().equals("Exchange")){
-                  if(childA instanceof ExchangeTreeNode){
-                      if(childA.getText().equals("!")|| childA.getText().equals("!!")){
-
-
-                      final ArrayList<String> data =new ArrayList<String>();
-
-                      final StringBuilder sb = new StringBuilder();
-                      sb.append(childA.getChild(0).getText());
-                      final String n = childA.getChild(0).getText();
-                     // sb.append(childA.getText()+"[");
-                      chan.get(childA.getChild(0).getText()).incSendnumber();
-                      final CommonTree msgargs = (CommonTree) childA.getChild(1); //message statement
-
-                      final ArrayList<String> labels = new ArrayList<String>();
-                      //add event name
-                      labels.add(n);
-
-                      for(int y = 0; y <msgargs.getChildCount();y++){
-                        final CommonTree childY = (CommonTree) msgargs.getChild(y);
-
-
-                        if(childY instanceof ConstantTreeNode){
-
-                          sb.append("[");
-                          sb.append(childY.getText());
-                          sb.append("]");
-                          data.add(childY.getText());
-
-                          //add all event data
-                          labels.add(childY.getText());
-
-                        }
-
-                      }
-
-                      //store proctype name and relevant data into hashtable
-                      chan.get(childA.getChild(0).getText()).storeMsg(data);
-
-                      //add this event info to event list
-                      componentLabels.add(labels);
-
-                      }
-                      //still need to handle recieve statement
-                      if(childA.getText().equals("?")|| childA.getText().equals("??")){
-                        chan.get(childA.getChild(0).getText()).incRecnumber();
-                        //if it is receiving msgs, set it to null, since it can be anything in automaton
-                        final ArrayList<String> recEverything = new ArrayList<String>();
-                        recEverything.add("recieve");
-                        componentLabels.add(recEverything);
-                      }
-                  }
-                }
-                  //store in such a style A: [[init], [name, 33, 124], [name, 33, 121]]
-                  //or B: [[init], null]
-                  component.put(proctypeName, componentLabels);
-                }
-
-            }
-
-        }
-        if(t instanceof InitialTreeNode){
-          final CommonTree childI = (CommonTree) t.getChild(0);
-          //if it is atomic, create "init" event for each proctype/component.
-          if(childI.getChild(0).getText().equals("atomic")){
-            final ArrayList<String> temp = new ArrayList<String>();
-            temp.add("init");
-            //insert this particular event into first place of event label list, for each component
-            for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
-              entry.getValue().add(0,temp);
-
-            }
-
-        }
-        }
-        for(int i = 0; i < t.getChildCount();i++){
-
-            collectMsg((CommonTree)t.getChild(i));
-
-        }
-    }
-}
   //#########################################################################
   //# Data Members
   /**
@@ -339,8 +230,7 @@ public class PromelaUnmarshaller
   private File mOutputDir;
 
   private DocumentManager mDocumentManager;
-  private final Hashtable<String, ChanInfo> chan = new Hashtable<String,ChanInfo>();
-  private final Hashtable<String, ArrayList<List<String>>> component = new Hashtable<String,ArrayList<List<String>>>();
+
   //#########################################################################
   //# Class Constants
   private static final String PROMELA_EXTENSION = ".pml";
@@ -352,5 +242,5 @@ public class PromelaUnmarshaller
                                       PROMELA_EXTENSION + "]");
   private static final Collection<FileFilter> FILTERS =
       Collections.singletonList(PROMELA_FILTER);
-
+  final PromelaVisitor visitor = new PromelaVisitor();
 }

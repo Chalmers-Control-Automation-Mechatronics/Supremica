@@ -277,15 +277,15 @@ public class PromelaTools {
         PromelaWalker walker = new PromelaWalker(nodes);
         walker.specRule();
     */
-        final PromelaVisitor visitor = new PromelaVisitor();
+
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
             //collectMsg(t);
            // print_label();
             //print_chan();
             //printTree(t,0);
-            visitor.visitModule(t);
-            visitor.output();
+            //visitor.visitModule(t);
+            //visitor.output();
             //System.out.println(t.toStringTree());
         //modified
         /*
