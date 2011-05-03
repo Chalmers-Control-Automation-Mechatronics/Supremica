@@ -13,6 +13,7 @@ import org.antlr.runtime.tree.CommonTree;
 public class PromelaVisitor
 {
   int count = 0;
+  boolean atomic = false;
   ArrayList<String> data =new ArrayList<String>();
   ArrayList<String> labels = new ArrayList<String>();
   private final Hashtable<String, ChanInfo> chan = new Hashtable<String,ChanInfo>();
@@ -54,6 +55,7 @@ public class PromelaVisitor
   public void visitChannel(final CommonTree t){
     final PromelaTreeNode tr1 = (PromelaTreeNode) t.getChild(1);
     final String name = t.getChild(0).getText();
+
     chan.put(name,new ChanInfo());
     tr1.acceptVisitor(this);
   }
@@ -73,8 +75,12 @@ public class PromelaVisitor
     final int length = Integer.parseInt(t.getChild(0).getText());
     final int datalength = t.getChildCount()-2;
     final String name = t.getParent().getChild(0).getText();
+    final ArrayList<String> type = new ArrayList<String>();
+    for(int i=1;i<t.getChildCount();i++){
+      type.add(t.getChild(i).getText());
+    }
     //System.out.println(name);
-    chan.put(name,new ChanInfo(name, length, datalength));
+    chan.put(name,new ChanInfo(name, length, datalength,type));
   }
 
   public void visitExchange(final CommonTree t){
@@ -135,6 +141,7 @@ public class PromelaVisitor
     if(t.getText().equals("atomic")){
       final ArrayList<String> temp = new ArrayList<String>();
       temp.add("init");
+      atomic = true;
       //insert this particular event into first place of event label list, for each component
       for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
         entry.getValue().add(0,temp);
@@ -177,5 +184,7 @@ public class PromelaVisitor
       System.out.println(entry.getKey()+"->"+entry.getValue());
     }
   }
-
+  public boolean getAtomic(){
+    return atomic;
+  }
 }

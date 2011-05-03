@@ -15,8 +15,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.external.promela.ast.*;
-
 import net.sourceforge.waters.external.promela.parser.PromelaLexer;
 import net.sourceforge.waters.external.promela.parser.PromelaParser;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -87,7 +85,7 @@ public class PromelaTools {
     }
 
     // ---------------------------------------------------------------
-    @SuppressWarnings("unused")
+
     private void printTree(final CommonTree t, final int indent) {
     if ( t != null ) {
 
@@ -129,7 +127,7 @@ public class PromelaTools {
         return chan;
     }
 
-    @SuppressWarnings("unused")
+  /*  @SuppressWarnings("unused")
     private void collectMsg(final CommonTree t)
     {
       if (t!=null) {
@@ -223,6 +221,7 @@ public class PromelaTools {
           }
       }
   }
+  */
     @SuppressWarnings("unused")
     private void print_chan(){
        // System.out.println(chan.get("name").getValue().toString());
@@ -277,15 +276,15 @@ public class PromelaTools {
         PromelaWalker walker = new PromelaWalker(nodes);
         walker.specRule();
     */
-
+        final PromelaVisitor visitor = new PromelaVisitor();
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
             //collectMsg(t);
            // print_label();
             //print_chan();
-            //printTree(t,0);
-            //visitor.visitModule(t);
-            //visitor.output();
+            printTree(t,0);
+            visitor.visitModule(t);
+            visitor.output();
             //System.out.println(t.toStringTree());
         //modified
         /*

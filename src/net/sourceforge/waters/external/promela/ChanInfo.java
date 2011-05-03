@@ -13,20 +13,23 @@ public class ChanInfo{
     @SuppressWarnings("unused")
     private final int mTypeLength;
     @SuppressWarnings("unused")
-    private List<String> type;
+    //private List<String> type;
     private final List<List<String>> mMsg = new ArrayList<List<String>>();
     @SuppressWarnings("unused")
     private final Map<String,List<List<String>>> message =
       new Hashtable<String,List<List<String>>>();
     @SuppressWarnings("unused")
     private final String mName;
-
-    public ChanInfo(final String n, final int type,final int data){
+    private final ArrayList<String> type = new ArrayList<String>();
+    public ChanInfo(final String n, final int typeL,final int dataL,final ArrayList<String> ty){
         mSendCount = 0;
         mRecCount = 0;
         mName = n;
-        mDataLength = data;
-        mTypeLength = type;
+        mDataLength = dataL;
+        mTypeLength = typeL;
+        for(final String value: ty){
+           type.add(value);
+        }
     }
 
     public ChanInfo()
@@ -51,7 +54,9 @@ public class ChanInfo{
     public int getDataLength(){
         return mDataLength;
     }
-
+    public ArrayList<String> getType(){
+      return type;
+    }
     public int getSendnumber(){
         return mSendCount;
     }

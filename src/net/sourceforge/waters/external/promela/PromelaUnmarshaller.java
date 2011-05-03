@@ -26,16 +26,22 @@ import javax.swing.filechooser.FileFilter;
 
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.anarres.cpp.LexerException;
 import org.antlr.runtime.RecognitionException;
@@ -187,13 +193,43 @@ public class PromelaUnmarshaller
     final String comment = "Imported from Promela file " + source + ".";
     // Create event declarations ...
     final List<EventDeclProxy> events = new ArrayList<EventDeclProxy>();
+
+    //adding channel events
     for (final Map.Entry<String,ChanInfo> entry : visitor.getChan().entrySet()) {
       final String key = entry.getKey();
       //final ChanInfo info = entry.getValue();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy(key);
+      //final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+      final int size = entry.getValue().getType().size();
+      final Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>(size);
+      for(final String value: entry.getValue().getType()){
+        if(value.equals("byte")){
+          final IntConstantProxy zero = mFactory.createIntConstantProxy(0);
+          final IntConstantProxy c255 = mFactory.createIntConstantProxy(255);
+          final BinaryOperator op = optable.getRangeOperator();
+          final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, zero, c255);
+          ranges.add(range);
+        }
+      }
+     //mFactory.
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
+
+      events.add(event);
+    }
+
+    //adding atomic event if it is atomic
+    if(visitor.getAtomic()){
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
       events.add(event);
     }
+/*
+    for(final Map.Entry<String, ArrayList<List<String>>> entry: visitor.getComponent().entrySet()){
+      final ArrayList<List<String>> value = entry.getValue();
+
+      }
+    }
+*/
     // Create automata ...
     @SuppressWarnings("unused")
     final List<Proxy> components = new ArrayList<Proxy>();
@@ -226,7 +262,7 @@ public class PromelaUnmarshaller
    * we are converting into.
    */
   private final ModuleProxyFactory mFactory;
-
+  private final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
   private File mOutputDir;
 
   private DocumentManager mDocumentManager;
