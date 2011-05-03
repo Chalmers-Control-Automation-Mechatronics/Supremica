@@ -24,7 +24,7 @@ import java.util.Map;
 
 import javax.swing.filechooser.FileFilter;
 
-
+import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -52,7 +52,6 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.anarres.cpp.LexerException;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.CommonTree;
 
 
 /**
@@ -163,7 +162,7 @@ public class PromelaUnmarshaller
   {
     final URL url = uri.toURL();
     final InputStream stream = url.openStream();
-    CommonTree ast = null;
+    ModuleTreeNode ast = null;
     try {
 
       final PromelaTools tool = new PromelaTools();
@@ -176,8 +175,8 @@ public class PromelaUnmarshaller
       stream.close();
     }
 
-    visitor.visitModule(ast);
-    visitor.output();
+    mVisitor.visitModule(ast);
+    mVisitor.output();
 
 
     final ModuleProxy module = constructModule(uri);
@@ -204,7 +203,7 @@ public class PromelaUnmarshaller
 //Creating Default events
 
     //adding channel events
-    for (final Map.Entry<String,ChanInfo> entry : visitor.getChan().entrySet()) {
+    for (final Map.Entry<String,ChanInfo> entry : mVisitor.getChan().entrySet()) {
       final String key = entry.getKey();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy(key);
 
@@ -226,7 +225,7 @@ public class PromelaUnmarshaller
     }
 
     //adding atomic event if it is atomic
-    if(visitor.getAtomic()){
+    if(mVisitor.getAtomic()){
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
       events.add(event);
@@ -240,7 +239,7 @@ public class PromelaUnmarshaller
     final List<Proxy> components = new ArrayList<Proxy>();
 
     //Main loop to create Node and Edges, for GraphProxy, then create components
-    for(final Map.Entry<String, ArrayList<List<String>>> entry: visitor.getComponent().entrySet()){
+    for(final Map.Entry<String, ArrayList<List<String>>> entry: mVisitor.getComponent().entrySet()){
         final Collection<NodeProxy> nodes = new ArrayList<NodeProxy>();
         final Collection<EdgeProxy> edges = new ArrayList<EdgeProxy>();
         final Collection<Proxy> eventList = new ArrayList<Proxy>();
@@ -254,16 +253,14 @@ public class PromelaUnmarshaller
           //check if its "init", create simple event init
           if(value.get(i).size()==1&&value.get(i).get(0).equals("init")){
             final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
-            final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-            eventList.add(event);
+            eventList.add(ident);
             System.out.println("initial");
           }
           //check if its receiving
           else if(value.get(i).size()==1 && value.get(i).get(0).equals("receive")){
               //!!!to do ... when its receiving
             final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("testing");
-            final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-            eventList.add(event);
+            eventList.add(ident);
             System.out.println("testing");
           }
           //if it is normal event, create it
@@ -291,7 +288,7 @@ public class PromelaUnmarshaller
 
         //there is not get method in Collection, so i use toArray
         final NodeProxy[] nodeinfo = nodes.toArray(new NodeProxy[0]);
-        //!!!to do... how to handle mutilple events for 1 edge
+        //!!!to do... how to handle multiple events for 1 edge
         final Proxy[] eventLabel = eventList.toArray(new Proxy[0]);
 
         //Create Edges
@@ -364,5 +361,5 @@ public class PromelaUnmarshaller
                                       PROMELA_EXTENSION + "]");
   private static final Collection<FileFilter> FILTERS =
       Collections.singletonList(PROMELA_FILTER);
-  final PromelaVisitor visitor = new PromelaVisitor();
+  private final EventCollectingVisitor mVisitor = new EventCollectingVisitor();
 }

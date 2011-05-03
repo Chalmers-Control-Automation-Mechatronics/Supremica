@@ -15,6 +15,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
 import net.sourceforge.waters.external.promela.parser.PromelaLexer;
 import net.sourceforge.waters.external.promela.parser.PromelaParser;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -56,7 +57,7 @@ public class PromelaTools {
 
     // ---------------------------------------------------------------
 
-    public CommonTree parseStream(final InputStream input)
+    public ModuleTreeNode parseStream(final InputStream input)
       throws IOException, LexerException, RecognitionException
     {
       // final File f = new File(promelaFilename);
@@ -239,7 +240,7 @@ public class PromelaTools {
       }
     }
  ///////////
-    private CommonTree parseInternal(final Preprocessor preProcessor) throws IOException,
+    private ModuleTreeNode parseInternal(final Preprocessor preProcessor) throws IOException,
             LexerException, RecognitionException {
         preProcessor.setListener(new PreprocessorListener() {
             public void handleError(final Source source, final int line, final int column, final String msg) {
@@ -269,20 +270,20 @@ public class PromelaTools {
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
         final PromelaParser parser = new PromelaParser(tokens);
         final PromelaParser.specRule_return r = parser.specRule();
-        final CommonTree t = (CommonTree)r.getTree();
+        final ModuleTreeNode t = (ModuleTreeNode) r.getTree();
 
     /*  CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
         nodes.setTokenStream(tokens);
         PromelaWalker walker = new PromelaWalker(nodes);
         walker.specRule();
     */
-        final PromelaVisitor visitor = new PromelaVisitor();
+        final EventCollectingVisitor visitor = new EventCollectingVisitor();
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
             //collectMsg(t);
            // print_label();
             //print_chan();
-            //printTree(t,0);
+            printTree(t,0);
             visitor.visitModule(t);
             visitor.output();
             //System.out.println(t.toStringTree());
