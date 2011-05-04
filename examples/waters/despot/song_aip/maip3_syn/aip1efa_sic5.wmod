@@ -7054,7 +7054,7 @@ The following changes have been made in order make the model amenable to composi
                             </Guards>
                             <Actions>
                                 <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="count_1in"/>
+                                    <SimpleIdentifier Name="count_2in"/>
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Actions>
