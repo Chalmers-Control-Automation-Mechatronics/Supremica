@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -1261,10 +1262,16 @@ public class OPConflictChecker
     final ProductDESProxyFactory factory = getFactory();
     final KindTranslator translator = getKindTranslator();
     final EventProxy tau = createSilentEvent(candidate, factory);
-    final EventEncoding eventEnc = new EventEncoding(aut, translator, tau);
+    final EventEncoding eventEnc = new EventEncoding();
     final Collection<EventProxy> local = candidate.getLocalEvents();
-    for (final EventProxy event : local) {
-      eventEnc.addSilentEvent(event);
+    eventEnc.addSilentEvent(tau);
+    for (final EventProxy event : aut.getEvents()) {
+      if (local.contains(event)) {
+        eventEnc.addSilentEvent(event);
+      } else if (translator.getEventKind(event) != EventKind.PROPOSITION ||
+                 mPropositions.contains(event)) {
+        eventEnc.addEvent(event, translator, false);
+      }
     }
     final StateEncoding stateEnc = new StateEncoding(aut);
     final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
@@ -2641,11 +2648,12 @@ public class OPConflictChecker
       mPreconditionMarkingID = eventEnc.getEventCode(mUsedPreconditionMarking);
       if (mPreconditionMarkingID < 0) {
         mPreconditionMarkingID =
-          eventEnc.addEvent(mUsedPreconditionMarking, true);
+          eventEnc.addEvent(mUsedPreconditionMarking, translator, true);
       }
       mDefaultMarkingID = eventEnc.getEventCode(mUsedDefaultMarking);
       if (mDefaultMarkingID < 0) {
-        mDefaultMarkingID = eventEnc.addEvent(mUsedDefaultMarking, true);
+        mDefaultMarkingID =
+          eventEnc.addEvent(mUsedDefaultMarking, translator, true);
       }
       final ChainTRSimplifier simplifier = getSimplifier();
       for (final TransitionRelationSimplifier step : simplifier.getSteps()) {
@@ -2734,12 +2742,12 @@ public class OPConflictChecker
       final EventEncoding eventEnc =
         new EventEncoding(aut, translator, tau, mPropositions,
                           EventEncoding.FILTER_PROPOSITIONS);
-      eventEnc.addEvent(vtau, false);
+      final KindTranslator id = IdenticalKindTranslator.getInstance();
+      final int codeOfVTau = eventEnc.addEvent(vtau, id, false);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
       final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
         (aut, eventEnc, inputStateEnc,
          ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-      final int codeOfVTau = eventEnc.getEventCode(vtau);
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(rel);
       bisimulator.setAppliesPartitionAutomatically(false);

@@ -302,12 +302,12 @@ public abstract class AbstractTRSimplifierTest
     final EventProxy alpha = getEvent(des, ALPHA);
     mAlphaID = enc.getEventCode(alpha);
     if (alpha != null && mAlphaID < 0) {
-      mAlphaID = enc.addEvent(alpha, true);
+      mAlphaID = enc.addEvent(alpha, translator, true);
     }
     final EventProxy omega = getEvent(des, OMEGA);
     mOmegaID = enc.getEventCode(omega);
     if (omega != null && mOmegaID < 0) {
-      mOmegaID = enc.addEvent(omega, true);
+      mOmegaID = enc.addEvent(omega, translator, true);
     }
     return enc;
   }

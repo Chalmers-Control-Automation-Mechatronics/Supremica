@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.op;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import gnu.trove.TObjectIntHashMap;
@@ -125,6 +126,17 @@ public class EventEncoding
                        final int filterMode)
   {
     this(aut.getEvents(), translator, tau, filter, filterMode);
+  }
+
+  /**
+   * Creates an empty encoding.
+   * This method creates an event encoding without any events or propositions.
+   * Events can be added using {@link #addEvent(EventProxy,boolean) addEvent()}
+   * or {@link #addSilentEvent(EventProxy) addSilentEvent()}.
+   */
+  public EventEncoding()
+  {
+    this(NO_EVENTS, null);
   }
 
   /**
@@ -409,21 +421,25 @@ public class EventEncoding
   /**
    * Adds an event to this encoding. This method enlarges the event encoding
    * with a new event, assigning a new code.
-   * @param  event    The event to be added, which may be a proper event
-   *                  or a proposition.
-   * @param  selfloop A flag, indicating whether the additional event should
-   *                  be selflooped (or marked, for propositions) in all states
-   *                  of an automaton using this encoding. This information
-   *                  is stored on the event encoding and needs to be read
-   *                  by any procedures creating transition relations using
-   *                  the encoding.
+   * @param  event       The event to be added, which may be a proper event
+   *                     or a proposition.
+   * @param  translator  Kind translator to distinguish propositions from
+   *                     proper events.
+   * @param  selfloop    A flag, indicating whether the additional event should
+   *                     be selflooped (or marked, for propositions) in all
+   *                     states of an automaton using this encoding. This
+   *                     information is stored on the event encoding and needs
+   *                     to be read by any procedures creating transition
+   *                     relations using the encoding.
    * @return The event (or proposition) code that was assigned to the event.
    * @see #getExtraSelfloops()
    */
-  public int addEvent(final EventProxy event, final boolean selfloop)
+  public int addEvent(final EventProxy event,
+                      final KindTranslator translator,
+                      final boolean selfloop)
   {
     final int code;
-    switch (event.getKind()) {
+    switch (translator.getEventKind(event)) {
     case CONTROLLABLE:
     case UNCONTROLLABLE:
       code = mProperEvents.size();
@@ -530,5 +546,9 @@ public class EventEncoding
    */
   public static final int FILTER_ALL =
     FILTER_PROPER_EVENTS | FILTER_PROPOSITIONS;
+
+
+  private static final Collection<EventProxy> NO_EVENTS =
+    Collections.emptySet();
 
 }

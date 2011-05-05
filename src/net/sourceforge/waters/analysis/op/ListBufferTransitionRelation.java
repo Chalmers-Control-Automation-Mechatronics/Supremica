@@ -1359,6 +1359,9 @@ public class ListBufferTransitionRelation
     if (mPredecessorBuffer != null) {
       mPredecessorBuffer.replaceEvent(oldID, newID);
     }
+    if (mUsedEvents.get(oldID)) {
+      mUsedEvents.set(newID);
+    }
   }
 
 
