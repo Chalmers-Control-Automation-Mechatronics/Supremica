@@ -18,6 +18,7 @@ public class RunTreeNode extends PromelaTreeNode
   {
     return mRun;
   }
+
   public void acceptVisitor(final PromelaVisitor visitor)
    {
      visitor.visitRun(this);

@@ -5,9 +5,21 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.external.promela.ast.*;
-
-import org.antlr.runtime.tree.CommonTree;
+import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
+import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
+import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
+import net.sourceforge.waters.external.promela.ast.ExchangeTreeNode;
+import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
+import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
+import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
+import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
+import net.sourceforge.waters.external.promela.ast.NameTreeNode;
+import net.sourceforge.waters.external.promela.ast.ProctypeStatementTreeNode;
+import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
+import net.sourceforge.waters.external.promela.ast.PromelaTreeNode;
+import net.sourceforge.waters.external.promela.ast.RunTreeNode;
+import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
+import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 
 
 public class EventCollectingVisitor implements PromelaVisitor
@@ -34,56 +46,51 @@ public class EventCollectingVisitor implements PromelaVisitor
   {
     //final String name = t.getText();
     for(int i=0;i<t.getChildCount();i++) {
-      if(t instanceof PromelaTreeNode) {
         ((PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
-      }
     }
     return null;
   }
 
-  public void visitProcType(final CommonTree t){
+  public Object visitProcType(final ProctypeTreeNode t){
     final String proctypeName = t.getText();
     componentLabels = new ArrayList<List<String>>();
     if(!component.containsKey(proctypeName)){
       component.put(proctypeName,componentLabels);
     }
     for(int i=0;i<t.getChildCount();i++){
-      if(t instanceof PromelaTreeNode){
         final PromelaTreeNode node = (PromelaTreeNode)t.getChild(i);
         node.acceptVisitor(this);
     }
-    }
+    return null;
   }
-  public void visitMsg(final CommonTree t){
+
+  public Object visitMsg(final MsgTreeNode t){
     for(int i=0;i<t.getChildCount();i++){
-      if(t instanceof PromelaTreeNode){
       ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
     }
-    }
+    return null;
   }
-  public void visitVar(final CommonTree t){
 
-  }
-  public void visitChannel(final CommonTree t){
+  public Object visitChannel(final ChannelTreeNode t){
     final PromelaTreeNode tr1 = (PromelaTreeNode) t.getChild(1);
     final String name = t.getChild(0).getText();
 
     chan.put(name,new ChanInfo());
     tr1.acceptVisitor(this);
+    return null;
   }
 
-  public void visitProcTypeStatement(final CommonTree t){
+  public Object visitProcTypeStatement(final ProctypeStatementTreeNode t){
     //data.clear();
     //labels.clear();
 
     for(int i=0;i<t.getChildCount();i++){
-      if(t instanceof PromelaTreeNode){
       ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
     }
-    }
+    return null;
   }
 
-  public void visitChannelStatement(final CommonTree t){
+  public Object visitChannelStatement(final ChannelStatementTreeNode t){
     final int length = Integer.parseInt(t.getChild(0).getText());
     final int datalength = t.getChildCount()-2;
     final String name = t.getParent().getChild(0).getText();
@@ -93,9 +100,10 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
     //System.out.println(name);
     chan.put(name,new ChanInfo(name, length, datalength,type));
+    return null;
   }
 
-  public void visitExchange(final CommonTree t){
+  public Object visitExchange(final ExchangeTreeNode t){
     final String proctypeName =t.getParent().getParent().getText();
 
     //send statement
@@ -131,16 +139,17 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
       component.put(proctypeName, componentLabels);
      // System.out.println(proctypeName + "->"+componentLabels);
+      return null;
   }
 
-  public void visitConstant(final CommonTree t){
+  public Object visitConstant(final ConstantTreeNode t){
     data.add(t.getText());
     //add all event data
     labels.add(t.getText());
-
+    return null;
   }
 
-  public void visitInitial(final CommonTree t){
+  public Object visitInitial(final InitialTreeNode t){
    // final ArrayList<String> temp = new ArrayList<String>();
     final ArrayList<List<String>> tempLabel = new ArrayList<List<String>>();
     //temp.add("init");
@@ -148,12 +157,11 @@ public class EventCollectingVisitor implements PromelaVisitor
     component.put("Init",tempLabel);
     count = 0;
     for(int i=0;i<t.getChildCount();i++){
-      if(t instanceof PromelaTreeNode){
       ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
     }
-    }
+    return null;
   }
-  public void visitInitialStatement(final CommonTree t){
+  public Object visitInitialStatement(final InitialStatementTreeNode t){
     if(t.getText().equals("atomic")){
       final ArrayList<String> temp = new ArrayList<String>();
 
@@ -167,12 +175,11 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
     }
     for(int i=0;i<t.getChildCount();i++){
-      if(t instanceof PromelaTreeNode){
       ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
     }
-    }
+    return null;
   }
-  public void visitRun(final CommonTree t){
+  public Object visitRun(final RunTreeNode t){
     final String proctypeName = t.getChild(0).getText();
 
     if(!eventData.containsKey(proctypeName)){
@@ -182,11 +189,10 @@ public class EventCollectingVisitor implements PromelaVisitor
       final String newKey = proctypeName+"_"+count;
       eventData.put(newKey,component.get(proctypeName));
     }
+    return null;
   }
 
-  public void visitName(final CommonTree t){
 
-  }
 
   public Hashtable<String, ChanInfo> getChan(){
     return chan;
@@ -198,11 +204,33 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
 
   public void output(){
-    for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
+  /*  for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
       System.out.println(entry.getKey()+"->"+entry.getValue());
+    }
+    */
+    for(final Map.Entry<String,ChanInfo> entry: chan.entrySet()){
+      System.out.println(entry.getKey()+" ->>"+ entry.getValue().getValue());
     }
   }
   public boolean getAtomic(){
     return atomic;
+  }
+
+  public Object visitVar(final VardefTreeNode t)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Object visitName(final NameTreeNode t)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Object visitSemicolon(final SemicolonTreeNode semicolonTreeNode)
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

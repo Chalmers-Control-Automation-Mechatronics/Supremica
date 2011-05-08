@@ -1,8 +1,19 @@
 package net.sourceforge.waters.external.promela;
 
+import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
+import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
+import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
+import net.sourceforge.waters.external.promela.ast.ExchangeTreeNode;
+import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
+import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
-
-import org.antlr.runtime.tree.CommonTree;
+import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
+import net.sourceforge.waters.external.promela.ast.NameTreeNode;
+import net.sourceforge.waters.external.promela.ast.ProctypeStatementTreeNode;
+import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
+import net.sourceforge.waters.external.promela.ast.RunTreeNode;
+import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
+import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 
 
 public interface PromelaVisitor
@@ -10,28 +21,30 @@ public interface PromelaVisitor
 
   public Object visitModule(final ModuleTreeNode t);
 
-  public void visitProcType(final CommonTree t);
+  public Object visitProcType(final ProctypeTreeNode t);
 
-  public void visitMsg(final CommonTree t);
+  public Object visitMsg(final MsgTreeNode t);
 
-  public void visitVar(final CommonTree t);
+  public Object visitVar(final VardefTreeNode t);
 
-  public void visitChannel(final CommonTree t);
+  public Object visitChannel(final ChannelTreeNode t);
 
-  public void visitProcTypeStatement(final CommonTree t);
+  public Object visitProcTypeStatement(final ProctypeStatementTreeNode t);
 
-  public void visitChannelStatement(final CommonTree t);
+  public Object visitChannelStatement(final ChannelStatementTreeNode t);
 
-  public void visitExchange(final CommonTree t);
+  public Object visitExchange(final ExchangeTreeNode t);
 
-  public void visitConstant(final CommonTree t);
+  public Object visitConstant(final ConstantTreeNode t);
 
-  public void visitInitial(final CommonTree t);
+  public Object visitInitial(final InitialTreeNode t);
 
-  public void visitInitialStatement(final CommonTree t);
+  public Object visitInitialStatement(final InitialStatementTreeNode t);
 
-  public void visitRun(final CommonTree t);
+  public Object visitRun(final RunTreeNode t);
 
-  public void visitName(final CommonTree t);
+  public Object visitName(final NameTreeNode t);
+
+  public Object visitSemicolon(SemicolonTreeNode semicolonTreeNode);
 
 }

@@ -24,7 +24,7 @@ import java.util.Map;
 
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
+import net.sourceforge.waters.external.promela.ast.PromelaTreeNode;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -162,7 +162,8 @@ public class PromelaUnmarshaller
   {
     final URL url = uri.toURL();
     final InputStream stream = url.openStream();
-    ModuleTreeNode ast = null;
+    //ModuleTreeNode ast = null;
+    PromelaTreeNode ast = null;
     try {
 
       final PromelaTools tool = new PromelaTools();
@@ -175,7 +176,8 @@ public class PromelaUnmarshaller
       stream.close();
     }
 
-    mVisitor.visitModule(ast);
+    //mVisitor.visitModule(ast);
+    mVisitor.collectEvents(ast);
     mVisitor.output();
 
 

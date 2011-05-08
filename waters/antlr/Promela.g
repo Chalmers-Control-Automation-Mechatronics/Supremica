@@ -191,7 +191,7 @@ sequenceRule
 	:	// original: stepRule (';' stepRule)*
 //		(stepRule (';' | '-' '>')? )*
 		(stepRule (SEMICOLON)* (isguard=ARROW )? )*
-		->( stepRule)*
+		->(stepRule)*
 ;
 
 stepRule 
@@ -419,7 +419,7 @@ channelRule
 @init  { paraphrases.push("in channel definition"); }
 @after { paraphrases.pop(); }
 	:	CHAN NAME (ASSIGN)?  ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
-		-> ^(CHAN<ChannelTreeNode> NAME ^( CHAN<ChannelStatementTreeNode> constRule typenameRule*) )
+		-> ^(CHAN<ChannelTreeNode> NAME<NameTreeNode> ^( CHAN<ChannelStatementTreeNode> constRule typenameRule*) )
 	;													 
 
 unameRule

@@ -15,7 +15,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
+import net.sourceforge.waters.external.promela.ast.PromelaTreeNode;
 import net.sourceforge.waters.external.promela.parser.PromelaLexer;
 import net.sourceforge.waters.external.promela.parser.PromelaParser;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -57,7 +57,7 @@ public class PromelaTools {
 
     // ---------------------------------------------------------------
 
-    public ModuleTreeNode parseStream(final InputStream input)
+    public PromelaTreeNode parseStream(final InputStream input)
       throws IOException, LexerException, RecognitionException
     {
       // final File f = new File(promelaFilename);
@@ -240,7 +240,7 @@ public class PromelaTools {
       }
     }
  ///////////
-    private ModuleTreeNode parseInternal(final Preprocessor preProcessor) throws IOException,
+    private PromelaTreeNode parseInternal(final Preprocessor preProcessor) throws IOException,
             LexerException, RecognitionException {
         preProcessor.setListener(new PreprocessorListener() {
             public void handleError(final Source source, final int line, final int column, final String msg) {
@@ -270,7 +270,8 @@ public class PromelaTools {
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
         final PromelaParser parser = new PromelaParser(tokens);
         final PromelaParser.specRule_return r = parser.specRule();
-        final ModuleTreeNode t = (ModuleTreeNode) r.getTree();
+ //       final ModuleTreeNode t = (ModuleTreeNode) r.getTree();
+        final PromelaTreeNode t = (PromelaTreeNode)r.getTree();
 
     /*  CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
         nodes.setTokenStream(tokens);
@@ -284,8 +285,8 @@ public class PromelaTools {
            // print_label();
             //print_chan();
             printTree(t,0);
-            visitor.visitModule(t);
-            visitor.output();
+ //           visitor.visitModule(t);
+  //          visitor.output();
             //System.out.println(t.toStringTree());
         //modified
         /*
