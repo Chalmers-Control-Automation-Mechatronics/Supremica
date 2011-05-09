@@ -10,6 +10,8 @@
 package net.sourceforge.waters.external.promela;
 
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +46,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -284,11 +287,18 @@ public class PromelaUnmarshaller
         //create simple nodes, with only names, maybe problem is here?
         for(int i=0;i<=value.size();i++){
           final String nodeName = componentName+i;
-          final NodeProxy node = mFactory.createSimpleNodeProxy(nodeName);
-          nodes.add(node);
+          if(i==0){
+            final Point2D point = new Point(10,-10);
+            final PointGeometryProxy geo = mFactory.createPointGeometryProxy(point);
+            final NodeProxy node = mFactory.createSimpleNodeProxy(nodeName,null,true,null,geo,null);
+            nodes.add(node);
+          }else{
+            final NodeProxy node = mFactory.createSimpleNodeProxy(nodeName);
+            nodes.add(node);
+          }
         }
 
-        //there is not get method in Collection, so i use toArray
+        //there isn't get method in Collection, so i use toArray
         final NodeProxy[] nodeinfo = nodes.toArray(new NodeProxy[0]);
         //!!!to do... how to handle multiple events for 1 edge
         final Proxy[] eventLabel = eventList.toArray(new Proxy[0]);

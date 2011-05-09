@@ -19,6 +19,7 @@ import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.PromelaTreeNode;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
+import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 
 
@@ -104,7 +105,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
 
   public Object visitExchange(final ExchangeTreeNode t){
-    final String proctypeName =t.getParent().getParent().getText();
+    final String proctypeName =t.getParent().getParent().getParent().getText();
 
     //send statement
     if(t.getText().equals("!")|| t.getText().equals("!!")){
@@ -228,9 +229,22 @@ public class EventCollectingVisitor implements PromelaVisitor
     return null;
   }
 
-  public Object visitSemicolon(final SemicolonTreeNode semicolonTreeNode)
+  public Object visitSemicolon(final SemicolonTreeNode t)
   {
     // TODO Auto-generated method stub
+    if(t.getChildCount()>0){
+      for(int i=0;i<t.getChildCount();i++){
+        ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+      }
+    }
     return null;
+  }
+
+  public Object visitType(final TypeTreeNode t)
+  {
+ // TODO Auto-generated method stub
+    return null;
+
+
   }
 }

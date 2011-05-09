@@ -1,8 +1,8 @@
 package net.sourceforge.waters.external.promela.ast;
 
 import net.sourceforge.waters.external.promela.PromelaVisitor;
+import net.sourceforge.waters.model.module.GraphProxy;
 
-import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.*;
 
 public class MsgTreeNode extends PromelaTreeNode
@@ -29,9 +29,9 @@ public class MsgTreeNode extends PromelaTreeNode
     return mChanState;
   }
 
-  public void acceptVisitor(final PromelaVisitor visitor)
+  public GraphProxy acceptVisitor(final PromelaVisitor visitor)
   {
-    visitor.visitMsg(this);
+    return (GraphProxy) visitor.visitMsg(this);
   }
 
   private String mChanState;

@@ -44,6 +44,7 @@ tokens{
 	PROCSTATE=	'proc_state';
 	CHANSTATE=	'chan_state';
 	VARDEFINITION;
+	SEMI;
 }
 
 @header {
@@ -187,13 +188,22 @@ priorityRule
 	;
 
 
-sequenceRule
-	:	// original: stepRule (';' stepRule)*
+//sequenceRule
+//	:	// original: stepRule (';' stepRule)*
 //		(stepRule (';' | '-' '>')? )*
-		(stepRule (SEMICOLON)* (isguard=ARROW )? )*
-		->(stepRule)*
-;
+//		(stepRule (SEMICOLON)* (isguard=ARROW )? )*
+//		->(stepRule)*
+//;
 
+sequenceRule
+    :   stepRule (SEMICOLON)* (isguard=ARROW )?
+        (
+        -> stepRule
+        |
+        ( stepRule (SEMICOLON)* (isguard=ARROW )? )+
+        -> ^(STATEMENT<SemicolonTreeNode> (stepRule)*)
+        )
+    ;
 stepRule 
 	:	decl_lstRule
 		| stmntRule (UNLESS stmntRule)?
@@ -214,10 +224,11 @@ stmntRule
         | DO optionsRule OD
 		-> ^(DO<ConditionTreeNode> optionsRule)
         | ATOMIC BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
-		->^(ATOMIC<InitialStatementTreeNode> sequenceRule)		
+		->^(ATOMIC<InitialStatementTreeNode>  sequenceRule )		
 
         | DSTEP BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
         | BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
+        ->^(SEMI<SemicolonTreeNode> sequenceRule)
         | sendRule
         | receiveRule
         | assignRule
@@ -337,7 +348,7 @@ optionsRule
 @init  { paraphrases.push("in option"); }
 @after { paraphrases.pop(); }
 	:	COLONCOLON sequenceRule (COLONCOLON sequenceRule)*
-		-> sequenceRule*
+		-> (sequenceRule)+
 		//->  (sequenceRule sequenceRule*)
 		//-> ^(CONDITION<ConditionTreeNode> sequenceRule sequenceRule*)
 	;

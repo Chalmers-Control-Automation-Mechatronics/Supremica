@@ -1,6 +1,7 @@
 package net.sourceforge.waters.external.promela.ast;
 
 import net.sourceforge.waters.external.promela.PromelaVisitor;
+import net.sourceforge.waters.model.module.GraphProxy;
 
 import org.antlr.runtime.*;
 
@@ -29,9 +30,9 @@ public class ChannelStatementTreeNode extends PromelaTreeNode
     return mChanState;
   }
 
-  public void acceptVisitor(final PromelaVisitor visitor)
+  public GraphProxy acceptVisitor(final PromelaVisitor visitor)
   {
-    visitor.visitChannelStatement(this);
+    return (GraphProxy) visitor.visitChannelStatement(this);
   }
 
   private String mChanState;

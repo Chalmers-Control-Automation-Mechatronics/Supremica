@@ -13,6 +13,7 @@ import net.sourceforge.waters.external.promela.ast.ProctypeStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
+import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 
 
@@ -45,6 +46,8 @@ public interface PromelaVisitor
 
   public Object visitName(final NameTreeNode t);
 
-  public Object visitSemicolon(SemicolonTreeNode semicolonTreeNode);
+  public Object visitSemicolon(SemicolonTreeNode t);
+
+  public Object visitType(TypeTreeNode t);
 
 }
