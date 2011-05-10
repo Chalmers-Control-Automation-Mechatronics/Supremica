@@ -287,6 +287,7 @@ public class PromelaUnmarshaller
         //create simple nodes, with only names, maybe problem is here?
         for(int i=0;i<=value.size();i++){
           final String nodeName = componentName+i;
+          //final String nodeName = "";
           if(i==0){
             final Point2D point = new Point(10,-10);
             final PointGeometryProxy geo = mFactory.createPointGeometryProxy(point);
