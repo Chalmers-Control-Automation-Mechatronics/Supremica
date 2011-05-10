@@ -45,6 +45,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 {
   private final ModuleProxyFactory mFactory = new ModuleElementFactory();
   private final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+  @SuppressWarnings("unused")
   private EventCollectingVisitor mVisitor=null;
 
   ArrayList<String> data =new ArrayList<String>();
@@ -151,6 +152,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, zero, c255);
       ranges.add(range);
     }
+    @SuppressWarnings("unused")
     final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
 
     return null;
@@ -252,11 +254,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitInitial(final InitialTreeNode t)
   {
+    @SuppressWarnings("unused")
     final GraphProxy graph = null;
     final Collection<NodeProxy> nodes = new ArrayList<NodeProxy>();
+    @SuppressWarnings("unused")
     final Collection<EdgeProxy> edges = new ArrayList<EdgeProxy>();
 
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
+    @SuppressWarnings("unused")
     final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
 
     //create node

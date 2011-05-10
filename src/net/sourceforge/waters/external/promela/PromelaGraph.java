@@ -54,6 +54,7 @@ public class PromelaGraph
     final NodeProxy lastNodeOfFirst = ((ArrayList<NodeProxy>) first.getNodes()).get(first.getNodes().size()-1);
 
     final ArrayList<EdgeProxy> edgesOfSecond = (ArrayList<EdgeProxy>) second.getEdges();
+    @SuppressWarnings("unused")
     final NodeProxy firstNodeOfSecond = ((ArrayList<NodeProxy>) second.getNodes()).get(second.getNodes().size()-1);
 
     final NodeProxy newNode = mFactory.createSimpleNodeProxy("new"+r.nextInt());
