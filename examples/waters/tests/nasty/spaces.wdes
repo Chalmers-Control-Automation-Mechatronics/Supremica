@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="spaces" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A test to check whether the compiler can handle a file name containing spaces in an instance.</ns2:Comment>
+</ProductDES>
+

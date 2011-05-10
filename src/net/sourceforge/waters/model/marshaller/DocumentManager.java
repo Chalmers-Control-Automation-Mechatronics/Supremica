@@ -432,7 +432,7 @@ public class DocumentManager
     }
     list.add(unmarshaller);
     final Collection<String> extensions = unmarshaller.getSupportedExtensions();
-    for (String extension : extensions) {
+    for (final String extension : extensions) {
       final String lowerext = extension.toLowerCase();
       if (mExtensionUnmarshallerMap.containsKey(lowerext)) {
         throw new IllegalArgumentException(
@@ -549,21 +549,23 @@ public class DocumentManager
   private static URI resolve(final URI base, final String tailname)
       throws WatersUnmarshalException
   {
-    if (base != null) {
-      return base.resolve(tailname);
-    } else {
-      try {
-        final URI result = new URI(tailname);
+    try {
+      if (base != null) {
+        final URI tailuri = new URI(null, tailname, null);
+        return base.resolve(tailuri);
+      } else {
+        final File tailfile = new File(tailname);
+        final URI result = tailfile.toURI();
         if (result.isAbsolute()) {
           return result;
         } else {
-          throw new WatersUnmarshalException(
-              "Trying to load from relative location '" + tailname
-                  + "' without known path!");
+          throw new WatersUnmarshalException
+            ("Trying to load from relative location '" + tailname +
+             "' without known path!");
         }
-      } catch (final URISyntaxException exception) {
-        throw new WatersUnmarshalException(exception);
       }
+    } catch (final URISyntaxException exception) {
+      throw new WatersUnmarshalException(exception);
     }
   }
 

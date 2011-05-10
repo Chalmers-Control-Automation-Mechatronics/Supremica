@@ -192,6 +192,12 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "small_factory_n");
   }
 
+  public void testCompile_spaces()
+  throws IOException, WatersException
+  {
+    compile("tests", "nasty", "spaces");
+  }
+
   public void testCompile_tictactoe()
     throws IOException, WatersException
   {

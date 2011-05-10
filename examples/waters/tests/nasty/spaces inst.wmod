@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="spaces_inst" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This module with a space in its file name in instantiated from spaces.wmod to test whether the compiler can handle this kind of file name.</ns2:Comment>
+</Module>
