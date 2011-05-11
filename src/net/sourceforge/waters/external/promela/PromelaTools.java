@@ -279,8 +279,7 @@ public class PromelaTools {
         PromelaWalker walker = new PromelaWalker(nodes);
         walker.specRule();
     */
-        @SuppressWarnings("unused")
-        final EventCollectingVisitor visitor = new EventCollectingVisitor();
+
         if (parser.isSyntacticallyCorrect()) {
             isSyntacticallyCorrect = true;
             //collectMsg(t);

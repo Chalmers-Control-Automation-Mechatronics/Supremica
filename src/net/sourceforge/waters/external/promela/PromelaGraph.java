@@ -12,12 +12,11 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 public class PromelaGraph
 {
-  public PromelaGraph(final IdentifierProxy ident){
-
+  public PromelaGraph(final IdentifierProxy ident,final ModuleProxyFactory factory){
+    mFactory = factory;
     mStart = mFactory.createSimpleNodeProxy("s"+r.nextInt());
     mEnd = mFactory.createSimpleNodeProxy("s"+r.nextInt());
 
@@ -31,8 +30,8 @@ public class PromelaGraph
     mNodes.add(mEnd);
   }
 
-  public PromelaGraph(final Collection<IdentifierProxy> events){
-
+  public PromelaGraph(final Collection<IdentifierProxy> events, final ModuleProxyFactory factory){
+    mFactory = factory;
     mStart = mFactory.createSimpleNodeProxy("l"+r.nextInt());
     mEnd = mFactory.createSimpleNodeProxy("l"+r.nextInt());
 
@@ -57,45 +56,60 @@ public class PromelaGraph
       return null;
     }else{
     final ArrayList<EdgeProxy> edgesOfFirst = (ArrayList<EdgeProxy>) first.getEdges();
-    final NodeProxy lastNodeOfFirst = ((ArrayList<NodeProxy>) first.getNodes()).get(first.getNodes().size()-1);
+    final ArrayList<NodeProxy> nodeOfFirst = (ArrayList<NodeProxy>) first.getNodes();
+
 
     final ArrayList<EdgeProxy> edgesOfSecond = (ArrayList<EdgeProxy>) second.getEdges();
-    final NodeProxy firstNodeOfSecond = ((ArrayList<NodeProxy>) second.getNodes()).get(0);
+    final ArrayList<NodeProxy> nodeOfSecond = (ArrayList<NodeProxy>) second.getNodes();
+
 
 
     final NodeProxy newNode = mFactory.createSimpleNodeProxy("new"+r.nextInt());
-    ((ArrayList<NodeProxy>) first.getNodes()).set(first.getNodes().size()-1, newNode);
-    ((ArrayList<NodeProxy>) second.getNodes()).set(0,newNode);
+    //((ArrayList<NodeProxy>) first.getNodes()).set(first.getNodes().size()-1, newNode);
+    //((ArrayList<NodeProxy>) second.getNodes()).set(0,newNode);
 
     //replace last node from first PromelaGraph with new node
     for(int i =0;i<edgesOfFirst.size();i++){
-      if(edgesOfFirst.get(i).getTarget().refequals(lastNodeOfFirst)){
-        final LabelBlockProxy label = edgesOfFirst.get(i).getLabelBlock();
+      if(edgesOfFirst.get(i).getTarget().refequals(first.getEnd())){
+        final LabelBlockProxy label1 = edgesOfFirst.get(i).getLabelBlock();
         final NodeProxy sourceNode = edgesOfFirst.get(i).getSource();
-        final EdgeProxy newEdge = mFactory.createEdgeProxy(sourceNode,newNode,label,null,null,null,null);
-        ((ArrayList<EdgeProxy>) first.getEdges()).set(i, newEdge);
+        final EdgeProxy newEdge = mFactory.createEdgeProxy(sourceNode,newNode,label1,null,null,null,null);
+        edgesOfFirst.set(i, newEdge);
       }
     }
+
     //replace first node from second PromelaGraph with new node
     for(int i =0;i<edgesOfSecond.size();i++){
-      if(edgesOfSecond.get(i).getSource().refequals(firstNodeOfSecond)){
-        final LabelBlockProxy label = edgesOfSecond.get(i).getLabelBlock();
-        final NodeProxy targetNode = edgesOfSecond.get(i).getSource();
-        final EdgeProxy newEdge = mFactory.createEdgeProxy(newNode,targetNode,label,null,null,null,null);
-        ((ArrayList<EdgeProxy>) second.getEdges()).set(i, newEdge);
+      if(edgesOfSecond.get(i).getSource().refequals(second.getStart())){
+        final LabelBlockProxy label2 = edgesOfSecond.get(i).getLabelBlock();
+        final NodeProxy targetNode = edgesOfSecond.get(i).getTarget();
+        final EdgeProxy newEdge = mFactory.createEdgeProxy(newNode,targetNode,label2,null,null,null,null);
+        edgesOfSecond.set(i, newEdge);
       }
 
     }
-    //continue, make new PromelaGraph
-    for(int i=0;i<second.getEdges().size();i++){
+
     //add edges of second graph to first graph
-      first.getEdges().add(((ArrayList<EdgeProxy>) second.getEdges()).get(i));
-      if(i>=1){
-        //add all nodes but first node of second graph to first graph
-        first.getNodes().add(((ArrayList<NodeProxy>) second.getNodes()).get(i));
-      }
+    for(final EdgeProxy e: edgesOfSecond){
+      edgesOfFirst.add(e);
     }
-    //reset first graph end node
+
+    //remove the original start node of second graph and end node of first graph
+    //They are replaced by new node
+    nodeOfSecond.remove(second.getStart());
+    nodeOfFirst.remove(first.getEnd());
+
+    //add this new node to node list of first graph
+    nodeOfFirst.add(newNode);
+
+    //then, add nodes of second graph to first graph
+    for(final NodeProxy n: nodeOfSecond){
+      nodeOfFirst.add(n);
+    }
+
+    //redefine first graph
+    first.setEdges(edgesOfFirst);
+    first.setNodes(nodeOfFirst);
     first.setEnd(second.getEnd());
 
     return first;
@@ -118,6 +132,18 @@ public class PromelaGraph
   public void setEnd(final NodeProxy newEnd){
     mEnd = (SimpleNodeProxy) newEnd ;
   }
+  public void setNodes(final Collection<NodeProxy> nodes){
+    mNodes.clear();
+    for(final NodeProxy n: nodes){
+      mNodes.add(n);
+    }
+  }
+  public void setEdges(final Collection<EdgeProxy> edges){
+    mEdges.clear();
+    for(final EdgeProxy n: edges){
+      mEdges.add(n);
+    }
+  }
   public NodeProxy getStart(){
     return mStart;
   }
@@ -129,5 +155,5 @@ public class PromelaGraph
   private final Collection<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
   private SimpleNodeProxy mStart;
   private SimpleNodeProxy mEnd;
-  private final static ModuleProxyFactory mFactory = new ModuleElementFactory();
+  private static ModuleProxyFactory mFactory;
 }

@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+
 import org.anarres.cpp.LexerException;
 import org.antlr.runtime.RecognitionException;
 
@@ -140,6 +141,9 @@ public class PromelaUnmarshaller
     throws IOException, URISyntaxException,
            WatersMarshalException, WatersUnmarshalException
   {
+    mVisitor = new EventCollectingVisitor(mFactory);
+    mGraphVisitor= new GraphCollectingVisitor(mVisitor);
+
     final URL url = uri.toURL();
     final InputStream stream = url.openStream();
     //ModuleTreeNode ast = null;
@@ -185,7 +189,7 @@ public class PromelaUnmarshaller
     final Collection<EventDeclProxy> events = mVisitor.getEvents();
     final Collection<SimpleComponentProxy> components = mGraphVisitor.getComponents();
     final ModuleProxy module =mFactory.createModuleProxy(name, comment, null, null, events, null, components);
-
+    //final ModuleProxy module =mFactory.createModuleProxy(name, comment, null, null, events, null, null);
     return module;
   }
 
@@ -214,7 +218,8 @@ public class PromelaUnmarshaller
   private File mOutputDir;
 
   private DocumentManager mDocumentManager;
-
+  private EventCollectingVisitor mVisitor;
+  private GraphCollectingVisitor mGraphVisitor;
   //#########################################################################
   //# Class Constants
   private static final String PROMELA_EXTENSION = ".pml";
@@ -226,6 +231,5 @@ public class PromelaUnmarshaller
                                       PROMELA_EXTENSION + "]");
   private static final Collection<FileFilter> FILTERS =
       Collections.singletonList(PROMELA_FILTER);
-  private final EventCollectingVisitor mVisitor = new EventCollectingVisitor();
-  private final GraphCollectingVisitor mGraphVisitor = new GraphCollectingVisitor(mVisitor);
+
 }
