@@ -1,8 +1,6 @@
 package net.sourceforge.waters.external.promela.ast;
 
 import net.sourceforge.waters.external.promela.PromelaVisitor;
-import net.sourceforge.waters.model.module.GraphProxy;
-
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
@@ -23,9 +21,9 @@ public class SemicolonTreeNode extends PromelaTreeNode
   {
     return mSemi;
   }
-  public GraphProxy acceptVisitor(final PromelaVisitor visitor)
+  public Object acceptVisitor(final PromelaVisitor visitor)
   {
-    return (GraphProxy) visitor.visitSemicolon(this);
+    return  visitor.visitSemicolon(this);
 
   }
 

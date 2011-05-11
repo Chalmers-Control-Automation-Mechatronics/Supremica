@@ -1,6 +1,7 @@
 package net.sourceforge.waters.external.promela;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,18 @@ import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 public class EventCollectingVisitor implements PromelaVisitor
@@ -34,13 +47,28 @@ public class EventCollectingVisitor implements PromelaVisitor
   ArrayList<List<String>> componentLabels = new ArrayList<List<String>>();
   private final Hashtable<String, ArrayList<List<String>>> eventData = new Hashtable<String,ArrayList<List<String>>>();
 
+  private final ModuleProxyFactory mFactory = new ModuleElementFactory();
+  private final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+
+  ArrayList<Integer> lowerEnd = new ArrayList<Integer>();
+  ArrayList<Integer> upperEnd = new ArrayList<Integer>();
+  ArrayList<Collection<IdentifierProxy>> eventStore = new ArrayList<Collection<IdentifierProxy>>();
+  final Hashtable<String,Collection<IdentifierProxy>> procEvent = new Hashtable<String,Collection<IdentifierProxy>>();
+  //This is the output event table, for each proctype
+  private Hashtable<String,List<Collection<IdentifierProxy>>> outputEvent = new Hashtable<String,List<Collection<IdentifierProxy>>>();
+  private final Collection<EventDeclProxy> mEventDecls = new ArrayList<EventDeclProxy>();
   //########################################################################
   //# Invocation
   public void collectEvents(final PromelaTreeNode node)
   {
     node.acceptVisitor(this);
   }
-
+  public Hashtable<String,List<Collection<IdentifierProxy>>> getOutputEvent(){
+    return outputEvent;
+  }
+  public Collection<EventDeclProxy> getEvents(){
+    return mEventDecls;
+  }
   //########################################################################
   //# Interface net.sourceforge.waters.external.promela.PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)
@@ -54,6 +82,12 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitProcType(final ProctypeTreeNode t){
     final String proctypeName = t.getText();
+    eventStore = new ArrayList<Collection<IdentifierProxy>>();
+    outputEvent = new Hashtable<String,List<Collection<IdentifierProxy>>>();
+    outputEvent.put(proctypeName, eventStore);
+
+    procEvent.put(proctypeName,new ArrayList<IdentifierProxy>());
+
     componentLabels = new ArrayList<List<String>>();
     if(!component.containsKey(proctypeName)){
       component.put(proctypeName,componentLabels);
@@ -82,9 +116,6 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
 
   public Object visitProcTypeStatement(final ProctypeStatementTreeNode t){
-    //data.clear();
-    //labels.clear();
-
     for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
     }
@@ -99,9 +130,28 @@ public class EventCollectingVisitor implements PromelaVisitor
     for(int i=1;i<t.getChildCount();i++){
       type.add(t.getChild(i).getText());
     }
-    //System.out.println(name);
+
     chan.put(name,new ChanInfo(name, length, datalength,type));
-    return null;
+
+    final String chanName = t.getParent().getChild(0).getText();
+    lowerEnd = new ArrayList<Integer>();
+    upperEnd = new ArrayList<Integer>();
+    for(int i =1;i<t.getChildCount();i++){
+      ((PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+    }
+    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy(chanName);
+    final int size = t.getChildCount()-1;
+    final Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>(size);
+    for(int i=0;i<size;i++){
+      final IntConstantProxy zero = mFactory.createIntConstantProxy(lowerEnd.get(i));
+      final IntConstantProxy c255 = mFactory.createIntConstantProxy(upperEnd.get(i));
+      final BinaryOperator op = optable.getRangeOperator();
+      final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, zero, c255);
+      ranges.add(range);
+    }
+    final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
+    mEventDecls.add(event);
+    return ident;
   }
 
   public Object visitExchange(final ExchangeTreeNode t){
@@ -126,20 +176,43 @@ public class EventCollectingVisitor implements PromelaVisitor
 
       //add this event info to event list
       componentLabels.add(labels);
+      final String ename = labels.get(0);
+      final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
+      for(int y=1;y<labels.size();y++){
+        final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
+        indexes.add(c);
+      }
+        //create indexedIdentifier, and store it for receive statement
+        final IndexedIdentifierProxy indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
+        ArrayList<IdentifierProxy> temp =  (ArrayList<IdentifierProxy>) procEvent.get(proctypeName);
+        if(temp==null){
+          temp = new ArrayList<IdentifierProxy>();
+        }
+        temp.add(indexEvent);
+        procEvent.put(proctypeName,temp);
 
+        final Collection<IdentifierProxy> temp2 = new ArrayList<IdentifierProxy>();
+        temp2.add(indexEvent);
+        eventStore.add(temp2);
+        component.put(proctypeName, componentLabels);
+        outputEvent.put(proctypeName, eventStore);
+        return indexEvent;
       }
       //receive statement
       if(t.getText().equals("?")|| t.getText().equals("??")){
-       // chan.get(proctypeName).incRecnumber();
+
         //if it is receiving messages, set it to default string receive
         final ArrayList<String> recEverything = new ArrayList<String>();
-        //!!!!!!!!! how to solve where the send request come from@
-
         recEverything.add("receive");
         componentLabels.add(recEverything);
+
+        component.put(proctypeName, componentLabels);
+        final ArrayList<IdentifierProxy> temp = (ArrayList<IdentifierProxy>) procEvent.get(proctypeName);
+        eventStore.add(temp);
+        outputEvent.put(proctypeName, eventStore);
+        return null;
       }
-      component.put(proctypeName, componentLabels);
-     // System.out.println(proctypeName + "->"+componentLabels);
+
       return null;
   }
 
@@ -151,11 +224,6 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
 
   public Object visitInitial(final InitialTreeNode t){
-   // final ArrayList<String> temp = new ArrayList<String>();
-    final ArrayList<List<String>> tempLabel = new ArrayList<List<String>>();
-    //temp.add("init");
-    //tempLabel.add(temp);
-    component.put("Init",tempLabel);
     count = 0;
     for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
@@ -163,7 +231,13 @@ public class EventCollectingVisitor implements PromelaVisitor
     return null;
   }
   public Object visitInitialStatement(final InitialStatementTreeNode t){
-    if(t.getText().equals("atomic")){
+
+      final ArrayList<List<String>> tempLabel = new ArrayList<List<String>>();
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+      mEventDecls.add(event);
+
+      component.put("Init",tempLabel);
       final ArrayList<String> temp = new ArrayList<String>();
 
       temp.add("init");
@@ -174,15 +248,14 @@ public class EventCollectingVisitor implements PromelaVisitor
         entry.getValue().add(0,temp);
 
       }
-    }
-    for(int i=0;i<t.getChildCount();i++){
-      ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
-    }
+
     return null;
   }
   public Object visitRun(final RunTreeNode t){
     final String proctypeName = t.getChild(0).getText();
-
+    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("Run"+proctypeName);
+    final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+    mEventDecls.add(event);
     if(!eventData.containsKey(proctypeName)){
       eventData.put(proctypeName,component.get(proctypeName));
     }else{
@@ -192,8 +265,6 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
     return null;
   }
-
-
 
   public Hashtable<String, ChanInfo> getChan(){
     return chan;
@@ -205,10 +276,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
 
   public void output(){
-  /*  for (final Map.Entry<String,ArrayList<List<String>>> entry : component.entrySet()) {
-      System.out.println(entry.getKey()+"->"+entry.getValue());
-    }
-    */
+
     for(final Map.Entry<String,ChanInfo> entry: chan.entrySet()){
       System.out.println(entry.getKey()+" ->>"+ entry.getValue().getValue());
     }
@@ -242,7 +310,10 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitType(final TypeTreeNode t)
   {
- // TODO Auto-generated method stub
+    if(t.getText().equals("byte")){
+      lowerEnd.add(0);
+      upperEnd.add(255);
+    }
     return null;
 
 

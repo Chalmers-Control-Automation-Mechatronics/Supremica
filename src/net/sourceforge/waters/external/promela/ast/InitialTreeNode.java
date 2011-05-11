@@ -2,8 +2,6 @@ package net.sourceforge.waters.external.promela.ast;
 
 
 import net.sourceforge.waters.external.promela.PromelaVisitor;
-import net.sourceforge.waters.model.module.GraphProxy;
-
 import org.antlr.runtime.*;
 
 public class InitialTreeNode extends PromelaTreeNode
@@ -20,9 +18,9 @@ public class InitialTreeNode extends PromelaTreeNode
     {
         return mInit;
     }
-    public GraphProxy acceptVisitor(final PromelaVisitor visitor)
+    public Object acceptVisitor(final PromelaVisitor visitor)
     {
-      return (GraphProxy) visitor.visitInitial(this);
+      return  visitor.visitInitial(this);
 
     }
 }

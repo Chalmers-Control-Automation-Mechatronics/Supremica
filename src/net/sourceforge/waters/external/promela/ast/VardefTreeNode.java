@@ -1,7 +1,6 @@
 package net.sourceforge.waters.external.promela.ast;
 
 import net.sourceforge.waters.external.promela.PromelaVisitor;
-import net.sourceforge.waters.model.module.GraphProxy;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
@@ -29,9 +28,9 @@ public class VardefTreeNode extends PromelaTreeNode
     return mChanState;
   }
 
-  public GraphProxy acceptVisitor(final PromelaVisitor visitor)
+  public Object acceptVisitor(final PromelaVisitor visitor)
   {
-    return (GraphProxy) visitor.visitVar(this);
+    return  visitor.visitVar(this);
   }
 
   private String mChanState;

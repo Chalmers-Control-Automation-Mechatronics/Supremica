@@ -2,8 +2,6 @@ package net.sourceforge.waters.external.promela.ast;
 
 
 import net.sourceforge.waters.external.promela.PromelaVisitor;
-import net.sourceforge.waters.model.module.GraphProxy;
-
 import org.antlr.runtime.*;
 
 public class ConstantTreeNode extends PromelaTreeNode
@@ -20,9 +18,9 @@ public class ConstantTreeNode extends PromelaTreeNode
 	{
 		return mValue;
 	}
-  public GraphProxy acceptVisitor(final PromelaVisitor visitor)
+  public Object acceptVisitor(final PromelaVisitor visitor)
   {
     // TODO Auto-generated method stub
-    return (GraphProxy) visitor.visitConstant(this);
+    return  visitor.visitConstant(this);
   }
 }
