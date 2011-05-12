@@ -15,7 +15,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.external.promela.ast.PromelaTreeNode;
+import net.sourceforge.waters.external.promela.ast.PromelaTree;
 import net.sourceforge.waters.external.promela.parser.PromelaLexer;
 import net.sourceforge.waters.external.promela.parser.PromelaParser;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -57,7 +57,7 @@ public class PromelaTools {
 
     // ---------------------------------------------------------------
 
-    public PromelaTreeNode parseStream(final InputStream input)
+    public PromelaTree parseStream(final InputStream input)
       throws IOException, LexerException, RecognitionException
     {
       // final File f = new File(promelaFilename);
@@ -241,7 +241,7 @@ public class PromelaTools {
       }
     }
  ///////////
-    private PromelaTreeNode parseInternal(final Preprocessor preProcessor) throws IOException,
+    private PromelaTree parseInternal(final Preprocessor preProcessor) throws IOException,
             LexerException, RecognitionException {
         preProcessor.setListener(new PreprocessorListener() {
             public void handleError(final Source source, final int line, final int column, final String msg) {
@@ -272,7 +272,7 @@ public class PromelaTools {
         final PromelaParser parser = new PromelaParser(tokens);
         final PromelaParser.specRule_return r = parser.specRule();
  //       final ModuleTreeNode t = (ModuleTreeNode) r.getTree();
-        final PromelaTreeNode t = (PromelaTreeNode)r.getTree();
+        final PromelaTree t = (PromelaTree)r.getTree();
 
     /*  CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
         nodes.setTokenStream(tokens);

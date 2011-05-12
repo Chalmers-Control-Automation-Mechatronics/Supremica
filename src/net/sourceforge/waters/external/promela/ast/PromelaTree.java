@@ -6,9 +6,9 @@ import org.antlr.runtime.tree.*;
 
 
 
-public abstract class PromelaTreeNode extends CommonTree
+public abstract class PromelaTree extends CommonTree
 {
-  public PromelaTreeNode(final Token token)
+  public PromelaTree(final Token token)
   {
     super(token);
   }

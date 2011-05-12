@@ -6,7 +6,7 @@ import net.sourceforge.waters.external.promela.PromelaVisitor;
 
 import org.antlr.runtime.*;
 
-public class ProctypeTreeNode extends PromelaTreeNode
+public class ProctypeTreeNode extends PromelaTree
 {
 	public ProctypeTreeNode(final Token token){
 		super(token);

@@ -4,7 +4,7 @@ package net.sourceforge.waters.external.promela.ast;
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 import org.antlr.runtime.*;
 
-public class ConstantTreeNode extends PromelaTreeNode
+public class ConstantTreeNode extends PromelaTree
 {
 	public ConstantTreeNode(final Token token){
 		super(token);

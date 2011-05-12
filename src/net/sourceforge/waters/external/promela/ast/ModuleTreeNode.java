@@ -3,7 +3,7 @@ package net.sourceforge.waters.external.promela.ast;
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 import org.antlr.runtime.*;
 
-public class ModuleTreeNode extends PromelaTreeNode
+public class ModuleTreeNode extends PromelaTree
 {
   public ModuleTreeNode(final Token token){
     super(token);

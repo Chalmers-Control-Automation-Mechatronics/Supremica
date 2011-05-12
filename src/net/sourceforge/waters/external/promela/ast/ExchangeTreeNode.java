@@ -4,7 +4,7 @@ package net.sourceforge.waters.external.promela.ast;
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 import org.antlr.runtime.*;
 
-public class ExchangeTreeNode extends PromelaTreeNode
+public class ExchangeTreeNode extends PromelaTree
 {
 	public ExchangeTreeNode(final Token token){
 		super(token);

@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.external.promela.ast.PromelaTreeNode;
+import net.sourceforge.waters.external.promela.ast.PromelaTree;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
@@ -147,7 +147,7 @@ public class PromelaUnmarshaller
     final URL url = uri.toURL();
     final InputStream stream = url.openStream();
     //ModuleTreeNode ast = null;
-    PromelaTreeNode ast = null;
+    PromelaTree ast = null;
     try {
 
       final PromelaTools tool = new PromelaTools();

@@ -16,7 +16,7 @@ import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
 import net.sourceforge.waters.external.promela.ast.NameTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
-import net.sourceforge.waters.external.promela.ast.PromelaTreeNode;
+import net.sourceforge.waters.external.promela.ast.PromelaTree;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
@@ -57,7 +57,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   public EventCollectingVisitor(final ModuleProxyFactory factory){
     mFactory = factory;
   }
-  public void collectEvents(final PromelaTreeNode node)
+  public void collectEvents(final PromelaTree node)
   {
     node.acceptVisitor(this);
   }
@@ -74,7 +74,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   {
     //final String name = t.getText();
     for(int i=0;i<t.getChildCount();i++) {
-        ((PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+        ((PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     return null;
   }
@@ -83,7 +83,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
 
     for(int i=0;i<t.getChildCount();i++){
-        final PromelaTreeNode node = (PromelaTreeNode)t.getChild(i);
+        final PromelaTree node = (PromelaTree)t.getChild(i);
         node.acceptVisitor(this);
     }
     return null;
@@ -91,13 +91,13 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitMsg(final MsgTreeNode t){
     for(int i=0;i<t.getChildCount();i++){
-      ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     return null;
   }
 
   public Object visitChannel(final ChannelTreeNode t){
-    final PromelaTreeNode tr1 = (PromelaTreeNode) t.getChild(1);
+    final PromelaTree tr1 = (PromelaTree) t.getChild(1);
     final String name = t.getChild(0).getText();
     procEvent.put(name,new ArrayList<IdentifierProxy>());
     chan.put(name,new ChanInfo());
@@ -107,7 +107,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitProcTypeStatement(final ProctypeStatementTreeNode t){
     for(int i=0;i<t.getChildCount();i++){
-      ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     return null;
   }
@@ -127,7 +127,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     lowerEnd = new ArrayList<Integer>();
     upperEnd = new ArrayList<Integer>();
     for(int i =1;i<t.getChildCount();i++){
-      ((PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+      ((PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy(chanName);
     final int size = t.getChildCount()-1;
@@ -157,7 +157,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       //chan.get(t.getParent().getChild(0).getText()).incSendnumber();
 
       for(int i = 0; i <t.getChildCount();i++){
-        ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+        ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
       }
 
       //store channel name and relevant data into hashtable
@@ -204,7 +204,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitInitial(final InitialTreeNode t){
     count = 0;
     for(int i=0;i<t.getChildCount();i++){
-      ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     return null;
   }
@@ -262,7 +262,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     // TODO Auto-generated method stub
     if(t.getChildCount()>0){
       for(int i=0;i<t.getChildCount();i++){
-        ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+        ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
       }
     }
     return null;

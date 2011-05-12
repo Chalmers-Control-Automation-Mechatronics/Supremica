@@ -4,7 +4,7 @@ import net.sourceforge.waters.external.promela.PromelaVisitor;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
-public class SemicolonTreeNode extends PromelaTreeNode
+public class SemicolonTreeNode extends PromelaTree
 {
   public SemicolonTreeNode(final int token)
   {

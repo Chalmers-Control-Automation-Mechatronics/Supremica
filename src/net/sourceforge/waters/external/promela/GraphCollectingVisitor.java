@@ -14,7 +14,7 @@ import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
 import net.sourceforge.waters.external.promela.ast.NameTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
-import net.sourceforge.waters.external.promela.ast.PromelaTreeNode;
+import net.sourceforge.waters.external.promela.ast.PromelaTree;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -43,7 +44,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     mVisitor = v;
     mFactory = v.getFactory();
   }
-  public PromelaGraph collectGraphs(final PromelaTreeNode node)
+  public PromelaGraph collectGraphs(final PromelaTree node)
   {
     return (PromelaGraph) node.acceptVisitor(this);
   }
@@ -54,7 +55,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)
   {
     for(int i=0;i<t.getChildCount();i++){
-      ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     return null;
   }
@@ -64,7 +65,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     final String procName = t.getText();
     //visit child 1
-    final PromelaTreeNode statement = (PromelaTreeNode) t.getChild(1);
+    final PromelaTree statement = (PromelaTree) t.getChild(1);
     final PromelaGraph g = collectGraphs(statement);
 
     final IdentifierProxy ident;
@@ -86,7 +87,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitMsg(final MsgTreeNode t)
   {
     for(int i=0;i<t.getChildCount();i++){
-      ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     return null;
   }
@@ -107,7 +108,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitProcTypeStatement(final ProctypeStatementTreeNode t)
   {
     PromelaGraph result = null;
-    final PromelaGraph step = collectGraphs((PromelaTreeNode) t.getChild(0));
+    final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
     result = PromelaGraph.sequentialComposition(result,step);
 
     return result;
@@ -129,7 +130,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       labels.add(chanName);
 
       for(int i = 0; i <t.getChildCount();i++){
-        ( (PromelaTreeNode) t.getChild(i)).acceptVisitor(this);
+        ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
       }
 
       final String ename = labels.get(0);
@@ -160,7 +161,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitInitial(final InitialTreeNode t)
   {
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("Init");
-    final PromelaGraph initGraph = collectGraphs((PromelaTreeNode) t.getChild(0));
+    final PromelaGraph initGraph = collectGraphs((PromelaTree) t.getChild(0));
     final GraphProxy graph = initGraph.createGraphProxy();
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
     mComponents.add(component);
@@ -198,7 +199,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     PromelaGraph result = null;
     //if(t.getChildCount()>0){
       for(int i=0;i<t.getChildCount();i++){
-        final PromelaGraph step = collectGraphs((PromelaTreeNode) t.getChild(i));
+        final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
         result = PromelaGraph.sequentialComposition(result,step);
       }
    // }
