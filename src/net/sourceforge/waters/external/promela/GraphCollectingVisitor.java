@@ -2,6 +2,7 @@ package net.sourceforge.waters.external.promela;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
@@ -25,8 +26,8 @@ import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+
 
 public class GraphCollectingVisitor implements PromelaVisitor
 {
