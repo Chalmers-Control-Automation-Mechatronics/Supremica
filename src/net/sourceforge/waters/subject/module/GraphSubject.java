@@ -24,7 +24,6 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -172,13 +171,17 @@ public final class GraphSubject
 
   public Set<NodeProxy> getNodes()
   {
-    final Set<NodeProxy> downcast = Casting.toSet(mNodes);
+    final Set<?> precast = mNodes;
+    @SuppressWarnings("unchecked")
+    final Set<NodeProxy> downcast = (Set<NodeProxy>) precast;
     return Collections.unmodifiableSet(downcast);
   }
 
   public Collection<EdgeProxy> getEdges()
   {
-    final Collection<EdgeProxy> downcast = Casting.toCollection(mEdges);
+    final Collection<?> precast = mEdges;
+    @SuppressWarnings("unchecked")
+    final Collection<EdgeProxy> downcast = (Collection<EdgeProxy>) precast;
     return Collections.unmodifiableCollection(downcast);
   }
 

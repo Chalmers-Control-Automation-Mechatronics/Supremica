@@ -144,10 +144,6 @@
            includeantruntime="false">
       <classpath refid="antlr.runtime.classpath"/>
     </javac>
-    <javac srcdir="${supremica.src}" destdir="${waters.classes}"
-           includes="net/sourceforge/waters/model/unchecked/**/*.java"
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
-           includeantruntime="false"/>
   </target>
 
   <target name="jaxb-jar" depends="jaxb-compile"
@@ -155,7 +151,6 @@
     <jar jarfile="${jaxb.jar}">
       <fileset dir="${waters.classes}">
         <include name="net/sourceforge/waters/external/promela/parser/**/*.class"/>
-        <include name="net/sourceforge/waters/model/unchecked/**/*.class"/>
         <include name="net/sourceforge/waters/xsd/**/*.class"/>
        </fileset>
       <fileset dir="${src}">
@@ -176,7 +171,6 @@
       <include name="net/sourceforge/waters/**/*.java"/>
       <exclude name="net/sourceforge/waters/external/promela/parser/**/*.java"/>
       <exclude name="net/sourceforge/waters/gui/**/*.java"/>
-      <exclude name="net/sourceforge/waters/model/unchecked/**/*.java"/>
       <include name="org/supremica/log/**/*.java"/>
    </javac>
   </target>
@@ -198,7 +192,6 @@
         <include name="net/sourceforge/waters/**/*.xsl"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
-        <exclude name="net/sourceforge/waters/model/unchecked/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
         <include name="org/supremica/log/**"/>
       </fileset>

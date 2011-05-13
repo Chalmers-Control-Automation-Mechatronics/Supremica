@@ -15,8 +15,6 @@ import java.util.List;
 import net.sourceforge.waters.model.base.IndexedCollection;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.unchecked.Casting;
-
 import net.sourceforge.waters.xsd.base.ElementType;
 
 
@@ -56,7 +54,8 @@ abstract class JAXBImporter
                 final Collection<? extends Proxy> proxies)
     throws WatersUnmarshalException
   {
-    final Collection<Proxy> unsafe = Casting.toCollection(proxies);
+    @SuppressWarnings("unchecked")
+    final Collection<Proxy> unsafe = (Collection<Proxy>) proxies;
     for (final ElementType element : elements) {
       final Proxy proxy = (Proxy) importElement(element);
       unsafe.add(proxy);
@@ -67,8 +66,10 @@ abstract class JAXBImporter
                        final IndexedCollection<? extends NamedProxy> proxies)
     throws WatersUnmarshalException
   {
+    final Class<?> preclazz = IndexedCollection.class;
+    @SuppressWarnings("unchecked")
     final Class<IndexedCollection<NamedProxy>> clazz =
-      Casting.toClass(IndexedCollection.class);
+      (Class<IndexedCollection<NamedProxy>>) preclazz;
     final IndexedCollection<NamedProxy> unsafe = clazz.cast(proxies);
     for (final ElementType element : elements) {
       final NamedProxy proxy = (NamedProxy) importElement(element);

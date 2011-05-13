@@ -28,7 +28,6 @@ import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -69,7 +68,8 @@ class NodeSetSubject
   NodeSetSubject(final Collection<? extends NodeProxy> input)
   {
     this(input.size());
-    final Collection<NodeSubject> downcast = Casting.toCollection(input);
+    @SuppressWarnings("unchecked")
+    final Collection<NodeSubject> downcast = (Collection<NodeSubject>) input;
     insertAllUnique(downcast);
   }
 
@@ -231,7 +231,9 @@ class NodeSetSubject
     } else if (mNameMap.containsKey(newname)) {
       throw createDuplicateName(newname);
     }
-    final Map<String,NamedProxy> map = Casting.toMap(mNameMap);
+    final Map<?,?> precast = mNameMap;
+    @SuppressWarnings("unchecked")
+    final Map<String,NamedProxy> map = (Map<String,NamedProxy>) precast;
     map.remove(oldname);
     map.put(newname, proxy);
   }

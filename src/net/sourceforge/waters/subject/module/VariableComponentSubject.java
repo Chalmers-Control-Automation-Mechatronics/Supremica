@@ -24,7 +24,6 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -181,8 +180,10 @@ public final class VariableComponentSubject
 
   public List<VariableMarkingProxy> getVariableMarkings()
   {
+    final List<?> precast = mVariableMarkings;
+    @SuppressWarnings("unchecked")
     final List<VariableMarkingProxy> downcast =
-      Casting.toList(mVariableMarkings);
+      (List<VariableMarkingProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

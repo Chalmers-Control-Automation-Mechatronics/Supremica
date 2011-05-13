@@ -24,7 +24,6 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.SetSubject;
 import net.sourceforge.waters.subject.base.Subject;
@@ -146,7 +145,9 @@ public final class GroupNodeSubject
   //# Interface net.sourceforge.waters.model.module.GroupNodeProxy
   public Set<NodeProxy> getImmediateChildNodes()
   {
-    final Set<NodeProxy> downcast = Casting.toSet(mImmediateChildNodes);
+    final Set<?> precast = mImmediateChildNodes;
+    @SuppressWarnings("unchecked")
+    final Set<NodeProxy> downcast = (Set<NodeProxy>) precast;
     return Collections.unmodifiableSet(downcast);
   }
 

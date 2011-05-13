@@ -19,7 +19,6 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -94,7 +93,9 @@ public abstract class EventListExpressionSubject
   //# Interface net.sourceforge.waters.model.module.EventListExpressionProxy
   public List<Proxy> getEventList()
   {
-    final List<Proxy> downcast = Casting.toList(mEventList);
+    final List<?> precast = mEventList;
+    @SuppressWarnings("unchecked")
+    final List<Proxy> downcast = (List<Proxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

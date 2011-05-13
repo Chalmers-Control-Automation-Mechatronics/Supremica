@@ -45,7 +45,6 @@ import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
@@ -160,15 +159,19 @@ class EditorGraph
     return mBlockedEvents;
   }
 
+  @SuppressWarnings("unchecked")
   public Set<NodeProxy> getNodes()
   {
-    final Set<NodeProxy> downcast = Casting.toSet(mNodes);
+    final Set<?> precast = mNodes;
+    final Set<NodeProxy> downcast = (Set<NodeProxy>) precast;
     return Collections.unmodifiableSet(downcast);
   }
 
+  @SuppressWarnings("unchecked")
   public List<EdgeProxy> getEdges()
   {
-    final List<EdgeProxy> downcast = Casting.toList(mEdges);
+    final List<?> precast = mEdges;
+    final List<EdgeProxy> downcast = (List<EdgeProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -74,8 +73,9 @@ public class NotCloningGeometrySetSubject<E>
   public NotCloningGeometrySetSubject<E> clone()
   {
     try {
+      @SuppressWarnings("unchecked")
       final Class<NotCloningGeometrySetSubject<E>> clazz =
-        Casting.toClass(getClass());
+        (Class<NotCloningGeometrySetSubject<E>>) getClass();
       final NotCloningGeometrySetSubject<E> cloned = clazz.cast(super.clone());
       cloned.mParent = null;
       cloned.mObservers = null;
@@ -122,7 +122,7 @@ public class NotCloningGeometrySetSubject<E>
     return mSet.size();
   }
 
-           
+
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()
@@ -212,7 +212,7 @@ public class NotCloningGeometrySetSubject<E>
     }
   }
 
-  
+
   //#########################################################################
   //# Printing
   public String getShortClassName()

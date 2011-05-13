@@ -636,12 +636,17 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  Java_WriteLn $stream $umap "    if ($paramname == null) \{"
 	  Java_WriteLn $stream $umap "      $membername = $empty;"
 	  Java_WriteLn $stream $umap "    \} else \{"
-	  Java_WriteLn $stream $umap \
-              "      final $type ${paramname}Modifiable ="
-	  Java_WriteLn $stream $umap "        new ${impltype}($paramname);"
-	  Java_WriteLn $stream $umap "      $membername ="
-	  Java_WriteLn $stream $umap \
-	      "        Collections.${transformer}(${paramname}Modifiable);";
+          if {[regexp {^Immutable} $impltype all]} {
+            Java_WriteLn $stream $umap "      $membername ="
+            Java_WriteLn $stream $umap "        new ${impltype}($paramname);"
+          } else {
+            Java_WriteLn $stream $umap \
+                "      final $type ${paramname}Modifiable ="
+            Java_WriteLn $stream $umap "        new ${impltype}($paramname);"
+            Java_WriteLn $stream $umap "      $membername ="
+            Java_WriteLn $stream $umap \
+                "        Collections.${transformer}(${paramname}Modifiable);";
+          }
 	  Java_WriteLn $stream $umap "    \}"
 	}
       } elseif {[regexp {^.*Subject<(.*Subject)>} $impltype all elemtype]} {
@@ -948,13 +953,21 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  Java_WriteLn $stream $umap "      return null;"
 	  Java_WriteLn $stream $umap "    \} else \{"
 	  Java_WriteLn $stream $umap \
-	      "      final $type downcast = Casting.${caster}($membername);"
+	      "      final $caster precast = $membername;"
+	  Java_WriteLn $stream $umap \
+              "      @SuppressWarnings(\"unchecked\")"
+	  Java_WriteLn $stream $umap \
+              "      final $type downcast = ($type) precast;"
 	  Java_WriteLn $stream $umap \
 	      "      return Collections.${transformer}(downcast);"
 	  Java_WriteLn $stream $umap "    \}"
 	} else {
 	  Java_WriteLn $stream $umap \
-	      "    final $type downcast = Casting.${caster}($membername);"
+	      "    final $caster precast = $membername;"
+	  Java_WriteLn $stream $umap \
+              "    @SuppressWarnings(\"unchecked\")"
+	  Java_WriteLn $stream $umap \
+              "    final $type downcast = ($type) precast;"
 	  Java_WriteLn $stream $umap \
 	      "    return Collections.${transformer}(downcast);"
 	}
@@ -1503,7 +1516,10 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "      final Proxy cloned = getClone(proxy);"
     Java_WriteLn $stream $umap "      result.add(cloned);"
     Java_WriteLn $stream $umap "    \}"
-    Java_WriteLn $stream $umap "    return Casting.toList(result);"
+    Java_WriteLn $stream $umap "    final List<?> precast = result;"
+    Java_WriteLn $stream $umap "    @SuppressWarnings(\"unchecked\")"
+    Java_WriteLn $stream $umap "    List<P> cast = (List<P>) precast;"
+    Java_WriteLn $stream $umap "    return cast;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
     Java_WriteLn $stream $umap "  public <P extends Proxy>"
@@ -1512,12 +1528,15 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "  \{"
     Java_WriteLn $stream $umap "    final int size = collection.size();"
     Java_WriteLn $stream $umap \
-        "    final Set<Proxy> result = new HashSet<Proxy>(size);"
+        "    final Set<Proxy> result = new THashSet<Proxy>(size);"
     Java_WriteLn $stream $umap "    for (final P proxy : collection) \{"
     Java_WriteLn $stream $umap "      final Proxy cloned = getClone(proxy);"
     Java_WriteLn $stream $umap "      result.add(cloned);"
     Java_WriteLn $stream $umap "    \}"
-    Java_WriteLn $stream $umap "    return Casting.toSet(result);"
+    Java_WriteLn $stream $umap "    final Set<?> precast = result;"
+    Java_WriteLn $stream $umap "    @SuppressWarnings(\"unchecked\")"
+    Java_WriteLn $stream $umap "    Set<P> cast = (Set<P>) precast;"
+    Java_WriteLn $stream $umap "    return cast;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
     
@@ -1673,7 +1692,11 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
         "      final Proxy reselem = (Proxy) origelem.acceptVisitor(this);"
     Java_WriteLn $stream $umap "      result.add(reselem);"
     Java_WriteLn $stream $umap "    \}"
-    Java_WriteLn $stream $umap "    return Casting.toCollection(result);"
+    Java_WriteLn $stream $umap "    final Collection<?> precast = result;"
+    Java_WriteLn $stream $umap "    @SuppressWarnings(\"unchecked\")"
+    Java_WriteLn $stream $umap \
+        "    Collection<P> cast = (Collection<P>) precast;"
+    Java_WriteLn $stream $umap "    return cast;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
 
@@ -2298,6 +2321,7 @@ proc Java_CollectGlobalImports {importMapName} {
   set importMap(List) "java.util"
   set importMap(Map) "java.util"
   set importMap(Set) "java.util"
+  set importMap(THashSet) "gnu.trove"
   set importMap(TreeMap) "java.util"
 
   set packprefix "net.sourceforge.waters"
@@ -2630,7 +2654,7 @@ proc Java_AttribGetImplementationType {attrib impl classMapName} {
     }
   } elseif {[regexp {^Set<(.*Proxy)>$} $type all elemtype]} {
     if {[string compare $impl "plain"] == 0} {
-      return "IndexedHashSet<$elemtype>"
+      return "ImmutableOrderedSet<$elemtype>"
     } else {
       set refstatus [Java_AttribGetRefStatus $attrib $impl]
       set suffix [Java_GetImplObjectName $impl]
@@ -2655,7 +2679,7 @@ proc Java_AttribGetImplementationType {attrib impl classMapName} {
 	    [regexp {^List<(.*)>$} $type all elemtype]} {
     return "ArrayList<$elemtype>"
   } elseif {[regexp {^Set<(.*)>$} $type all elemtype]} {
-    return "HashSet<$elemtype>"
+    return "THashSet<$elemtype>"
   } elseif {[regexp {^Map<String,String>$} $type all]} {
     if {[string compare $impl "plain"] == 0} {
       return "TreeMap<String,String>"
@@ -2720,9 +2744,10 @@ proc Java_AttribGetCastTransformerName {attrib impl} {
   set decltype [Java_AttribGetDeclaredType $attrib $impl]
   if {[regexp {^(Collection)<} $decltype all collectiontype] ||
       [regexp {^(List)<} $decltype all collectiontype] ||
-      [regexp {^(Set)<} $decltype all collectiontype] ||
-      [regexp {^(Map)<} $decltype all collectiontype]} {
-    return "to$collectiontype"
+      [regexp {^(Set)<} $decltype all collectiontype]} {
+    return "$collectiontype<?>"
+  } elseif {[regexp {^(Map)<} $decltype all collectiontype]} { 
+    return "$collectiontype<?,?>"
   } else {
     return ""
   }

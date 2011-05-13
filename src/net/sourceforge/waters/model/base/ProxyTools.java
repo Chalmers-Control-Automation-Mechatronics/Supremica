@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.model.base;
 
-import net.sourceforge.waters.model.unchecked.Casting;
-
 
 /**
  * A utility class to compare collections and lists of proxies.
@@ -66,7 +64,8 @@ public class ProxyTools
     if (proxy == null) {
       return null;
     } else {
-      final Class<P> clazz = Casting.toClass(proxy.getClass());
+      @SuppressWarnings("unchecked")
+      final Class<P> clazz = (Class<P>) proxy.getClass();
       return clazz.cast(proxy.clone());
     }
   }

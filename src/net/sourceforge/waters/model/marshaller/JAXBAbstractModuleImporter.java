@@ -62,7 +62,6 @@ import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.xsd.base.AttributeMap;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.ElementType;
@@ -622,8 +621,7 @@ public abstract class JAXBAbstractModuleImporter
       final List<SimpleExpressionProxy> guardList =
         new LinkedList<SimpleExpressionProxy>();
       if (guards != null) {
-        final List<SimpleExpressionType> guardListElement =
-          Casting.toList(guards.getList());
+        final List<SimpleExpressionType> guardListElement = guards.getList();
         for (final SimpleExpressionType exprElement : guardListElement) {
           final SimpleExpressionProxy exprProxy =
             (SimpleExpressionProxy) importElement(exprElement);
@@ -634,8 +632,7 @@ public abstract class JAXBAbstractModuleImporter
       final List<BinaryExpressionProxy> actionList =
         new LinkedList<BinaryExpressionProxy>();
       if (actions != null) {
-        final List<BinaryExpression> actionListElement =
-          Casting.toList(actions.getList());
+        final List<BinaryExpression> actionListElement = actions.getList();
         for (final BinaryExpression exprElement : actionListElement) {
           final BinaryExpressionProxy exprProxy =
             (BinaryExpressionProxy) importElement(exprElement);
@@ -691,8 +688,7 @@ public abstract class JAXBAbstractModuleImporter
     final String text = element.getText();
     final List<SimpleIdentifierProxy> items =
       new LinkedList<SimpleIdentifierProxy>();
-    final List<SimpleIdentifier> itemsElement =
-      Casting.toList(element.getItems());
+    final List<SimpleIdentifier> itemsElement = element.getItems();
     for (final SimpleIdentifier itemElement : itemsElement) {
       final SimpleIdentifierProxy itemProxy =
         importSimpleIdentifier(itemElement);
@@ -722,8 +718,7 @@ public abstract class JAXBAbstractModuleImporter
       new LinkedList<SimpleExpressionProxy>();
     final RangeList rangeList = element.getRangeList();
     if (rangeList != null) {
-      final List<SimpleExpressionType> rangesElement =
-        Casting.toList(rangeList.getRanges());
+      final List<SimpleExpressionType> rangesElement = rangeList.getRanges();
       for (final SimpleExpressionType itemElement : rangesElement) {
         final SimpleExpressionProxy itemProxy =
           (SimpleExpressionProxy) importElement(itemElement);
@@ -833,8 +828,7 @@ public abstract class JAXBAbstractModuleImporter
       mFactory.createPlainEventListProxy(eventList);
     final Collection<NodeProxy> immediateChildNodes =
       new CheckedImportList<NodeProxy>(GroupNodeProxy.class, name, "node");
-    final List<NodeRef> immediateChildNodesElement =
-      Casting.toList(element.getNodes());
+    final List<NodeRef> immediateChildNodesElement = element.getNodes();
     for (final NodeRef ref : immediateChildNodesElement) {
       final NodeProxy itemProxy = importNodeRef(ref);
       immediateChildNodes.add(itemProxy);
@@ -856,8 +850,7 @@ public abstract class JAXBAbstractModuleImporter
     final String name = element.getName();
     final List<SimpleExpressionProxy> indexes =
       new LinkedList<SimpleExpressionProxy>();
-    final List<SimpleExpressionType> indexesElement =
-      Casting.toList(element.getIndexes());
+    final List<SimpleExpressionType> indexesElement = element.getIndexes();
     for (final SimpleExpressionType itemElement : indexesElement) {
       final SimpleExpressionProxy itemProxy =
         (SimpleExpressionProxy) importElement(itemElement);
@@ -873,8 +866,7 @@ public abstract class JAXBAbstractModuleImporter
     final String moduleName = element.getModuleName();
     final List<ParameterBindingProxy> bindingList =
       new LinkedList<ParameterBindingProxy>();
-    final List<ParameterBinding> bindingListElement =
-      Casting.toList(element.getBindings());
+    final List<ParameterBinding> bindingListElement = element.getBindings();
     for (final ParameterBinding itemElement : bindingListElement) {
       final ParameterBindingProxy itemProxy =
         importParameterBinding(itemElement);
@@ -895,8 +887,7 @@ public abstract class JAXBAbstractModuleImporter
   {
     if (element != null) {
       final List<Proxy> eventList = new LinkedList<Proxy>();
-      final List<ElementType> eventListElement =
-        Casting.toList(element.getList());
+      final List<ElementType> eventListElement = element.getList();
       for (final ElementType itemElement : eventListElement) {
         final Proxy itemProxy = (Proxy) importElement(itemElement);
         eventList.add(itemProxy);
@@ -1059,8 +1050,7 @@ public abstract class JAXBAbstractModuleImporter
       return null;
     } else {
       final List<java.awt.Point> points = new LinkedList<java.awt.Point>();
-      final List<Point> pointsElement =
-        Casting.toList(element.getPoints());
+      final List<Point> pointsElement = element.getPoints();
       for (final Point pointElement : pointsElement) {
         final java.awt.Point point = importPoint(pointElement);
         points.add(point);
@@ -1102,7 +1092,7 @@ public abstract class JAXBAbstractModuleImporter
     final List<VariableMarkingProxy> markingList =
       new LinkedList<VariableMarkingProxy>();
     final List<VariableMarking> markingListElement =
-      Casting.toList(element.getVariableMarkings());
+      element.getVariableMarkings();
     for (final VariableMarking markingElement : markingListElement) {
       final VariableMarkingProxy markingProxy =
         importVariableMarking(markingElement);

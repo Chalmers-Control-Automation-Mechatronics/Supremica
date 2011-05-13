@@ -15,8 +15,6 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.unchecked.Casting;
-
 import net.sourceforge.waters.xsd.base.ElementType;
 
 
@@ -43,7 +41,8 @@ abstract class JAXBListHandler
     if (!proxies.isEmpty()) {
       final L listelem = createListElement(container);
       final List<?> untyped = getList(listelem);
-      final List<ElementType> elements = Casting.toList(untyped);
+      @SuppressWarnings("unchecked")
+      final List<ElementType> elements = (List<ElementType>) untyped;
       for (final P proxy : proxies) {
         final ElementType element =
           (ElementType) proxy.acceptVisitor(exporter);
@@ -60,7 +59,8 @@ abstract class JAXBListHandler
     final L listelem = getListElement(container);
     if (listelem != null) {
       final List<?> untyped = getList(listelem);
-      final List<ElementType> elements = Casting.toList(untyped);
+      @SuppressWarnings("unchecked")
+      final List<ElementType> elements = (List<ElementType>) untyped;
       importer.copyList(elements, proxies);
     }
   }

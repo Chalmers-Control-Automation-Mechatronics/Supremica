@@ -22,7 +22,6 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.AttributeMapSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
@@ -150,7 +149,9 @@ public final class SimpleComponentSubject
 
   public Map<String,String> getAttributes()
   {
-    final Map<String,String> downcast = Casting.toMap(mAttributes);
+    final Map<?,?> precast = mAttributes;
+    @SuppressWarnings("unchecked")
+    final Map<String,String> downcast = (Map<String,String>) precast;
     return Collections.unmodifiableMap(downcast);
   }
 

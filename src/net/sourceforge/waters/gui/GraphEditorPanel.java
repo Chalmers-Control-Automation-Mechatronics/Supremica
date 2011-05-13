@@ -112,7 +112,6 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.plain.module.GraphElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -624,7 +623,6 @@ public class GraphEditorPanel
     return inserts;
   }
 
-  @SuppressWarnings("unchecked")
   public void insertItems(final List<InsertInfo> inserts)
   {
     final GraphSubject graph = getGraph();
@@ -642,7 +640,9 @@ public class GraphEditorPanel
                  proxy instanceof ForeachEventSubject) {
         final ListInsertPosition inspos =
           (ListInsertPosition) insert.getInsertPosition();
-        final List<Proxy> eventlist = Casting.toList(inspos.getList());
+        final List<?> untyped = inspos.getList();
+        @SuppressWarnings("unchecked")
+        final List<Proxy> eventlist = (List<Proxy>) untyped;
         final int pos = inspos.getPosition();
         eventlist.add(pos, proxy);
       } else if (proxy instanceof GuardActionBlockSubject) {
@@ -659,6 +659,7 @@ public class GraphEditorPanel
           graph.setBlockedEvents(block);
         } else {
           final List<AbstractSubject> list = block.getEventListModifiable();
+          @SuppressWarnings("unchecked")
           final List<AbstractSubject> clonedlist =
             (List<AbstractSubject>) inspos.getOldValue();
           list.addAll(clonedlist);

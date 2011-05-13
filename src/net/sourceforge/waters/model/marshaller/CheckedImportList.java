@@ -12,7 +12,6 @@ package net.sourceforge.waters.model.marshaller;
 import net.sourceforge.waters.model.base.IndexedArrayList;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 class CheckedImportList<P extends NamedProxy>
@@ -41,7 +40,9 @@ class CheckedImportList<P extends NamedProxy>
   //# Cloning
   public CheckedImportList<P> clone()
   {
-    final Class<CheckedImportList<P>> clazz = Casting.toClass(getClass());
+    @SuppressWarnings("unchecked")
+    final Class<CheckedImportList<P>> clazz =
+      (Class<CheckedImportList<P>>) getClass();
     return clazz.cast(super.clone());
   }
 

@@ -26,7 +26,6 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -333,7 +332,9 @@ public class DocumentManager
   public void saveAs(final DocumentProxy doc, final File filename)
       throws WatersMarshalException, IOException
   {
-    final Class<DocumentProxy> clazz = Casting.toClass(doc.getClass());
+    @SuppressWarnings("unchecked")
+    final Class<DocumentProxy> clazz =
+      (Class<DocumentProxy>) doc.getClass();
     final ProxyMarshaller<DocumentProxy> marshaller =
         findProxyMarshaller(clazz);
     final URI newuri = filename.toURI();
@@ -466,8 +467,10 @@ public class DocumentManager
   {
     final ProxyMarshaller<?> marshaller = getProxyMarshaller(clazz);
     if (marshaller != null) {
+      final Class<?> preclazz = ProxyMarshaller.class;
+      @SuppressWarnings("unchecked")
       final Class<ProxyMarshaller<DD>> marshallerclazz =
-          Casting.toClass(ProxyMarshaller.class);
+        (Class<ProxyMarshaller<DD>>) preclazz;
       return marshallerclazz.cast(marshaller);
     } else {
       throw new IllegalArgumentException("Unsupported document class "
@@ -485,13 +488,15 @@ public class DocumentManager
    *           to indicate that no registered {@link ProxyUnmarshaller} for the
    *           given class was found.
    */
-  public <DD extends DocumentProxy> Collection<ProxyUnmarshaller<? extends DD>> findProxyUnmarshallers(
-      final Class<DD> clazz)
+  @SuppressWarnings("unchecked")
+  public <DD extends DocumentProxy> Collection<ProxyUnmarshaller<? extends DD>>
+    findProxyUnmarshallers(final Class<DD> clazz)
   {
     final Collection<ProxyUnmarshaller<? extends DocumentProxy>> unmarshallers =
         mClassUnmarshallerMap.get(clazz);
     if (unmarshallers != null) {
-      return Casting.toCollection(unmarshallers);
+      final Collection<?> precast = unmarshallers;
+      return (Collection<ProxyUnmarshaller<? extends DD>>) precast;
     } else {
       throw new IllegalArgumentException("Unsupported document class "
           + clazz.getName() + "!");

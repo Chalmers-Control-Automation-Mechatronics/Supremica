@@ -17,7 +17,6 @@ import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -58,7 +57,9 @@ public class ModularHeuristicFactory {
       final String packname = myclass.getPackage().getName();
       final String fullname = packname + "." + method.toString() + "Heuristic";
       final Class<?> lclass = myclass.getClassLoader().loadClass(fullname);
-      final Class<ModularHeuristic> heuclass = Casting.toClass(lclass);
+      @SuppressWarnings("unchecked")
+      final Class<ModularHeuristic> heuclass =
+        (Class<ModularHeuristic>) lclass;
       final Constructor<ModularHeuristic> constr =
         heuclass.getConstructor(KindTranslator.class, Preference.class);
       return constr.newInstance(translator, pref);

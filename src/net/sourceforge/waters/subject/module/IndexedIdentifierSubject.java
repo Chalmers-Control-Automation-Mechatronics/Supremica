@@ -22,7 +22,6 @@ import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -136,7 +135,10 @@ public final class IndexedIdentifierSubject
 
   public List<SimpleExpressionProxy> getIndexes()
   {
-    final List<SimpleExpressionProxy> downcast = Casting.toList(mIndexes);
+    final List<?> precast = mIndexes;
+    @SuppressWarnings("unchecked")
+    final List<SimpleExpressionProxy> downcast =
+      (List<SimpleExpressionProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

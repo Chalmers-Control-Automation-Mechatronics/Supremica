@@ -27,7 +27,6 @@ import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -107,19 +106,20 @@ public class IndexedArrayListSubject<P extends NamedSubject>
 
   //#########################################################################
   //# Cloning
+  @SuppressWarnings("unchecked")
   public IndexedArrayListSubject<P> clone()
   {
     try {
       final int clonedsize = size();
       final Class<IndexedArrayListSubject<P>> clazz =
-        Casting.toClass(getClass());
+        (Class<IndexedArrayListSubject<P>>) getClass();
       final IndexedArrayListSubject<P> cloned = clazz.cast(super.clone());
       cloned.mParent = null;
       cloned.mObservers = null;
       cloned.mProxyList = new ArrayList<P>(clonedsize);
       cloned.mProxyMap = new HashMap<String,P>(clonedsize);
       for (final P elem : this) {
-        final Class<P> elemclazz = Casting.toClass(elem.getClass());
+        final Class<P> elemclazz = (Class<P>) elem.getClass();
         final P clonedelem = elemclazz.cast(elem.clone());
         cloned.add(clonedelem);
       }
@@ -294,7 +294,9 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     } else if (mProxyMap.containsKey(newname)) {
       throw createDuplicateName(newname);
     }
-    final Map<String,NamedProxy> map = Casting.toMap(mProxyMap);
+    final Map<?,?> untyped = mProxyMap;
+    @SuppressWarnings("unchecked")
+    final Map<String,NamedProxy> map = (Map<String,NamedProxy>) untyped;
     map.remove(oldname);
     map.put(newname, proxy);
   }

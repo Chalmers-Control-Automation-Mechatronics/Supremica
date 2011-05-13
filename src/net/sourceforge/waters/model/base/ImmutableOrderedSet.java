@@ -21,8 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.model.unchecked.Casting;
-
 
 /**
  * <P>A immutable set implementation that guarantees the ordering of elements
@@ -88,7 +86,9 @@ public class ImmutableOrderedSet<P extends NamedProxy>
   public ImmutableOrderedSet<P> clone()
   {
     try {
-      final Class<ImmutableOrderedSet<P>> clazz = Casting.toClass(getClass());
+      @SuppressWarnings("unchecked")
+      final Class<ImmutableOrderedSet<P>> clazz =
+        (Class<ImmutableOrderedSet<P>>) getClass();
       final ImmutableOrderedSet<P> cloned = clazz.cast(super.clone());
       cloned.mProxyList = new ArrayList<P>(mProxyList);
       return cloned;

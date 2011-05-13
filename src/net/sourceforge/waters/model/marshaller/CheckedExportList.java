@@ -16,7 +16,6 @@ import net.sourceforge.waters.model.base.IndexedArrayList;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 class CheckedExportList<P extends NamedProxy>
@@ -48,7 +47,9 @@ class CheckedExportList<P extends NamedProxy>
   //# Cloning
   public CheckedExportList<P> clone()
   {
-    final Class<CheckedExportList<P>> clazz = Casting.toClass(getClass());
+    @SuppressWarnings("unchecked")
+    final Class<CheckedExportList<P>> clazz =
+      (Class<CheckedExportList<P>>) getClass();
     return clazz.cast(super.clone());
   }
 

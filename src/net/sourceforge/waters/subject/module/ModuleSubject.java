@@ -25,7 +25,6 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.DocumentSubject;
@@ -175,26 +174,34 @@ public final class ModuleSubject
   //# Interface net.sourceforge.waters.model.module.ModuleProxy
   public List<ConstantAliasProxy> getConstantAliasList()
   {
+    final List<?> precast = mConstantAliasList;
+    @SuppressWarnings("unchecked")
     final List<ConstantAliasProxy> downcast =
-      Casting.toList(mConstantAliasList);
+      (List<ConstantAliasProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 
   public List<EventDeclProxy> getEventDeclList()
   {
-    final List<EventDeclProxy> downcast = Casting.toList(mEventDeclList);
+    final List<?> precast = mEventDeclList;
+    @SuppressWarnings("unchecked")
+    final List<EventDeclProxy> downcast = (List<EventDeclProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 
   public List<Proxy> getEventAliasList()
   {
-    final List<Proxy> downcast = Casting.toList(mEventAliasList);
+    final List<?> precast = mEventAliasList;
+    @SuppressWarnings("unchecked")
+    final List<Proxy> downcast = (List<Proxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 
   public List<Proxy> getComponentList()
   {
-    final List<Proxy> downcast = Casting.toList(mComponentList);
+    final List<?> precast = mComponentList;
+    @SuppressWarnings("unchecked")
+    final List<Proxy> downcast = (List<Proxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

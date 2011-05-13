@@ -20,7 +20,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -152,7 +151,9 @@ public abstract class ForeachSubject
 
   public List<Proxy> getBody()
   {
-    final List<Proxy> downcast = Casting.toList(mBody);
+    final List<?> precast = mBody;
+    @SuppressWarnings("unchecked")
+    final List<Proxy> downcast = (List<Proxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

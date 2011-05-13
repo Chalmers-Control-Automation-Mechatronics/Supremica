@@ -45,7 +45,6 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
@@ -128,7 +127,9 @@ class EventDeclDeleteVisitor
       } else {
         final ListInsertPosition inspos =
           (ListInsertPosition) insert.getInsertPosition();
-        final List<Proxy> list = Casting.toList(inspos.getList());
+        final List<?> untyped = inspos.getList();
+        @SuppressWarnings("unchecked")
+        final List<Proxy> list = (List<Proxy>) untyped;
         final int index = inspos.getPosition();
         list.add(index, proxy);
         if (proxy instanceof IdentifierSubject) {
@@ -177,7 +178,9 @@ class EventDeclDeleteVisitor
         }
         final ListInsertPosition inspos =
           (ListInsertPosition) insert.getInsertPosition();
-        final List<Proxy> list = Casting.toList(inspos.getList());
+        final List<?> untyped = inspos.getList();
+        @SuppressWarnings("unchecked")
+        final List<Proxy> list = (List<Proxy>) untyped;
         final int index = inspos.getPosition();
         list.remove(index);
       }

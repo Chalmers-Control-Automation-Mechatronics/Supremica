@@ -43,7 +43,6 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -272,7 +271,9 @@ public class ProjectingSafetyVerifier
       forbiddenEvents.addAll(spec.getEvents());
       final AutomatonProxy plant = (AutomatonProxy) array[0];
       automata.add(plant);
-      final Map<EventProxy,EventProxy> uncont = Casting.toMap((Map<?,?>) array[2]);
+      @SuppressWarnings("unchecked")
+      final Map<EventProxy,EventProxy> uncont =
+        (Map<EventProxy,EventProxy>) array[2];
       final Set<AutomatonProxy> newplants = new HashSet<AutomatonProxy>(plants.size());
       for (final AutomatonProxy p : plants) {
         newplants.add(convertPlant(p, uncont));

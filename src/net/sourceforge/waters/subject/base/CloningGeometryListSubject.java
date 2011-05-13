@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -29,7 +28,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
  * <P>This is an implementation of a mutable list with full event
  * notification support. In contrast to the {@link ArrayListSubject}
  * implementation, this class is intended for geometry information, and
- * therefore fires geometry change events when a change occurs. 
+ * therefore fires geometry change events when a change occurs.
  * Furthermore, it always clones any elements inserted or returned
  * from the list, effectively ensuring immutable semantics for mutable
  * list elements.</P>
@@ -81,8 +80,9 @@ public class CloningGeometryListSubject<E extends Cloneable>
   public CloningGeometryListSubject<E> clone()
   {
     try {
+      @SuppressWarnings("unchecked")
       final Class<CloningGeometryListSubject<E>> clazz =
-        Casting.toClass(getClass());
+        (Class<CloningGeometryListSubject<E>>) getClass();
       final CloningGeometryListSubject<E> cloned = clazz.cast(super.clone());
       cloned.mParent = null;
       cloned.mObservers = null;
@@ -132,7 +132,7 @@ public class CloningGeometryListSubject<E extends Cloneable>
     return mList.size();
   }
 
-           
+
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()
@@ -262,7 +262,7 @@ public class CloningGeometryListSubject<E extends Cloneable>
             final E item = cloneElement(newitem);
             newlist.set(i, item);
           }
-        } 
+        }
         i++;
       }
     }
@@ -272,7 +272,7 @@ public class CloningGeometryListSubject<E extends Cloneable>
     }
   }
 
-  
+
   //#########################################################################
   //# Printing
   public String getShortClassName()
@@ -289,10 +289,11 @@ public class CloningGeometryListSubject<E extends Cloneable>
   private E cloneElement(final E element)
   {
     try {
-      final Class<E> clazz = Casting.toClass(element.getClass());
+      @SuppressWarnings("unchecked")
+      final Class<E> clazz = (Class<E>) element.getClass();
       final Method method = getCloneMethod(clazz);
       final Object cloned = method.invoke(element);
-      return clazz.cast(cloned);    
+      return clazz.cast(cloned);
     } catch (final IllegalAccessException exception) {
       throw new WatersRuntimeException(exception);
     } catch (final InvocationTargetException exception) {

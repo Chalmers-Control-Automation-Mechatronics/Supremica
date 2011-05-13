@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 
-import net.sourceforge.waters.model.unchecked.Casting;
-
 
 /**
  * An array list implementation of the {@link IndexedCollection}
@@ -78,7 +76,9 @@ public class IndexedArrayList<P extends NamedProxy>
   public IndexedArrayList<P> clone()
   {
     try {
-      final Class<IndexedArrayList<P>> clazz = Casting.toClass(getClass());
+      @SuppressWarnings("unchecked")
+      final Class<IndexedArrayList<P>> clazz =
+        (Class<IndexedArrayList<P>>) getClass();
       final IndexedArrayList<P> cloned = clazz.cast(super.clone());
       cloned.mProxyList = new ArrayList<P>(mProxyList);
       cloned.mProxyMap = new HashMap<String,P>(mProxyMap);
@@ -108,7 +108,7 @@ public class IndexedArrayList<P extends NamedProxy>
     }
   }
 
-  public void clear() 
+  public void clear()
   {
     mProxyList.clear();
     mProxyMap.clear();
@@ -159,7 +159,7 @@ public class IndexedArrayList<P extends NamedProxy>
     return mProxyList.size();
   }
 
-           
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.IndexedCollection
   public void checkAllUnique(final Collection<? extends P> collection)
@@ -190,7 +190,7 @@ public class IndexedArrayList<P extends NamedProxy>
       return proxy;
     } else {
       throw createNameNotFound(name);
-    }      
+    }
   }
 
   public P get(final String name)
@@ -238,7 +238,8 @@ public class IndexedArrayList<P extends NamedProxy>
     } else if (mProxyMap.containsKey(newname)) {
       throw createDuplicateName(newname);
     }
-    final Map<String,NamedProxy> map = Casting.toMap(mProxyMap);
+    @SuppressWarnings("unchecked")
+    final Map<String,NamedProxy> map = (Map<String,NamedProxy>) mProxyMap;
     map.remove(oldname);
     map.put(newname, proxy);
   }

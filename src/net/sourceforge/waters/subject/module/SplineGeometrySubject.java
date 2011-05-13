@@ -22,7 +22,6 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.CloningGeometryListSubject;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -126,7 +125,9 @@ public final class SplineGeometrySubject
   //# Interface net.sourceforge.waters.model.module.SplineGeometryProxy
   public List<Point2D> getPoints()
   {
-    final List<Point2D> downcast = Casting.toList(mPoints);
+    final List<?> precast = mPoints;
+    @SuppressWarnings("unchecked")
+    final List<Point2D> downcast = (List<Point2D>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

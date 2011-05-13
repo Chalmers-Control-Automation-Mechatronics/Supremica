@@ -9,11 +9,10 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.lang.reflect.Array;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 class BlockedArrayList<T> extends AbstractList<T> {
@@ -30,13 +29,15 @@ class BlockedArrayList<T> extends AbstractList<T> {
 
   //#########################################################################
   //# Interface java.util.List
+  @SuppressWarnings("unchecked")
   public boolean add(final T item)
   {
     final int blockno = size_ / BLOCK_SIZE;
+    final T[] block;
     if (blockno < blocks_.size()) {
       block = blocks_.get(blockno);
     } else {
-      block = Casting.newArray(clazz_, BLOCK_SIZE);
+      block = (T[]) Array.newInstance(clazz_, BLOCK_SIZE);
       blocks_.add(block);
     }
     block[size_ % BLOCK_SIZE] = item;
@@ -48,7 +49,7 @@ class BlockedArrayList<T> extends AbstractList<T> {
   {
     final int blockno = index / BLOCK_SIZE;
     if (blockno < blocks_.size()) {
-      block = blocks_.get(blockno);
+      final T[] block = blocks_.get(blockno);
       return block[index % BLOCK_SIZE];
     } else {
       throw new IndexOutOfBoundsException
@@ -67,9 +68,7 @@ class BlockedArrayList<T> extends AbstractList<T> {
   //# Data Members
   private final Class<T> clazz_;
   private int size_;                    // The number of nodes
-  private List<T[]> blocks_;            // Fixed length blocks for nodes
-
-  private T[] block;
+  private final List<T[]> blocks_;            // Fixed length blocks for nodes
 
   private static final int BLOCK_SIZE = 1024;
 

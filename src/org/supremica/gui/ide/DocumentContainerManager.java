@@ -53,7 +53,6 @@ import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.samples.maze.MazeCompiler;
@@ -533,7 +532,8 @@ public class DocumentContainerManager
                                final DocumentProxy doc,
                                final boolean maycancel)
   {
-    final Class<DocumentProxy> clazz = Casting.toClass(doc.getClass());
+    @SuppressWarnings("unchecked")
+    final Class<DocumentProxy> clazz = (Class<DocumentProxy>) doc.getClass();
     final ProxyMarshaller<DocumentProxy> marshaller =
       mDocumentManager.findProxyMarshaller(clazz);
     final String ext = marshaller.getDefaultExtension();

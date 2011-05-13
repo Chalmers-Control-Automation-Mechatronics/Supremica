@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -81,7 +80,9 @@ public class IndexedArraySet<P extends NamedProxy>
   public IndexedArraySet<P> clone()
   {
     try {
-      final Class<IndexedArraySet<P>> clazz = Casting.toClass(getClass());
+      @SuppressWarnings("unchecked")
+      final Class<IndexedArraySet<P>> clazz =
+        (Class<IndexedArraySet<P>>) getClass();
       final IndexedArraySet<P> cloned = clazz.cast(super.clone());
       cloned.mProxyList = new ArrayList<P>(mProxyList);
       cloned.mProxyMap = new HashMap<String,P>(mProxyMap);
@@ -228,7 +229,8 @@ public class IndexedArraySet<P extends NamedProxy>
     } else if (mProxyMap.containsKey(newname)) {
       throw createDuplicateName(newname);
     }
-    final Map<String,NamedProxy> map = Casting.toMap(mProxyMap);
+    @SuppressWarnings("unchecked")
+    final Map<String,NamedProxy> map = (Map<String,NamedProxy>) mProxyMap;
     map.remove(oldname);
     map.put(newname, proxy);
   }

@@ -18,7 +18,6 @@ import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -79,9 +78,11 @@ class TransitionPartitionBDD
 
   //#########################################################################
   //# Specific Methods
+  @SuppressWarnings("unchecked")
   Map<EventProxy,TransitionPartitionBDD> getTransitionComponents()
   {
-    return Casting.toMap(super.getComponents());
+    final Map<?,?> precast = super.getComponents();
+    return (Map<EventProxy,TransitionPartitionBDD>) precast;
   }
 
   BDDVarSet getCurrentStateCube()

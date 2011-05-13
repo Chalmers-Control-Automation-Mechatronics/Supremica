@@ -22,7 +22,6 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.NotCloningGeometrySetSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -114,7 +113,9 @@ public final class ColorGeometrySubject
   //# Interface net.sourceforge.waters.model.module.ColorGeometryProxy
   public Set<Color> getColorSet()
   {
-    final Set<Color> downcast = Casting.toSet(mColorSet);
+    final Set<?> precast = mColorSet;
+    @SuppressWarnings("unchecked")
+    final Set<Color> downcast = (Set<Color>) precast;
     return Collections.unmodifiableSet(downcast);
   }
 

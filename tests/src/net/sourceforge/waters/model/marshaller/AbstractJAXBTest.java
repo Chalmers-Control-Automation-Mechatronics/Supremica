@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 
 
@@ -147,7 +146,8 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final DocumentProxy proxy2 = manager.load(outuri);
     assertProxyEquals("Structure changed after marshaling!", proxy1, proxy2);
     assertProxyEquals("Structure changed after marshaling!", proxy2, proxy1);
-    final Class<D> clazz = Casting.toClass(proxy1.getClass());
+    @SuppressWarnings("unchecked")
+    final Class<D> clazz = (Class<D>) proxy1.getClass();
     return clazz.cast(proxy1);
   }
 
@@ -189,7 +189,8 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final DocumentProxy proxy2 = manager.load(truefile);
     assertProxyEquals("Structure in JAR differs from file!", proxy1, proxy2);
     assertProxyEquals("Structure in JAR differs from file!", proxy2, proxy1);
-    final Class<D> clazz = Casting.toClass(proxy1.getClass());
+    @SuppressWarnings("unchecked")
+    final Class<D> clazz = (Class<D>) proxy1.getClass();
     return clazz.cast(proxy1);
   }
 
@@ -335,7 +336,8 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
       assertProxyEquals("Structure changed after serialising!", doc1, doc2);
       assertProxyEquals("Structure changed after serialising!", doc2, doc1);
     }
-    final Class<D> clazz = Casting.toClass(doc1.getClass());
+    @SuppressWarnings("unchecked")
+    final Class<D> clazz = (Class<D>) doc1.getClass();
     return clazz.cast(doc1);
   }
 

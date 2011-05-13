@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -66,7 +65,9 @@ public class IndexedTreeSet<P extends NamedProxy>
   public IndexedTreeSet<P> clone()
   {
     try {
-      final Class<IndexedTreeSet<P>> clazz = Casting.toClass(getClass());
+      @SuppressWarnings("unchecked")
+      final Class<IndexedTreeSet<P>> clazz =
+        (Class<IndexedTreeSet<P>>) getClass();
       final IndexedTreeSet<P> cloned = clazz.cast(super.clone());
       cloned.mProxyMap = new TreeMap<String,P>(mProxyMap);
       return cloned;
@@ -209,7 +210,8 @@ public class IndexedTreeSet<P extends NamedProxy>
     } else if (mProxyMap.containsKey(newname)) {
       throw createDuplicateName(newname);
     }
-    final Map<String,NamedProxy> map = Casting.toMap(mProxyMap);
+    @SuppressWarnings("unchecked")
+    final Map<String,NamedProxy> map = (Map<String,NamedProxy>) mProxyMap;
     map.remove(oldname);
     map.put(newname, proxy);
   }

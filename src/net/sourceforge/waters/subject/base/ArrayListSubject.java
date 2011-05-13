@@ -20,7 +20,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -92,17 +91,18 @@ public class ArrayListSubject<P extends ProxySubject>
 
   //#########################################################################
   //# Cloning
+  @SuppressWarnings("unchecked")
   public ArrayListSubject<P> clone()
   {
     try {
       final Class<ArrayListSubject<P>> clazz =
-        Casting.toClass(getClass());
+        (Class<ArrayListSubject<P>>) getClass();
       final ArrayListSubject<P> cloned = clazz.cast(super.clone());
       cloned.mParent = null;
       cloned.mObservers = null;
       cloned.mProxyList = new ArrayList<P>(size());
       for (final P elem : this) {
-        final Class<P> elemclazz = Casting.toClass(elem.getClass());
+        final Class<P> elemclazz = (Class<P>) elem.getClass();
         final P clonedelem = elemclazz.cast(elem.clone());
         cloned.add(clonedelem);
       }

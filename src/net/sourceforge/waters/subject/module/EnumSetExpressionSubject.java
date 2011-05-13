@@ -22,7 +22,6 @@ import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -120,7 +119,10 @@ public final class EnumSetExpressionSubject
   //# Interface net.sourceforge.waters.model.module.EnumSetExpressionProxy
   public List<SimpleIdentifierProxy> getItems()
   {
-    final List<SimpleIdentifierProxy> downcast = Casting.toList(mItems);
+    final List<?> precast = mItems;
+    @SuppressWarnings("unchecked")
+    final List<SimpleIdentifierProxy> downcast =
+      (List<SimpleIdentifierProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

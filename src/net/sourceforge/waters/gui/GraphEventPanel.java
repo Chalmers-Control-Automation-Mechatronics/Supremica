@@ -92,7 +92,6 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
@@ -369,9 +368,9 @@ public class GraphEventPanel
     try {
       if (transferable.isDataFlavorSupported
           (WatersDataFlavor.IDENTIFIER_LIST)) {
-        final List<Proxy> data =
-          Casting.toList(transferable.getTransferData
-              (WatersDataFlavor.IDENTIFIER_LIST));
+        @SuppressWarnings("unchecked")
+        final List<Proxy> data = (List<Proxy>)
+          transferable.getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
         for (final Proxy proxy : data) {
           if (!containsEqualIdentifier(proxy)) {
             return true;
@@ -406,9 +405,9 @@ public class GraphEventPanel
     if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)) {
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
-      final List<Proxy> data =
-        Casting.toList(transferable.getTransferData
-            (WatersDataFlavor.IDENTIFIER_LIST));
+      @SuppressWarnings("unchecked")
+      final List<Proxy> data = (List<Proxy>)
+        transferable.getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
       for (final Proxy proxy : data) {
         if (!containsEqualIdentifier(proxy)) {
           final Proxy cloned = cloner.getClone(proxy);
@@ -484,7 +483,9 @@ public class GraphEventPanel
         model.addIdentifier(ident);
       } else {
         final ListInsertPosition linspos = (ListInsertPosition) inspos;
-        final List<Proxy> eventlist = Casting.toList(linspos.getList());
+        final List<?> untyped = linspos.getList();
+        @SuppressWarnings("unchecked")
+        final List<Proxy> eventlist = (List<Proxy>) untyped;
         final int pos = linspos.getPosition();
         eventlist.add(pos, proxy);
       }
@@ -502,7 +503,9 @@ public class GraphEventPanel
         model.removeIdentifier(ident);
       } else {
         final ListInsertPosition linspos = (ListInsertPosition) inspos;
-        final List<Proxy> eventlist = Casting.toList(linspos.getList());
+        final List<?> untyped = linspos.getList();
+        @SuppressWarnings("unchecked")
+        final List<Proxy> eventlist = (List<Proxy>) untyped;
         eventlist.remove(proxy);
       }
     }

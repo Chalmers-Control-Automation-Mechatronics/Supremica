@@ -12,10 +12,10 @@
 
 package net.sourceforge.waters.plain.module;
 
+import gnu.trove.THashSet;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -48,7 +48,7 @@ public final class ColorGeometryElement
       mColorSet = Collections.emptySet();
     } else {
       final Set<Color> colorSetModifiable =
-        new HashSet<Color>(colorSet);
+        new THashSet<Color>(colorSet);
       mColorSet =
         Collections.unmodifiableSet(colorSetModifiable);
     }

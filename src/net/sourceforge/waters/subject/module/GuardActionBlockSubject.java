@@ -24,7 +24,6 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.MutableSubject;
@@ -154,13 +153,19 @@ public final class GuardActionBlockSubject
   //# Interface net.sourceforge.waters.model.module.GuardActionBlockProxy
   public List<SimpleExpressionProxy> getGuards()
   {
-    final List<SimpleExpressionProxy> downcast = Casting.toList(mGuards);
+    final List<?> precast = mGuards;
+    @SuppressWarnings("unchecked")
+    final List<SimpleExpressionProxy> downcast =
+      (List<SimpleExpressionProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 
   public List<BinaryExpressionProxy> getActions()
   {
-    final List<BinaryExpressionProxy> downcast = Casting.toList(mActions);
+    final List<?> precast = mActions;
+    @SuppressWarnings("unchecked")
+    final List<BinaryExpressionProxy> downcast =
+      (List<BinaryExpressionProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

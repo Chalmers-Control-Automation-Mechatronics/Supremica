@@ -60,7 +60,6 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ForeachComponentSubject;
@@ -245,7 +244,8 @@ public class ComponentsTree
   {
     final ProxySubject subject = (ProxySubject) proxy;
     final ListInsertPosition inspos = (ListInsertPosition) insobj;
-    final List<ProxySubject> list = Casting.toList(inspos.getList());
+    @SuppressWarnings("unchecked")
+    final List<ProxySubject> list = (List<ProxySubject>) inspos.getList();
     final int pos = inspos.getPosition();
     list.add(pos, subject);
   }
@@ -295,9 +295,9 @@ public class ComponentsTree
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
-    final List<Proxy> data =
-      Casting.toList(transferable.getTransferData
-        (WatersDataFlavor.MODULE_COMPONENT_LIST));
+    @SuppressWarnings("unchecked")
+    final List<Proxy> data = (List<Proxy>)
+      transferable.getTransferData(WatersDataFlavor.MODULE_COMPONENT_LIST);
     final int size = data.size();
     final ListSubject<? extends ProxySubject> list;
     final ModuleContext context;
@@ -372,7 +372,8 @@ public class ComponentsTree
       final ProxySubject victim = (ProxySubject) insert.getProxy();
       final ListInsertPosition inspos =
         (ListInsertPosition) insert.getInsertPosition();
-      final List<ProxySubject> list = Casting.toList(inspos.getList());
+      @SuppressWarnings("unchecked")
+      final List<ProxySubject> list = (List<ProxySubject>) inspos.getList();
       final int pos = inspos.getPosition();
       list.add(pos, victim);
       expand(victim);

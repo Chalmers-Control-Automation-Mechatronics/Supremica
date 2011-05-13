@@ -18,7 +18,6 @@ import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.ReplaceInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -114,9 +113,9 @@ public class ReplaceCommand
         ReplaceInfo.getOldProxies(mReplacements, undoing);
       panel.removeFromSelection(deselect);
     }
-    List<InsertInfo> deletes = new ArrayList<InsertInfo>(size);
-    List<InsertInfo> inserts = new ArrayList<InsertInfo>(size);
-    List<Proxy> selects =
+    final List<InsertInfo> deletes = new ArrayList<InsertInfo>(size);
+    final List<InsertInfo> inserts = new ArrayList<InsertInfo>(size);
+    final List<Proxy> selects =
       selecting ? new ArrayList<Proxy>(size) : null;
     for (final ReplaceInfo replacement : mReplacements) {
       final Object pos = replacement.getReplacePosition();
@@ -130,17 +129,19 @@ public class ReplaceCommand
           inserts.clear();
         }
         final ListInsertPosition listpos = (ListInsertPosition) pos;
-        final List<Proxy> list = Casting.toList(listpos.getList());
+        final List<?> untyped = listpos.getList();
+        @SuppressWarnings("unchecked")
+        final List<Proxy> list = (List<Proxy>) untyped;
         final int index = listpos.getPosition();
         list.set(index, neo);
       } else {
-	final InsertInfo delete = new InsertInfo(old, pos);
-	deletes.add(delete);
-	final InsertInfo insert = new InsertInfo(neo, pos);
-	inserts.add(insert);
+        final InsertInfo delete = new InsertInfo(old, pos);
+        deletes.add(delete);
+        final InsertInfo insert = new InsertInfo(neo, pos);
+        inserts.add(insert);
       }
       if (selecting) {
-	selects.add(neo);
+        selects.add(neo);
       }
     }
     if (!deletes.isEmpty()) {

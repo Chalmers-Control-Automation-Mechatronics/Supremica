@@ -13,8 +13,6 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.IndexedCollection;
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
-
 import net.sourceforge.waters.xsd.base.ElementType;
 
 
@@ -33,7 +31,8 @@ abstract class JAXBCheckedListHandler
     final L listelem = getListElement(container);
     if (listelem != null) {
       final List<?> untyped = getList(listelem);
-      final List<ElementType> elements = Casting.toList(untyped);
+      @SuppressWarnings("unchecked")
+      final List<ElementType> elements = (List<ElementType>) untyped;
       importer.copyCheckedList(elements, proxies);
     }
   }

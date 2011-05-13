@@ -64,8 +64,6 @@ import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
-
 import net.sourceforge.waters.xsd.base.AttributeMap;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.module.Actions;
@@ -518,6 +516,7 @@ public class JAXBModuleExporter
   //#########################################################################
   //# Copying Data
   // ------------------EFA
+  @SuppressWarnings("unchecked")
   private void copyGuardActionBlockProxy
     (final GuardActionBlockProxy proxy,
      final GuardActionBlock element)
@@ -526,16 +525,16 @@ public class JAXBModuleExporter
     final List<SimpleExpressionProxy> guardsProxy = proxy.getGuards();
     if (!guardsProxy.isEmpty()) {
       final Guards guardsElement = mFactory.createGuards();
-      final List<ElementType> guardsList =
-        Casting.toList(guardsElement.getList());
+      final List<?> untyped = guardsElement.getList();
+      final List<ElementType> guardsList = (List<ElementType>) untyped;
       copyCollection(guardsProxy, guardsList);
       element.setGuards(guardsElement);
     }
     final List<BinaryExpressionProxy> actionsProxy = proxy.getActions();
     if (!actionsProxy.isEmpty()) {
       final Actions actionsElement = mFactory.createActions();
-      final List<ElementType> actionsList =
-        Casting.toList(actionsElement.getList());
+      final List<?> untyped = actionsElement.getList();
+      final List<ElementType> actionsList = (List<ElementType>) untyped;
       copyCollection(actionsProxy, actionsList);
       element.setActions(actionsElement);
     }
@@ -686,7 +685,9 @@ public class JAXBModuleExporter
   {
     copySimpleExpressionProxy(proxy, element);
     final List<SimpleIdentifierProxy> itemsProxy = proxy.getItems();
-    final List<ElementType> itemsElement = Casting.toList(element.getItems());
+    final List<?> untyped = element.getItems();
+    @SuppressWarnings("unchecked")
+    final List<ElementType> itemsElement = (List<ElementType>) untyped;
     copyCollection(itemsProxy, itemsElement);
   }
 
@@ -719,8 +720,9 @@ public class JAXBModuleExporter
     final List<SimpleExpressionProxy> rangesProxy = proxy.getRanges();
     if (!rangesProxy.isEmpty()) {
       final RangeList rangeList = mFactory.createRangeList();
-      final List<ElementType> rangesElement =
-        Casting.toList(rangeList.getRanges());
+      final List<?> untyped = rangeList.getRanges();
+      @SuppressWarnings("unchecked")
+      final List<ElementType> rangesElement = (List<ElementType>) untyped;
       copyCollection(rangesProxy, rangesElement);
       element.setRangeList(rangeList);
     }
@@ -830,8 +832,9 @@ public class JAXBModuleExporter
     final Set<NodeProxy> childrenProxy = proxy.getImmediateChildNodes();
     final IndexedList<NodeProxy> childrenChecked =
       new CheckedExportList<NodeProxy>(childrenProxy, proxy, "node");
-    final List<ElementType> childrenElement =
-      Casting.toList(element.getNodes());
+    final List<?> untyped = element.getNodes();
+    @SuppressWarnings("unchecked")
+    final List<ElementType> childrenElement = (List<ElementType>) untyped;
     for (final NodeProxy node : childrenChecked) {
       mGraphNodeList.checkUnique(node);
       final NodeRef noderef = mFactory.createNodeRef();
@@ -881,8 +884,9 @@ public class JAXBModuleExporter
     copyIdentifierProxy(proxy, element);
     element.setName(proxy.getName());
     final List<SimpleExpressionProxy> indexesProxy = proxy.getIndexes();
-    final List<ElementType> indexesElement =
-      Casting.toList(element.getIndexes());
+    final List<?> untyped = element.getIndexes();
+    @SuppressWarnings("unchecked")
+    final List<ElementType> indexesElement = (List<ElementType>) untyped;
     copyCollection(indexesProxy, indexesElement);
   }
 
@@ -894,8 +898,9 @@ public class JAXBModuleExporter
     copyComponentProxy(proxy, element);
     element.setModuleName(proxy.getModuleName());
     final List<ParameterBindingProxy> bindingsProxy = proxy.getBindingList();
-    final List<ElementType> bindingsElement =
-      Casting.toList(element.getBindings());
+    final List<?> untyped = element.getBindings();
+    @SuppressWarnings("unchecked")
+    final List<ElementType> bindingsElement = (List<ElementType>) untyped;
     copyCollection(bindingsProxy, bindingsElement);
   }
 
@@ -915,8 +920,9 @@ public class JAXBModuleExporter
   {
     copyProxy(proxy, element);
     final List<Proxy> eventListProxy = proxy.getEventList();
-    final List<ElementType> eventListElement =
-      Casting.toList(element.getList());
+    final List<?> untyped = element.getList();
+    @SuppressWarnings("unchecked")
+    final List<ElementType> eventListElement = (List<ElementType>) untyped;
     copyCollection(eventListProxy, eventListElement);
     final LabelGeometryProxy geometryProxy = proxy.getGeometry();
     if (geometryProxy != null) {
@@ -1102,7 +1108,7 @@ public class JAXBModuleExporter
   {
     copyGeometryProxy(proxy, element);
     final List<Point2D> pointListProxy = proxy.getPoints();
-    final List<Point> pointListElement = Casting.toList(element.getPoints());
+    final List<Point> pointListElement = element.getPoints();
     for (final Point2D pointProxy : pointListProxy) {
       final Point pointElement = createPoint(pointProxy);
       pointListElement.add(pointElement);
@@ -1150,8 +1156,9 @@ public class JAXBModuleExporter
     vinit.setPredicate(predicateElement);
     element.setVariableInitial(vinit);
     final List<VariableMarkingProxy> listProxy = proxy.getVariableMarkings();
-    final List<ElementType> listElement =
-      Casting.toList(element.getVariableMarkings());
+    final List<?> untyped = element.getVariableMarkings();
+    @SuppressWarnings("unchecked")
+    final List<ElementType> listElement = (List<ElementType>) untyped;
     copyCollection(listProxy, listElement);
   }
 

@@ -23,7 +23,6 @@ import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.IndexedArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -136,7 +135,10 @@ public final class InstanceSubject
 
   public List<ParameterBindingProxy> getBindingList()
   {
-    final List<ParameterBindingProxy> downcast = Casting.toList(mBindingList);
+    final List<?> precast = mBindingList;
+    @SuppressWarnings("unchecked")
+    final List<ParameterBindingProxy> downcast =
+      (List<ParameterBindingProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

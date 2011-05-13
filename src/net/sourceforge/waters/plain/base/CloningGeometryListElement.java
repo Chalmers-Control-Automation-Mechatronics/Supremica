@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -78,8 +77,9 @@ public class CloningGeometryListElement<E extends Cloneable>
   public CloningGeometryListElement<E> clone()
   {
     try {
+      @SuppressWarnings("unchecked")
       final Class<CloningGeometryListElement<E>> clazz =
-        Casting.toClass(getClass());
+        (Class<CloningGeometryListElement<E>>) getClass();
       final CloningGeometryListElement<E> cloned = clazz.cast(super.clone());
       cloned.mList = new ArrayList<E>(mList);
       return cloned;
@@ -102,16 +102,17 @@ public class CloningGeometryListElement<E extends Cloneable>
     return mList.size();
   }
 
-           
+
   //#########################################################################
   //# Auxiliary Methods
   private E cloneElement(final E element)
   {
     try {
-      final Class<E> clazz = Casting.toClass(element.getClass());
+      @SuppressWarnings("unchecked")
+      final Class<E> clazz = (Class<E>) element.getClass();
       final Method method = getCloneMethod(clazz);
       final Object cloned = method.invoke(element);
-      return clazz.cast(cloned);    
+      return clazz.cast(cloned);
     } catch (final IllegalAccessException exception) {
       throw new WatersRuntimeException(exception);
     } catch (final InvocationTargetException exception) {

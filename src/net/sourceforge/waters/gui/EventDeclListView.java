@@ -53,7 +53,6 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -299,7 +298,8 @@ public class EventDeclListView
 
   public Transferable createTransferable(final List<? extends Proxy> items)
   {
-    final List<EventDeclSubject> decls = Casting.toList(items);
+    @SuppressWarnings("unchecked")
+    final List<EventDeclSubject> decls = (List<EventDeclSubject>) items;
     return new EventDeclTransferable(decls);
   }
 
@@ -340,7 +340,8 @@ public class EventDeclListView
 
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
-    final List<EventDeclSubject> decls = Casting.toList(items);
+    @SuppressWarnings("unchecked")
+    final List<EventDeclSubject> decls = (List<EventDeclSubject>) items;
     return mDeleteVisitor.getDeletionVictims(decls);
   }
 

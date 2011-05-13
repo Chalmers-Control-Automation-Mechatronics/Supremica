@@ -23,7 +23,6 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ModuleSequenceProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 import net.sourceforge.waters.subject.base.IndexedArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
@@ -130,7 +129,9 @@ public final class ModuleSequenceSubject
   //# Interface net.sourceforge.waters.model.module.ModuleSequenceProxy
   public List<ModuleProxy> getModules()
   {
-    final List<ModuleProxy> downcast = Casting.toList(mModules);
+    final List<?> precast = mModules;
+    @SuppressWarnings("unchecked")
+    final List<ModuleProxy> downcast = (List<ModuleProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 

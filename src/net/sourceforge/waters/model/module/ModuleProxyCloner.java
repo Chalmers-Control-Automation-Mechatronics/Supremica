@@ -12,13 +12,13 @@
 
 package net.sourceforge.waters.model.module;
 
+import gnu.trove.THashSet;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,6 @@ import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.unchecked.Casting;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -84,19 +83,25 @@ public class ModuleProxyCloner
       final Proxy cloned = getClone(proxy);
       result.add(cloned);
     }
-    return Casting.toList(result);
+    final List<?> precast = result;
+    @SuppressWarnings("unchecked")
+    List<P> cast = (List<P>) precast;
+    return cast;
   }
 
   public <P extends Proxy>
   Set<P> getClonedSet(Collection<? extends P> collection)
   {
     final int size = collection.size();
-    final Set<Proxy> result = new HashSet<Proxy>(size);
+    final Set<Proxy> result = new THashSet<Proxy>(size);
     for (final P proxy : collection) {
       final Proxy cloned = getClone(proxy);
       result.add(cloned);
     }
-    return Casting.toSet(result);
+    final Set<?> precast = result;
+    @SuppressWarnings("unchecked")
+    Set<P> cast = (Set<P>) precast;
+    return cast;
   }
 
 
@@ -723,7 +728,10 @@ public class ModuleProxyCloner
       final Proxy reselem = (Proxy) origelem.acceptVisitor(this);
       result.add(reselem);
     }
-    return Casting.toCollection(result);
+    final Collection<?> precast = result;
+    @SuppressWarnings("unchecked")
+    Collection<P> cast = (Collection<P>) precast;
+    return cast;
   }
 
 

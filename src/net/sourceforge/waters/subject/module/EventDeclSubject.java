@@ -25,7 +25,6 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.AttributeMapSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -207,7 +206,10 @@ public final class EventDeclSubject
 
   public List<SimpleExpressionProxy> getRanges()
   {
-    final List<SimpleExpressionProxy> downcast = Casting.toList(mRanges);
+    final List<?> precast = mRanges;
+    @SuppressWarnings("unchecked")
+    final List<SimpleExpressionProxy> downcast =
+      (List<SimpleExpressionProxy>) precast;
     return Collections.unmodifiableList(downcast);
   }
 
@@ -218,7 +220,9 @@ public final class EventDeclSubject
 
   public Map<String,String> getAttributes()
   {
-    final Map<String,String> downcast = Casting.toMap(mAttributes);
+    final Map<?,?> precast = mAttributes;
+    @SuppressWarnings("unchecked")
+    final Map<String,String> downcast = (Map<String,String>) precast;
     return Collections.unmodifiableMap(downcast);
   }
 
