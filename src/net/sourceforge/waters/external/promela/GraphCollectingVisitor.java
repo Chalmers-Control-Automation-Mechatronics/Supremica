@@ -76,7 +76,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
 
     final PromelaGraph newGraph = new PromelaGraph(ident,mFactory);
-    final GraphProxy graph = PromelaGraph.sequentialComposition(newGraph, g).createGraphProxy();
+    final GraphProxy graph = PromelaGraph.sequentialComposition(newGraph, g).createGraphProxy(procName);
     final IdentifierProxy name = mFactory.createSimpleIdentifierProxy(procName);
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
     mComponents.add(component);
@@ -162,7 +162,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("Init");
     final PromelaGraph initGraph = collectGraphs((PromelaTree) t.getChild(0));
-    final GraphProxy graph = initGraph.createGraphProxy();
+    final GraphProxy graph = initGraph.createGraphProxy(t.getText());
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
     mComponents.add(component);
 

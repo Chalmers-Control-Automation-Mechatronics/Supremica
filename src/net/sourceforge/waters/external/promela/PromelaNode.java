@@ -2,12 +2,10 @@ package net.sourceforge.waters.external.promela;
 
 public class PromelaNode
 {
-  private final String eName;
-  public PromelaNode(final String name){
-    eName = name;
+  //private final String eName;
+
+  public PromelaNode(){
+
   }
-  public String geteName()
-  {
-    return eName;
-  }
+
 }

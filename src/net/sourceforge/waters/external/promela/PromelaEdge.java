@@ -6,15 +6,15 @@ public class PromelaEdge
   private PromelaNode mStart;
   private final PromelaNode mEnd;
   public PromelaEdge(final PromelaNode start, final PromelaNode end, final PromelaLabel label){
-    setStart(start);
+    mStart = start;
     mEnd = end;
-    setLabel(label);
+    mLabel = label;
   }
   public void setLabel(final PromelaLabel label)
   {
     mLabel = label;
   }
-  public PromelaLabel getLabel()
+  public PromelaLabel getLabelBlock()
   {
     return mLabel;
   }
@@ -22,11 +22,11 @@ public class PromelaEdge
   {
     mStart = start;
   }
-  public PromelaNode getStart()
+  public PromelaNode getSource()
   {
     return mStart;
   }
-  public PromelaNode getEnd()
+  public PromelaNode getTarget()
   {
     return mEnd;
   }
