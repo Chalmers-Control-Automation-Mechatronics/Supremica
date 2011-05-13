@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.despot
+//# PACKAGE: net.sourceforge.waters.analysis.hisc
 //# CLASS:   CompositionalSICProperty5VerifierTest
 //###########################################################################
 //# $Id$
@@ -45,6 +45,7 @@ public class CompositionalSICProperty5VerifierTest
   {
     final CompositionalGeneralisedConflictChecker checker =
         new CompositionalGeneralisedConflictChecker(factory);
+    checker.setInternalStepNodeLimit(5000);
     checker.setInternalStepTransitionLimit(100000);
     return new SICProperty5Verifier(checker, factory);
   }

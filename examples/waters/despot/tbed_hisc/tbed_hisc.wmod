@@ -2775,7 +2775,7 @@
                 <SimpleIdentifier Name="t2_lv_Sw8_at14"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="Low level Sec4-6" Name="Low level Sec4:6">
+        <Instance ModuleName="Low Level Sec4-6" Name="Low Level Sec4:6">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>

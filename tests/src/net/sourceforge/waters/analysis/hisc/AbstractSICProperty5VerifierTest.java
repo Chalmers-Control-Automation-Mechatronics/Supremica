@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.despot
+//# PACKAGE: net.sourceforge.waters.analysis.hisc
 //# CLASS:   AbstractSICProperty5VerifierTest
 //###########################################################################
 //# $Id$
@@ -38,53 +38,6 @@ public abstract class AbstractSICProperty5VerifierTest
 
   // #########################################################################
   // # Test Cases
-  public void testSICProperty5Verifier_parManEg_I_mfb_lowlevel()
-      throws Exception
-  {
-    runModelVerifier("tests", "hisc", "parManEg_I_mfb_lowlevel.wmod", true);
-  }
-
-  public void testSICProperty5Verifier_parManEg_I_mfb_lowlevel_multiAnswers()
-      throws Exception
-  {
-    runModelVerifier("tests", "hisc",
-                     "parManEg_I_mfb_lowlevel_multiAnswers.wmod", true);
-  }
-
-  public void testSICProperty5Verifier_parManEg_I_mfb_middlelevel()
-      throws Exception
-  {
-    runModelVerifier("tests", "hisc", "parManEg_I_mfb_middlelevel.wmod", true);
-  }
-
-  public void testSICProperty5Verifier_parManEg_I_mfb_parManEg_I_mfb_lowlevel_multiAnswers_noInterface()
-      throws Exception
-  {
-    runModelVerifier("tests", "hisc",
-                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
-                     false);
-  }
-
-  public void testSICProperty5Verifier_rhone_subsystem1_ld()
-    throws Exception
-  {
-    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", true);
-  }
-
-  public void testSICProperty5Verifier_rhone_subsystem1_ld_failsic5()
-    throws Exception
-  {
-    runModelVerifier("tests", "hisc",
-                     "rhone_subsystem1_ld_failsic5.wmod", false);
-  }
-
-  // SimpleManufacturingExample
-  public void testSICProperty5Verifier_Manuf_Cells() throws Exception
-  {
-    runModelVerifier("despot", "simpleManufacturingExample",
-                     "Manuf-Cells.wmod", true);
-  }
-
   // testHISC
   public void testSICProperty5Verifier_hisc0_low1() throws Exception
   {
@@ -171,6 +124,43 @@ public abstract class AbstractSICProperty5VerifierTest
     runModelVerifier("despot", "testHISC", "hisc9_low2.wmod", false);
   }
 
+  // ParallelManufacturingExample
+  public void testSICProperty5Verifier_parManEg_I_mfb_lowlevel()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc", "parManEg_I_mfb_lowlevel.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_parManEg_I_mfb_lowlevel_multiAnswers()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_parManEg_I_mfb_middlelevel()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc", "parManEg_I_mfb_middlelevel.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_parManEg_I_mfb_parManEg_I_mfb_lowlevel_multiAnswers_noInterface()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
+                     false);
+  }
+
+  // SimpleManufacturingExample
+  public void testSICProperty5Verifier_Manuf_Cells()
+  throws Exception
+  {
+    runModelVerifier("despot", "simpleManufacturingExample",
+                     "Manuf-Cells.wmod", true);
+  }
+
+  // song_aip
   public void testSICProperty5Verifier_aip3_syn_as1() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "as1.wmod", true);
@@ -209,6 +199,69 @@ public abstract class AbstractSICProperty5VerifierTest
   public void testSICProperty5Verifier_aip3_syn_tu4() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "tu4.wmod", true);
+  }
+
+  // tbed_hisc
+  public void testSICProperty5Verifier_tbed_hisc_crane1()
+  throws Exception
+  {
+    runModelVerifier("despot", "tbed_hisc", "Low Level Crane1.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_tbed_hisc_crane2()
+  throws Exception
+  {
+    runModelVerifier("despot", "tbed_hisc", "Low Level Crane2.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_tbed_hisc_crane3()
+  throws Exception
+  {
+    runModelVerifier("despot", "tbed_hisc", "Low Level Crane3.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_tbed_hisc_ll2()
+  throws Exception
+  {
+    runModelVerifier("despot", "tbed_hisc", "Low Level II.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_tbed_hisc_ll46()
+  throws Exception
+  {
+    runModelVerifier("despot", "tbed_hisc", "Low Level Sec4-6.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_tbed_hisc_ll57()
+  throws Exception
+  {
+    runModelVerifier("despot", "tbed_hisc", "Low Level Sec5-7.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_tbed_hisc_switch3()
+  throws Exception
+  {
+    runModelVerifier("despot", "tbed_hisc", "Low Level Switch3.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_tbed_hisc_switch8()
+  throws Exception
+  {
+    runModelVerifier("despot", "tbed_hisc", "Low Level Switch8.wmod", true);
+  }
+
+  // rhone_subsystem1
+  public void testSICProperty5Verifier_rhone_subsystem1_ld()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_rhone_subsystem1_ld_failsic5()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc",
+                     "rhone_subsystem1_ld_failsic5.wmod", false);
   }
 
   /**
