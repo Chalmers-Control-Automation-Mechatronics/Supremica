@@ -807,7 +807,7 @@ public abstract class TransitionListBuffer
 
   /**
    * Creates a iterator for the tau-closure of this buffer that is set up to
-   * iterate over all states silently reachable form the given from-state.
+   * iterate over all states silently reachable from the given from-state.
    * The first state returned by the iterator is the given from-state,
    * and it is followed by all states reachable by sequences of
    * {@link EventEncoding#TAU} events in depth-first order. The tau-closure

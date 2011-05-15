@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  */
 
 class OmegaRemovalTRSimplifier
-  extends AbstractGeneralisedTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
   //#########################################################################
   //# Constructors

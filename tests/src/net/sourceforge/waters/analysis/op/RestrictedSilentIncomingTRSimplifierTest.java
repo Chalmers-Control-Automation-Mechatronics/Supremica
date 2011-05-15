@@ -21,7 +21,7 @@ import junit.framework.TestSuite;
  * This tests the {@link SilentIncomingTRSimplifier} when it is configured
  * to remove only tau transitions leading to states that become unreachable.
  *
- * @see SilentIncomingTRSimplifier#setAppliesPartitionAutomatically(boolean)
+ * @see SilentIncomingTRSimplifier#setRestrictsToUnreachableStates(boolean)
  * @author Robi Malik
  */
 

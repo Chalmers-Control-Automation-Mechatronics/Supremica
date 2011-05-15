@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  */
 
 public class CoreachabilityTRSimplifier
-  extends AbstractGeneralisedTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#######################################################################

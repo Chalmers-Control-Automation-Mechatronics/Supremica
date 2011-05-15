@@ -22,7 +22,7 @@ import junit.framework.TestSuite;
  * to remove all eligible transitions, regardless of whether the target
  * states become unreachable.
  *
- * @see SilentIncomingTRSimplifier#setAppliesPartitionAutomatically(boolean)
+ * @see SilentIncomingTRSimplifier#setRestrictsToUnreachableStates(boolean)
  * @author Robi Malik
  */
 

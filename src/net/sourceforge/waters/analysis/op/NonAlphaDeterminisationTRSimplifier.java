@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  */
 
 public class NonAlphaDeterminisationTRSimplifier
-  extends AbstractGeneralisedTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################

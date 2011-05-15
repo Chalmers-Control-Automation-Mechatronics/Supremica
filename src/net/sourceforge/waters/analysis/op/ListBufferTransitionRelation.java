@@ -584,7 +584,7 @@ public class ListBufferTransitionRelation
     if (mSuccessorBuffer != null) {
       return mSuccessorBuffer.createReadOnlyIterator();
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -603,7 +603,7 @@ public class ListBufferTransitionRelation
     if (mSuccessorBuffer != null) {
       return mSuccessorBuffer.createReadOnlyIterator(source);
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -623,7 +623,7 @@ public class ListBufferTransitionRelation
     if (mSuccessorBuffer != null) {
       return mSuccessorBuffer.createReadOnlyIterator(source, event);
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -641,7 +641,7 @@ public class ListBufferTransitionRelation
     if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createReadOnlyIterator();
     } else {
-      throw createNoBufferException("predecessor");
+      throw createNoBufferException(CONFIG_PREDECESSORS);
     }
   }
 
@@ -660,7 +660,7 @@ public class ListBufferTransitionRelation
     if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createReadOnlyIterator(target);
     } else {
-      throw createNoBufferException("predecessor");
+      throw createNoBufferException(CONFIG_PREDECESSORS);
     }
   }
 
@@ -680,7 +680,7 @@ public class ListBufferTransitionRelation
     if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createReadOnlyIterator(target, event);
     } else {
-      throw createNoBufferException("predecessor");
+      throw createNoBufferException(CONFIG_PREDECESSORS);
     }
   }
 
@@ -700,7 +700,7 @@ public class ListBufferTransitionRelation
     } else if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createReadOnlyIterator(state);
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -721,7 +721,7 @@ public class ListBufferTransitionRelation
     } else if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createReadOnlyIterator(state, event);
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -784,7 +784,7 @@ public class ListBufferTransitionRelation
       mPredecessorBuffer = null;
       return mSuccessorBuffer.createModifyingIterator();
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -804,7 +804,7 @@ public class ListBufferTransitionRelation
       mSuccessorBuffer = null;
       return mPredecessorBuffer.createModifyingIterator();
     } else {
-      throw createNoBufferException("predecessor");
+      throw createNoBufferException(CONFIG_PREDECESSORS);
     }
   }
 
@@ -856,6 +856,83 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Creates an iterator for the tau-closure of this buffer.
+   * The iterator returned is not initialised, so the method
+   * {@link TransitionIterator#resetState(int)} must be used before it can be
+   * used. After initialisation, the first state returned by the iterator is
+   * the start state of iteration, and it is followed by all successors
+   * reachable by sequences of {@link EventEncoding#TAU} events in depth-first
+   * order. The tau-closure iterator is a read-only iterator and does not
+   * implement the {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createSuccessorsTauClosureIterator()
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createTauClosureIterator();
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
+   * Creates a iterator for the tau-closure of this buffer that is set up
+   * to iterate over all states silently reachable form the given state.
+   * The first state returned by the iterator is the given state,
+   * and it is followed by all successors reachable by sequences of
+   * {@link EventEncoding#TAU} events in depth-first order. The tau-closure
+   * iterator is a read-only iterator and does not implement the
+   * {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createSuccessorsTauClosureIterator
+    (final int state)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createTauClosureIterator(state);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
+   * Creates an iterator for the backwards tau-closure of this buffer.
+   * The iterator returned is not initialised, so the method
+   * {@link TransitionIterator#resetState(int)} must be used before it can be
+   * used. After initialisation, the first state returned by the iterator is
+   * the start state of iteration, and it is followed by all predecessors
+   * reachable by sequences of {@link EventEncoding#TAU} events in depth-first
+   * order. The tau-closure iterator is a read-only iterator and does not
+   * implement the {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createPredecessorsTauClosureIterator()
+  {
+    if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createTauClosureIterator();
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
+    }
+  }
+
+  /**
+   * Creates a iterator for the backwards tau-closure of this buffer
+   * that is set up to iterate over all states from which the given
+   * state is silently reachable.
+   * The first state returned by the iterator is the given state,
+   * and it is followed by all predecessors reachable by sequences of
+   * {@link EventEncoding#TAU} events in depth-first order. The tau-closure
+   * iterator is a read-only iterator and does not implement the
+   * {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createPredecessorsTauClosureIterator
+    (final int state)
+  {
+    if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createTauClosureIterator(state);
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
+    }
+  }
+
+  /**
    * Checks whether this transition relation represents a deterministic
    * automaton.
    * @throws IllegalStateException if the transition relation is not
@@ -874,7 +951,7 @@ public class ListBufferTransitionRelation
       }
     }
     if (mSuccessorBuffer == null) {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
     final TransitionIterator iter =
       mSuccessorBuffer.createAllTransitionsReadOnlyIterator();
@@ -1048,7 +1125,7 @@ public class ListBufferTransitionRelation
       }
       return remove;
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -1076,7 +1153,7 @@ public class ListBufferTransitionRelation
       }
       return remove;
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -1105,7 +1182,7 @@ public class ListBufferTransitionRelation
       }
       return remove;
     } else {
-      throw createNoBufferException("predecessor");
+      throw createNoBufferException(CONFIG_PREDECESSORS);
     }
   }
 
@@ -1133,7 +1210,7 @@ public class ListBufferTransitionRelation
       }
       return remove;
     } else {
-      throw createNoBufferException("predecessor");
+      throw createNoBufferException(CONFIG_PREDECESSORS);
     }
   }
 
@@ -1160,7 +1237,7 @@ public class ListBufferTransitionRelation
   {
     if (from != to) {
       if (mSuccessorBuffer == null) {
-        throw createNoBufferException("successor");
+        throw createNoBufferException(CONFIG_SUCCESSORS);
       }
       copyMarkings(from, to);
       mSuccessorBuffer.copyTransitions(from, to, mPredecessorBuffer);
@@ -1224,7 +1301,7 @@ public class ListBufferTransitionRelation
   {
     if (from != to) {
       if (mPredecessorBuffer == null) {
-        throw createNoBufferException("predecessor");
+        throw createNoBufferException(CONFIG_PREDECESSORS);
       }
       if (isInitial(from)) {
         setInitial(to, true);
@@ -1386,7 +1463,7 @@ public class ListBufferTransitionRelation
           new OutgoingTransitionListBuffer(numEvents, numStates);
         mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
       } else {
-        throw createNoBufferException("predecessor");
+        throw createNoBufferException(CONFIG_PREDECESSORS);
       }
     }
     if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
@@ -1395,7 +1472,7 @@ public class ListBufferTransitionRelation
           new IncomingTransitionListBuffer(numEvents, numStates);
         mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
       } else {
-        throw createNoBufferException("successor");
+        throw createNoBufferException(CONFIG_SUCCESSORS);
       }
     }
     if ((config & CONFIG_SUCCESSORS) == 0) {
@@ -1610,7 +1687,7 @@ public class ListBufferTransitionRelation
       }
       return modified;
     } else {
-      throw createNoBufferException("successor");
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
@@ -1769,11 +1846,20 @@ public class ListBufferTransitionRelation
        " configuration error: no transition buffer!");
   }
 
-  private IllegalStateException createNoBufferException(final String name)
+  private IllegalStateException createNoBufferException(final int config)
   {
-    return new IllegalStateException
-      (ProxyTools.getShortClassName(this) +
-       " configuration error: " + name + " buffer not initialised!");
+    switch (config) {
+    case CONFIG_SUCCESSORS:
+      return new IllegalStateException
+        (ProxyTools.getShortClassName(this) +
+         " configuration error: successor buffer not initialised!");
+    case CONFIG_PREDECESSORS:
+      return new IllegalStateException
+        (ProxyTools.getShortClassName(this) +
+         " configuration error: predecessor buffer not initialised!");
+    default:
+      return createNoBufferException();
+    }
   }
 
 

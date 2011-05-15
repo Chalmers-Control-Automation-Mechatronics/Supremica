@@ -2657,9 +2657,9 @@ public class OPConflictChecker
       }
       final ChainTRSimplifier simplifier = getSimplifier();
       for (final TransitionRelationSimplifier step : simplifier.getSteps()) {
-        if (step instanceof AbstractGeneralisedTRSimplifier) {
-          final AbstractGeneralisedTRSimplifier gen =
-            (AbstractGeneralisedTRSimplifier) step;
+        if (step instanceof AbstractMarkingTRSimplifier) {
+          final AbstractMarkingTRSimplifier gen =
+            (AbstractMarkingTRSimplifier) step;
           gen.setPropositions(mPreconditionMarkingID, mDefaultMarkingID);
         }
       }

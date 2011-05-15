@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  */
 
 public class OnlySilentOutgoingTRSimplifier
-  extends AbstractGeneralisedTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################

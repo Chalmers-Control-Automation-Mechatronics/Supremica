@@ -327,12 +327,12 @@ public abstract class AbstractTRSimplifierTest
    * subclasses needing to override {@link
    * #configureTransitionRelationSimplifier()}.
    * @throws ClassCastException to indicate that the transition simplifier
-   *         is not of type {@link AbstractGeneralisedTRSimplifier}.
+   *         is not of type {@link AbstractMarkingTRSimplifier}.
    */
   protected void configureTransitionRelationSimplifierWithPropositions()
   {
-    final AbstractGeneralisedTRSimplifier simplifier =
-      (AbstractGeneralisedTRSimplifier) mSimplifier;
+    final AbstractMarkingTRSimplifier simplifier =
+      (AbstractMarkingTRSimplifier) mSimplifier;
     simplifier.setPropositions(mAlphaID, mOmegaID);
   }
 
