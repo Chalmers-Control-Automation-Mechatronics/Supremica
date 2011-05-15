@@ -32,11 +32,7 @@ public abstract class AbstractMarkingTRSimplifier
 
   //#########################################################################
   //# Configuration
-  public void setDefaultMarkingID(final int defaultID)
-  {
-    setPropositions(-1, defaultID);
-  }
-
+  @Override
   public void setPropositions(final int preconditionID, final int defaultID)
   {
     mPreconditionMarkingID = preconditionID;

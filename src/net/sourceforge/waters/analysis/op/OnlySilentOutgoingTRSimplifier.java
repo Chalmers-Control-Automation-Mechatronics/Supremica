@@ -69,8 +69,8 @@ public class OnlySilentOutgoingTRSimplifier
     main:
     for (int source = 0; source < numStates; source++) {
       if (rel.isReachable(source) &&
-          !rel.isMarked(source, alphaID) &&
-          !rel.isMarked(source, omegaID)) {
+          !rel.isMarked(source, omegaID) &&
+          (alphaID < 0 || !rel.isMarked(source, alphaID))) {
         iter.resetState(source);
         while (iter.advance()) {
           final int eventID = iter.getCurrentEvent();

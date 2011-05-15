@@ -58,6 +58,15 @@ public abstract class AbstractTRSimplifier
     mTransitionRelation = rel;
   }
 
+  public void setDefaultMarkingID(final int defaultID)
+  {
+    setPropositions(-1, defaultID);
+  }
+
+  public void setPropositions(final int preconditionID, final int defaultID)
+  {
+  }
+
   public void setAppliesPartitionAutomatically(final boolean apply)
   {
     mAppliesPartitionAutomatically = apply;

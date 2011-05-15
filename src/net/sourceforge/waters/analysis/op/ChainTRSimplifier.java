@@ -85,6 +85,14 @@ public class ChainTRSimplifier
     }
   }
 
+  @Override
+  public void setPropositions(final int preconditionID, final int defaultID)
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.setPropositions(preconditionID, defaultID);
+    }
+  }
+
   public boolean run()
     throws AnalysisException
   {

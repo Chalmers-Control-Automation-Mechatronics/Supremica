@@ -62,6 +62,22 @@ public interface TransitionRelationSimplifier
    */
   public void setTransitionRelation(ListBufferTransitionRelation rel);
 
+  /**
+   * Sets the IDs of the default marking with respect to which
+   * transition relations are simplified.
+   * @param defaultID       The default (omega) marking used,
+   *                        or <CODE>-1</CODE>.
+   */
+  public void setDefaultMarkingID(final int defaultID);
+  /**
+   * Sets the IDs of the marking propositions with respect to which
+   * transition relations are simplified.
+   * @param preconditionID  The precondition (alpha) marking used,
+   *                        or <CODE>-1</CODE>.
+   * @param defaultID       The default (omega) marking used,
+   *                        or <CODE>-1</CODE>.
+   */
+  public void setPropositions(final int preconditionID, final int defaultID);
 
   /**
    * Sets whether this simplifier applies the computed partition automatically.

@@ -522,7 +522,7 @@ public class OPConflictChecker
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     chain.add(bisimulator);
-    return new StandardTRSimplifierAbstractionRule(chain);
+    return new StandardTRSimplifierAbstractionRule(chain, false);
   }
 
   private AbstractionRule createGeneralisedNonblockingAbstractionChain()
@@ -569,6 +569,37 @@ public class OPConflictChecker
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
     return new GeneralisedTRSimplifierAbstractionRule(chain);
+  }
+
+  private AbstractionRule createStandardNonblockingAbstractionChain()
+  throws EventNotFoundException
+  {
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final TauLoopRemovalTRSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+    final SilentContinuationTRSimplifier silentContinuationRemover =
+      new SilentContinuationTRSimplifier();
+    chain.add(silentContinuationRemover);
+    final ActiveEventsTRSimplifier activeEventsMerger =
+      new ActiveEventsTRSimplifier();
+    chain.add(activeEventsMerger);
+    final OnlySilentOutgoingTRSimplifier silentOutRemover =
+      new OnlySilentOutgoingTRSimplifier();
+    chain.add(silentOutRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    chain.add(bisimulator);
+    final MarkingSaturationTRSimplifier saturator =
+      new MarkingSaturationTRSimplifier();
+    chain.add(saturator);
+    return new StandardTRSimplifierAbstractionRule(chain, true);
   }
 
 
@@ -1533,6 +1564,23 @@ public class OPConflictChecker
         throws EventNotFoundException
       {
         return checker.createGeneralisedNonblockingAbstractionChain();
+      }
+    },
+    /**
+     * <P>
+     * Minimisation is performed according to a sequence of abstraction rules
+     * for standard nonblocking.
+     * </P>
+     *
+     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
+     * Verification in Supervisory Control. SIAM Journal of Control and
+     * Optimization, 48(3), 1914-1938, 2009.</P>
+     */
+    NB {
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+        throws EventNotFoundException
+      {
+        return checker.createStandardNonblockingAbstractionChain();
       }
     },
     /**
@@ -2573,9 +2621,10 @@ public class OPConflictChecker
     //#######################################################################
     //# Constructor
     private StandardTRSimplifierAbstractionRule
-      (final TransitionRelationSimplifier simplifier)
+      (final TransitionRelationSimplifier simplifier, final boolean marking)
     {
       super(simplifier);
+      mMarking = marking;
     }
 
     //#######################################################################
@@ -2585,9 +2634,17 @@ public class OPConflictChecker
                                       final EventProxy tau)
     {
       final KindTranslator translator = getKindTranslator();
-      return new EventEncoding(aut, translator, tau, mPropositions,
-                               EventEncoding.FILTER_PROPOSITIONS);
-
+      final EventEncoding eventEnc =
+        new EventEncoding(aut, translator, tau, mPropositions,
+                          EventEncoding.FILTER_PROPOSITIONS);
+      int markingID = eventEnc.getEventCode(mCurrentDefaultMarking);
+      if (markingID < 0 && mMarking) {
+        markingID =
+          eventEnc.addEvent(mCurrentDefaultMarking, translator, true);
+      }
+      final TransitionRelationSimplifier simplifier = getSimplifier();
+      simplifier.setDefaultMarkingID(markingID);
+      return eventEnc;
     }
 
     @Override
@@ -2595,6 +2652,10 @@ public class OPConflictChecker
     {
       return false;
     }
+
+    //#######################################################################
+    //# Data Members
+    private final boolean mMarking;
 
   }
 
@@ -2645,7 +2706,8 @@ public class OPConflictChecker
       final EventEncoding eventEnc =
         new EventEncoding(aut, translator, tau, mPropositions,
                           EventEncoding.FILTER_PROPOSITIONS);
-      mPreconditionMarkingID = eventEnc.getEventCode(mUsedPreconditionMarking);
+      mPreconditionMarkingID =
+        eventEnc.getEventCode(mUsedPreconditionMarking);
       if (mPreconditionMarkingID < 0) {
         mPreconditionMarkingID =
           eventEnc.addEvent(mUsedPreconditionMarking, translator, true);
@@ -2655,14 +2717,8 @@ public class OPConflictChecker
         mDefaultMarkingID =
           eventEnc.addEvent(mUsedDefaultMarking, translator, true);
       }
-      final ChainTRSimplifier simplifier = getSimplifier();
-      for (final TransitionRelationSimplifier step : simplifier.getSteps()) {
-        if (step instanceof AbstractMarkingTRSimplifier) {
-          final AbstractMarkingTRSimplifier gen =
-            (AbstractMarkingTRSimplifier) step;
-          gen.setPropositions(mPreconditionMarkingID, mDefaultMarkingID);
-        }
-      }
+      final TransitionRelationSimplifier simplifier = getSimplifier();
+      simplifier.setPropositions(mPreconditionMarkingID, mDefaultMarkingID);
       return eventEnc;
     }
 
