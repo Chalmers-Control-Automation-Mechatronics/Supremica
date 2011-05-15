@@ -69,7 +69,7 @@ public class NonAlphaDeterminisationTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
-  public int getPreferredConfiguration()
+  public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }

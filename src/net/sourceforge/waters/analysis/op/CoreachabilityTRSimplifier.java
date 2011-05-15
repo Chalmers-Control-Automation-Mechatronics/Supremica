@@ -41,7 +41,7 @@ public class CoreachabilityTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
-  public int getPreferredConfiguration()
+  public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
@@ -105,7 +105,9 @@ public class CoreachabilityTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected void applyResultPartition()
+  throws AnalysisException
   {
+    super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeUnreachableTransitions();
     rel.removeTauSelfLoops();

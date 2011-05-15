@@ -78,7 +78,7 @@ public class SilentIncomingTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
-  public int getPreferredConfiguration()
+  public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }
@@ -90,6 +90,9 @@ public class SilentIncomingTRSimplifier
     final int tauID = EventEncoding.TAU;
     final int alphaID = getPreconditionMarkingID();
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (!rel.isUsedEvent(tauID)) {
+      return false;
+    }
     final int numStates = rel.getNumberOfStates();
     final BitSet keep = new BitSet(numStates);
     if (mRestrictsToUnreachableStates) {
@@ -157,7 +160,9 @@ public class SilentIncomingTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected void applyResultPartition()
+  throws AnalysisException
   {
+    super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.checkReachability();
     rel.removeTauSelfLoops();

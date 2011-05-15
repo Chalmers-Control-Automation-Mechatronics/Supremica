@@ -1346,6 +1346,20 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Returns whether the given event is used in this transition relation.
+   * Events can be marked as unused by various operations to signify that
+   * the event is always selflooped and should be suppressed when generating
+   * an automaton.
+   * @param  event   The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is still used, i.e., it
+   *         is not marked as unused.
+   */
+  public boolean isUsedEvent(final int event)
+  {
+    return mUsedEvents.get(event);
+  }
+
+  /**
    * Determines whether the given event is globally disabled in this transition
    * relation.
    * @param  event   The ID of the event to be tested.
@@ -1401,7 +1415,7 @@ public class ListBufferTransitionRelation
   /**
    * Removes the given event from this transition relation.
    * This method removes the given event including all its transitions
-   * from the transition relation. The event is marked as unused,
+   * from the transition relation. The event is marked as used,
    * and all associated transitions are deleted.
    * @param  event   The ID of the event to be removed.
    */
@@ -1444,6 +1458,25 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Buffer Maintenance
+  /**
+   * Gets the current configuration of this transition relation.
+   * The configuration determines whether transitions can be accessed
+   * easily in forwards or backwards direction.
+   * @return One of {@link #CONFIG_SUCCESSORS},
+   *         {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   */
+  public int getConfiguration()
+  {
+    int config = 0;
+    if (mSuccessorBuffer != null) {
+      config = CONFIG_SUCCESSORS;
+    }
+    if (mPredecessorBuffer != null) {
+      config |= CONFIG_PREDECESSORS;
+    }
+    return config;
+  }
+
   /**
    * Reconfigures the current set of transition buffers.
    * @param  config   Configuration flags defining which transition buffers

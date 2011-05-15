@@ -31,15 +31,21 @@ public abstract class AbstractTRSimplifier
   public AbstractTRSimplifier(final ListBufferTransitionRelation rel)
   {
     mAppliesPartitionAutomatically = true;
+    mPreferredOutputConfiguration = 0;
     mTransitionRelation = rel;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
-  public int getPreferredConfiguration()
+  public int getPreferredInputConfiguration()
   {
     return 0;
+  }
+
+  public void setPreferredOutputConfiguration(final int config)
+  {
+    mPreferredOutputConfiguration = config;
   }
 
   public ListBufferTransitionRelation getTransitionRelation()
@@ -90,7 +96,7 @@ public abstract class AbstractTRSimplifier
     throws AnalysisException
   {
     mResultPartition = null;
-    final int config = getPreferredConfiguration();
+    final int config = getPreferredInputConfiguration();
     if (config != 0) {
       mTransitionRelation.reconfigure(config);
     }
@@ -121,6 +127,16 @@ public abstract class AbstractTRSimplifier
   protected void applyResultPartition()
     throws AnalysisException
   {
+    if (mTransitionRelation.getConfiguration() ==
+        ListBufferTransitionRelation.CONFIG_ALL) {
+      final int config;
+      if (mPreferredOutputConfiguration != 0) {
+        config = mPreferredOutputConfiguration;
+      } else {
+        config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+      }
+      mTransitionRelation.reconfigure(config);
+    }
     mTransitionRelation.merge(mResultPartition);
   }
 
@@ -137,6 +153,7 @@ public abstract class AbstractTRSimplifier
   //#########################################################################
   //# Data Members
   private boolean mAppliesPartitionAutomatically;
+  private int mPreferredOutputConfiguration;
   private ListBufferTransitionRelation mTransitionRelation;
   private List<int[]> mResultPartition;
 

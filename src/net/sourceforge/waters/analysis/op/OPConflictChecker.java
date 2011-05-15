@@ -2506,7 +2506,7 @@ public class OPConflictChecker
       try {
         final EventEncoding eventEnc = createEventEncoding(aut, tau);
         final StateEncoding inputStateEnc = new StateEncoding(aut);
-        final int config = mSimplifier.getPreferredConfiguration();
+        final int config = mSimplifier.getPreferredInputConfiguration();
         final ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);
@@ -2680,7 +2680,7 @@ public class OPConflictChecker
         final EventEncoding eventEnc = createEventEncoding(aut, tau);
         final StateEncoding inputStateEnc = new StateEncoding(aut);
         final ChainTRSimplifier simplifier = getSimplifier();
-        final int config = simplifier.getPreferredConfiguration();
+        final int config = simplifier.getPreferredInputConfiguration();
         final ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);

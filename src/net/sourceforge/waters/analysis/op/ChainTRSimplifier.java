@@ -54,6 +54,8 @@ public class ChainTRSimplifier
 
   void add(final TransitionRelationSimplifier step)
   {
+    final int config = step.getPreferredInputConfiguration();
+    setPreferredOutputConfiguration(config);
     mSteps.add(step);
   }
 
@@ -61,15 +63,26 @@ public class ChainTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
-  public int getPreferredConfiguration()
+  public int getPreferredInputConfiguration()
   {
     for (final TransitionRelationSimplifier step : mSteps) {
-      final int result = step.getPreferredConfiguration();
+      final int result = step.getPreferredInputConfiguration();
       if (result != 0) {
         return result;
       }
     }
     return 0;
+  }
+
+  @Override
+  public void setPreferredOutputConfiguration(final int config)
+  {
+    super.setPreferredOutputConfiguration(config);
+    if (!mSteps.isEmpty()) {
+      final int end = mSteps.size() - 1;
+      final TransitionRelationSimplifier last = mSteps.get(end);
+      last.setPreferredOutputConfiguration(config);
+    }
   }
 
   public boolean run()

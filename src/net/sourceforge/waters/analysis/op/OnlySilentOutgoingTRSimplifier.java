@@ -45,7 +45,7 @@ public class OnlySilentOutgoingTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
-  public int getPreferredConfiguration()
+  public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
@@ -58,6 +58,9 @@ public class OnlySilentOutgoingTRSimplifier
     final int omegaID = getDefaultMarkingID();
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (!rel.isUsedEvent(tauID)) {
+      return false;
+    }
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     final TIntArrayList targets = new TIntArrayList();
     final int numStates = rel.getNumberOfStates();
@@ -107,7 +110,9 @@ public class OnlySilentOutgoingTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected void applyResultPartition()
+  throws AnalysisException
   {
+    super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
     rel.removeProperSelfLoopEvents();

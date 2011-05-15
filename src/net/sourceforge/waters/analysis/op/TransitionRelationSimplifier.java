@@ -36,7 +36,21 @@ public interface TransitionRelationSimplifier
    * @see ListBufferTransitionRelation#CONFIG_SUCCESSORS
    * @see ListBufferTransitionRelation#CONFIG_ALL
    */
-  public int getPreferredConfiguration();
+  public int getPreferredInputConfiguration();
+
+  /**
+   * Sets a preferred configuration for the transition relation when this
+   * simplifier exits. Simplifiers may or may not honour thus setting, but
+   * they should respect it when reconfiguring the transition relation
+   * prior to producing the output partition.
+   * @param config Combination of flags defined in
+   *               {@link ListBufferTransitionRelation}.
+   *               A value of&nbsp;0 indicates no preference.
+   * @see ListBufferTransitionRelation#CONFIG_PREDECESSORS
+   * @see ListBufferTransitionRelation#CONFIG_SUCCESSORS
+   * @see ListBufferTransitionRelation#CONFIG_ALL
+   */
+  public void setPreferredOutputConfiguration(int config);
 
   /**
    * Gets the transition relation modified by this simplifier.

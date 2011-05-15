@@ -2,12 +2,16 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.op
-//# CLASS:   ActiveEventsTRSimplifier
+//# CLASS:   SilentContinuationTRSimplifier
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.op;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
 
 import gnu.trove.HashFunctions;
 import gnu.trove.TIntHashSet;
@@ -17,10 +21,10 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 
 
 /**
- * <P>An implementation of the <I>Active Events Rule</I>.</P>
+ * <P>An implementation of the <I>Silent Continuation Rule</I>.</P>
  *
  * <P>This rule merges all states that are incoming equivalent and have
- * equal sets of eligible events.</P>
+ * at least one outgoing silent transition.</P>
  *
  * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional Verification
  * in Supervisory Control. SIAM Journal of Control and Optimization,
@@ -29,17 +33,17 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  * @author Robi Malik
  */
 
-public class ActiveEventsTRSimplifier
-  extends AbstractMarkingTRSimplifier
+public class SilentContinuationTRSimplifier
+  extends AbstractTRSimplifier
 {
 
   //#######################################################################
   //# Constructors
-  public ActiveEventsTRSimplifier()
+  public SilentContinuationTRSimplifier()
   {
   }
 
-  public ActiveEventsTRSimplifier(final ListBufferTransitionRelation rel)
+  public SilentContinuationTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -50,7 +54,7 @@ public class ActiveEventsTRSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
-    return ListBufferTransitionRelation.CONFIG_ALL;
+    return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
   public boolean run()
@@ -58,13 +62,28 @@ public class ActiveEventsTRSimplifier
   {
     setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (!rel.isUsedEvent(EventEncoding.TAU)) {
+      return false;
+    }
     final int numStates = rel.getNumberOfStates();
-    final WatersIntHashingStrategy strategy = new ActiveEventsStateHash();
+    final BitSet candidates = new BitSet(numStates);
+    final TransitionIterator iter =
+      rel.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);
+    while (iter.advance()) {
+      final int source = iter.getCurrentSourceState();
+      candidates.set(source);
+    }
+    final int numCandidates = candidates.cardinality();
+    if (numCandidates == 0) {
+      return false;
+    }
+    final WatersIntHashingStrategy strategy =
+      new IncomingEquivalenceStateHash();
     final WatersIntIntHashMap map =
-      new WatersIntIntHashMap(numStates, IntListBuffer.NULL, strategy);
+      new WatersIntIntHashMap(numCandidates, IntListBuffer.NULL, strategy);
     final IntListBuffer prepartition = new IntListBuffer();
     for (int state = 0; state < numStates; state++) {
-      if (rel.isReachable(state)) {
+      if (candidates.get(state)) {
         int list = map.get(state);
         if (list == IntListBuffer.NULL) {
           list = prepartition.createList();
@@ -74,21 +93,27 @@ public class ActiveEventsTRSimplifier
       }
     }
     final int numClasses = map.size();
-    if (numClasses == numStates) {
+    if (numClasses == numCandidates) {
       return false;
     } else {
-      final int[][] partition = new int[numClasses][];
-      int index = 0;
+      final int numSingles = numStates - numCandidates;
+      final List<int[]> partition =
+        new ArrayList<int[]>(numClasses + numSingles);
       for (int state = 0; state < numStates; state++) {
-        if (rel.isReachable(state)) {
+        if (candidates.get(state)) {
           final int list = map.get(state);
           final int first = prepartition.getFirst(list);
           if (state == first) {
-            partition[index++] = prepartition.toArray(list);
+            final int[] clazz = prepartition.toArray(list);
+            partition.add(clazz);
           }
+        } else if (rel.isReachable(state)) {
+          final int[] clazz = new int[1];
+          clazz[0] = state;
+          partition.add(clazz);
         }
       }
-      setResultPartitionArray(partition);
+      setResultPartitionList(partition);
       applyResultPartitionAutomatically();
       return true;
     }
@@ -109,17 +134,16 @@ public class ActiveEventsTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class ActiveEventsStateHash
-  private class ActiveEventsStateHash implements WatersIntHashingStrategy
+  //# Inner Class IncomingEquavalenceStateHash
+  private class IncomingEquivalenceStateHash
+    implements WatersIntHashingStrategy
   {
 
     //#######################################################################
     //# Constructor
-    private ActiveEventsStateHash()
+    private IncomingEquivalenceStateHash()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      mForwardsTauClosureIterator = rel.createSuccessorsTauClosureIterator();
-      mForwardsEventIterator = rel.createSuccessorsReadOnlyIterator();
       mBackwardsTauClosureIterator1 =
         rel.createPredecessorsTauClosureIterator();
       mBackwardsEventIterator = rel.createPredecessorsReadOnlyIterator();
@@ -139,31 +163,9 @@ public class ActiveEventsTRSimplifier
       } else {
         final ListBufferTransitionRelation rel = getTransitionRelation();
         final int numProperEvents = rel.getNumberOfProperEvents();
-        final int[] props = getPropositions();
-        int result = 0;
-        mCurrentSet1.clear();
-        mForwardsTauClosureIterator.resetState(root);
-        while (mForwardsTauClosureIterator.advance()) {
-          final int state = mForwardsTauClosureIterator.getCurrentTargetState();
-          for (final int prop : props) {
-            if (rel.isMarked(state, prop)) {
-              final int event = numProperEvents + prop;
-              if (mCurrentSet1.add(event)) {
-                result += HashFunctions.hash(event);
-              }
-            }
-          }
-          mForwardsEventIterator.resetState(state);
-          while (mForwardsEventIterator.advance()) {
-            final int event = mForwardsEventIterator.getCurrentEvent();
-            if (event != EventEncoding.TAU && mCurrentSet1.add(event)) {
-              result += HashFunctions.hash(event);
-            }
-          }
-        }
-        result *= 31;
         final int numStates = rel.getNumberOfStates();
         final int shift = AutomatonTools.log2(numStates);
+        int result = 0;
         mCurrentSet1.clear();
         mBackwardsTauClosureIterator1.resetState(root);
         while (mBackwardsTauClosureIterator1.advance()) {
@@ -206,54 +208,6 @@ public class ActiveEventsTRSimplifier
       try {
         final ListBufferTransitionRelation rel = getTransitionRelation();
         final int numProperEvents = rel.getNumberOfProperEvents();
-        final int[] props = getPropositions();
-        mCurrentSet1.clear();
-        mCurrentSet2.clear();
-        mForwardsTauClosureIterator.resetState(root1);
-        while (mForwardsTauClosureIterator.advance()) {
-          final int state =
-            mForwardsTauClosureIterator.getCurrentTargetState();
-          for (final int prop : props) {
-            if (rel.isMarked(state, prop)) {
-              final int event = numProperEvents + prop;
-              mCurrentSet1.add(event);
-            }
-          }
-          mForwardsEventIterator.resetState(state);
-          while (mForwardsEventIterator.advance()) {
-            final int event = mForwardsEventIterator.getCurrentEvent();
-            if (event != EventEncoding.TAU) {
-              mCurrentSet1.add(event);
-            }
-          }
-        }
-        mForwardsTauClosureIterator.resetState(root2);
-        while (mForwardsTauClosureIterator.advance()) {
-          final int state =
-            mForwardsTauClosureIterator.getCurrentTargetState();
-          for (final int prop : props) {
-            if (rel.isMarked(state, prop)) {
-              final int event = numProperEvents + prop;
-              if (!mCurrentSet1.contains(event)) {
-                return false;
-              }
-              mCurrentSet2.add(event);
-            }
-          }
-          mForwardsEventIterator.resetState(state);
-          while (mForwardsEventIterator.advance()) {
-            final int event = mForwardsEventIterator.getCurrentEvent();
-            if (event != EventEncoding.TAU) {
-              if (!mCurrentSet1.contains(event)) {
-                return false;
-              }
-              mCurrentSet2.add(event);
-            }
-          }
-        }
-        if (mCurrentSet1.size() != mCurrentSet2.size()) {
-          return false;
-        }
         final int numStates = rel.getNumberOfStates();
         final int shift = AutomatonTools.log2(numStates);
         mCurrentSet1.clear();
@@ -323,8 +277,6 @@ public class ActiveEventsTRSimplifier
 
     //#######################################################################
     //# Data Members
-    private final TransitionIterator mForwardsTauClosureIterator;
-    private final TransitionIterator mForwardsEventIterator;
     private final TransitionIterator mBackwardsTauClosureIterator1;
     private final TransitionIterator mBackwardsEventIterator;
     private final TransitionIterator mBackwardsTauClosureIterator2;

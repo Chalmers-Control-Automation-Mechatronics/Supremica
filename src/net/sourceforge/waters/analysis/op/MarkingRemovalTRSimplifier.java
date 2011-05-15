@@ -46,7 +46,7 @@ public class MarkingRemovalTRSimplifier
   //#########################################################################
   //# Rule Application
   @Override
-  public int getPreferredConfiguration()
+  public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }

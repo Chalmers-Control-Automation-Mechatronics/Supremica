@@ -103,6 +103,14 @@ public abstract class AbstractTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_empty_2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "empty_2.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
 
   //#########################################################################
   //# Instantiating and Checking Modules
@@ -221,7 +229,7 @@ public abstract class AbstractTRSimplifierTest
   {
     final EventEncoding eventEnc = createEventEncoding(des, aut);
     final StateEncoding inputStateEnc = new StateEncoding(aut);
-    final int config = mSimplifier.getPreferredConfiguration();
+    final int config = mSimplifier.getPreferredInputConfiguration();
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
     mSimplifier.setTransitionRelation(rel);
