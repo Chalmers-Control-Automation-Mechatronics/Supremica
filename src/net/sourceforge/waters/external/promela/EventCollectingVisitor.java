@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
@@ -73,6 +74,10 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)
   {
     //final String name = t.getText();
+    final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
+    final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(accepting);
+    final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.PROPOSITION);
+    mEventDecls.add(event);
     for(int i=0;i<t.getChildCount();i++) {
         ((PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
