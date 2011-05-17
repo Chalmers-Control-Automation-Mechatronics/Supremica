@@ -130,9 +130,10 @@ public class EventEncoding
 
   /**
    * Creates an empty encoding.
-   * This method creates an event encoding without any events or propositions.
-   * Events can be added using {@link #addEvent(EventProxy,boolean) addEvent()}
-   * or {@link #addSilentEvent(EventProxy) addSilentEvent()}.
+   * This method creates an event encoding without any events or
+   * propositions. Events can be added using {@link
+   * #addEvent(EventProxy,KindTranslator,boolean) addEvent()} or {@link
+   * #addSilentEvent(EventProxy) addSilentEvent()}.
    */
   public EventEncoding()
   {
@@ -469,9 +470,9 @@ public class EventEncoding
    * by this encoding. Procedures building up transition relations query this
    * method to add additional selfloops.
    * @return The list of events and propositions passed into the
-   *         {@link #addEvent(EventProxy, boolean) addEvent()} with the
-   *         selfloop parameter set to true.
-   * @see #addEvent(EventProxy, boolean) addEvent()
+   *         {@link #addEvent(EventProxy,KindTranslator,boolean) addEvent()}
+   *         with the selfloop parameter set to true.
+   * @see #addEvent(EventProxy,KindTranslator,boolean) addEvent()
    */
   public List<EventProxy> getExtraSelfloops()
   {

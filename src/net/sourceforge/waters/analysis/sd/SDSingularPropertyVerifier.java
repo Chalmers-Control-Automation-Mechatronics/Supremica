@@ -29,13 +29,14 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  * A model verifier to check SD Singular prohibitable behavior Property.
  *
  * This wrapper can be used to check whether a model satisfies
- * SD Singular Prohibitable behavior property...
+ * SD Singular Prohibitable behavior property.
  *
- * The check is done by creating a test automata and modifying Plant automata each prohibitable
- * event in the model, and passing these models to a modular language inclusion checker
+ * The check is done by creating a test automata and modifying Plant
+ * automata each prohibitable event in the model, and passing these models
+ * to a modular language inclusion checker
  *
  * @see SDPropertyBuilder
- * @see Modular Language Inclusion Checker
+ * @see ModularLanguageInclusionChecker
  *
  * @author Mahvash Baloch , Robi Malik
  */

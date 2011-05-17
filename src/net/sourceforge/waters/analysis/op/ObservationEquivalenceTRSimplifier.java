@@ -230,10 +230,6 @@ public class ObservationEquivalenceTRSimplifier
    * transition relation. This method merges any states found to be equivalent
    * during the last call to {@link #run()}, and depending on configuration,
    * performs a second pass to remove redundant transitions.
-   * @return <CODE>true</CODE> if the transition relation has been modified in
-   *         any way. Note that the transition relation may also be modified
-   *         in case of a trivial partition, due to removal of redundant
-   *         transitions or markings.
    * @see TransitionRemoval
    */
   @Override

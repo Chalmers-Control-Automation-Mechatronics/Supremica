@@ -80,7 +80,7 @@ public class BDDSafetyVerifier
    * @param  model       The model to be checked by this verifier.
    * @param  translator  The kind translator is used to remap component and
    *                     event kinds.
-   * @param  factory     The factory used for trace construction.
+   * @param  desfactory  The factory used for trace construction.
    */
   public BDDSafetyVerifier(final ProductDESProxy model,
                            final KindTranslator translator,

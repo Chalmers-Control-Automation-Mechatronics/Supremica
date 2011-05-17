@@ -81,8 +81,9 @@ public interface ModelAnalyser
    * automata. Only model analyser that return <CODE>true</CODE> on this
    * call are guaranteed to give correct results when presented an input
    * containing nondeterministic automata. Model analysers not supporting
-   * nondeterministic automata should throw {@link NondeterminsticDESException}
-   * when encountering a nondeterministic automaton in their input.
+   * nondeterministic automata should throw
+   * {@link NondeterministicDESException} when encountering a nondeterministic
+   * automaton in their input.
    */
   public boolean supportsNondeterminism();
 

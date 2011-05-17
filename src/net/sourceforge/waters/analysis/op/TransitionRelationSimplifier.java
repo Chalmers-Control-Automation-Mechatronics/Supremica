@@ -83,14 +83,15 @@ public interface TransitionRelationSimplifier
    * Sets whether this simplifier applies the computed partition automatically.
    * If set to <CODE>true</CODE> (the default), then any partition computed
    * by a call to {@link #run()} will immediately be applied to the
-   * transition relation. Otherwise, states have to be merged manually
-   * by calling {@link #applyResultPartition()}.
+   * transition relation. Otherwise, states have to be merged by the
+   * user.
    */
   public void setAppliesPartitionAutomatically(boolean apply);
 
   /**
    * Gets whether this simplifier applies the computed partition automatically.
-   * @see #setAppliesPartitionAutomatically(boolean) setAppliesPartitionAutomatically()
+   * @see #setAppliesPartitionAutomatically(boolean)
+   * setAppliesPartitionAutomatically()
    */
   public boolean getAppliesPartitionAutomatically();
 
@@ -100,7 +101,6 @@ public interface TransitionRelationSimplifier
    * relation by modifying markings or transitions.
    * @return <CODE>true</CODE> if the transition relation was changed,
    *         <CODE>false</CODE> if no simplification was possible.
-   * @see #applyResultPartition()
    * @see #getResultPartition()
    */
   public boolean run() throws AnalysisException;

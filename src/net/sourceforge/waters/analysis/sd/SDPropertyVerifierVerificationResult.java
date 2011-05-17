@@ -8,11 +8,11 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 
 
 /**
- * A result record returned by a {@link SDSingularProperyVerifier} A verification
- * result contains the information on whether the property checked is true or
- * false, and in the latter case, it also contains a counterexample. In
- * addition, it contains individual statistics about the Language Inclusion Checker run
- * for every prohibitable event.
+ * A result record returned by a {@link SDSingularPropertyVerifier}.
+ * A verification result contains the information on whether the property
+ * checked is true or false, and in the latter case, it also contains a
+ * counterexample. In addition, it contains individual statistics about the
+ * Language Inclusion Checker run for every prohibitable event.
  *
  * @author Rachel Francis, Mahvash Baloch
  */
