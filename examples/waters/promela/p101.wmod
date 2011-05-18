@@ -21,7 +21,7 @@
         <SimpleComponent Kind="PLANT" Name="A">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="A:0">
+                    <SimpleNode Initial="true" Name="A_0">
                         <PointGeometry>
                             <Point Y="64" X="80"/>
                         </PointGeometry>
@@ -29,7 +29,7 @@
                             <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="A:1">
+                    <SimpleNode Name="A_1">
                         <PointGeometry>
                             <Point Y="144" X="80"/>
                         </PointGeometry>
@@ -37,7 +37,7 @@
                             <Point Y="-6" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="A:2">
+                    <SimpleNode Name="A_2">
                         <PointGeometry>
                             <Point Y="224" X="80"/>
                         </PointGeometry>
@@ -45,7 +45,7 @@
                             <Point Y="-5" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="A:3">
+                    <SimpleNode Name="A_3">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -58,7 +58,7 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="A:1" Source="A:0">
+                    <Edge Target="A_1" Source="A_0">
                         <LabelBlock>
                             <SimpleIdentifier Name="init"/>
                             <LabelGeometry Anchor="NW">
@@ -66,7 +66,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="A:2" Source="A:1">
+                    <Edge Target="A_2" Source="A_1">
                         <LabelBlock>
                             <IndexedIdentifier Name="name">
                                 <IntConstant Value="33"/>
@@ -77,7 +77,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="A:3" Source="A:2">
+                    <Edge Target="A_3" Source="A_2">
                         <LabelBlock>
                             <IndexedIdentifier Name="name">
                                 <IntConstant Value="33"/>
@@ -94,7 +94,7 @@
         <SimpleComponent Kind="PLANT" Name="B">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="B:0">
+                    <SimpleNode Initial="true" Name="B_0">
                         <PointGeometry>
                             <Point Y="64" X="80"/>
                         </PointGeometry>
@@ -102,7 +102,7 @@
                             <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="B:1">
+                    <SimpleNode Name="B_1">
                         <PointGeometry>
                             <Point Y="144" X="80"/>
                         </PointGeometry>
@@ -110,7 +110,7 @@
                             <Point Y="-6" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="B:2">
+                    <SimpleNode Name="B_2">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -123,7 +123,7 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="B:1" Source="B:0">
+                    <Edge Target="B_1" Source="B_0">
                         <LabelBlock>
                             <SimpleIdentifier Name="init"/>
                             <LabelGeometry Anchor="NW">
@@ -131,7 +131,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="B:2" Source="B:1">
+                    <Edge Target="B_2" Source="B_1">
                         <LabelBlock>
                             <IndexedIdentifier Name="name">
                                 <IntConstant Value="33"/>
