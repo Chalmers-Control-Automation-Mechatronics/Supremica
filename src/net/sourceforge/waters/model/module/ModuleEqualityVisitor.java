@@ -661,7 +661,7 @@ public class ModuleEqualityVisitor
       }
       final List<EventDeclProxy> eventDeclList1 = proxy.getEventDeclList();
       final List<EventDeclProxy> eventDeclList2 = expected.getEventDeclList();
-      if (!compareLists(eventDeclList1, eventDeclList2)) {
+      if (!compareSets(eventDeclList1, eventDeclList2)) {
         return false;
       }
       final List<Proxy> eventAliasList1 = proxy.getEventAliasList();

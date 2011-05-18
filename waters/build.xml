@@ -607,11 +607,9 @@
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
         <include
-          name="net/sourceforge/waters/analysis/comp552/BDDConflictChecker.java"/>
+          name="net/sourceforge/waters/analysis/comp552/ConflictChecker.java"/>
         <include
-          name="net/sourceforge/waters/analysis/comp552/BDDConflictMain.java"/>
-        <include
-          name="net/sourceforge/waters/analysis/comp552/BDDEncoding.java"/>
+          name="net/sourceforge/waters/analysis/comp552/ConflictMain.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
         <include name="net/sourceforge/waters/model/**"/>

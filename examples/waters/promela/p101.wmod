@@ -1,61 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="p101" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Imported from Promela file p101.pml.</ns2:Comment>
     <EventDeclList>
-        <EventDecl Kind="CONTROLLABLE" Name="atomic:0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="init"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="name">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="33"/>
-                    <IntConstant Value="33"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="121"/>
-                    <IntConstant Value="124"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT" Name="init">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
-                        <PointGeometry>
-                            <Point Y="48" X="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="128" X="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="S1" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="atomic:0"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="A">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
+                    <SimpleNode Initial="true" Name="A:0">
                         <PointGeometry>
                             <Point Y="64" X="80"/>
                         </PointGeometry>
@@ -63,7 +29,7 @@
                             <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S1">
+                    <SimpleNode Name="A:1">
                         <PointGeometry>
                             <Point Y="144" X="80"/>
                         </PointGeometry>
@@ -71,7 +37,7 @@
                             <Point Y="-6" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S2">
+                    <SimpleNode Name="A:2">
                         <PointGeometry>
                             <Point Y="224" X="80"/>
                         </PointGeometry>
@@ -79,7 +45,7 @@
                             <Point Y="-5" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S3">
+                    <SimpleNode Name="A:3">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -92,15 +58,15 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Target="A:1" Source="A:0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="atomic:0"/>
+                            <SimpleIdentifier Name="init"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-8" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S1">
+                    <Edge Target="A:2" Source="A:1">
                         <LabelBlock>
                             <IndexedIdentifier Name="name">
                                 <IntConstant Value="33"/>
@@ -111,7 +77,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S3" Source="S2">
+                    <Edge Target="A:3" Source="A:2">
                         <LabelBlock>
                             <IndexedIdentifier Name="name">
                                 <IntConstant Value="33"/>
@@ -128,7 +94,7 @@
         <SimpleComponent Kind="PLANT" Name="B">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
+                    <SimpleNode Initial="true" Name="B:0">
                         <PointGeometry>
                             <Point Y="64" X="80"/>
                         </PointGeometry>
@@ -136,7 +102,7 @@
                             <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S1">
+                    <SimpleNode Name="B:1">
                         <PointGeometry>
                             <Point Y="144" X="80"/>
                         </PointGeometry>
@@ -144,7 +110,7 @@
                             <Point Y="-6" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S2">
+                    <SimpleNode Name="B:2">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -157,15 +123,15 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Target="B:1" Source="B:0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="atomic:0"/>
+                            <SimpleIdentifier Name="init"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-8" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S1">
+                    <Edge Target="B:2" Source="B:1">
                         <LabelBlock>
                             <IndexedIdentifier Name="name">
                                 <IntConstant Value="33"/>
@@ -177,6 +143,41 @@
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-13" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="init">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="init:0">
+                        <PointGeometry>
+                            <Point Y="48" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="init:1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-4" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="init:1" Source="init:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="init"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

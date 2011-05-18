@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.module
+//# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GeometryTools
 //###########################################################################
 //# $Id$
