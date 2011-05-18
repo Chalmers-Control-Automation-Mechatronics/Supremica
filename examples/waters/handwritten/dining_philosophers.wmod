@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="dining_philosophers" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>The classical dining philosophers problem, with a paramterisable number N of philosophers. This model includes no control strategy and is blocking.</ns2:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression>
+<IntConstant Value="5"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="take">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<EnumSetExpression Text="[U,L]">
+<SimpleIdentifier Name="U"/>
+<SimpleIdentifier Name="L"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="put">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<EnumSetExpression Text="[U,L]">
+<SimpleIdentifier Name="U"/>
+<SimpleIdentifier Name="L"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="eat">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="I">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="fork">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="available">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="64" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="taken">
+<PointGeometry>
+<Point Y="144" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="taken" Source="available">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-21" X="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="105" X="125"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="available" Source="taken">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-38"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="103" X="98"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="philo">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="think">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hungry">
+<PointGeometry>
+<Point Y="128" X="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="-47"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="putting">
+<PointGeometry>
+<Point Y="128" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="eaten">
+<PointGeometry>
+<Point Y="208" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ready">
+<PointGeometry>
+<Point Y="208" X="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-40"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="hungry" Source="think">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="take">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-83"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="think" Source="putting">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="put">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="ready" Source="hungry">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="take">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-61"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="128" X="64"/>
+</StartPointGeometry>
+</Edge>
+<Edge Target="eaten" Source="ready">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="putting" Source="eaten">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="put">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="-53"/>
+</LabelGeometry>
+</LabelBlock>
+<EndPointGeometry>
+<Point Y="128" X="160"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

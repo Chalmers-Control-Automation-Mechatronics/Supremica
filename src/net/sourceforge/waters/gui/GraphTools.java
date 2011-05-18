@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
-import net.sourceforge.waters.model.module.GeometryTools;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
@@ -31,6 +30,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;

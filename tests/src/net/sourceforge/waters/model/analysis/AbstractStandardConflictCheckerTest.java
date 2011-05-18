@@ -198,6 +198,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testOneState() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "onestate.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testOrphanEvents() throws Exception
   {
     final String group = "tests";
@@ -821,6 +829,11 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases -- Parameterised
+  public void testDiningPhilosophers__2() throws Exception
+  {
+    checkDiningPhilosophers(2);
+  }
+
   public void testTransferline__1() throws Exception
   {
     checkTransferline(1);
@@ -839,6 +852,18 @@ public abstract class AbstractStandardConflictCheckerTest
   public void testTransferline__4() throws Exception
   {
     checkTransferline(4);
+  }
+
+
+  public void checkDiningPhilosophers(final int n) throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "dining_philosophers.wmod";
+    final List<ParameterBindingProxy> bindings =
+        new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("N", n);
+    bindings.add(binding);
+    runModelVerifier(group, name, bindings, false);
   }
 
   public void checkTransferline(final int n) throws Exception

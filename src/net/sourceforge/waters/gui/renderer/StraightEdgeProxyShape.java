@@ -14,7 +14,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.GeometryTools;
+import net.sourceforge.waters.subject.module.GeometryTools;
 
 import org.supremica.properties.Config;
 

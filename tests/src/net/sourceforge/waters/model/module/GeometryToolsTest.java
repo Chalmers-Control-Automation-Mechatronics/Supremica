@@ -12,6 +12,8 @@ package net.sourceforge.waters.model.module;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 
+import net.sourceforge.waters.subject.module.GeometryTools;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
