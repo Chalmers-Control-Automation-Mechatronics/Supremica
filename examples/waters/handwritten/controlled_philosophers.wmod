@@ -1,0 +1,808 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="controlled_philosophers" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>The classical dining philosophers problem, with a paramterisable number N of philosophers. This model includes a simple first-come-first-served control strategy and is nonblocking.</ns2:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression>
+<IntConstant Value="5"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="take">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<EnumSetExpression Text="[U,L]">
+<SimpleIdentifier Name="U"/>
+<SimpleIdentifier Name="L"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="put">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<EnumSetExpression Text="[U,L]">
+<SimpleIdentifier Name="U"/>
+<SimpleIdentifier Name="L"/>
+</EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="eat">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="hungry">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name="eaten">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</RangeList>
+<ColorGeometry>
+<Color Red="0" Green="204" Blue="0"/>
+</ColorGeometry>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="I">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="fork">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="available">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="96" X="112"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="0" X="-25"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="taken_l">
+<PointGeometry>
+<Point Y="160" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-2" X="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="taken_u">
+<PointGeometry>
+<Point Y="32" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="taken_l" Source="available">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="129" X="122"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="available" Source="taken_l">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="-56"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="127" X="101"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="taken_u" Source="available">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="125"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="available" Source="taken_u">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-55"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="65" X="99"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="philo">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="think">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="160"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-15" X="0"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="got1">
+<PointGeometry>
+<Point Y="128" X="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-1" X="-39"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="put1">
+<PointGeometry>
+<Point Y="128" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="0" X="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="eaten">
+<EventList>
+<IndexedIdentifier Name="eaten">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+</EventList>
+<PointGeometry>
+<Point Y="208" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="eating">
+<PointGeometry>
+<Point Y="208" X="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-40"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hungry">
+<PointGeometry>
+<Point Y="48" X="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-51"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="got1" Source="hungry">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="take">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-83"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="48" X="64"/>
+</StartPointGeometry>
+</Edge>
+<Edge Target="think" Source="put1">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="put">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="eating" Source="got1">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="take">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-61"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="128" X="64"/>
+</StartPointGeometry>
+</Edge>
+<Edge Target="eaten" Source="eating">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="put1" Source="eaten">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="put">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="-53"/>
+</LabelGeometry>
+</LabelBlock>
+<EndPointGeometry>
+<Point Y="128" X="160"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="hungry" Source="think">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-22" X="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<EndPointGeometry>
+<Point Y="48" X="64"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="mutex_l">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="noreq">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="self">
+<PointGeometry>
+<Point Y="112" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-30"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="self_other">
+<PointGeometry>
+<Point Y="192" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-72"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="other">
+<PointGeometry>
+<Point Y="112" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="other_self">
+<PointGeometry>
+<Point Y="192" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="noreq" Source="self">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="89" X="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="self_other" Source="self">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="-">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-66"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="other" Source="self_other">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="22" X="-62"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="160" X="190"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="noreq" Source="other">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="-">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-2" X="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="85" X="202"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="other_self" Source="other">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="self" Source="other_self">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="-">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="9" X="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="160" X="163"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="self" Source="noreq">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-56"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="74" X="138"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="other" Source="noreq">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="-">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="71" X="215"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="self" Source="self">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-30" X="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="113" X="73"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="self_other" Source="self_other">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="15" X="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="72"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="mutex_u">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="noreq">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="self">
+<PointGeometry>
+<Point Y="112" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-30"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="self_other">
+<PointGeometry>
+<Point Y="192" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-72"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="other">
+<PointGeometry>
+<Point Y="112" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="other_self">
+<PointGeometry>
+<Point Y="192" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="noreq" Source="self">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="89" X="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="self_other" Source="self">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-66"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="other" Source="self_other">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="22" X="-62"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="160" X="190"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="noreq" Source="other">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-2" X="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="85" X="202"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="other_self" Source="other">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="self" Source="other_self">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="9" X="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="160" X="163"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="self" Source="noreq">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-56"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="74" X="138"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="other" Source="noreq">
+<LabelBlock>
+<IndexedIdentifier Name="hungry">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="71" X="215"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="self" Source="self">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-30" X="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="113" X="73"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="self_other" Source="self_other">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="I"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="15" X="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="72"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

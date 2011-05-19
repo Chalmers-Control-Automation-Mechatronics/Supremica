@@ -68,51 +68,92 @@
 </IndexedIdentifier>
 <Graph>
 <NodeList>
+<SimpleNode Name="taken_u">
+<PointGeometry>
+<Point Y="32" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="taken_l">
+<PointGeometry>
+<Point Y="160" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-2" X="6"/>
+</LabelGeometry>
+</SimpleNode>
 <SimpleNode Initial="true" Name="available">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
-<Point Y="64" X="112"/>
+<Point Y="96" X="96"/>
 </PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point Y="-6" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="taken">
-<PointGeometry>
-<Point Y="144" X="112"/>
-</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="0" X="-25"/>
+</InitialArrowGeometry>
 <LabelGeometry Anchor="NW">
 <Point Y="-6" X="9"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="taken" Source="available">
+<Edge Target="taken_l" Source="available">
 <LabelBlock>
 <IndexedIdentifier Name="take">
 <SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point Y="-21" X="1"/>
+<Point Y="-12" X="5"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point Y="105" X="125"/>
+<Point Y="129" X="106"/>
 </SplineGeometry>
 </Edge>
-<Edge Target="available" Source="taken">
+<Edge Target="available" Source="taken_l">
 <LabelBlock>
 <IndexedIdentifier Name="put">
 <SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="L"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point Y="-19" X="-38"/>
+<Point Y="-8" X="-56"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point Y="103" X="98"/>
+<Point Y="127" X="85"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="taken_u" Source="available">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="109"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="available" Source="taken_u">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<SimpleIdentifier Name="I"/>
+<SimpleIdentifier Name="U"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-55"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="65" X="83"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>
