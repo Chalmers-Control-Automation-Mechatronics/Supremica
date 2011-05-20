@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 /**
  * <P>A list buffer transition relation implementation of the
- * <I>Silent Incoming Rule</I>.</P>
+ * <I>Silent Incoming Rule</I> or the <I>Only Silent Incoming Rule</I>.</P>
  *
  * <P>The <I>Silent Incoming Rule</I> removes a transition
  * when a tau event links two states <I>x</I> and&nbsp;<I>y</I> where at most
@@ -27,6 +27,21 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * marking&nbsp;<I>alpha</I>. If the target state&nbsp;<I>y</I> becomes
  * unreachable, it is removed, too. All transitions originating from the target
  * state&nbsp;<I>y</I> are copied to the source state&nbsp;<I>x</I>.</P>
+ *
+ * <P>The implementation can be configured to remove only transitions leading
+ * to states that become unreachable, giving the <I>Only Silent Incoming
+ * Rule</I>.</P>
+ *
+ * <P>The implementation supports both standard and generalised nonblocking
+ * variants of the abstraction. If a precondition marking is configured,
+ * only transitions leading to states not marked by the precondition marking
+ * can be abstracted (as described above). Without a precondition marking, only
+ * transitions leading to states with an outgoing silent transition can be
+ * abstracted.</P>
+ *
+ * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional Verification
+ * in Supervisory Control. SIAM Journal of Control and Optimization,
+ * 48(3), 1914-1938, 2009.</P>
  *
  * @author Rachel Francis, Robi Malik
  */
@@ -88,17 +103,19 @@ public class SilentIncomingTRSimplifier
   {
     setUp();
     final int tauID = EventEncoding.TAU;
-    final int alphaID = getPreconditionMarkingID();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (!rel.isUsedEvent(tauID)) {
       return false;
+    } else if (getPreconditionMarkingID() < 0) {
+      mTauTestIterator = rel.createSuccessorsReadOnlyIterator();
+      mTauTestIterator.resetEvent(tauID);
     }
     final int numStates = rel.getNumberOfStates();
     final BitSet keep = new BitSet(numStates);
     if (mRestrictsToUnreachableStates) {
       for (int state = 0; state < numStates; state++) {
         if (rel.isInitial(state) ||
-            rel.isMarked(state, alphaID) ||
+            !isReducible(state) ||
             !rel.isReachable(state)) {
           keep.set(state);
         }
@@ -113,7 +130,7 @@ public class SilentIncomingTRSimplifier
       }
     } else {
       for (int state = 0; state < numStates; state++) {
-        if (rel.isMarked(state, alphaID) || !rel.isReachable(state)) {
+        if (!isReducible(state) || !rel.isReachable(state)) {
           keep.set(state);
         }
       }
@@ -155,6 +172,13 @@ public class SilentIncomingTRSimplifier
     return true;
   }
 
+  @Override
+  public void reset()
+  {
+    mTauTestIterator = null;
+    super.reset();
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
@@ -171,7 +195,24 @@ public class SilentIncomingTRSimplifier
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private boolean isReducible(final int state)
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int alphaID = getPreconditionMarkingID();
+    if (alphaID < 0) {
+      mTauTestIterator.resetState(state);
+      return mTauTestIterator.advance();
+    } else {
+      return !rel.isMarked(state, alphaID);
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private boolean mRestrictsToUnreachableStates = true;
+
+  private TransitionIterator mTauTestIterator;
 
 }

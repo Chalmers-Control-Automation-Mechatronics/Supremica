@@ -582,15 +582,19 @@ public class OPConflictChecker
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
-    final SilentContinuationTRSimplifier silentContinuationRemover =
-      new SilentContinuationTRSimplifier();
-    chain.add(silentContinuationRemover);
+    final SilentIncomingTRSimplifier silentInRemover =
+      new SilentIncomingTRSimplifier();
+    silentInRemover.setRestrictsToUnreachableStates(true);
+    chain.add(silentInRemover);
     final ActiveEventsTRSimplifier activeEventsMerger =
       new ActiveEventsTRSimplifier();
     chain.add(activeEventsMerger);
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     chain.add(silentOutRemover);
+    final SilentContinuationTRSimplifier silentContinuationRemover =
+      new SilentContinuationTRSimplifier();
+    chain.add(silentContinuationRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
