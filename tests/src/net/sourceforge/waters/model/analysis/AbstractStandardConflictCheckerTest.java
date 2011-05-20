@@ -52,7 +52,8 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void testReentrant() throws Exception
+  public void testReentrant1()
+  throws Exception
   {
     testEmpty();
     testSmallFactory2();
@@ -60,6 +61,15 @@ public abstract class AbstractStandardConflictCheckerTest
     testEmpty();
     testTransferline__1();
     testSmallFactory2();
+  }
+
+  public void testReentrant2()
+  throws Exception
+  {
+    checkDiningPhilosophers(2);
+    checkDiningPhilosophers(3);
+    checkDiningPhilosophers(2);
+    checkDiningPhilosophers(3);
   }
 
   public void testOverflowException() throws Exception
@@ -834,6 +844,11 @@ public abstract class AbstractStandardConflictCheckerTest
     checkDiningPhilosophers(2);
   }
 
+  public void testDirtyPhilosophers__2() throws Exception
+  {
+    checkDirtyPhilosophers(2);
+  }
+
   public void testTransferline__1() throws Exception
   {
     checkTransferline(1);
@@ -859,6 +874,17 @@ public abstract class AbstractStandardConflictCheckerTest
   {
     final String group = "handwritten";
     final String name = "dining_philosophers.wmod";
+    final List<ParameterBindingProxy> bindings =
+        new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("N", n);
+    bindings.add(binding);
+    runModelVerifier(group, name, bindings, false);
+  }
+
+  public void checkDirtyPhilosophers(final int n) throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "dirty_philosophers.wmod";
     final List<ParameterBindingProxy> bindings =
         new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", n);

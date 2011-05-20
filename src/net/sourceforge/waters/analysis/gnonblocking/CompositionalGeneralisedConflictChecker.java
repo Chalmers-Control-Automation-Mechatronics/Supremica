@@ -544,8 +544,9 @@ public class CompositionalGeneralisedConflictChecker extends
     return initial;
   }
 
-  // #########################################################################
-  // # Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   /**
    * Initialises required variables to default values if the user has not
    * configured them.
@@ -554,9 +555,9 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     super.setUp();
     mEventsToAutomata = new HashMap<EventProxy,Set<AutomatonProxy>>();
-    mNonAlphaEvents = new HashSet<EventProxy>();
-    mUnsuccessfulCandidates = new HashSet<Candidate>();
-    mTrivialAbstractedAutomata = new HashSet<AutomatonProxy>();
+    mNonAlphaEvents = new THashSet<EventProxy>();
+    mUnsuccessfulCandidates = new THashSet<Candidate>();
+    mTrivialAbstractedAutomata = new THashSet<AutomatonProxy>();
     if (mPreselectingHeuristic == null) {
       final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinTa();
@@ -640,6 +641,23 @@ public class CompositionalGeneralisedConflictChecker extends
       mAbstractionRules.add(rttonsRule);
     }
   }
+
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mEventsToAutomata = null;
+    mNonAlphaEvents = null;
+    mUnsuccessfulCandidates = null;
+    mTrivialAbstractedAutomata = null;
+    mPreselectingHeuristic = null;
+    mSelectingHeuristics = null;
+    mTemporaryModifyingSteps = null;
+    mUsedPreconditionMarking = null;
+    mPropositions = null;
+    mAbstractionRules = null;
+  }
+
 
   // #########################################################################
   // # Auxiliary Methods

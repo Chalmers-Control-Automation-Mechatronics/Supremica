@@ -139,6 +139,7 @@ public abstract class AbstractConflictChecker
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.ModelAnalyser
+  @Override
   protected void tearDown()
   {
     mUsedMarking = null;

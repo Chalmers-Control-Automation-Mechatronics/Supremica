@@ -484,7 +484,12 @@ public class OPConflictChecker
 
   protected void tearDown()
   {
+    super.tearDown();
+    mCurrentDefaultMarking = null;
     mPropositions = null;
+    mAbstractionRule = null;
+    mPreselectingHeuristic = null;
+    mSelectingHeuristic = null;
     mCurrentSynchronousProductBuilder = null;
     mCurrentMonolithicConflictChecker = null;
     mCurrentCompositionalLanguageInclusionChecker = null;
@@ -501,7 +506,6 @@ public class OPConflictChecker
     mModifyingSteps = null;
     mUsedEventNames = null;
     mOverflowCandidates = null;
-    super.tearDown();
   }
 
 
