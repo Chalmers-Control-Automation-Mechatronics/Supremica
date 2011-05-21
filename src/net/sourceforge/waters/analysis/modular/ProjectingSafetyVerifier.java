@@ -30,6 +30,7 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -630,35 +631,53 @@ public class ProjectingSafetyVerifier
     }
 
     public TraceProxy getTrace(TraceProxy trace, final ProductDESProxy model)
+    throws NondeterministicDESException
     {
       final List<Map<StateProxy, Set<EventProxy>>> events =
         new ArrayList<Map<StateProxy, Set<EventProxy>>>(mCompautomata.size());
       final List<Map<Key, StateProxy>> automata =
         new ArrayList<Map<Key, StateProxy>>(mCompautomata.size());
       List<StateProxy> currstate = new ArrayList<StateProxy>(mCompautomata.size());
-      final AutomatonProxy[] aut = new AutomatonProxy[mCompautomata.size()];
+      final AutomatonProxy[] autarray =
+        new AutomatonProxy[mCompautomata.size()];
       int i = 0;
-      for (final AutomatonProxy proxy : mCompautomata) {
-        events.add(new HashMap<StateProxy, Set<EventProxy>>(proxy.getStates().size()));
-        automata.add(new HashMap<Key, StateProxy>(proxy.getTransitions().size()));
+      for (final AutomatonProxy aut : mCompautomata) {
+        events.add(new HashMap<StateProxy, Set<EventProxy>>(aut.getStates().size()));
+        automata.add(new HashMap<Key, StateProxy>(aut.getTransitions().size()));
         final Set<EventProxy> autevents = new HashSet<EventProxy>(mOriginalAlphabet);
         //System.out.println(autevents);
-        autevents.removeAll(proxy.getEvents());
+        autevents.removeAll(aut.getEvents());
         //System.out.println(autevents);
         int init = 0;
-        for (final StateProxy s : proxy.getStates()) {
+        for (final StateProxy s : aut.getStates()) {
           if (s.isInitial()) {
             init++;
             currstate.add(s);
           }
           events.get(i).put(s, new HashSet<EventProxy>(autevents));
         }
-        assert(init == 1);
-        for (final TransitionProxy t : proxy.getTransitions()) {
-          events.get(i).get(t.getSource()).add(t.getEvent());
-          automata.get(i).put(new Key(t.getSource(), t.getEvent()), t.getTarget());
+        switch (init) {
+        case 0:
+          throw new IllegalStateException("No initial state for trace!");
+        case 1:
+          break;
+        default:
+          final int index = currstate.size() - 1;
+          final StateProxy state = currstate.get(index);
+          throw new NondeterministicDESException(aut, state);
         }
-        aut[i] = proxy;
+        for (final TransitionProxy trans : aut.getTransitions()) {
+          final StateProxy source = trans.getSource();
+          final EventProxy event = trans.getEvent();
+          final Key key = new Key(source, event);
+          final Map<Key,StateProxy> transmap = automata.get(i);
+          if (transmap.containsKey(key)) {
+            throw new NondeterministicDESException(aut, source, event);
+          }
+          events.get(i).get(source).add(event);
+          transmap.put(key, trans.getTarget());
+        }
+        autarray[i] = aut;
         i++;
       }
       Queue<Place> stateList = new PriorityQueue<Place>();
@@ -683,7 +702,7 @@ public class ProjectingSafetyVerifier
           //System.out.println(pe);
           final List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
           for (i = 0; i < currstate.size(); i++) {
-            if (aut[i].getEvents().contains(pe)) {
+            if (autarray[i].getEvents().contains(pe)) {
               final StateProxy t = automata.get(i).get(new Key(currstate.get(i), pe));
               //System.out.println(t);
               if (t == null) {
@@ -704,7 +723,7 @@ public class ProjectingSafetyVerifier
         final List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
         boolean contains = true;
         for (i = 0; i < currstate.size(); i++) {
-          if (aut[i].getEvents().contains(currevent)) {
+          if (autarray[i].getEvents().contains(currevent)) {
             final StateProxy t = automata.get(i).get(new Key(currstate.get(i), currevent));
             if (t == null) {
               contains = false;

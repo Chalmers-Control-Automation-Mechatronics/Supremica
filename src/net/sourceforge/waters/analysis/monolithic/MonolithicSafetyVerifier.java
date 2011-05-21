@@ -23,6 +23,7 @@ import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
@@ -165,10 +166,14 @@ public class MonolithicSafetyVerifier
           }
         }
         for (final TransitionProxy tp : ap.getTransitions()) {
-          atransition
-          [codes.indexOf(tp.getSource())]
-           [mEventCodingList.indexOf(tp.getEvent())]
-            = codes.indexOf(tp.getTarget());
+          final int source = codes.indexOf(tp.getSource());
+          final int event = mEventCodingList.indexOf(tp.getEvent());
+          if (atransition[source][event] >= 0) {
+            throw new NondeterministicDESException
+              (ap, tp.getSource(), tp.getEvent());
+          }
+          final int target = codes.indexOf(tp.getTarget());
+          atransition[source][event] = target;
         }
         // Compute bit length and mask
         bl = BigInteger.valueOf(stateSize).bitLength();
@@ -178,8 +183,11 @@ public class MonolithicSafetyVerifier
         StateProxy initialState = null;
         for (final StateProxy sp : stateSet) {
           if (sp.isInitial()) {
-            initialState = sp;
-            break;
+            if (initialState == null) {
+              initialState = sp;
+            } else {
+              throw new NondeterministicDESException(ap, sp);
+            }
           }
         }
         // Store all the information by automaton type
