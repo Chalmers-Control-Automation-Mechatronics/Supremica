@@ -839,14 +839,34 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases -- Parameterised
+  public void testControlledPhilosophers__2() throws Exception
+  {
+    checkControlledPhilosophers(2);
+  }
+
+  public void testControlledPhilosophers__3() throws Exception
+  {
+    checkControlledPhilosophers(3);
+  }
+
   public void testDiningPhilosophers__2() throws Exception
   {
     checkDiningPhilosophers(2);
   }
 
+  public void testDiningPhilosophers__3() throws Exception
+  {
+    checkDiningPhilosophers(3);
+  }
+
   public void testDirtyPhilosophers__2() throws Exception
   {
     checkDirtyPhilosophers(2);
+  }
+
+  public void testDirtyPhilosophers__3() throws Exception
+  {
+    checkDirtyPhilosophers(3);
   }
 
   public void testTransferline__1() throws Exception
@@ -870,7 +890,18 @@ public abstract class AbstractStandardConflictCheckerTest
   }
 
 
-  public void checkDiningPhilosophers(final int n) throws Exception
+  protected void checkControlledPhilosophers(final int n) throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "controlled_philosophers.wmod";
+    final List<ParameterBindingProxy> bindings =
+        new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("N", n);
+    bindings.add(binding);
+    runModelVerifier(group, name, bindings, true);
+  }
+
+  protected void checkDiningPhilosophers(final int n) throws Exception
   {
     final String group = "handwritten";
     final String name = "dining_philosophers.wmod";
@@ -881,7 +912,7 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, name, bindings, false);
   }
 
-  public void checkDirtyPhilosophers(final int n) throws Exception
+  protected void checkDirtyPhilosophers(final int n) throws Exception
   {
     final String group = "handwritten";
     final String name = "dirty_philosophers.wmod";
@@ -892,7 +923,7 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, name, bindings, false);
   }
 
-  public void checkTransferline(final int n) throws Exception
+  protected void checkTransferline(final int n) throws Exception
   {
     final String group = "handwritten";
     final String name = "transferline.wmod";

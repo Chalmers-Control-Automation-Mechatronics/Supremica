@@ -39,9 +39,13 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * transitions leading to states with an outgoing silent transition can be
  * abstracted.</P>
  *
- * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional Verification
+ * <P><I>References:</I><BR>
+ * Hugo Flordal, Robi Malik. Compositional Verification
  * in Supervisory Control. SIAM Journal of Control and Optimization,
- * 48(3), 1914-1938, 2009.</P>
+ * 48(3), 1914-1938, 2009.<BR>
+ * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying
+ * Generalised Nonblocking, Proc. 7th International Conference on Control and
+ * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
  *
  * @author Rachel Francis, Robi Malik
  */

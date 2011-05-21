@@ -760,7 +760,7 @@ public abstract class TransitionListBuffer
   {
     final TransitionIterator inner = createReadOnlyIterator();
     inner.resetEvent(event);
-    return new AllTransitionsIterator(inner);
+    return new AllTransitionsIterator(inner, event);
   }
 
   /**
@@ -787,7 +787,7 @@ public abstract class TransitionListBuffer
     (final int event)
   {
     final TransitionIterator inner = createModifyingIterator(event);
-    return new AllTransitionsIterator(inner);
+    return new AllTransitionsIterator(inner, event);
   }
 
   /**

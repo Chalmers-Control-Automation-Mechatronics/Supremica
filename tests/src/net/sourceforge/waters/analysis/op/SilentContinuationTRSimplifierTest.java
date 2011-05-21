@@ -58,13 +58,25 @@ public class SilentContinuationTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_silentContinuation_2()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "silentContinuation_2.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
+   */
   public void testReentrant() throws Exception
   {
     test_silentContinuation_1();
+    test_silentContinuation_2();
+    test_silentContinuation_1();
+    test_silentContinuation_2();
   }
-   */
 
 }
