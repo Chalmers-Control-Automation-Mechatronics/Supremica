@@ -405,6 +405,11 @@ public class SplitComputer
 
   //#########################################################################
   //# Inner Class CollectVisitor
+  /**
+   * A visitor that collects the variables in an expression.
+   * Splitting is performed by assigning to each variable all possible values
+   * from is range.
+   */
   private class CollectVisitor
     extends AbstractModuleProxyVisitor
   {
@@ -444,7 +449,9 @@ public class SplitComputer
     public Boolean visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
-      if (mContext.isEnumAtom(ident)) {
+      if (mInQualification) {
+        return false;
+      } else if (mContext.isEnumAtom(ident)) {
         return false;
       } else if (mContext.getVariableRange(ident) != null) {
         return recordCandidate(ident);
@@ -494,6 +501,7 @@ public class SplitComputer
           mInQualification = true;
           final boolean baseresult = process(base);
           final boolean compresult = process(comp);
+          mInQualification = false;
           if (baseresult | compresult) {
             return true;
           } else {

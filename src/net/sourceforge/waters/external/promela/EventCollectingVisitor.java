@@ -105,7 +105,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     final PromelaTree tr1 = (PromelaTree) t.getChild(1);
     final String name = t.getChild(0).getText();
     procEvent.put(name,new ArrayList<IdentifierProxy>());
-    chan.put(name,new ChanInfo());
+    //chan.put(name,new ChanInfo());
     tr1.acceptVisitor(this);
     return null;
   }
@@ -176,7 +176,9 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
         //create indexedIdentifier, and store it for receive statement
         final IndexedIdentifierProxy indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
-        ArrayList<IdentifierProxy> temp =  (ArrayList<IdentifierProxy>) procEvent.get(chanName);
+        //ChanInfo info = chan.get(chanName);
+        //info.addEvent(indexEvent);
+        Collection<IdentifierProxy> temp = procEvent.get(chanName);
         if(temp==null){
           temp = new ArrayList<IdentifierProxy>();
         }

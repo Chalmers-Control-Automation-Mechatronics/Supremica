@@ -1,6 +1,6 @@
 #define msgtype 33
 
-chan name = [0] of { byte, byte };
+chan name = [1] of { byte, byte };
 
 /* byte name; 	typo  - this line shouldn't have been here */
 
@@ -13,5 +13,6 @@ proctype B()
 	name?msgtype(state)
 }
 init
-{	atomic { run A(); run B() }
+{	run A();
+        run B()
 }

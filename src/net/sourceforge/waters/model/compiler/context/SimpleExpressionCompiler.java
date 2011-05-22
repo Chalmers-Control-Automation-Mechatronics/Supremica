@@ -120,7 +120,7 @@ public class SimpleExpressionCompiler
   {
     try {
       mIsEvaluating = false;
-      mNumPrimes = 0;
+      mNumLocks = 0;
       mContext = context;
       if (context instanceof VariableContext) {
         mVariableContext = (VariableContext) context;
@@ -138,7 +138,7 @@ public class SimpleExpressionCompiler
   {
     try {
       mIsEvaluating = true;
-      mNumPrimes = 0;
+      mNumLocks = 0;
       mContext = context;
       if (context instanceof VariableContext) {
         mVariableContext = (VariableContext) context;
@@ -260,8 +260,8 @@ public class SimpleExpressionCompiler
     (final SimpleExpressionProxy expr, final boolean alreadyCloned)
     throws EvalException
   {
-    if (mNumPrimes > 0) {
-      // Do not lookup names in primed subexpression!
+    if (mNumLocks > 0) {
+      // Do not lookup names prefixed by qualifier or in primed subexpression!
       return getClone(expr, alreadyCloned);
     }
     final SimpleExpressionProxy bound = getBoundExpression(expr);
@@ -411,11 +411,11 @@ public class SimpleExpressionCompiler
         final List<SimpleExpressionProxy> indexes =
           new ArrayList<SimpleExpressionProxy>(ident.getIndexes());
         final int size = indexes.size();
-        final int numprimes = mNumPrimes;
+        final int locks = mNumLocks;
         boolean change = false;
         try {
           // Evaluate indexes even if primed!
-          mNumPrimes = 0;
+          mNumLocks = 0;
           for (int i = 0; i < size; i++) {
             final SimpleExpressionProxy index = indexes.get(i);
             final SimpleExpressionProxy simplified = process(index);
@@ -425,7 +425,7 @@ public class SimpleExpressionCompiler
             }
           }
         } finally {
-          mNumPrimes = numprimes;
+          mNumLocks = locks;
         }
         if (change) {
           final String name = ident.getName();
@@ -444,13 +444,16 @@ public class SimpleExpressionCompiler
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
+      final int locks = mNumLocks;
       try {
+        mNumLocks++;
         final IdentifierProxy base0 = ident.getBaseIdentifier();
         final SimpleExpressionProxy basev = process(base0);
         final IdentifierProxy base1 = getIdentifierValue(basev);
         final IdentifierProxy comp0 = ident.getComponentIdentifier();
         final SimpleExpressionProxy compv = process(comp0);
         final IdentifierProxy comp1 = getIdentifierValue(compv);
+        mNumLocks--;
         if (base0 == base1 && comp0 == comp1) {
           return processIdentifier(ident, false);
         } else {
@@ -460,6 +463,8 @@ public class SimpleExpressionCompiler
         }
       } catch (final EvalException exception) {
         throw wrap(exception);
+      } finally {
+        mNumLocks = locks;
       }
     }
 
@@ -1261,16 +1266,16 @@ public class SimpleExpressionCompiler
     SimpleExpressionProxy eval(final UnaryExpressionProxy expr)
       throws EvalException
     {
-      final int numprimes = mNumPrimes;
+      final int locks = mNumLocks;
       try {
-        mNumPrimes++;
+        mNumLocks++;
         final SimpleExpressionProxy origsub = expr.getSubTerm();
         final SimpleExpressionProxy simpsub = simplify(origsub);
         final UnaryExpressionProxy newexpr = createExpression(expr, simpsub);
-        mNumPrimes--;
+        mNumLocks--;
         return processIdentifier(newexpr, true);
       } finally {
-        mNumPrimes = numprimes;
+        mNumLocks = locks;
       }
     }
 
@@ -1313,7 +1318,12 @@ public class SimpleExpressionCompiler
   private final ModuleEqualityVisitor mEquality;
 
   private boolean mIsEvaluating;
-  private int mNumPrimes;
+  /**
+   * The number of locks that prevent evaluation of subterms.
+   * Locks are used to prevent evaluation of primed subexpressions or
+   * identifiers prefixed by a qualifier.
+   */
+  private int mNumLocks;
   private BindingContext mContext;
   private VariableContext mVariableContext;
 

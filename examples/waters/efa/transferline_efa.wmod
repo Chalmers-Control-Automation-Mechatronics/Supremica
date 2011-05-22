@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="transferline" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="transferline_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment>Uncontrollable version of Wonham's tranferline. Use for synthesis.</ns2:Comment>
 <ConstantAliasList>
 <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">

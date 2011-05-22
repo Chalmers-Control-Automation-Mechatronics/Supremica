@@ -31,10 +31,10 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
@@ -299,8 +299,7 @@ class EFATransitionRelationBuilder
   private EFAVariable getPrimedVariable(final EFAVariable var)
   {
     final UnaryOperator nextop = mOperatorTable.getNextOperator();
-    final SimpleIdentifierProxy varname =
-      (SimpleIdentifierProxy) var.getVariableName();
+    final IdentifierProxy varname = (IdentifierProxy) var.getVariableName();
     final UnaryExpressionProxy nextvarname =
       mFactory.createUnaryExpressionProxy(nextop, varname);
     return mContext.getVariable(nextvarname);

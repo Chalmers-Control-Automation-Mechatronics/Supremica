@@ -312,7 +312,7 @@ public abstract class AbstractCompilerTest
   public void testCompile_EFATransferLine()
   throws IOException, WatersException
   {
-    compile("efa", "transferline");
+    compile("efa", "transferline_efa");
   }
 
   public void testCompile_enumvar()
@@ -480,7 +480,7 @@ public abstract class AbstractCompilerTest
     throws IOException, WatersException
   {
     compileError("handwritten", "error7_small", null,
-                 UndefinedIdentifierException.class, "'curr'");
+                 UndefinedIdentifierException.class, "'buffer.curr'");
   }
 
   public void testCompile_markus1()

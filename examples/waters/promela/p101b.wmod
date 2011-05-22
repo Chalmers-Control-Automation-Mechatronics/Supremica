@@ -3,7 +3,7 @@
     <ns2:Comment>Imported from Promela file p101b.pml.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="name">
+        <EventDecl Kind="CONTROLLABLE" Name="exch_name">
             <RangeList>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
@@ -19,7 +19,7 @@
         <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT" Name="A">
+        <SimpleComponent Kind="PLANT" Name="proctype_A">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="A_0">
@@ -77,7 +77,7 @@
                     </Edge>
                     <Edge Target="A_2" Source="A_1">
                         <LabelBlock>
-                            <IndexedIdentifier Name="name">
+                            <IndexedIdentifier Name="exch_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>
@@ -88,7 +88,7 @@
                     </Edge>
                     <Edge Target="A_3" Source="A_2">
                         <LabelBlock>
-                            <IndexedIdentifier Name="name">
+                            <IndexedIdentifier Name="exch_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="121"/>
                             </IndexedIdentifier>
@@ -99,7 +99,7 @@
                     </Edge>
                     <Edge Target="A_4" Source="A_3">
                         <LabelBlock>
-                            <IndexedIdentifier Name="name">
+                            <IndexedIdentifier Name="exch_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>
@@ -111,7 +111,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="B">
+        <SimpleComponent Kind="PLANT" Name="proctype_B">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="B_0">
@@ -153,11 +153,11 @@
                     </Edge>
                     <Edge Target="B_2" Source="B_1">
                         <LabelBlock>
-                            <IndexedIdentifier Name="name">
+                            <IndexedIdentifier Name="exch_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="121"/>
                             </IndexedIdentifier>
-                            <IndexedIdentifier Name="name">
+                            <IndexedIdentifier Name="exch_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>
