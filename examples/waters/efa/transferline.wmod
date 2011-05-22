@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="transferline" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>Uncontrollable version of Wonham's tranferline. Use for synthesis.</ns2:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression>
+<IntConstant Value="1"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="GROUPS">
+<ConstantAliasExpression>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="IGROUPS">
+<ConstantAliasExpression>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="rejectT">
+<RangeList>
+<SimpleIdentifier Name="GROUPS"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="startT">
+<RangeList>
+<SimpleIdentifier Name="IGROUPS"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="acceptT">
+<RangeList>
+<SimpleIdentifier Name="IGROUPS"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="finishM">
+<RangeList>
+<SimpleIdentifier Name="GROUPS"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="startM">
+<RangeList>
+<SimpleIdentifier Name="GROUPS"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="init">
+<Graph>
+<NodeList>
+<SimpleNode Name="WORKING">
+<PointGeometry>
+<Point Y="249" X="214"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="162" X="214"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry>
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="WORKING" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="startT">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-68"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="162" X="214"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="207" X="192"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="249" X="214"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="IDLE" Source="WORKING">
+<LabelBlock>
+<IndexedIdentifier Name="acceptT">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="249" X="214"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="206" X="235"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="162" X="214"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="i">
+<SimpleIdentifier Name="GROUPS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="machine">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Name="WORKING">
+<PointGeometry>
+<Point Y="144" X="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="57" X="160"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry>
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="WORKING" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="startM">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="-102"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="57" X="160"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="100" X="134"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="144" X="160"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="IDLE" Source="WORKING">
+<LabelBlock>
+<IndexedIdentifier Name="finishM">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="144" X="160"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="101" X="184"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="57" X="160"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="testunit">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Name="WORKING">
+<PointGeometry>
+<Point Y="128" X="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="-3" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="41" X="128"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry>
+<Point Y="-5" X="13"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="IDLE" Source="WORKING">
+<LabelBlock>
+<IndexedIdentifier Name="rejectT">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="acceptT">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-18" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="128" X="128"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="87" X="154"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="41" X="128"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="WORKING" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="startT">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-71"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="41" X="128"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="86" X="101"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="128" X="128"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<Instance ModuleName="buffer">
+<IndexedIdentifier Name="b1">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<ParameterBinding Name="size">
+<IntConstant Value="3"/>
+</ParameterBinding>
+<ParameterBinding Name="put">
+<EventListExpression>
+<EventList>
+<IndexedIdentifier Name="acceptT">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IndexedIdentifier Name="rejectT">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</EventList>
+</EventListExpression>
+</ParameterBinding>
+<ParameterBinding Name="get">
+<IndexedIdentifier Name="startM">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</ParameterBinding>
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+</Instance>
+<Instance ModuleName="buffer">
+<IndexedIdentifier Name="b2">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<ParameterBinding Name="size">
+<IntConstant Value="1"/>
+</ParameterBinding>
+<ParameterBinding Name="put">
+<IndexedIdentifier Name="finishM">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</ParameterBinding>
+<ParameterBinding Name="get">
+<IndexedIdentifier Name="startT">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</ParameterBinding>
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+</Instance>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

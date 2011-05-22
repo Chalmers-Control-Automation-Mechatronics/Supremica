@@ -304,9 +304,15 @@ public abstract class AbstractCompilerTest
   }
 
   public void testCompile_EFAJournalExample()
-    throws IOException, WatersException
+  throws IOException, WatersException
   {
     compile("handwritten", "EFAJournalExample");
+  }
+
+  public void testCompile_EFATransferLine()
+  throws IOException, WatersException
+  {
+    compile("efa", "transferline");
   }
 
   public void testCompile_enumvar()
