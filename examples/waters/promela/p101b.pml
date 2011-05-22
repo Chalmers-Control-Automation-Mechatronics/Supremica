@@ -14,5 +14,5 @@ proctype B()
 	name?msgtype(state)
 }
 init
-{	atomic { run A(); run B() }
+{	run A(); run B()
 }

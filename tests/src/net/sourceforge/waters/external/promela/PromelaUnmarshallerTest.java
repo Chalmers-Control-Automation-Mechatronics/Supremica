@@ -34,12 +34,12 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
   //#########################################################################
   //# Successful Test Cases
   /**
-   * <P>Test the import of the Promela file
+   * <P>Tests the import of the Promela file
    * {supremica}<CODE>/examples/waters/promela/p101.pml</CODE>.</P>
    *
    * <P>After running the test, the imported module is saved in
    * {supremica}<CODE>/logs/results/external/promela/PromelaUnmarshallerTest</CODE>
-   * as a <CODE>.wmod</CODE> file that can be loaded into. After saving the
+   * as a <CODE>.wmod</CODE> file that can be loaded into. After saving, the
    * output is compared to the expected result in
    * {supremica}<CODE>/examples/waters/promela/p101.wmod</CODE>, and any
    * differences cause a test failure.</P>
@@ -57,6 +57,11 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
   public void testImport_p101b() throws Exception
   {
     testImport("p101b");
+  }
+
+  public void testImport_p102() throws Exception
+  {
+    testImport("p102");
   }
 
 

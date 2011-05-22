@@ -1,7 +1,7 @@
 #define a 1
 #define b 2
 
-chan ch = [1] of { byte };
+chan ch = [0] of { byte };
 
 proctype A() { ch!a }
 proctype B() { ch!b }
@@ -11,4 +11,4 @@ proctype C()
 	:: ch?b
 	fi
 }
-init { atomic { run A(); run B(); run C() } }
+init { run A(); run B(); run C() }
