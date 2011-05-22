@@ -82,6 +82,7 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
     final URI promelaURI = infilename.toURI();
     final File outdirname = getOutputDirectory();
     final ModuleProxy module = mImporter.unmarshal(promelaURI);
+
     final String wmodextname = name + mModuleMarshaller.getDefaultExtension();
     final File wmodfilename = new File(outdirname, wmodextname);
     mModuleMarshaller.marshal(module, wmodfilename);
