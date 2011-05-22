@@ -33,9 +33,30 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
 
   //#########################################################################
   //# Successful Test Cases
-  public void testImport_output_aip_leducversion_old() throws Exception
+  /**
+   * <P>Test the import of the Promela file
+   * {supremica}<CODE>/examples/waters/promela/p101.pml</CODE>.</P>
+   *
+   * <P>After running the test, the imported module is saved in
+   * {supremica}<CODE>/logs/results/external/promela/PromelaUnmarshallerTest</CODE>
+   * as a <CODE>.wmod</CODE> file that can be loaded into. After saving the
+   * output is compared to the expected result in
+   * {supremica}<CODE>/examples/waters/promela/p101.wmod</CODE>, and any
+   * differences cause a test failure.</P>
+   */
+  public void testImport_p101() throws Exception
   {
     testImport("p101");
+  }
+
+  public void testImport_p101a() throws Exception
+  {
+    testImport("p101a");
+  }
+
+  public void testImport_p101b() throws Exception
+  {
+    testImport("p101b");
   }
 
 
@@ -48,17 +69,18 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
   {
     try {
       testImport(subdir, name);
-      fail("Expected " + ProxyTools.getShortClassName(exclass) + " not caught!");
+      fail("Expected " + ProxyTools.getShortClassName(exclass) +
+           " not caught!");
     } catch (final Exception exception) {
       if (exclass.isAssignableFrom(exception.getClass())) {
         final String msg = exception.getMessage();
         if (msg == null) {
-          fail(ProxyTools.getShortClassName(exclass)
-              + " caught as expected, but message is null!");
+          fail(ProxyTools.getShortClassName(exclass) +
+               " caught as expected, but message is null!");
         } else if (msg.indexOf(culprit) < 0) {
-          fail(ProxyTools.getShortClassName(exclass)
-              + " caught as expected, but message '" + msg
-              + "' does not mention culprit '" + culprit + "'!");
+          fail(ProxyTools.getShortClassName(exclass) +
+               " caught as expected, but message '" + msg +
+               "' does not mention culprit '" + culprit + "'!");
         }
       } else {
         throw exception;
@@ -82,7 +104,6 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
     final URI promelaURI = infilename.toURI();
     final File outdirname = getOutputDirectory();
     final ModuleProxy module = mImporter.unmarshal(promelaURI);
-
     final String wmodextname = name + mModuleMarshaller.getDefaultExtension();
     final File wmodfilename = new File(outdirname, wmodextname);
     mModuleMarshaller.marshal(module, wmodfilename);

@@ -120,21 +120,20 @@ public class PromelaGraph
 
   }
 
-  public GraphProxy createGraphProxy(final String name,final boolean init){
-
-
+  public GraphProxy createGraphProxy(final String name)
+  {
     int index = 0;
     SimpleNodeProxy proxy;
     for (final PromelaNode node : getNodes()) {
       final boolean initial = (node == this.getStart());
       final boolean marked = (node == this.getEnd());
-      proxy = node.createNode(name, index++,init, initial, marked, mFactory);
+      proxy = node.createNode(name, index++, initial, marked, mFactory);
       mNodes.add(proxy);
     }
-
     for(final PromelaEdge e : this.getEdges()){
       final Collection<Proxy> label = e.getLabelBlock().getLabel();
-      final LabelBlockProxy labelBlock = mFactory.createLabelBlockProxy(label, null);
+      final LabelBlockProxy labelBlock =
+        mFactory.createLabelBlockProxy(label, null);
       final NodeProxy source = e.getSource().getNode();
 
 

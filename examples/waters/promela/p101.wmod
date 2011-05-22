@@ -152,7 +152,7 @@
         <SimpleComponent Kind="PLANT" Name="init">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="init:0">
+                    <SimpleNode Initial="true" Name="init_0">
                         <PointGeometry>
                             <Point Y="48" X="80"/>
                         </PointGeometry>
@@ -160,7 +160,7 @@
                             <Point Y="-9" X="10"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="init:1">
+                    <SimpleNode Name="init_1">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -173,11 +173,11 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="init:1" Source="init:0">
+                    <Edge Target="init_1" Source="init_0">
                         <LabelBlock>
                             <SimpleIdentifier Name="init"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="1"/>
+                                <Point Y="-10" X="7"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
