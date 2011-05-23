@@ -1111,7 +1111,7 @@ public class ListBufferTransitionRelation
   public boolean removeOutgoingTransitions(final int source)
   {
     if (mSuccessorBuffer != null) {
-      boolean remove = true;
+      boolean removed = false;
       final TransitionIterator iter =
         mSuccessorBuffer.createModifyingIterator(source);
       while (iter.advance()) {
@@ -1121,9 +1121,9 @@ public class ListBufferTransitionRelation
           mPredecessorBuffer.removeTransition(target, event, source);
         }
         iter.remove();
-        remove = true;
+        removed = true;
       }
-      return remove;
+      return removed;
     } else {
       throw createNoBufferException(CONFIG_SUCCESSORS);
     }
@@ -1140,7 +1140,7 @@ public class ListBufferTransitionRelation
   public boolean removeOutgoingTransitions(final int source, final int event)
   {
     if (mSuccessorBuffer != null) {
-      boolean remove = true;
+      boolean removed = false;
       final TransitionIterator iter =
         mSuccessorBuffer.createModifyingIterator(source, event);
       while (iter.advance()) {
@@ -1149,9 +1149,9 @@ public class ListBufferTransitionRelation
           mPredecessorBuffer.removeTransition(target, event, source);
         }
         iter.remove();
-        remove = true;
+        removed = true;
       }
-      return remove;
+      return removed;
     } else {
       throw createNoBufferException(CONFIG_SUCCESSORS);
     }
@@ -1168,7 +1168,7 @@ public class ListBufferTransitionRelation
   public boolean removeIncomingTransitions(final int target)
   {
     if (mPredecessorBuffer != null) {
-      boolean remove = true;
+      boolean removed = false;
       final TransitionIterator iter =
         mPredecessorBuffer.createModifyingIterator(target);
       while (iter.advance()) {
@@ -1178,9 +1178,9 @@ public class ListBufferTransitionRelation
           mSuccessorBuffer.removeTransition(source, event, target);
         }
         iter.remove();
-        remove = true;
+        removed = true;
       }
-      return remove;
+      return removed;
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }
@@ -1197,7 +1197,7 @@ public class ListBufferTransitionRelation
   public boolean removeIncomingTransitions(final int target, final int event)
   {
     if (mPredecessorBuffer != null) {
-      boolean remove = true;
+      boolean removed = false;
       final TransitionIterator iter =
         mPredecessorBuffer.createModifyingIterator(target, event);
       while (iter.advance()) {
@@ -1206,9 +1206,9 @@ public class ListBufferTransitionRelation
           mSuccessorBuffer.removeTransition(source, event, target);
         }
         iter.remove();
-        remove = true;
+        removed = true;
       }
-      return remove;
+      return removed;
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }

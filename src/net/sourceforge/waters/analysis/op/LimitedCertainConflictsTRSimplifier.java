@@ -82,8 +82,8 @@ public class LimitedCertainConflictsTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     mPredecessorsIterator = rel.createPredecessorsReadOnlyIterator();
     findCoreachableStates();
-    final int numReachable = rel.getNumberOfReachableStates();
-    if (mCoreachableStates.cardinality() == numReachable) {
+    int numReachable = rel.getNumberOfReachableStates();
+    if (mCoreachableStates.cardinality() == rel.getNumberOfReachableStates()) {
       return false;
     }
     final int tauID = EventEncoding.TAU;
@@ -91,7 +91,7 @@ public class LimitedCertainConflictsTRSimplifier
     final TransitionIterator closureIter =
       rel.createPredecessorsTauClosureIterator();
     final TransitionIterator succIter = rel.createSuccessorsReadOnlyIterator();
-    boolean result = mCoreachableStates.cardinality() < numReachable - 1;
+    boolean result = false;
     boolean modified;
     do {
       modified = false;
@@ -146,6 +146,20 @@ public class LimitedCertainConflictsTRSimplifier
       }
     } while (modified);
 
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    if (result) {
+      if (rel.checkReachability()) {
+        numReachable = 0;
+        for (int state = 0; state < numStates; state++) {
+          if (rel.isReachable(state)) {
+            numReachable++;
+          } else {
+            mCoreachableStates.clear(state);
+          }
+        }
+      }
+    }
+
     final int numCoreachable = mCoreachableStates.cardinality();
     if (numCoreachable == numReachable - 1) {
       // Only one state of certain conflicts. No result partition,
@@ -164,6 +178,7 @@ public class LimitedCertainConflictsTRSimplifier
     } else {
       // More than one state of certain conflicts.
       // Create a partition that can be applied separately.
+      result = true;
       final int numClasses = numCoreachable + 1;
       final int[][] partition = new int[numClasses][];
       final int numBlocking = numReachable - numCoreachable;
@@ -204,10 +219,9 @@ public class LimitedCertainConflictsTRSimplifier
   {
     // 1. Remove all transitions originating from certain conflicts states.
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final List<int[]> partition = getResultPartition();
-    final int bstate = partition.size();
-    final int[] bclass = partition.listIterator(bstate).previous();
+    final int end = partition.size();
+    final int[] bclass = partition.listIterator(end).previous();
     for (final int state : bclass) {
       rel.removeOutgoingTransitions(state);
     }
@@ -215,6 +229,7 @@ public class LimitedCertainConflictsTRSimplifier
     super.applyResultPartition();
     // 3. Add selfloops to certain conflicts and try to remove events
     rel.removeTauSelfLoops();
+    final int bstate = end - 1;
     final int numEvents = rel.getNumberOfProperEvents();
     for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
       if (rel.isUsedEvent(event)) {
