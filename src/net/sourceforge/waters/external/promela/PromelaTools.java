@@ -85,29 +85,23 @@ public class PromelaTools {
         }
     }
 
-    // ---------------------------------------------------------------
-
-    @SuppressWarnings("unused")
-    private void printTree(final CommonTree t, final int indent) {
-    if ( t != null ) {
-
-        StringBuffer sb = new StringBuffer(indent);
-        //System.out.println(sb.toString() + t.toString());
-        for ( int i = 0; i < indent; i++ ){
-            sb = sb.append("   ");
-        }
-
-        System.out.println(sb.toString() + t.token.getType() + ":" +
-                           t.getText() + " <" + ProxyTools.getShortClassName(t) + ">");
-
-        for ( int i = 0; i < t.getChildCount(); i++ ) {
-
-            //System.out.println(sb.toString() + t.getChild(i).toString());
-            printTree((CommonTree)t.getChild(i), indent+1);
-        }
+  private void printTree(final CommonTree t, final int indent)
+  {
+    if (t != null) {
+      StringBuffer sb = new StringBuffer(indent);
+      // System.out.println(sb.toString() + t.toString());
+      for (int i = 0; i < indent; i++) {
+        sb = sb.append("   ");
+      }
+      System.out.println(sb.toString() + t.token.getType() + ":" +
+                         t.getText() + " <" + ProxyTools.getShortClassName(t) +
+                         ">");
+      for (int i = 0; i < t.getChildCount(); i++) {
+        // System.out.println(sb.toString() + t.getChild(i).toString());
+        printTree((CommonTree) t.getChild(i), indent + 1);
+      }
     }
-    }
- ///////////
+  }
 
     @SuppressWarnings("unused")
     private void getdata(final StringBuilder s,final CommonTree t,final ArrayList<String> a){
