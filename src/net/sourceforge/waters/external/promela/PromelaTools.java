@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -218,16 +217,7 @@ public class PromelaTools {
       }
   }
   */
-    @SuppressWarnings("unused")
-    private void print_chan(){
-       // System.out.println(chan.get("name").getValue().toString());
-      //System.out.println(chan);
-      final Enumeration<String> e = chan.keys();
-      while(e.hasMoreElements()){
-        final String name = (String)e.nextElement();
-        System.out.println(name+" "+chan.get(name).getValue());
-      }
-    }
+
     @SuppressWarnings("unused")
     private void print_label(){
       for(final Map.Entry<String,ArrayList<List<String>>> entry: component.entrySet()){

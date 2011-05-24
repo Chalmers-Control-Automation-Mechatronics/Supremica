@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.List;
 
 import java.util.Hashtable;
-import java.util.Map;
-
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
@@ -270,12 +268,6 @@ public class EventCollectingVisitor implements PromelaVisitor
     return chan;
   }
 
-
-  public void output(){
-    for(final Map.Entry<String,ChanInfo> entry: chan.entrySet()){
-      System.out.println(entry.getKey()+" ->>"+ entry.getValue().getValue());
-    }
-  }
   public boolean getAtomic(){
     return atomic;
   }
