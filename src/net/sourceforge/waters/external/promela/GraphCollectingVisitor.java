@@ -1,5 +1,7 @@
 package net.sourceforge.waters.external.promela;
 
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -71,7 +73,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
     final IdentifierProxy ident;
     if(mVisitor.getAtomic()){
-      ident = mFactory.createSimpleIdentifierProxy("init");
+      ident = mFactory.createSimpleIdentifierProxy("initrun");
     }else{
       ident = mFactory.createSimpleIdentifierProxy("run_"+procName.toUpperCase());
     }
@@ -125,6 +127,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitSend(final SendTreeNode t)
   {
     final String chanName = t.getChild(0).getText();
+    final ChanInfo ch = mVisitor.getChan().get(chanName);
+    final int length = ch.getChanLength();
 
     //Send statement
 
@@ -135,14 +139,21 @@ public class GraphCollectingVisitor implements PromelaVisitor
         ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
       }
 
-      final String ename = labels.get(0);
+      String ename = labels.get(0);
       final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
       for(int y=1;y<labels.size();y++){
         final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
         indexes.add(c);
       }
         //create indexedIdentifier
-        final IndexedIdentifierProxy indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
+      IndexedIdentifierProxy indexEvent;
+      if(length==0){
+        ename = "exch_"+ename;
+        indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
+      }else{
+        ename = "send_"+ename;
+        indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
+      }
         return new PromelaGraph(indexEvent,mFactory);
 
   }
@@ -151,6 +162,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
      //receive statement
     final String chanName = t.getChild(0).getText();
+    final ChanInfo ch = mVisitor.getChan().get(chanName);
+    final int length = ch.getChanLength();
+    final THashSet<IdentifierProxy> chanData =(THashSet<IdentifierProxy>) ch.receive();
+    if(length==0){
+      return new PromelaGraph(chanData,mFactory);
+    }else{
+
+    }
     return new PromelaGraph(mVisitor.getChanEvent().get(chanName),mFactory);
   }
 
@@ -174,7 +193,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitInitialStatement(final InitialStatementTreeNode t)
   {
     //assert t.getText().equals("atomic");
-    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
+    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("initrun");
     final PromelaGraph initGraph = new PromelaGraph(ident,mFactory);
     return initGraph;
   }
