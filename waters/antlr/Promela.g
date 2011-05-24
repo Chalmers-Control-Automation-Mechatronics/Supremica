@@ -258,18 +258,18 @@ receiveRule
 @after { paraphrases.pop(); }
 
   : 	varrefRule ((QUESTIONMARK) ( recv_argsRule))
-    	-> ^(QUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule) 
+    	-> ^(QUESTIONMARK<ReceiveTreeNode> varrefRule recv_argsRule) 
  	| varrefRule ((QUESTIONMARK) ( ALTPARENOPEN recv_argsRule ALTPARENCLOSE))
-	-> ^(QUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule)
+	-> ^(QUESTIONMARK<ReceiveTreeNode> varrefRule recv_argsRule)
 	| varrefRule ((QUESTIONMARK) ( LESS recv_argsRule MORE))
-	-> ^(QUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule)	
+	-> ^(QUESTIONMARK<ReceiveTreeNode> varrefRule recv_argsRule)	
 	
    	| varrefRule ((DOUBLEQUESTIONMARK) ( recv_argsRule))
-	-> ^(DOUBLEQUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule) 
+	-> ^(DOUBLEQUESTIONMARK<ReceiveTreeNode> varrefRule recv_argsRule) 
 	| varrefRule ((DOUBLEQUESTIONMARK) (ALTPARENOPEN recv_argsRule ALTPARENCLOSE))
-	-> ^(DOUBLEQUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule) 
+	-> ^(DOUBLEQUESTIONMARK<ReceiveTreeNode> varrefRule recv_argsRule) 
 	| varrefRule ((DOUBLEQUESTIONMARK) (LESS recv_argsRule MORE))
-	-> ^(DOUBLEQUESTIONMARK<ExchangeTreeNode> varrefRule recv_argsRule) 
+	-> ^(DOUBLEQUESTIONMARK<ReceiveTreeNode> varrefRule recv_argsRule) 
   ;
 
 //modified
@@ -305,9 +305,9 @@ sendRule
 	:	varrefRule 
 	    EXCLAMATIONMARK 
 	    send_argsRule
-	-> ^(EXCLAMATIONMARK<ExchangeTreeNode> varrefRule send_argsRule)
+	-> ^(EXCLAMATIONMARK<SendTreeNode> varrefRule send_argsRule)
 	| varrefRule DOUBLEEXCLAMATIONMARK send_argsRule
-	-> ^(DOUBLEEXCLAMATIONMARK<ExchangeTreeNode> varrefRule send_argsRule)
+	-> ^(DOUBLEEXCLAMATIONMARK<SendTreeNode> varrefRule send_argsRule)
 	
   ;
 

@@ -3,7 +3,6 @@ package net.sourceforge.waters.external.promela;
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
-import net.sourceforge.waters.external.promela.ast.ExchangeTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
@@ -11,8 +10,10 @@ import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
 import net.sourceforge.waters.external.promela.ast.NameTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
+import net.sourceforge.waters.external.promela.ast.ReceiveTreeNode;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
+import net.sourceforge.waters.external.promela.ast.SendTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 
@@ -34,8 +35,6 @@ public interface PromelaVisitor
 
   public Object visitChannelStatement(final ChannelStatementTreeNode t);
 
-  public Object visitExchange(final ExchangeTreeNode t);
-
   public Object visitConstant(final ConstantTreeNode t);
 
   public Object visitInitial(final InitialTreeNode t);
@@ -49,5 +48,9 @@ public interface PromelaVisitor
   public Object visitSemicolon(SemicolonTreeNode t);
 
   public Object visitType(TypeTreeNode t);
+
+  public Object visitSend(SendTreeNode sendTreeNode);
+
+  public Object visitReceive(ReceiveTreeNode receiveTreeNode);
 
 }

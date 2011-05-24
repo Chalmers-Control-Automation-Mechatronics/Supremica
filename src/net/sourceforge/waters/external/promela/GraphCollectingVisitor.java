@@ -6,7 +6,6 @@ import java.util.Collection;
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
-import net.sourceforge.waters.external.promela.ast.ExchangeTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
@@ -15,8 +14,10 @@ import net.sourceforge.waters.external.promela.ast.NameTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.PromelaTree;
+import net.sourceforge.waters.external.promela.ast.ReceiveTreeNode;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
+import net.sourceforge.waters.external.promela.ast.SendTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -78,7 +79,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final PromelaGraph newGraph = new PromelaGraph(ident,mFactory);
     g = PromelaGraph.sequentialComposition(newGraph, g);
     final GraphProxy graph = g.createGraphProxy(procName);
-    final IdentifierProxy name = mFactory.createSimpleIdentifierProxy(procName);
+    final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName);
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
     mComponents.add(component);
 
@@ -121,12 +122,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
   }
 
   //return PromelaGraph of proctype statements
-  public Object visitExchange(final ExchangeTreeNode t)
+  public Object visitSend(final SendTreeNode t)
   {
     final String chanName = t.getChild(0).getText();
 
     //Send statement
-    if(t.getText().equals("!")|| t.getText().equals("!!")){
+
       labels = new ArrayList<String>();
       labels.add(chanName);
 
@@ -143,14 +144,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
         //create indexedIdentifier
         final IndexedIdentifierProxy indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
         return new PromelaGraph(indexEvent,mFactory);
-     }
 
+  }
+
+  public Object visitReceive(final ReceiveTreeNode t)
+  {
      //receive statement
-     if(t.getText().equals("?")|| t.getText().equals("??")){
-       return new PromelaGraph(mVisitor.getChanEvent().get(chanName),mFactory);
-     }
-
-    return null;
+    final String chanName = t.getChild(0).getText();
+    return new PromelaGraph(mVisitor.getChanEvent().get(chanName),mFactory);
   }
 
   public Object visitConstant(final ConstantTreeNode t)
@@ -211,5 +212,6 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     return null;
   }
+
 
 }

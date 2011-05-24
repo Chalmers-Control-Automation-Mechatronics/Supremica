@@ -1,5 +1,7 @@
 package net.sourceforge.waters.external.promela;
 
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,10 +45,10 @@ public class PromelaGraph
 
   }
 
-  public PromelaGraph(final Collection<IdentifierProxy> events, final ModuleProxyFactory factory){
+  public PromelaGraph(final THashSet<IdentifierProxy> events, final ModuleProxyFactory factory){
     pStart = new PromelaNode();
     pEnd = new PromelaNode();
-
+    System.out.println(events.size());
     final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(events);
     Collections.sort(tempLabel,mComparator);
     final Collection<Proxy> labelBlock = new ArrayList<Proxy>(tempLabel);
@@ -135,10 +137,7 @@ public class PromelaGraph
       final LabelBlockProxy labelBlock =
         mFactory.createLabelBlockProxy(label, null);
       final NodeProxy source = e.getSource().getNode();
-
-
       final NodeProxy target = e.getTarget().getNode();
-     // System.out.println(source.toString()+"->"+target.toString());
 
       //assert this.getNodes().indexOf(e.getTarget())==-1;
       final EdgeProxy edge = mFactory.createEdgeProxy(source, target, labelBlock, null, null, null, null);

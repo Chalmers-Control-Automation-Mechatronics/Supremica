@@ -1,14 +1,16 @@
 package net.sourceforge.waters.external.promela;
 
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
+
 import java.util.Hashtable;
 import java.util.Map;
 
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
-import net.sourceforge.waters.external.promela.ast.ExchangeTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
@@ -17,8 +19,10 @@ import net.sourceforge.waters.external.promela.ast.NameTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ProctypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.PromelaTree;
+import net.sourceforge.waters.external.promela.ast.ReceiveTreeNode;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
+import net.sourceforge.waters.external.promela.ast.SendTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -49,7 +53,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   ArrayList<Integer> lowerEnd = new ArrayList<Integer>();
   ArrayList<Integer> upperEnd = new ArrayList<Integer>();
-  final Hashtable<String,Collection<IdentifierProxy>> procEvent = new Hashtable<String,Collection<IdentifierProxy>>();
+  final Hashtable<String,THashSet<IdentifierProxy>> procEvent = new Hashtable<String,THashSet<IdentifierProxy>>();
   //This is the output event table, for each proctype
   private final Collection<EventDeclProxy> mEventDecls = new ArrayList<EventDeclProxy>();
 
@@ -67,7 +71,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Collection<EventDeclProxy> getEvents(){
     return mEventDecls;
   }
-  public Hashtable<String,Collection<IdentifierProxy>> getChanEvent(){
+  public Hashtable<String,THashSet<IdentifierProxy>> getChanEvent(){
     return procEvent;
   }
   //########################################################################
@@ -86,8 +90,6 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
 
   public Object visitProcType(final ProctypeTreeNode t){
-
-
     for(int i=0;i<t.getChildCount();i++){
         final PromelaTree node = (PromelaTree)t.getChild(i);
         node.acceptVisitor(this);
@@ -105,7 +107,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitChannel(final ChannelTreeNode t){
     final PromelaTree tr1 = (PromelaTree) t.getChild(1);
     final String name = t.getChild(0).getText();
-    procEvent.put(name,new ArrayList<IdentifierProxy>());
+    procEvent.put(name,new THashSet<IdentifierProxy>());
     //chan.put(name,new ChanInfo());
     tr1.acceptVisitor(this);
     return null;
@@ -150,10 +152,8 @@ public class EventCollectingVisitor implements PromelaVisitor
     return ident;
   }
 
-  public Object visitExchange(final ExchangeTreeNode t){
+  public Object visitSend(final SendTreeNode t){
 
-    //send statement
-    if(t.getText().equals("!")|| t.getText().equals("!!")){
       data =new ArrayList<String>();
       labels = new ArrayList<String>();
 
@@ -179,27 +179,30 @@ public class EventCollectingVisitor implements PromelaVisitor
         final IndexedIdentifierProxy indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
         //ChanInfo info = chan.get(chanName);
         //info.addEvent(indexEvent);
-        Collection<IdentifierProxy> temp = procEvent.get(chanName);
+        THashSet<IdentifierProxy> temp = procEvent.get(chanName);
         if(temp==null){
-          temp = new ArrayList<IdentifierProxy>();
+          temp = new THashSet<IdentifierProxy>();
         }
-        temp.add(indexEvent);
-        procEvent.put(chanName,temp);
-
-        final Collection<IdentifierProxy> temp2 = new ArrayList<IdentifierProxy>();
-        temp2.add(indexEvent);
+        boolean same = false;
+        if(temp.size()>1){
+          for(final IdentifierProxy i : temp){
+            if(i.compareTo(indexEvent)==0){
+              same = true;
+            }
+          }
+        }
+        if(!same){
+          temp.add(indexEvent);
+          procEvent.put(chanName,temp);
+        }
 
         return indexEvent;
-      }
-      //receive statement
-      if(t.getText().equals("?")|| t.getText().equals("??")){
+  }
 
-        //do nothing
-
-        return null;
-      }
-
-      return null;
+  public Object visitReceive(final ReceiveTreeNode receiveTreeNode)
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   public Object visitConstant(final ConstantTreeNode t){
@@ -216,19 +219,15 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
     return null;
   }
+
   public Object visitInitialStatement(final InitialStatementTreeNode t){
-
-
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
       mEventDecls.add(event);
-
-
-
       atomic = true;
-
-    return null;
+      return null;
   }
+
   public Object visitRun(final RunTreeNode t){
     final String proctypeName = t.getChild(0).getText();
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+proctypeName.toUpperCase());
@@ -240,7 +239,6 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Hashtable<String, ChanInfo> getChan(){
     return chan;
-
   }
 
 
@@ -283,12 +281,13 @@ public class EventCollectingVisitor implements PromelaVisitor
       upperEnd.add(255);
     }
     return null;
-
-
   }
   public ModuleProxyFactory getFactory()
   {
     // TODO Auto-generated method stub
     return mFactory;
   }
+
+
+
 }
