@@ -285,7 +285,8 @@ public class PromelaTools {
             //collectMsg(t);
            // print_label();
             //print_chan();
- //           printTree(t,0);
+
+            printTree(t,0);
  //           visitor.visitModule(t);
   //          visitor.output();
             //System.out.println(t.toStringTree());

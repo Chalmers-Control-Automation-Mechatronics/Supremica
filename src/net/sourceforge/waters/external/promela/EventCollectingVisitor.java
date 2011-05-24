@@ -58,6 +58,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   public EventCollectingVisitor(final ModuleProxyFactory factory){
     mFactory = factory;
   }
+
   public void collectEvents(final PromelaTree node)
   {
     node.acceptVisitor(this);
@@ -230,7 +231,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
   public Object visitRun(final RunTreeNode t){
     final String proctypeName = t.getChild(0).getText();
-    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("Run"+proctypeName);
+    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+proctypeName.toUpperCase());
     final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
     mEventDecls.add(event);
 

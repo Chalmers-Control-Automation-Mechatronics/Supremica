@@ -72,7 +72,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     if(mVisitor.getAtomic()){
       ident = mFactory.createSimpleIdentifierProxy("init");
     }else{
-      ident = mFactory.createSimpleIdentifierProxy("Run"+procName);
+      ident = mFactory.createSimpleIdentifierProxy("run_"+procName.toUpperCase());
     }
 
     final PromelaGraph newGraph = new PromelaGraph(ident,mFactory);
@@ -181,7 +181,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitRun(final RunTreeNode t)
   {
       final String name = t.getChild(0).getText();
-      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("Run"+name);
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name.toUpperCase());
       final PromelaGraph graph = new PromelaGraph(ident,mFactory);
       return graph;
   }
@@ -198,12 +198,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitSemicolon(final SemicolonTreeNode t)
   {
     PromelaGraph result = null;
-    //if(t.getChildCount()>0){
+
       for(int i=0;i<t.getChildCount();i++){
         final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
         result = PromelaGraph.sequentialComposition(result,step);
       }
-   // }
+
     return result;
   }
 
