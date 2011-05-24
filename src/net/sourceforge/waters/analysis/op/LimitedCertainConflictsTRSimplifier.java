@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.op;
 import java.util.BitSet;
 import java.util.List;
 
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntStack;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -93,6 +94,7 @@ public class LimitedCertainConflictsTRSimplifier
     final TransitionIterator succIter = rel.createSuccessorsReadOnlyIterator();
     boolean result = false;
     boolean modified;
+    final TIntArrayList victims = new TIntArrayList();
     do {
       modified = false;
       for (int state = 0; state < numStates; state++) {
@@ -108,10 +110,18 @@ public class LimitedCertainConflictsTRSimplifier
                 modified = true;
                 mCoreachableStates.clear(pred);
                 mUnvisitedStates.push(pred);
-                rel.removeOutgoingTransitions(pred);
-                rel.setMarked(pred, defaultID, false);
+                victims.add(pred);
               }
             }
+          }
+          if (!victims.isEmpty()) {
+            modified = true;
+            for (int index = 0; index < victims.size(); index++) {
+              final int victim = victims.get(index);
+              rel.removeOutgoingTransitions(victim);
+              rel.setMarked(victim, defaultID, false);
+            }
+            victims.clear();
           }
           // check for proper event transitions to certain conflicts
           mPredecessorsIterator.reset(state, -1);
