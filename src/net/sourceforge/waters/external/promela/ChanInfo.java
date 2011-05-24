@@ -13,6 +13,8 @@ public class ChanInfo{
     private int mRecCount;
     private final int mDataLength;
     private final int mChanLength;
+
+
     @SuppressWarnings("unused")
     private final String mName;
     private final ArrayList<String> type = new ArrayList<String>();
