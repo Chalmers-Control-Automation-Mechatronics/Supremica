@@ -16,6 +16,7 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntStack;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.des.AutomatonTools;
 
 
 /**
@@ -89,6 +90,11 @@ public class LimitedCertainConflictsTRSimplifier
     }
     final int tauID = EventEncoding.TAU;
     final int numStates = rel.getNumberOfStates();
+    final int shift = AutomatonTools.log2(numStates);
+    final int mask = (1 << shift) - 1;
+    final int numEvents = rel.getNumberOfProperEvents();
+    final int eshift = AutomatonTools.log2(numEvents);
+    final int root = 1 << (shift + eshift);
     final TransitionIterator closureIter =
       rel.createPredecessorsTauClosureIterator();
     final TransitionIterator succIter = rel.createSuccessorsReadOnlyIterator();
@@ -132,21 +138,33 @@ public class LimitedCertainConflictsTRSimplifier
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
-                if (ppred == pred) {
-                  succIter.reset(pred, event);
-                  while (succIter.advance()) {
-                    if (succIter.getCurrentTargetState() != state) {
-                      rel.removeOutgoingTransitions(pred, event);
-                      rel.addTransition(pred, event, state);
-                      modified = true;
-                      break;
-                    }
+                succIter.reset(ppred, event);
+                while (succIter.advance()) {
+                  if (ppred != pred) {
+                    final int code = (event << shift) | ppred;
+                    victims.add(code);
+                    break;
+                  } else if (succIter.getCurrentTargetState() != state) {
+                    final int code = root | (event << shift) | ppred;
+                    victims.add(code);
+                    break;
                   }
-                } else {
-                  modified |= rel.removeOutgoingTransitions(ppred, event);
                 }
               }
             }
+          }
+          if (!victims.isEmpty()) {
+            modified = true;
+            for (int index = 0; index < victims.size(); index++) {
+              final int victim = victims.get(index);
+              final int event = (victim & ~root) >>> shift;
+              final int pred = victim & mask;
+              rel.removeOutgoingTransitions(pred, event);
+              if ((victim & root) != 0) {
+                rel.addTransition(pred, event, state);
+              }
+            }
+            victims.clear();
           }
         }
       }
@@ -177,7 +195,6 @@ public class LimitedCertainConflictsTRSimplifier
       final int bstate = mCoreachableStates.nextClearBit(0);
       succIter.reset(bstate, -1);
       result |= succIter.advance();
-      final int numEvents = rel.getNumberOfProperEvents();
       for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
         if (rel.isUsedEvent(event)) {
           rel.addTransition(bstate, event, bstate);

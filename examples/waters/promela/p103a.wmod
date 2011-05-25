@@ -125,7 +125,7 @@
         <SimpleComponent Kind="PLANT" Name="proctype_C">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="B_0">
+                    <SimpleNode Initial="true" Name="C_0">
                         <PointGeometry>
                             <Point Y="64" X="80"/>
                         </PointGeometry>
@@ -133,7 +133,7 @@
                             <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="B_1">
+                    <SimpleNode Name="C_1">
                         <PointGeometry>
                             <Point Y="144" X="80"/>
                         </PointGeometry>
@@ -141,7 +141,7 @@
                             <Point Y="-6" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="B_2">
+                    <SimpleNode Name="C_2">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -154,7 +154,7 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="B_1" Source="B_0">
+                    <Edge Target="C_1" Source="C_0">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_C"/>
                             <LabelGeometry Anchor="NW">
@@ -162,7 +162,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="B_2" Source="B_1">
+                    <Edge Target="C_2" Source="C_1">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="1"/>
