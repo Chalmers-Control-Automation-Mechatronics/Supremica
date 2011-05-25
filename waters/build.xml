@@ -85,6 +85,7 @@
 
   <path id="waters.test.classpath">
     <path refid="waters.compile.classpath"/>
+    <path refid="antlr.runtime.classpath"/>
     <pathelement location="${waters.jar}"/>
     <pathelement location="${test.jar}"/>
     <pathelement location="${junit.jar}"/>

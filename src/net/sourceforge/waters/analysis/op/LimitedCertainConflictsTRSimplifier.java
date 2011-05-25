@@ -113,7 +113,6 @@ public class LimitedCertainConflictsTRSimplifier
             while (mPredecessorsIterator.advance()) {
               final int pred = mPredecessorsIterator.getCurrentSourceState();
               if (mCoreachableStates.get(pred)) {
-                modified = true;
                 mCoreachableStates.clear(pred);
                 mUnvisitedStates.push(pred);
                 victims.add(pred);
@@ -121,7 +120,7 @@ public class LimitedCertainConflictsTRSimplifier
             }
           }
           if (!victims.isEmpty()) {
-            modified = true;
+            mHasRemovedTransitions = modified = true;
             for (int index = 0; index < victims.size(); index++) {
               final int victim = victims.get(index);
               rel.removeOutgoingTransitions(victim);
@@ -154,7 +153,7 @@ public class LimitedCertainConflictsTRSimplifier
             }
           }
           if (!victims.isEmpty()) {
-            modified = true;
+            mHasRemovedTransitions = modified = true;
             for (int index = 0; index < victims.size(); index++) {
               final int victim = victims.get(index);
               final int event = (victim & ~root) >>> shift;
@@ -239,7 +238,23 @@ public class LimitedCertainConflictsTRSimplifier
 
 
   //#########################################################################
+  //# Specific Access
+  public boolean hasRemovedTransitions()
+  {
+    return mHasRemovedTransitions;
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected void setUp()
+  throws AnalysisException
+  {
+    super.setUp();
+    mHasRemovedTransitions = false;
+  }
+
   @Override
   protected void applyResultPartition()
   throws AnalysisException
@@ -305,6 +320,8 @@ public class LimitedCertainConflictsTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mHasRemovedTransitions;
+
   private BitSet mCoreachableStates;
   private TIntStack mUnvisitedStates;
   private TransitionIterator mPredecessorsIterator;

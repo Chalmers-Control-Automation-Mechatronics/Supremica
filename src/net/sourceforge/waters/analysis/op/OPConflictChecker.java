@@ -494,7 +494,6 @@ public class OPConflictChecker
     mCurrentMonolithicConflictChecker = null;
     mCurrentCompositionalLanguageInclusionChecker = null;
     mCurrentMonolithicLanguageInclusionChecker = null;
-    mPreconditionMarkingRecovery = null;
     mCurrentAutomata = null;
     mAutomatonInfoMap = null;
     mCurrentEvents = null;
@@ -526,53 +525,7 @@ public class OPConflictChecker
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     chain.add(bisimulator);
-    return new StandardTRSimplifierAbstractionRule(chain, false);
-  }
-
-  private AbstractionRule createGeneralisedNonblockingAbstractionChain()
-    throws EventNotFoundException
-  {
-    final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final ChainTRSimplifier recovery = new ChainTRSimplifier();
-    final TauLoopRemovalTRSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover);
-    recovery.add(loopRemover);
-    final MarkingRemovalTRSimplifier alphaRemover =
-      new MarkingRemovalTRSimplifier();
-    chain.add(alphaRemover);
-    recovery.add(alphaRemover);
-    mPreconditionMarkingRecovery =
-      new GeneralisedTRSimplifierAbstractionRule(recovery);
-    final OmegaRemovalTRSimplifier omegaRemover =
-      new OmegaRemovalTRSimplifier();
-    chain.add(omegaRemover);
-    final CoreachabilityTRSimplifier nonCoreachableRemover =
-      new CoreachabilityTRSimplifier();
-    chain.add(nonCoreachableRemover);
-    final SilentIncomingTRSimplifier silentInRemover =
-      new SilentIncomingTRSimplifier();
-    silentInRemover.setRestrictsToUnreachableStates(true);
-    chain.add(silentInRemover);
-    final OnlySilentOutgoingTRSimplifier silentOutRemover =
-      new OnlySilentOutgoingTRSimplifier();
-    chain.add(silentOutRemover);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
-    chain.add(bisimulator);
-    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-      new NonAlphaDeterminisationTRSimplifier(bisimulator);
-    chain.add(nonAlphaDeterminiser);
-    final MarkingSaturationTRSimplifier saturator =
-      new MarkingSaturationTRSimplifier();
-    chain.add(saturator);
-    return new GeneralisedTRSimplifierAbstractionRule(chain);
+    return new TRSimplifierAbstractionRule(chain);
   }
 
   private AbstractionRule createStandardNonblockingAbstractionChain()
@@ -610,7 +563,49 @@ public class OPConflictChecker
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
-    return new StandardTRSimplifierAbstractionRule(chain, true);
+    return new StandardTRSimplifierAbstractionRule(chain, -1);
+  }
+
+  private AbstractionRule createGeneralisedNonblockingAbstractionChain()
+    throws EventNotFoundException
+  {
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final TauLoopRemovalTRSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+    final MarkingRemovalTRSimplifier alphaRemover =
+      new MarkingRemovalTRSimplifier();
+    chain.add(alphaRemover);
+    final int recoveryIndex = chain.size();
+    final OmegaRemovalTRSimplifier omegaRemover =
+      new OmegaRemovalTRSimplifier();
+    chain.add(omegaRemover);
+    final CoreachabilityTRSimplifier nonCoreachableRemover =
+      new CoreachabilityTRSimplifier();
+    chain.add(nonCoreachableRemover);
+    final SilentIncomingTRSimplifier silentInRemover =
+      new SilentIncomingTRSimplifier();
+    silentInRemover.setRestrictsToUnreachableStates(true);
+    chain.add(silentInRemover);
+    final OnlySilentOutgoingTRSimplifier silentOutRemover =
+      new OnlySilentOutgoingTRSimplifier();
+    chain.add(silentOutRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    chain.add(bisimulator);
+    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+      new NonAlphaDeterminisationTRSimplifier(bisimulator);
+    chain.add(nonAlphaDeterminiser);
+    final MarkingSaturationTRSimplifier saturator =
+      new MarkingSaturationTRSimplifier();
+    chain.add(saturator);
+    return new GeneralisedTRSimplifierAbstractionRule(chain, recoveryIndex);
   }
 
 
@@ -2543,12 +2538,25 @@ public class OPConflictChecker
                                  final EventProxy tau)
       throws AnalysisException;
 
+    //#######################################################################
+    //# Trace Recovery
+    int getPreconditionMarkingID()
+    {
+      return -1;
+    }
+
+    BitSet recoverMarkings(final AutomatonProxy aut, final EventProxy tau)
+    throws AnalysisException
+    {
+      return null;
+    }
+
   }
 
 
   //#########################################################################
   //# Inner Class TRSimplifierAbstractionRule
-  private abstract class TRSimplifierAbstractionRule
+  private class TRSimplifierAbstractionRule
     extends AbstractionRule
   {
 
@@ -2586,17 +2594,8 @@ public class OPConflictChecker
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy convertedAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          final List<int[]> partition = mSimplifier.getResultPartition();
-          final boolean reduced = hasReducedPreconditionMarking();
-          if (mSimplifier.isObservationEquivalentAbstraction()) {
-            return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                                  inputStateEnc, partition,
-                                                  reduced, outputStateEnc);
-          } else {
-            return new ConflictEquivalenceStep(convertedAut, aut, tau,
-                                               inputStateEnc, partition,
-                                               reduced, outputStateEnc);
-          }
+          return createStep
+            (aut, inputStateEnc, convertedAut, outputStateEnc, tau);
         } else {
           return null;
         }
@@ -2614,10 +2613,35 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Auxiliary Methods
-    abstract EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                               final EventProxy tau);
+    EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                      final EventProxy tau)
+    {
+      final KindTranslator translator = getKindTranslator();
+      final EventEncoding eventEnc =
+        new EventEncoding(aut, translator, tau, mPropositions,
+                          EventEncoding.FILTER_PROPOSITIONS);
+      final int markingID = eventEnc.getEventCode(mCurrentDefaultMarking);
+      mSimplifier.setDefaultMarkingID(markingID);
+      return eventEnc;
+    }
 
-    abstract boolean hasReducedPreconditionMarking();
+    MergeStep createStep(final AutomatonProxy input,
+                         final StateEncoding inputStateEnc,
+                         final AutomatonProxy output,
+                         final StateEncoding outputStateEnc,
+                         final EventProxy tau)
+    {
+      final List<int[]> partition = mSimplifier.getResultPartition();
+      if (mSimplifier.isObservationEquivalentAbstraction()) {
+        return new ObservationEquivalenceStep(output, input, tau,
+                                              inputStateEnc, partition,
+                                              false, outputStateEnc);
+      } else {
+        return new ConflictEquivalenceStep(output, input, tau,
+                                           inputStateEnc, partition,
+                                           false, outputStateEnc);
+      }
+    }
 
     //#######################################################################
     //# Data Members
@@ -2634,10 +2658,22 @@ public class OPConflictChecker
     //#######################################################################
     //# Constructor
     private StandardTRSimplifierAbstractionRule
-      (final TransitionRelationSimplifier simplifier, final boolean marking)
+      (final ChainTRSimplifier chain, final int ccindex)
     {
-      super(simplifier);
-      mMarking = marking;
+      super(chain);
+      mCertainConflictsIndex = ccindex;
+      if (ccindex >= 0) {
+        mCertainConflictsStep =
+          (LimitedCertainConflictsTRSimplifier) chain.getStep(ccindex);
+      }
+    }
+
+    //#######################################################################
+    //# Simple Access
+    @Override
+    ChainTRSimplifier getSimplifier()
+    {
+      return (ChainTRSimplifier) super.getSimplifier();
     }
 
     //#######################################################################
@@ -2646,31 +2682,27 @@ public class OPConflictChecker
     EventEncoding createEventEncoding(final AutomatonProxy aut,
                                       final EventProxy tau)
     {
-      final KindTranslator translator = getKindTranslator();
-      final EventEncoding eventEnc =
-        new EventEncoding(aut, translator, tau, mPropositions,
-                          EventEncoding.FILTER_PROPOSITIONS);
+      final EventEncoding eventEnc = super.createEventEncoding(aut, tau);
       int markingID = eventEnc.getEventCode(mCurrentDefaultMarking);
-      if (markingID < 0 && mMarking) {
+      if (markingID < 0) {
+        final KindTranslator translator = getKindTranslator();
         markingID =
           eventEnc.addEvent(mCurrentDefaultMarking, translator, true);
+        final TransitionRelationSimplifier simplifier = getSimplifier();
+        simplifier.setDefaultMarkingID(markingID);
       }
-      final TransitionRelationSimplifier simplifier = getSimplifier();
-      simplifier.setDefaultMarkingID(markingID);
       return eventEnc;
-    }
-
-    @Override
-    boolean hasReducedPreconditionMarking()
-    {
-      return false;
     }
 
     //#######################################################################
     //# Data Members
-    private final boolean mMarking;
+    @SuppressWarnings("unused")
+    private LimitedCertainConflictsTRSimplifier mCertainConflictsStep;
+    @SuppressWarnings("unused")
+    private final int mCertainConflictsIndex;
 
   }
+
 
   //#########################################################################
   //# Inner Class GeneralisedTRSimplifierAbstractionRule
@@ -2681,9 +2713,10 @@ public class OPConflictChecker
     //#######################################################################
     //# Constructor
     private GeneralisedTRSimplifierAbstractionRule
-      (final ChainTRSimplifier simplifier)
+      (final ChainTRSimplifier simplifier, final int recoveryIndex)
     {
       super(simplifier);
+      mRecoveryIndex = recoveryIndex;
       final EventProxy[] props = new EventProxy[2];
       mUsedDefaultMarking = props[0] = mCurrentDefaultMarking;
       if (mPreconditionMarking == null) {
@@ -2704,9 +2737,32 @@ public class OPConflictChecker
       return (ChainTRSimplifier) super.getSimplifier();
     }
 
+    @Override
     int getPreconditionMarkingID()
     {
       return mPreconditionMarkingID;
+    }
+
+    @Override
+    MergeStep createStep(final AutomatonProxy input,
+                         final StateEncoding inputStateEnc,
+                         final AutomatonProxy output,
+                         final StateEncoding outputStateEnc,
+                         final EventProxy tau)
+    {
+      final ChainTRSimplifier simplifier = getSimplifier();
+      final List<int[]> partition = simplifier.getResultPartition();
+      final boolean reduced =
+        simplifier.isReducedMarking(mPreconditionMarkingID);
+      if (simplifier.isObservationEquivalentAbstraction()) {
+        return new ObservationEquivalenceStep(output, input, tau,
+                                              inputStateEnc, partition,
+                                              reduced, outputStateEnc);
+      } else {
+        return new ConflictEquivalenceStep(output, input, tau,
+                                           inputStateEnc, partition,
+                                           reduced, outputStateEnc);
+      }
     }
 
     //#######################################################################
@@ -2736,12 +2792,6 @@ public class OPConflictChecker
     }
 
     @Override
-    boolean hasReducedPreconditionMarking()
-    {
-      final ChainTRSimplifier simplifier = getSimplifier();
-      return simplifier.isReducedMarking(mPreconditionMarkingID);
-    }
-
     BitSet recoverMarkings(final AutomatonProxy aut, final EventProxy tau)
     throws AnalysisException
     {
@@ -2755,7 +2805,7 @@ public class OPConflictChecker
                                            inputStateEnc, config);
         final int origNumStates = rel.getNumberOfStates();
         simplifier.setTransitionRelation(rel);
-        simplifier.run();
+        simplifier.runTo(mRecoveryIndex);
         final BitSet result = new BitSet(origNumStates);
         final List<int[]> partition = simplifier.getResultPartition();
         if (partition == null) {
@@ -2783,6 +2833,7 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Data Members
+    private final int mRecoveryIndex;
     private final List<EventProxy> mPropositions;
     private EventProxy mUsedPreconditionMarking;
     private final EventProxy mUsedDefaultMarking;
@@ -3457,10 +3508,9 @@ public class OPConflictChecker
     {
       if (mHasReducedPreconditionMarking) {
         final AutomatonProxy aut = getOriginalAutomaton();
-        mPreconditionMarkingID =
-          mPreconditionMarkingRecovery.getPreconditionMarkingID();
+        mPreconditionMarkingID = mAbstractionRule.getPreconditionMarkingID();
         mRecoveredPreconditionMarking =
-          mPreconditionMarkingRecovery.recoverMarkings(aut, mTau);
+          mAbstractionRule.recoverMarkings(aut, mTau);
       } else {
         mPreconditionMarkingID =
           mEventEncoding.getEventCode(mPreconditionMarking);
@@ -3965,7 +4015,6 @@ public class OPConflictChecker
   private ConflictChecker mMonolithicConflictChecker;
   private SafetyVerifier mCompositionalLanguageInclusionChecker;
   private SafetyVerifier mMonolithicLanguageInclusionChecker;
-  private GeneralisedTRSimplifierAbstractionRule mPreconditionMarkingRecovery;
 
   private List<AutomatonProxy> mCurrentAutomata;
   private Map<AutomatonProxy,AutomatonInfo> mAutomatonInfoMap;

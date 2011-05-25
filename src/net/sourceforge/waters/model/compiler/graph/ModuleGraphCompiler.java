@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.compiler.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -233,7 +234,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       mCurrentComponent = comp;
       // Prepare alphabet ...
       mLocalEventsMap = new HashMap<EventProxy,SelfloopInfo>();
-      mLocalEventsList = new LinkedList<EventProxy>();
       final GraphProxy graph = comp.getGraph();
       final EventListExpressionProxy blocked = graph.getBlockedEvents();
       if (blocked != null) {
@@ -257,6 +257,8 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
           visitEdgeProxy(edge, cnode);
         }
       }
+      final Collection<EventProxy> keys = mLocalEventsMap.keySet();
+      final List<EventProxy> alphabet = new ArrayList<EventProxy>(keys);
       // Reachability ...
       if (mIsOptimizationEnabled) {
         mNumReachableStates = 0;
@@ -266,8 +268,8 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
             node.explore();
           }
         }
-        removeSelfloopedEvents(mLocalEventsList);
-        if (mLocalEventsList.isEmpty()) {
+        removeSelfloopedEvents(alphabet);
+        if (alphabet.isEmpty()) {
           return null;
         }
       } else {
@@ -297,8 +299,9 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       final String name = ident.toString();
       final ComponentKind kind = comp.getKind();
       final Map<String,String> attribs = comp.getAttributes();
+      Collections.sort(alphabet);
       final AutomatonProxy aut =
-        mFactory.createAutomatonProxy(name, kind, mLocalEventsList,
+        mFactory.createAutomatonProxy(name, kind, alphabet,
                                       states, transitions, attribs);
       addAutomaton(ident, aut);
       addSourceInfo(aut, comp);
@@ -306,7 +309,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     } finally {
       mCurrentComponent = null;
       mLocalEventsMap = null;
-      mLocalEventsList = null;
       mPrecompiledNodesMap = null;
       mLocalStateNames = null;
       mLocalTransitionsList = null;
@@ -402,7 +404,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     if (!mLocalEventsMap.containsKey(event)) {
       final SelfloopInfo info = new SelfloopInfo();
       mLocalEventsMap.put(event, info);
-      mLocalEventsList.add(event);
     }
   }
 
@@ -860,7 +861,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   private SimpleComponentProxy mCurrentComponent;
   private boolean mCurrentComponentIsDetermistic;
   private Map<EventProxy,SelfloopInfo> mLocalEventsMap;
-  private List<EventProxy> mLocalEventsList;
   private Map<NodeProxy,CompiledNode> mPrecompiledNodesMap;
   private Set<String> mLocalStateNames;
   private List<CompiledTransition> mLocalTransitionsList;

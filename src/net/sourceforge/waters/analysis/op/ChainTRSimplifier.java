@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.op;
 import gnu.trove.TIntArrayList;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,16 +48,23 @@ public class ChainTRSimplifier
 
   //#########################################################################
   //# Configuration
-  List<TransitionRelationSimplifier> getSteps()
+  int size()
   {
-    return mSteps;
+    return mSteps.size();
   }
 
-  void add(final TransitionRelationSimplifier step)
+  TransitionRelationSimplifier getStep(final int index)
   {
+    return mSteps.get(index);
+  }
+
+  int add(final TransitionRelationSimplifier step)
+  {
+    final int index = size();
     final int config = step.getPreferredInputConfiguration();
     setPreferredOutputConfiguration(config);
     mSteps.add(step);
+    return index;
   }
 
 
@@ -96,6 +104,37 @@ public class ChainTRSimplifier
   public boolean run()
     throws AnalysisException
   {
+    final int index = size();
+    return runTo(index);
+  }
+
+  @Override
+  public boolean isObservationEquivalentAbstraction()
+  {
+    return mIsObservationEquivalentAbstraction;
+  }
+
+  @Override
+  public boolean isReducedMarking(final int propID)
+  {
+    return mReducedMarkings[propID];
+  }
+
+  @Override
+  public void reset()
+  {
+    super.reset();
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.reset();
+    }
+  }
+
+
+  //#########################################################################
+  //# Specific Access
+  public boolean runTo(int index)
+    throws AnalysisException
+  {
     final Logger logger = getLogger();
     setUp();
     mIsObservationEquivalentAbstraction = true;
@@ -109,7 +148,9 @@ public class ChainTRSimplifier
     final int numProps = rel.getNumberOfPropositions();
     mReducedMarkings = new boolean[numProps];
     boolean result = false;
-    for (final TransitionRelationSimplifier step : mSteps) {
+    final Iterator<TransitionRelationSimplifier> iter = mSteps.iterator();
+    while (--index >= 0) {
+      final TransitionRelationSimplifier step = iter.next();
       try {
         if (logger.isDebugEnabled()) {
           logger.debug(ProxyTools.getShortClassName(step) + " ...");
@@ -135,27 +176,6 @@ public class ChainTRSimplifier
       }
     }
     return result;
-  }
-
-  @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return mIsObservationEquivalentAbstraction;
-  }
-
-  @Override
-  public boolean isReducedMarking(final int propID)
-  {
-    return mReducedMarkings[propID];
-  }
-
-  @Override
-  public void reset()
-  {
-    super.reset();
-    for (final TransitionRelationSimplifier step : mSteps) {
-      step.reset();
-    }
   }
 
 
