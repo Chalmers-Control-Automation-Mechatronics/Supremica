@@ -1,8 +1,13 @@
+/*
+ * A test for the Promela importer in Waters.
+ * This tests whether an init block before proctype declarations
+ * can be recognised, and whether automata are produced in the order
+ * in which they appear in the Promela file.
+ */
+
 #define msgtype 33
 
 chan name = [0] of { byte, byte };
-
-/* byte name;   typo  - this line shouldn't have been here */
 
 init
 {       

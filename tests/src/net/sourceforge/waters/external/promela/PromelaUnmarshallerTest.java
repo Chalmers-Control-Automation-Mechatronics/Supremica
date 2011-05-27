@@ -74,6 +74,11 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
     testImport("p103a");
   }
 
+  public void testImport_p103b() throws Exception
+  {
+    testImport("p103b");
+  }
+
   public void testImport_p105a() throws Exception
   {
     testImport("p105a");
@@ -126,10 +131,10 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
     final ModuleProxy module = mImporter.unmarshal(promelaURI);
     final String wmodextname = name + mModuleMarshaller.getDefaultExtension();
     final File wmodfilename = new File(outdirname, wmodextname);
+    mIntegrityChecker.check(module);
     mModuleMarshaller.marshal(module, wmodfilename);
     assertEquals("Unexpected module name in output!", module.getName(), name);
     mIdentifierChecker.check(module);
-    mIntegrityChecker.check(module);
     final File expectfile = new File(indirname, wmodextname);
     if (expectfile.exists()) {
       final URI expecturi = expectfile.toURI();

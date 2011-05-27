@@ -108,10 +108,14 @@ public class ModuleIntegrityChecker
     final Collection<EdgeProxy> edges = graph.getEdges();
     for (final EdgeProxy edge : edges) {
       final NodeProxy source = edge.getSource();
+      Assert.assertNotNull("Null source node found in graph '" +
+                           comp.getName() + "'!", source);
       Assert.assertTrue("Bad source node '" + source.getName() +
                         "' in graph '" + comp.getName() + "'!",
                         collected.contains(source));
       final NodeProxy target = edge.getTarget();
+      Assert.assertNotNull("Null target node found in graph '" +
+                           comp.getName() + "'!", target);
       Assert.assertTrue("Bad target node '" + target.getName() +
                         "' in graph '" + comp.getName() + "'!",
                         collected.contains(target));
