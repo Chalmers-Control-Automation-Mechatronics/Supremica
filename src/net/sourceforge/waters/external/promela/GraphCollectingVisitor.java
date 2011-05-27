@@ -160,7 +160,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
           final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
           indexes.add(c1);
         }
-        ident = mFactory.createIndexedIdentifierProxy("receive_"+name, indexes);
+        ident = mFactory.createIndexedIdentifierProxy("recv_"+name, indexes);
         labelBlock.add(ident);
         label = mFactory.createLabelBlockProxy(labelBlock,null);
         thisend = start;

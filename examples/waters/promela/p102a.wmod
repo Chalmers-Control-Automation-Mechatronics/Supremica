@@ -17,7 +17,7 @@
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_A"/>
         <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
-        <EventDecl Kind="CONTROLLABLE" Name="receive_name">
+        <EventDecl Kind="CONTROLLABLE" Name="recv_name">
             <RangeList>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
@@ -79,7 +79,7 @@
                     </Edge>
                     <Edge Target="empty" Source="s_33_121">
                         <LabelBlock>
-                            <IndexedIdentifier Name="receive_name">
+                            <IndexedIdentifier Name="recv_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="121"/>
                             </IndexedIdentifier>
@@ -107,7 +107,7 @@
                     </Edge>
                     <Edge Target="empty" Source="s_33_124">
                         <LabelBlock>
-                            <IndexedIdentifier Name="receive_name">
+                            <IndexedIdentifier Name="recv_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>
@@ -237,11 +237,11 @@
                     </Edge>
                     <Edge Target="B_2" Source="B_1">
                         <LabelBlock>
-                            <IndexedIdentifier Name="receive_name">
+                            <IndexedIdentifier Name="recv_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="121"/>
                             </IndexedIdentifier>
-                            <IndexedIdentifier Name="receive_name">
+                            <IndexedIdentifier Name="recv_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>

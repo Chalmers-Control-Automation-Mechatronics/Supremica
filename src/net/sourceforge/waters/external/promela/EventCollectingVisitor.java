@@ -156,7 +156,7 @@ public class EventCollectingVisitor implements PromelaVisitor
      mEventDecls.add(event);
     }else if(chanLength==1){
       ident = mFactory.createSimpleIdentifierProxy("send_"+chanName);
-      ident2 = mFactory.createSimpleIdentifierProxy("receive_"+chanName);
+      ident2 = mFactory.createSimpleIdentifierProxy("recv_"+chanName);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
       final Collection<SimpleExpressionProxy> ranges2 = new ArrayList<SimpleExpressionProxy>(size);
       for(int i=0;i<size;i++){
@@ -215,7 +215,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       }else if(length==1){
         name = "send_"+ename;
         indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
-        name = "receive_"+ename;
+        name = "recv_"+ename;
         indexEvent2 = mFactory.createIndexedIdentifierProxy(name,indexes2);
       }
 
