@@ -4,9 +4,12 @@ import gnu.trove.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
+import net.sourceforge.waters.external.promela.ast.ConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
@@ -22,13 +25,19 @@ import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
 import net.sourceforge.waters.external.promela.ast.SendTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -106,6 +115,67 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     final String name = t.getChild(0).getText();
     chanNames.add(name);
+    final ChanInfo ch = mVisitor.getChan().get(name);
+    if(ch.getChanLength()==1){
+      final Collection<NodeProxy> mNodes = new ArrayList<NodeProxy>();
+      final Collection<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
+      final Collection<Collection<SimpleExpressionProxy>> sendData = ch.getSendData();
+      final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
+      final SimpleIdentifierProxy id =
+          mFactory.createSimpleIdentifierProxy(accepting);
+      final List<SimpleIdentifierProxy> list = Collections.singletonList(id);
+      final PlainEventListProxy eventList =
+          mFactory.createPlainEventListProxy(list);
+      final NodeProxy start = mFactory.createSimpleNodeProxy("empty", eventList, true, null, null, null);
+   //   mNodes.add(start);
+      for(final Collection<SimpleExpressionProxy> s: sendData){
+        String ename="s";
+        for(final SimpleExpressionProxy ss: s){
+           ename = ename+"_"+ss;
+        }
+        final NodeProxy node = mFactory.createSimpleNodeProxy(ename);
+        mNodes.add(node);
+      }
+      final ArrayList<Collection<SimpleExpressionProxy>> storeSend = new ArrayList<Collection<SimpleExpressionProxy>>(sendData);
+      final ArrayList<NodeProxy> storeNode = new ArrayList<NodeProxy>(mNodes);
+      for(int i=0;i<storeSend.size();i++){
+        Collection<IdentifierProxy> labelBlock = new ArrayList<IdentifierProxy>();
+        Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+        for(final SimpleExpressionProxy s: storeSend.get(i)){
+          final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+          indexes.add(c1);
+        }
+        IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("send_"+name, indexes);
+        labelBlock.add(ident);
+        LabelBlockProxy label =
+          mFactory.createLabelBlockProxy(labelBlock, null);
+        NodeProxy thisend = storeNode.get(i);
+        NodeProxy thisstart = start;
+        final EdgeProxy edge =mFactory.createEdgeProxy(thisstart, thisend, label, null, null, null, null);
+        mEdges.add(edge);
+
+        labelBlock = new ArrayList<IdentifierProxy>();
+        indexes = new ArrayList<SimpleExpressionProxy>();
+        for(final SimpleExpressionProxy s: storeSend.get(i)){
+          final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+          indexes.add(c1);
+        }
+        ident = mFactory.createIndexedIdentifierProxy("receive_"+name, indexes);
+        labelBlock.add(ident);
+        label = mFactory.createLabelBlockProxy(labelBlock,null);
+        thisend = start;
+        thisstart = storeNode.get(i);
+        final EdgeProxy edge2 = mFactory.createEdgeProxy(thisstart,thisend,label,null,null,null,null);
+        mEdges.add(edge2);
+      }
+      mNodes.add(start);
+
+      final GraphProxy graph = mFactory.createGraphProxy(true, null, mNodes, mEdges);
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("channel_"+name);
+      final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
+      mComponents.add(component);
+    }
+
     return null;
   }
 
@@ -164,13 +234,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final String chanName = t.getChild(0).getText();
     final ChanInfo ch = mVisitor.getChan().get(chanName);
     final int length = ch.getChanLength();
-    final THashSet<IdentifierProxy> chanData =(THashSet<IdentifierProxy>) ch.receive();
-    if(length==0){
-      return new PromelaGraph(chanData,mFactory);
+    final THashSet<IdentifierProxy> chanData =(THashSet<IdentifierProxy>) ch.getRecData();
+    if(length==1){
+    return new PromelaGraph(chanData,mFactory);
     }else{
-
+      return new PromelaGraph((THashSet<IdentifierProxy>)ch.getChannelData(),mFactory);
     }
-    return new PromelaGraph(mVisitor.getChanEvent().get(chanName),mFactory);
+   // return new PromelaGraph(mVisitor.getChanEvent().get(chanName),mFactory);
   }
 
   public Object visitConstant(final ConstantTreeNode t)
@@ -230,6 +300,17 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitType(final TypeTreeNode t)
   {
     return null;
+  }
+  public Object visitCondition(final ConditionTreeNode t)
+  {
+    PromelaGraph result = null;
+
+    for(int i=0;i<t.getChildCount();i++){
+      final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
+      result = PromelaGraph.combineComposition(result,step);
+    }
+
+  return result;
   }
 
 

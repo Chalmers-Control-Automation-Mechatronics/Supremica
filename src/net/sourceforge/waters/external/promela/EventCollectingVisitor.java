@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Hashtable;
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
+import net.sourceforge.waters.external.promela.ast.ConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
@@ -107,7 +108,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitChannel(final ChannelTreeNode t){
     final PromelaTree tr1 = (PromelaTree) t.getChild(1);
     final String name = t.getChild(0).getText();
-    procEvent.put(name,new THashSet<IdentifierProxy>());
+  //  procEvent.put(name,new THashSet<IdentifierProxy>());
     //chan.put(name,new ChanInfo());
     tr1.acceptVisitor(this);
     return null;
@@ -153,11 +154,19 @@ public class EventCollectingVisitor implements PromelaVisitor
      ident = mFactory.createSimpleIdentifierProxy("exch_"+chanName);
      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
      mEventDecls.add(event);
-    }else{
+    }else if(chanLength==1){
       ident = mFactory.createSimpleIdentifierProxy("send_"+chanName);
       ident2 = mFactory.createSimpleIdentifierProxy("receive_"+chanName);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
-      final EventDeclProxy event2 = mFactory.createEventDeclProxy(ident2, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
+      final Collection<SimpleExpressionProxy> ranges2 = new ArrayList<SimpleExpressionProxy>(size);
+      for(int i=0;i<size;i++){
+        final IntConstantProxy zero_2 = mFactory.createIntConstantProxy(lowerEnd.get(i));
+        final IntConstantProxy c255_2 = mFactory.createIntConstantProxy(upperEnd.get(i));
+        final BinaryOperator op = optable.getRangeOperator();
+        final BinaryExpressionProxy range2 = mFactory.createBinaryExpressionProxy(op, zero_2, c255_2);
+        ranges2.add(range2);
+      }
+      final EventDeclProxy event2 = mFactory.createEventDeclProxy(ident2, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges2, null, null);
       mEventDecls.add(event);
       mEventDecls.add(event2);
     }
@@ -184,26 +193,33 @@ public class EventCollectingVisitor implements PromelaVisitor
       //store channel name and relevant data into hashtable
       //chan.get(chanName).storeMsg(data);
 
-      String ename = labels.get(0);
+      final String ename = labels.get(0);
       final ChanInfo ch = chan.get(ename);
       final int length = ch.getChanLength();
       final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
+      final Collection<SimpleExpressionProxy> indexes2 = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
       for(int y=1;y<labels.size();y++){
         final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
         indexes.add(c);
+        final IntConstantProxy c2 = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
+        indexes2.add(c2);
       }
         //create indexedIdentifier, and store it for receive statement
-      final IndexedIdentifierProxy indexEvent;
+      IndexedIdentifierProxy indexEvent = null;
+      IndexedIdentifierProxy indexEvent2 = null;
+      String name;
       if(length==0){
-        ename = "exch_"+ename;
-        indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
-      }else{
-        ename = "send_"+ename;
-        indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
+        name = "exch_"+ename;
+        indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
+       // indexEvent2 = mFactory.createIndexedIdentifierProxy(name,indexes2);
+      }else if(length==1){
+        name = "send_"+ename;
+        indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
+        name = "receive_"+ename;
+        indexEvent2 = mFactory.createIndexedIdentifierProxy(name,indexes2);
       }
-        //ChanInfo info = chan.get(chanName);
-        //info.addEvent(indexEvent);
-        THashSet<IdentifierProxy> temp = procEvent.get(chanName);
+
+        THashSet<IdentifierProxy> temp = (THashSet<IdentifierProxy>) ch.getChannelData();
         if(temp==null){
           temp = new THashSet<IdentifierProxy>();
         }
@@ -217,8 +233,10 @@ public class EventCollectingVisitor implements PromelaVisitor
         }
         if(!same){
           temp.add(indexEvent);
-          procEvent.put(chanName,temp);
-          ch.send(indexEvent);
+     //     procEvent.put(chanName,temp);
+          ch.addChannelData(indexEvent);
+          ch.send(indexEvent.getIndexes());
+          ch.addReceiveData(indexEvent2);
         }
 
         return indexEvent;
@@ -226,9 +244,29 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitReceive(final ReceiveTreeNode t)
   {
+    /*
+    labels = new ArrayList<String>();
 
-    // TODO Auto-generated method stub
+    final String chanName = t.getChild(0).getText();
+    labels.add(chanName);
 
+    for(int i = 0; i <t.getChildCount();i++){
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+    }
+    final ChanInfo ch = chan.get(chanName);
+    final int length = ch.getChanLength();
+    final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
+    for(int y=1;y<labels.size();y++){
+      final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
+      indexes.add(c);
+    }
+    IndexedIdentifierProxy indexEvent = null;
+    if(length==1){
+      indexEvent = mFactory.createIndexedIdentifierProxy(chanName,indexes);
+    }
+    ch.saveReceive(indexes);
+    return indexEvent;
+    */
     return null;
   }
 
@@ -307,6 +345,12 @@ public class EventCollectingVisitor implements PromelaVisitor
   {
     // TODO Auto-generated method stub
     return mFactory;
+  }
+
+  public Object visitCondition(final ConditionTreeNode t)
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 

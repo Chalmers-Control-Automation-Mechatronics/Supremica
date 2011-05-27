@@ -21,6 +21,6 @@ public class ConditionTreeNode extends PromelaTree
   public Object acceptVisitor(final PromelaVisitor visitor)
   {
     // TODO Auto-generated method stub
-    return null;
+    return visitor.visitCondition(this);
   }
 }
