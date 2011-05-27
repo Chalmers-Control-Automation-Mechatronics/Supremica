@@ -14,6 +14,7 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntStack;
 import gnu.trove.TObjectByteHashMap;
 import gnu.trove.TObjectByteIterator;
 import gnu.trove.TObjectIntHashMap;
@@ -2540,9 +2541,9 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Trace Recovery
-    int getPreconditionMarkingID()
+    EventProxy getUsedPreconditionMarking()
     {
-      return -1;
+      return null;
     }
 
     BitSet recoverMarkings(final AutomatonProxy aut, final EventProxy tau)
@@ -2663,7 +2664,7 @@ public class OPConflictChecker
       super(chain);
       mCertainConflictsIndex = ccindex;
       if (ccindex >= 0) {
-        mCertainConflictsStep =
+        mCertainConflictsSimplifier =
           (LimitedCertainConflictsTRSimplifier) chain.getStep(ccindex);
       }
     }
@@ -2674,6 +2675,16 @@ public class OPConflictChecker
     ChainTRSimplifier getSimplifier()
     {
       return (ChainTRSimplifier) super.getSimplifier();
+    }
+
+    LimitedCertainConflictsTRSimplifier getCertainConflictsSimplifier()
+    {
+      return mCertainConflictsSimplifier;
+    }
+
+    int getCertainConflictsIndex()
+    {
+      return mCertainConflictsIndex;
     }
 
     //#######################################################################
@@ -2696,9 +2707,7 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Data Members
-    @SuppressWarnings("unused")
-    private LimitedCertainConflictsTRSimplifier mCertainConflictsStep;
-    @SuppressWarnings("unused")
+    private LimitedCertainConflictsTRSimplifier mCertainConflictsSimplifier;
     private final int mCertainConflictsIndex;
 
   }
@@ -2732,15 +2741,15 @@ public class OPConflictChecker
     //#######################################################################
     //# Simple Access
     @Override
-    ChainTRSimplifier getSimplifier()
+    EventProxy getUsedPreconditionMarking()
     {
-      return (ChainTRSimplifier) super.getSimplifier();
+      return mUsedPreconditionMarking;
     }
 
     @Override
-    int getPreconditionMarkingID()
+    ChainTRSimplifier getSimplifier()
     {
-      return mPreconditionMarkingID;
+      return (ChainTRSimplifier) super.getSimplifier();
     }
 
     @Override
@@ -3285,6 +3294,23 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Constructor
+    /**
+     * Creates a new abstraction step record.
+     * @param  resultAut         The automaton resulting from abstraction.
+     * @param  originalAut       The automaton before abstraction.
+     * @param  tau               The event represent silent transitions,
+     *                           or <CODE>null</CODE>.
+     * @param  originalStateEnc  State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     * @param  partition         Partition that identifies classes of states
+     *                           merged during abstraction.
+     * @param  reduced           Whether or not the set of precondition markings
+     *                           was reduced during abstraction.
+     * @param  resultStateEnc    State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     */
     MergeStep(final AutomatonProxy resultAut,
               final AutomatonProxy originalAut,
               final EventProxy tau,
@@ -3308,11 +3334,28 @@ public class OPConflictChecker
       return mTransitionRelation;
     }
 
+    EventEncoding getEventEncoding()
+    {
+      return mEventEncoding;
+    }
+
     //#######################################################################
     //# Trace Computation
     List<TraceStepProxy> convertTraceSteps
       (final List<TraceStepProxy> traceSteps)
-      throws AnalysisException
+    throws AnalysisException
+    {
+      setupTraceConversion();
+      final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
+      final List<SearchRecord> convertedSteps =
+        convertCrucialSteps(crucialSteps);
+      mergeTraceSteps(traceSteps, convertedSteps);
+      tearDownTraceConversion();
+      return traceSteps;
+    }
+
+    void setupTraceConversion()
+    throws AnalysisException
     {
       final AutomatonProxy originalAutomaton = getOriginalAutomaton();
       final KindTranslator translator = getKindTranslator();
@@ -3323,15 +3366,23 @@ public class OPConflictChecker
       mTransitionRelation = new ListBufferTransitionRelation
         (originalAutomaton, mEventEncoding, mOriginalStateEncoding,
          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
-      final List<SearchRecord> convertedSteps =
-        convertCrucialSteps(crucialSteps);
+    }
+
+    void setupTraceConversion(final EventEncoding enc,
+                              final ListBufferTransitionRelation rel)
+    {
+      mEventEncoding = enc;
+      mTransitionRelation = rel;
+      final EventProxy alpha = mAbstractionRule.getUsedPreconditionMarking();
+      mPreconditionMarkingID = enc.getEventCode(alpha);
+    }
+
+    void tearDownTraceConversion()
+    {
       mTargetSet = null;
       mRecoveredPreconditionMarking = null;
-      mergeTraceSteps(traceSteps, convertedSteps);
       mEventEncoding = null;
       mTransitionRelation = null;
-      return traceSteps;
     }
 
     List<SearchRecord> getCrucialSteps(final List<TraceStepProxy> traceSteps)
@@ -3506,14 +3557,17 @@ public class OPConflictChecker
     void recoverPreconditionMarking()
       throws AnalysisException
     {
+      final EventProxy alpha = mAbstractionRule.getUsedPreconditionMarking();
+      mPreconditionMarkingID = mEventEncoding.getEventCode(alpha);
       if (mHasReducedPreconditionMarking) {
         final AutomatonProxy aut = getOriginalAutomaton();
-        mPreconditionMarkingID = mAbstractionRule.getPreconditionMarkingID();
         mRecoveredPreconditionMarking =
           mAbstractionRule.recoverMarkings(aut, mTau);
-      } else {
-        mPreconditionMarkingID =
-          mEventEncoding.getEventCode(mPreconditionMarking);
+        if (mPreconditionMarkingID < 0) {
+          final KindTranslator translator = getKindTranslator();
+          mPreconditionMarkingID =
+            mEventEncoding.addEvent(alpha, translator, true);
+        }
       }
     }
 
@@ -3535,7 +3589,7 @@ public class OPConflictChecker
      */
     private final List<int[]> mPartition;
     /**
-     * A flag, indicated that the precondition markings have been reduced
+     * A flag, indicating that the precondition markings have been reduced
      * during abstraction and need to be recovered for trace expansion.
      */
     private final boolean mHasReducedPreconditionMarking;
@@ -3586,6 +3640,23 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Constructors
+    /**
+     * Creates a new observation equivalence step record.
+     * This constructor creates a step that assumes an unchanged set of
+     * precondition markings.
+     * @param  resultAut         The automaton resulting from abstraction.
+     * @param  originalAut       The automaton before abstraction.
+     * @param  tau               The event represent silent transitions,
+     *                           or <CODE>null</CODE>.
+     * @param  originalStateEnc  State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     * @param  partition         Partition that identifies classes of states
+     *                           merged during abstraction.
+     * @param  resultStateEnc    State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     */
     private ObservationEquivalenceStep(final AutomatonProxy resultAut,
                                        final AutomatonProxy originalAut,
                                        final EventProxy tau,
@@ -3597,6 +3668,23 @@ public class OPConflictChecker
            originalStateEnc, partition, false, resultStateEnc);
     }
 
+    /**
+     * Creates a new observation equivalence step record.
+     * @param  resultAut         The automaton resulting from abstraction.
+     * @param  originalAut       The automaton before abstraction.
+     * @param  tau               The event represent silent transitions,
+     *                           or <CODE>null</CODE>.
+     * @param  originalStateEnc  State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     * @param  partition         Partition that identifies classes of states
+     *                           merged during abstraction.
+     * @param  reduced           Whether or not the set of precondition markings
+     *                           was reduced during abstraction.
+     * @param  resultStateEnc    State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     */
     private ObservationEquivalenceStep(final AutomatonProxy resultAut,
                                        final AutomatonProxy originalAut,
                                        final EventProxy tau,
@@ -3752,6 +3840,23 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Constructor
+    /**
+     * Creates a new conflict equivalence step record.
+     * @param  resultAut         The automaton resulting from abstraction.
+     * @param  originalAut       The automaton before abstraction.
+     * @param  tau               The event represent silent transitions,
+     *                           or <CODE>null</CODE>.
+     * @param  originalStateEnc  State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     * @param  partition         Partition that identifies classes of states
+     *                           merged during abstraction.
+     * @param  reduced           Whether or not the set of precondition markings
+     *                           was reduced during abstraction.
+     * @param  resultStateEnc    State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     */
     private ConflictEquivalenceStep(final AutomatonProxy resultAut,
                                     final AutomatonProxy originalAut,
                                     final EventProxy tau,
@@ -3864,6 +3969,256 @@ public class OPConflictChecker
         }
       }
     }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class MergeStep
+  /**
+   * An abstraction step in which the result automaton is obtained by
+   * merging states of the original automaton (automaton quotient).
+   */
+  @SuppressWarnings("unused")
+  private class CertainConflictsStep extends AbstractionStep
+  {
+
+    //#######################################################################
+    //# Constructor
+    /**
+     * Creates a new abstraction step record.
+     * @param  resultAut         The automaton resulting from abstraction.
+     * @param  originalAut       The automaton before abstraction.
+     * @param  tau               The event represent silent transitions,
+     *                           or <CODE>null</CODE>.
+     * @param  originalStateEnc  State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     * @param  partition         Partition that identifies classes of states
+     *                           merged during abstraction.
+     * @param  resultStateEnc    State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     * @param  oeqBefore         Whether or not the abstraction steps applied
+     *                           before identifying certain conflicts preserve
+     *                           observation equivalence.
+     * @param  oeqAfter          Whether or not the abstraction steps applied
+     *                           after identifying certain conflicts preserve
+     *                           observation equivalence.
+     */
+    CertainConflictsStep(final AutomatonProxy resultAut,
+                         final AutomatonProxy originalAut,
+                         final EventProxy tau,
+                         final StateEncoding originalStateEnc,
+                         final List<int[]> partition,
+                         final StateEncoding resultStateEnc,
+                         final boolean oeqBefore,
+                         final boolean oeqAfter)
+    {
+      super(resultAut, originalAut);
+      mTau = tau;
+      mOriginalStateEncoding = originalStateEnc;
+      mPartition = partition;
+      mResultStateEncoding = resultStateEnc;
+      mIsObservationEquivalentBefore = oeqBefore;
+      mIsObservationEquivalentAfter = oeqAfter;
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    @Override
+    List<TraceStepProxy> convertTraceSteps
+      (final List<TraceStepProxy> traceSteps)
+    throws AnalysisException
+    {
+      // First check whether certain conflicts need to be considered
+      // in trace expansion ...
+      final AutomatonProxy originalAut = getOriginalAutomaton();
+      final AutomatonProxy resultAut = getResultAutomaton();
+      MergeStep delegate =
+        createDelegate(resultAut, originalAut, mOriginalStateEncoding,
+                       mPartition, mResultStateEncoding,
+                       mIsObservationEquivalentBefore &&
+                       mIsObservationEquivalentAfter);
+      if (!isBlockingTrace(traceSteps)) {
+        return delegate.convertTraceSteps(traceSteps);
+      }
+      delegate.setupTraceConversion();
+      List<SearchRecord> crucialSteps = delegate.getCrucialSteps(traceSteps);
+      List<SearchRecord> convertedSteps =
+        delegate.convertCrucialSteps(crucialSteps);
+      ListBufferTransitionRelation rel = delegate.getTransitionRelation();
+      final EventEncoding eventEnc = delegate.getEventEncoding();
+      if (isBlockingTrace(convertedSteps, rel, eventEnc)) {
+        delegate.mergeTraceSteps(traceSteps, convertedSteps);
+        return traceSteps;
+      }
+
+      // OK, abstract trace leads to blocking, expanded trace does not.
+      // We need to add steps to get from certain conflicts to blocking ...
+      final StandardTRSimplifierAbstractionRule rule =
+        (StandardTRSimplifierAbstractionRule) mAbstractionRule;
+      final ChainTRSimplifier chain = rule.getSimplifier();
+      final int config = chain.getPreferredInputConfiguration();
+      rel = new ListBufferTransitionRelation
+        (originalAut, eventEnc, mOriginalStateEncoding, config);
+      chain.setTransitionRelation(rel);
+      final int ccindex = rule.getCertainConflictsIndex();
+      final boolean modified1 = chain.runTo(ccindex);
+      final List<int[]> partition1 = chain.getResultPartition();
+      final List<int[]> partition2 = computeQuotientPartition(partition1);
+      delegate =
+        createDelegate(resultAut, null, null, partition2,
+                       mResultStateEncoding, mIsObservationEquivalentAfter);
+      delegate.setupTraceConversion(eventEnc, rel);
+      crucialSteps = delegate.getCrucialSteps(traceSteps);
+      convertedSteps = delegate.convertCrucialSteps(crucialSteps);
+      final LimitedCertainConflictsTRSimplifier simplifier =
+        rule.getCertainConflictsSimplifier();
+      simplifier.setTransitionRelation(rel);
+      simplifier.setAppliesPartitionAutomatically(false);
+
+      // TODO Proper trace expansion for certain conflicts ...
+      assert false;
+      return null;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private boolean isBlockingTrace(final List<TraceStepProxy> steps)
+    {
+      final AutomatonProxy aut = getResultAutomaton();
+      final int traceEnd = steps.size() - 1;
+      final TraceStepProxy step = steps.get(traceEnd);
+      final StateProxy state = step.getStateMap().get(aut);
+      final int code = mResultStateEncoding.getStateCode(state);
+      final int partitionEnd = mPartition.size() - 1;
+      final int[] bclazz = mPartition.get(partitionEnd);
+      for (final int elem : bclazz) {
+        if (elem == code) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private boolean isBlockingTrace(final List<SearchRecord> steps,
+                                    final ListBufferTransitionRelation rel,
+                                    final EventEncoding enc)
+    {
+      final int markingID = enc.getEventCode(mCurrentDefaultMarking);
+      assert markingID >= 0;
+      final int traceEnd = steps.size() - 1;
+      final SearchRecord step = steps.get(traceEnd);
+      final int state= step.getState();
+      if (rel.isMarked(state, markingID)) {
+        return false;
+      }
+      final TIntStack stack = new TIntStack();
+      final TIntHashSet visited = new TIntHashSet();
+      stack.push(state);
+      visited.add(state);
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      while (stack.size() > 0) {
+        final int current = stack.pop();
+        iter.resetState(current);
+        while (iter.advance()) {
+          final int succ = iter.getCurrentTargetState();
+          if (visited.add(succ)) {
+            if (rel.isMarked(succ, markingID)) {
+              return false;
+            }
+            stack.push(succ);
+          }
+        }
+      }
+      return false;
+    }
+
+    private MergeStep createDelegate(final AutomatonProxy resultAut,
+                                     final AutomatonProxy originalAut,
+                                     final StateEncoding originalStateEnc,
+                                     final List<int[]> partition,
+                                     final StateEncoding resultStateEnc,
+                                     final boolean oeq)
+    {
+      if (oeq) {
+        return new ObservationEquivalenceStep(resultAut, originalAut, mTau,
+                                              originalStateEnc, partition,
+                                              false, resultStateEnc);
+      } else {
+        return new ConflictEquivalenceStep(resultAut, originalAut, mTau,
+                                           originalStateEnc, partition,
+                                           false, resultStateEnc);
+      }
+    }
+
+    private List<int[]> computeQuotientPartition(final List<int[]> partition)
+    {
+      if (partition == null) {
+        return mPartition;
+      } else {
+        final AutomatonProxy aut = getOriginalAutomaton();
+        final int numStates = aut.getStates().size();
+        final TIntIntHashMap classMap = new TIntIntHashMap(numStates);
+        int code = 0;
+        for (final int[] clazz : partition) {
+          for (final int state : clazz) {
+            classMap.put(state, code);
+          }
+          code++;
+        }
+        final int numClasses = mPartition.size();
+        final List<int[]> quotient = new ArrayList<int[]>(numClasses);
+        final TIntHashSet set = new TIntHashSet();
+        boolean trivial = true;
+        for (final int[] clazz : mPartition) {
+          for (final int state : clazz) {
+            code = classMap.get(state);
+            set.add(code);
+          }
+          final int[] newclazz = set.toArray();
+          Arrays.sort(newclazz);
+          quotient.add(newclazz);
+          trivial &= set.size() == 1;
+          set.clear();
+        }
+        return trivial ? null : quotient;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    /**
+     * The event that was hidden from the original automaton,
+     * or <CODE>null</CODE>.
+     */
+    private final EventProxy mTau;
+    /**
+     * State encoding of original automaton. Maps state codes in the input
+     * transition relation to state objects in the input automaton.
+     */
+    private final StateEncoding mOriginalStateEncoding;
+    /**
+     * Partition applied to original automaton.
+     * Each entry lists states of the input encoding that have been merged.
+     */
+    private final List<int[]> mPartition;
+    /**
+     * Reverse encoding of output states. Maps states in output automaton
+     * (simplified automaton) to state code in output transition relation.
+     */
+    private final StateEncoding mResultStateEncoding;
+    /**
+     * A flag, indicating whether or not the abstraction steps applied
+     * before identifying certain conflicts preserve observation equivalence.
+     */
+    private final boolean mIsObservationEquivalentBefore;
+    /**
+     * A flag, indicating whether or not the abstraction steps applied
+     * after identifying certain conflicts preserve observation equivalence.
+     */
+    private final boolean mIsObservationEquivalentAfter;
 
   }
 

@@ -128,6 +128,19 @@ public class IntStateBuffer
     Arrays.fill(mStateInfo, TAG_REACHABLE);
   }
 
+  /**
+   * Creates a new state buffer that is an identical copy of the given
+   * state buffer. This copy constructor constructs a deep copy that does
+   * not share any data structures with the given state buffer.
+   */
+  public IntStateBuffer(final IntStateBuffer buffer)
+  {
+    mNumPropositions = buffer.getNumberOfPropositions();
+    mUsedPropositions = (int) buffer.getUsedPropositions();
+    final int size = buffer.getNumberOfStates();
+    mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
+  }
+
 
   //#########################################################################
   //# Simple Access

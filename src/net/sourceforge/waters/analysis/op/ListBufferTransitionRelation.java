@@ -215,6 +215,55 @@ public class ListBufferTransitionRelation
     mUsedEvents.set(first, numEvents, true);
   }
 
+  /**
+   * Creates a new transition relation that contains the same states
+   * and transitions as the given transition relation. This copy constructor
+   * constructs a deep copy that does not share any data structures with the
+   * given transition relation.
+   * @param  rel         The transition relation to be copied.
+   * @param  config      Configuration flags defining which transition buffers
+   *                     are to be created in the copy. Should be one of
+   *                     {@link #CONFIG_SUCCESSORS},
+   *                     {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   */
+  public ListBufferTransitionRelation(final ListBufferTransitionRelation rel,
+                                      final int config)
+  {
+    checkConfig(config);
+    mName = rel.getName();
+    mKind = rel.getKind();
+    mStateBuffer = new IntStateBuffer(rel.mStateBuffer);
+    final int numEvents = rel.getNumberOfProperEvents();
+    final int numStates = mStateBuffer.getNumberOfStates();
+    try {
+      if ((config & CONFIG_SUCCESSORS) != 0) {
+        mSuccessorBuffer =
+          new OutgoingTransitionListBuffer(numEvents, numStates, 0);
+      }
+      if ((config & CONFIG_PREDECESSORS) != 0) {
+        mPredecessorBuffer =
+          new IncomingTransitionListBuffer(numEvents, numStates, 0);
+      }
+    } catch (final OverflowException exception) {
+      // Can't have overflow because states and events have already been
+      // encoded successfully in rel.
+      throw new WatersRuntimeException(exception);
+    }
+    mUsedEvents = new BitSet(numEvents);
+    for (int event = 0; event < numEvents; event++) {
+      if (rel.isUsedEvent(event)) {
+        mUsedEvents.set(event);
+      }
+    }
+    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+    while (iter.advance()) {
+      final int source = iter.getCurrentSourceState();
+      final int event = iter.getCurrentEvent();
+      final int target = iter.getCurrentTargetState();
+      addTransition(source, event, target);
+    }
+  }
+
 
   //#########################################################################
   //# Overrides for java.lang.object
