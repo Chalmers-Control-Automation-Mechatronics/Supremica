@@ -224,6 +224,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         ename = "send_"+ename;
         indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
       }
+        System.out.println(indexEvent);
         return new PromelaGraph(indexEvent,mFactory);
 
   }
@@ -234,11 +235,43 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final String chanName = t.getChild(0).getText();
     final ChanInfo ch = mVisitor.getChan().get(chanName);
     final int length = ch.getChanLength();
-    final THashSet<IdentifierProxy> chanData =(THashSet<IdentifierProxy>) ch.getRecData();
+    THashSet<IdentifierProxy> chanData ;
+    labels = new ArrayList<String>();
+    labels.add(chanName);
+
+
+    for(int i = 0; i <t.getChildCount();i++){
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+    }
+    if(labels.size()-1 == ch.getDataLength()){
+      final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
+      for(int y=1;y<labels.size();y++){
+        final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
+        indexes.add(c);
+      }
+      IndexedIdentifierProxy indexEvent;
+      final String name;
+      if(length==0){
+
+        name = "exch_"+chanName;
+
+        indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
+        System.out.println(indexEvent);
+      }else{
+        name = "send_"+chanName;
+        indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
+      }
+        return new PromelaGraph(indexEvent,mFactory);
+    }
+    else{
     if(length==1){
-    return new PromelaGraph(chanData,mFactory);
+      chanData =(THashSet<IdentifierProxy>) ch.getRecData();
+
     }else{
-      return new PromelaGraph((THashSet<IdentifierProxy>)ch.getChannelData(),mFactory);
+      System.out.println("oh ye");
+      chanData = (THashSet<IdentifierProxy>)ch.getChannelData();
+    }
+    return new PromelaGraph(chanData,mFactory);
     }
    // return new PromelaGraph(mVisitor.getChanEvent().get(chanName),mFactory);
   }
@@ -308,6 +341,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     for(int i=0;i<t.getChildCount();i++){
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       result = PromelaGraph.combineComposition(result,step);
+     // result = PromelaGraph.sequentialComposition(result,step);
     }
 
   return result;

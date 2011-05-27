@@ -107,7 +107,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitChannel(final ChannelTreeNode t){
     final PromelaTree tr1 = (PromelaTree) t.getChild(1);
-    final String name = t.getChild(0).getText();
+
   //  procEvent.put(name,new THashSet<IdentifierProxy>());
     //chan.put(name,new ChanInfo());
     tr1.acceptVisitor(this);
@@ -349,7 +349,11 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitCondition(final ConditionTreeNode t)
   {
-    // TODO Auto-generated method stub
+    if(t.getChildCount()>0){
+      for(int i=0;i<t.getChildCount();i++){
+        ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+      }
+    }
     return null;
   }
 
