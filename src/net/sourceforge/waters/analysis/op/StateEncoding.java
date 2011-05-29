@@ -35,7 +35,7 @@ import net.sourceforge.waters.model.des.StateProxy;
  * the order in which they are found in the input. There is support to modify
  * an encoding after it has been created. However, transition relations are
  * not expected to store the state encoding after creation, so changes to the
- * state encoding will not affect any transition relation that have been
+ * state encoding will not affect any transition relation that has been
  * created.</P>
  *
  * <P>States in the encoding may be missing, represented by <CODE>null</CODE>.

@@ -74,6 +74,7 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Constructors
+
   /**
    * Creates a new transition relation from the given automaton,
    * using default (temporary) state and event encodings.
@@ -167,7 +168,6 @@ public class ListBufferTransitionRelation
     mUsedEvents.set(first, numEvents, true);
   }
 
-
   /**
    * Creates an empty transition relation. This method creates a transition
    * relation with the given number of states and event encoding, but without
@@ -187,13 +187,12 @@ public class ListBufferTransitionRelation
    *         is too large to be encoded in the bit sizes used by the
    *         list buffer implementations.
    */
-  public ListBufferTransitionRelation
-    (final String name,
-     final ComponentKind kind,
-     final EventEncoding eventEnc,
-     final int numStates,
-     final int config)
-    throws OverflowException
+  public ListBufferTransitionRelation(final String name,
+                                      final ComponentKind kind,
+                                      final EventEncoding eventEnc,
+                                      final int numStates,
+                                      final int config)
+  throws OverflowException
   {
     checkConfig(config);
     mName = name;
@@ -213,6 +212,49 @@ public class ListBufferTransitionRelation
     final int tau = EventEncoding.TAU;
     final int first = eventEnc.getProperEvent(tau) == null ? tau + 1 : tau;
     mUsedEvents.set(first, numEvents, true);
+  }
+
+  /**
+   * Creates an empty transition relation.
+   * @param  name             The name of the new transition relation.
+   * @param  kind             The automaton type to be recorded for the new
+   *                          transition relation.
+   * @param  numProperEvents  The number of proper events (i.e.,
+   *                          not propositions) used by the new transition
+   *                          relation.
+   * @param  numPropositions  The number of propositions used by the new
+   *                          transition relation.
+   * @param  numStates        The number of states to be created.
+   * @param  config           Configuration flags defining which transition
+   *                          buffers are to be created. Should be one of
+   *                          {@link #CONFIG_SUCCESSORS},
+   *                          {@link #CONFIG_PREDECESSORS},
+   *                          or {@link #CONFIG_ALL}.
+   * @throws OverflowException if given numbers of states and events
+   *         are too large to be encoded in the bit sizes used by the
+   *         list buffer implementations.
+   */
+  public ListBufferTransitionRelation(final String name,
+                                      final ComponentKind kind,
+                                      final int numProperEvents,
+                                      final int numPropositions,
+                                      final int numStates,
+                                      final int config)
+  throws OverflowException
+  {
+    checkConfig(config);
+    mName = name;
+    mKind = kind;
+    mStateBuffer = new IntStateBuffer(numStates, numPropositions);
+    if ((config & CONFIG_SUCCESSORS) != 0) {
+      mSuccessorBuffer =
+        new OutgoingTransitionListBuffer(numProperEvents, numStates, 0);
+    }
+    if ((config & CONFIG_PREDECESSORS) != 0) {
+      mPredecessorBuffer =
+        new IncomingTransitionListBuffer(numProperEvents, numStates, 0);
+    }
+    mUsedEvents = new BitSet(numProperEvents);
   }
 
   /**

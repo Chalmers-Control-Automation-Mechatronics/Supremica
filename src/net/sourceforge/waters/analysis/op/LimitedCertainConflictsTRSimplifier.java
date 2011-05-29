@@ -87,6 +87,8 @@ public class LimitedCertainConflictsTRSimplifier
     int numReachable = rel.getNumberOfReachableStates();
     if (mCoreachableStates.cardinality() == rel.getNumberOfReachableStates()) {
       return false;
+    } else if (mCertainConflictsInfo != null) {
+      mCertainConflictsInfo.setBlockingStates(mCoreachableStates);
     }
     final int tauID = EventEncoding.TAU;
     final int numStates = rel.getNumberOfStates();
@@ -125,6 +127,10 @@ public class LimitedCertainConflictsTRSimplifier
               final int victim = victims.get(index);
               rel.removeOutgoingTransitions(victim);
               rel.setMarked(victim, defaultID, false);
+              if (mCertainConflictsInfo != null) {
+                mCertainConflictsInfo.
+                  addCertainConflictTransition(victim, tauID, state);
+              }
             }
             victims.clear();
           }
@@ -134,6 +140,7 @@ public class LimitedCertainConflictsTRSimplifier
             final int event = mPredecessorsIterator.getCurrentEvent();
             final int pred = mPredecessorsIterator.getCurrentSourceState();
             if (event != tauID && mCoreachableStates.get(pred)) {
+              final int oldNumVictims = victims.size();
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
@@ -149,6 +156,11 @@ public class LimitedCertainConflictsTRSimplifier
                     break;
                   }
                 }
+              }
+              if (mCertainConflictsInfo != null &&
+                  victims.size() > oldNumVictims) {
+                mCertainConflictsInfo.
+                  addCertainConflictTransition(pred, event, state);
               }
             }
           }
@@ -185,6 +197,9 @@ public class LimitedCertainConflictsTRSimplifier
           }
         }
       }
+    }
+    if (mCertainConflictsInfo != null) {
+      mCertainConflictsInfo.setCertainConflictStates(mCoreachableStates);
     }
 
     final int numCoreachable = mCoreachableStates.cardinality();
@@ -230,6 +245,7 @@ public class LimitedCertainConflictsTRSimplifier
   @Override
   public void reset()
   {
+    mCertainConflictsInfo = null;
     mPredecessorsIterator = null;
     mCoreachableStates = null;
     mUnvisitedStates = null;
@@ -244,6 +260,11 @@ public class LimitedCertainConflictsTRSimplifier
     return mHasRemovedTransitions;
   }
 
+  public LimitedCertainConflictsInfo getCertainConflictsInfo()
+  {
+    return mCertainConflictsInfo;
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
@@ -252,6 +273,10 @@ public class LimitedCertainConflictsTRSimplifier
   throws AnalysisException
   {
     super.setUp();
+    if (!getAppliesPartitionAutomatically()) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mCertainConflictsInfo = new LimitedCertainConflictsInfo(rel);
+    }
     mHasRemovedTransitions = false;
   }
 
@@ -320,6 +345,7 @@ public class LimitedCertainConflictsTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private LimitedCertainConflictsInfo mCertainConflictsInfo;
   private boolean mHasRemovedTransitions;
 
   private BitSet mCoreachableStates;

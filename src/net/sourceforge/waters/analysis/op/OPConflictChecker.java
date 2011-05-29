@@ -46,7 +46,6 @@ import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
@@ -300,16 +299,14 @@ public class OPConflictChecker
     mMonolithicConflictChecker = checker;
   }
 
-  public void setCompositionalLanguageInclusionChecker
-    (final LanguageInclusionChecker checker)
+  public void setCompositionalSafetyVerifier(final SafetyVerifier checker)
   {
-    mCompositionalLanguageInclusionChecker = checker;
+    mCompositionalSafetyVerifier = checker;
   }
 
-  public void setLanguageInclusionConflictChecker
-    (final LanguageInclusionChecker checker)
+  public void setMonolithicSafetyVerifier(final SafetyVerifier checker)
   {
-    mMonolithicLanguageInclusionChecker = checker;
+    mMonolithicSafetyVerifier = checker;
   }
 
 
@@ -354,30 +351,28 @@ public class OPConflictChecker
     }
   }
 
-  private void setupLanguageInclusionCheckers()
+  private void setupSafetyVerifiers()
   {
     final ProductDESProxyFactory factory = getFactory();
-    if (mCurrentMonolithicLanguageInclusionChecker == null) {
-      if (mMonolithicLanguageInclusionChecker == null) {
-        mCurrentMonolithicLanguageInclusionChecker =
+    if (mCurrentMonolithicSafetyVerifier == null) {
+      if (mMonolithicSafetyVerifier == null) {
+        mCurrentMonolithicSafetyVerifier =
           new NativeLanguageInclusionChecker(factory);
       } else {
-        mCurrentMonolithicLanguageInclusionChecker =
-          mMonolithicLanguageInclusionChecker;
+        mCurrentMonolithicSafetyVerifier = mMonolithicSafetyVerifier;
       }
       final int nlimit = getFinalStepNodeLimit();
-      mCurrentMonolithicLanguageInclusionChecker.setNodeLimit(nlimit);
+      mCurrentMonolithicSafetyVerifier.setNodeLimit(nlimit);
       final int tlimit = getFinalStepTransitionLimit();
-      mCurrentMonolithicLanguageInclusionChecker.setTransitionLimit(tlimit);
+      mCurrentMonolithicSafetyVerifier.setTransitionLimit(tlimit);
     }
-    if (mCurrentCompositionalLanguageInclusionChecker == null) {
-      if (mCompositionalLanguageInclusionChecker == null) {
-        mCurrentCompositionalLanguageInclusionChecker =
+    if (mCurrentCompositionalSafetyVerifier == null) {
+      if (mCompositionalSafetyVerifier == null) {
+        mCurrentCompositionalSafetyVerifier =
           new ModularControllabilityChecker
-            (factory, mCurrentMonolithicLanguageInclusionChecker);
+            (factory, mCurrentMonolithicSafetyVerifier);
       } else {
-        mCurrentCompositionalLanguageInclusionChecker =
-          mCompositionalLanguageInclusionChecker;
+        mCurrentCompositionalSafetyVerifier = mCompositionalSafetyVerifier;
       }
     }
   }
@@ -476,7 +471,7 @@ public class OPConflictChecker
     mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
     setupSynchronousProductBuilder();
     setupMonolithicConflictChecker();
-    setupLanguageInclusionCheckers();
+    setupSafetyVerifiers();
     mModifyingSteps = new ArrayList<AbstractionStep>();
     mNumOverflows = 0;
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
@@ -493,8 +488,8 @@ public class OPConflictChecker
     mSelectingHeuristic = null;
     mCurrentSynchronousProductBuilder = null;
     mCurrentMonolithicConflictChecker = null;
-    mCurrentCompositionalLanguageInclusionChecker = null;
-    mCurrentMonolithicLanguageInclusionChecker = null;
+    mCurrentCompositionalSafetyVerifier = null;
+    mCurrentMonolithicSafetyVerifier = null;
     mCurrentAutomata = null;
     mAutomatonInfoMap = null;
     mCurrentEvents = null;
@@ -1096,9 +1091,9 @@ public class OPConflictChecker
       builder.getKindTranslator();
     final SafetyVerifier checker;
     if (languageInclusionModel.getAutomata().size() > 2) {
-      checker = mCurrentCompositionalLanguageInclusionChecker;
+      checker = mCurrentCompositionalSafetyVerifier;
     } else {
-      checker = mCurrentMonolithicLanguageInclusionChecker;
+      checker = mCurrentMonolithicSafetyVerifier;
     }
     checker.setKindTranslator(languageInclusionTranslator);
     checker.setModel(languageInclusionModel);
@@ -1251,7 +1246,7 @@ public class OPConflictChecker
       tau = syncStep.getHiddenEvent();
     }
     recordStatistics(aut);
-    final MergeStep simpStep = mAbstractionRule.applyRule(aut, tau);
+    final AbstractionStep simpStep = mAbstractionRule.applyRule(aut, tau);
     if (syncStep != null || simpStep != null) {
       if (syncStep != null) {
         mModifyingSteps.add(syncStep);
@@ -1394,7 +1389,8 @@ public class OPConflictChecker
   private ConflictTraceProxy expandTrace(final ConflictTraceProxy trace)
     throws AnalysisException
   {
-    List<TraceStepProxy> traceSteps = getSaturatedTraceSteps(trace);
+    final List<TraceStepProxy> unsat = trace.getTraceSteps();
+    List<TraceStepProxy> traceSteps = getSaturatedTraceSteps(unsat);
     final int size = mModifyingSteps.size();
     final ListIterator<AbstractionStep> iter =
       mModifyingSteps.listIterator(size);
@@ -1432,11 +1428,10 @@ public class OPConflictChecker
    * for the result automaton.
    */
   private List<TraceStepProxy> getSaturatedTraceSteps
-    (final ConflictTraceProxy trace)
+    (final List<TraceStepProxy> steps)
   {
     final ProductDESProxyFactory factory = getFactory();
     final int numAutomata = mCurrentAutomata.size();
-    final List<TraceStepProxy> steps = trace.getTraceSteps();
     final int numSteps = steps.size();
     final List<TraceStepProxy> convertedSteps =
         new ArrayList<TraceStepProxy>(numSteps);
@@ -2535,8 +2530,8 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Rule Application
-    abstract MergeStep applyRule(final AutomatonProxy aut,
-                                 final EventProxy tau)
+    abstract AbstractionStep applyRule(final AutomatonProxy aut,
+                                       final EventProxy tau)
       throws AnalysisException;
 
     //#######################################################################
@@ -2570,7 +2565,7 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Overrides for AbstractionRule
-    MergeStep applyRule(final AutomatonProxy aut, final EventProxy tau)
+    AbstractionStep applyRule(final AutomatonProxy aut, final EventProxy tau)
       throws AnalysisException
     {
       try {
@@ -2626,11 +2621,11 @@ public class OPConflictChecker
       return eventEnc;
     }
 
-    MergeStep createStep(final AutomatonProxy input,
-                         final StateEncoding inputStateEnc,
-                         final AutomatonProxy output,
-                         final StateEncoding outputStateEnc,
-                         final EventProxy tau)
+    AbstractionStep createStep(final AutomatonProxy input,
+                               final StateEncoding inputStateEnc,
+                               final AutomatonProxy output,
+                               final StateEncoding outputStateEnc,
+                               final EventProxy tau)
     {
       final List<int[]> partition = mSimplifier.getResultPartition();
       if (mSimplifier.isObservationEquivalentAbstraction()) {
@@ -2703,6 +2698,36 @@ public class OPConflictChecker
         simplifier.setDefaultMarkingID(markingID);
       }
       return eventEnc;
+    }
+
+    @Override
+    AbstractionStep createStep(final AutomatonProxy input,
+                               final StateEncoding inputStateEnc,
+                               final AutomatonProxy output,
+                               final StateEncoding outputStateEnc,
+                               final EventProxy tau)
+    {
+      if (mCertainConflictsSimplifier != null &&
+          mCertainConflictsSimplifier.hasRemovedTransitions()) {
+        final ChainTRSimplifier chain = getSimplifier();
+        boolean oeq1 = true;
+        for (int index = 0; index < mCertainConflictsIndex; index++) {
+          final TransitionRelationSimplifier simp = chain.getStep(index);
+          oeq1 &= simp.isObservationEquivalentAbstraction();
+        }
+        final int size = chain.size();
+        boolean oeq2 = true;
+        for (int index = mCertainConflictsIndex + 1; index < size; index++) {
+          final TransitionRelationSimplifier simp = chain.getStep(index);
+          oeq2 &= simp.isObservationEquivalentAbstraction();
+        }
+        final List<int[]> partition = chain.getResultPartition();
+        return new CertainConflictsStep(output, input, tau, inputStateEnc,
+                                        partition, outputStateEnc, oeq1, oeq2);
+      } else {
+        return super.createStep(input, inputStateEnc,
+                                output, outputStateEnc, tau);
+      }
     }
 
     //#######################################################################
@@ -3979,7 +4004,6 @@ public class OPConflictChecker
    * An abstraction step in which the result automaton is obtained by
    * merging states of the original automaton (automaton quotient).
    */
-  @SuppressWarnings("unused")
   private class CertainConflictsStep extends AbstractionStep
   {
 
@@ -4075,12 +4099,75 @@ public class OPConflictChecker
       convertedSteps = delegate.convertCrucialSteps(crucialSteps);
       final LimitedCertainConflictsTRSimplifier simplifier =
         rule.getCertainConflictsSimplifier();
-      simplifier.setTransitionRelation(rel);
+      final int lconfig = simplifier.getPreferredInputConfiguration();
+      ListBufferTransitionRelation copy =
+        new ListBufferTransitionRelation(rel, lconfig);
+      simplifier.setTransitionRelation(copy);
       simplifier.setAppliesPartitionAutomatically(false);
+      simplifier.run();
+      final LimitedCertainConflictsInfo info =
+        simplifier.getCertainConflictsInfo();
+      simplifier.reset();
+      copy = null;
 
-      // TODO Proper trace expansion for certain conflicts ...
-      assert false;
-      return null;
+      final ProductDESProxyFactory factory = getFactory();
+      final KindTranslator translator = getKindTranslator();
+      final CertainConflictsTraceExpander expander =
+        new CertainConflictsTraceExpander(factory,
+                                          translator,
+                                          mCompositionalSafetyVerifier);
+      final int endConvertedSteps = convertedSteps.size() - 1;
+      SearchRecord record = convertedSteps.get(endConvertedSteps);
+      int depth = convertedSteps.size();
+      int endState = record.getState();
+      while (!info.canSilentlyReachBlockingState(endState)) {
+        final int numTraceSteps = traceSteps.size();
+        final TraceStepProxy lastTraceStep = traceSteps.get(numTraceSteps - 1);
+        expander.setStartStates(lastTraceStep);
+        final ListBufferTransitionRelation testrel =
+          info.createTestAutomaton(rel, ":certainconf", endState);
+        final StateEncoding stateEnc = new StateEncoding();
+        final AutomatonProxy testaut =
+          testrel.createAutomaton(factory, eventEnc, stateEnc);
+        final Collection<EventProxy> uncontrollables =
+          info.getUncontrollableEvents(testrel, eventEnc);
+        expander.setCertainConflictsAutomaton
+          (originalAut, testaut, uncontrollables);
+        final List<TraceStepProxy> additionalSteps = expander.run();
+        final List<TraceStepProxy> saturatedSteps =
+          getSaturatedTraceSteps(additionalSteps);
+        final Iterator<TraceStepProxy> iter = saturatedSteps.iterator();
+        iter.next();
+        while (iter.hasNext()) {
+          final TraceStepProxy step = iter.next();
+          traceSteps.add(step);
+          final EventProxy event = step.getEvent();
+          final int ecode = eventEnc.getEventCode(event);
+          if (ecode >= 0) {
+            final Map<AutomatonProxy,StateProxy> map = step.getStateMap();
+            final StateProxy state = map.get(testaut);
+            endState = stateEnc.getStateCode(state);
+            record = new SearchRecord(endState, depth++, ecode, record);
+            convertedSteps.add(record);
+          }
+        }
+      }
+      final int tauID = EventEncoding.TAU;
+      while (!info.isBlockingState(endState)) {
+        endState = info.getCertainConflictsSuccessor(endState, tauID);
+        record = new SearchRecord(endState, depth++, tauID, record);
+        convertedSteps.add(record);
+      }
+
+      delegate =
+        createDelegate(null, originalAut, mOriginalStateEncoding,
+                       partition1, null, mIsObservationEquivalentBefore);
+      delegate.setupTraceConversion();
+      if (modified1) {
+        convertedSteps = delegate.convertCrucialSteps(convertedSteps);
+      }
+      delegate.mergeTraceSteps(traceSteps, convertedSteps);
+      return traceSteps;
     }
 
     //#######################################################################
@@ -4368,8 +4455,8 @@ public class OPConflictChecker
   private boolean mSubsumptionEnabled;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
-  private SafetyVerifier mCompositionalLanguageInclusionChecker;
-  private SafetyVerifier mMonolithicLanguageInclusionChecker;
+  private SafetyVerifier mCompositionalSafetyVerifier;
+  private SafetyVerifier mMonolithicSafetyVerifier;
 
   private List<AutomatonProxy> mCurrentAutomata;
   private Map<AutomatonProxy,AutomatonInfo> mAutomatonInfoMap;
@@ -4399,8 +4486,8 @@ public class OPConflictChecker
   private Comparator<Candidate> mSelectingHeuristic;
   private SynchronousProductBuilder mCurrentSynchronousProductBuilder;
   private ConflictChecker mCurrentMonolithicConflictChecker;
-  private SafetyVerifier mCurrentCompositionalLanguageInclusionChecker;
-  private SafetyVerifier mCurrentMonolithicLanguageInclusionChecker;
+  private SafetyVerifier mCurrentCompositionalSafetyVerifier;
+  private SafetyVerifier mCurrentMonolithicSafetyVerifier;
 
 
   //#########################################################################
