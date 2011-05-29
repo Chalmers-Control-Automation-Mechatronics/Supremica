@@ -174,8 +174,8 @@ public class LimitedCertainConflictsInfo
   void setBlockingStates(final BitSet coreachable)
   {
     for (int state = coreachable.nextClearBit(0);
-         state >= 0;
-         state = coreachable.nextClearBit(state)) {
+         state < mNumberOfStates;
+         state = coreachable.nextClearBit(state + 1)) {
       mBlockingStates.set(state);
     }
   }
@@ -183,8 +183,8 @@ public class LimitedCertainConflictsInfo
   void setCertainConflictStates(final BitSet coreachable)
   {
     for (int state = coreachable.nextClearBit(0);
-         state >= 0;
-         state = coreachable.nextClearBit(state)) {
+         state < mNumberOfStates;
+         state = coreachable.nextClearBit(state + 1)) {
       mCertainConflictStates.set(state);
     }
   }

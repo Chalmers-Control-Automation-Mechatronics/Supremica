@@ -547,6 +547,9 @@ public class OPConflictChecker
     final SilentContinuationTRSimplifier silentContinuationRemover =
       new SilentContinuationTRSimplifier();
     chain.add(silentContinuationRemover);
+    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
+      new LimitedCertainConflictsTRSimplifier();
+    final int ccindex = chain.add(certainConflictsRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
@@ -559,7 +562,7 @@ public class OPConflictChecker
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
-    return new StandardTRSimplifierAbstractionRule(chain, -1);
+    return new StandardTRSimplifierAbstractionRule(chain, ccindex);
   }
 
   private AbstractionRule createGeneralisedNonblockingAbstractionChain()
@@ -3398,6 +3401,7 @@ public class OPConflictChecker
     {
       mEventEncoding = enc;
       mTransitionRelation = rel;
+      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       final EventProxy alpha = mAbstractionRule.getUsedPreconditionMarking();
       mPreconditionMarkingID = enc.getEventCode(alpha);
     }
@@ -4115,7 +4119,7 @@ public class OPConflictChecker
       final CertainConflictsTraceExpander expander =
         new CertainConflictsTraceExpander(factory,
                                           translator,
-                                          mCompositionalSafetyVerifier);
+                                          mCurrentCompositionalSafetyVerifier);
       final int endConvertedSteps = convertedSteps.size() - 1;
       SearchRecord record = convertedSteps.get(endConvertedSteps);
       int depth = convertedSteps.size();
@@ -4160,8 +4164,9 @@ public class OPConflictChecker
       }
 
       delegate =
-        createDelegate(null, originalAut, mOriginalStateEncoding,
-                       partition1, null, mIsObservationEquivalentBefore);
+        createDelegate(resultAut, originalAut, mOriginalStateEncoding,
+                       partition1, mResultStateEncoding,
+                       mIsObservationEquivalentBefore);
       delegate.setupTraceConversion();
       if (modified1) {
         convertedSteps = delegate.convertCrucialSteps(convertedSteps);
