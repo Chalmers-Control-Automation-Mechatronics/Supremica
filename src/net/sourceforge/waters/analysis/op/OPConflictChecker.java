@@ -4092,7 +4092,7 @@ public class OPConflictChecker
         (originalAut, eventEnc, mOriginalStateEncoding, config);
       chain.setTransitionRelation(rel);
       final int ccindex = rule.getCertainConflictsIndex();
-      final boolean modified1 = chain.runTo(ccindex);
+      chain.runTo(ccindex);
       final List<int[]> partition1 = chain.getResultPartition();
       final List<int[]> partition2 = computeQuotientPartition(partition1);
       delegate =
@@ -4115,16 +4115,17 @@ public class OPConflictChecker
       copy = null;
 
       final ProductDESProxyFactory factory = getFactory();
-      final KindTranslator translator = getKindTranslator();
-      final CertainConflictsTraceExpander expander =
-        new CertainConflictsTraceExpander(factory,
-                                          translator,
-                                          mCurrentCompositionalSafetyVerifier);
+      CertainConflictsTraceExpander expander = null;
       final int endConvertedSteps = convertedSteps.size() - 1;
       SearchRecord record = convertedSteps.get(endConvertedSteps);
       int depth = convertedSteps.size();
       int endState = record.getState();
       while (!info.canSilentlyReachBlockingState(endState)) {
+        if (expander == null) {
+          final KindTranslator translator = getKindTranslator();
+          expander = new CertainConflictsTraceExpander
+            (factory, translator, mCurrentCompositionalSafetyVerifier);
+        }
         final int numTraceSteps = traceSteps.size();
         final TraceStepProxy lastTraceStep = traceSteps.get(numTraceSteps - 1);
         expander.setStartStates(lastTraceStep);
@@ -4159,18 +4160,17 @@ public class OPConflictChecker
       final int tauID = EventEncoding.TAU;
       while (!info.isBlockingState(endState)) {
         endState = info.getCertainConflictsSuccessor(endState, tauID);
-        record = new SearchRecord(endState, depth++, tauID, record);
-        convertedSteps.add(record);
       }
+      record = new SearchRecord(endState, depth++, tauID, record);
+      convertedSteps.add(record);
 
       delegate =
         createDelegate(resultAut, originalAut, mOriginalStateEncoding,
                        partition1, mResultStateEncoding,
                        mIsObservationEquivalentBefore);
       delegate.setupTraceConversion();
-      if (modified1) {
-        convertedSteps = delegate.convertCrucialSteps(convertedSteps);
-      }
+      convertedSteps = getCrucialSteps(convertedSteps);
+      convertedSteps = delegate.convertCrucialSteps(convertedSteps);
       delegate.mergeTraceSteps(traceSteps, convertedSteps);
       return traceSteps;
     }
@@ -4269,14 +4269,41 @@ public class OPConflictChecker
             code = classMap.get(state);
             set.add(code);
           }
+          final int index = quotient.size();
           final int[] newclazz = set.toArray();
           Arrays.sort(newclazz);
           quotient.add(newclazz);
-          trivial &= set.size() == 1;
+          trivial &= newclazz.length == 1 && newclazz[0] == index;
           set.clear();
         }
         return trivial ? null : quotient;
       }
+    }
+
+    private List<SearchRecord> getCrucialSteps
+      (final List<SearchRecord> rawSteps)
+    {
+      final int tau = EventEncoding.TAU;
+      final int len = rawSteps.size() - 1;
+      final List<SearchRecord> crucialSteps = new ArrayList<SearchRecord>(len);
+      int crucialState = -1;
+      int crucialEvent = tau;
+      SearchRecord record;
+      for (final SearchRecord raw : rawSteps) {
+        final int event = raw.getEvent();
+        if (event >= tau) {
+          if (crucialEvent != tau) {
+            record =
+              new SearchRecord(crucialState, 0, crucialEvent, null);
+            crucialSteps.add(record);
+          }
+          crucialEvent = event;
+        }
+        crucialState = raw.getState();
+      }
+      record = new SearchRecord(crucialState, 0, crucialEvent, null);
+      crucialSteps.add(record);
+      return crucialSteps;
     }
 
     //#######################################################################

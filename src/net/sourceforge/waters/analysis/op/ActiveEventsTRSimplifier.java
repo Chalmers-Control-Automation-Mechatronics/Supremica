@@ -74,7 +74,7 @@ public class ActiveEventsTRSimplifier
       }
     }
     final int numClasses = map.size();
-    if (numClasses == numStates) {
+    if (numClasses == rel.getNumberOfReachableStates()) {
       return false;
     } else {
       final int[][] partition = new int[numClasses][];

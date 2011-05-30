@@ -137,14 +137,14 @@ public class LimitedCertainConflictsInfo
           do {
             result.addTransition(state, event, dump);
             event = todump.nextSetBit(event + 1);
-          } while (event < mNumberOfEvents);
+          } while (event >= 0);
           result.setReachable(dump, true);
           todump.or(uncontrollable);
         }
       }
     }
     for (int event = uncontrollable.nextSetBit(nontau);
-         event < mNumberOfEvents;
+         event >= 0;
          event = uncontrollable.nextSetBit(event + 1)) {
       result.addTransition(dump, event, dump);
     }
