@@ -151,38 +151,72 @@ public class PromelaGraph
       PromelaLabel label2;
       PromelaNode targetNode,sourceNode;
       PromelaEdge newEdge;
+      PromelaEdge specialEdge1=null;
+      PromelaEdge specialEdge2 = null;
+      final Collection<Proxy> specialLabel = new ArrayList<Proxy>();
+      boolean simpleFirst = false;
+      boolean simpleSecond = false;
+
+
       for (final PromelaEdge edge : edgesOfFirst) {
-        if (edge.getSource() == first.getStart()) {
+        if (edge.getSource() == first.getStart()&& edge.getTarget()!=first.getEnd()) {
           label1 = edge.getLabelBlock();
           targetNode = edge.getTarget();
           newEdge = new PromelaEdge(newStartNode, targetNode, label1);
           edgesOfResult.add(newEdge);
-        } else if(edge.getTarget() == first.getEnd()){
-          label2 = edge.getLabelBlock();
+          simpleFirst = false;
+        } else if(edge.getTarget() == first.getEnd()&& edge.getSource()!=first.getStart()){
+          label1 = edge.getLabelBlock();
           sourceNode = edge.getSource();
-          newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
+          newEdge = new PromelaEdge(sourceNode, newEndNode, label1);
           edgesOfResult.add(newEdge);
+          simpleFirst = false;
+        }else if(edge.getTarget()==first.getEnd() && edge.getSource()==first.getStart()){
+          label1 = edge.getLabelBlock();
+          specialLabel.addAll(label1.getLabel());
+          specialEdge1 = new PromelaEdge(newStartNode,newEndNode,label1);
+          simpleFirst = true;
+          edgesOfResult.add(specialEdge1);
         }
         else {
           edgesOfResult.add(edge);
+          simpleFirst = false;
         }
       }
 
       for (final PromelaEdge edge : edgesOfSecond) {
-        if (edge.getSource() == second.getStart()) {
-          label1 = edge.getLabelBlock();
+        if (edge.getSource() == second.getStart()&& edge.getTarget()!=second.getEnd()) {
+          label2 = edge.getLabelBlock();
           targetNode = edge.getTarget();
-          newEdge = new PromelaEdge(newStartNode, targetNode, label1);
+          newEdge = new PromelaEdge(newStartNode, targetNode, label2);
           edgesOfResult.add(newEdge);
-        }else if(edge.getTarget() == second.getEnd()){
+          simpleSecond = false;
+        }else if(edge.getTarget() == second.getEnd()&& edge.getSource()!=second.getStart()){
           label2 = edge.getLabelBlock();
           sourceNode = edge.getSource();
           newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
           edgesOfResult.add(newEdge);
+          simpleSecond = false;
+        }else if(edge.getTarget()==second.getEnd() && edge.getSource()==second.getStart()){
+          label2 = edge.getLabelBlock();
+          specialLabel.addAll(label2.getLabel());
+          specialEdge2 = new PromelaEdge(newStartNode,newEndNode,label2);
+          edgesOfResult.add(specialEdge2);
+          simpleSecond = true;
         }
         else {
           edgesOfResult.add(edge);
+          simpleSecond = false;
         }
+      }
+      if(simpleFirst&& simpleSecond){
+        edgesOfResult.remove(specialEdge1);
+        edgesOfResult.remove(specialEdge2);
+        final PromelaLabel label = new PromelaLabel(specialLabel);
+        final PromelaEdge edge = new PromelaEdge(newStartNode, newEndNode,label);
+        edgesOfResult.add(edge);
+        simpleFirst = false;
+        simpleSecond = false;
       }
 
       final List<PromelaNode> nodesOfResult =
