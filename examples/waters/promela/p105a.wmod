@@ -5,9 +5,9 @@
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="exch_name">
             <RangeList>
-                <EnumSetExpression Text="[A:1,A:2]">
-                    <SimpleIdentifier Name="A:1"/>
-                    <SimpleIdentifier Name="A:2"/>
+                <EnumSetExpression Text="[A_0,A_1]">
+                    <SimpleIdentifier Name="A_0"/>
+                    <SimpleIdentifier Name="A_1"/>
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="33"/>
@@ -31,9 +31,9 @@
     </EventDeclList>
     <ComponentList>
         <ForeachComponent Name="procid">
-            <EnumSetExpression Text="[A_1,A_2]">
+            <EnumSetExpression Text="[A_0,A_1]">
+                <SimpleIdentifier Name="A_0"/>
                 <SimpleIdentifier Name="A_1"/>
-                <SimpleIdentifier Name="A_2"/>
             </EnumSetExpression>
             <ComponentList>
                 <SimpleComponent Kind="PLANT">
@@ -161,22 +161,22 @@
                     <Edge Target="B_2" Source="B_1">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_name">
-                                <SimpleIdentifier Name="A_1"/>
+                                <SimpleIdentifier Name="A_0"/>
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="121"/>
                             </IndexedIdentifier>
                             <IndexedIdentifier Name="exch_name">
-                                <SimpleIdentifier Name="A_1"/>
+                                <SimpleIdentifier Name="A_0"/>
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>
                             <IndexedIdentifier Name="exch_name">
-                                <SimpleIdentifier Name="A_2"/>
+                                <SimpleIdentifier Name="A_1"/>
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="121"/>
                             </IndexedIdentifier>
                             <IndexedIdentifier Name="exch_name">
-                                <SimpleIdentifier Name="A_2"/>
+                                <SimpleIdentifier Name="A_1"/>
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>
@@ -230,8 +230,8 @@
                 <EdgeList>
                     <Edge Target="S1" Source="S0">
                         <LabelBlock>
-                            <IndexedIdentifier Name="run">
-                                <SimpleIdentifier Name="A:1"/>
+                            <IndexedIdentifier Name="run_A">
+                                <SimpleIdentifier Name="A_0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-9" X="6"/>
@@ -240,8 +240,8 @@
                     </Edge>
                     <Edge Target="S2" Source="S1">
                         <LabelBlock>
-                            <IndexedIdentifier Name="run">
-                                <SimpleIdentifier Name="A:2"/>
+                            <IndexedIdentifier Name="run_A">
+                                <SimpleIdentifier Name="A_1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-3" X="4"/>
@@ -250,9 +250,7 @@
                     </Edge>
                     <Edge Target="S3" Source="S2">
                         <LabelBlock>
-                            <IndexedIdentifier Name="run">
-                                <SimpleIdentifier Name="B"/>
-                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-7" X="3"/>
                             </LabelGeometry>
