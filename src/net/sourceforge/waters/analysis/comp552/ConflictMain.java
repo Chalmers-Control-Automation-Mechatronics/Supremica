@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //##########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
+//# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   ConflictMain
 //##########################################################################
 //# $Id$
@@ -10,6 +10,8 @@
 package net.sourceforge.waters.analysis.comp552;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -86,6 +88,7 @@ public class ConflictMain
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);
+      final Collection<String> empty = Collections.emptyList();
 
       for (int i = 0; i < args.length; i++) {
         final String name = args[i];
@@ -98,6 +101,7 @@ public class ConflictMain
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
+          compiler.setEnabledPropositionNames(empty);
           des = compiler.compile();
         }
         final ConflictChecker checker = new ConflictChecker(des, desFactory);

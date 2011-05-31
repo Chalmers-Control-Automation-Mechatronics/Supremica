@@ -4184,14 +4184,7 @@ public class OPConflictChecker
       final TraceStepProxy step = steps.get(traceEnd);
       final StateProxy state = step.getStateMap().get(aut);
       final int code = mResultStateEncoding.getStateCode(state);
-      final int partitionEnd = mPartition.size() - 1;
-      final int[] bclazz = mPartition.get(partitionEnd);
-      for (final int elem : bclazz) {
-        if (elem == code) {
-          return true;
-        }
-      }
-      return false;
+      return code == mPartition.size() - 1;
     }
 
     private boolean isBlockingTrace(final List<SearchRecord> steps,

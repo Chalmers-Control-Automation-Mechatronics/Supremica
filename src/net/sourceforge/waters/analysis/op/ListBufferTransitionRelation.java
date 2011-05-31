@@ -255,6 +255,7 @@ public class ListBufferTransitionRelation
         new IncomingTransitionListBuffer(numProperEvents, numStates, 0);
     }
     mUsedEvents = new BitSet(numProperEvents);
+    mUsedEvents.set(0, numProperEvents);
   }
 
   /**

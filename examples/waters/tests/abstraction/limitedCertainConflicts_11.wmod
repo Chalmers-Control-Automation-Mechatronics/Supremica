@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="limitedCertainConflicts_11" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test for the Certains Conflicts Rule. This tests whether a large number of blocking staes are all merged correctly.</ns2:Comment>
+    <ns2:Comment>A test for the Certains Conflicts Rule. This tests whether a large number of blocking states are all merged correctly.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name=":symbols">
             <ConstantAliasExpression>
@@ -1129,25 +1129,25 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="S:7"/>
-                        <NodeRef Name="S:8"/>
                         <NodeRef Name="S:27"/>
                         <NodeRef Name="S:21"/>
-                        <NodeRef Name="S:32"/>
+                        <NodeRef Name="S:7"/>
+                        <NodeRef Name="S:8"/>
                         <NodeRef Name="S:3"/>
                         <NodeRef Name="S:36"/>
                         <NodeRef Name="S:19"/>
+                        <NodeRef Name="S:32"/>
                         <NodeRef Name="S:13"/>
                         <BoxGeometry>
                             <Box Y="336" X="96" Width="448" Height="256"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G1">
-                        <NodeRef Name="S:4"/>
                         <NodeRef Name="S:9"/>
+                        <NodeRef Name="S:4"/>
+                        <NodeRef Name="S:10"/>
                         <NodeRef Name="S:15"/>
                         <NodeRef Name="S:22"/>
-                        <NodeRef Name="S:10"/>
                         <BoxGeometry>
                             <Box Y="48" X="512" Width="144" Height="256"/>
                         </BoxGeometry>

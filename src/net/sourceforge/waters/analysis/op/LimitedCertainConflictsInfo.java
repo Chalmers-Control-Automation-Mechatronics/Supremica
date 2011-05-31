@@ -133,7 +133,7 @@ public class LimitedCertainConflictsInfo
           todump.clear(event);
         }
         int event = todump.nextSetBit(nontau);
-        if (event < mNumberOfEvents) {
+        if (event >= 0) {
           do {
             result.addTransition(state, event, dump);
             event = todump.nextSetBit(event + 1);
