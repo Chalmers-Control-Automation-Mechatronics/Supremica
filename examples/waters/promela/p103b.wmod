@@ -141,7 +141,7 @@
                             <Point Y="-6" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="C_2">
+                    <SimpleNode Name="C_3">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -152,7 +152,7 @@
                             <Point Y="-5" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="C_3">
+                    <SimpleNode Name="C_2">
                         <PointGeometry>
                             <Point Y="192" X="112"/>
                         </PointGeometry>
@@ -170,7 +170,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="C_2" Source="C_1">
+                    <Edge Target="C_3" Source="C_1">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="1"/>
@@ -183,7 +183,7 @@
                             <Point Y="195" X="90"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="C_3" Source="C_1">
+                    <Edge Target="C_2" Source="C_1">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="2"/>
@@ -193,7 +193,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="C_2" Source="C_3">
+                    <Edge Target="C_3" Source="C_2">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="1"/>

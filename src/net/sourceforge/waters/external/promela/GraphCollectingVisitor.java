@@ -49,6 +49,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   ArrayList<String> labels = new ArrayList<String>();
   final ArrayList<String> procNames = new ArrayList<String>();
   ArrayList<String> chanNames = new ArrayList<String>();
+  Collection<String> duplicatedRun = new ArrayList<String>();
 
   Collection<SimpleComponentProxy> mComponents = new ArrayList<SimpleComponentProxy>();
 
@@ -92,6 +93,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final GraphProxy graph = g.createGraphProxy(procName);
     final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName);
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
+
     mComponents.add(component);
 
     return null;
@@ -284,15 +286,38 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitInitial(final InitialTreeNode t)
   {
+    duplicatedRun = new ArrayList<String>();
+    Collection<String> output = new ArrayList<String>();
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
     final PromelaGraph initGraph = collectGraphs((PromelaTree) t.getChild(0));
+
+    output = distinct(duplicatedRun,output);
+    for(final String name: output){
+      for(final SimpleComponentProxy component: mComponents){
+        if(component.getName()==name){
+          //change this component
+          //how to store
+        }
+      }
+    }
+
     final GraphProxy graph = initGraph.createGraphProxy(t.getText());
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
     mComponents.add(component);
 
     return null;
   }
-
+public Collection<String> distinct(final Collection<String> t,final Collection<String> output){
+  final ArrayList<String> temp = new ArrayList<String>(t);
+  for(int i=0;i<t.size();i++){
+    final String compare = temp.get(i);
+    temp.set(i, null);
+    if(temp.contains(compare)){
+      output.add(compare);
+    }
+  }
+  return output;
+}
   public Object visitInitialStatement(final InitialStatementTreeNode t)
   {
     //assert t.getText().equals("atomic");
@@ -304,6 +329,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitRun(final RunTreeNode t)
   {
       final String name = t.getChild(0).getText();
+      duplicatedRun.add(name);
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name.toUpperCase());
       final PromelaGraph graph = new PromelaGraph(ident,mFactory);
       return graph;
