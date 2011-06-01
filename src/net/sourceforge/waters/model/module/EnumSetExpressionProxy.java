@@ -18,13 +18,13 @@ import java.util.List;
  * <P>An enumerated range consists of a list of names, its <I>atoms</I>,
  * which can be used as array indexes or as the range for a <I>foreach</I>
  * construct ({@link ForeachProxy}). In textual representation, enumerated
- * ranges are listed within curled braces, with their elements separated by
+ * ranges are listed within square brackets, with their elements separated by
  * commas.</P>
  *
  * <P>Examples:</P>
  * <UL>
- * <LI><CODE>{a, b, c}</CODE>;
- * <LI><CODE>{}</CODE>.
+ * <LI><CODE>[a, b, c]</CODE>;
+ * <LI><CODE>[]</CODE>.
  * </UL>
  *
  * @author Robi Malik

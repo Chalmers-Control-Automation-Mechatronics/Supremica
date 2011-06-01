@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.comp552;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
-
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -101,7 +100,7 @@ public class ConflictMain
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          compiler.setEnabledPropositionNames(empty);
+          compiler.setEnabledPropertyNames(empty);
           des = compiler.compile();
         }
         final ConflictChecker checker = new ConflictChecker(des, desFactory);
