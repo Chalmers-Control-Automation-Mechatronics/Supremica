@@ -3,9 +3,6 @@
 
 package net.sourceforge.waters.analysis.sd;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -17,30 +14,30 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
-
-
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import java.util.Collection;
 /**
- * A model verifier to check SD Singular prohibitable behavior Property.
+ * A model verifier to check SD Controllability Property.
  *
  * This wrapper can be used to check whether a model satisfies
- * SD Singular Prohibitable behavior property.
+ * SD Controllability Property iii.1
  *
- * The check is done by creating a test automata and modifying Plant
- * automata each prohibitable event in the model, and passing these models
- * to a modular language inclusion checker
+ * The check is done by creating a test automata and modifying Plant automata for
+ * each prohibitable event in the model, and passing these models to a modular
+ * language inclusion checker
  *
  * @see SDPropertyBuilder
- * @see ModularLanguageInclusionChecker
+ * @see Modular Language Inclusion Checker
  *
  * @author Mahvash Baloch , Robi Malik
  */
 
-public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
+public class SDCTwoVerifier extends AbstractSafetyVerifier
 {
 
   //#########################################################################
   //# Constructors
-  public SDSingularPropertyVerifier( final ProductDESProxy model,
+  public SDCTwoVerifier( final ProductDESProxy model,
                                      final ProductDESProxyFactory factory,
                                      final ControllabilityChecker checker)
 
@@ -49,7 +46,7 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
                  LanguageInclusionKindTranslator.getInstance(),
                  LanguageInclusionDiagnostics.getInstance(),
                  factory);
-           mChecker = checker;
+           cChecker = checker;
          }
 
 
@@ -58,21 +55,24 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
     setUp();
     try {
       final ProductDESProxy model = getModel();
-      final SDPropertyBuilder builder =
-          new SDPropertyBuilder(model, getFactory());
-      final List<EventProxy> Hibs =
-          (List<EventProxy>) builder.getHibEvents();
-      final int numHib = Hibs.size();
-      mCheckerStats = new ArrayList<VerificationResult>(numHib);
+
+	final Collection<AutomatonProxy> oldAutomata = model.getAutomata();
+
+      final int numaut = oldAutomata.size();
+
+      if (numaut == 0) {
+        return setSatisfiedResult();
+      }
+
+      final SD_Two_PropertyBuilder builder =
+          new SD_Two_PropertyBuilder(model, getFactory());
 
       ProductDESProxy convertedModel = null;
 
-      for (final EventProxy hib : Hibs)
-       {
-        convertedModel = builder.createSingularModel(hib);
-        final ModularLanguageInclusionChecker checker=
+      convertedModel = builder.createSDTwoModel();
+      final ModularLanguageInclusionChecker checker=
          new ModularLanguageInclusionChecker(convertedModel, getFactory(),
-                                              mChecker );
+                                              cChecker );
         checker.setModel(convertedModel);
         final VerificationResult result;
         try {
@@ -80,22 +80,22 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
         } finally {
 
           result = checker.getAnalysisResult();
+
           recordStatistics(result);
         }
         if (!result.isSatisfied()) {
           final SafetyTraceProxy counterexample =
               checker.getCounterExample();
-          mFailedAnswer = hib;
+
           return setFailedResult(counterexample);
         }
-      }
-      return setSatisfiedResult();
+
+    return setSatisfiedResult();
 
 
     } finally {
       tearDown();
-      mCheckerStats = null;
-    }
+      }
   }
 
   public EventProxy getFailedAnswer()
@@ -103,14 +103,12 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
     return mFailedAnswer;
   }
 
-
-  //#########################################################################
+//#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
-    return mChecker.supportsNondeterminism();
+    return cChecker.supportsNondeterminism();
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.ModelAnalyser
@@ -148,8 +146,7 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
     stats.setPeakNumberOfStates(mPeakNumberOfStates);
     stats.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
     stats.setPeakNumberOfTransitions(mPeakNumberOfTransitions);
-    stats.setCheckerResult(mCheckerStats);
-  }
+    }
 
 
   //#########################################################################
@@ -165,7 +162,7 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
     mTotalNumberOfTransitions += result.getPeakNumberOfTransitions();
     mPeakNumberOfTransitions =
         Math.max(mPeakNumberOfTransitions, result.getPeakNumberOfTransitions());
-    mCheckerStats.add(result);
+
   }
 
 
@@ -179,7 +176,6 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
   private double mTotalNumberOfTransitions;
   private double mPeakNumberOfTransitions;
 
-  private List<VerificationResult> mCheckerStats;
 
-  private final ControllabilityChecker mChecker;
+  private final ControllabilityChecker cChecker;
 }

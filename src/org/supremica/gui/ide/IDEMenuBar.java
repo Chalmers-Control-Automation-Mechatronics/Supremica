@@ -78,8 +78,12 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_apropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_bpropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
-
+import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
 
 /**
  * <P>
@@ -348,9 +352,24 @@ public class IDEMenuBar extends JMenuBar
             final Action SSingular =
               actions.getAction(AnalyzeSDSingularPropertyAction.class);
             mVerifyMenu.add(SSingular);
+            final Action Sdtwoa =
+              actions.getAction(AnalyzeSDCTwoApropertyAction.class);
+            mVerifyMenu.add(Sdtwoa);
+            final Action Sdtwob =
+              actions.getAction(AnalyzeSDCTwoBPropertyAction.class);
+            mVerifyMenu.add(Sdtwob);
+            final Action Sdthree1a =
+              actions.getAction(AnalyzeSDCThreep1_apropertyAction.class);
+            mVerifyMenu.add(Sdthree1a);
+            final Action Sdthree1b =
+              actions.getAction(AnalyzeSDCThreep1_bpropertyAction.class);
+            mVerifyMenu.add(Sdthree1b);
             final Action Sdfour =
               actions.getAction(AnalyzeSDCFourPropertyAction.class);
             mVerifyMenu.add(Sdfour);
+            final Action PTimeBeh =
+              actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
+            mVerifyMenu.add(PTimeBeh);
 
 		}
       }

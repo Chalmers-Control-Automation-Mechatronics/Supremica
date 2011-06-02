@@ -1,10 +1,3 @@
-//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
-//###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   SICProperty6Verifier
-//###########################################################################
-//# $Id: SICProperty6Verifier.java 5926 2010-09-23 03:54:41Z robi $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.sd;
@@ -19,6 +12,8 @@ import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import java.util.Collection;
 
 
 /**
@@ -58,6 +53,14 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
     setUp();
     try {
       final ProductDESProxy model = getModel();
+
+      final Collection<AutomatonProxy> oldAutomata = model.getAutomata();
+
+      final int numaut = oldAutomata.size();
+
+      if (numaut == 0) {
+        return setSatisfiedResult();
+      }
 
       final SDPropertyBuilder builder =
         new SDPropertyBuilder(model, getFactory());
@@ -99,6 +102,6 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
 
 
   //#########################################################################
-  //# Auxiliary Methods
+  //# Data Members
   private final ControllabilityChecker mChecker;
 }

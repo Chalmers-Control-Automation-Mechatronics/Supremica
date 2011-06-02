@@ -1,10 +1,4 @@
-//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
-//###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   SDPropertyBuilder
-//###########################################################################
-//# $Id$
+
 //###########################################################################
 
 
@@ -13,7 +7,9 @@ package net.sourceforge.waters.analysis.sd;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -22,13 +18,14 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
-* A converter to translate models to different models 
-* for checking SD Properties.(S - Singular Prohibitable behaviour and SD four)
+* A converter to translate models to different models for checking SD Properties.
+* (S - Singular Prohibitable behaviour, SD four and Proper Time Behavior)
 *
 * @author Mahvash Baloch, Robi Malik
 */
@@ -184,7 +181,7 @@ private AutomatonProxy createS_SingularTest(final EventProxy hib)
   newEvents.add(mMarking);
 
   final AutomatonProxy newTestAut =
-      mFactory.createAutomatonProxy("Test:Aut", ComponentKind.PROPERTY,
+      mFactory.createAutomatonProxy("TestSSPB", ComponentKind.PROPERTY,
                                    newEvents, states, transitions);
 
   return newTestAut;
@@ -227,7 +224,7 @@ for (final TransitionProxy transition : alltransitions) {
     }
 
 newEvents.add(enEvent);
-return mFactory.createAutomatonProxy("PlantSigma"+ pCounta, ComponentKind.PLANT,
+return mFactory.createAutomatonProxy(aut.getName() , aut.getKind(),
                                      newEvents, allStates, newTransitions);
 }
 
@@ -250,9 +247,9 @@ public ProductDESProxy createModelSDFour()
   final Collection <EventProxy> tevents = new ArrayList<EventProxy>();  //total events
 
   final AutomatonProxy testAut = createT_SDfour();
-
   newAutomata.add(testAut);                                      //add test automata in new
 
+  pCountw = 0;
 
   for (final AutomatonProxy oldAut : oldAutomata) {
      final AutomatonProxy newAut;
@@ -354,7 +351,7 @@ private AutomatonProxy createT_SDfour()
       transitions.add(OmTransition);
 
   final AutomatonProxy newTestAut =
-      mFactory.createAutomatonProxy("Test:Aut", ComponentKind.PROPERTY,
+      mFactory.createAutomatonProxy("TestSD4", ComponentKind.PROPERTY,
                                    newEvents, states, transitions);
 
   return newTestAut;
@@ -401,10 +398,198 @@ for (final StateProxy state : allStates) {
   }
     }
 
-return mFactory.createAutomatonProxy("PlantOmega"+ pCountw, ComponentKind.PLANT,
+return mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
                                      newEvents, allStates, newTransitions);
 }
+/* ------------------------------------------------------------------------------
+ * ----------------------------------------------------------------------------
+ * END OF SD iv ..............................................................
+ * -----------------------------------------------------------------------------
+ */
 
+ // PROPER TIME BeHAVIOUR
+public ProductDESProxy createModelproperTimeB()
+{
+
+  final Collection<AutomatonProxy> oldAutomata = mModel.getAutomata(); //get the automata
+  final Collection<EventProxy> allEvents = mModel.getEvents();
+
+  final int numaut = oldAutomata.size();
+  final List<AutomatonProxy> newAutomata =               // create a new array for new ones
+    new ArrayList<AutomatonProxy>(numaut);
+
+  final Collection <EventProxy> tevents = new ArrayList<EventProxy>();  //total events
+
+  getDefaultEvents();
+  final AutomatonProxy testAut = createT_pTime();
+  newAutomata.add(testAut);     //add test automata in new
+
+  for (final AutomatonProxy oldAut : oldAutomata) {
+    final AutomatonProxy newAut;
+    if (oldAut.getKind()== ComponentKind.PLANT)
+        {
+            newAut = modiAuto(oldAut);
+            newAutomata.add(newAut);
+          }
+  }
+
+  for(final EventProxy event: allEvents)
+    tevents.add(event);
+    tevents.add(que);
+
+  final String desname = mModel.getName();
+  final String name = desname + "-ProperTimeBehavior";
+  final String comment =
+    "Automatically generated from '" + desname +
+    "' to check Proper Time Behaviour";
+
+  return mFactory.createProductDESProxy(name, comment, null,
+                                        tevents, newAutomata);
+}
+
+  //#########################################################################
+//# Auxiliary Methods
+/**
+ * Creates the test automaton added to the model to check
+ * Proper Time Behavior
+ */
+private AutomatonProxy createT_pTime()
+{
+  // gets the events from automaton event alphabet
+  final Collection<EventProxy> allEvents = mModel.getEvents();
+
+  final Collection<EventProxy> newEvents = new ArrayList<EventProxy>();
+  final List<EventProxy> UpsilonEvents = new ArrayList<EventProxy>();
+  final List<EventProxy> SigmaEvents = new ArrayList<EventProxy>();
+  final List<EventProxy> propositions = new ArrayList<EventProxy>(1);
+
+
+  for (final EventProxy event : allEvents) {
+
+    final EventKind kind= event.getKind();
+
+    if((kind.equals(EventKind.UNCONTROLLABLE)) || (event.equals(tick)))
+      UpsilonEvents.add(event);
+
+      if(!(kind.equals(EventKind.PROPOSITION)))
+        SigmaEvents.add(event);
+
+      newEvents.add(event);
+   }
+
+   propositions.add(mMarking);
+
+  // creates the 2 states needed
+  final Collection<StateProxy> states = new ArrayList<StateProxy>(2);
+
+  // initial state has the default marking proposition
+  final StateProxy initialState =
+    mFactory.createStateProxy("S1", true, propositions);
+    states.add(initialState);
+  // next state does not have any marking
+  final StateProxy s2State =
+      mFactory.createStateProxy("S2", false, null);
+    states.add(s2State);
+
+   //create tau event
+
+   que =
+   mFactory.createEventProxy("que", EventKind.CONTROLLABLE, true);
+   newEvents.add(que);
+
+
+  // creates the transitions needed
+  final Collection<TransitionProxy> newtransitions
+  = new ArrayList<TransitionProxy>();
+
+     // self loop all events from Sigma on the initial state
+  for (final EventProxy event : SigmaEvents)
+  {final TransitionProxy transitions =
+        mFactory.createTransitionProxy(initialState, event, initialState);
+    newtransitions.add(transitions);}
+
+    for (final EventProxy event : UpsilonEvents) {
+        // the transition which accepts any event from the Upsilon event alphabet
+    final TransitionProxy upTransition =
+          mFactory.createTransitionProxy(s2State, event, initialState);
+          newtransitions.add(upTransition);
+    }
+
+    // the transitions which accepts only que
+    final TransitionProxy tauTransition =
+          mFactory.createTransitionProxy(initialState, que, s2State);
+      newtransitions.add(tauTransition);
+
+  final AutomatonProxy newTestAut =
+      mFactory.createAutomatonProxy("TestPTB", ComponentKind.PLANT,
+                                   newEvents, states, newtransitions);
+
+  return newTestAut;
+}
+
+/**
+ * Modifies the Plant component to construct the G-Omega automaton
+ * to check Proper Time Behavior
+ */
+
+private AutomatonProxy modiAuto (final AutomatonProxy aut)
+{
+
+final Collection<EventProxy> allEvents = aut.getEvents();
+
+Collection <EventProxy> mProps = null;
+final Collection<StateProxy> oldStates = aut.getStates();
+final int numStates = oldStates.size();
+final Collection<StateProxy> newStates = new ArrayList<StateProxy>(numStates);
+final ComponentKind kind = aut.getKind();
+
+for (final StateProxy state : oldStates) {
+  final Collection <EventProxy> props = state.getPropositions();
+  if (props.contains(mMarking))
+  {  mProps = props; }
+}
+
+ for (final StateProxy oldState : oldStates) {
+
+      final StateProxy newState =
+        mFactory.createStateProxy(oldState.getName(), oldState.isInitial(),
+                                  mProps);
+    newStates.add(newState);
+    mStateMap.put(oldState, newState);
+
+ }
+ final Collection<TransitionProxy> newTransitions =
+   replaceTransitionStates(aut);
+ mStateMap.clear();
+
+return mFactory.createAutomatonProxy(aut.getName(), kind,
+                                     allEvents, newStates, newTransitions);
+}
+
+/**
+ * Replaces the source and target states of a transition with the new version
+ * of the states stored in the map {@link #mStateMap}.
+ */
+private Collection<TransitionProxy> replaceTransitionStates
+  (final AutomatonProxy aut)
+{
+  final Collection<TransitionProxy> oldTransitions = aut.getTransitions();
+  final int numTransitions = oldTransitions.size();
+  final List<TransitionProxy> newTransitions =
+      new ArrayList<TransitionProxy>(numTransitions);
+  for (final TransitionProxy transition : oldTransitions) {
+    final StateProxy source = mStateMap.get(transition.getSource());
+    final StateProxy target = mStateMap.get(transition.getTarget());
+    final TransitionProxy newTransition =
+        mFactory.createTransitionProxy(source, transition.getEvent(), target);
+    newTransitions.add(newTransition);
+  }
+  return newTransitions;
+}
+
+/* gets the values of tick event and the marking in the model
+ * gets the default values
+ */
 private void getDefaultEvents()
 {
   final Collection<EventProxy> allEvents = mModel.getEvents();
@@ -424,7 +609,12 @@ if((kind.equals(EventKind.CONTROLLABLE)))
 
 if ((kind.equals(EventKind.PROPOSITION)))
   mMarking=event;
+ }
 
+if (mMarking == null) {
+  mMarking =
+      mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
+                                EventKind.PROPOSITION, true);
 }
 }
 
@@ -445,6 +635,9 @@ private void createEnevent
  */
 private final ProductDESProxy mModel;
 
+private final Map<StateProxy,StateProxy> mStateMap =
+  new HashMap<StateProxy,StateProxy>();
+
 private final ProductDESProxyFactory mFactory;
 
 private EventProxy enEvent;
@@ -457,5 +650,6 @@ private EventProxy mMarking;
  */
 private EventProxy tick;
 private EventProxy Omega;
+private EventProxy que;
 private int pCounta=0, pCountw=0;     // a Count for naming the modified Plant Automata
 }

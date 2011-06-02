@@ -20,27 +20,27 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
 /**
- * A model verifier to check SD Singular prohibitable behavior Property.
+ * A model verifier to check SD Controllability Property.
  *
  * This wrapper can be used to check whether a model satisfies
- * SD Singular Prohibitable behavior property.
+ * SD Controllability Property iii.1
  *
- * The check is done by creating a test automata and modifying Plant
- * automata each prohibitable event in the model, and passing these models
- * to a modular language inclusion checker
+ * The check is done by creating a test automata and modifying Plant automata for
+ * each prohibitable event in the model, and passing these models to a modular
+ * language inclusion checker
  *
  * @see SDPropertyBuilder
- * @see ModularLanguageInclusionChecker
+ * @see Modular Language Inclusion Checker
  *
  * @author Mahvash Baloch , Robi Malik
  */
 
-public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
+public class SDCThreeVerifier extends AbstractSafetyVerifier
 {
 
   //#########################################################################
   //# Constructors
-  public SDSingularPropertyVerifier( final ProductDESProxy model,
+  public SDCThreeVerifier( final ProductDESProxy model,
                                      final ProductDESProxyFactory factory,
                                      final ControllabilityChecker checker)
 
@@ -49,7 +49,7 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
                  LanguageInclusionKindTranslator.getInstance(),
                  LanguageInclusionDiagnostics.getInstance(),
                  factory);
-           mChecker = checker;
+           cChecker = checker;
          }
 
 
@@ -58,8 +58,8 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
     setUp();
     try {
       final ProductDESProxy model = getModel();
-      final SDPropertyBuilder builder =
-          new SDPropertyBuilder(model, getFactory());
+      final SD_three_PropertyBuilder builder =
+          new SD_three_PropertyBuilder(model, getFactory());
       final List<EventProxy> Hibs =
           (List<EventProxy>) builder.getHibEvents();
       final int numHib = Hibs.size();
@@ -69,10 +69,10 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
 
       for (final EventProxy hib : Hibs)
        {
-        convertedModel = builder.createSingularModel(hib);
+        convertedModel = builder.createSDThreeModel(hib);
         final ModularLanguageInclusionChecker checker=
          new ModularLanguageInclusionChecker(convertedModel, getFactory(),
-                                              mChecker );
+                                              cChecker );
         checker.setModel(convertedModel);
         final VerificationResult result;
         try {
@@ -80,6 +80,7 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
         } finally {
 
           result = checker.getAnalysisResult();
+
           recordStatistics(result);
         }
         if (!result.isSatisfied()) {
@@ -103,14 +104,12 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
     return mFailedAnswer;
   }
 
-
-  //#########################################################################
+//#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
-    return mChecker.supportsNondeterminism();
+    return cChecker.supportsNondeterminism();
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.ModelAnalyser
@@ -181,5 +180,5 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
 
   private List<VerificationResult> mCheckerStats;
 
-  private final ControllabilityChecker mChecker;
+  private final ControllabilityChecker cChecker;
 }
