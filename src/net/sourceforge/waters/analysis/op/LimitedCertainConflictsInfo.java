@@ -68,19 +68,6 @@ public class LimitedCertainConflictsInfo
     }
   }
 
-  public boolean canSilentlyReachBlockingState(final int state)
-  {
-    if (isBlockingState(state)) {
-      return true;
-    }
-    final int tauSucc = getCertainConflictsSuccessor(state, EventEncoding.TAU);
-    if (tauSucc < 0) {
-      return false;
-    } else {
-      return canSilentlyReachBlockingState(tauSucc);
-    }
-  }
-
   public ListBufferTransitionRelation createTestAutomaton
     (final ListBufferTransitionRelation rel,
      final String name,

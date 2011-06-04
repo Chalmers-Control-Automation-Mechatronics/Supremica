@@ -81,10 +81,13 @@ public class CertainConflictsTraceExpander
   {
     final ProductDESProxy des = createControllabilityModel();
     mSafetyVerifier.setModel(des);
-    mSafetyVerifier.run();
-    final SafetyTraceProxy trace = mSafetyVerifier.getCounterExample();
-    final List<TraceStepProxy> steps = trace.getTraceSteps();
-    return convertTraceSteps(steps);
+    if (mSafetyVerifier.run()) {
+      return null;
+    } else {
+      final SafetyTraceProxy trace = mSafetyVerifier.getCounterExample();
+      final List<TraceStepProxy> steps = trace.getTraceSteps();
+      return convertTraceSteps(steps);
+    }
   }
 
 

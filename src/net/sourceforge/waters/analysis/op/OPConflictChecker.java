@@ -3441,8 +3441,7 @@ public class OPConflictChecker
           // 1) Add a step to the source state unless initial.
           if (crucialEventID != tau) {
             final int crucialStateID = mReverseOutputStateMap.get(crucialState);
-            record =
-              new SearchRecord(crucialStateID, 0, crucialEventID, null);
+            record = new SearchRecord(crucialStateID, crucialEventID);
             crucialSteps.add(record);
           }
           // 2) Record new event and target state.
@@ -3453,7 +3452,7 @@ public class OPConflictChecker
       }
       // Add step to last target state.
       final int crucialStateID = mReverseOutputStateMap.get(crucialState);
-      record = new SearchRecord(crucialStateID, 0, crucialEventID, null);
+      record = new SearchRecord(crucialStateID, crucialEventID);
       crucialSteps.add(record);
       // Add final step to reach alpha.
       if (mPreconditionMarkingID >= 0) {
@@ -4120,7 +4119,7 @@ public class OPConflictChecker
       SearchRecord record = convertedSteps.get(endConvertedSteps);
       int depth = convertedSteps.size();
       int endState = record.getState();
-      while (!info.canSilentlyReachBlockingState(endState)) {
+      while (!extendToBlockingState(info, endState, convertedSteps)) {
         if (expander == null) {
           final KindTranslator translator = getKindTranslator();
           expander = new CertainConflictsTraceExpander
@@ -4139,6 +4138,9 @@ public class OPConflictChecker
         expander.setCertainConflictsAutomaton
           (originalAut, testaut, uncontrollables);
         final List<TraceStepProxy> additionalSteps = expander.run();
+        if (additionalSteps == null) {
+          break;
+        }
         final List<TraceStepProxy> saturatedSteps =
           getSaturatedTraceSteps(additionalSteps);
         final Iterator<TraceStepProxy> iter = saturatedSteps.iterator();
@@ -4157,12 +4159,6 @@ public class OPConflictChecker
           }
         }
       }
-      final int tauID = EventEncoding.TAU;
-      while (!info.isBlockingState(endState)) {
-        endState = info.getCertainConflictsSuccessor(endState, tauID);
-      }
-      record = new SearchRecord(endState, depth++, tauID, record);
-      convertedSteps.add(record);
 
       delegate =
         createDelegate(resultAut, originalAut, mOriginalStateEncoding,
@@ -4218,6 +4214,29 @@ public class OPConflictChecker
         }
       }
       return false;
+    }
+
+    private boolean extendToBlockingState
+      (final LimitedCertainConflictsInfo info,
+       final int start,
+       final List<SearchRecord> trace)
+    {
+      if (info.isBlockingState(start)) {
+        return true;
+      } else {
+        final int tau = EventEncoding.TAU;
+        int state = start;
+        do {
+          state = info.getCertainConflictsSuccessor(state, tau);
+        } while (state >= 0 && !info.isBlockingState(state));
+        if (state < 0) {
+          return false;
+        } else {
+          final SearchRecord record = new SearchRecord(state, tau);
+          trace.add(record);
+          return true;
+        }
+      }
     }
 
     private MergeStep createDelegate(final AutomatonProxy resultAut,
@@ -4286,15 +4305,14 @@ public class OPConflictChecker
         final int event = raw.getEvent();
         if (event >= tau) {
           if (crucialEvent != tau) {
-            record =
-              new SearchRecord(crucialState, 0, crucialEvent, null);
+            record = new SearchRecord(crucialState, crucialEvent);
             crucialSteps.add(record);
           }
           crucialEvent = event;
         }
         crucialState = raw.getState();
       }
-      record = new SearchRecord(crucialState, 0, crucialEvent, null);
+      record = new SearchRecord(crucialState, crucialEvent);
       crucialSteps.add(record);
       return crucialSteps;
     }
@@ -4397,7 +4415,12 @@ public class OPConflictChecker
     //# Constructors
     SearchRecord(final int state)
     {
-      this(state, 0, -1, null);
+      this(state, -1);
+    }
+
+    SearchRecord(final int state, final int event)
+    {
+      this(state, 0, event, null);
     }
 
     SearchRecord(final int state, final int depth, final int event,
