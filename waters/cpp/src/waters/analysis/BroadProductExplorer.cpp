@@ -28,7 +28,6 @@
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
-#include "jni/glue/NondeterministicDESExceptionGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
 #include "jni/glue/TransitionGlue.h"
@@ -580,22 +579,8 @@ setupSafety()
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
-    const uint32 numinit = aut->getNumberOfInitialStates();
-    switch (numinit) {
-    case 0:
+    if (aut->getNumberOfInitialStates() == 0) {
       setTrivial();
-      return;
-    case 1:
-      break;
-    default:
-      if (aut->isPlant()) {
-        break;
-      } else {
-        const jni::StateGlue& state = aut->getJavaState(1);
-        jni::NondeterministicDESExceptionGlue
-          exception(&autglue, &state, cache);
-        throw cache->throwJavaException(exception);
-      }
     }
     setupTransitions(aut, autglue, eventmap);
     const jni::SetGlue& events = autglue.getEventsGlue(cache);
@@ -715,16 +700,10 @@ setupTransitions
       const jni::StateGlue& targetglue = trans.getTargetGlue(cache);
       const uint32 targetcode = statemap->get(&targetglue);
       if (pass == 1) {
-        const bool det = eventrecord->addDeterministicTransition
-          (aut, sourcecode, targetcode);
+        const bool det =
+          eventrecord->addDeterministicTransition(aut, sourcecode, targetcode);
         if (!det) {
-          if (aut->isPlant()) {
-            maxpass = 2;
-          } else {
-            jni::NondeterministicDESExceptionGlue
-              exception(&autglue, &sourceglue, &eventglue, cache);
-            throw cache->throwJavaException(exception);
-          }
+          maxpass = 2;
         }
       } else {
         eventrecord->addNondeterministicTransition

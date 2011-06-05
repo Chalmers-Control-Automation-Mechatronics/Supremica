@@ -179,12 +179,11 @@ throwJavaException(const PreJavaException& pre)
   return throwJavaException(classcode, msg);
 }
 
-jthrowable ClassCache::
+jint ClassCache::
 throwJavaException(const ExceptionGlue& glue)
 {
   jthrowable exception = (jthrowable) glue.returnJavaObject();
-  mEnvironment->Throw(exception);
-  return exception;
+  return mEnvironment->Throw(exception);
 }
 
 

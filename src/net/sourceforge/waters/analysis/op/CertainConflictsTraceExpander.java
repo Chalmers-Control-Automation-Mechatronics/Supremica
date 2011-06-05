@@ -81,6 +81,7 @@ public class CertainConflictsTraceExpander
   {
     final ProductDESProxy des = createControllabilityModel();
     mSafetyVerifier.setModel(des);
+    //MarshallingTools.saveModule(des, "xxx.wmod");
     if (mSafetyVerifier.run()) {
       return null;
     } else {
@@ -88,6 +89,20 @@ public class CertainConflictsTraceExpander
       final List<TraceStepProxy> steps = trace.getTraceSteps();
       return convertTraceSteps(steps);
     }
+  }
+
+  public Collection<AutomatonProxy> getTraceAutomata()
+  {
+    final int numAutomata = mOriginalAutomata.size();
+    final Collection<AutomatonProxy> result =
+      new ArrayList<AutomatonProxy>(numAutomata);
+    for (final AutomatonProxy aut : mOriginalAutomata) {
+      if (aut != mOriginalCertainConflictsAutomaton) {
+        result.add(aut);
+      }
+    }
+    result.add(mConvertedCertainConflictsAutomaton);
+    return result;
   }
 
 

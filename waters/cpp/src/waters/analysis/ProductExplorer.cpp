@@ -23,6 +23,7 @@
 #include "jni/glue/ConflictKindGlue.h"
 #include "jni/glue/ConflictTraceGlue.h"
 #include "jni/glue/EventGlue.h"
+#include "jni/glue/ExceptionGlue.h"
 #include "jni/glue/ExplorerModeGlue.h"
 #include "jni/glue/Glue.h"
 #include "jni/glue/HashMapGlue.h"
@@ -735,35 +736,32 @@ JNIEXPORT jobject JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
   (JNIEnv* env, jobject jchecker)
 {
+  jni::ClassCache cache(env);
   try {
-    jni::ClassCache cache(env);
-    try {
-      jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
-      jni::KindTranslatorGlue translator =
-        gchecker.getKindTranslatorGlue(&cache);
-      jni::EventGlue nomarking(0, &cache);
-      waters::ProductExplorerFinalizer finalizer(gchecker);
-      waters::ProductExplorer* checker =
-        finalizer.createProductExplorer(translator, nomarking,
-                                        nomarking, cache);
-      bool result = checker->runSafetyCheck();
-      jni::VerificationResultGlue vresult(&cache);
-      if (result) {
-        vresult.setSatisfied(true);
-        checker->addStatistics(vresult);
-        return vresult.returnJavaObject();
-      } else {
-        jni::SafetyTraceGlue trace =
-          checker->getSafetyCounterExample(gchecker);
-        vresult.setCounterExample(&trace);
-        checker->addStatistics(vresult);
-        return vresult.returnJavaObject();
-      }
-    } catch (const jni::PreJavaException& pre) {
-      cache.throwJavaException(pre);
-      return 0;
+    jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
+    jni::KindTranslatorGlue translator =
+      gchecker.getKindTranslatorGlue(&cache);
+    jni::EventGlue nomarking(0, &cache);
+    waters::ProductExplorerFinalizer finalizer(gchecker);
+    waters::ProductExplorer* checker =
+      finalizer.createProductExplorer(translator, nomarking, nomarking, cache);
+    bool result = checker->runSafetyCheck();
+    jni::VerificationResultGlue vresult(&cache);
+    if (result) {
+      vresult.setSatisfied(true);
+      checker->addStatistics(vresult);
+      return vresult.returnJavaObject();
+    } else {
+      jni::SafetyTraceGlue trace = checker->getSafetyCounterExample(gchecker);
+      vresult.setCounterExample(&trace);
+      checker->addStatistics(vresult);
+      return vresult.returnJavaObject();
     }
-  } catch (jthrowable exception) {
+  } catch (const jni::PreJavaException& pre) {
+    cache.throwJavaException(pre);
+    return 0;
+  } catch (const jni::ExceptionGlue& glue) {
+    cache.throwJavaException(glue);
     return 0;
   }
 }
@@ -773,37 +771,34 @@ JNIEXPORT jobject JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorithm
   (JNIEnv* env, jobject jchecker)
 {
+  jni::ClassCache cache(env);
   try {
-    jni::ClassCache cache(env);
-    try {
-      jni::NativeConflictCheckerGlue gchecker(jchecker, &cache);
-      jni::KindTranslatorGlue translator =
-        gchecker.getKindTranslatorGlue(&cache);
-      jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
-      jni::EventGlue premarking =
-        gchecker.getPreconditionMarkingGlue(&cache);
-      waters::ProductExplorerFinalizer finalizer(gchecker);
-      waters::ProductExplorer* checker =
-        finalizer.createProductExplorer(translator, premarking,
-                                        marking, cache);
-      bool result = checker->runNonblockingCheck();
-      jni::VerificationResultGlue vresult(&cache);
-      if (result) {
-        vresult.setSatisfied(true);
-        checker->addStatistics(vresult);
-        return vresult.returnJavaObject();
-      } else {
-        jni::ConflictTraceGlue trace =
-          checker->getConflictCounterExample(gchecker);
-        vresult.setCounterExample(&trace);
-        checker->addStatistics(vresult);
-        return vresult.returnJavaObject();
-      }
-    } catch (const jni::PreJavaException& pre) {
-      cache.throwJavaException(pre);
-      return 0;
+    jni::NativeConflictCheckerGlue gchecker(jchecker, &cache);
+    jni::KindTranslatorGlue translator =
+      gchecker.getKindTranslatorGlue(&cache);
+    jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
+    jni::EventGlue premarking = gchecker.getPreconditionMarkingGlue(&cache);
+    waters::ProductExplorerFinalizer finalizer(gchecker);
+    waters::ProductExplorer* checker =
+      finalizer.createProductExplorer(translator, premarking, marking, cache);
+    bool result = checker->runNonblockingCheck();
+    jni::VerificationResultGlue vresult(&cache);
+    if (result) {
+      vresult.setSatisfied(true);
+      checker->addStatistics(vresult);
+      return vresult.returnJavaObject();
+    } else {
+      jni::ConflictTraceGlue trace =
+        checker->getConflictCounterExample(gchecker);
+      vresult.setCounterExample(&trace);
+      checker->addStatistics(vresult);
+      return vresult.returnJavaObject();
     }
-  } catch (jthrowable exception) {
+  } catch (const jni::PreJavaException& pre) {
+    cache.throwJavaException(pre);
+    return 0;
+  } catch (const jni::ExceptionGlue& glue) {
+    cache.throwJavaException(glue);
     return 0;
   }
 }

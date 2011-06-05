@@ -521,7 +521,11 @@ public class OPConflictChecker
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     chain.add(bisimulator);
-    return new TRSimplifierAbstractionRule(chain);
+    if (mPreconditionMarking != null) {
+      return new GeneralisedTRSimplifierAbstractionRule(chain);
+    } else {
+      return new TRSimplifierAbstractionRule(chain);
+    }
   }
 
   private AbstractionRule createStandardNonblockingAbstractionChain()
@@ -1393,25 +1397,20 @@ public class OPConflictChecker
     throws AnalysisException
   {
     final List<TraceStepProxy> unsat = trace.getTraceSteps();
-    List<TraceStepProxy> traceSteps = getSaturatedTraceSteps(unsat);
+    List<TraceStepProxy> traceSteps =
+      getSaturatedTraceSteps(unsat, mCurrentAutomata);
     final int size = mModifyingSteps.size();
     final ListIterator<AbstractionStep> iter =
       mModifyingSteps.listIterator(size);
-
     final Collection<AutomatonProxy> check =
-      new THashSet<AutomatonProxy>(trace.getAutomata());
-    TraceChecker.checkCounterExample(traceSteps, check,
-                                     mPreconditionMarking, true);
-
+      new THashSet<AutomatonProxy>(mCurrentAutomata);
+    checkCounterExample(traceSteps, check);
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
-
       check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
-      TraceChecker.checkCounterExample(traceSteps, check,
-                                       mPreconditionMarking, true);
-
+      checkCounterExample(traceSteps, check);
     }
     final ProductDESProxyFactory factory = getFactory();
     final String tracename = getTraceName();
@@ -1426,15 +1425,31 @@ public class OPConflictChecker
                                             trace.getKind());
   }
 
+  private void checkCounterExample(final List<TraceStepProxy> steps,
+                                   final Collection<AutomatonProxy> automata)
+  throws AnalysisException
+  {
+    /*
+    TraceChecker.checkCounterExample(steps, automata,
+                                     mPreconditionMarking, true);
+    */
+    final KindTranslator translator = getKindTranslator();
+    TraceChecker.checkConflictCounterExample(steps, automata,
+                                             mPreconditionMarking,
+                                             mCurrentDefaultMarking,
+                                             true, translator);
+  }
+
   /**
    * Fills in the target states in the state maps for each step of the trace
    * for the result automaton.
    */
   private List<TraceStepProxy> getSaturatedTraceSteps
-    (final List<TraceStepProxy> steps)
+    (final List<TraceStepProxy> steps,
+     final Collection<AutomatonProxy> automata)
   {
     final ProductDESProxyFactory factory = getFactory();
-    final int numAutomata = mCurrentAutomata.size();
+    final int numAutomata = automata.size();
     final int numSteps = steps.size();
     final List<TraceStepProxy> convertedSteps =
         new ArrayList<TraceStepProxy>(numSteps);
@@ -1444,7 +1459,7 @@ public class OPConflictChecker
     final Map<AutomatonProxy,StateProxy> firstMap = firstStep.getStateMap();
     final Map<AutomatonProxy,StateProxy> convertedFirstMap =
       new HashMap<AutomatonProxy,StateProxy>(numAutomata);
-    for (final AutomatonProxy aut : mCurrentAutomata) {
+    for (final AutomatonProxy aut : automata) {
       final StateProxy state = getInitialState(aut, firstMap);
       convertedFirstMap.put(aut, state);
     }
@@ -1458,7 +1473,7 @@ public class OPConflictChecker
       final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
       final Map<AutomatonProxy,StateProxy> convertedStepMap =
         new HashMap<AutomatonProxy,StateProxy>(numAutomata);
-      for (final AutomatonProxy aut : mCurrentAutomata) {
+      for (final AutomatonProxy aut : automata) {
         final StateProxy prev = previousStepMap.get(aut);
         final StateProxy state = findSuccessor(aut, event, prev, stepMap);
         convertedStepMap.put(aut, state);
@@ -2749,6 +2764,12 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Constructor
+    private GeneralisedTRSimplifierAbstractionRule
+      (final ChainTRSimplifier simplifier)
+    {
+      this(simplifier, -1);
+    }
+
     private GeneralisedTRSimplifierAbstractionRule
       (final ChainTRSimplifier simplifier, final int recoveryIndex)
     {
@@ -4082,7 +4103,8 @@ public class OPConflictChecker
       }
 
       // OK, abstract trace leads to blocking, expanded trace does not.
-      // We need to add steps to get from certain conflicts to blocking ...
+      // We need to add steps to get from certain conflicts to blocking,
+      // or prove that the rest of the system blocks ...
       final StandardTRSimplifierAbstractionRule rule =
         (StandardTRSimplifierAbstractionRule) mAbstractionRule;
       final ChainTRSimplifier chain = rule.getSimplifier();
@@ -4117,7 +4139,6 @@ public class OPConflictChecker
       CertainConflictsTraceExpander expander = null;
       final int endConvertedSteps = convertedSteps.size() - 1;
       SearchRecord record = convertedSteps.get(endConvertedSteps);
-      int depth = convertedSteps.size();
       int endState = record.getState();
       while (!extendToBlockingState(info, endState, convertedSteps)) {
         if (expander == null) {
@@ -4136,25 +4157,35 @@ public class OPConflictChecker
         final Collection<EventProxy> uncontrollables =
           info.getUncontrollableEvents(testrel, eventEnc);
         expander.setCertainConflictsAutomaton
-          (originalAut, testaut, uncontrollables);
+          (resultAut, testaut, uncontrollables);
         final List<TraceStepProxy> additionalSteps = expander.run();
         if (additionalSteps == null) {
           break;
         }
+        final Collection<AutomatonProxy> automata = expander.getTraceAutomata();
         final List<TraceStepProxy> saturatedSteps =
-          getSaturatedTraceSteps(additionalSteps);
+          getSaturatedTraceSteps(additionalSteps, automata);
         final Iterator<TraceStepProxy> iter = saturatedSteps.iterator();
         iter.next();
         while (iter.hasNext()) {
           final TraceStepProxy step = iter.next();
-          traceSteps.add(step);
           final EventProxy event = step.getEvent();
           final int ecode = eventEnc.getEventCode(event);
+          final Map<AutomatonProxy,StateProxy> map = step.getStateMap();
+          final Map<AutomatonProxy,StateProxy> reducedMap =
+            new HashMap<AutomatonProxy,StateProxy>(map);
+          reducedMap.remove(testaut);
+          final TraceStepProxy reducedStep =
+            factory.createTraceStepProxy(event, reducedMap);
+          traceSteps.add(reducedStep);
           if (ecode >= 0) {
-            final Map<AutomatonProxy,StateProxy> map = step.getStateMap();
             final StateProxy state = map.get(testaut);
-            endState = stateEnc.getStateCode(state);
-            record = new SearchRecord(endState, depth++, ecode, record);
+            if (state == null) {
+              endState = info.getCertainConflictsSuccessor(endState, ecode);
+            } else {
+              endState = stateEnc.getStateCode(state);
+            }
+            record = new SearchRecord(endState, ecode);
             convertedSteps.add(record);
           }
         }

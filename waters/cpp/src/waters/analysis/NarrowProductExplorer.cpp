@@ -29,7 +29,6 @@
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/MapGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
-#include "jni/glue/NondeterministicDESExceptionGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
 #include "jni/glue/TransitionGlue.h"
@@ -120,23 +119,8 @@ setup()
     if (aut->isPlant()) {
       mNumPlants++;
     }
-    const uint32 numinit = aut->getNumberOfInitialStates();
-    switch (numinit) {
-    case 0:
+    if (aut->getNumberOfInitialStates() == 0) {
       setTrivial();
-      return;
-    case 1:
-      break;
-    default:
-      if (getMode() != EXPLORER_MODE_SAFETY || aut->isPlant()) {
-        break;
-      } else {
-        const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
-        const jni::StateGlue& state = aut->getJavaState(1);
-        jni::NondeterministicDESExceptionGlue
-          exception(&autglue, &state, cache);
-        throw cache->throwJavaException(exception);
-      }
     }
   }
 

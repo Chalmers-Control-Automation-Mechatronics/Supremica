@@ -18,7 +18,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                 <LabelBlock>
                     <SimpleIdentifier Name=":accepting"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="231" X="119"/>
+                        <Point Y="28" X="156"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
@@ -33,7 +33,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                             <Point Y="-5" X="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-8" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -41,7 +41,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                             <Point Y="80" X="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-6" X="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
@@ -49,7 +49,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                             <Point Y="80" X="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-7" X="-25"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S3">
@@ -57,7 +57,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                             <Point Y="144" X="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-7" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
@@ -65,7 +65,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                             <Point Y="144" X="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-8" X="-26"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -74,7 +74,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="-15" X="-26"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -82,7 +82,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="-6" X="-28"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -90,7 +90,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="-13" X="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -98,7 +98,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="-4" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

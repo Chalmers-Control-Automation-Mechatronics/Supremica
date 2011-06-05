@@ -87,7 +87,7 @@ public:
   //# Exceptions
   jint throwJavaException(waters::uint32 classcode, const char* msg);
   jint throwJavaException(const PreJavaException& pre);
-  jthrowable throwJavaException(const ExceptionGlue& glue);
+  jint throwJavaException(const ExceptionGlue& glue);
   
 private:
   //##########################################################################
