@@ -24,7 +24,6 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
-import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -189,7 +188,6 @@ class AutomatonBDD
   //#########################################################################
   //# Constructing BDDs
   BDD getInitialStateBDD(final BDDFactory factory)
-    throws NondeterministicDESException
   {
     final BDD result = factory.zero();
     final Collection<StateProxy> states = mAutomaton.getStates();
@@ -197,11 +195,7 @@ class AutomatonBDD
     for (final StateProxy state : states) {
       if (state.isInitial()) {
         if (++count > 1) {
-          if (mKind == ComponentKind.SPEC) {
-            throw new NondeterministicDESException(mAutomaton, state);
-          } else {
-            setNondeterministic(null);
-          }
+          setNondeterministic(null);
         }
         final BDD statebdd = getStateBDD(state, factory);
         result.orWith(statebdd);

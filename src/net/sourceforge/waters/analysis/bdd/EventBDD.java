@@ -18,12 +18,10 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDVarSet;
 
-import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -109,7 +107,6 @@ abstract class EventBDD
 
   void includeTransition(final TransitionProxy trans,
                          final BDDFactory factory)
-    throws NondeterministicDESException
   {
     if (mCurrentAutomatonBDD != null) {
       final BDD transbdd = mCurrentAutomaton.getTransitionBDD(trans, factory);
@@ -129,9 +126,6 @@ abstract class EventBDD
           mCurrentAutomatonDeterministicSuccessors[code] = target;
         } else if (old == target) {
           // skip ...
-        } else if (mCurrentAutomaton.getKind() == ComponentKind.SPEC) {
-          final AutomatonProxy aut = mCurrentAutomaton.getAutomaton();
-          throw new NondeterministicDESException(aut, source, mEvent);
         } else {
           mCurrentAutomaton.setNondeterministic(mEvent);
           mCurrentAutomatonDeterministicSuccessors = null;
