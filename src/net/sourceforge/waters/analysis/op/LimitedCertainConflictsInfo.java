@@ -82,6 +82,7 @@ public class LimitedCertainConflictsInfo
       result.setReachable(state, false);
     }
     result.setInitial(init, true);
+    final boolean cc = isCertainConflictState(init);
     final int tau = EventEncoding.TAU;
     final int dump = mNumberOfStates;
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
@@ -101,7 +102,7 @@ public class LimitedCertainConflictsInfo
           continue;
         }
         final int target = iter.getCurrentTargetState();
-        if (isCertainConflictState(target)) {
+        if (!cc || isCertainConflictState(target)) {
           result.addTransition(state, event, target);
           if (visited.add(target)) {
             open.push(target);
@@ -180,7 +181,10 @@ public class LimitedCertainConflictsInfo
                                     final int event,
                                     final int to)
   {
-    mCertainConflictTransitions.addTransition(from, event, to);
+    mIterator.reset(from, event);
+    if (!mIterator.advance()) {
+      mCertainConflictTransitions.addTransition(from, event, to);
+    }
   }
 
 

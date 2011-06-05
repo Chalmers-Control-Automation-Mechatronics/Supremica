@@ -140,7 +140,6 @@ public class LimitedCertainConflictsTRSimplifier
             final int event = mPredecessorsIterator.getCurrentEvent();
             final int pred = mPredecessorsIterator.getCurrentSourceState();
             if (event != tauID && mCoreachableStates.get(pred)) {
-              final int oldNumVictims = victims.size();
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
@@ -157,8 +156,7 @@ public class LimitedCertainConflictsTRSimplifier
                   }
                 }
               }
-              if (mCertainConflictsInfo != null &&
-                  victims.size() > oldNumVictims) {
+              if (mCertainConflictsInfo != null) {
                 mCertainConflictsInfo.
                   addCertainConflictTransition(pred, event, state);
               }

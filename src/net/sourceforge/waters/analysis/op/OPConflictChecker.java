@@ -4088,9 +4088,6 @@ public class OPConflictChecker
                        mPartition, mResultStateEncoding,
                        mIsObservationEquivalentBefore &&
                        mIsObservationEquivalentAfter);
-      if (!isBlockingTrace(traceSteps)) {
-        return delegate.convertTraceSteps(traceSteps);
-      }
       delegate.setupTraceConversion();
       List<SearchRecord> crucialSteps = delegate.getCrucialSteps(traceSteps);
       List<SearchRecord> convertedSteps =
@@ -4102,9 +4099,9 @@ public class OPConflictChecker
         return traceSteps;
       }
 
-      // OK, abstract trace leads to blocking, expanded trace does not.
-      // We need to add steps to get from certain conflicts to blocking,
-      // or prove that the rest of the system blocks ...
+      // OK, expanded trace is not blocking.
+      // We need to try to add steps into certain conflicts and further
+      // into blocking, or prove that the rest of the system blocks ...
       final StandardTRSimplifierAbstractionRule rule =
         (StandardTRSimplifierAbstractionRule) mAbstractionRule;
       final ChainTRSimplifier chain = rule.getSimplifier();
@@ -4204,16 +4201,6 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Auxiliary Methods
-    private boolean isBlockingTrace(final List<TraceStepProxy> steps)
-    {
-      final AutomatonProxy aut = getResultAutomaton();
-      final int traceEnd = steps.size() - 1;
-      final TraceStepProxy step = steps.get(traceEnd);
-      final StateProxy state = step.getStateMap().get(aut);
-      final int code = mResultStateEncoding.getStateCode(state);
-      return code == mPartition.size() - 1;
-    }
-
     private boolean isBlockingTrace(final List<SearchRecord> steps,
                                     final ListBufferTransitionRelation rel,
                                     final EventEncoding enc)
