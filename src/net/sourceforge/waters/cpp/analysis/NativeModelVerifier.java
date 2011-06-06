@@ -42,7 +42,6 @@ public abstract class NativeModelVerifier
     super(model, factory);
     mKindTranslator = translator;
     mExplorerMode = ExplorerMode.BEST_GUESS;
-    mResult = null;
   }
 
 
@@ -81,12 +80,13 @@ public abstract class NativeModelVerifier
     if (getModel() == null) {
       throw new NullPointerException("No model given!");
     } else {
+      clearAnalysisResult();
       final long start = System.currentTimeMillis();
-      mResult = null;
-      mResult = runNativeAlgorithm();
+      final VerificationResult result = runNativeAlgorithm();
       final long stop = System.currentTimeMillis();
-      mResult.setRuntime(stop - start);
-      return mResult.isSatisfied();
+      result.setRuntime(stop - start);
+      setAnalysisResult(result);
+      return result.isSatisfied();
     }
   }
 
@@ -95,8 +95,9 @@ public abstract class NativeModelVerifier
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   public boolean isSatisfied()
   {
-    if (mResult != null) {
-      return mResult.isSatisfied();
+    final VerificationResult result = getAnalysisResult();
+    if (result != null) {
+      return result.isSatisfied();
     } else {
       throw new IllegalStateException("Call run() first!");
     }
@@ -107,18 +108,15 @@ public abstract class NativeModelVerifier
     if (isSatisfied()) {
       throw new IllegalStateException("No trace for satisfied property!");
     } else {
-      return mResult.getCounterExample();
+      final VerificationResult result = getAnalysisResult();
+      return result.getCounterExample();
     }
   }
 
+  @Override
   public VerificationResult getAnalysisResult()
   {
-    return mResult;
-  }
-
-  public void clearAnalysisResult()
-  {
-    mResult = null;
+    return (VerificationResult) super.getAnalysisResult();
   }
 
 
@@ -130,41 +128,8 @@ public abstract class NativeModelVerifier
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  /*
-  private void dumpModel()
-  {
-    try {
-      final ProductDESProxy model = getModel();
-      // should also replace event and component kinds
-      // according to KindTranslator ...
-      final ProductDESProxyFactory factory = getFactory();
-      final net.sourceforge.waters.model.marshaller.
-        ProxyMarshaller<ProductDESProxy> marshaller =
-        new net.sourceforge.waters.model.marshaller.
-        JAXBProductDESMarshaller(factory);
-      final int code = model.hashCodeByContents();
-      final java.io.File file = new java.io.File("failed" + code + ".wdes");
-      marshaller.marshal(model, file);
-    } catch (final java.io.IOException exception) {
-      // ignore
-    } catch (final javax.xml.bind.JAXBException exception) {
-      // ignore
-    } catch (final org.xml.sax.SAXException exception) {
-      // ignore
-    } catch (final
-             net.sourceforge.waters.model.marshaller.WatersMarshalException
-             exception) {
-      // ignore
-    }
-  }
-  */
-
-
-  //#########################################################################
   //# Data Members
   private KindTranslator mKindTranslator;
   private ExplorerMode mExplorerMode;
-  private VerificationResult mResult;
 
 }

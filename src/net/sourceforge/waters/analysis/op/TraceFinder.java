@@ -75,7 +75,7 @@ public class TraceFinder
   //# Simple Access
   public boolean isDeterministic()
   {
-    return mStateEncoding != null;
+    return mStateEncoding == null;
   }
 
 

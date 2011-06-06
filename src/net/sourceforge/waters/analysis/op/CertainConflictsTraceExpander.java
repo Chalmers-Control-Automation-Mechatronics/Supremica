@@ -214,8 +214,8 @@ public class CertainConflictsTraceExpander
     final int size = oldmap.size();
     final Map<AutomatonProxy,StateProxy> newmap =
       new HashMap<AutomatonProxy,StateProxy>(size);
-    final Iterator<AutomatonProxy> olditer = mOriginalAutomata.iterator();
-    final Iterator<AutomatonProxy> newiter = mConvertedAutomata.iterator();
+    final Iterator<AutomatonProxy> olditer = mConvertedAutomata.iterator();
+    final Iterator<AutomatonProxy> newiter = mOriginalAutomata.iterator();
     while (olditer.hasNext()) {
       final AutomatonProxy oldaut = olditer.next();
       final AutomatonProxy newaut = newiter.next();

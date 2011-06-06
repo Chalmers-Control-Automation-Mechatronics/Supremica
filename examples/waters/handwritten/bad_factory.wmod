@@ -225,7 +225,7 @@
 <Point Y="224" X="112"/>
 </PointGeometry>
 <LabelGeometry>
-<Point Y="6" X="14"/>
+<Point Y="-6" X="8"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Initial="true" Name="M1">
@@ -235,8 +235,11 @@
 <PointGeometry>
 <Point Y="144" X="112"/>
 </PointGeometry>
+<InitialArrowGeometry>
+<Point Y="0" X="-40"/>
+</InitialArrowGeometry>
 <LabelGeometry>
-<Point Y="6" X="15"/>
+<Point Y="-7" X="8"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -245,33 +248,33 @@
 <LabelBlock>
 <SimpleIdentifier Name="repair2"/>
 <LabelGeometry Anchor="NW">
-<Point Y="-7" X="-40"/>
+<Point Y="5" X="-18"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point Y="185" X="97"/>
+<Point Y="185" X="126"/>
 </SplineGeometry>
 </Edge>
 <Edge Target="M2" Source="M1">
 <LabelBlock>
 <SimpleIdentifier Name="break2"/>
 <LabelGeometry Anchor="NW">
-<Point Y="-6" X="-11"/>
+<Point Y="-23" X="-26"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point Y="184" X="127"/>
+<Point Y="187" X="98"/>
 </SplineGeometry>
 </Edge>
 <Edge Target="M1" Source="M1">
 <LabelBlock>
 <SimpleIdentifier Name="repair1"/>
 <LabelGeometry Anchor="NW">
-<Point Y="-28" X="-12"/>
+<Point Y="5" X="-6"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point Y="144" X="77"/>
+<Point Y="108" X="111"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>

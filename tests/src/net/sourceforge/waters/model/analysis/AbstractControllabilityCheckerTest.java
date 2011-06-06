@@ -22,7 +22,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -153,6 +152,17 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "verriegel4counter2.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- nondeterministic
+  public void testNondeterministicExtension() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nondeterministic";
+    final String name = "nondeterministicExtension.wmod";
     runModelVerifier(group, dir, name, false);
   }
 
@@ -859,55 +869,11 @@ public abstract class AbstractControllabilityCheckerTest
     boolean rejected = false;
     for (final AutomatonProxy aut : automata){
       final ComponentKind akind = aut.getKind();
-      final int accepted = checkCounterExample(aut, eventlist);
-      if (akind.equals(ComponentKind.PLANT)){
-	assertTrue("Counterexample not accepted by plant " +
-		   aut.getName() + "!", accepted == len);
-      } else if (akind.equals(ComponentKind.SPEC)) {
-	assertFalse("Counterexample rejected too early (step " + accepted +
-		    ") by spec " + aut.getName() + "!",
-		    accepted < len - 1);
-	rejected |= (accepted == len - 1);
-      }
+      final StateProxy state =
+        checkCounterExample(aut, trace, akind == ComponentKind.SPEC);
+      rejected |= state == null;
     }
     assertTrue("Counterexample not rejected by any spec!", rejected);
-  }
-
-  private int checkCounterExample(final AutomatonProxy aut,
-                                  final List<EventProxy> counterexample)
-  {
-    final Collection<EventProxy> events = aut.getEvents();
-    final Collection<StateProxy> states = aut.getStates();
-    final Collection<TransitionProxy> transitions = aut.getTransitions();
-
-    int steps = -1;
-    StateProxy current = null;
-    for (final StateProxy state : states){
-      if (state.isInitial()){
-        current = state;
-        break;
-      }
-    }
-    if (current == null){
-      return steps;
-    }
-    for (final EventProxy event : counterexample){
-      steps++;
-      if (events.contains(event)){
-        boolean found = false;
-        for(final TransitionProxy trans : transitions){
-          if (trans.getSource()== current && trans.getEvent() == event){
-            current = trans.getTarget();
-            found = true;
-            break;
-          }
-        }
-        if(!found){
-          return steps;
-        }
-      }
-    }
-    return steps + 1;
   }
 
 }

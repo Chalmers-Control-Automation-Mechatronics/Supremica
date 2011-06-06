@@ -11,13 +11,18 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
@@ -213,6 +218,99 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
             + "' does not match any in product DES!");
       }
     }
+  }
+
+  protected StateProxy checkCounterExample(final AutomatonProxy aut,
+                                           final TraceProxy trace)
+  {
+    return checkCounterExample(aut, trace, false);
+  }
+
+  protected StateProxy checkCounterExample(final AutomatonProxy aut,
+                                           final TraceProxy trace,
+                                           final boolean spec)
+  {
+    final Collection<EventProxy> events = aut.getEvents();
+    final Collection<StateProxy> states = aut.getStates();
+    final Collection<TransitionProxy> transitions = aut.getTransitions();
+    final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
+    final Iterator<TraceStepProxy> iter = traceSteps.iterator();
+    final TraceStepProxy initStep = iter.next();
+    final Map<AutomatonProxy,StateProxy> initMap = initStep.getStateMap();
+    StateProxy current = initMap.get(aut);
+    if (current == null) {
+      for (final StateProxy state : states) {
+        if (state.isInitial()) {
+          if (current == null) {
+            current = state;
+          } else {
+            fail("Trace specifies no initial state for automaton " +
+                 aut.getName() + ", which has more than one initial state!");
+          }
+        }
+      }
+      assertNotNull("The automaton " + aut.getName() +
+                    " has no initial state!", current);
+    } else {
+      assertTrue("Trace initial state " + current.getName() +
+                 " for automaton " + aut.getName() +
+                 " is not an initial state of the automaton!",
+                 current.isInitial());
+    }
+    while (iter.hasNext()) {
+      final TraceStepProxy traceStep = iter.next();
+      final EventProxy event = traceStep.getEvent();
+      final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
+      final StateProxy target = stepMap.get(aut);
+      if (target == null) {
+        if (events.contains(event)) {
+          StateProxy next = null;
+          for (final TransitionProxy trans : transitions) {
+            if (trans.getSource() == current && trans.getEvent() == event) {
+              if (next == null) {
+                next = trans.getTarget();
+              } else {
+                fail("The counterexample trace does not contain a " +
+                     "successor state for the nondeterministic transition" +
+                     " in automaton " + aut.getName() + " from source state " +
+                     current.getName() + " with event " + event.getName() +
+                     "!");
+              }
+            }
+          }
+          if (!spec || iter.hasNext()) {
+            assertNotNull("The automaton " + aut.getName() +
+                          " has no successor state for event " +
+                          event.getName() + " from state " +
+                          current.getName() + "!",
+                          next);
+          }
+          current = next;
+        }
+      } else {
+        if (events.contains(event)) {
+          boolean found = false;
+          for (final TransitionProxy trans : transitions) {
+            if (trans.getSource() == current && trans.getEvent() == event &&
+                trans.getTarget() == target) {
+              found = true;
+            }
+          }
+          assertTrue("There is no transition from state " + current.getName() +
+                     " to state " + target.getName() + " with event " +
+                     event.getName() + " in automaton " + aut.getName() +
+                     " as specified in the counterexample trace!", found);
+          current = target;
+        } else {
+          assertSame("The target state specified in the counterexample " +
+                     "for the selflooped event " + event.getName() +
+                     " is different from the current state of automaton " +
+                     aut.getName() + "!", current, target);
+        }
+      }
+    }
+    // returns the end state of the counterexample trace
+    return current;
   }
 
   protected File saveCounterExample(final TraceProxy counterexample)

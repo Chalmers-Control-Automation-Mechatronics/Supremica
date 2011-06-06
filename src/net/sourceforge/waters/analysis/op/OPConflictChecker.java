@@ -4098,6 +4098,7 @@ public class OPConflictChecker
         delegate.mergeTraceSteps(traceSteps, convertedSteps);
         return traceSteps;
       }
+      delegate = null;
 
       // OK, expanded trace is not blocking.
       // We need to try to add steps into certain conflicts and further

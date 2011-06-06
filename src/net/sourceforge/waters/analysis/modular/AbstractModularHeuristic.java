@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   AbstractModularHeuristic
 //###########################################################################
@@ -105,7 +105,8 @@ abstract class AbstractModularHeuristic
                                             des, automata, oldSteps);
     }
     final int numSteps = oldSteps.size();
-    final List<TraceStepProxy> newSteps = new ArrayList<TraceStepProxy>(numSteps);
+    final List<TraceStepProxy> newSteps =
+      new ArrayList<TraceStepProxy>(numSteps);
     int depth = 0;
     for (final TraceStepProxy oldStep : oldSteps) {
       final EventProxy event = oldStep.getEvent();
