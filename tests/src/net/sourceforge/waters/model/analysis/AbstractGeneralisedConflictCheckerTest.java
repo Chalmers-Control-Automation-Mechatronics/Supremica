@@ -11,8 +11,6 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +18,6 @@ import net.sourceforge.waters.analysis.hisc.HISCAttributes;
 import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -209,9 +206,11 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
                      "fin_exit", true);
   }
 
-  // #########################################################################
-  // # Overrides for abstract base class
-  // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected void configureModelVerifier(final ProductDESProxy des)
   {
     super.configureModelVerifier(des);
@@ -226,10 +225,11 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
         return;
       }
     }
-    fail("Model '" + des.getName()
-        + "' does not contain a proposition named :alpha.");
+    fail("Model '" + des.getName() +
+         "' does not contain a proposition named :alpha.");
   }
 
+  @Override
   protected void configure(final ModuleCompiler compiler)
   {
     super.configure(compiler);
@@ -239,46 +239,25 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     compiler.setEnabledPropositionNames(propositions);
   }
 
-  /**
-   * Checks the correctness of a conflict counterexample. A conflict
-   * counterexample has to be a {@link ConflictTraceProxy}, its event sequence
-   * has to be accepted by all automata in the given model, and it must take the
-   * model to a blocking state which has the precondition marking :alpha. The
-   * latter condition is checked by means of a language inclusion check.
-   *
-   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
-   * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
-   */
-  protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace) throws Exception
+  @Override
+  protected StateProxy checkCounterExample(final AutomatonProxy aut,
+                                           final TraceProxy trace)
   {
-    super.checkCounterExample(des, trace);
-    // checks if the marking proposition :alpha is in the alphabet
-    final Set<EventProxy> alphabet = des.getEvents();
-    if (alphabet.contains(mAlpha)) {
-      final Map<AutomatonProxy,StateProxy> endState = getEndState(des, trace);
-      boolean marked = false;
-      for (final AutomatonProxy aut : endState.keySet()) {
-        final StateProxy state = endState.get(aut);
-        for (final EventProxy proposition : state.getPropositions()) {
-          if (proposition.equals(mAlpha)) {
-            marked = true;
-            break;
-          }
-        }
-        if (!marked && aut.getEvents().contains(mAlpha)) {
-          fail("Counterexample leads to an end state where automaton "
-              + aut.getName() + " is in state " + state.getName()
-              + " which does not contain the proposition named :alpha");
-          ;
-          return;
-        }
-      }
+    final StateProxy endstate = super.checkCounterExample(aut, trace);
+    if (endstate != null &&
+        !endstate.getPropositions().contains(mAlpha) &&
+        aut.getEvents().contains(mAlpha)) {
+      fail("Counterexample takes automaton '" + aut.getName() +
+           "' to state '" + endstate.getName() +
+           "', which is not marked by the precondition '" +
+           mAlpha.getName() + "'!");
     }
+    return endstate;
   }
 
-  // #########################################################################
-  // # Testing SIC Property V
+
+  //#########################################################################
+  //# Testing SIC Property V
   private void testSICPropertyV(final String group, final String subdir,
                                 final String fileName, final String eventName,
                                 final boolean expect) throws Exception
@@ -302,34 +281,22 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     runModelVerifier(answerDES, expect);
   }
 
-  // #########################################################################
-  // # Auxiliary Methods
+
+  //#########################################################################
+  //# Auxiliary Methods
   private EventProxy findAnswerEvent(final ProductDESProxy des,
                                      final String eventName)
   {
     final EventProxy event = findEvent(des, eventName);
     final Map<String,String> attribs = event.getAttributes();
-    if (HISCAttributes.getEventType(attribs) != HISCAttributes.EventType.ANSWER) {
-      fail("The event '" + eventName + "' in model '" + des.getName()
-          + "'is not an answer event!");
+    if (HISCAttributes.getEventType(attribs) !=
+        HISCAttributes.EventType.ANSWER) {
+      fail("The event '" + eventName + "' in model '" + des.getName() +
+           "'is not an answer event!");
     }
     return event;
   }
 
-  private Map<AutomatonProxy,StateProxy> getEndState(final ProductDESProxy des,
-                                                     final TraceProxy trace)
-  {
-    final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
-    final Collection<AutomatonProxy> automata = des.getAutomata();
-    final int size = automata.size();
-    final Map<AutomatonProxy,StateProxy> tuple =
-        new HashMap<AutomatonProxy,StateProxy>(size);
-    for (final AutomatonProxy aut : automata) {
-      final StateProxy state = checkCounterExample(aut, counterexample);
-      tuple.put(aut, state);
-    }
-    return tuple;
-  }
 
   // #########################################################################
   // # Data Members
