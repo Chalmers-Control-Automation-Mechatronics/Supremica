@@ -127,8 +127,8 @@ public class LimitedCertainConflictsInfo
             event = todump.nextSetBit(event + 1);
           } while (event >= 0);
           result.setReachable(dump, true);
-          todump.or(uncontrollable);
         }
+        todump.or(uncontrollable);
       }
     }
     for (int event = uncontrollable.nextSetBit(nontau);

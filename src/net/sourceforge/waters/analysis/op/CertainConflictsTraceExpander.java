@@ -119,21 +119,23 @@ public class CertainConflictsTraceExpander
     mReverseStateMap = new HashMap<StateProxy,StateProxy>(numStates);
     mOriginalAutomata = new ArrayList<AutomatonProxy>(numAutomata);
     mConvertedAutomata = new ArrayList<AutomatonProxy>(numAutomata);
-    final Collection<EventProxy> events = new THashSet<EventProxy>();
+    mOriginalAutomata.add(mOriginalCertainConflictsAutomaton);
+    mConvertedAutomata.add(mConvertedCertainConflictsAutomaton);
+    final Collection<EventProxy> ccevents =
+      mConvertedCertainConflictsAutomaton.getEvents();
+    final Collection<EventProxy> events = new THashSet<EventProxy>(ccevents);
     for (final Map.Entry<AutomatonProxy,StateProxy> entry :
          stepMap.entrySet()) {
       final AutomatonProxy aut = entry.getKey();
-      mOriginalAutomata.add(aut);
-      final AutomatonProxy converted;
-      if (aut == mOriginalCertainConflictsAutomaton) {
-        converted = mConvertedCertainConflictsAutomaton;
-      } else {
+      if (aut != mOriginalCertainConflictsAutomaton) {
+        mOriginalAutomata.add(aut);
         final StateProxy init = entry.getValue();
-        converted = createControllabilityAutomaton(aut, init);
+        final AutomatonProxy converted =
+          createControllabilityAutomaton(aut, init);
+        mConvertedAutomata.add(converted);
+        final Collection<EventProxy> local = converted.getEvents();
+        events.addAll(local);
       }
-      mConvertedAutomata.add(converted);
-      final Collection<EventProxy> local = converted.getEvents();
-      events.addAll(local);
     }
     final List<EventProxy> eventList = new ArrayList<EventProxy>(events);
     Collections.sort(eventList);

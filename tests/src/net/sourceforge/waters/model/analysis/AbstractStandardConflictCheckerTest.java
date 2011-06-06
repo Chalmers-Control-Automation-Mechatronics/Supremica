@@ -192,6 +192,14 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testCertainConf1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "certainconf1.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testJpt10Counter() throws Exception
   {
     final String group = "tests";

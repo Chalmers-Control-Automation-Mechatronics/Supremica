@@ -4138,7 +4138,8 @@ public class OPConflictChecker
       final int endConvertedSteps = convertedSteps.size() - 1;
       SearchRecord record = convertedSteps.get(endConvertedSteps);
       int endState = record.getState();
-      while (!extendToBlockingState(info, endState, convertedSteps)) {
+      endState = addTauSteps(info, endState, convertedSteps);
+      while (!info.isBlockingState(endState)) {
         if (expander == null) {
           final KindTranslator translator = getKindTranslator();
           expander = new CertainConflictsTraceExpander
@@ -4187,6 +4188,7 @@ public class OPConflictChecker
             convertedSteps.add(record);
           }
         }
+        endState = addTauSteps(info, endState, convertedSteps);
       }
 
       delegate =
@@ -4235,26 +4237,26 @@ public class OPConflictChecker
       return false;
     }
 
-    private boolean extendToBlockingState
-      (final LimitedCertainConflictsInfo info,
-       final int start,
-       final List<SearchRecord> trace)
+    private int addTauSteps(final LimitedCertainConflictsInfo info,
+                            final int start,
+                            final List<SearchRecord> trace)
     {
-      if (info.isBlockingState(start)) {
-        return true;
-      } else {
-        final int tau = EventEncoding.TAU;
-        int state = start;
-        do {
-          state = info.getCertainConflictsSuccessor(state, tau);
-        } while (state >= 0 && !info.isBlockingState(state));
-        if (state < 0) {
-          return false;
-        } else {
-          final SearchRecord record = new SearchRecord(state, tau);
-          trace.add(record);
-          return true;
+      final int tau = EventEncoding.TAU;
+      int state = start;
+      int succ = state;
+      do {
+        state = succ;
+        if (info.isBlockingState(state)) {
+          break;
         }
+        succ = info.getCertainConflictsSuccessor(state, tau);
+      } while (succ >= 0);
+      if (state != start && info.isCertainConflictState(state)) {
+        final SearchRecord record = new SearchRecord(state, tau);
+        trace.add(record);
+        return state;
+      } else {
+        return start;
       }
     }
 
