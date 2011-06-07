@@ -280,12 +280,12 @@ public class ConflictAssess
       mProgressPrinter.flush();
     }
 
-    BDDConflictChecker checker;
+    ConflictChecker checker;
     boolean result;
     double time;
     try {
       mSecurityManager.setEnabled(true);
-      checker = new BDDConflictChecker(des, mDESFactory);
+      checker = new ConflictChecker(des, mDESFactory);
       final long starttime = System.currentTimeMillis();
       result = checker.run();
       final long stoptime = System.currentTimeMillis();

@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="round_robin_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>Adapted from 'Compositional Minimization of Finite State Systems' by S. Graf and B. Steffen. Round robin access by token passing, the token starts at Process 1. The system is mutually but not globally nonblocking and the behaviour of the plants does not violate the specification (language inclusion).</ns2:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression>
+<IntConstant Value="4"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="tk">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="ps">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="sb">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="bp">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<VariableComponent Name="token">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="token"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="token"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<SimpleComponent Kind="PLANT" Name="mutex">
+<Graph>
+<NodeList>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="112" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="32" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="ps"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="73" X="109"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S0" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="sb"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="72" X="84"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="process">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<PointGeometry>
+<Point Y="128" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point Y="192" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="5" X="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point Y="128" X="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point Y="128" X="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Idle">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="64" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="s2" Source="s1">
+<LabelBlock>
+<IndexedIdentifier Name="ps">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-21" X="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="s3" Source="s2">
+<LabelBlock>
+<IndexedIdentifier Name="tk">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-65"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="s4" Source="s2">
+<LabelBlock>
+<IndexedIdentifier Name="bp">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-2" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="Idle" Source="s3">
+<LabelBlock>
+<IndexedIdentifier Name="bp">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-17" X="-36"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="Idle" Source="s4">
+<LabelBlock>
+<IndexedIdentifier Name="tk">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-18" X="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="s1" Source="Idle">
+<LabelBlock>
+<IndexedIdentifier Name="tk">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="5" X="0"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="process">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point Y="128" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point Y="192" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="5" X="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point Y="128" X="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point Y="128" X="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="Idle">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="64" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="s2" Source="s1">
+<LabelBlock>
+<IndexedIdentifier Name="ps">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="0"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="s3" Source="s2">
+<LabelBlock>
+<IndexedIdentifier Name="tk">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-65"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="s4" Source="s2">
+<LabelBlock>
+<IndexedIdentifier Name="bp">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-2" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="Idle" Source="s3">
+<LabelBlock>
+<IndexedIdentifier Name="bp">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-17" X="-36"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="Idle" Source="s4">
+<LabelBlock>
+<IndexedIdentifier Name="tk">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-18" X="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="s1" Source="Idle">
+<LabelBlock>
+<IndexedIdentifier Name="tk">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="5" X="0"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="buffer">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="128" X="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<IndexedIdentifier Name="sb">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="90" X="93"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S0" Source="S1">
+<LabelBlock>
+<IndexedIdentifier Name="bp">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="-37"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="87" X="68"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="resource">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="128" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<IndexedIdentifier Name="ps">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="89" X="125"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S0" Source="S1">
+<LabelBlock>
+<IndexedIdentifier Name="sb">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-35"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="88" X="100"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="token_passing">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="96" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S0" Source="S0">
+<LabelBlock>
+<IndexedIdentifier Name="tk">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-28" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="96" X="187"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="token"/>
+<SimpleIdentifier Name="i"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="token"/>
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="token"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="5"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

@@ -212,9 +212,7 @@
         <include name="net/sourceforge/waters/**/*.xsl"/>
         <exclude name="net/sourceforge/waters/analysis/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
-        <exclude name="net/sourceforge/waters/cpp/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
-        <exclude name="net/sourceforge/waters/model/analysis/**"/>
         <exclude name="net/sourceforge/waters/samples/**"/>
       </fileset>
     </jar>
@@ -222,6 +220,8 @@
       <fileset dir="${waters.classes}">
         <include
            name="net/sourceforge/waters/analysis/comp552/ModelChecker.class"/>
+        <include
+           name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.class"/>
       </fileset>
     </jar>
   </target>
@@ -613,6 +613,7 @@
           name="net/sourceforge/waters/analysis/comp552/ConflictMain.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
+        <include name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.java"/>
         <include name="net/sourceforge/waters/model/**"/>
         <exclude name="net/sourceforge/waters/model/analysis/**"/>
         <include name="net/sourceforge/waters/plain/**"/>
