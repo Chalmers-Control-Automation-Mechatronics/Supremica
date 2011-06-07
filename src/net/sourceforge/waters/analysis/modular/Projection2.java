@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   Projection2
 //###########################################################################
@@ -9,13 +9,17 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import gnu.trove.THashSet;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectHashingStrategy;
+import gnu.trove.TObjectIntHashMap;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +28,7 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -57,7 +62,7 @@ public class Projection2
   {
     super(model, factory);
     mHide = hide;
-    mForbidden = new HashSet<EventProxy>(forbidden);
+    mForbidden = new THashSet<EventProxy>(forbidden);
   }
 
 
@@ -94,124 +99,138 @@ public class Projection2
       setUp();
       final ProductDESProxy model = getModel();
       final int limit = getNodeLimit();
-      states = new IntMap(limit);
-      trans = new ArrayList<TransitionProxy>();
-      events = model.getEvents().toArray(new EventProxy[model.getEvents().size()]);
-      mPossible = new boolean[events.length];
+      final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
+      mStates = new TObjectIntHashMap<int[]>(strategy);
+      mTransitions = new ArrayList<TransitionProxy>();
+      mEvents = model.getEvents().toArray(new EventProxy[model.getEvents().size()]);
+      mPossible = new boolean[mEvents.length];
       final int numAutomata = model.getAutomata().size();
-      AutomatonProxy[] aut = model.getAutomata().toArray(new AutomatonProxy[numAutomata]);
-      eventAutomaton = new int[events.length][numAutomata];
+      AutomatonProxy[] automata = model.getAutomata().toArray(new AutomatonProxy[numAutomata]);
+      mEventAutomaton = new int[mEvents.length][numAutomata];
       int l = 0;
       // transitions indexed first by automaton then by event then by source state
-      mTransitions = new int[numAutomata][events.length][];
+      mTransitionTable = new int[numAutomata][mEvents.length][];
       // go through and put all the events to be hidden to the front
-      Map<EventProxy, Integer> eventToIndex = new HashMap<EventProxy, Integer>(events.length);
-      for (int i = 0; i < events.length; i++) {
-        if (mHide.contains(events[i])) {
-          final EventProxy temp = events[i];
-          events[i] = events[l];
-          events[l] = temp;
+      TObjectIntHashMap<EventProxy> eventToIndex =
+        new TObjectIntHashMap<EventProxy>(mEvents.length);
+      for (int i = 0; i < mEvents.length; i++) {
+        if (mHide.contains(mEvents[i])) {
+          final EventProxy temp = mEvents[i];
+          mEvents[i] = mEvents[l];
+          mEvents[l] = temp;
           l++;
         }
       }
       assert(l == mHide.size());
       //put all the forbidden events directly after the Hidden ones
-      for (int i = l; i < events.length; i++) {
-        if (mForbidden.contains(events[i])) {
-          final EventProxy temp = events[i];
-          events[i] = events[l];
-          events[l] = temp;
+      for (int i = l; i < mEvents.length; i++) {
+        if (mForbidden.contains(mEvents[i])) {
+          final EventProxy temp = mEvents[i];
+          mEvents[i] = mEvents[l];
+          mEvents[l] = temp;
           l++;
         }
       }
-      for (int i = 0; i < events.length; i++) {
-        eventToIndex.put(events[i], i);
+      for (int i = 0; i < mEvents.length; i++) {
+        eventToIndex.put(mEvents[i], i);
       }
       assert(l == mHide.size() + mForbidden.size());
       // this has to be done after events gets it's final ordering to avoid
       // subtle bugs
-      for (int i = 0; i < events.length; i++) {
-        for (int j = 0; j < aut.length; j++) {
-          if (aut[j].getEvents().contains(events[i])) {
-            final int[] states1 = new int[aut[j].getStates().size()];
+      for (int i = 0; i < mEvents.length; i++) {
+        for (int j = 0; j < automata.length; j++) {
+          if (automata[j].getEvents().contains(mEvents[i])) {
+            final int[] states1 = new int[automata[j].getStates().size()];
             Arrays.fill(states1, -1);
-            mTransitions[j][i] = states1;
+            mTransitionTable[j][i] = states1;
           } else {
-            mTransitions[j][i] = null;
+            mTransitionTable[j][i] = null;
           }
         }
       }
       int[] currentState = new int[numAutomata];
-      for (int i = 0; i < aut.length; i++) {
-        final Map<StateProxy, Integer> stateMap = new HashMap<StateProxy, Integer>(aut[i].getStates().size());
+      for (int i = 0; i < automata.length; i++) {
+        final AutomatonProxy aut = automata[i];
+        final TObjectIntHashMap<StateProxy> stateMap =
+          new TObjectIntHashMap<StateProxy>(aut.getStates().size());
         l = 0;
-        for (final StateProxy s : aut[i].getStates()) {
+        for (final StateProxy s : aut.getStates()) {
           if (s.isInitial()) {
             currentState[i] = l;
           }
           stateMap.put(s, l);
           l++;
         }
-        assert(l == aut[i].getStates().size());
-        for (final TransitionProxy t : aut[i].getTransitions()) {
-          mTransitions[i][eventToIndex.get(t.getEvent())]
-                          [stateMap.get(t.getSource())] = stateMap.get(t.getTarget());
+        assert(l == aut.getStates().size());
+        for (final TransitionProxy trans : aut.getTransitions()) {
+          final StateProxy source = trans.getSource();
+          final int scode = stateMap.get(source);
+          final EventProxy event = trans.getEvent();
+          final int ecode = eventToIndex.get(event);
+          final StateProxy target = trans.getTarget();
+          final int tcode = stateMap.get(target);
+          final int current = mTransitionTable[i][ecode][scode];
+          if (current < 0) {
+            mTransitionTable[i][ecode][scode] = tcode;
+          } else if (current != tcode) {
+            throw new NondeterministicDESException(aut, source, event);
+          }
         }
       }
-      for (int i = 0; i < events.length; i++) {
+      for (int i = 0; i < mEvents.length; i++) {
         final IntDouble[] list = new IntDouble[numAutomata];
-        for (int j = 0; j < aut.length; j++) {
+        for (int j = 0; j < automata.length; j++) {
           list[j] = new IntDouble(j, 0);
-          if (mTransitions[j][i] != null) {
-            for (int k = 0; k < mTransitions[j][i].length; k++) {
-              if (mTransitions[j][i][k] != -1) {
+          if (mTransitionTable[j][i] != null) {
+            for (int k = 0; k < mTransitionTable[j][i].length; k++) {
+              if (mTransitionTable[j][i][k] != -1) {
                 list[j].mDouble++;
               }
             }
-            list[j].mDouble /= (double)mTransitions[j][i].length;
+            list[j].mDouble /= (double)mTransitionTable[j][i].length;
           } else {
             list[j].mDouble = Double.POSITIVE_INFINITY;
           }
         }
         Arrays.sort(list);
-        for (int j = 0; j < eventAutomaton[i].length; j++) {
-          eventAutomaton[i][j] = list[j].mInt;
+        for (int j = 0; j < mEventAutomaton[i].length; j++) {
+          mEventAutomaton[i][j] = list[j].mInt;
         }
       }
       // don't need these anymore
-      aut = null;
+      automata = null;
       eventToIndex = null;
 
       // Time to start building the automaton
       mNumberOfStates = 1;
       currentState = encode(currentState);
-      states.put(currentState, 0);
-      unvisited = new ArrayBag(100);
-      unvisited.offer(currentState);
-      while (!unvisited.isEmpty()) {
-        currentState = unvisited.take();
+      mStates.put(currentState, 0);
+      mUnvisited = new ArrayBag(100);
+      mUnvisited.offer(currentState);
+      while (!mUnvisited.isEmpty()) {
+        currentState = mUnvisited.take();
         if (!explore(currentState, true)) {
           explore(currentState, false);
         }
       }
-      states = null;
+      mStates = null;
       currentState = new int[] {0};
-      mTransitions = new int[1][events.length][mNumberOfStates];
-      for (int i = 0; i < mTransitions[0].length; i++) {
-        for (int j = 0; j < mTransitions[0][i].length; j++) {
-          mTransitions[0][i][j] = -1;
+      mTransitionTable = new int[1][mEvents.length][mNumberOfStates];
+      for (int i = 0; i < mTransitionTable[0].length; i++) {
+        for (int j = 0; j < mTransitionTable[0][i].length; j++) {
+          mTransitionTable[0][i][j] = -1;
         }
       }
-      for (final int[] tran : newtrans) {
-        mTransitions[0][tran[1]][tran[0]] = tran[2];
+      for (final int[] tran : mNewTransitions) {
+        mTransitionTable[0][tran[1]][tran[0]] = tran[2];
       }
       mNumberOfStates = 1;
       currentState = actualState(currentState);
-      newStates = new StateMap(limit);
-      newStates.put(currentState, new MemStateProxy(0));
-      unvisited.offer(currentState);
-      while (!unvisited.isEmpty()) {
-        currentState = unvisited.take();
+      mNewStates = new StateMap(limit);
+      mNewStates.put(currentState, new MemStateProxy(0));
+      mUnvisited.offer(currentState);
+      while (!mUnvisited.isEmpty()) {
+        currentState = mUnvisited.take();
         if (!explore2(currentState, true)) {
           explore2(currentState, false);
         }
@@ -234,9 +253,9 @@ public class Projection2
       final ProductDESProxyFactory factory = getFactory();
       AutomatonProxy result =
         factory.createAutomatonProxy(name.toString(), ComponentKind.PLANT,
-                                     ev, newStates.values(), trans);
-      newStates = null;
-      trans = null;
+                                     ev, mNewStates.values(), mTransitions);
+      mNewStates = null;
+      mTransitions = null;
       final Minimizer min = new Minimizer(result, factory);
       result = min.run();
       return setAutomatonResult(result);
@@ -271,10 +290,10 @@ public class Projection2
     } else {
       mForbidden.retainAll(events);
     }
-    mDisabled = new HashSet<EventProxy>(events);
+    mDisabled = new THashSet<EventProxy>(events);
     mDisabled.removeAll(mHide);
     mNumberOfStates = 1;
-    newtrans = new ArrayList<int[]>();
+    mNewTransitions = new ArrayList<int[]>();
   }
 
   @Override
@@ -282,14 +301,14 @@ public class Projection2
   {
     super.tearDown();
     mDisabled = null;
-    states = null;
-    trans = null;
-    events = null;
+    mStates = null;
     mTransitions = null;
-    newtrans = null;
-    newStates = null;
-    unvisited = null;
-    eventAutomaton = null;
+    mEvents = null;
+    mTransitionTable = null;
+    mNewTransitions = null;
+    mNewStates = null;
+    mUnvisited = null;
+    mEventAutomaton = null;
   }
 
 
@@ -299,8 +318,8 @@ public class Projection2
     throws OverflowException
   {
     boolean result = false;
-    final int numAutomata = mTransitions.length;
-    final int source = states.get(state);
+    final int numAutomata = mTransitionTable.length;
+    final int source = mStates.get(state);
     state = decode(state);
     int min, max;
     if (forbidden) {
@@ -308,7 +327,7 @@ public class Projection2
       max = mHide.size() + mForbidden.size();
     } else {
       min = 0;
-      max = events.length;
+      max = mEvents.length;
     }
     events:
     for (int i = min; i < max; i++) {
@@ -319,35 +338,37 @@ public class Projection2
       }
       final int[] suc = new int[numAutomata];
       for (int l = 0; l < numAutomata; l++) {
-        final int automaton = eventAutomaton[i][l];
-        if (mTransitions[automaton][i] != null) {
-          suc[automaton] = mTransitions[automaton][i][state[automaton]];
+        final int automaton = mEventAutomaton[i][l];
+        if (mTransitionTable[automaton][i] != null) {
+          suc[automaton] = mTransitionTable[automaton][i][state[automaton]];
         } else {
           suc[automaton] = state[automaton];
         }
         if (suc[automaton] == -1) {
           if (l > 0) {
-            final int t = eventAutomaton[i][l];
-            eventAutomaton[i][l] = eventAutomaton[i][l - 1];
-            eventAutomaton[i][l - 1] = t;
+            final int t = mEventAutomaton[i][l];
+            mEventAutomaton[i][l] = mEventAutomaton[i][l - 1];
+            mEventAutomaton[i][l - 1] = t;
           }
           continue events;
         }
       }
       result = true;
-      mDisabled.remove(events[i]);
-      Integer target = states.get(suc);
-      if (target == null) {
+      mDisabled.remove(mEvents[i]);
+      int target;
+      if (mStates.containsKey(suc)) {
+        target = mStates.get(suc);
+      } else {
         target = mNumberOfStates;
-        states.put(suc, target);
+        mStates.put(suc, target);
         mNumberOfStates++;
         final int limit = getNodeLimit();
         if (mNumberOfStates > limit) {
           throw new OverflowException(limit);
         }
-        unvisited.offer(suc);
+        mUnvisited.offer(suc);
       }
-      newtrans.add(new int[] {source, i, target});
+      mNewTransitions.add(new int[] {source, i, target});
       mPossible[i] = true;
     }
     return result;
@@ -362,16 +383,16 @@ public class Projection2
       max = mHide.size() + mForbidden.size();
     } else {
       min = mHide.size() + mForbidden.size();
-      max = events.length;
+      max = mEvents.length;
     }
     boolean result = false;
     //System.out.println("state:" + Arrays.toString(state));
     final ProductDESProxyFactory factory = getFactory();
-    final StateProxy source = newStates.get(state);
+    final StateProxy source = mNewStates.get(state);
     for (int i = min; i < max; i++) {
-      final List<Integer> successor = new ArrayList<Integer>(state.length);
+      final TIntArrayList successor = new TIntArrayList(state.length);
       for (int j = 0; j < state.length; j++) {
-        final int s = mTransitions[0][i][state[j]];
+        final int s = mTransitionTable[0][i][state[j]];
         if (s == -1) {
           continue;
         }
@@ -387,18 +408,18 @@ public class Projection2
         succ[j] = successor.get(j);
       }
       succ = actualState(succ);
-      StateProxy target = newStates.get(succ);
+      StateProxy target = mNewStates.get(succ);
       if (target == null) {
         target = new MemStateProxy(mNumberOfStates);
-        newStates.put(succ, target);
+        mNewStates.put(succ, target);
         mNumberOfStates++;
         final int limit = getNodeLimit();
         if (mNumberOfStates > limit) {
           throw new OverflowException(limit);
         }
-        unvisited.offer(succ);
+        mUnvisited.offer(succ);
       }
-      trans.add(factory.createTransitionProxy(source, events[i], target));
+      mTransitions.add(factory.createTransitionProxy(source, mEvents[i], target));
     }
     return result;
   }
@@ -417,7 +438,7 @@ public class Projection2
     while (!nextstate.isEmpty()) {
       final int s = nextstate.take();
       for (int i = 0; i < numHidden; i++) {
-        final int newstate = mTransitions[0][i][s];
+        final int newstate = mTransitionTable[0][i][s];
         if (newstate == -1) {
           continue;
         }
@@ -428,7 +449,7 @@ public class Projection2
     }
     final int[] result = new int[setofstates.size()];
     int l = 0;
-    for (final Integer a : setofstates) {
+    for (final int a : setofstates) {
       result[l] = a;
       l++;
     }
@@ -678,49 +699,31 @@ public class Projection2
     }
   }
 
-  private static class IntMap
-    extends AbstractMap<int[], Integer>
+
+  //#######################################################################
+  //# Inner Class IntArrayHashingStrategy
+  private static class IntArrayHashingStrategy
+    implements TObjectHashingStrategy<int[]>
   {
-    final Map<IntArray, Integer> mMap;
 
-    public IntMap(final int num)
+    //#######################################################################
+    //# Interface gnu.trove.TObjectHashingStrategy
+    public int computeHashCode(final int[] array)
     {
-      mMap = new HashMap<IntArray, Integer>(num);
+      return Arrays.hashCode(array);
     }
 
-    public Set<Map.Entry<int[],Integer>> entrySet()
+    public boolean equals(final int[] array1, final int[] array2)
     {
-      return null; // I don't think i'll be using this method so meh
+      return Arrays.equals(array1, array2);
     }
 
-    public Integer get(final Object o)
-    {
-      final int[] a = (int[]) o;
-      return mMap.get(new IntArray(a));
-    }
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unused")
-	public Integer get(final int[] a)
-    {
-      return mMap.get(new IntArray(a));
-    }
-
-    @SuppressWarnings("unused")
-	public Integer put(final Object o, final Integer s)
-    {
-      return mMap.put(new IntArray((int[])o), s);
-    }
-
-    public Integer put(final int[] a, final Integer s)
-    {
-      return mMap.put(new IntArray(a), s);
-    }
-
-    public Collection<Integer> values()
-    {
-      return mMap.values();
-    }
   }
+
 
   private static class IntArray
   {
@@ -783,13 +786,13 @@ public class Projection2
   private Set<EventProxy> mHide;
   private Set<EventProxy> mForbidden;
   private Set<EventProxy> mDisabled;
-  private Map<int[], Integer> states;
-  private Collection<TransitionProxy> trans;
-  private EventProxy[] events;
-  private int[][][] mTransitions;
-  private List<int[]> newtrans = new ArrayList<int[]>();
-  private Map<int[], StateProxy> newStates;
+  private TObjectIntHashMap<int[]> mStates;
+  private Collection<TransitionProxy> mTransitions;
+  private EventProxy[] mEvents;
+  private int[][][] mTransitionTable;
+  private List<int[]> mNewTransitions = new ArrayList<int[]>();
+  private Map<int[], StateProxy> mNewStates;
   private int mNumberOfStates;
-  private Bag unvisited;
-  private int[][] eventAutomaton;
+  private Bag mUnvisited;
+  private int[][] mEventAutomaton;
 }
