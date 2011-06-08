@@ -39,8 +39,8 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
    *
    * <P>After running the test, the imported module is saved in
    * {supremica}<CODE>/logs/results/external/promela/PromelaUnmarshallerTest</CODE>
-   * as a <CODE>.wmod</CODE> file that can be loaded into. After saving, the
-   * output is compared to the expected result in
+   * as a <CODE>.wmod</CODE> file that can be loaded into the IDE.
+   * After saving, the output is compared to the expected result in
    * {supremica}<CODE>/examples/waters/promela/p101a.wmod</CODE>, and any
    * differences cause a test failure.</P>
    */
