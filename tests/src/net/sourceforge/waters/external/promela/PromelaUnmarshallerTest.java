@@ -89,6 +89,16 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
     testImport("p103d");
   }
 
+  public void testImport_p104a() throws Exception
+  {
+    testImport("p104a");
+  }
+
+  public void testImport_p104b() throws Exception
+  {
+    testImport("p104b");
+  }
+
   public void testImport_p105a() throws Exception
   {
     testImport("p105a");
