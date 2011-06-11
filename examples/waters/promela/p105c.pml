@@ -1,7 +1,8 @@
 /*                                     
  * A test for the Promela importer in Waters.
- * This model creates two instances of the process type A, such that different
- * message exchange events need to be created for different senders.
+ * This model creates two instances of the process types A and B,
+ * such that different message exchange events need to be created for
+ * different combinations of senders and recipients.
  */
 
 #define msgtype 33
@@ -24,5 +25,6 @@ init
 {
         run A();
         run A();
+        run B();
         run B()
 }
