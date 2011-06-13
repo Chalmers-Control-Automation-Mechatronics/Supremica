@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="wicked_counting" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>A test for limited depth-first search conflict check algorithms. The synchronous product has two strongly connected components with more than 1 million states each, enough to fill up the stack of the native conflict checker in its backwards search.</ns2:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="REQUIRED_PARAMETER" Name="DIGITS">
+<ConstantAliasExpression>
+<IntConstant Value="20"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="set">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="DIGITS"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="go"/>
+<EventDecl Kind="CONTROLLABLE" Name="split1"/>
+<EventDecl Kind="CONTROLLABLE" Name="split2"/>
+<EventDecl Kind="CONTROLLABLE" Name="flip"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="DIGITS"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="digit">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-26"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="128" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-25"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<IndexedIdentifier Name="set">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-38"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="90" X="83"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S0" Source="S1">
+<LabelBlock>
+<ForeachEvent Name="j">
+<BinaryExpression Operator="..">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="DIGITS"/>
+</BinaryExpression>
+<EventList>
+<IndexedIdentifier Name="set">
+<SimpleIdentifier Name="j"/>
+</IndexedIdentifier>
+</EventList>
+</ForeachEvent>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="87" X="110"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S0" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="go"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="49" X="136"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="PLANT" Name="split">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="112" X="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="64" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-25"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="160" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="split1"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-4" X="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S2" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="split2"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S1" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="go"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="65" X="189"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S2" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="go"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="161" X="187"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="go">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="64" X="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point Y="112" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="9" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S3">
+<PointGeometry>
+<Point Y="160" X="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="7" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="go"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-17" X="-21"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S2" Source="S1">
+<LabelBlock>
+<IndexedIdentifier Name="set">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-17" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<EndPointGeometry>
+<Point Y="112" X="176"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="S3" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="go"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-2" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S0" Source="S3">
+<LabelBlock>
+<SimpleIdentifier Name="go"/>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S2" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="set"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="113" X="218"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="flipflop">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="64" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="128" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-4" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="flip"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="97" X="99"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S0" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="flip"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="96" X="124"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

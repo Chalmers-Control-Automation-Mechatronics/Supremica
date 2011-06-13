@@ -384,32 +384,33 @@ doNonblockingCoreachabilitySearch()
     currenttuple = new uint32[mNumAutomata];
     setupReverseTransitionRelations();
   }
-  try {
-    for (uint32 current = 0; current < mNumStates; current++) {
-      checkAbort();
-      uint32* currentpacked = mStateSpace->get(current);
-      if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
-        continue;
+  for (uint32 current = 0; current < mNumStates; current++) {
+    checkAbort();
+    uint32* currentpacked = mStateSpace->get(current);
+    if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
+      continue;
+    }
+    if (mEncoding->isMarkedStateTuplePacked(currentpacked)) {
+      mEncoding->setTag(currentpacked, TAG_COREACHABLE);
+      if (mNumCoreachableStates != UNDEF_UINT32 &&
+          ++mNumCoreachableStates == mNumStates) {
+        return true;
       }
-      if (mEncoding->isMarkedStateTuplePacked(currentpacked)) {
-        mEncoding->setTag(currentpacked, TAG_COREACHABLE);
-        if (mNumCoreachableStates != UNDEF_UINT32 &&
-            ++mNumCoreachableStates == mNumStates) {
-          return true;
-        }
+      try {
         if (currenttuple == 0) { // storing
           exploreNonblockingCoreachabilityStateDFS(current);
         } else { // non-storing
           exploreNonblockingCoreachabilityStateDFS(currenttuple,
                                                    currentpacked);
         }
+      } catch (const SearchAbort& abort) {
+        delete [] currenttuple;
+        return true;
+      } catch (const DFSStackOverflow& abort) {
+        mDFSStackPos = 0;
+        overflow = true;
       }
     }
-  } catch (const SearchAbort& abort) {
-    delete [] currenttuple;
-    return true;
-  } catch (const DFSStackOverflow& abort) {
-    overflow = true;
   }
   while (overflow) {
     overflow = false;
@@ -430,6 +431,7 @@ doNonblockingCoreachabilitySearch()
       delete [] currenttuple;
       return true;
     } catch (const DFSStackOverflow& abort) {
+      mDFSStackPos = 0;
       overflow = true;
     }
   }
@@ -629,7 +631,7 @@ checkCoreachabilityState()
 
 void ProductExplorer::
 checkTraceState()
-{        
+{
   uint32 found = mStateSpace->find();
   if (found < mTraceLimit) {
     mTraceState = found;

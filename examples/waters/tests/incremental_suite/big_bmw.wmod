@@ -161,41 +161,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 <ComponentList>
 <SimpleComponent Kind="SPEC" Name="comfort_condition_doors">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CLOSEDOOR">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CLOSEDOOR">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_doors"/>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_start"/>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="doors_closed">
 <EventList>
@@ -341,31 +306,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="comfort_condition_key">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_key"/>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="KEY_PLUG"/>
-<SimpleIdentifier Name="KEY_UNPLUG"/>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="key">
 <PointGeometry>
@@ -456,29 +396,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="comfort_control">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_doors"/>
-<SimpleIdentifier Name="cmft_cond_key"/>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="CMFT_STOP"/>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="esc_req">
 <PointGeometry>
@@ -692,17 +609,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PLANT" Name="comfort_function">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="no_request">
 <EventList>
@@ -765,29 +671,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 <SimpleIdentifier Name="FUNC"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="FUNC"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_doors"/>
-<SimpleIdentifier Name="cmft_cond_key"/>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="FUNC"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="FUNC"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_start"/>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="FUNC"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="reset"/>
-<SimpleIdentifier Name="timeout"/>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="request">
 <PointGeometry>
@@ -1201,14 +1084,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 <SimpleIdentifier Name="DOOR"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CLOSEDOOR">
-<SimpleIdentifier Name="DOOR"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="DOOR"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="closed">
 <EventList>
@@ -1264,54 +1139,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </ForeachComponent>
 <SimpleComponent Kind="SPEC" Name="fh">
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="ecefin"/>
-<SimpleIdentifier Name="fh_cond_door_open"/>
-<SimpleIdentifier Name="fh_cond_doors_closed"/>
-<SimpleIdentifier Name="fh_cond_ecefin"/>
-<SimpleIdentifier Name="fh_cond_kl_r"/>
-<SimpleIdentifier Name="FH_LOCK"/>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-<SimpleIdentifier Name="KL_50_ON"/>
-<SimpleIdentifier Name="nocountry"/>
-<SimpleIdentifier Name="read_country"/>
-<SimpleIdentifier Name="roof_manual_close"/>
-<SimpleIdentifier Name="roof_manual_open"/>
-<SimpleIdentifier Name="usaus"/>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="REAR"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="REAR"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="REAR"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="REAR"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="s7">
 <PointGeometry>
@@ -1724,22 +1551,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="fh_condition_doors">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CLOSEDOOR">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CLOSEDOOR">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="fh_cond_door_open"/>
-<SimpleIdentifier Name="fh_cond_doors_closed"/>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="doors_closed">
 <EventList>
@@ -1872,23 +1683,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="fh_condition_ecefin">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CLOSEDOOR">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CLOSEDOOR">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="fh_cond_ecefin"/>
-<SimpleIdentifier Name="KL_R_OFF"/>
-<SimpleIdentifier Name="KL_R_ON"/>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio_door_open">
 <PointGeometry>
@@ -2185,14 +1979,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="fh_condition_kl_r">
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="fh_cond_ecefin"/>
-<SimpleIdentifier Name="fh_cond_kl_r"/>
-<SimpleIdentifier Name="KL_50_OFF"/>
-<SimpleIdentifier Name="KL_50_ON"/>
-<SimpleIdentifier Name="KL_R_ON"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio">
 <PointGeometry>
@@ -2296,50 +2082,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="fh_sync_cmft">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="FH_LOCK"/>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-<SimpleIdentifier Name="roof_manual_close"/>
-<SimpleIdentifier Name="roof_manual_open"/>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="REAR"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="REAR"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="REAR"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="REAR"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="locked">
 <EventList>
@@ -2452,14 +2194,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PLANT" Name="lock">
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="KEY_PLUG"/>
-<SimpleIdentifier Name="KEY_UNPLUG"/>
-<SimpleIdentifier Name="KL_50_OFF"/>
-<SimpleIdentifier Name="KL_50_ON"/>
-<SimpleIdentifier Name="KL_R_OFF"/>
-<SimpleIdentifier Name="KL_R_ON"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio">
 <PointGeometry>
@@ -2569,30 +2303,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PROPERTY" Name="prop_cmft_kl50">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-<SimpleIdentifier Name="KL_50_OFF"/>
-<SimpleIdentifier Name="KL_50_ON"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="starter">
 <PointGeometry>
@@ -2672,24 +2382,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PROPERTY" Name="prop_cmft_req">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="KEY_PLUG"/>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPENDOOR">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="s4">
 <PointGeometry>
@@ -2814,18 +2506,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PROPERTY" Name="prop_fh_cmftreq0">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="s1">
 <PointGeometry>
@@ -2896,20 +2576,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PROPERTY" Name="prop_fh_cmftreq1">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_doors"/>
-<SimpleIdentifier Name="cmft_cond_key"/>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -2984,12 +2650,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PLANT" Name="readcountry">
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="ecefin"/>
-<SimpleIdentifier Name="nocountry"/>
-<SimpleIdentifier Name="read_country"/>
-<SimpleIdentifier Name="usaus"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -3041,11 +2701,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PLANT" Name="roof">
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="ROOF_MANUAL_CLOSE"/>
-<SimpleIdentifier Name="ROOF_MANUAL_OPEN"/>
-<SimpleIdentifier Name="ROOF_MANUAL_STOP"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="s2">
 <EventList>
@@ -3131,17 +2786,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="roof_move_stop">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="roof_manual_close"/>
-<SimpleIdentifier Name="roof_manual_open"/>
-<SimpleIdentifier Name="roof_manual_stop"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="s1">
 <EventList>
@@ -3211,14 +2855,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="roof_spec">
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="ROOF_MANUAL_CLOSE"/>
-<SimpleIdentifier Name="roof_manual_close"/>
-<SimpleIdentifier Name="ROOF_MANUAL_OPEN"/>
-<SimpleIdentifier Name="roof_manual_open"/>
-<SimpleIdentifier Name="ROOF_MANUAL_STOP"/>
-<SimpleIdentifier Name="roof_manual_stop"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -3337,11 +2973,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 </SimpleComponent>
 <SimpleComponent Kind="PLANT" Name="timer">
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="reset"/>
-<SimpleIdentifier Name="timeout"/>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="on">
 <PointGeometry>
@@ -3408,29 +3039,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 <SimpleIdentifier Name="I"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_stop">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="5" X="5"/>
-</LabelGeometry>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="s1">
 <EventList>
@@ -3513,20 +3121,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 <SimpleIdentifier Name="I"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="WINDOW_MANUAL_CLOSE">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="WINDOW_MANUAL_OPEN">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="WINDOW_MANUAL_STOP">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -3628,32 +3222,6 @@ Reference: Petra Malik, From Supervisory Control to Nonblocking Controllers of D
 <SimpleIdentifier Name="I"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="WINDOW_MANUAL_CLOSE">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_close">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="WINDOW_MANUAL_OPEN">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_open">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="WINDOW_MANUAL_STOP">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="window_manual_stop">
-<SimpleIdentifier Name="I"/>
-<SimpleIdentifier Name="J"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>

@@ -256,6 +256,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testWickedCounting() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "wicked_counting.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
 
   //#########################################################################
   //# Test Cases --- tests
