@@ -13,13 +13,12 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.cpp.analysis.ExplorerMode;
-import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public class NativeStandardNarrowStoringConflictCheckerTest
-  extends AbstractStandardConflictCheckerTest
+  extends AbstractNativeStandardConflictCheckerTest
 {
 
   //#########################################################################

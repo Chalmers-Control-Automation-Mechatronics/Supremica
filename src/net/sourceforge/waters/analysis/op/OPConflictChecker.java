@@ -1404,13 +1404,13 @@ public class OPConflictChecker
       mModifyingSteps.listIterator(size);
     final Collection<AutomatonProxy> check =
       new THashSet<AutomatonProxy>(mCurrentAutomata);
-    checkCounterExample(traceSteps, check);
+    //checkCounterExample(traceSteps, check);
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
       check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
-      checkCounterExample(traceSteps, check);
+      //checkCounterExample(traceSteps, check);
     }
     final ProductDESProxyFactory factory = getFactory();
     final String tracename = getTraceName();
@@ -1425,6 +1425,7 @@ public class OPConflictChecker
                                             trace.getKind());
   }
 
+  @SuppressWarnings("unused")
   private void checkCounterExample(final List<TraceStepProxy> steps,
                                    final Collection<AutomatonProxy> automata)
   throws AnalysisException

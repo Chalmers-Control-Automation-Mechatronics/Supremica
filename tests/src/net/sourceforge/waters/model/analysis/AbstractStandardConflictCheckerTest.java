@@ -11,7 +11,6 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.des.EventProxy;
@@ -66,10 +65,11 @@ public abstract class AbstractStandardConflictCheckerTest
   public void testReentrant2()
   throws Exception
   {
-    checkDiningPhilosophers(2);
-    checkDiningPhilosophers(3);
-    checkDiningPhilosophers(2);
-    checkDiningPhilosophers(3);
+    testDiningPhilosophers__2();
+    testDiningPhilosophers__3();
+    testDiningPhilosophers__2();
+    testDirtyPhilosophers__2();
+    testDiningPhilosophers__3();
   }
 
   public void testOverflowException() throws Exception
@@ -200,6 +200,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testCertainConf2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "certainconf2.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testJpt10Counter() throws Exception
   {
     final String group = "tests";
@@ -258,10 +266,18 @@ public abstract class AbstractStandardConflictCheckerTest
 
   public void testWickedCounting() throws Exception
   {
+    checkWickedCounting(15);
+  }
+
+  protected void checkWickedCounting(final int digits) throws Exception
+  {
     final String group = "tests";
     final String dir = "nasty";
     final String name = "wicked_counting.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ParameterBindingProxy binding = createBinding("DIGITS", digits);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    runModelVerifier(group, dir, name, bindings, true);
   }
 
 
@@ -857,32 +873,52 @@ public abstract class AbstractStandardConflictCheckerTest
   //# Test Cases -- Parameterised
   public void testControlledPhilosophers__2() throws Exception
   {
-    checkControlledPhilosophers(2);
+    checkPhilosophers("controlled_philosophers.wmod", 2, true);
   }
 
   public void testControlledPhilosophers__3() throws Exception
   {
-    checkControlledPhilosophers(3);
+    checkPhilosophers("controlled_philosophers.wmod", 3, true);
   }
 
   public void testDiningPhilosophers__2() throws Exception
   {
-    checkDiningPhilosophers(2);
-  }
+    checkPhilosophers("dining_philosophers.wmod", 2, false);
+ }
 
   public void testDiningPhilosophers__3() throws Exception
   {
-    checkDiningPhilosophers(3);
+    checkPhilosophers("dining_philosophers.wmod", 3, false);
   }
 
   public void testDirtyPhilosophers__2() throws Exception
   {
-    checkDirtyPhilosophers(2);
+    checkPhilosophers("dirty_philosophers.wmod", 2, false);
   }
 
   public void testDirtyPhilosophers__3() throws Exception
   {
-    checkDirtyPhilosophers(3);
+    checkPhilosophers("dirty_philosophers.wmod", 2, false);
+  }
+
+  public void testOrderedPhilosophers__2() throws Exception
+  {
+    checkPhilosophers("ordered_philosophers.wmod", 2, true);
+  }
+
+  public void testOrderedPhilosophers__4() throws Exception
+  {
+    checkPhilosophers("ordered_philosophers.wmod", 4, true);
+  }
+
+  public void testRoundRobin__2() throws Exception
+  {
+    checkRoundRobin(2);
+  }
+
+  public void testRoundRobin__5() throws Exception
+  {
+    checkRoundRobin(5);
   }
 
   public void testTransferline__1() throws Exception
@@ -906,36 +942,25 @@ public abstract class AbstractStandardConflictCheckerTest
   }
 
 
-  protected void checkControlledPhilosophers(final int n) throws Exception
+  protected void checkPhilosophers(final String name,
+                                   final int n,
+                                   final boolean result)
+  throws Exception
   {
     final String group = "handwritten";
-    final String name = "controlled_philosophers.wmod";
-    final List<ParameterBindingProxy> bindings =
-        new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", n);
-    bindings.add(binding);
-    runModelVerifier(group, name, bindings, true);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    runModelVerifier(group, name, bindings, result);
   }
 
-  protected void checkDiningPhilosophers(final int n) throws Exception
+  protected void checkRoundRobin(final int n) throws Exception
   {
-    final String group = "handwritten";
-    final String name = "dining_philosophers.wmod";
-    final List<ParameterBindingProxy> bindings =
-        new LinkedList<ParameterBindingProxy>();
+    final String group = "efa";
+    final String name = "round_robin_efa.wmod";
     final ParameterBindingProxy binding = createBinding("N", n);
-    bindings.add(binding);
-    runModelVerifier(group, name, bindings, false);
-  }
-
-  protected void checkDirtyPhilosophers(final int n) throws Exception
-  {
-    final String group = "handwritten";
-    final String name = "dirty_philosophers.wmod";
     final List<ParameterBindingProxy> bindings =
-        new LinkedList<ParameterBindingProxy>();
-    final ParameterBindingProxy binding = createBinding("N", n);
-    bindings.add(binding);
+      Collections.singletonList(binding);
     runModelVerifier(group, name, bindings, false);
   }
 
@@ -943,10 +968,9 @@ public abstract class AbstractStandardConflictCheckerTest
   {
     final String group = "handwritten";
     final String name = "transferline.wmod";
-    final List<ParameterBindingProxy> bindings =
-        new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", n);
-    bindings.add(binding);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
     runModelVerifier(group, name, bindings, true);
   }
 
