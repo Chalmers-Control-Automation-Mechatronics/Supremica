@@ -40,6 +40,7 @@ import net.sourceforge.waters.analysis.monolithic.
   MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
@@ -441,6 +442,27 @@ public class OPConflictChecker
   public boolean supportsNondeterminism()
   {
     return mAbstractionMethod.supportsNondeterminism();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mAbstractionRule != null) {
+      mAbstractionRule.requestAbort();
+    }
+    if (mCurrentSynchronousProductBuilder != null) {
+      mCurrentSynchronousProductBuilder.requestAbort();
+    }
+    if (mCurrentMonolithicConflictChecker != null) {
+      mCurrentMonolithicConflictChecker.requestAbort();
+    }
+    if (mCurrentCompositionalSafetyVerifier != null) {
+      mCurrentCompositionalSafetyVerifier.requestAbort();
+    }
   }
 
 
@@ -2545,6 +2567,7 @@ public class OPConflictChecker
   //#########################################################################
   //# Inner Class AbstractionRule
   private abstract class AbstractionRule
+    implements Abortable
   {
 
     //#######################################################################
@@ -2617,6 +2640,18 @@ public class OPConflictChecker
       } finally {
         mSimplifier.reset();
       }
+    }
+
+    //#########################################################################
+    //# Interface net.sourceforge.waters.model.analysis.Abortable
+    public void requestAbort()
+    {
+      mSimplifier.requestAbort();
+    }
+
+    public boolean isAborting()
+    {
+      return mSimplifier.isAborting();
     }
 
     //#######################################################################
@@ -2908,44 +2943,58 @@ public class OPConflictChecker
   {
 
     //#######################################################################
+    //# Constructors
+    private ObserverProjectionAbstractionRule()
+    {
+      mSimplifier = new ObservationEquivalenceTRSimplifier();
+      mSimplifier.setAppliesPartitionAutomatically(false);
+    }
+
+    //#######################################################################
     //# Rule Application
     ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
                                          final EventProxy tau)
     throws AnalysisException
     {
-      final ProductDESProxyFactory factory = getFactory();
-      final String name = "vtau:" + aut.getName();
-      final KindTranslator translator = getKindTranslator();
-      final EventProxy vtau =
-        factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
-      final EventEncoding eventEnc =
-        new EventEncoding(aut, translator, tau, mPropositions,
-                          EventEncoding.FILTER_PROPOSITIONS);
-      final KindTranslator id = IdenticalKindTranslator.getInstance();
-      final int codeOfVTau = eventEnc.addEvent(vtau, id, false);
-      final StateEncoding inputStateEnc = new StateEncoding(aut);
-      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
-        (aut, eventEnc, inputStateEnc,
-         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-      final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier(rel);
-      bisimulator.setAppliesPartitionAutomatically(false);
-      final List<int[]> partition =
-        applySimplifier(bisimulator, rel, codeOfVTau);
-      if (partition != null) {
-        final StateEncoding outputStateEnc = new StateEncoding();
-        final AutomatonProxy convertedAut =
-          rel.createAutomaton(factory, eventEnc, outputStateEnc);
-        /*
-        final IsomorphismChecker checker =
-          new IsomorphismChecker(factory, false);
-        checker.checkObservationEquivalence(aut, convertedAut, tau);
-        */
-        return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                              inputStateEnc, partition,
-                                              outputStateEnc);
-      } else {
-        return null;
+      try {
+        final ProductDESProxyFactory factory = getFactory();
+        final String name = "vtau:" + aut.getName();
+        final KindTranslator translator = getKindTranslator();
+        final EventProxy vtau =
+          factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
+        final EventEncoding eventEnc =
+          new EventEncoding(aut, translator, tau, mPropositions,
+                            EventEncoding.FILTER_PROPOSITIONS);
+        final KindTranslator id = IdenticalKindTranslator.getInstance();
+        final int codeOfVTau = eventEnc.addEvent(vtau, id, false);
+        final StateEncoding inputStateEnc = new StateEncoding(aut);
+        final ListBufferTransitionRelation rel =
+          new ListBufferTransitionRelation
+            (aut, eventEnc, inputStateEnc,
+             ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+        mSimplifier.setTransitionRelation(rel);
+        final List<int[]> partition =
+          applySimplifier(mSimplifier, rel, codeOfVTau);
+        if (partition != null) {
+          final StateEncoding outputStateEnc = new StateEncoding();
+          final AutomatonProxy convertedAut =
+            rel.createAutomaton(factory, eventEnc, outputStateEnc);
+          /*
+          final IsomorphismChecker checker =
+            new IsomorphismChecker(factory, false);
+          checker.checkObservationEquivalence(aut, convertedAut, tau);
+           */
+          return new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                                inputStateEnc, partition,
+                                                outputStateEnc);
+        } else {
+          return null;
+        }
+      } catch (final OutOfMemoryError error) {
+        mSimplifier.reset();
+        throw new OverflowException(error);
+      } finally {
+        mSimplifier.reset();
       }
     }
 
@@ -3022,6 +3071,23 @@ public class OPConflictChecker
       }
       return modified;
     }
+
+    //#########################################################################
+    //# Interface net.sourceforge.waters.model.analysis.Abortable
+    public void requestAbort()
+    {
+      mSimplifier.requestAbort();
+    }
+
+    public boolean isAborting()
+    {
+      return mSimplifier.isAborting();
+    }
+
+    //#########################################################################
+    //# Data Members
+    private final ObservationEquivalenceTRSimplifier mSimplifier;
+
   }
 
 
@@ -3032,34 +3098,65 @@ public class OPConflictChecker
   {
 
     //#######################################################################
+    //# Constructors
+    private OPSearchAbstractionRule()
+    {
+      final ProductDESProxyFactory factory = getFactory();
+      final KindTranslator translator = getKindTranslator();
+      mSimplifier = new OPSearchAutomatonSimplifier(factory, translator);
+      mSimplifier.setPropositions(mPropositions);
+      mSimplifier.setNodeLimit(mInternalStepNodeLimit);
+    }
+
+    //#######################################################################
     //# Rule Application
     ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
                                          final EventProxy tau)
     throws AnalysisException
     {
-      if (tau == null) {
-        return null;
+      try {
+        if (tau == null) {
+          return null;
+        }
+        final Collection<EventProxy> hidden = Collections.singletonList(tau);
+        mSimplifier.setModel(aut);
+        mSimplifier.setHiddenEvents(hidden);
+        mSimplifier.setOutputHiddenEvent(tau);
+        mSimplifier.run();
+        final PartitionedAutomatonResult result =
+          mSimplifier.getAnalysisResult();
+        final AutomatonProxy convertedAut = result.getAutomaton();
+        if (aut == convertedAut) {
+          return null;
+        }
+        final StateEncoding inputEnc = result.getInputEncoding();
+        final StateEncoding outputEnc = result.getOutputEncoding();
+        final List<int[]> partition = result.getPartition();
+        return new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                              inputEnc, partition, outputEnc);
+      } catch (final OutOfMemoryError error) {
+        mSimplifier.tearDown();
+        throw new OverflowException(error);
+      } finally {
+        mSimplifier.tearDown();
       }
-      final ProductDESProxyFactory factory = getFactory();
-      final Collection<EventProxy> hidden = Collections.singletonList(tau);
-      final KindTranslator translator = getKindTranslator();
-      final OPSearchAutomatonSimplifier simplifier =
-        new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
-      simplifier.setPropositions(mPropositions);
-      simplifier.setOutputHiddenEvent(tau);
-      simplifier.setNodeLimit(mInternalStepNodeLimit);
-      simplifier.run();
-      final PartitionedAutomatonResult result = simplifier.getAnalysisResult();
-      final AutomatonProxy convertedAut = result.getAutomaton();
-      if (aut == convertedAut) {
-        return null;
-      }
-      final StateEncoding inputEnc = result.getInputEncoding();
-      final StateEncoding outputEnc = result.getOutputEncoding();
-      final List<int[]> partition = result.getPartition();
-      return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                            inputEnc, partition, outputEnc);
     }
+
+    //#########################################################################
+    //# Interface net.sourceforge.waters.model.analysis.Abortable
+    public void requestAbort()
+    {
+      mSimplifier.requestAbort();
+    }
+
+    public boolean isAborting()
+    {
+      return mSimplifier.isAborting();
+    }
+
+    //#########################################################################
+    //# Data Members
+    private final OPSearchAutomatonSimplifier mSimplifier;
 
   }
 

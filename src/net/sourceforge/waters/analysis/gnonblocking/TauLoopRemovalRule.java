@@ -16,8 +16,10 @@ import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.analysis.op.TauLoopRemovalTRSimplifier;
+import net.sourceforge.waters.analysis.op.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -30,7 +32,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Rachel Francis
  */
 
-class TauLoopRemovalRule extends AbstractionRule
+class TauLoopRemovalRule extends TRSimplifierAbstractionRule
 {
 
   //#######################################################################
@@ -39,14 +41,13 @@ class TauLoopRemovalRule extends AbstractionRule
                      final KindTranslator translator)
   {
     this(factory, translator, null);
-
   }
 
   TauLoopRemovalRule(final ProductDESProxyFactory factory,
                      final KindTranslator translator,
                      final Collection<EventProxy> propositions)
   {
-    super(factory, translator, propositions);
+    super(factory, translator, propositions, new TauLoopRemovalTRSimplifier());
   }
 
 
@@ -66,16 +67,23 @@ class TauLoopRemovalRule extends AbstractionRule
     mTr =
         new ListBufferTransitionRelation(autToAbstract, eventEnc,
             mInputEncoding, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final TauLoopRemovalTRSimplifier tauLoopRemover =
-        new TauLoopRemovalTRSimplifier(mTr);
-    final boolean modified = tauLoopRemover.run();
-    if (modified) {
-      mPartition = tauLoopRemover.getResultPartition();
-      final ProductDESProxyFactory factory = getFactory();
-      mOutputEncoding = new StateEncoding();
-      return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
-    } else {
-      return autToAbstract;
+    final TransitionRelationSimplifier simplifier = getSimplifier();
+    try {
+      simplifier.setTransitionRelation(mTr);
+      final boolean modified = simplifier.run();
+      if (modified) {
+        mPartition = simplifier.getResultPartition();
+        final ProductDESProxyFactory factory = getFactory();
+        mOutputEncoding = new StateEncoding();
+        return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
+      } else {
+        return autToAbstract;
+      }
+    } catch (final OutOfMemoryError error) {
+      simplifier.reset();
+      throw new OverflowException(error);
+    } finally {
+      simplifier.reset();
     }
   }
 

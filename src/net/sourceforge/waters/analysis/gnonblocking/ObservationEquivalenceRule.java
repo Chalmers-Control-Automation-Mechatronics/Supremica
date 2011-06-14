@@ -19,6 +19,7 @@ import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -28,7 +29,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Rachel Francis
  */
 
-class ObservationEquivalenceRule extends AbstractionRule
+class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
 {
 
   //#######################################################################
@@ -44,15 +45,22 @@ class ObservationEquivalenceRule extends AbstractionRule
                              final KindTranslator translator,
                              final Collection<EventProxy> propositions)
   {
-    super(factory, translator, propositions);
+    super(factory, translator, propositions,
+          new ObservationEquivalenceTRSimplifier());
     mTransitionRemovalMode =
         ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
     mTransitionLimit = Integer.MAX_VALUE;
   }
 
 
-  //#######################################################################
-  //# Rule Application
+  //#########################################################################
+  //# Configuration
+  @Override
+  ObservationEquivalenceTRSimplifier getSimplifier()
+  {
+    return (ObservationEquivalenceTRSimplifier) super.getSimplifier();
+  }
+
   /**
    * Sets the mode which redundant transitions are to be removed.
    *
@@ -118,19 +126,26 @@ class ObservationEquivalenceRule extends AbstractionRule
     final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
       (autToAbstract, eventEnc, mInputEncoding,
        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier(rel);
-    bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
-    bisimulator.setTransitionLimit(mTransitionLimit);
-    final boolean modified = bisimulator.run();
-    if (modified) {
-      mPartition = bisimulator.getResultPartition();
-      rel.removeRedundantPropositions();
-      final ProductDESProxyFactory factory = getFactory();
-      mOutputEncoding = new StateEncoding();
-      return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
-    } else {
-      return autToAbstract;
+    final ObservationEquivalenceTRSimplifier bisimulator = getSimplifier();
+    bisimulator.setTransitionRelation(rel);
+    try {
+      bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
+      bisimulator.setTransitionLimit(mTransitionLimit);
+      final boolean modified = bisimulator.run();
+      if (modified) {
+        mPartition = bisimulator.getResultPartition();
+        rel.removeRedundantPropositions();
+        final ProductDESProxyFactory factory = getFactory();
+        mOutputEncoding = new StateEncoding();
+        return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
+      } else {
+        return autToAbstract;
+      }
+    } catch (final OutOfMemoryError error) {
+      bisimulator.reset();
+      throw new OverflowException(error);
+    } finally {
+      bisimulator.reset();
     }
   }
 

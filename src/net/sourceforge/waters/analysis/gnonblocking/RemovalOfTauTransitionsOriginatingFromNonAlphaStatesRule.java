@@ -15,8 +15,10 @@ import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.analysis.op.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -32,7 +34,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
-  extends AbstractionRule
+  extends TRSimplifierAbstractionRule
 {
 
   //#########################################################################
@@ -49,7 +51,8 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
      final KindTranslator translator,
      final Collection<EventProxy> propositions)
   {
-    super(factory, translator, propositions);
+    super(factory, translator, propositions,
+          new OnlySilentOutgoingTRSimplifier());
   }
 
 
@@ -104,17 +107,24 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
       new ListBufferTransitionRelation
                  (autToAbstract, eventEnc, mInputEncoding,
                   ListBufferTransitionRelation.CONFIG_ALL);
-    final OnlySilentOutgoingTRSimplifier simplifier =
-      new OnlySilentOutgoingTRSimplifier(rel);
-    simplifier.setPropositions(alphaID, omegaID);
-    final boolean modified = simplifier.run();
-    if (modified) {
-      rel.removeRedundantPropositions();
-      final ProductDESProxyFactory factory = getFactory();
-      mOutputEncoding = new StateEncoding();
-      return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
-    } else {
-      return autToAbstract;
+    final TransitionRelationSimplifier simplifier = getSimplifier();
+    try {
+      simplifier.setTransitionRelation(rel);
+      simplifier.setPropositions(alphaID, omegaID);
+      final boolean modified = simplifier.run();
+      if (modified) {
+        rel.removeRedundantPropositions();
+        final ProductDESProxyFactory factory = getFactory();
+        mOutputEncoding = new StateEncoding();
+        return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
+      } else {
+        return autToAbstract;
+      }
+    } catch (final OutOfMemoryError error) {
+      simplifier.reset();
+      throw new OverflowException(error);
+    } finally {
+      simplifier.reset();
     }
   }
 

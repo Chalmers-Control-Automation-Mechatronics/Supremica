@@ -131,6 +131,18 @@ public class ChainTRSimplifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.requestAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Specific Access
   public boolean runTo(int index)
     throws AnalysisException
@@ -150,6 +162,7 @@ public class ChainTRSimplifier
     boolean result = false;
     final Iterator<TransitionRelationSimplifier> iter = mSteps.iterator();
     while (--index >= 0) {
+      checkAbort();
       final TransitionRelationSimplifier step = iter.next();
       try {
         if (logger.isDebugEnabled()) {

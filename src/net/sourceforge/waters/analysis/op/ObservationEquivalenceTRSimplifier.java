@@ -199,6 +199,7 @@ public class ObservationEquivalenceTRSimplifier
     setUp();
 
     while (true) {
+      checkAbort();
       final Iterator<? extends EquivalenceClass> it;
       if (!mWS.isEmpty()) {
         it = mWS.iterator();

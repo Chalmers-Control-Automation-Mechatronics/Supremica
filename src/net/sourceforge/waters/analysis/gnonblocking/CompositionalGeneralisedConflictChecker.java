@@ -222,8 +222,23 @@ public class CompositionalGeneralisedConflictChecker extends
     return mUsedPreconditionMarking;
   }
 
-  // #########################################################################
-  // # Invocation
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mAbstractionRules != null) {
+      for (final AbstractionRule rule : mAbstractionRules) {
+        rule.requestAbort();
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Invocation
   public boolean run() throws AnalysisException
   {
     setUp();
@@ -659,8 +674,8 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  // #########################################################################
-  // # Auxiliary Methods
+  //#########################################################################
+  //# Auxiliary Methods
   private AutomatonProxy applyAbstractionRules(AutomatonProxy autToAbstract,
                                                final EventProxy tau)
       throws AnalysisException

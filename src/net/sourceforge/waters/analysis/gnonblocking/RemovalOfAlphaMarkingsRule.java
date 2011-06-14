@@ -16,6 +16,7 @@ import gnu.trove.TObjectIntHashMap;
 
 import java.util.Collection;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -43,6 +44,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                              final Collection<EventProxy> propositions)
   {
     super(factory, translator, propositions);
+    mIsAborting = false;
   }
 
 
@@ -58,10 +60,25 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     mAlphaMarking = alphaMarking;
   }
 
-  // #######################################################################
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  public void requestAbort()
+  {
+    mIsAborting = true;
+  }
+
+  public boolean isAborting()
+  {
+    return mIsAborting;
+  }
+
+
+  //#######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
+    throws AbortException
   {
     mAutToAbstract = autToAbstract;
     mTR =
@@ -84,6 +101,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     // performs a backwards search to remove alpha markings from states which
     // satisfy the rule conditions
     for (int stateID = 0; stateID < numStates; stateID++) {
+      checkAbort();
       if (mTR.isMarked(stateID, alphaID)) {
         unvisitedStates.push(stateID);
         while (unvisitedStates.size() > 0) {
@@ -120,9 +138,9 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     }
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep(
-                                                          final CompositionalGeneralisedConflictChecker checker,
-                                                          final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy abstractedAut)
   {
     return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
                                                mOriginalIntToStateMap,
@@ -137,12 +155,32 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     mAutToAbstract = null;
   }
 
-  // #######################################################################
-  // # Data Members
+
+  //#######################################################################
+  //# Auxiliary Methods
+  /**
+   * Checks whether this simplifier has been requested to abort,
+   * and if so, performs the abort by throwing an {@link AbortException}.
+   * This method should be called periodically by any transition relation
+   * simplifier that supports being aborted by user request.
+   */
+  private void checkAbort()
+    throws AbortException
+  {
+    if (mIsAborting) {
+      final AbortException exception = new AbortException();
+      throw exception;
+    }
+  }
+
+
+  //#######################################################################
+  //# Data Members
   private EventProxy mAlphaMarking;
   private AutomatonProxy mAutToAbstract;
   private StateProxy[] mOriginalIntToStateMap;
   private TObjectIntHashMap<StateProxy> mResultingStateToIntMap;
-  ObserverProjectionTransitionRelation mTR = null;
+  private boolean mIsAborting;
+  private ObserverProjectionTransitionRelation mTR = null;
 
 }

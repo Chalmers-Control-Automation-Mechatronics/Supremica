@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.op;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 import org.apache.log4j.Logger;
@@ -30,6 +31,7 @@ public abstract class AbstractTRSimplifier
 
   public AbstractTRSimplifier(final ListBufferTransitionRelation rel)
   {
+    mIsAborting = false;
     mAppliesPartitionAutomatically = true;
     mPreferredOutputConfiguration = 0;
     mTransitionRelation = rel;
@@ -100,10 +102,24 @@ public abstract class AbstractTRSimplifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  public void requestAbort()
+  {
+    mIsAborting = true;
+  }
+
+  public boolean isAborting()
+  {
+    return mIsAborting;
+  }
+
+
+  //#########################################################################
   //# Algorithm Support
   protected void setUp()
     throws AnalysisException
   {
+    checkAbort();
     mResultPartition = null;
     final int config = getPreferredInputConfiguration();
     if (config != 0) {
@@ -149,6 +165,21 @@ public abstract class AbstractTRSimplifier
     mTransitionRelation.merge(mResultPartition);
   }
 
+  /**
+   * Checks whether this simplifier has been requested to abort,
+   * and if so, performs the abort by throwing an {@link AbortException}.
+   * This method should be called periodically by any transition relation
+   * simplifier that supports being aborted by user request.
+   */
+  protected void checkAbort()
+    throws AbortException
+  {
+    if (mIsAborting) {
+      final AbortException exception = new AbortException();
+      throw exception;
+    }
+  }
+
 
   //#########################################################################
   //# Logging
@@ -161,6 +192,7 @@ public abstract class AbstractTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mIsAborting;
   private boolean mAppliesPartitionAutomatically;
   private int mPreferredOutputConfiguration;
   private ListBufferTransitionRelation mTransitionRelation;

@@ -15,6 +15,7 @@ import gnu.trove.TIntStack;
 
 import java.util.Collection;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -45,6 +46,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
                                final Collection<EventProxy> propositions)
   {
     super(factory, translator, propositions);
+    mIsAborting = false;
   }
 
 
@@ -70,10 +72,25 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
     mDefaultMarking = defaultMarking;
   }
 
-  // #######################################################################
-  // # Rule Application
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  public void requestAbort()
+  {
+    mIsAborting = true;
+  }
+
+  public boolean isAborting()
+  {
+    return mIsAborting;
+  }
+
+
+  //#######################################################################
+  //# Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
+  throws AbortException
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
@@ -96,8 +113,9 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
     // creates a hash set of all states which are reachable from an alpha marked
     // state
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (mTR.isMarked(sourceID, alphaID)
-          && !reachableStates.contains(sourceID)) {
+      if (mTR.isMarked(sourceID, alphaID) &&
+          !reachableStates.contains(sourceID)) {
+        checkAbort();
         unvisitedStates.push(sourceID);
         reachableStates.add(sourceID);
         while (unvisitedStates.size() > 0) {
@@ -153,11 +171,31 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
     mAutToAbstract = null;
   }
 
-  // #######################################################################
-  // # Data Members
+  //#######################################################################
+  //# Auxiliary Methods
+  /**
+   * Checks whether this simplifier has been requested to abort,
+   * and if so, performs the abort by throwing an {@link AbortException}.
+   * This method should be called periodically by any transition relation
+   * simplifier that supports being aborted by user request.
+   */
+  private void checkAbort()
+    throws AbortException
+  {
+    if (mIsAborting) {
+      final AbortException exception = new AbortException();
+      throw exception;
+    }
+  }
+
+
+  //#######################################################################
+  //# Data Members
   private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
   private AutomatonProxy mAutToAbstract;
+
+  private boolean mIsAborting;
   private ObserverProjectionTransitionRelation mTR;
 
 }

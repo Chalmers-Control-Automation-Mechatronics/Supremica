@@ -17,8 +17,10 @@ import net.sourceforge.waters.analysis.op.CoreachabilityTRSimplifier;
 import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.analysis.op.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -32,7 +34,7 @@ import net.sourceforge.waters.model.des.StateProxy;
  * @author Rachel Francis
  */
 
-class RemovalOfNoncoreachableStatesRule extends AbstractionRule
+class RemovalOfNoncoreachableStatesRule extends TRSimplifierAbstractionRule
 {
 
   //#########################################################################
@@ -47,7 +49,8 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
                                     final KindTranslator translator,
                                     final Collection<EventProxy> propositions)
   {
-    super(factory, translator, propositions);
+    super(factory, translator, propositions,
+          new CoreachabilityTRSimplifier());
   }
 
 
@@ -96,20 +99,27 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
       new ListBufferTransitionRelation
                  (autToAbstract, eventEnc, mInputEncoding,
                   ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final CoreachabilityTRSimplifier simplifier =
-        new CoreachabilityTRSimplifier(rel);
-    simplifier.setPropositions(alphaID, defaultID);
-    simplifier.setAppliesPartitionAutomatically(false);
-    final boolean modified = simplifier.run();
-    if (modified) {
-      rel.removeTauSelfLoops();
-      rel.removeProperSelfLoopEvents();
-      rel.removeRedundantPropositions();
-      final ProductDESProxyFactory factory = getFactory();
-      mOutputEncoding = new StateEncoding();
-      return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
-    } else {
-      return autToAbstract;
+    final TransitionRelationSimplifier simplifier = getSimplifier();
+    try {
+      simplifier.setTransitionRelation(rel);
+      simplifier.setPropositions(alphaID, defaultID);
+      simplifier.setAppliesPartitionAutomatically(false);
+      final boolean modified = simplifier.run();
+      if (modified) {
+        rel.removeTauSelfLoops();
+        rel.removeProperSelfLoopEvents();
+        rel.removeRedundantPropositions();
+        final ProductDESProxyFactory factory = getFactory();
+        mOutputEncoding = new StateEncoding();
+        return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
+      } else {
+        return autToAbstract;
+      }
+    } catch (final OutOfMemoryError error) {
+      simplifier.reset();
+      throw new OverflowException(error);
+    } finally {
+      simplifier.reset();
     }
   }
 

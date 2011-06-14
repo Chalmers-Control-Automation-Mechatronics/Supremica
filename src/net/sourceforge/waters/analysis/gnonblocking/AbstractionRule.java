@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -26,6 +27,7 @@ import org.apache.log4j.Logger;
  */
 
 public abstract class AbstractionRule
+  implements Abortable
 {
   //#######################################################################
   //# Constructor
@@ -180,4 +182,5 @@ public abstract class AbstractionRule
   private int mOutputTransitions;
   private int mUnchangedStates;
   private int mUnchangedTransitions;
+
 }

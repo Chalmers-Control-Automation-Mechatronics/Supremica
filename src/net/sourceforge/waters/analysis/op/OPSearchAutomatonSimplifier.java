@@ -195,6 +195,7 @@ public class OPSearchAutomatonSimplifier
       } else {
         mOPSearchPhase = true;
         while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
+          checkAbort();
           doOPSearchStep();
         }
         final boolean force = needsMerge();

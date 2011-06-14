@@ -109,6 +109,9 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     mAnalysisResult = null;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
   public void requestAbort()
   {
     mIsAborting = true;
