@@ -23,42 +23,46 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 public class PromelaGraph
 {
   public PromelaGraph(final List<PromelaNode> nodes, final List<PromelaEdge> edges,final PromelaNode start, final PromelaNode end){
-    pNodes = nodes;
-    pEdges = edges;
+    mPromelaNodes = nodes;
+    mPromelaEdges = edges;
 
-    pStart = start;
-    pEnd = end;
+    mPromelaSartNode = start;
+    mPromelaEndNode = end;
   }
-  public PromelaGraph(final IdentifierProxy ident,final ModuleProxyFactory factory){
-    mFactory = factory;
-    pStart = new PromelaNode();
-    pEnd = new PromelaNode();
+
+  public PromelaGraph(final IdentifierProxy ident)
+  {
+    mPromelaSartNode = new PromelaNode();
+    mPromelaEndNode = new PromelaNode();
 
     final Collection<Proxy> labelBlock = new ArrayList<Proxy>();
     labelBlock.add(ident);
     final PromelaLabel label = new PromelaLabel(labelBlock);
 
-    final PromelaEdge edge = new PromelaEdge(pStart,pEnd,label);
-    pEdges.add(edge);
-    pNodes.add(pStart);
-    pNodes.add(pEnd);
+    final PromelaEdge edge = new PromelaEdge(mPromelaSartNode,mPromelaEndNode,label);
+    mPromelaEdges.add(edge);
+    mPromelaNodes.add(mPromelaSartNode);
+    mPromelaNodes.add(mPromelaEndNode);
 
   }
 
   public PromelaGraph(final THashSet<IdentifierProxy> events, final ModuleProxyFactory factory){
-    pStart = new PromelaNode();
-    pEnd = new PromelaNode();
+    mPromelaSartNode = new PromelaNode();
+    mPromelaEndNode = new PromelaNode();
     System.out.println(events.size());
     final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(events);
-    Collections.sort(tempLabel,mComparator);
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final Comparator<SimpleExpressionProxy> comparator =
+      new ExpressionComparator(optable);
+    Collections.sort(tempLabel, comparator);
     final Collection<Proxy> labelBlock = new ArrayList<Proxy>(tempLabel);
 
     final PromelaLabel label = new PromelaLabel(labelBlock);
 
-    final PromelaEdge edge = new PromelaEdge(pStart, pEnd, label);
-    pEdges.add(edge);
-    pNodes.add(pStart);
-    pNodes.add(pEnd);
+    final PromelaEdge edge = new PromelaEdge(mPromelaSartNode, mPromelaEndNode, label);
+    mPromelaEdges.add(edge);
+    mPromelaNodes.add(mPromelaSartNode);
+    mPromelaNodes.add(mPromelaEndNode);
 
   }
   /*
@@ -240,7 +244,7 @@ public class PromelaGraph
 
   }
 
-  public GraphProxy createGraphProxy(final String name)
+  public GraphProxy createGraphProxy(final ModuleProxyFactory mFactory, final String name)
   {
     int index = 0;
     SimpleNodeProxy proxy;
@@ -267,49 +271,44 @@ public class PromelaGraph
   }
 
   public List<PromelaNode> getNodes(){
-    return pNodes;
+    return mPromelaNodes;
   }
   public List<PromelaEdge> getEdges(){
-    return pEdges;
+    return mPromelaEdges;
   }
   public void setStart(final PromelaNode newStart){
-    pStart =newStart ;
+    mPromelaSartNode =newStart ;
   }
   public void setEnd(final PromelaNode promelaNode){
-    pEnd = promelaNode ;
+    mPromelaEndNode = promelaNode ;
   }
   public void setNodes(final ArrayList<PromelaNode> nodes){
-    pNodes.clear();
+    mPromelaNodes.clear();
     for(final PromelaNode n: nodes){
-      pNodes.add(n);
+      mPromelaNodes.add(n);
     }
   }
   public void setEdges(final ArrayList<PromelaEdge> edges){
-    pEdges.clear();
+    mPromelaEdges.clear();
     for(final PromelaEdge n: edges){
-      pEdges.add(n);
+      mPromelaEdges.add(n);
     }
   }
   public PromelaNode getStart(){
-    return pStart;
+    return mPromelaSartNode;
   }
   public PromelaNode getEnd(){
-    return pEnd;
+    return mPromelaEndNode;
   }
 
-  private static ModuleProxyFactory mFactory;
-  private final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-  private final Comparator<SimpleExpressionProxy> mComparator=new ExpressionComparator(optable);
 
+  //#########################################################################
+  //# Data Members
   private final Collection<NodeProxy> mNodes = new ArrayList<NodeProxy>();
   private final Collection<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
-
-  private PromelaNode pStart;
-  private PromelaNode pEnd;
-  private List<PromelaNode> pNodes = new ArrayList<PromelaNode>();
-  private List<PromelaEdge> pEdges = new ArrayList<PromelaEdge>();
-
-  final ArrayList<NodeProxy> nodeStore = new ArrayList<NodeProxy>();
-
+  private PromelaNode mPromelaSartNode;
+  private PromelaNode mPromelaEndNode;
+  private List<PromelaNode> mPromelaNodes = new ArrayList<PromelaNode>();
+  private List<PromelaEdge> mPromelaEdges = new ArrayList<PromelaEdge>();
 
 }

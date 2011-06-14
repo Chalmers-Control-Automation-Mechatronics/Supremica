@@ -88,9 +88,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
       ident = mFactory.createSimpleIdentifierProxy("run_"+procName.toUpperCase());
     }
 
-    final PromelaGraph newGraph = new PromelaGraph(ident,mFactory);
+    final PromelaGraph newGraph = new PromelaGraph(ident);
     g = PromelaGraph.sequentialComposition(newGraph, g);
-    final GraphProxy graph = g.createGraphProxy(procName);
+    final GraphProxy graph = g.createGraphProxy(mFactory, procName);
     final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName);
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
 
@@ -227,7 +227,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
       }
         System.out.println(indexEvent);
-        return new PromelaGraph(indexEvent,mFactory);
+        return new PromelaGraph(indexEvent);
 
   }
 
@@ -263,7 +263,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         name = "send_"+chanName;
         indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
       }
-        return new PromelaGraph(indexEvent,mFactory);
+        return new PromelaGraph(indexEvent);
     }
     else{
     if(length==1){
@@ -301,7 +301,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       }
     }
 
-    final GraphProxy graph = initGraph.createGraphProxy(t.getText());
+    final GraphProxy graph = initGraph.createGraphProxy(mFactory, t.getText());
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
     mComponents.add(component);
 
@@ -322,7 +322,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
   {
     //assert t.getText().equals("atomic");
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("initrun");
-    final PromelaGraph initGraph = new PromelaGraph(ident,mFactory);
+    final PromelaGraph initGraph = new PromelaGraph(ident);
     return initGraph;
   }
 
@@ -331,7 +331,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       final String name = t.getChild(0).getText();
       duplicatedRun.add(name);
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name.toUpperCase());
-      final PromelaGraph graph = new PromelaGraph(ident,mFactory);
+      final PromelaGraph graph = new PromelaGraph(ident);
       return graph;
   }
 
