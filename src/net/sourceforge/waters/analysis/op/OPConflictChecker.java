@@ -500,6 +500,7 @@ public class OPConflictChecker
     mNumOverflows = 0;
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
     mGotGlobalResult = false;
+    mPreliminaryCounterexample = null;
   }
 
   protected void tearDown()
@@ -525,6 +526,7 @@ public class OPConflictChecker
     mModifyingSteps = null;
     mUsedEventNames = null;
     mOverflowCandidates = null;
+    mPreliminaryCounterexample = null;
   }
 
   @Override
@@ -673,6 +675,8 @@ public class OPConflictChecker
         mDirtyAutomata.add(aut);
       }
     }
+    final CompositionalVerificationResult result = getAnalysisResult();
+    result.setNumberOfAutomata(mCurrentAutomata.size());
     mUsedEventNames = new THashSet<String>(numEvents + numAutomata);
     for (final EventProxy event : mCurrentEvents) {
       final String name = event.getName();

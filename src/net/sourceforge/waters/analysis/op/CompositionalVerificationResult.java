@@ -169,6 +169,7 @@ public class CompositionalVerificationResult extends VerificationResult
       }
     }
     if (mMonolithicVerificationResult != null) {
+      writer.print(',');
       mMonolithicVerificationResult.printCSVHorizontalHeadings(writer);
     }
   }
@@ -187,6 +188,7 @@ public class CompositionalVerificationResult extends VerificationResult
       }
     }
     if (mMonolithicVerificationResult != null) {
+      writer.print(',');
       mMonolithicVerificationResult.printCSVHorizontal(writer);
     }
   }
