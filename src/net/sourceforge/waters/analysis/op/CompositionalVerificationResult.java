@@ -13,8 +13,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Formatter;
+import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 
 
@@ -42,6 +44,7 @@ public class CompositionalVerificationResult extends VerificationResult
     mTotalCompositionCount = 0;
     mUnsuccessfulCompositionCount = 0;
     mSimplifierStatistics = null;
+    mNumberOfMonolithicRuns = 0;
     mMonolithicVerificationResult = null;
   }
 
@@ -119,9 +122,44 @@ public class CompositionalVerificationResult extends VerificationResult
     }
   }
 
-  public void setMonolithicVerificationResult(final VerificationResult result)
+  public void addMonolithicVerificationResult(final VerificationResult result)
   {
-    mMonolithicVerificationResult = result;
+    mNumberOfMonolithicRuns++;
+    if (mMonolithicVerificationResult == null) {
+      mMonolithicVerificationResult = result;
+    } else if (result != null) {
+      mMonolithicVerificationResult.merge(result);
+    }
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AnalysisResult
+  @Override
+  public void merge(final AnalysisResult other)
+  {
+    super.merge(other);
+    final CompositionalVerificationResult result =
+      (CompositionalVerificationResult) other;
+    mTotalCompositionCount += result.mTotalCompositionCount;
+    mUnsuccessfulCompositionCount += result.mUnsuccessfulCompositionCount;
+    if (mSimplifierStatistics != null && result.mSimplifierStatistics != null) {
+      final Iterator<TRSimplifierStatistics> iter1 =
+        mSimplifierStatistics.iterator();
+      final Iterator<TRSimplifierStatistics> iter2 =
+        mSimplifierStatistics.iterator();
+      while (iter1.hasNext() && iter2.hasNext()) {
+        final TRSimplifierStatistics stats1 = iter1.next();
+        final TRSimplifierStatistics stats2 = iter2.next();
+        stats1.merge(stats2);
+      }
+    }
+    mNumberOfMonolithicRuns += result.mNumberOfMonolithicRuns;
+    if (mMonolithicVerificationResult == null) {
+      mMonolithicVerificationResult = result.mMonolithicVerificationResult;
+    } else if (result != null) {
+      mMonolithicVerificationResult.merge(result.mMonolithicVerificationResult);
+    }
   }
 
 
@@ -152,7 +190,8 @@ public class CompositionalVerificationResult extends VerificationResult
     }
     if (mMonolithicVerificationResult != null) {
       writer.println("--------------------------------------------------");
-      writer.println("FINAL MONOLITHIC VERIFICATION");
+      writer.print("Number of monolithic verification runs: ");
+      writer.println(mNumberOfMonolithicRuns);
       mMonolithicVerificationResult.print(writer);
     }
   }
@@ -169,7 +208,7 @@ public class CompositionalVerificationResult extends VerificationResult
       }
     }
     if (mMonolithicVerificationResult != null) {
-      writer.print(',');
+      writer.print(",Monolithic,");
       mMonolithicVerificationResult.printCSVHorizontalHeadings(writer);
     }
   }
@@ -189,6 +228,8 @@ public class CompositionalVerificationResult extends VerificationResult
     }
     if (mMonolithicVerificationResult != null) {
       writer.print(',');
+      writer.print(mNumberOfMonolithicRuns);
+      writer.print(',');
       mMonolithicVerificationResult.printCSVHorizontal(writer);
     }
   }
@@ -199,6 +240,7 @@ public class CompositionalVerificationResult extends VerificationResult
   private int mUnsuccessfulCompositionCount;
   private int mTotalCompositionCount;
   private List<TRSimplifierStatistics> mSimplifierStatistics;
+  private int mNumberOfMonolithicRuns;
   private VerificationResult mMonolithicVerificationResult;
 
 }

@@ -57,15 +57,17 @@ public class SilentContinuationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
+  @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, true, false);
+    return setStatistics(stats);
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
-  @Override
-  protected TRSimplifierStatistics createStatistics()
-  {
-    return new TRSimplifierStatistics(this, true, false);
-  }
-
   @Override
   protected boolean runSimplifier()
   throws AnalysisException

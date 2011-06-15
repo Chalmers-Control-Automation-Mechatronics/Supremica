@@ -133,9 +133,19 @@ public interface TransitionRelationSimplifier
   public boolean isReducedMarking(int propID);
 
   /**
+   * Creates a new statistics record.
+   * This method resets the gathering of statistics by this simplifier
+   * by creating a new record. The previously used record remains unchanged
+   * by this operation.
+   * @return The new statistics record.
+   */
+  public abstract TRSimplifierStatistics createStatistics();
+
+  /**
    * Gets a record with details of the performance of this simplifier.
    * The returned record contains accumulative information over all
-   * invocations since the simplifier was created.
+   * invocations since the simplifier was created, or since
+   * {@link #createStatistics()} was called.
    */
   public TRSimplifierStatistics getStatistics();
 

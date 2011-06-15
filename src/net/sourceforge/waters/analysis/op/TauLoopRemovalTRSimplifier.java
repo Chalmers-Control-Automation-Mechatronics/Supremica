@@ -44,15 +44,17 @@ public class TauLoopRemovalTRSimplifier
     return true;
   }
 
+  @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, true, false);
+    return setStatistics(stats);
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
-  @Override
-  protected TRSimplifierStatistics createStatistics()
-  {
-    return new TRSimplifierStatistics(this, true, false);
-  }
-
   @Override
   protected void setUp()
     throws AnalysisException

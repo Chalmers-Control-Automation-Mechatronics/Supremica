@@ -44,7 +44,7 @@ public class MarkingRemovalTRSimplifier
 
 
   //#########################################################################
-  //# Rule Application
+  //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -63,15 +63,17 @@ public class MarkingRemovalTRSimplifier
     return mReducedMarkings[propID];
   }
 
+  @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, false, true);
+    return setStatistics(stats);
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
-  @Override
-  protected TRSimplifierStatistics createStatistics()
-  {
-    return new TRSimplifierStatistics(this, false, true);
-  }
-
   @Override
   protected boolean runSimplifier()
   throws AnalysisException

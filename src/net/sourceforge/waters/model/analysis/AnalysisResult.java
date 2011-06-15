@@ -121,6 +121,41 @@ public class AnalysisResult
     mRunTime = time;
   }
 
+  /**
+   * <P>Merges this result with another.</P>
+   *
+   * <P>This method destructively modifies the contents of this result record
+   * by merging in the contents of the given other record.</P>
+   *
+   * <P>Merging is done for the purpose of accumulating statistics over
+   * multiple runs of the same algorithm. The way how information is merged
+   * depends on the type of data stored, e.g., run times and totals of state
+   * numbers will be added, while for other values such as peak state number
+   * the maximum value will be chosen. Not all result data makes sense for
+   * multiple runs, so items that are only relevant for a single run (such
+   * as counterexamples) may be removed by this method.</P>
+   * @param other
+   *          The record to be merged into this record.
+   * @throws ClassCaseException
+   *          to indicate that the two records merged are not of exactly the
+   *          same type.
+   */
+  public void merge(final AnalysisResult other)
+  {
+    if (other.getClass() == getClass()) {
+      mFinished &= other.mFinished;
+      mSatisfied &= other.mSatisfied;
+      mRunTime = mergeAdd(mRunTime, other.mRunTime);
+      if (mException != null) {
+        mException = other.mException;
+      }
+    } else {
+      throw new ClassCastException
+        ("Attempting to merge " + ProxyTools.getShortClassName(this) +
+         " with " + ProxyTools.getShortClassName(other) + "!");
+    }
+  }
+
 
   //#########################################################################
   //# Printing
@@ -174,7 +209,43 @@ public class AnalysisResult
 
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
-    writer.print("Result,Runtime [ms]");
+    writer.print("Result,Runtime");
+  }
+
+
+  //#########################################################################
+  //# Static Methods
+  public static int mergeAdd(final int data1, final int data2)
+  {
+    if (data1 < 0) {
+      return data2;
+    } else if (data2 < 0) {
+      return data1;
+    } else {
+      return data1 + data2;
+    }
+  }
+
+  public static long mergeAdd(final long data1, final long data2)
+  {
+    if (data1 < 0) {
+      return data2;
+    } else if (data2 < 0) {
+      return data1;
+    } else {
+      return data1 + data2;
+    }
+  }
+
+  public static double mergeAdd(final double data1, final double data2)
+  {
+    if (data1 < 0.0) {
+      return data2;
+    } else if (data2 < 0.0) {
+      return data1;
+    } else {
+      return data1 + data2;
+    }
   }
 
 

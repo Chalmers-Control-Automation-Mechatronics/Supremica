@@ -88,6 +88,14 @@ public class ObservationEquivalenceTRSimplifier
   }
 
   @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, true, false);
+    return setStatistics(stats);
+  }
+
+  @Override
   public void reset()
   {
     super.reset();
@@ -207,12 +215,6 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
-  @Override
-  protected TRSimplifierStatistics createStatistics()
-  {
-    return new TRSimplifierStatistics(this, true, false);
-  }
-
   @Override
   protected void setUp()
   throws AnalysisException

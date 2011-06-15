@@ -121,6 +121,19 @@ public class ChainTRSimplifier
   }
 
   @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    if (mSteps != null) {
+      for (final TransitionRelationSimplifier step : mSteps) {
+        step.createStatistics();
+      }
+    }
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, true, true);
+    return setStatistics(stats);
+  }
+
+  @Override
   public void reset()
   {
     super.reset();
@@ -155,12 +168,6 @@ public class ChainTRSimplifier
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
-  protected TRSimplifierStatistics createStatistics()
-  {
-    return new TRSimplifierStatistics(this, true, true);
-  }
-
-  @Override
   protected boolean runSimplifier()
   throws AnalysisException
   {
@@ -183,6 +190,10 @@ public class ChainTRSimplifier
       try {
         if (logger.isDebugEnabled()) {
           logger.debug(ProxyTools.getShortClassName(step) + " ...");
+        }
+        final int config = step.getPreferredInputConfiguration();
+        if (config != 0) {
+          rel.reconfigure(config);
         }
         step.setTransitionRelation(rel);
         if (step.run()) {

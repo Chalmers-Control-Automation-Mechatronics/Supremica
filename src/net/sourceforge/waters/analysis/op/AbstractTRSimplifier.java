@@ -35,8 +35,8 @@ public abstract class AbstractTRSimplifier
     mIsAborting = false;
     mAppliesPartitionAutomatically = true;
     mPreferredOutputConfiguration = 0;
-    mStatistics = createStatistics();
     mTransitionRelation = rel;
+    createStatistics();
   }
 
 
@@ -149,8 +149,6 @@ public abstract class AbstractTRSimplifier
 
   //#########################################################################
   //# Algorithm Support
-  protected abstract TRSimplifierStatistics createStatistics();
-
   protected void setUp()
     throws AnalysisException
   {
@@ -164,6 +162,15 @@ public abstract class AbstractTRSimplifier
 
   protected abstract boolean runSimplifier() throws AnalysisException;
 
+  /**
+   * Cleans up temporary data from the current {@link #run()}.
+   * The difference between this method and {@link #reset()} is that
+   * tearDown() deletes temporary data structures that are only needed
+   * during simplification, whereas {@link #reset()} cleans up results.
+   * The tearDown() method is called automatically by {@link #run()} in
+   * a <CODE>finally</CODE> block, while {@link #reset()} must be called
+   * by the user after retrieving all results.
+   */
   protected void tearDown()
   {
   }
@@ -207,6 +214,18 @@ public abstract class AbstractTRSimplifier
   }
 
   /**
+   * Stores the given statistics record to be used for any further
+   * statistics recording.
+   * @param  statistics  The new statistics record.
+   * @return The given statistics record.
+   */
+  protected TRSimplifierStatistics setStatistics
+    (final TRSimplifierStatistics statistics)
+  {
+    return mStatistics = statistics;
+  }
+
+  /**
    * Checks whether this simplifier has been requested to abort,
    * and if so, performs the abort by throwing an {@link AbortException}.
    * This method should be called periodically by any transition relation
@@ -236,7 +255,7 @@ public abstract class AbstractTRSimplifier
   private boolean mIsAborting;
   private boolean mAppliesPartitionAutomatically;
   private int mPreferredOutputConfiguration;
-  private final TRSimplifierStatistics mStatistics;
+  private TRSimplifierStatistics mStatistics;
   private ListBufferTransitionRelation mTransitionRelation;
   private List<int[]> mResultPartition;
 

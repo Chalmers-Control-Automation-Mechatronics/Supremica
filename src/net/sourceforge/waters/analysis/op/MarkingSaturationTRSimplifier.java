@@ -44,7 +44,7 @@ public class MarkingSaturationTRSimplifier
 
 
   //#########################################################################
-  //# Rule Application
+  //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -57,14 +57,17 @@ public class MarkingSaturationTRSimplifier
     return true;
   }
 
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
-  protected TRSimplifierStatistics createStatistics()
+  public TRSimplifierStatistics createStatistics()
   {
-    return new TRSimplifierStatistics(this, false, true);
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, false, true);
+    return setStatistics(stats);
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
   throws AnalysisException

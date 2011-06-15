@@ -74,12 +74,15 @@ public abstract class AbstractMarkingTRSimplifier
     return mPropositions;
   }
 
+
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
-  protected TRSimplifierStatistics createStatistics()
+  public TRSimplifierStatistics createStatistics()
   {
-    return new TRSimplifierStatistics(this, true, false);
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, true, false);
+    return setStatistics(stats);
   }
 
 

@@ -425,6 +425,7 @@ public class OPConflictChecker
       if (mPreliminaryCounterexample == null) {
         return setSatisfiedResult();
       } else {
+        mAbstractionRule.resetStatistics();
         restoreAutomata();
         final ConflictTraceProxy trace =
           expandTrace(mPreliminaryCounterexample);
@@ -1604,7 +1605,7 @@ public class OPConflictChecker
   private void recordStatistics(final VerificationResult result)
   {
     final CompositionalVerificationResult global = getAnalysisResult();
-    global.setMonolithicVerificationResult(result);
+    global.addMonolithicVerificationResult(result);
   }
 
 
@@ -2597,6 +2598,8 @@ public class OPConflictChecker
 
     abstract void storeStatistics();
 
+    abstract void resetStatistics();
+
     //#######################################################################
     //# Trace Recovery
     EventProxy getUsedPreconditionMarking()
@@ -2668,6 +2671,12 @@ public class OPConflictChecker
     {
       final CompositionalVerificationResult result = getAnalysisResult();
       result.setSimplifierStatistics(mSimplifier);
+    }
+
+    @Override
+    void resetStatistics()
+    {
+      mSimplifier.createStatistics();
     }
 
     //#########################################################################
@@ -3029,6 +3038,14 @@ public class OPConflictChecker
     @Override
     void storeStatistics()
     {
+      final CompositionalVerificationResult result = getAnalysisResult();
+      result.setSimplifierStatistics(mSimplifier);
+    }
+
+    @Override
+    void resetStatistics()
+    {
+      mSimplifier.createStatistics();
     }
 
     //#######################################################################
@@ -3177,6 +3194,11 @@ public class OPConflictChecker
 
     @Override
     void storeStatistics()
+    {
+    }
+
+    @Override
+    void resetStatistics()
     {
     }
 

@@ -27,8 +27,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 public class VerificationResult extends AnalysisResult
 {
 
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Constructors
   /**
    * Creates a new verification result representing an incomplete run.
    */
@@ -42,8 +42,9 @@ public class VerificationResult extends AnalysisResult
     mPeakNumberOfNodes = -1;
   }
 
-  // #########################################################################
-  // # Simple Access Methods
+
+  //#########################################################################
+  //# Simple Access Methods
   /**
    * Gets the counter example computed by the model checker, or
    * <CODE>null</CODE> if the property checked was true.
@@ -132,8 +133,9 @@ public class VerificationResult extends AnalysisResult
     return mPeakNumberOfTransitions;
   }
 
-  // #########################################################################
-  // # Providing Result Data
+
+  //#########################################################################
+  //# Providing Result Data
   /**
    * Sets the counterexample obtained from verification. Setting the
    * counterexample also marks the verification result as completed and sets the
@@ -217,6 +219,29 @@ public class VerificationResult extends AnalysisResult
   public void setPeakNumberOfNodes(final int numnodes)
   {
     mPeakNumberOfNodes = numnodes;
+  }
+
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AnalysisResult
+  @Override
+  public void merge(final AnalysisResult other)
+  {
+    super.merge(other);
+    final VerificationResult result = (VerificationResult) other;
+    mTotalNumberOfAutomata =
+      mergeAdd(mTotalNumberOfAutomata, result.mTotalNumberOfAutomata);
+    mTotalNumberOfStates =
+      mergeAdd(mTotalNumberOfStates, result.mTotalNumberOfStates);
+    mTotalNumberOfTransitions =
+      mergeAdd(mTotalNumberOfTransitions, result.mTotalNumberOfTransitions);
+    mPeakNumberOfStates =
+      Math.max(mPeakNumberOfStates, result.mPeakNumberOfStates);
+    mPeakNumberOfTransitions =
+      Math.max(mPeakNumberOfTransitions, result.mPeakNumberOfTransitions);
+    mPeakNumberOfNodes =
+      Math.max(mPeakNumberOfNodes, result.mPeakNumberOfNodes);
   }
 
 
