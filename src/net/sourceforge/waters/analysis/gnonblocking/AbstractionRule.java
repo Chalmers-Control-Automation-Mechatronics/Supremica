@@ -92,7 +92,6 @@ public abstract class AbstractionRule
     stats.setOutputStates(mOutputStates);
     stats.setOutputTransitions(mOutputTransitions);
     stats.setReductionCount(mReductionCount);
-    stats.setRunTime(mRunTime);
     stats.setUnchangedStates(mUnchangedStates);
     stats.setUnchangedTransitions(mUnchangedTransitions);
     stats.setRunTime(mRunTime);

@@ -15,6 +15,7 @@ import java.util.List;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntStack;
 
+import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonTools;
 
@@ -73,10 +74,45 @@ public class LimitedCertainConflictsTRSimplifier
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
-  public boolean run()
-    throws AnalysisException
+  @Override
+  public void reset()
   {
-    setUp();
+    mCertainConflictsInfo = null;
+    super.reset();
+  }
+
+
+  //#########################################################################
+  //# Specific Access
+  public boolean hasRemovedTransitions()
+  {
+    return mHasRemovedTransitions;
+  }
+
+  public LimitedCertainConflictsInfo getCertainConflictsInfo()
+  {
+    return mCertainConflictsInfo;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected void setUp()
+  throws AnalysisException
+  {
+    super.setUp();
+    if (!getAppliesPartitionAutomatically()) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mCertainConflictsInfo = new LimitedCertainConflictsInfo(rel);
+    }
+    mHasRemovedTransitions = false;
+  }
+
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
+  {
     final int defaultID = getDefaultMarkingID();
     if (defaultID < 0) {
       return false;
@@ -107,6 +143,7 @@ public class LimitedCertainConflictsTRSimplifier
       modified = false;
       for (int state = 0; state < numStates; state++) {
         if (!mCoreachableStates.get(state) && rel.isReachable(state)) {
+          checkAbort();
           // check for tau-transitions to certain conflicts
           mUnvisitedStates.push(state);
           while (mUnvisitedStates.size() > 0) {
@@ -241,41 +278,12 @@ public class LimitedCertainConflictsTRSimplifier
   }
 
   @Override
-  public void reset()
+  protected void tearDown()
   {
-    mCertainConflictsInfo = null;
     mPredecessorsIterator = null;
     mCoreachableStates = null;
     mUnvisitedStates = null;
-    super.reset();
-  }
-
-
-  //#########################################################################
-  //# Specific Access
-  public boolean hasRemovedTransitions()
-  {
-    return mHasRemovedTransitions;
-  }
-
-  public LimitedCertainConflictsInfo getCertainConflictsInfo()
-  {
-    return mCertainConflictsInfo;
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
-  @Override
-  protected void setUp()
-  throws AnalysisException
-  {
-    super.setUp();
-    if (!getAppliesPartitionAutomatically()) {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      mCertainConflictsInfo = new LimitedCertainConflictsInfo(rel);
-    }
-    mHasRemovedTransitions = false;
+    super.tearDown();
   }
 
   @Override
@@ -309,6 +317,7 @@ public class LimitedCertainConflictsTRSimplifier
   //#########################################################################
   //# Auxiliary Methods
   private void findCoreachableStates()
+  throws AbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -323,6 +332,7 @@ public class LimitedCertainConflictsTRSimplifier
       if (rel.isMarked(state, defaultID) &&
           rel.isReachable(state) &&
           !mCoreachableStates.get(state)) {
+        checkAbort();
         mCoreachableStates.set(state);
         mUnvisitedStates.push(state);
         while (mUnvisitedStates.size() > 0) {

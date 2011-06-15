@@ -57,10 +57,19 @@ public class SilentContinuationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
-  public boolean run()
-    throws AnalysisException
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected TRSimplifierStatistics createStatistics()
   {
-    setUp();
+    return new TRSimplifierStatistics(this, true, false);
+  }
+
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
+  {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (!rel.isUsedEvent(EventEncoding.TAU)) {
       return false;
@@ -84,6 +93,7 @@ public class SilentContinuationTRSimplifier
     final IntListBuffer prepartition = new IntListBuffer();
     for (int state = 0; state < numStates; state++) {
       if (candidates.get(state)) {
+        checkAbort();
         int list = map.get(state);
         if (list == IntListBuffer.NULL) {
           list = prepartition.createList();
@@ -100,6 +110,7 @@ public class SilentContinuationTRSimplifier
       final List<int[]> partition =
         new ArrayList<int[]>(numClasses + numSingles);
       for (int state = 0; state < numStates; state++) {
+        checkAbort();
         if (candidates.get(state)) {
           final int list = map.get(state);
           final int first = prepartition.getFirst(list);
@@ -119,9 +130,6 @@ public class SilentContinuationTRSimplifier
     }
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected void applyResultPartition()
     throws AnalysisException

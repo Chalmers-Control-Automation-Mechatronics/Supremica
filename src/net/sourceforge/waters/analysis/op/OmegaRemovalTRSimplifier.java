@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.op
 //# CLASS:   RemovalOfAlphaMarkingsRule
 //###########################################################################
@@ -47,10 +47,19 @@ class OmegaRemovalTRSimplifier
     return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }
 
-  public boolean run()
-    throws AnalysisException
+  @Override
+  public boolean isObservationEquivalentAbstraction()
   {
-    setUp();
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
+  {
     final int alphaID = getPreconditionMarkingID();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -61,6 +70,7 @@ class OmegaRemovalTRSimplifier
     // alpha-marked state ...
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (rel.isMarked(sourceID, alphaID) && !reachableStates.get(sourceID)) {
+        checkAbort();
         reachableStates.set(sourceID);
         unvisitedStates.push(sourceID);
         while (unvisitedStates.size() > 0) {
@@ -83,18 +93,13 @@ class OmegaRemovalTRSimplifier
     int sourceID = reachableStates.nextClearBit(0);
     while (sourceID < numStates) {
       if (rel.isMarked(sourceID, defaultID)) {
+        checkAbort();
         rel.setMarked(sourceID, defaultID, false);
         modified = true;
       }
       sourceID = reachableStates.nextClearBit(sourceID + 1);
     }
     return modified;
-  }
-
-  @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return true;
   }
 
 }

@@ -14,6 +14,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 
 import org.apache.log4j.Logger;
 
@@ -34,6 +35,7 @@ public abstract class AbstractTRSimplifier
     mIsAborting = false;
     mAppliesPartitionAutomatically = true;
     mPreferredOutputConfiguration = 0;
+    mStatistics = createStatistics();
     mTransitionRelation = rel;
   }
 
@@ -79,6 +81,32 @@ public abstract class AbstractTRSimplifier
     return mAppliesPartitionAutomatically;
   }
 
+  public boolean run()
+  throws AnalysisException
+  {
+    final long start = System.currentTimeMillis();
+    boolean completed = false;
+    try {
+      setUp();
+      mStatistics.recordStart(mTransitionRelation);
+      final boolean success = runSimplifier();
+      mStatistics.recordFinish(mTransitionRelation, success);
+      completed = true;
+      return success;
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      System.gc();
+      throw new OverflowException(error);
+    } finally {
+      tearDown();
+      if (!completed) {
+        mStatistics.recordOverflow(mTransitionRelation);
+      }
+      final long stop = System.currentTimeMillis();
+      mStatistics.recordRunTime(stop - start);
+    }
+  }
+
   public List<int[]> getResultPartition()
   {
     return mResultPartition;
@@ -92,6 +120,11 @@ public abstract class AbstractTRSimplifier
   public boolean isReducedMarking(final int propID)
   {
     return false;
+  }
+
+  public TRSimplifierStatistics getStatistics()
+  {
+    return mStatistics;
   }
 
   public void reset()
@@ -116,6 +149,8 @@ public abstract class AbstractTRSimplifier
 
   //#########################################################################
   //# Algorithm Support
+  protected abstract TRSimplifierStatistics createStatistics();
+
   protected void setUp()
     throws AnalysisException
   {
@@ -125,6 +160,12 @@ public abstract class AbstractTRSimplifier
     if (config != 0) {
       mTransitionRelation.reconfigure(config);
     }
+  }
+
+  protected abstract boolean runSimplifier() throws AnalysisException;
+
+  protected void tearDown()
+  {
   }
 
   protected void setResultPartitionList(final List<int[]> partition)
@@ -195,6 +236,7 @@ public abstract class AbstractTRSimplifier
   private boolean mIsAborting;
   private boolean mAppliesPartitionAutomatically;
   private int mPreferredOutputConfiguration;
+  private final TRSimplifierStatistics mStatistics;
   private ListBufferTransitionRelation mTransitionRelation;
   private List<int[]> mResultPartition;
 

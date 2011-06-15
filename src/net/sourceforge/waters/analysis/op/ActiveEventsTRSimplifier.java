@@ -53,10 +53,13 @@ public class ActiveEventsTRSimplifier
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
-  public boolean run()
-    throws AnalysisException
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
   {
-    setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final WatersIntHashingStrategy strategy = new ActiveEventsStateHash();
@@ -65,6 +68,7 @@ public class ActiveEventsTRSimplifier
     final IntListBuffer prepartition = new IntListBuffer();
     for (int state = 0; state < numStates; state++) {
       if (rel.isReachable(state)) {
+        checkAbort();
         int list = map.get(state);
         if (list == IntListBuffer.NULL) {
           list = prepartition.createList();
@@ -81,6 +85,7 @@ public class ActiveEventsTRSimplifier
       int index = 0;
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
+          checkAbort();
           final int list = map.get(state);
           final int first = prepartition.getFirst(list);
           if (state == first) {
@@ -94,9 +99,6 @@ public class ActiveEventsTRSimplifier
     }
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected void applyResultPartition()
     throws AnalysisException

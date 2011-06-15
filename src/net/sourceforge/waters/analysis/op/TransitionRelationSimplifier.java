@@ -133,6 +133,13 @@ public interface TransitionRelationSimplifier
   public boolean isReducedMarking(int propID);
 
   /**
+   * Gets a record with details of the performance of this simplifier.
+   * The returned record contains accumulative information over all
+   * invocations since the simplifier was created.
+   */
+  public TRSimplifierStatistics getStatistics();
+
+  /**
    * Cleans up. This method removes all temporary data and results
    * associated with any previous call to {@link #run()}.
    */

@@ -51,8 +51,23 @@ public class MarkingSaturationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
-  public boolean run()
-    throws AnalysisException
+  @Override
+  public boolean isObservationEquivalentAbstraction()
+  {
+    return true;
+  }
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected TRSimplifierStatistics createStatistics()
+  {
+    return new TRSimplifierStatistics(this, false, true);
+  }
+
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
   {
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -62,7 +77,6 @@ public class MarkingSaturationTRSimplifier
       // No tau transitions - no simplification
       return false;
     }
-    setUp();
 
     // For each proposition, visit all marked states. For each of them, do
     // a depth-first search following all tau-transitions, adding markings to
@@ -77,6 +91,7 @@ public class MarkingSaturationTRSimplifier
         if (rel.isReachable(stateID) &&
             rel.isMarked(stateID, prop) &&
             visitedStates.add(stateID)) {
+          checkAbort();
           unvisitedStates.push(stateID);
           while (unvisitedStates.size() > 0) {
             final int newStateID = unvisitedStates.pop();
@@ -97,12 +112,6 @@ public class MarkingSaturationTRSimplifier
       visitedStates.clear();
     }
     return modified;
-  }
-
-  @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return true;
   }
 
 }

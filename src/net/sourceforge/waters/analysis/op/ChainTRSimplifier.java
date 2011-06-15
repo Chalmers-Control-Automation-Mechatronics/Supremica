@@ -104,8 +104,8 @@ public class ChainTRSimplifier
   public boolean run()
     throws AnalysisException
   {
-    final int index = size();
-    return runTo(index);
+    mStopIndex = size();
+    return super.run();
   }
 
   @Override
@@ -144,11 +144,27 @@ public class ChainTRSimplifier
 
   //#########################################################################
   //# Specific Access
-  public boolean runTo(int index)
-    throws AnalysisException
+  public boolean runTo(final int index)
+  throws AnalysisException
+  {
+    mStopIndex = index;
+    return super.run();
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected TRSimplifierStatistics createStatistics()
+  {
+    return new TRSimplifierStatistics(this, true, true);
+  }
+
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
   {
     final Logger logger = getLogger();
-    setUp();
     mIsObservationEquivalentAbstraction = true;
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (logger.isDebugEnabled()) {
@@ -161,7 +177,7 @@ public class ChainTRSimplifier
     mReducedMarkings = new boolean[numProps];
     boolean result = false;
     final Iterator<TransitionRelationSimplifier> iter = mSteps.iterator();
-    while (--index >= 0) {
+    for (int index = 0; index < mStopIndex; index++) {
       checkAbort();
       final TransitionRelationSimplifier step = iter.next();
       try {
@@ -224,6 +240,7 @@ public class ChainTRSimplifier
   //#########################################################################
   //# Data Members
   private final List<TransitionRelationSimplifier> mSteps;
+  private int mStopIndex;
   private boolean mIsObservationEquivalentAbstraction;
   private boolean[] mReducedMarkings;
 

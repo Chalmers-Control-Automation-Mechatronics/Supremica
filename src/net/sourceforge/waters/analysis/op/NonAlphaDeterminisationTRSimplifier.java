@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.op
 //# CLASS:   NonAlphaDeterminisationTRSimplifier
 //###########################################################################
@@ -75,13 +75,16 @@ public class NonAlphaDeterminisationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }
 
-  public boolean run()
-    throws AnalysisException
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
   {
     if (!hasNonPreconditionMarkedStates()) {
       return false;
     }
-    setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.reverse();
     try {
@@ -97,15 +100,15 @@ public class NonAlphaDeterminisationTRSimplifier
       setResultPartitionList(partition);
       return modified;
     } finally {
-      mBisimulator.reset();
       rel.reverse();
     }
   }
 
   @Override
-  public void reset()
+  protected void tearDown()
   {
     mBisimulator.reset();
+    super.tearDown();
   }
 
 

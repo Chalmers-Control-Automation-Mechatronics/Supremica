@@ -409,6 +409,7 @@ public class OPConflictChecker
               simplify(mEventHasDisappeared);
               break;
             } catch (final OverflowException overflow) {
+              recordUnsuccessfulComposition();
               if (mNumOverflows++ >= MAX_OVERFLOWS) {
                 break subsystem;
               }
@@ -476,7 +477,7 @@ public class OPConflictChecker
     throws AnalysisException
   {
     super.setUp();
-    final VerificationResult result = getAnalysisResult();
+    final CompositionalVerificationResult result = getAnalysisResult();
     result.setNumberOfStates(0.0);
     result.setNumberOfTransitions(0.0);
     mCurrentDefaultMarking = getUsedMarkingProposition();
@@ -489,6 +490,7 @@ public class OPConflictChecker
       mPropositions = Arrays.asList(markings);
     }
     mAbstractionRule = mAbstractionMethod.createAbstractionRule(this);
+    mAbstractionRule.storeStatistics();
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
     mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
     setupSynchronousProductBuilder();
@@ -523,6 +525,18 @@ public class OPConflictChecker
     mModifyingSteps = null;
     mUsedEventNames = null;
     mOverflowCandidates = null;
+  }
+
+  @Override
+  protected CompositionalVerificationResult createAnalysisResult()
+  {
+    return new CompositionalVerificationResult();
+  }
+
+  @Override
+  public CompositionalVerificationResult getAnalysisResult()
+  {
+    return (CompositionalVerificationResult) super.getAnalysisResult();
   }
 
 
@@ -1561,21 +1575,10 @@ public class OPConflictChecker
   //# Statistics
   private void recordStatistics(final AutomatonProxy aut)
   {
+    final CompositionalVerificationResult result = getAnalysisResult();
+    result.addCompositionAttempt();
     final int numStates = aut.getStates().size();
     final int numTrans = aut.getTransitions().size();
-    recordStatistics(numStates, numTrans);
-  }
-
-  private void recordStatistics(final VerificationResult result)
-  {
-    final double numStates = result.getTotalNumberOfStates();
-    final double numTrans = result.getTotalNumberOfTransitions();
-    recordStatistics(numStates, numTrans);
-  }
-
-  private void recordStatistics(final double numStates, final double numTrans)
-  {
-    final VerificationResult result = getAnalysisResult();
     final double totalStates = result.getTotalNumberOfStates() + numStates;
     result.setTotalNumberOfStates(totalStates);
     final double peakStates =
@@ -1586,6 +1589,18 @@ public class OPConflictChecker
     final double peakTrans =
       Math.max(result.getPeakNumberOfTransitions(), numTrans);
     result.setPeakNumberOfTransitions(peakTrans);
+  }
+
+  private void recordUnsuccessfulComposition()
+  {
+    final CompositionalVerificationResult result = getAnalysisResult();
+    result.addUnsuccessfulComposition();
+  }
+
+  private void recordStatistics(final VerificationResult result)
+  {
+    final CompositionalVerificationResult global = getAnalysisResult();
+    global.setMonolithicVerificationResult(result);
   }
 
 
@@ -2576,6 +2591,8 @@ public class OPConflictChecker
                                        final EventProxy tau)
       throws AnalysisException;
 
+    abstract void storeStatistics();
+
     //#######################################################################
     //# Trace Recovery
     EventProxy getUsedPreconditionMarking()
@@ -2640,6 +2657,13 @@ public class OPConflictChecker
       } finally {
         mSimplifier.reset();
       }
+    }
+
+    @Override
+    void storeStatistics()
+    {
+      final CompositionalVerificationResult result = getAnalysisResult();
+      result.setSimplifierStatistics(mSimplifier);
     }
 
     //#########################################################################
@@ -2998,6 +3022,11 @@ public class OPConflictChecker
       }
     }
 
+    @Override
+    void storeStatistics()
+    {
+    }
+
     //#######################################################################
     //# Auxiliary Methods
     private List<int[]> applySimplifier
@@ -3140,6 +3169,11 @@ public class OPConflictChecker
       } finally {
         mSimplifier.tearDown();
       }
+    }
+
+    @Override
+    void storeStatistics()
+    {
     }
 
     //#########################################################################

@@ -74,6 +74,14 @@ public abstract class AbstractMarkingTRSimplifier
     return mPropositions;
   }
 
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected TRSimplifierStatistics createStatistics()
+  {
+    return new TRSimplifierStatistics(this, true, false);
+  }
+
 
   //#########################################################################
   //# Data Members

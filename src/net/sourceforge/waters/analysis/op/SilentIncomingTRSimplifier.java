@@ -102,10 +102,19 @@ public class SilentIncomingTRSimplifier
     return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }
 
-  public boolean run()
-    throws AnalysisException
+  @Override
+  public boolean isObservationEquivalentAbstraction()
   {
-    setUp();
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  public boolean runSimplifier()
+  throws AnalysisException
+  {
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (!rel.isUsedEvent(tauID)) {
@@ -139,6 +148,7 @@ public class SilentIncomingTRSimplifier
         }
       }
     }
+    checkAbort();
     if (keep.cardinality() == numStates) {
       return false;
     }
@@ -146,24 +156,25 @@ public class SilentIncomingTRSimplifier
     int source = 0;
     boolean modified = false;
     main:
-    while (source < numStates) {
-      if (rel.isReachable(source)) {
-        iter.reset(source, tauID);
-        while (iter.advance()) {
-          final int target = iter.getCurrentTargetState();
-          if (!keep.get(target)) {
-            iter.remove();
-            rel.copyOutgoingTransitions(target, source);
-            modified = true;
-            // After copying outgoing transitions from target to source,
-            // the source state may receive new tau-transitions. To make sure
-            // these are processed, we start checking the source state again.
-            continue main;
+      while (source < numStates) {
+        if (rel.isReachable(source)) {
+          checkAbort();
+          iter.reset(source, tauID);
+          while (iter.advance()) {
+            final int target = iter.getCurrentTargetState();
+            if (!keep.get(target)) {
+              iter.remove();
+              rel.copyOutgoingTransitions(target, source);
+              modified = true;
+              // After copying outgoing transitions from target to source,
+              // the source state may receive new tau-transitions. To make sure
+              // these are processed, we start checking the source state again.
+              continue main;
+            }
           }
         }
+        source++;
       }
-      source++;
-    }
     if (modified) {
       applyResultPartitionAutomatically();
     }
@@ -171,21 +182,12 @@ public class SilentIncomingTRSimplifier
   }
 
   @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return true;
-  }
-
-  @Override
-  public void reset()
+  protected void tearDown()
   {
     mTauTestIterator = null;
-    super.reset();
+    super.tearDown();
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected void applyResultPartition()
   throws AnalysisException

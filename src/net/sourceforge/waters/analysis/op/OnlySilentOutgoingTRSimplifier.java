@@ -50,10 +50,19 @@ public class OnlySilentOutgoingTRSimplifier
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
-  public boolean run()
-    throws AnalysisException
+  @Override
+  public boolean isObservationEquivalentAbstraction()
   {
-    setUp();
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
+  {
     final int alphaID = getPreconditionMarkingID();
     final int omegaID = getDefaultMarkingID();
     final int tauID = EventEncoding.TAU;
@@ -71,6 +80,7 @@ public class OnlySilentOutgoingTRSimplifier
       if (rel.isReachable(source) &&
           !rel.isMarked(source, omegaID) &&
           (alphaID < 0 || !rel.isMarked(source, alphaID))) {
+        checkAbort();
         iter.resetState(source);
         while (iter.advance()) {
           final int eventID = iter.getCurrentEvent();
@@ -99,15 +109,6 @@ public class OnlySilentOutgoingTRSimplifier
     return modified;
   }
 
-  @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return true;
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected void applyResultPartition()
   throws AnalysisException

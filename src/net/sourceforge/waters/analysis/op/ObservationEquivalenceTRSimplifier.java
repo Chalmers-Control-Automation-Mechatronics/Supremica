@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis Algorithms
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.op
 //# CLASS:   ObservationEquivalenceTRSimplifier
 //###########################################################################
@@ -79,6 +79,19 @@ public class ObservationEquivalenceTRSimplifier
     super.setTransitionRelation(rel);
     mNumStates = rel.getNumberOfStates();
     mNumEvents = rel.getNumberOfProperEvents();
+  }
+
+  @Override
+  public boolean isObservationEquivalentAbstraction()
+  {
+    return true;
+  }
+
+  @Override
+  public void reset()
+  {
+    super.reset();
+    mInitialPartition = null;
   }
 
 
@@ -193,11 +206,36 @@ public class ObservationEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Invocation
-  public boolean run() throws AnalysisException
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected TRSimplifierStatistics createStatistics()
   {
-    setUp();
+    return new TRSimplifierStatistics(this, true, false);
+  }
 
+  @Override
+  protected void setUp()
+  throws AnalysisException
+  {
+    super.setUp();
+    if (mEquivalence == Equivalence.WEAK_OBSERVATION_EQUIVALENCE) {
+      mFirstSplitEvent = EventEncoding.NONTAU;
+    } else {
+      mFirstSplitEvent = EventEncoding.TAU;
+    }
+    mHasModifications = false;
+    final boolean doTau = mTransitionRemovalMode == TransitionRemoval.ALL;
+    final boolean doNonTau =
+      doTau || mTransitionRemovalMode == TransitionRemoval.NONTAU;
+    removeRedundantTransitions(doTau, doNonTau);
+    final Collection<int[]> partition = createInitialPartition();
+    setUpInitialPartition(partition);
+  }
+
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
+  {
     while (true) {
       checkAbort();
       final Iterator<? extends EquivalenceClass> it;
@@ -219,11 +257,20 @@ public class ObservationEquivalenceTRSimplifier
     if (!mHasModifications) {
       return false;
     }
-
     buildResultPartition();
     applyResultPartitionAutomatically();
-
     return true;
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    mTauPreds = null;
+    mWS = null;
+    mWC = null;
+    mP = null;
+    mStateToClass = null;
+    super.tearDown();
   }
 
   /**
@@ -234,8 +281,8 @@ public class ObservationEquivalenceTRSimplifier
    * @see TransitionRemoval
    */
   @Override
-  public void applyResultPartition()
-    throws AnalysisException
+  protected void applyResultPartition()
+  throws AnalysisException
   {
     super.applyResultPartition();
     final boolean doTau;
@@ -253,44 +300,6 @@ public class ObservationEquivalenceTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
     rel.removeProperSelfLoopEvents();
-  }
-
-  @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return true;
-  }
-
-  @Override
-  public void reset()
-  {
-    super.reset();
-    mInitialPartition = null;
-    mTauPreds = null;
-    mWS = null;
-    mWC = null;
-    mP = null;
-    mStateToClass = null;
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
-  protected void setUp() throws AnalysisException
-  {
-    super.setUp();
-    if (mEquivalence == Equivalence.WEAK_OBSERVATION_EQUIVALENCE) {
-      mFirstSplitEvent = EventEncoding.NONTAU;
-    } else {
-      mFirstSplitEvent = EventEncoding.TAU;
-    }
-    mHasModifications = false;
-    final boolean doTau = mTransitionRemovalMode == TransitionRemoval.ALL;
-    final boolean doNonTau =
-      doTau || mTransitionRemovalMode == TransitionRemoval.NONTAU;
-    removeRedundantTransitions(doTau, doNonTau);
-    final Collection<int[]> partition = createInitialPartition();
-    setUpInitialPartition(partition);
   }
 
 

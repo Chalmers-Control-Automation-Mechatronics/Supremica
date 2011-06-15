@@ -46,10 +46,19 @@ public class CoreachabilityTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
-  public boolean run()
-    throws AnalysisException
+  @Override
+  public boolean isObservationEquivalentAbstraction()
   {
-    setUp();
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
+  {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     final int alphaID = getPreconditionMarkingID();
@@ -64,6 +73,7 @@ public class CoreachabilityTRSimplifier
            rel.isMarked(sourceID, alphaID)) &&
           rel.isReachable(sourceID) &&
           reachableStates.add(sourceID) ) {
+        checkAbort();
         unvisitedStates.push(sourceID);
         while (unvisitedStates.size() > 0) {
           final int newSource = unvisitedStates.pop();
@@ -94,15 +104,6 @@ public class CoreachabilityTRSimplifier
     }
   }
 
-  @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return true;
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
   @Override
   protected void applyResultPartition()
   throws AnalysisException

@@ -51,8 +51,30 @@ public class MarkingRemovalTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
-  public boolean run()
-    throws AnalysisException
+  @Override
+  public boolean isObservationEquivalentAbstraction()
+  {
+    return true;
+  }
+
+  @Override
+  public boolean isReducedMarking(final int propID)
+  {
+    return mReducedMarkings[propID];
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.op.AbstractTRSimplifier
+  @Override
+  protected TRSimplifierStatistics createStatistics()
+  {
+    return new TRSimplifierStatistics(this, false, true);
+  }
+
+  @Override
+  protected boolean runSimplifier()
+  throws AnalysisException
   {
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -62,7 +84,6 @@ public class MarkingRemovalTRSimplifier
       // No tau transitions - no simplification
       return false;
     }
-    setUp();
 
     // For each proposition, visit all marked states. For each of them, do a
     // depth-first search, removing markings from all states encountered
@@ -77,6 +98,7 @@ public class MarkingRemovalTRSimplifier
     for (int prop = 0; prop < rel.getNumberOfPropositions(); prop++) {
       for (int stateID = 0; stateID < numStates; stateID++) {
         if (rel.isMarked(stateID, prop)) {
+          checkAbort();
           iter.reset(stateID, tauID);
           while (iter.advance()) {
             final int predID = iter.getCurrentSourceState();
@@ -85,6 +107,7 @@ public class MarkingRemovalTRSimplifier
             }
           }
           while (unvisitedStates.size() > 0) {
+            checkAbort();
             final int newStateID = unvisitedStates.pop();
             if (rel.isMarked(newStateID, prop)) {
               rel.setMarked(newStateID, prop, false);
@@ -104,18 +127,6 @@ public class MarkingRemovalTRSimplifier
       visitedStates.clear();
     }
     return modified;
-  }
-
-  @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return true;
-  }
-
-  @Override
-  public boolean isReducedMarking(final int propID)
-  {
-    return mReducedMarkings[propID];
   }
 
 
