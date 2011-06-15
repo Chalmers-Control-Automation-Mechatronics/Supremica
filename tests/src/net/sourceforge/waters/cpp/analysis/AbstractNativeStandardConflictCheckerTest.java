@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   AbstractNativeStandardConflictCheckerTest
 //###########################################################################
@@ -15,6 +15,18 @@ import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest
 public abstract class AbstractNativeStandardConflictCheckerTest
   extends AbstractStandardConflictCheckerTest
 {
+
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
+  public AbstractNativeStandardConflictCheckerTest()
+  {
+  }
+
+  public AbstractNativeStandardConflictCheckerTest(final String name)
+  {
+    super(name);
+  }
+
 
   //#########################################################################
   //# Test Case Overrides

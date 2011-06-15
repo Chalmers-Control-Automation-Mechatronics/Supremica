@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractStandardConflictCheckerTest
 //###########################################################################
@@ -56,8 +56,10 @@ public abstract class AbstractStandardConflictCheckerTest
   {
     testEmpty();
     testSmallFactory2();
+    testWspTimer();
     testTransferline__1();
     testEmpty();
+    testWspTimer();
     testTransferline__1();
     testSmallFactory2();
   }
@@ -954,7 +956,8 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, name, bindings, result);
   }
 
-  protected void checkRoundRobin(final int n) throws Exception
+  protected void checkRoundRobin(final int n)
+  throws Exception
   {
     final String group = "efa";
     final String name = "round_robin_efa.wmod";
@@ -964,7 +967,8 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, name, bindings, false);
   }
 
-  protected void checkTransferline(final int n) throws Exception
+  protected void checkTransferline(final int n)
+  throws Exception
   {
     final String group = "handwritten";
     final String name = "transferline.wmod";
