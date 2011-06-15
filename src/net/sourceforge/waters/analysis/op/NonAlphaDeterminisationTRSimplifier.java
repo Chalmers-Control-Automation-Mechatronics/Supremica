@@ -85,9 +85,11 @@ public class NonAlphaDeterminisationTRSimplifier
     if (!hasNonPreconditionMarkedStates()) {
       return false;
     }
+    final TRSimplifierStatistics backup = mBisimulator.getStatistics();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.reverse();
     try {
+      mBisimulator.setStatistics(null);
       mBisimulator.setTransitionRelation(rel);
       List<int[]> partition = createInitialPartition();
       if (partition == null) {
@@ -100,6 +102,7 @@ public class NonAlphaDeterminisationTRSimplifier
       setResultPartitionList(partition);
       return modified;
     } finally {
+      mBisimulator.setStatistics(backup);
       rel.reverse();
     }
   }

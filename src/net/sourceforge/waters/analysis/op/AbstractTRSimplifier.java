@@ -88,9 +88,13 @@ public abstract class AbstractTRSimplifier
     boolean completed = false;
     try {
       setUp();
-      mStatistics.recordStart(mTransitionRelation);
+      if (mStatistics != null) {
+        mStatistics.recordStart(mTransitionRelation);
+      }
       final boolean success = runSimplifier();
-      mStatistics.recordFinish(mTransitionRelation, success);
+      if (mStatistics != null) {
+        mStatistics.recordFinish(mTransitionRelation, success);
+      }
       completed = true;
       return success;
     } catch (final OutOfMemoryError error) {
@@ -99,11 +103,13 @@ public abstract class AbstractTRSimplifier
       throw new OverflowException(error);
     } finally {
       tearDown();
-      if (!completed) {
-        mStatistics.recordOverflow(mTransitionRelation);
+      if (mStatistics != null) {
+        if (!completed) {
+          mStatistics.recordOverflow(mTransitionRelation);
+        }
+        final long stop = System.currentTimeMillis();
+        mStatistics.recordRunTime(stop - start);
       }
-      final long stop = System.currentTimeMillis();
-      mStatistics.recordRunTime(stop - start);
     }
   }
 
