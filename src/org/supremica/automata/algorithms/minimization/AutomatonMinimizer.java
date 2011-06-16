@@ -2714,6 +2714,18 @@ class EquivalenceClasses
             super.add(currEquivClass);
         }
     }
+    public void addAll(final EquivalenceClassHolder equivClassHolder, boolean list)
+    {
+		if(list == false)
+		{
+			addAll(equivClassHolder);
+		}
+		else
+		{
+			// Sahars code to store stuff as a list and not as a single set
+			//... blah blah blah...
+		}
+	}
 }
 
 class EquivalenceClass
