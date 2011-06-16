@@ -63,7 +63,6 @@ public class MarkingRemovalTRSimplifier
     return mReducedMarkings[propID];
   }
 
-  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =

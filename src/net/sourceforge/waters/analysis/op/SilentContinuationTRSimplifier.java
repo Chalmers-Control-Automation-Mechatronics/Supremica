@@ -57,7 +57,6 @@ public class SilentContinuationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
-  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =

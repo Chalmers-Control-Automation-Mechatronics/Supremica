@@ -44,7 +44,6 @@ public class TauLoopRemovalTRSimplifier
     return true;
   }
 
-  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =

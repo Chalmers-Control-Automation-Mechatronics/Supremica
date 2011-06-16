@@ -120,7 +120,6 @@ public class ChainTRSimplifier
     return mReducedMarkings[propID];
   }
 
-  @Override
   public TRSimplifierStatistics createStatistics()
   {
     if (mSteps != null) {

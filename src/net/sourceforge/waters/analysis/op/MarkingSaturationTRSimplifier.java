@@ -57,7 +57,6 @@ public class MarkingSaturationTRSimplifier
     return true;
   }
 
-  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =

@@ -77,7 +77,6 @@ public abstract class AbstractMarkingTRSimplifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
-  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =

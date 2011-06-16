@@ -87,7 +87,6 @@ public class ObservationEquivalenceTRSimplifier
     return true;
   }
 
-  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
