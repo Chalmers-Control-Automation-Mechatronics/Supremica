@@ -78,14 +78,12 @@ public class CommandLineTool
     boolean stats = false;
     boolean optimise = true;
     boolean noargs = false;
+    int timeout = -1;
     PrintWriter csv = null;
 
     try {
       if (args.length < 2) {
-        System.err.println
-          ("USAGE: java CommandLineTool <factory> " +
-           "[options] <checker> <file> ...");
-        System.exit(1);
+        usage();
       }
 
       final ModuleProxyFactory moduleFactory =
@@ -114,6 +112,12 @@ public class CommandLineTool
           stats = true;
         } else if (arg.equals("-noopt")) {
           optimise = false;
+        } else if (arg.equals("-timeout") && i + 1 < args.length) {
+          try {
+            timeout = Integer.parseInt(args[++i]);
+          } catch (final NumberFormatException exception) {
+            usage();
+          }
         } else if (arg.equals("-csv") && i + 1 < args.length) {
           final String csvname = args[++i];
           final OutputStream csvstream = new FileOutputStream(csvname);
@@ -182,10 +186,10 @@ public class CommandLineTool
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
+      final Watchdog watchdog = new Watchdog(checker, timeout);
       final boolean noProperties =
         !(checker instanceof LanguageInclusionChecker);
-      final boolean noPropositions =
-        !(checker instanceof ConflictChecker);
+      final boolean noPropositions = !(checker instanceof ConflictChecker);
       if (wrapper == null) {
         wrapper = checker;
       } else if (checker instanceof ConflictChecker) {
@@ -226,27 +230,12 @@ public class CommandLineTool
         System.out.print(des.getName() + " ... ");
         System.out.flush();
 
-        /* shuffle
-        {
-          final String desname = des.getName();
-          final String comment = des.getComment();
-          final List<EventProxy> events = new ArrayList<EventProxy>(des.getEvents());
-          Collections.shuffle(events);
-          final List<AutomatonProxy> automata =
-            new ArrayList<AutomatonProxy>(des.getAutomata());
-          Collections.shuffle(automata);
-          final ProductDESProxy shuffle =
-            desFactory.createProductDESProxy(desname, comment, null,
-                                             events, automata);
-          MarshallingTools.saveProductDES(shuffle, "shuffle.wdes");
-        } */
-
         final long start = System.currentTimeMillis();
         wrapper.setModel(des);
         factory.postConfigure(checker);
         boolean additions = false;
         try {
-          wrapper.run();
+          watchdog.launch(wrapper);
           final VerificationResult result = wrapper.getAnalysisResult();
           final long stop = System.currentTimeMillis();
           final boolean satisfied = result.isSatisfied();
@@ -278,6 +267,10 @@ public class CommandLineTool
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("OVERFLOW (%.3f s)\n", difftime);
+        } catch (final AbortException abort) {
+          final long stop = System.currentTimeMillis();
+          final float difftime = 0.001f * (stop - start);
+          formatter.format("TIMEOUT (%.3f s)\n", difftime);
         }
         final VerificationResult result = wrapper.getAnalysisResult();
         if (result != null) {
@@ -318,6 +311,64 @@ public class CommandLineTool
         csv.close();
       }
     }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static void usage()
+  {
+    System.err.println
+      ("USAGE: java CommandLineTool <factory>  [options] <checker> <file> ...");
+    System.exit(1);
+  }
+
+
+  //#########################################################################
+  //# Inner Class Watchdog
+  private static class Watchdog implements Runnable {
+
+    //#######################################################################
+    //# Constructor
+    private Watchdog(final ModelVerifier checker, final int timeout)
+    {
+      mChecker = checker;
+      mTimeoutMillis = timeout >= 0 ? 1000L * timeout : -1;
+    }
+
+    //#######################################################################
+    //# Invocation
+    private boolean launch(final ModelVerifier wrapper)
+    throws AnalysisException
+    {
+      if (mTimeoutMillis >= 0) {
+        final Thread thread = new Thread(this);
+        thread.start();
+        final boolean result = wrapper.run();
+        thread.interrupt();
+        return result;
+      } else {
+        return wrapper.run();
+      }
+    }
+
+    //#######################################################################
+    //# Interface java.lang.Runnable
+    public void run()
+    {
+      try {
+        Thread.sleep(mTimeoutMillis);
+        mChecker.requestAbort();
+      } catch (final InterruptedException exception) {
+        // No problem ...
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ModelVerifier mChecker;
+    private final long mTimeoutMillis;
+
   }
 
 
