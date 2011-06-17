@@ -47,6 +47,8 @@ public class NBAbstractionStandardConflictCheckerTest
     checker.setInternalStepNodeLimit(5000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);
+    //checker.setPreselectingMethod(OPConflictChecker.PreselectingMethod.MaxS);
+    //checker.setSelectingMethod(OPConflictChecker.SelectingMethod.MaxL);
     return checker;
   }
 

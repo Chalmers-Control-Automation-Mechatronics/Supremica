@@ -4278,6 +4278,9 @@ public class OPConflictChecker
       delegate.setupTraceConversion(eventEnc, rel);
       crucialSteps = delegate.getCrucialSteps(traceSteps);
       convertedSteps = delegate.convertCrucialSteps(crucialSteps);
+      final int numConvertedSteps = convertedSteps.size();
+      SearchRecord record = convertedSteps.get(numConvertedSteps - 1);
+      final int lastConvertedState = record.getState();
       final LimitedCertainConflictsTRSimplifier simplifier =
         rule.getCertainConflictsSimplifier();
       final int lconfig = simplifier.getPreferredInputConfiguration();
@@ -4286,39 +4289,34 @@ public class OPConflictChecker
       simplifier.setTransitionRelation(copy);
       simplifier.setAppliesPartitionAutomatically(false);
       simplifier.run();
-      final LimitedCertainConflictsInfo info =
-        simplifier.getCertainConflictsInfo();
-      simplifier.reset();
+      simplifier.setTransitionRelation(rel);
       copy = null;
 
       final ProductDESProxyFactory factory = getFactory();
-      CertainConflictsTraceExpander expander = null;
-      final int endConvertedSteps = convertedSteps.size() - 1;
-      SearchRecord record = convertedSteps.get(endConvertedSteps);
-      int endState = record.getState();
-      endState = addTauSteps(info, endState, convertedSteps);
-      while (!info.isBlockingState(endState)) {
-        if (expander == null) {
-          final KindTranslator translator = getKindTranslator();
-          expander = new CertainConflictsTraceExpander
-            (factory, translator, mCurrentCompositionalSafetyVerifier);
-        }
-        final int numTraceSteps = traceSteps.size();
-        final TraceStepProxy lastTraceStep = traceSteps.get(numTraceSteps - 1);
-        expander.setStartStates(lastTraceStep);
-        final ListBufferTransitionRelation testrel =
-          info.createTestAutomaton(rel, ":certainconf", endState);
-        final StateEncoding stateEnc = new StateEncoding();
-        final AutomatonProxy testaut =
-          testrel.createAutomaton(factory, eventEnc, stateEnc);
-        final Collection<EventProxy> uncontrollables =
-          info.getUncontrollableEvents(testrel, eventEnc);
-        expander.setCertainConflictsAutomaton
-          (resultAut, testaut, uncontrollables);
-        final List<TraceStepProxy> additionalSteps = expander.run();
-        if (additionalSteps == null) {
+      final KindTranslator translator = getKindTranslator();
+      final CertainConflictsTraceExpander expander =
+        new CertainConflictsTraceExpander(factory, translator,
+                                          mCurrentCompositionalSafetyVerifier);
+      final int numTraceSteps = traceSteps.size();
+      final TraceStepProxy lastTraceStep = traceSteps.get(numTraceSteps - 1);
+      expander.setStartStates(lastTraceStep);
+      final StateEncoding stateEnc = new StateEncoding();
+      final EventProxy prop =
+        factory.createEventProxy(":certainconf", EventKind.UNCONTROLLABLE);
+      AutomatonProxy testaut = null;
+      List<TraceStepProxy> additionalSteps = null;
+      final int maxlevel = simplifier.getMaxLevel();
+      for (int level = 0; level <= maxlevel; level++) {
+        testaut = simplifier.createTestAutomaton
+          (factory, eventEnc, stateEnc, lastConvertedState, prop, level);
+        expander.setCertainConflictsAutomaton(resultAut, testaut, prop);
+        additionalSteps = expander.run();
+        if (additionalSteps != null) {
           break;
         }
+        stateEnc.clear();
+      }
+      if (additionalSteps != null) {
         final Collection<AutomatonProxy> automata = expander.getTraceAutomata();
         final List<TraceStepProxy> saturatedSteps =
           getSaturatedTraceSteps(additionalSteps, automata);
@@ -4337,18 +4335,12 @@ public class OPConflictChecker
           traceSteps.add(reducedStep);
           if (ecode >= 0) {
             final StateProxy state = map.get(testaut);
-            if (state == null) {
-              endState = info.getCertainConflictsSuccessor(endState, ecode);
-            } else {
-              endState = stateEnc.getStateCode(state);
-            }
-            record = new SearchRecord(endState, ecode);
+            final int scode = stateEnc.getStateCode(state);
+            record = new SearchRecord(scode, ecode);
             convertedSteps.add(record);
           }
         }
-        endState = addTauSteps(info, endState, convertedSteps);
       }
-
       delegate =
         createDelegate(resultAut, originalAut, mOriginalStateEncoding,
                        partition1, mResultStateEncoding,
@@ -4393,29 +4385,6 @@ public class OPConflictChecker
         }
       }
       return false;
-    }
-
-    private int addTauSteps(final LimitedCertainConflictsInfo info,
-                            final int start,
-                            final List<SearchRecord> trace)
-    {
-      final int tau = EventEncoding.TAU;
-      int state = start;
-      int succ = state;
-      do {
-        state = succ;
-        if (info.isBlockingState(state)) {
-          break;
-        }
-        succ = info.getCertainConflictsSuccessor(state, tau);
-      } while (succ >= 0);
-      if (state != start && info.isCertainConflictState(state)) {
-        final SearchRecord record = new SearchRecord(state, tau);
-        trace.add(record);
-        return state;
-      } else {
-        return start;
-      }
     }
 
     private MergeStep createDelegate(final AutomatonProxy resultAut,

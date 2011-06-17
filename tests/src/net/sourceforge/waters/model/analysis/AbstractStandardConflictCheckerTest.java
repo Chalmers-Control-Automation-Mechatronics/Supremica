@@ -136,6 +136,20 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- handwritten
+  public void testCell() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "cell.wmod";
+    runModelVerifier(group, name, true);
+  }
+
+  public void testCellBlock() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "cell_block.wmod";
+    runModelVerifier(group, name, false);
+  }
+
   public void testDosingTankWithJellyEFA1() throws Exception
   {
     final String group = "handwritten";

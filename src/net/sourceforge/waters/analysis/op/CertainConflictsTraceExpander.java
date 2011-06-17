@@ -66,11 +66,14 @@ public class CertainConflictsTraceExpander
   public void setCertainConflictsAutomaton
     (final AutomatonProxy original,
      final AutomatonProxy converted,
-     final Collection<EventProxy> uncontrollables)
+     final EventProxy prop)
   {
     mOriginalCertainConflictsAutomaton = original;
     mConvertedCertainConflictsAutomaton = converted;
-    mUncontrollableEvents = uncontrollables;
+    if (mCheckedProposition != prop) {
+      mCheckedProposition = prop;
+      mPropertyAutomaton = null;
+    }
   }
 
 
@@ -79,7 +82,7 @@ public class CertainConflictsTraceExpander
   public List<TraceStepProxy> run()
   throws AnalysisException
   {
-    final ProductDESProxy des = createControllabilityModel();
+    final ProductDESProxy des = createLanguageInclusionModel();
     mSafetyVerifier.setModel(des);
     //MarshallingTools.saveModule(des, "xxx.wmod");
     if (mSafetyVerifier.run()) {
@@ -108,7 +111,7 @@ public class CertainConflictsTraceExpander
 
   //#########################################################################
   //# Auxiliary Methods
-  private ProductDESProxy createControllabilityModel()
+  private ProductDESProxy createLanguageInclusionModel()
   {
     final Map<AutomatonProxy,StateProxy> stepMap = mStartStates.getStateMap();
     final int numAutomata = stepMap.size();
@@ -118,7 +121,7 @@ public class CertainConflictsTraceExpander
     }
     mReverseStateMap = new HashMap<StateProxy,StateProxy>(numStates);
     mOriginalAutomata = new ArrayList<AutomatonProxy>(numAutomata);
-    mConvertedAutomata = new ArrayList<AutomatonProxy>(numAutomata);
+    mConvertedAutomata = new ArrayList<AutomatonProxy>(numAutomata + 1);
     mOriginalAutomata.add(mOriginalCertainConflictsAutomaton);
     mConvertedAutomata.add(mConvertedCertainConflictsAutomaton);
     final Collection<EventProxy> ccevents =
@@ -131,12 +134,16 @@ public class CertainConflictsTraceExpander
         mOriginalAutomata.add(aut);
         final StateProxy init = entry.getValue();
         final AutomatonProxy converted =
-          createControllabilityAutomaton(aut, init);
+          createLanguageInclusionAutomaton(aut, init);
         mConvertedAutomata.add(converted);
         final Collection<EventProxy> local = converted.getEvents();
         events.addAll(local);
       }
     }
+    if (mPropertyAutomaton == null) {
+      mPropertyAutomaton = createPropertyAutomaton();
+    }
+    mConvertedAutomata.add(mPropertyAutomaton);
     final List<EventProxy> eventList = new ArrayList<EventProxy>(events);
     Collections.sort(eventList);
     final String name = mOriginalCertainConflictsAutomaton.getName();
@@ -149,7 +156,7 @@ public class CertainConflictsTraceExpander
     return des;
   }
 
-  private AutomatonProxy createControllabilityAutomaton
+  private AutomatonProxy createLanguageInclusionAutomaton
     (final AutomatonProxy aut, final StateProxy init)
   {
     final Collection<EventProxy> oldevents = aut.getEvents();
@@ -194,15 +201,27 @@ public class CertainConflictsTraceExpander
       (autname, ComponentKind.PLANT, newevents, newstates, newtransitions);
   }
 
+  private AutomatonProxy createPropertyAutomaton()
+  {
+    final String name = ":never";
+    final ComponentKind kind = ComponentKind.PROPERTY;
+    final Collection<EventProxy> events =
+      Collections.singletonList(mCheckedProposition);
+    final StateProxy state = new MemStateProxy(0, true);
+    final Collection<StateProxy> states = Collections.singletonList(state);
+    return mFactory.createAutomatonProxy(name, kind, events, states, null);
+  }
+
   private List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> steps)
   {
     final int len = steps.size();
     final List<TraceStepProxy> newsteps = new ArrayList<TraceStepProxy>(len);
     newsteps.add(mStartStates);
+    final int numSteps = steps.size() - 2; // skip first and last ...
     final Iterator<TraceStepProxy> iter = steps.iterator();
     iter.next();
-    while (iter.hasNext()) {
+    for (int i = 0; i < numSteps; i++) {
       final TraceStepProxy oldstep = iter.next();
       final TraceStepProxy newstep = convertTraceStep(oldstep);
       newsteps.add(newstep);
@@ -218,14 +237,14 @@ public class CertainConflictsTraceExpander
       new HashMap<AutomatonProxy,StateProxy>(size);
     final Iterator<AutomatonProxy> olditer = mConvertedAutomata.iterator();
     final Iterator<AutomatonProxy> newiter = mOriginalAutomata.iterator();
-    while (olditer.hasNext()) {
+    while (newiter.hasNext()) {
       final AutomatonProxy oldaut = olditer.next();
       final AutomatonProxy newaut = newiter.next();
       final StateProxy oldstate = oldmap.get(oldaut);
       if (oldstate != null) {
         final StateProxy newstate = mReverseStateMap.get(oldstate);
         if (newstate == null) {
-          newmap.put(newaut, oldstate);
+          newmap.put(oldaut, oldstate);
         } else {
           newmap.put(newaut, newstate);
         }
@@ -253,7 +272,7 @@ public class CertainConflictsTraceExpander
     //# Data Members
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
-      if (aut == mConvertedCertainConflictsAutomaton) {
+      if (aut == mPropertyAutomaton) {
         return ComponentKind.SPEC;
       } else {
         return ComponentKind.PLANT;
@@ -264,10 +283,8 @@ public class CertainConflictsTraceExpander
     {
       if (mParentKindTranslator.getEventKind(event) == EventKind.PROPOSITION) {
         return EventKind.PROPOSITION;
-      } else if (mUncontrollableEvents.contains(event)) {
-        return EventKind.UNCONTROLLABLE;
       } else {
-        return EventKind.CONTROLLABLE;
+        return EventKind.UNCONTROLLABLE;
       }
     }
 
@@ -287,7 +304,8 @@ public class CertainConflictsTraceExpander
   private TraceStepProxy mStartStates;
   private AutomatonProxy mOriginalCertainConflictsAutomaton;
   private AutomatonProxy mConvertedCertainConflictsAutomaton;
-  private Collection<EventProxy> mUncontrollableEvents;
+  private AutomatonProxy mPropertyAutomaton;
+  private EventProxy mCheckedProposition;
 
   private List<AutomatonProxy> mOriginalAutomata;
   private List<AutomatonProxy> mConvertedAutomata;

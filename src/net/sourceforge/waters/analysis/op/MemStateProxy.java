@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.op;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -36,6 +37,12 @@ public class MemStateProxy
 
   //#######################################################################
   //# Constructor
+  public MemStateProxy(final int code,
+                       final boolean init)
+  {
+    this(code, init, EMPTY);
+  }
+
   public MemStateProxy(final int code,
                        final boolean init,
                        final Collection<EventProxy> props)
@@ -142,7 +149,8 @@ public class MemStateProxy
 
 
   //#######################################################################
-  //# Data Members
+  //# Class Constants
+  private static final Collection<EventProxy> EMPTY = Collections.emptyList();
   private static final int TAG_INITIAL = 0x80000000;
 
 }

@@ -813,7 +813,9 @@ Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyser_requestAbort
   jni::ClassCache cache(env);
   jni::NativeModelAnalyserGlue gchecker(jchecker, &cache);
   jobject bbuffer = gchecker.getNativeModelAnalyser();
-  waters::ProductExplorer* explorer =
-    (waters::ProductExplorer*) env->GetDirectBufferAddress(bbuffer);
-  explorer->requestAbort();
+  if (bbuffer != 0) {
+    waters::ProductExplorer* explorer =
+      (waters::ProductExplorer*) env->GetDirectBufferAddress(bbuffer);
+    explorer->requestAbort();
+  }
 }

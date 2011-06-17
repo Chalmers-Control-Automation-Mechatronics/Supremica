@@ -216,6 +216,7 @@ public abstract class AbstractTRSimplifier
       }
       mTransitionRelation.reconfigure(config);
     }
+    checkAbort();
     mTransitionRelation.merge(mResultPartition);
   }
 
