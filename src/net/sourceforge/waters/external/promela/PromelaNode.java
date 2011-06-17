@@ -16,7 +16,11 @@ public class PromelaNode
   public PromelaNode(){
 
   }
-
+ public PromelaNode(final boolean isBreak,final boolean isEnd,final boolean isGoto){
+   mBreak = isBreak;
+   mEnd = isEnd;
+   mGoto = isGoto;
+ }
   public SimpleNodeProxy createNode(final String name, final int index,
                                     final boolean initial,
                                     final boolean marked,
@@ -44,6 +48,21 @@ public class PromelaNode
   public SimpleNodeProxy getNode(){
     return mNode;
   }
-
+  public boolean isBreak(){
+    return mBreak;
+  }
+  public boolean isEnd(){
+    return mEnd;
+  }
+  public boolean isGoto(){
+    return mGoto;
+  }
+  public void setBreak(final boolean i){
+    mBreak = i;
+  }
+  public void setEnd(final boolean i){
+    mEnd = i;
+  }
   private SimpleNodeProxy mNode;
+  private boolean mBreak,mEnd,mGoto;
 }

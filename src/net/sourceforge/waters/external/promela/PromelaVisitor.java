@@ -1,9 +1,11 @@
 package net.sourceforge.waters.external.promela;
 
+import net.sourceforge.waters.external.promela.ast.BreakStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
+import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
@@ -55,5 +57,9 @@ public interface PromelaVisitor
   public Object visitReceive(ReceiveTreeNode t);
 
   public Object visitCondition(ConditionTreeNode t);
+
+  public Object visitDoStatement(DoConditionTreeNode t);
+
+  public Object visitBreak(BreakStatementTreeNode t);
 
 }

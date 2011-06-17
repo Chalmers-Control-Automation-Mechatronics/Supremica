@@ -203,6 +203,8 @@ sequenceRule
         ( stepRule (SEMICOLON)* (isguard=ARROW )? )+
         -> ^(STATEMENT<SemicolonTreeNode> (stepRule)*)
         )
+ //       | stepRule (SEMICOLON)* (isguard=ARROW) (stepRule (SEMICOLON)* (isguard=ARROW)?)+
+ //       -> ^(STATEMENT<DoConditionTreeNode> (stepRule)*)
     ;
 stepRule 
 	:	decl_lstRule
@@ -222,7 +224,7 @@ stmntRule
 	:	    IF optionsRule FI
 		-> ^(IF<ConditionTreeNode> optionsRule)
         | DO optionsRule OD
-		-> ^(DO<ConditionTreeNode> optionsRule)
+		-> ^(DO<DoConditionTreeNode> optionsRule)
         | ATOMIC BLOCKBEGIN sequenceRule BLOCKEND (SEMICOLON)*
 		->^(ATOMIC<InitialStatementTreeNode>  sequenceRule )		
 
@@ -233,7 +235,7 @@ stmntRule
         | receiveRule
         | assignRule
         | ELSE
-        | BREAK
+        | BREAK -> ^(BREAK<BreakStatementTreeNode>)
         | GOTO NAME
         | NAME COLON stmntRule
         | (PRINT|PRINTF) PARENOPEN STRING (COMMA arg_lstRule)? PARENCLOSE

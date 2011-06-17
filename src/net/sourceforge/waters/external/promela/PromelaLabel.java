@@ -2,15 +2,15 @@ package net.sourceforge.waters.external.promela;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 public class PromelaLabel
 {
-  private final Collection<Proxy> mLabelBlock;
-  public PromelaLabel(final Collection<Proxy> label){
+  private final Collection<SimpleExpressionProxy> mLabelBlock;
+  public PromelaLabel(final Collection<SimpleExpressionProxy> label){
     mLabelBlock = label;
   }
-  public Collection<Proxy> getLabel(){
+  public Collection<SimpleExpressionProxy> getLabel(){
     return mLabelBlock;
   }
 }

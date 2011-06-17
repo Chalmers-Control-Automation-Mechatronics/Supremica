@@ -7,10 +7,13 @@ import java.util.Collection;
 import java.util.List;
 
 import java.util.Hashtable;
+
+import net.sourceforge.waters.external.promela.ast.BreakStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
+import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
@@ -244,6 +247,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitReceive(final ReceiveTreeNode t)
   {
+    if(t.getParent() instanceof DoConditionTreeNode){}
     /*
     labels = new ArrayList<String>();
 
@@ -356,6 +360,28 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
     return null;
   }
+
+  public Object visitDoStatement(final DoConditionTreeNode t)
+  {
+    if(t.getChildCount()>0){
+      for(int i=0;i<t.getChildCount();i++){
+        ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+      }
+    }
+    return null;
+  }
+
+  public Object visitBreak(final BreakStatementTreeNode t)
+  {
+    if(t.getParent() instanceof DoConditionTreeNode){
+      final String name = t.getParent().getParent().getParent().getText();
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name.toUpperCase());
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+      mEventDecls.add(event);
+    }
+    return null;
+  }
+
 
 
 
