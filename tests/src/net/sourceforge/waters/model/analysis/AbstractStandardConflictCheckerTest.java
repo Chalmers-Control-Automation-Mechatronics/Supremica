@@ -210,6 +210,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testCertainConf3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "certainconf3.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testJpt10Counter() throws Exception
   {
     final String group = "tests";
