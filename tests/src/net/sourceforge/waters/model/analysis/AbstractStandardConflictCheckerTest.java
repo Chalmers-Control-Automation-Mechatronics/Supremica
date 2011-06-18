@@ -98,39 +98,44 @@ public abstract class AbstractStandardConflictCheckerTest
 
   public void testNondeterministicConflicting() throws Exception
   {
-    final String group = "tests/nondeterministic";
+    final String group = "tests";
+    final String dir = "nondeterministic";
     final String name = "NondeterministicConflicting.wmod";
-    runModelVerifier(group, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testNondeterministicNonconflicting() throws Exception
   {
-    final String group = "tests/nondeterministic";
+    final String group = "tests";
+    final String dir = "nondeterministic";
     final String name = "NondeterministicNonconflicting.wmod";
-    runModelVerifier(group, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testMultiNondeterministicConflicting() throws Exception
   {
-    final String group = "tests/nondeterministic";
+    final String group = "tests";
+    final String dir = "nondeterministic";
     final String name = "multiNondeterministicConflicting.wmod";
-    runModelVerifier(group, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testMultiNondeterministicNonconflicting() throws Exception
   {
-    final String group = "tests/nondeterministic";
+    final String group = "tests";
+    final String dir = "nondeterministic";
     final String name = "multiNondeterministicNonconflicting.wmod";
-    runModelVerifier(group, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testMultiNondeterministicSepPlacesConflicting() throws Exception
   {
     // The two deterministic automata don't have nondeterminism at the same
     // time.
-    final String group = "tests/nondeterministic";
+    final String group = "tests";
+    final String dir = "nondeterministic";
     final String name = "multiNondeterministicSepPlacesConflicting.wmod";
-    runModelVerifier(group, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
 
@@ -229,6 +234,14 @@ public abstract class AbstractStandardConflictCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "certainconf3.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+  public void testDisjoint1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "disjoint1.wmod";
     runModelVerifier(group, dir, name, false);
   }
 

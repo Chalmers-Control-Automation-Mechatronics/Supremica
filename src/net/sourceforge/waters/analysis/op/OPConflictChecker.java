@@ -407,7 +407,7 @@ public class OPConflictChecker
               mEventHasDisappeared = false;
               applyCandidate(candidate);
               simplify(mEventHasDisappeared);
-              break;
+              continue subsystem;
             } catch (final OverflowException overflow) {
               recordUnsuccessfulComposition();
               if (mNumOverflows++ >= MAX_OVERFLOWS) {
@@ -518,7 +518,6 @@ public class OPConflictChecker
     mCurrentMonolithicSafetyVerifier = null;
     mCurrentAutomata = null;
     mAutomatonInfoMap = null;
-    mCurrentEvents = null;
     mEventInfoMap = null;
     mDirtyAutomata = null;
     mRedundantEvents = null;
@@ -666,7 +665,6 @@ public class OPConflictChecker
     mCurrentAutomata = new ArrayList<AutomatonProxy>(numAutomata);
     mAutomatonInfoMap = new HashMap<AutomatonProxy,AutomatonInfo>(numAutomata);
     final int numEvents = model.getEvents().size();
-    mCurrentEvents = new THashSet<EventProxy>(numEvents);
     mEventInfoMap = new HashMap<EventProxy,EventInfo>(numEvents);
     mDirtyAutomata = new LinkedList<AutomatonProxy>();
     for (final AutomatonProxy aut : automata) {
@@ -679,7 +677,7 @@ public class OPConflictChecker
     final CompositionalVerificationResult result = getAnalysisResult();
     result.setNumberOfAutomata(mCurrentAutomata.size());
     mUsedEventNames = new THashSet<String>(numEvents + numAutomata);
-    for (final EventProxy event : mCurrentEvents) {
+    for (final EventProxy event : mEventInfoMap.keySet()) {
       final String name = event.getName();
       mUsedEventNames.add(name);
     }
@@ -726,7 +724,6 @@ public class OPConflictChecker
         if (info == null) {
           info = new EventInfo();
           mEventInfoMap.put(event, info);
-          mCurrentEvents.add(event);
         }
         final byte lookup = statusMap.get(event);
         final byte status = lookup == UNKNOWN_SELFLOOP ? BLOCKED : lookup;
@@ -741,19 +738,18 @@ public class OPConflictChecker
       mAutomatonInfoMap.remove(aut);
     }
     mRedundantEvents.clear();
-    final Set<EventProxy> eventsToRemove = new THashSet<EventProxy>();
-    for (final EventProxy event : mCurrentEvents) {
-      final EventInfo info = mEventInfoMap.get(event);
+    final Iterator<Map.Entry<EventProxy,EventInfo>> iter =
+      mEventInfoMap.entrySet().iterator();
+    while (iter.hasNext()) {
+      final Map.Entry<EventProxy,EventInfo> entry = iter.next();
+      final EventInfo info = entry.getValue();
       info.removeAutomata(victims);
       if (info.isEmpty()) {
-        eventsToRemove.add(event);
+        iter.remove();
       } else if (info.isRemovable()) {
+        final EventProxy event = entry.getKey();
         mRedundantEvents.add(event);
       }
-    }
-    for (final EventProxy event : eventsToRemove) {
-      mCurrentEvents.remove(event);
-      mEventInfoMap.remove(event);
     }
   }
 
@@ -765,9 +761,10 @@ public class OPConflictChecker
     (final Collection<AutomatonProxy> candidate)
   {
     final Set<EventProxy> localEvents = new THashSet<EventProxy>();
-    for (final EventProxy event : mCurrentEvents) {
-      final EventInfo info = mEventInfoMap.get(event);
+    for (final Map.Entry<EventProxy,EventInfo> entry : mEventInfoMap.entrySet()) {
+      final EventInfo info = entry.getValue();
       if (info.containedIn(candidate)) {
+        final EventProxy event = entry.getKey();
         localEvents.add(event);
       }
     }
@@ -790,7 +787,6 @@ public class OPConflictChecker
       final Set<EventProxy> redundant = new THashSet<EventProxy>(numRedundant);
       for (final EventProxy event : mRedundantEvents) {
         redundant.add(event);
-        mCurrentEvents.remove(event);
         mEventInfoMap.remove(event);
       }
       mRedundantEvents.clear();
@@ -861,13 +857,13 @@ public class OPConflictChecker
   private boolean findEventDisjointSubsystems()
     throws AnalysisException
   {
-    if (mCurrentEvents.isEmpty()) {
+    if (mEventInfoMap.isEmpty()) {
       return false;
     }
     final Collection<AutomatonProxy> remainingAutomata =
       new THashSet<AutomatonProxy>(mCurrentAutomata);
     final List<EventProxy> remainingEvents =
-      new LinkedList<EventProxy>(mCurrentEvents);
+      new LinkedList<EventProxy>(mEventInfoMap.keySet());
     Collections.sort(remainingEvents);
     final List<SubSystem> tasks = new LinkedList<SubSystem>();
     while (!remainingEvents.isEmpty()) {
@@ -947,7 +943,10 @@ public class OPConflictChecker
     if (mPostponedSubsystems.isEmpty()) {
       return false;
     } else {
-      final SubSystem current = new SubSystem(mCurrentEvents, mCurrentAutomata);
+      final List<EventProxy> events =
+        new ArrayList<EventProxy>(mEventInfoMap.keySet());
+      Collections.sort(events);
+      final SubSystem current = new SubSystem(events, mCurrentAutomata);
       mProcessedSubsystems.add(current);
       final SubSystem next = Collections.min(mPostponedSubsystems);
       mPostponedSubsystems.remove(next);
@@ -959,7 +958,10 @@ public class OPConflictChecker
   private void loadSubSystem(final SubSystem task)
   {
     mCurrentAutomata = task.getAutomata();
-    mCurrentEvents = task.getEvents();
+    mEventInfoMap.clear();
+    for (final AutomatonProxy aut : mCurrentAutomata) {
+      addEventsToAutomata(aut);
+    }
   }
 
   private void restoreAutomata()
@@ -986,9 +988,9 @@ public class OPConflictChecker
       logger.debug("Monolithically composing " + mCurrentAutomata.size() +
                    " automata, estimated " + estimate + " states.");
     }
-    final int numEvents = mCurrentEvents.size() + 1;
+    final int numEvents = mEventInfoMap.size() + 1;
     final List<EventProxy> events = new ArrayList<EventProxy>(numEvents);
-    events.addAll(mCurrentEvents);
+    events.addAll(mEventInfoMap.keySet());
     events.add(mCurrentDefaultMarking);
     Collections.sort(events);
     final ProductDESProxy des = createDES(events, mCurrentAutomata);
@@ -1090,7 +1092,7 @@ public class OPConflictChecker
       final List<ConflictTraceProxy> traces =
         new LinkedList<ConflictTraceProxy>();
       if (includeCurrent) {
-        if (!isAlphaReachable(builder, mCurrentEvents,
+        if (!isAlphaReachable(builder, mEventInfoMap.keySet(),
                               mCurrentAutomata, traces)) {
           return false;
         }
@@ -1931,7 +1933,7 @@ public class OPConflictChecker
       mAutomata.add(aut);
     }
 
-    private SubSystem(final Collection<EventProxy> events,
+    private SubSystem(final List<EventProxy> events,
                       final List<AutomatonProxy> automata)
     {
       mEvents = events;
@@ -1959,7 +1961,7 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Simple Access
-    private Collection<EventProxy> getEvents()
+    private List<EventProxy> getEvents()
     {
       return mEvents;
     }
@@ -1971,7 +1973,7 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Data Members
-    private final Collection<EventProxy> mEvents;
+    private final List<EventProxy> mEvents;
     private final List<AutomatonProxy> mAutomata;
 
   }
@@ -4656,7 +4658,6 @@ public class OPConflictChecker
 
   private List<AutomatonProxy> mCurrentAutomata;
   private Map<AutomatonProxy,AutomatonInfo> mAutomatonInfoMap;
-  private Collection<EventProxy> mCurrentEvents;
   private Map<EventProxy,EventInfo> mEventInfoMap =
       new HashMap<EventProxy,EventInfo>();
   private Queue<AutomatonProxy> mDirtyAutomata;
