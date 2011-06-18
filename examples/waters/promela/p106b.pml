@@ -1,6 +1,6 @@
 /*
  * A test for the Promela importer in Waters.
- * This tests whether a goto-statement inside a do-statement can be processed.
+ * This tests whether a goto-statement inside a if-statement can be processed.
  */
 
 #define a 1
@@ -12,10 +12,10 @@ proctype A() { ch!a }
 proctype B() { ch!b }
 proctype C()
 {	
-L1:	do
+L1:	if
 	:: ch?a -> goto L1
-	:: ch?b -> goto L2
-	od;
+	:: ch?b 
+	fi;
 L2:	ch?a
 }
 init { run A(); run B(); run C() }
