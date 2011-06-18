@@ -8,6 +8,7 @@ import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
+import net.sourceforge.waters.external.promela.ast.LabelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
 import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
 import net.sourceforge.waters.external.promela.ast.NameTreeNode;
@@ -61,5 +62,7 @@ public interface PromelaVisitor
   public Object visitDoStatement(DoConditionTreeNode t);
 
   public Object visitBreak(BreakStatementTreeNode t);
+
+  public Object visitLabel(LabelTreeNode t);
 
 }

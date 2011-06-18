@@ -5,6 +5,7 @@ import gnu.trove.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 
 import net.sourceforge.waters.external.promela.ast.BreakStatementTreeNode;
@@ -15,6 +16,7 @@ import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
+import net.sourceforge.waters.external.promela.ast.LabelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
 import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
 import net.sourceforge.waters.external.promela.ast.NameTreeNode;
@@ -42,6 +44,8 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import org.antlr.runtime.tree.Tree;
 
 
 public class GraphCollectingVisitor implements PromelaVisitor
@@ -376,7 +380,12 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
   }
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
-    final String name = t.getParent().getParent().getChild(0).getText();
+    Tree tree = t;
+    while(!(tree instanceof ProctypeTreeNode)){
+      tree = tree.getParent();
+    }
+    //final String name = t.getParent().getParent().getChild(0).getText();
+    final String name = tree.getText();
     PromelaGraph result = null;
     final PromelaNode endNode = new PromelaNode(false,true,false);
     for(int i=0;i<t.getChildCount();i++){
@@ -395,6 +404,24 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
     return result;
 
+  }
+  public Object visitLabel(final LabelTreeNode t)
+  {
+    PromelaGraph result = null;
+    if(t.getChildCount()>0){
+      /*for(int i=0;i<t.getChildCount();i++){
+        final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
+        result = PromelaGraph.sequentialComposition(result,step);
+      }*/
+      final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
+      result = PromelaGraph.sequentialComposition(result,step);
+      return result;
+    }
+    else{
+      final Hashtable<String,LabelTreeNode> labels = new Hashtable<String,LabelTreeNode>(mVisitor.getGotoLabel());
+      visitLabel(labels.get(t.getText()));
+    }
+    return result;
   }
 
 

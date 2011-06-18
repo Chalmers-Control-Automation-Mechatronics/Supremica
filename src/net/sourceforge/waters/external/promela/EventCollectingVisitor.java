@@ -16,6 +16,7 @@ import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
+import net.sourceforge.waters.external.promela.ast.LabelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
 import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
 import net.sourceforge.waters.external.promela.ast.NameTreeNode;
@@ -57,6 +58,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   ArrayList<Integer> lowerEnd = new ArrayList<Integer>();
   ArrayList<Integer> upperEnd = new ArrayList<Integer>();
   final Hashtable<String,THashSet<IdentifierProxy>> procEvent = new Hashtable<String,THashSet<IdentifierProxy>>();
+  final Hashtable<String,LabelTreeNode> gotoLabel = new Hashtable<String,LabelTreeNode>();
   //This is the output event table, for each proctype
   private final Collection<EventDeclProxy> mEventDecls = new ArrayList<EventDeclProxy>();
 
@@ -77,6 +79,9 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
   public Hashtable<String,THashSet<IdentifierProxy>> getChanEvent(){
     return procEvent;
+  }
+  public Hashtable<String,LabelTreeNode> getGotoLabel(){
+    return gotoLabel;
   }
   //########################################################################
   //# Interface net.sourceforge.waters.external.promela.PromelaVisitor
@@ -374,10 +379,26 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitBreak(final BreakStatementTreeNode t)
   {
     if(t.getParent() instanceof DoConditionTreeNode){
-      final String name = t.getParent().getParent().getParent().getText();
+      PromelaTree tree = t;
+      while(!(tree instanceof ProctypeTreeNode)){
+        tree = (PromelaTree) tree.getParent();
+      }
+      final String name = tree.getText();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name.toUpperCase());
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
       mEventDecls.add(event);
+
+    }
+    return null;
+  }
+
+  public Object visitLabel(final LabelTreeNode t)
+  {
+    for(int i=0;i<t.getChildCount();i++){
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+    }
+    if(t.getChildCount()>0){
+      gotoLabel.put(t.getText(),t);
     }
     return null;
   }
