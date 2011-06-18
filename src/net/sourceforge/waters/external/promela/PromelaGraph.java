@@ -321,7 +321,6 @@ public class PromelaGraph
       final List<PromelaNode> nodesOfResult =
         new ArrayList<PromelaNode>();
       PromelaLabel label2;
-      final PromelaNode targetNode;
       PromelaNode sourceNode;
       PromelaEdge newEdge;
 
@@ -401,8 +400,6 @@ public class PromelaGraph
       final ModuleProxyFactory mFactory = factory;
       final List<PromelaNode> nodesOfFirst = first.getNodes();
       final List<PromelaEdge> edgesOfFirst = first.getEdges();
-      final List<PromelaNode> nodesOfSecond = second.getNodes();
-      final List<PromelaEdge> edgesOfSecond = second.getEdges();
       final List<PromelaEdge> indexEdge = new ArrayList<PromelaEdge>();
       final List<PromelaNode> indexNode = new ArrayList<PromelaNode>();
       PromelaGraph output = null;
@@ -414,7 +411,6 @@ public class PromelaGraph
       final List<PromelaNode> nodesOfResult =
         new ArrayList<PromelaNode>();
       PromelaLabel label2;
-      final PromelaNode targetNode;
       PromelaNode sourceNode;
       PromelaEdge newEdge;
 

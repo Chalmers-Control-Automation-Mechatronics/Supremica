@@ -277,6 +277,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testRhoneTU34() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "rhone_tu34.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testSilentContinuation() throws Exception
   {
     final String group = "tests";
