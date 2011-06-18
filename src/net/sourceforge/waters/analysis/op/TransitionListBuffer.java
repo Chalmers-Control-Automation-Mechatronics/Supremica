@@ -995,9 +995,20 @@ public abstract class TransitionListBuffer
   public abstract int getOtherIteratorToState(TransitionIterator iter);
 
 
+  /**
+   * Merges the transitions in this buffer according to a merge operation
+   * of the transition relation.
+   * @param partition
+   *          The partitioning to be imposed.
+   *          Each array in the list defines the state codes comprising an
+   *          equivalence class to be merged into a single state. The index
+   *          position in the list identifies the state code given to
+   *          the new merged state.
+   * @see ListBufferTransitionRelation#merge(List) ListBufferTransitionRelation.merge()
+   */
   public void merge(final List<int[]> partition)
   {
-    final int tau = EventEncoding.TAU;
+    mStateEventTransitions.clear();
     final int[] recoding = new int[mStateTransitions.length];
     int code = 0;
     int size = 0;
@@ -1010,56 +1021,53 @@ public abstract class TransitionListBuffer
         size = clazz.length;
       }
     }
-    final int[] newStateTransitions = new int[code];
-    mStateEventTransitions.clear();
-    final int[] iter = new int[size];
-    final TIntHashSet successors = new TIntHashSet(partition.size());
-    int from = 0;
+    final int numClasses = code;
+    final int[] newStateTransitions = new int[numClasses];
+    final int eventShift = AutomatonTools.log2(mNumStates);
+    final int stateMask = (1 << eventShift) - 1;
+    final int tau = EventEncoding.TAU;
+    final TIntHashSet transitions = new TIntHashSet();
+    code = 0;
     for (final int[] clazz : partition) {
-      size = clazz.length;
-      for (int i = 0; i < size; i++) {
-        final int oldState = clazz[i];
-        final int oldList = mStateTransitions[oldState];
-        iter[i] = getNext(oldList);
-      }
-      int list = NULL;
-      final int fromShift = from << mStateShift;
-      for (int e = 0; e < mNumEvents; e++) {
-        successors.clear();
-        for (int i = 0; i < size; i++) {
-          int current = iter[i];
-          while (current != NULL) {
-            final int[] block = mBlocks.get(current >>> mBlockShift);
-            final int offset = current & mBlockMask;
-            final int data = block[offset + OFFSET_DATA];
-            if ((data & mEventMask) != e) {
-              break;
-            }
-            final int to = recoding[data >>> mStateShift];
-            if (e == tau && from == to) {
-              // Nothing --- suppress tau selfloop.
-            } else if (successors.add(to)) {
-              if (list == NULL) {
-                newStateTransitions[from] = list = createList();
-              }
-              if (successors.size() == 1) {
-                final int fromCode = fromShift | e;
-                mStateEventTransitions.put(fromCode, list);
-              }
-              list = prepend(list, (to << mStateShift) | e);
-            }
-            final int next = block[offset + OFFSET_NEXT];
-            if (next == NULL) {
-              block[offset + OFFSET_NEXT] = mRecycleStart;
-              final int oldState = clazz[i];
-              mRecycleStart = mStateTransitions[oldState];
-            }
-            current = next;
+      int list;
+      for (final int state : clazz) {
+        list = mStateTransitions[state];
+        int current = getNext(list);
+        while (current != NULL) {
+          final int[] block = mBlocks.get(current >>> mBlockShift);
+          final int offset = current & mBlockMask;
+          final int data = block[offset + OFFSET_DATA];
+          final int event = data & mEventMask;
+          final int target = recoding[data >>> mStateShift];
+          if (event != tau || code != target) { // suppress tau-selfloops
+            final int trans = (event << eventShift) | target;
+            transitions.add(trans);
           }
-          iter[i] = current;
+          final int next = block[offset + OFFSET_NEXT];
+          if (next == NULL) { // delete list once read
+            block[offset + OFFSET_NEXT] = mRecycleStart;
+            mRecycleStart = list;
+          }
+          current = next;
         }
       }
-      from++;
+      final int[] transarray = transitions.toArray();
+      transitions.clear();
+      Arrays.sort(transarray);
+      newStateTransitions[code] = list = createList();
+      int event0 = -1;
+      for (final int trans : transarray) {
+        final int event = (trans >>> eventShift);
+        final int target = trans & stateMask;
+        if (event0 != event) {
+          final int fromCode = (code << mStateShift) | event;
+          mStateEventTransitions.put(fromCode, list);
+          event0 = event;
+        }
+        final int data = (target << mStateShift) | event;
+        list = prepend(list, data);
+      }
+      code++;
     }
     mStateTransitions = newStateTransitions;
   }

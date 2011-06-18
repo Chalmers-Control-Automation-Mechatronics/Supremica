@@ -1722,8 +1722,9 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Repartitions the states of this transition relation. This method is used to
-   * merge states after a partition has been obtained through a
+   * Repartitions the states of this transition relation.
+   * This method implements state merging by automaton quotient.
+   * It is used to merge states after a partition has been obtained through a
    * {@link TransitionRelationSimplifier}.
    * @param partition
    *          The partitioning to be imposed, or <CODE>null</CODE>.
