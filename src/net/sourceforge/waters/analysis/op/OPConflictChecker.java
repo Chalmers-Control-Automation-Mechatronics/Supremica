@@ -4308,7 +4308,7 @@ public class OPConflictChecker
       AutomatonProxy testaut = null;
       List<TraceStepProxy> additionalSteps = null;
       final int maxlevel = simplifier.getMaxLevel();
-      for (int level = 0; level <= maxlevel; level++) {
+      for (int level = 0; level <= maxlevel; level += 2) {
         testaut = simplifier.createTestAutomaton
           (factory, eventEnc, stateEnc, lastConvertedState, prop, level);
         expander.setCertainConflictsAutomaton(resultAut, testaut, prop);

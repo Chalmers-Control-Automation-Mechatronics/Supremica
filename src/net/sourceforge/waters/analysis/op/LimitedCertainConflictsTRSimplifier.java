@@ -143,12 +143,12 @@ public class LimitedCertainConflictsTRSimplifier
     boolean modified;
     final TIntArrayList victims = new TIntArrayList();
     do {
-      final int nextlevel = level + 1;
+      int nextlevel = level + 1;
       modified = false;
+      // check for tau-transitions to certain conflicts
       for (int state = 0; state < numStates; state++) {
         if (mStateInfo[state] == level && rel.isReachable(state)) {
           checkAbort();
-          // check for tau-transitions to certain conflicts
           mUnvisitedStates.push(state);
           while (mUnvisitedStates.size() > 0) {
             final int popped = mUnvisitedStates.pop();
@@ -172,7 +172,13 @@ public class LimitedCertainConflictsTRSimplifier
             }
             victims.clear();
           }
-          // check for proper event transitions to certain conflicts
+        }
+      }
+      // check for proper event transitions to certain conflicts
+      nextlevel++;
+      for (int state = 0; state < numStates; state++) {
+        if (mStateInfo[state] >= level && rel.isReachable(state)) {
+          checkAbort();
           mPredecessorsIterator.reset(state, -1);
           while (mPredecessorsIterator.advance()) {
             final int event = mPredecessorsIterator.getCurrentEvent();
