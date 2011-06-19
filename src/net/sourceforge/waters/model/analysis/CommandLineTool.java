@@ -343,10 +343,12 @@ public class CommandLineTool
     {
       if (mTimeoutMillis >= 0) {
         final Thread thread = new Thread(this);
-        thread.start();
-        final boolean result = wrapper.run();
-        thread.interrupt();
-        return result;
+        try {
+          thread.start();
+          return wrapper.run();
+        } finally {
+          thread.interrupt();
+        }
       } else {
         return wrapper.run();
       }
