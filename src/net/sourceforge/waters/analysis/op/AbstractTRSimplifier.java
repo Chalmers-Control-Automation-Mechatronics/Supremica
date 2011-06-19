@@ -88,13 +88,9 @@ public abstract class AbstractTRSimplifier
     boolean completed = false;
     try {
       setUp();
-      if (mStatistics != null) {
-        mStatistics.recordStart(mTransitionRelation);
-      }
+      recordStart();
       final boolean success = runSimplifier();
-      if (mStatistics != null) {
-        mStatistics.recordFinish(mTransitionRelation, success);
-      }
+      recordFinish(success);
       completed = true;
       return success;
     } catch (final OutOfMemoryError error) {
@@ -103,12 +99,10 @@ public abstract class AbstractTRSimplifier
       throw new OverflowException(error);
     } finally {
       tearDown();
-      if (mStatistics != null) {
-        if (!completed) {
-          mStatistics.recordOverflow(mTransitionRelation);
-        }
-        final long stop = System.currentTimeMillis();
-        mStatistics.recordRunTime(stop - start);
+      final long stop = System.currentTimeMillis();
+      recordRunTime(stop - start);
+      if (!completed) {
+        recordOverflow();
       }
     }
   }
@@ -230,6 +224,51 @@ public abstract class AbstractTRSimplifier
     (final TRSimplifierStatistics statistics)
   {
     return mStatistics = statistics;
+  }
+
+  /**
+   * Initiates recording of statistics by storing the current transition
+   * relation data as a new input automaton.
+   */
+  protected void recordStart()
+  {
+    if (mStatistics != null) {
+      mStatistics.recordStart(mTransitionRelation);
+    }
+  }
+
+  /**
+   * Completes recording of statistics by storing the current transition
+   * relation data as a new output automaton.
+   * @param  success  Whether or not the simplifier has been able to
+   *                  actually simplify the transition relation.
+   */
+  protected void recordFinish(final boolean success)
+  {
+    if (mStatistics != null) {
+      mStatistics.recordFinish(mTransitionRelation, success);
+    }
+  }
+
+  /**
+   * Completes recording of statistics by storing a failure of the current
+   * run due to an exception.
+   */
+  protected void recordOverflow()
+  {
+    if (mStatistics != null) {
+      mStatistics.recordOverflow(mTransitionRelation);
+    }
+  }
+
+  /**
+   * Adds the given runtime to the simplifier's statistics record.
+   */
+  protected void recordRunTime(final long runtime)
+  {
+    if (mStatistics != null) {
+      mStatistics.recordRunTime(runtime);
+    }
   }
 
   /**

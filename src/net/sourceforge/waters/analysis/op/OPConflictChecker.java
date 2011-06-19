@@ -3075,10 +3075,9 @@ public class OPConflictChecker
         simplifier.setInitialPartition(partition);
       }
       simplifier.applyResultPartition();
+      simplifier.reset();
       rel.replaceEvent(vtau, tau);
       rel.removeEvent(vtau);
-      rel.removeTauSelfLoops();
-      rel.removeProperSelfLoopEvents();
       rel.removeRedundantPropositions();
       return partition;
     }
@@ -4307,7 +4306,9 @@ public class OPConflictChecker
         factory.createEventProxy(":certainconf", EventKind.UNCONTROLLABLE);
       AutomatonProxy testaut = null;
       List<TraceStepProxy> additionalSteps = null;
-      final int maxlevel = simplifier.getMaxLevel();
+      final int startLevel = simplifier.getLevel(lastConvertedState);
+      final int maxlevel =
+        startLevel < 0 ? simplifier.getMaxLevel() : startLevel - 2;
       for (int level = 0; level <= maxlevel; level += 2) {
         testaut = simplifier.createTestAutomaton
           (factory, eventEnc, stateEnc, lastConvertedState, prop, level);
@@ -4342,6 +4343,11 @@ public class OPConflictChecker
             convertedSteps.add(record);
           }
         }
+      } else if (startLevel > 0 && (startLevel & 1) != 0) {
+        final int endState =
+          simplifier.findTauReachableState(lastConvertedState, startLevel & ~1);
+        record = new SearchRecord(endState, EventEncoding.TAU);
+        convertedSteps.add(record);
       }
       delegate =
         createDelegate(resultAut, originalAut, mOriginalStateEncoding,

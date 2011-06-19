@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -82,6 +83,19 @@ public class LimitedCertainConflictsTRSimplifier
   }
 
   @Override
+  public CertainConflictsStatistics getStatistics()
+  {
+    return (CertainConflictsStatistics) super.getStatistics();
+  }
+
+  @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats = new CertainConflictsStatistics(this);
+    return setStatistics(stats);
+  }
+
+  @Override
   public void reset()
   {
     mStateInfo = null;
@@ -99,6 +113,11 @@ public class LimitedCertainConflictsTRSimplifier
   public int getMaxLevel()
   {
     return mMaxLevel;
+  }
+
+  public int getLevel(final int state)
+  {
+    return mStateInfo[state];
   }
 
 
@@ -123,7 +142,8 @@ public class LimitedCertainConflictsTRSimplifier
     }
     final ListBufferTransitionRelation rel = getTransitionRelation();
     mPredecessorsIterator = rel.createPredecessorsReadOnlyIterator();
-    int level = mMaxLevel = BLOCKING;
+    mMaxLevel = COREACHABLE;
+    int level = BLOCKING;
     int numCoreachable = findCoreachableStates(level);
     int numReachable = rel.getNumberOfReachableStates();
     if (numCoreachable == numReachable) {
@@ -311,6 +331,19 @@ public class LimitedCertainConflictsTRSimplifier
     rel.removeOutgoingTransitions(bstate);
   }
 
+  @Override
+  protected void recordFinish(final boolean success)
+  {
+    super.recordFinish(success);
+    final CertainConflictsStatistics stats = getStatistics();
+    if (stats != null) {
+      stats.recordMaxCertainConflictsLevel(mMaxLevel);
+    }
+  }
+
+
+  //#########################################################################
+  //# Trace Computation Support
   /**
    * Creates a test automaton to check whether certain conflicts states of
    * the given level can be reached. States of certain conflicts are flagged
@@ -387,10 +420,38 @@ public class LimitedCertainConflictsTRSimplifier
                                         events, reachable, transitions);
   }
 
-  private boolean isTestState(final int state, final int level)
+  public int findTauReachableState(final int state, int level)
   {
-    final int status = mStateInfo[state];
-    return status == COREACHABLE || status >= level;
+    level++;
+    int info = mStateInfo[state];
+    if (info < level) {
+      return state;
+    } else if (info == level) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      final int tau = EventEncoding.TAU;
+      final TIntArrayList queue = new TIntArrayList();
+      final TIntHashSet visited = new TIntHashSet();
+      queue.add(state);
+      visited.add(state);
+      for (int rpos = 0; rpos < queue.size(); rpos++) {
+        final int current = queue.get(rpos);
+        iter.reset(current, tau);
+        while (iter.advance()) {
+          final int succ = iter.getCurrentTargetState();
+          info = mStateInfo[succ];
+          if (info < level) {
+            return succ;
+          } else if (info == level && visited.add(succ)) {
+            queue.add(succ);
+          }
+        }
+      }
+      assert false : "Could not found state with expected level!";
+      return -1;
+    } else {
+      return -1;
+    }
   }
 
 
@@ -439,6 +500,12 @@ public class LimitedCertainConflictsTRSimplifier
       }
     }
     return coreachable;
+  }
+
+  private boolean isTestState(final int state, final int level)
+  {
+    final int status = mStateInfo[state];
+    return status == COREACHABLE || status >= level;
   }
 
 
