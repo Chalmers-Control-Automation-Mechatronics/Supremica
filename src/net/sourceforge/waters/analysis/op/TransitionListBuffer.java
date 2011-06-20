@@ -939,40 +939,67 @@ public abstract class TransitionListBuffer
    */
   public void setUpTransitions(final TransitionListBuffer other)
   {
-    final int numTrans = other.getNumberOfTransitions();
-    final long[] transitions = new long[numTrans];
-    final int eventShift = AutomatonTools.log2(mNumStates);
-    final int fromShift = eventShift + AutomatonTools.log2(mNumEvents);
-    final int toMask = (1 << eventShift) - 1;
     final TransitionIterator iter =
       other.createAllTransitionsReadOnlyIterator();
-    int i = 0;
-    while (iter.advance()) {
-      final long from = getOtherIteratorFromState(iter);
-      final long event = iter.getCurrentEvent();
-      final long to = getOtherIteratorToState(iter);
-      transitions[i++] = (from << fromShift) | (event << eventShift) | to;
-    }
-    Arrays.sort(transitions);
-    int from0 = -1;
-    int event0 = -1;
-    int list = NULL;
-    for (final long trans : transitions) {
-      final int from = (int) (trans >>> fromShift);
-      final int event = (int) (trans >>> eventShift) & mEventMask;
-      final int to = (int) (trans & toMask);
-      if (from != from0) {
-        mStateTransitions[from] = list = createList();
-        from0 = from;
-        event0 = -1;
+    if (getClass() == other.getClass()) {
+      // If the source buffer is of the same type (predecessors/successors),
+      // just copy the transitions in the same order.
+      int from0 = -1;
+      int event0 = -1;
+      int list = NULL;
+      while (iter.advance()) {
+        final int from = getOtherIteratorFromState(iter);
+        final int event = iter.getCurrentEvent();
+        final int to = getOtherIteratorToState(iter);
+        if (from != from0) {
+          mStateTransitions[from] = list = createList();
+          from0 = from;
+          event0 = -1;
+        }
+        if (event0 != event) {
+          final int fromCode = (from << mStateShift) | event;
+          mStateEventTransitions.put(fromCode, list);
+          event0 = event;
+        }
+        final int data = (to << mStateShift) | event;
+        list = prepend(list, data);
       }
-      if (event0 != event) {
-        final int fromCode = (from << mStateShift) | event;
-        mStateEventTransitions.put(fromCode, list);
-        event0 = event;
+    } else {
+      // If the buffers are of different type, we must bring the transitions
+      // in the correct order for this buffer before building the lists.
+      final int numTrans = other.getNumberOfTransitions();
+      final long[] transitions = new long[numTrans];
+      final int eventShift = AutomatonTools.log2(mNumStates);
+      final int fromShift = eventShift + AutomatonTools.log2(mNumEvents);
+      final int toMask = (1 << eventShift) - 1;
+      int i = 0;
+      while (iter.advance()) {
+        final long from = getOtherIteratorFromState(iter);
+        final long event = iter.getCurrentEvent();
+        final long to = getOtherIteratorToState(iter);
+        transitions[i++] = (from << fromShift) | (event << eventShift) | to;
       }
-      final int data = (to << mStateShift) | event;
-      list = prepend(list, data);
+      Arrays.sort(transitions);
+      int from0 = -1;
+      int event0 = -1;
+      int list = NULL;
+      for (final long trans : transitions) {
+        final int from = (int) (trans >>> fromShift);
+        final int event = (int) (trans >>> eventShift) & mEventMask;
+        final int to = (int) (trans & toMask);
+        if (from != from0) {
+          mStateTransitions[from] = list = createList();
+          from0 = from;
+          event0 = -1;
+        }
+        if (event0 != event) {
+          final int fromCode = (from << mStateShift) | event;
+          mStateEventTransitions.put(fromCode, list);
+          event0 = event;
+        }
+        final int data = (to << mStateShift) | event;
+        list = prepend(list, data);
+      }
     }
   }
 

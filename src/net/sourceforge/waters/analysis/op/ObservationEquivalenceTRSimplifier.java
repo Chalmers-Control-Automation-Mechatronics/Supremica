@@ -26,7 +26,6 @@ import java.util.NoSuchElementException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -347,11 +346,6 @@ public class ObservationEquivalenceTRSimplifier
         } else {
           mTauPreds[s] = EMPTY_ARRAY;
         }
-      }
-      final Logger logger = getLogger();
-      if (logger.isDebugEnabled()) {
-        final String msg = "Size of tau-closure: " + numtrans;
-        logger.debug(msg);
       }
     }
   }

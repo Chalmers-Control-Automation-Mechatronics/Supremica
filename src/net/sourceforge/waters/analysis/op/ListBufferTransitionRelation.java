@@ -277,33 +277,36 @@ public class ListBufferTransitionRelation
     mKind = rel.getKind();
     mStateBuffer = new IntStateBuffer(rel.mStateBuffer);
     final int numEvents = rel.getNumberOfProperEvents();
-    final int numStates = mStateBuffer.getNumberOfStates();
-    try {
-      if ((config & CONFIG_SUCCESSORS) != 0) {
-        mSuccessorBuffer =
-          new OutgoingTransitionListBuffer(numEvents, numStates, 0);
-      }
-      if ((config & CONFIG_PREDECESSORS) != 0) {
-        mPredecessorBuffer =
-          new IncomingTransitionListBuffer(numEvents, numStates, 0);
-      }
-    } catch (final OverflowException exception) {
-      // Can't have overflow because states and events have already been
-      // encoded successfully in rel.
-      throw new WatersRuntimeException(exception);
-    }
     mUsedEvents = new BitSet(numEvents);
     for (int event = 0; event < numEvents; event++) {
       if (rel.isUsedEvent(event)) {
         mUsedEvents.set(event);
       }
     }
-    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-    while (iter.advance()) {
-      final int source = iter.getCurrentSourceState();
-      final int event = iter.getCurrentEvent();
-      final int target = iter.getCurrentTargetState();
-      addTransition(source, event, target);
+    final int numStates = mStateBuffer.getNumberOfStates();
+    try {
+      if ((config & CONFIG_SUCCESSORS) != 0) {
+        mSuccessorBuffer =
+          new OutgoingTransitionListBuffer(numEvents, numStates, 0);
+        if (rel.mSuccessorBuffer != null) {
+          mSuccessorBuffer.setUpTransitions(rel.mSuccessorBuffer);
+        } else {
+          mSuccessorBuffer.setUpTransitions(rel.mPredecessorBuffer);
+        }
+      }
+      if ((config & CONFIG_PREDECESSORS) != 0) {
+        mPredecessorBuffer =
+          new IncomingTransitionListBuffer(numEvents, numStates, 0);
+        if (rel.mPredecessorBuffer != null) {
+          mPredecessorBuffer.setUpTransitions(rel.mPredecessorBuffer);
+        } else {
+          mPredecessorBuffer.setUpTransitions(rel.mSuccessorBuffer);
+        }
+      }
+    } catch (final OverflowException exception) {
+      // Can't have overflow because states and events have already been
+      // encoded successfully in rel.
+      throw new WatersRuntimeException(exception);
     }
   }
 
