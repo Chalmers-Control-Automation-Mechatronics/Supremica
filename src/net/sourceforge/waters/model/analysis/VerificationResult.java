@@ -309,12 +309,12 @@ public class VerificationResult extends AnalysisResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
-    writer.print(",Tot aut");
-    writer.print(",Tot states");
-    writer.print(",Tot trans");
-    writer.print(",Peak states");
-    writer.print(",Peak trans");
-    writer.print(",Peak nodes");
+    writer.print(",TotAut");
+    writer.print(",TotStates");
+    writer.print(",TotTrans");
+    writer.print(",PeakStates");
+    writer.print(",PeakTrans");
+    writer.print(",PeakNodes");
   }
 
 

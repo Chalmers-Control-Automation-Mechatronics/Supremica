@@ -209,7 +209,7 @@ public class AnalysisResult
 
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
-    writer.print("Result,Runtime");
+    writer.print("Result,RunTime");
   }
 
 
