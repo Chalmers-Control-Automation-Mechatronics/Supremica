@@ -573,6 +573,7 @@ storeInitialStates(bool initzero, bool donondet)
 
 #define VISIT(source)                                                   \
   {                                                                     \
+    checkAbort();                                                       \
     uint32* sourcepacked = mStateSpace->get(source);                    \
     if (!mEncoding->hasTag(sourcepacked, TAG_COREACHABLE)) {            \
       mEncoding->setTag(sourcepacked, TAG_COREACHABLE);                 \
