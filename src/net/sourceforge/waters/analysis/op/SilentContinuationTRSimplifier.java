@@ -92,16 +92,17 @@ public class SilentContinuationTRSimplifier
     final WatersIntIntHashMap map =
       new WatersIntIntHashMap(numCandidates, IntListBuffer.NULL, strategy);
     final IntListBuffer prepartition = new IntListBuffer();
-    for (int state = 0; state < numStates; state++) {
-      if (candidates.get(state)) {
-        checkAbort();
-        int list = map.get(state);
-        if (list == IntListBuffer.NULL) {
-          list = prepartition.createList();
-          map.put(state, list);
-        }
-        prepartition.append(list, state);
+    final int[] lists = new int [numStates];
+    for (int state = candidates.nextSetBit(0); state >= 0;
+         state = candidates.nextSetBit(state + 1)) {
+      checkAbort();
+      int list = map.get(state);
+      if (list == IntListBuffer.NULL) {
+        list = prepartition.createList();
+        map.put(state, list);
       }
+      prepartition.append(list, state);
+      lists[state] = list;
     }
     final int numClasses = map.size();
     if (numClasses == numCandidates) {
@@ -112,8 +113,8 @@ public class SilentContinuationTRSimplifier
         new ArrayList<int[]>(numClasses + numSingles);
       for (int state = 0; state < numStates; state++) {
         checkAbort();
-        if (candidates.get(state)) {
-          final int list = map.get(state);
+        final int list = lists[state];
+        if (list != IntListBuffer.NULL) {
           final int first = prepartition.getFirst(list);
           if (state == first) {
             final int[] clazz = prepartition.toArray(list);

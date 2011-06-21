@@ -331,7 +331,8 @@ public class TRSimplifierStatistics
 
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
-    writer.print(",Rule");
+    writer.print(',');
+    writer.print(ProxyTools.getShortClassName(mSimplifierClass));
     writer.print(",Applied");
     writer.print(",Reductions");
     writer.print(",Overflows");
@@ -353,14 +354,12 @@ public class TRSimplifierStatistics
 
   public void printCSVHorizontal(final PrintWriter writer)
   {
-    writer.print(',');
-    writer.print(ProxyTools.getShortClassName(mSimplifierClass));
-    writer.print(',');
+    writer.print(",,");  // empty column under rule name
     writer.print(mApplicationCount);
     writer.print(',');
-    writer.print(mOverflowCount);
+    writer.print(mReductionCount);
     writer.print(',');
-    writer.print(mReductionCount );
+    writer.print(mOverflowCount);
     if (mInputStates >= 0) {
       writer.print(',');
       writer.print(mInputStates);

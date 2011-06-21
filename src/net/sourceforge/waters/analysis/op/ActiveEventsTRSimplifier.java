@@ -66,6 +66,7 @@ public class ActiveEventsTRSimplifier
     final WatersIntIntHashMap map =
       new WatersIntIntHashMap(numStates, IntListBuffer.NULL, strategy);
     final IntListBuffer prepartition = new IntListBuffer();
+    final int[] lists = new int[numStates];
     for (int state = 0; state < numStates; state++) {
       if (rel.isReachable(state)) {
         checkAbort();
@@ -73,6 +74,7 @@ public class ActiveEventsTRSimplifier
         if (list == IntListBuffer.NULL) {
           list = prepartition.createList();
           map.put(state, list);
+          lists[state] = list;
         }
         prepartition.append(list, state);
       }
@@ -84,13 +86,10 @@ public class ActiveEventsTRSimplifier
       final int[][] partition = new int[numClasses][];
       int index = 0;
       for (int state = 0; state < numStates; state++) {
-        if (rel.isReachable(state)) {
+        final int list = lists[state];
+        if (list != IntListBuffer.NULL) {
           checkAbort();
-          final int list = map.get(state);
-          final int first = prepartition.getFirst(list);
-          if (state == first) {
-            partition[index++] = prepartition.toArray(list);
-          }
+          partition[index++] = prepartition.toArray(list);
         }
       }
       setResultPartitionArray(partition);

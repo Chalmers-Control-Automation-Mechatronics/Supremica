@@ -82,6 +82,7 @@ public class CertainConflictsStatistics extends TRSimplifierStatistics
   public void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
+    writer.print(',');
     writer.print(mMaxLevel);
   }
 
