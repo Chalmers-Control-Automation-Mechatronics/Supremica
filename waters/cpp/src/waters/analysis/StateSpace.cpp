@@ -16,8 +16,7 @@
 
 #include <jni.h>
 
-#include "jni/cache/PreJavaException.h"
-#include "jni/glue/Glue.h"
+#include "jni/cache/PreOverflowException.h"
 
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/StateSpace.h"
@@ -95,7 +94,7 @@ add()
   uint32 added = mLookupTable.add(mNumStates);
   if (added == mNumStates) {
     if (++mNumStates > mStateLimit) {
-      throw jni::PreJavaException(jni::CLASS_OverflowException);
+      throw jni::PreOverflowException(jni::OverflowKind_STATE, mStateLimit);
     }
   }
   return added;

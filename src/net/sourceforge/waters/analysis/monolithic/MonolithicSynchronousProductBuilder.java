@@ -21,6 +21,7 @@ import java.util.Set;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -423,8 +424,8 @@ public class MonolithicSynchronousProductBuilder
     if (!isInitial) {
       if (mProjectionMask == null) {
         if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-          throw new OverflowException
-            (OverflowException.Kind.TRANSITION, getTransitionLimit());
+          throw new OverflowException(OverflowKind.TRANSITION,
+                                      getTransitionLimit());
         }
         mTransitionBuffer.add(source);
         mTransitionBuffer.add(event);
@@ -433,8 +434,8 @@ public class MonolithicSynchronousProductBuilder
         final int masked = mProjectionMask[event];
         if (mCurrentSuccessors[masked].add(target)) {
           if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-            throw new OverflowException
-              (OverflowException.Kind.TRANSITION, getTransitionLimit());
+            throw new OverflowException(OverflowKind.TRANSITION,
+                                        getTransitionLimit());
           }
           mTransitionBuffer.add(source);
           mTransitionBuffer.add(masked);

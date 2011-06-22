@@ -35,6 +35,7 @@ import net.sourceforge.waters.model.analysis.AutomatonResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -647,8 +648,7 @@ public class OPSearchAutomatonSimplifier
         } else {
           final int pindex = mVerifierStateMap.size();
           if (pindex >= getNodeLimit()) {
-            throw new OverflowException(OverflowException.Kind.NODE,
-                                        getNodeLimit());
+            throw new OverflowException(OverflowKind.NODE, getNodeLimit());
           }
           final int pcode = pindex + mOriginalStates.length;
           mVerifierStatePairs.add(pair);

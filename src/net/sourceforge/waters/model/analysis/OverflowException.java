@@ -26,7 +26,7 @@ public class OverflowException extends AnalysisException {
    */
   public OverflowException()
   {
-    this(Kind.STATE, -1);
+    this(OverflowKind.STATE, -1);
   }
 
   /**
@@ -35,14 +35,14 @@ public class OverflowException extends AnalysisException {
    */
   public OverflowException(final int limit)
   {
-    this(Kind.STATE, limit);
+    this(OverflowKind.STATE, limit);
   }
 
   /**
    * Constructs an overflow exception with a message indicating the
    * type of limit (states or transitions).
    */
-  public OverflowException(final Kind kind)
+  public OverflowException(final OverflowKind kind)
   {
     this(kind, -1);
   }
@@ -51,7 +51,7 @@ public class OverflowException extends AnalysisException {
    * Constructs an overflow exception with a message indicating the
    * type of limit and the number of states or transitions reached.
    */
-  public OverflowException(final Kind kind, final int limit)
+  public OverflowException(final OverflowKind kind, final int limit)
   {
     mKind = kind;
     mLimit = limit;
@@ -93,45 +93,8 @@ public class OverflowException extends AnalysisException {
 
 
   //#########################################################################
-  //# Inner Class Kind
-  public static enum Kind
-  {
-    STATE,
-    TRANSITION,
-    NODE;
-
-    //#########################################################################
-    //# Display
-    private String getMessage(final int limit)
-    {
-      final StringBuffer buffer = new StringBuffer();
-      final String name = toString();
-      final int namelen = name.length();
-      buffer.append(name.charAt(0));
-      for (int i = 1; i < namelen; i++) {
-        final char ch = name.charAt(i);
-        buffer.append(Character.toLowerCase(ch));
-      }
-      buffer.append(" limit ");
-      if (limit >= 0) {
-        buffer.append("of ");
-        buffer.append(limit);
-        buffer.append(' ');
-        for (int i = 0; i < namelen; i++) {
-          final char ch = name.charAt(i);
-          buffer.append(Character.toLowerCase(ch));
-        }
-        buffer.append("s ");
-      }
-      buffer.append("exceeded!");
-      return buffer.toString();
-    }
-  }
-
-
-  //#########################################################################
   //# Data Members
-  private final Kind mKind;
+  private final OverflowKind mKind;
   private final int mLimit;
 
 

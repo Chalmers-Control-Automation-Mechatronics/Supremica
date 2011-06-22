@@ -172,14 +172,6 @@ throwJavaException(waters::uint32 classcode, const char* msg)
 }
 
 jint ClassCache::
-throwJavaException(const PreJavaException& pre)
-{
-  waters::uint32 classcode = pre.getClassCode();
-  const char* msg = pre.getMessage();
-  return throwJavaException(classcode, msg);
-}
-
-jint ClassCache::
 throwJavaException(const ExceptionGlue& glue)
 {
   jthrowable exception = (jthrowable) glue.returnJavaObject();

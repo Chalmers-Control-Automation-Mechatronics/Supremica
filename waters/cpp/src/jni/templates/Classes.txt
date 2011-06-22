@@ -217,9 +217,11 @@ glue class NondeterministicDESException extends Exception {
 			       glue EventProxy event);
 }
 
+enum class OverflowKind {STATE, TRANSITION, NODE, MEMORY}
+
 glue class OverflowException extends Exception {
-  OverflowException();
-  OverflowException(int limit);
+  OverflowException(glue OverflowKind kind);
+  OverflowException(glue OverflowKind kind, int limit);
 }
 
 

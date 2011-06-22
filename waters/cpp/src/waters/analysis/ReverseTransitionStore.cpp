@@ -14,8 +14,7 @@
 #include <iostream>
 #include <new>
 
-#include "jni/cache/PreJavaException.h"
-#include "jni/glue/Glue.h"
+#include "jni/cache/PreOverflowException.h"
 
 #include "waters/analysis/ReverseTransitionStore.h"
 
@@ -96,9 +95,8 @@ addTransition(uint32 source, uint32 target)
     }
     if ((nodeindex & NODE_MASK) != 0) {
       if (mNumTransitions >= mTransitionLimit) {
-        throw jni::PreJavaException(jni::CLASS_OverflowException,
-                                    "Transition limit exceeded!",
-                                    true);
+        throw jni::PreOverflowException(jni::OverflowKind_TRANSITION,
+                                        mTransitionLimit);
       }
       mNumTransitions++;
       headblock[headindex] = head - 1;
@@ -118,9 +116,8 @@ addTransition(uint32 source, uint32 target)
 
   // allocate and/or populate node
   if (mNumTransitions >= mTransitionLimit) {
-    throw jni::PreJavaException(jni::CLASS_OverflowException,
-                                "Transition limit exceeded!",
-                                true);
+    throw jni::PreOverflowException(jni::OverflowKind_TRANSITION,
+                                    mTransitionLimit);
   }
   mNumTransitions++;
   if (mNextLocalIndex == BLOCK_SIZE) {

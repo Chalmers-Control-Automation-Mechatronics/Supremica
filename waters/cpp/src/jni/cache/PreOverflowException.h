@@ -2,14 +2,14 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: jni.javah
-//# CLASS:   PreJavaException
+//# CLASS:   PreOverflowException
 //###########################################################################
-//# $Id: PreJavaException.h,v 1.3 2006-11-15 01:26:40 robi Exp $
+//# $Id$
 //###########################################################################
 
 
-#ifndef _PreJavaException_h_
-#define _PreJavaException_h_
+#ifndef _PreOverflowException_h_
+#define _PreOverflowException_h_
 
 #ifdef __GNUG__
 #pragma interface
@@ -21,7 +21,8 @@
 
 #include <jni.h>
 
-#include "waters/base/IntTypes.h"
+#include "jni/cache/PreJavaException.h"
+#include "jni/glue/OverflowKindGlue.h"
 
 
 namespace jni {
@@ -30,30 +31,27 @@ class ClassCache;
 
 
 //###########################################################################
-//# Class PreJavaException
+//# Class PreOverflowException
 //###########################################################################
-//# A data structure containing the information for a Java esception to be
-//# thrown from native code. This is thrown as a C++ exception to be
-//# converted to a proper Java exception as soon as the environment
+//# A data structure containing the information for an overflow exception to
+//# be thrown from native code. This is thrown as a C++ exception to be
+//# converted to a proper OverflowException for Java as soon as the environment
 //# becomes available.
 //###########################################################################
 
-class PreJavaException {
+class PreOverflowException : public PreJavaException
+{
 public:
   //#########################################################################
   //# Constructors, Destructors & Co.
-  explicit PreJavaException(waters::uint32 classcode);
-  explicit PreJavaException(waters::uint32 classcode,
-			    const char* msg,
-			    bool staticString = false);
-  PreJavaException(const PreJavaException& partner);
-  virtual ~PreJavaException();
-  PreJavaException& operator=(const PreJavaException& partner);
+  explicit PreOverflowException(OverflowKind kind, int limit);
+  PreOverflowException(const PreOverflowException& partner);
+  PreOverflowException& operator=(const PreOverflowException& partner);
 
   //#########################################################################
   //# Simple Access
-  const waters::uint32 getClassCode() const {return mClassCode;}
-  const char* getMessage() const {return mMessage;}
+  OverflowKind getKind() const {return mKind;}
+  int getLimit() const {return mLimit;}
 
   //#########################################################################
   //# Throwing Exceptions
@@ -61,16 +59,11 @@ public:
 
 private:
   //#########################################################################
-  //# Auxiliary Methods
-  void initMessage(const char* msg, bool staticString);
-
-  //#########################################################################
   //# Data Members
-  waters::uint32 mClassCode;
-  bool mStaticString;
-  char* mMessage;
+  OverflowKind mKind;
+  int mLimit;
 };
 
 }   /* namespace jni */
 
-#endif  /* !_PreJavaException_h_ */
+#endif  /* !_PreOverflowException_h_ */

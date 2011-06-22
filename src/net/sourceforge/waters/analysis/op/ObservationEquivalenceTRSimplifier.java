@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 
@@ -338,8 +339,8 @@ public class ObservationEquivalenceTRSimplifier
           mTauPreds[s] = listTauPreds.toNativeArray();
           numtrans += listTauPreds.size();
           if (numtrans > mTransitionLimit) {
-            throw new OverflowException(OverflowException.Kind.TRANSITION,
-                mTransitionLimit);
+            throw new OverflowException(OverflowKind.TRANSITION,
+                                        mTransitionLimit);
           }
           hashTauPreds.clear();
           listTauPreds.clear();

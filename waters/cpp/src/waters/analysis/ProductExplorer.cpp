@@ -762,11 +762,11 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       return vresult.returnJavaObject();
     }
   } catch (const std::bad_alloc& error) {
-    jni::OverflowExceptionGlue glue(&cache);
+    jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);
     cache.throwJavaException(glue);
     return 0;
   } catch (const jni::PreJavaException& pre) {
-    cache.throwJavaException(pre);
+    pre.throwJavaException(cache);
     return 0;
   } catch (const jni::ExceptionGlue& glue) {
     cache.throwJavaException(glue);
@@ -803,11 +803,11 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       return vresult.returnJavaObject();
     }
   } catch (const std::bad_alloc& error) {
-    jni::OverflowExceptionGlue glue(&cache);
+    jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);
     cache.throwJavaException(glue);
     return 0;
   } catch (const jni::PreJavaException& pre) {
-    cache.throwJavaException(pre);
+    pre.throwJavaException(cache);
     return 0;
   } catch (const jni::ExceptionGlue& glue) {
     cache.throwJavaException(glue);

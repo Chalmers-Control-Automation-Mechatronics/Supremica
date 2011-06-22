@@ -13,6 +13,7 @@
 
 #include <string.h>
 
+#include "jni/cache/ClassCache.h"
 #include "jni/cache/PreJavaException.h"
 
 
@@ -68,6 +69,17 @@ operator=(const PreJavaException& partner)
     initMessage(partner.mMessage, partner.mStaticString);
   }
   return *this;
+}
+
+
+//###########################################################################
+//# PreJavaException: Throwing Exceptions
+
+jint PreJavaException::
+throwJavaException(ClassCache& cache)
+  const
+{
+  return cache.throwJavaException(mClassCode, mMessage);
 }
 
 

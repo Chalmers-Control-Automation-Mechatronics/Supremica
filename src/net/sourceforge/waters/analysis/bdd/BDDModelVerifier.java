@@ -33,6 +33,7 @@ import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -406,8 +407,7 @@ public abstract class BDDModelVerifier
       if (numnodes > mPeakNodes) {
         mPeakNodes = numnodes;
         if (numnodes > getNodeLimit()) {
-          throw new OverflowException(OverflowException.Kind.NODE,
-                                      getNodeLimit());
+          throw new OverflowException(OverflowKind.NODE, getNodeLimit());
         }
       }
       if (containsBadState(current)) {
@@ -455,8 +455,7 @@ public abstract class BDDModelVerifier
       if (numnodes > mPeakNodes) {
         mPeakNodes = numnodes;
         if (numnodes > getNodeLimit()) {
-          throw new OverflowException(OverflowException.Kind.NODE,
-                                      getNodeLimit());
+          throw new OverflowException(OverflowKind.NODE, getNodeLimit());
         }
       }
       if (isCoreachabilityExhausted(current)) {
