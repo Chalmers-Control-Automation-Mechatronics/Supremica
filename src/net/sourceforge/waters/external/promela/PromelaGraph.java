@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -265,6 +267,19 @@ public class PromelaGraph
           specialEdge2 = new PromelaEdge(newStartNode,newEndNode,label2);
           edgesOfResult.add(specialEdge2);
           simpleSecond = true;
+        }else if(edge.getTarget().isBreak()&& edge.getSource()==second.getStart()){
+          label2 = edge.getLabelBlock();
+          specialLabel.addAll(label2.getLabel());
+          newEndNode.setBreak(true);
+          specialEdge2 = new PromelaEdge(newStartNode,newEndNode,label2);
+          edgesOfResult.add(specialEdge2);
+          simpleSecond = true;
+        } else if(edge.getTarget().isBreak()&& edge.getSource()!=second.getStart()){
+          label2 = edge.getLabelBlock();
+          sourceNode = edge.getSource();
+          newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
+          edgesOfResult.add(newEdge);
+          simpleSecond = false;
         }
         else {
           edgesOfResult.add(edge);
@@ -306,9 +321,12 @@ public class PromelaGraph
                                                 final PromelaGraph second,
                                                 final PromelaNode endNode,
                                                 final ModuleProxyFactory factory,
-                                                final String name)
+                                                final String name,
+                                                final Map<PromelaNode,PromelaEdge> toBreakNode)
   {
+    PromelaNode newStartNode = new PromelaNode();
     final PromelaNode newEndNode = endNode;
+    final HashMap<PromelaNode,PromelaEdge> breakNodeSource = (HashMap<PromelaNode,PromelaEdge>) toBreakNode;
     if(first==null){
       final List<PromelaNode> nodesOfSecond = second.getNodes();
       final List<PromelaEdge> edgesOfSecond = second.getEdges();
@@ -316,7 +334,7 @@ public class PromelaGraph
       final List<PromelaNode> indexNode = new ArrayList<PromelaNode>();
       PromelaGraph output = null;
 
-      PromelaNode newStartNode = new PromelaNode();
+
      // final PromelaNode newEndNode = endNode;
       final List<PromelaEdge> edgesOfResult =
         new ArrayList<PromelaEdge>();
@@ -347,7 +365,7 @@ public class PromelaGraph
           newEdge = new PromelaEdge(newStartNode,newEndNode,label2);
           edgesOfResult.add(newEdge);
           nodesOfResult.add(newStartNode);
-
+          breakNodeSource.put(newStartNode, newEdge);
         }else if(node.isEnd()){
           // TODO
        /*   for(final PromelaEdge e: edgesOfSecond){
@@ -370,6 +388,7 @@ public class PromelaGraph
               label2 = e.getLabelBlock();
               sourceNode = e.getSource();
               newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
+              breakNodeSource.put(sourceNode, newEdge);
               edgesOfResult.add(newEdge);
               indexEdge.add(e);
             }
@@ -415,7 +434,7 @@ public class PromelaGraph
       final List<PromelaNode> indexNode = new ArrayList<PromelaNode>();
       PromelaGraph output = null;
 
-      PromelaNode newStartNode = new PromelaNode();
+
      // final PromelaNode newEndNode = endNode;
       final List<PromelaEdge> edgesOfResult =
         new ArrayList<PromelaEdge>();
@@ -497,7 +516,7 @@ public class PromelaGraph
       return output;
      // return first;
     }else{
-
+      //if neither first or second are null
       final List<PromelaNode> nodesOfFirst = first.getNodes();
       final List<PromelaEdge> edgesOfFirst = first.getEdges();
       final List<PromelaNode> nodesOfSecond = second.getNodes();
@@ -506,7 +525,7 @@ public class PromelaGraph
       List<PromelaNode> indexNode = new ArrayList<PromelaNode>();
       PromelaGraph output = null;
 
-      PromelaNode newStartNode = new PromelaNode();
+
    //   final PromelaNode newEndNode = endNode;
       final List<PromelaEdge> edgesOfResult =
         new ArrayList<PromelaEdge>();
@@ -527,7 +546,7 @@ public class PromelaGraph
         final PromelaNode node = nodesOfFirst.get(0);
         if(node.isBreak()){
           indexNode.add(node);
-          newStartNode = new PromelaNode();
+          //newStartNode = new PromelaNode();
           first.setStart(newStartNode);
           final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
           final IdentifierProxy ident = factory.createSimpleIdentifierProxy("step_"+name.toUpperCase());
@@ -538,6 +557,8 @@ public class PromelaGraph
           edgesOfResult.add(newEdge);
           nodesOfResult.add(newStartNode);
 
+          // one source node from break node
+          breakNodeSource.put(newStartNode,newEdge);
         }else if(node.isEnd()){
           //TO DO
         }else if(node.isGoto()){
@@ -555,6 +576,7 @@ public class PromelaGraph
               newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
               edgesOfResult.add(newEdge);
               indexEdge.add(e);
+              breakNodeSource.put(sourceNode,newEdge);
             }
           }
         }else if(n.isEnd()&&n!=newEndNode){
@@ -597,7 +619,18 @@ public class PromelaGraph
           //final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
           label.add(ident);
           label2 = new PromelaLabel(label);
+          if(!breakNodeSource.containsKey(first.getStart())){
           newEdge = new PromelaEdge(first.getStart(),newEndNode,label2);
+          }else{
+           for(final SimpleExpressionProxy l: breakNodeSource.get(first.getStart()).getLabelBlock().getLabel()){
+             label.add(l);
+           }
+           edgesOfResult.remove(breakNodeSource.get(first.getStart()));
+           newEdge =breakNodeSource.get(first.getStart());
+           for(final SimpleExpressionProxy l: label){
+             newEdge.getLabelBlock().getLabel().add(l);
+           }
+          }
           edgesOfResult.add(newEdge);
 
         }else if(n.isEnd()){
@@ -648,7 +681,7 @@ public class PromelaGraph
           }
         }
         else if (n.isBreak()){
-          System.out.println("wtf");
+
           indexNode.add(n);
           for(final PromelaEdge e: edgesOfSecond){
             if(e.getTarget()==n){
@@ -656,14 +689,30 @@ public class PromelaGraph
               label2 = e.getLabelBlock();
               sourceNode = e.getSource();
               //first.getEnd()
-              newEdge = new PromelaEdge(sourceNode, endNode, label2);
+              if(!breakNodeSource.containsKey(sourceNode)){
+                newEdge = new PromelaEdge(sourceNode,newEndNode,label2);
+                }else{
+                 edgesOfResult.remove(breakNodeSource.get(sourceNode));
+                 newEdge =breakNodeSource.get(sourceNode);
+                 for(final SimpleExpressionProxy l: label2.getLabel()){
+                   newEdge.getLabelBlock().getLabel().add(l);
+                 }
+                }
               edgesOfResult.add(newEdge);
               indexEdge.add(e);
             }
             else if(e.getSource()==second.getStart()){
               label2= e.getLabelBlock();
-              //first.getEnd()
-              newEdge = new PromelaEdge(first.getStart(),newEndNode,label2);
+
+              if(!breakNodeSource.containsKey(first.getStart())){
+                newEdge = new PromelaEdge(first.getStart(),newEndNode,label2);
+                }else{
+                  edgesOfResult.remove(breakNodeSource.get(first.getStart()));
+                 newEdge =breakNodeSource.get(first.getStart());
+                 for(final SimpleExpressionProxy l: label2.getLabel()){
+                   newEdge.getLabelBlock().getLabel().add(l);
+                 }
+                }
               edgesOfResult.add(newEdge);
               indexEdge.add(e);
             }

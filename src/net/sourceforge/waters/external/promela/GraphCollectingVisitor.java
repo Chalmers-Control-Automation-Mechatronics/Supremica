@@ -5,8 +5,10 @@ import gnu.trove.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.external.promela.ast.BreakStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
@@ -43,7 +45,6 @@ import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.antlr.runtime.tree.Tree;
@@ -60,6 +61,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   Collection<SimpleComponentProxy> mComponents = new ArrayList<SimpleComponentProxy>();
 
+  Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
   public GraphCollectingVisitor(final EventCollectingVisitor v){
     mVisitor = v;
     mFactory = v.getFactory();
@@ -391,7 +393,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     final PromelaNode endNode = new PromelaNode(PromelaNode.EndType.END);
     for(int i=0;i<t.getChildCount();i++){
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-      result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name);
+      result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name,mSourceOfBreakNode);
     //  result = PromelaGraph.combineComposition(result,step);
     }
     return result;
