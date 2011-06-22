@@ -236,7 +236,7 @@ stmntRule
         | assignRule
         | ELSE
         | BREAK -> ^(BREAK<BreakStatementTreeNode>)
-        | GOTO NAME -> ^(NAME<LabelTreeNode>)
+        | GOTO NAME -> ^(NAME<GotolTreeNode>)
         | NAME COLON stmntRule -> ^(NAME<LabelTreeNode> stmntRule)
         | (PRINT|PRINTF) PARENOPEN STRING (COMMA arg_lstRule)? PARENCLOSE
 		| NAME PARENOPEN arg_lstRule PARENCLOSE

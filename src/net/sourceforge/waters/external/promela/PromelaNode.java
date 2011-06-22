@@ -42,14 +42,10 @@ public class PromelaNode
   }
 
   // TODO Remove this
-  public PromelaNode(final boolean isBreak,final boolean isEnd,final boolean isGoto){
-    mBreak = isBreak;
-    mEnd = isEnd;
-    mGoto = isGoto;
-    mEndType = null;
-    mGotoLabel = null;
-  }
+ /* public PromelaNode(final boolean isBreak,final boolean isEnd,final boolean isGoto){
 
+  }
+*/
 
   //#########################################################################
   //# Simple Access
@@ -95,19 +91,19 @@ public class PromelaNode
   }
 
   public boolean isBreak(){
-    return mBreak;
+    return mEndType == EndType.BREAK;
   }
   public boolean isEnd(){
-    return mEnd;
+    return mEndType == EndType.END;
   }
   public boolean isGoto(){
-    return mGoto;
+    return mEndType == EndType.GOTO;
   }
   public void setBreak(final boolean i){
-    mBreak = i;
+    mEndType = EndType.BREAK;
   }
   public void setEnd(final boolean i){
-    mEnd = i;
+    mEndType = EndType.END;
   }
 
 
@@ -123,10 +119,10 @@ public class PromelaNode
 
   //#########################################################################
   //# Data Members
-  private final EndType mEndType;
+  private EndType mEndType;
   private final String mGotoLabel;
   private SimpleNodeProxy mNode;
 
   // TODO Remove this
-  private boolean mBreak,mEnd,mGoto;
+  //private boolean mBreak,mEnd,mGoto;
 }

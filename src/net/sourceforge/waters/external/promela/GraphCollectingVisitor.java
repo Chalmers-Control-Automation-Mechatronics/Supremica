@@ -14,6 +14,7 @@ import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
+import net.sourceforge.waters.external.promela.ast.GotolTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.LabelTreeNode;
@@ -387,7 +388,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     //final String name = t.getParent().getParent().getChild(0).getText();
     final String name = tree.getText();
     PromelaGraph result = null;
-    final PromelaNode endNode = new PromelaNode(false,true,false);
+    final PromelaNode endNode = new PromelaNode(PromelaNode.EndType.END);
     for(int i=0;i<t.getChildCount();i++){
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name);
@@ -397,7 +398,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
   }
   public Object visitBreak(final BreakStatementTreeNode t)
   {
-    final PromelaNode node = new PromelaNode(true,false,false);
+    final PromelaNode node = new PromelaNode(PromelaNode.EndType.BREAK);
     final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
     cNodes.add(node);
     final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
@@ -422,6 +423,11 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       visitLabel(labels.get(t.getText()));
     }
     return result;
+  }
+  public Object visitGoto(final GotolTreeNode t)
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 
