@@ -102,4 +102,12 @@ class OmegaRemovalTRSimplifier
     return modified;
   }
 
+  @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, false, true);
+    return setStatistics(stats);
+  }
+
 }

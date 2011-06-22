@@ -10,6 +10,7 @@
 package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -60,6 +61,15 @@ public abstract class NativeModelVerifier
 
 
   //#########################################################################
+  //# Overrides net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
+  protected VerificationResult createAnalysisResult()
+  {
+    return new VerificationResult();
+  }
+
+
+  //#########################################################################
   //# Configuration
   public void setExplorerMode(final ExplorerMode mode)
   {
@@ -82,11 +92,19 @@ public abstract class NativeModelVerifier
     } else {
       clearAnalysisResult();
       final long start = System.currentTimeMillis();
-      final VerificationResult result = runNativeAlgorithm();
-      final long stop = System.currentTimeMillis();
-      result.setRuntime(stop - start);
-      setAnalysisResult(result);
-      return result.isSatisfied();
+      try {
+        final AnalysisResult result = runNativeAlgorithm();
+        final long stop = System.currentTimeMillis();
+        result.setRuntime(stop - start);
+        setAnalysisResult(result);
+        return result.isSatisfied();
+      } catch (final AnalysisException exception) {
+        final long stop = System.currentTimeMillis();
+        final AnalysisResult result = createAnalysisResult();
+        result.setException(exception);
+        result.setRuntime(stop - start);
+        throw exception;
+      }
     }
   }
 

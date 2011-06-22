@@ -41,8 +41,9 @@ public class CompositionalVerificationResult extends VerificationResult
    */
   public CompositionalVerificationResult()
   {
-    mTotalCompositionCount = 0;
-    mUnsuccessfulCompositionCount = 0;
+    mTotalCompositionsCount = 0;
+    mUnsuccessfulCompositionsCount = 0;
+    mRedundantEventsCount = 0;
     mSimplifierStatistics = null;
     mNumberOfMonolithicRuns = 0;
     mMonolithicVerificationResult = null;
@@ -56,18 +57,29 @@ public class CompositionalVerificationResult extends VerificationResult
    * abstraction is attempted. The attempts may or may not have been successful
    * in producing a reduced size model with no overflow exceptions occurring.
    */
-  public int getTotalCompositionCount()
+  public int getTotalCompositionsCount()
   {
-    return mTotalCompositionCount;
+    return mTotalCompositionsCount;
   }
 
   /**
    * Gets the number of times an unsuccessful candidate is chosen and an
    * overflow exception occurs during composition or abstraction.
    */
-  public int getUnsuccessfulCompositionCount()
+  public int getUnsuccessfulCompositionsCount()
   {
-    return mUnsuccessfulCompositionCount;
+    return mUnsuccessfulCompositionsCount;
+  }
+
+  /**
+   * Gets the number of events that were found to be redundant and have
+   * been removed. Events are removed if they are found to be globally
+   * disabled, i.e., always blocked by one automaton, or globally selflooped,
+   * i.e., appear only in selfloops in all automata.
+   */
+  public int getRedundantEventsCount()
+  {
+    return mRedundantEventsCount;
   }
 
   /**
@@ -91,12 +103,17 @@ public class CompositionalVerificationResult extends VerificationResult
   //# Providing Statistics
   public void addCompositionAttempt()
   {
-    mTotalCompositionCount++;
+    mTotalCompositionsCount++;
   }
 
   public void addUnsuccessfulComposition()
   {
-    mUnsuccessfulCompositionCount++;
+    mUnsuccessfulCompositionsCount++;
+  }
+
+  public void addRedundantEvents(final int count)
+  {
+    mRedundantEventsCount += count;
   }
 
   public void setSimplifierStatistics
@@ -141,8 +158,8 @@ public class CompositionalVerificationResult extends VerificationResult
     super.merge(other);
     final CompositionalVerificationResult result =
       (CompositionalVerificationResult) other;
-    mTotalCompositionCount += result.mTotalCompositionCount;
-    mUnsuccessfulCompositionCount += result.mUnsuccessfulCompositionCount;
+    mTotalCompositionsCount += result.mTotalCompositionsCount;
+    mUnsuccessfulCompositionsCount += result.mUnsuccessfulCompositionsCount;
     if (mSimplifierStatistics != null && result.mSimplifierStatistics != null) {
       final Iterator<TRSimplifierStatistics> iter1 =
         mSimplifierStatistics.iterator();
@@ -170,14 +187,16 @@ public class CompositionalVerificationResult extends VerificationResult
   {
     super.print(writer);
     writer.print("Total number of compositions: ");
-    writer.println(mTotalCompositionCount);
+    writer.println(mTotalCompositionsCount);
     writer.print("Number of unsuccessful compositions: ");
-    writer.println(mUnsuccessfulCompositionCount);
-    if (mUnsuccessfulCompositionCount > 0) {
+    writer.println(mUnsuccessfulCompositionsCount);
+    writer.print("Number of redundant events: ");
+    writer.println(mRedundantEventsCount);
+    if (mUnsuccessfulCompositionsCount > 0) {
       final Formatter formatter = new Formatter(writer);
       final float probability =
-        (float) (mTotalCompositionCount - mUnsuccessfulCompositionCount) /
-        (float) mTotalCompositionCount;
+        (float) (mTotalCompositionsCount - mUnsuccessfulCompositionsCount) /
+        (float) mTotalCompositionsCount;
       formatter.format
         ("Probability of a candidate selection being successful: %.2f%%\n",
          100.0f * probability);
@@ -202,6 +221,7 @@ public class CompositionalVerificationResult extends VerificationResult
     super.printCSVHorizontalHeadings(writer);
     writer.print(",Compositions");
     writer.print(",Overflows");
+    writer.print(",RedundantEvents");
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         ruleStats.printCSVHorizontalHeadings(writer);
@@ -218,9 +238,11 @@ public class CompositionalVerificationResult extends VerificationResult
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
-    writer.print(mTotalCompositionCount);
+    writer.print(mTotalCompositionsCount);
     writer.print(',');
-    writer.print(mUnsuccessfulCompositionCount);
+    writer.print(mUnsuccessfulCompositionsCount);
+    writer.print(',');
+    writer.print(mRedundantEventsCount);
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         ruleStats.printCSVHorizontal(writer);
@@ -237,8 +259,9 @@ public class CompositionalVerificationResult extends VerificationResult
 
   //#########################################################################
   //# Data Members
-  private int mUnsuccessfulCompositionCount;
-  private int mTotalCompositionCount;
+  private int mTotalCompositionsCount;
+  private int mUnsuccessfulCompositionsCount;
+  private int mRedundantEventsCount;
   private List<TRSimplifierStatistics> mSimplifierStatistics;
   private int mNumberOfMonolithicRuns;
   private VerificationResult mMonolithicVerificationResult;

@@ -30,6 +30,7 @@
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeConflictCheckerGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
+#include "jni/glue/OverflowExceptionGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
@@ -760,6 +761,10 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     }
+  } catch (const std::bad_alloc& error) {
+    jni::OverflowExceptionGlue glue(&cache);
+    cache.throwJavaException(glue);
+    return 0;
   } catch (const jni::PreJavaException& pre) {
     cache.throwJavaException(pre);
     return 0;
@@ -797,6 +802,10 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     }
+  } catch (const std::bad_alloc& error) {
+    jni::OverflowExceptionGlue glue(&cache);
+    cache.throwJavaException(glue);
+    return 0;
   } catch (const jni::PreJavaException& pre) {
     cache.throwJavaException(pre);
     return 0;

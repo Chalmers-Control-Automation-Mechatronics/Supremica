@@ -621,9 +621,11 @@ public class OPConflictChecker
     final OmegaRemovalTRSimplifier omegaRemover =
       new OmegaRemovalTRSimplifier();
     chain.add(omegaRemover);
-    final CoreachabilityTRSimplifier nonCoreachableRemover =
-      new CoreachabilityTRSimplifier();
-    chain.add(nonCoreachableRemover);
+    if (mPreconditionMarking != null) {
+      final CoreachabilityTRSimplifier nonCoreachableRemover =
+        new CoreachabilityTRSimplifier();
+      chain.add(nonCoreachableRemover);
+    }
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
@@ -850,6 +852,8 @@ public class OPConflictChecker
       }
       final AbstractionStep step = new EventRemovalStep(results, originals);
       mModifyingSteps.add(step);
+      final CompositionalVerificationResult stats = getAnalysisResult();
+      stats.addRedundantEvents(numRedundant);
       return true;
     }
   }
