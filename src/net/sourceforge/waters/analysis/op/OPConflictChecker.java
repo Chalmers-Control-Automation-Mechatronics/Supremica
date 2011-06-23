@@ -1231,8 +1231,9 @@ public class OPConflictChecker
    *         into account.
    */
   private Candidate selectCandidate(final Collection<Candidate> preselected)
+  throws AnalysisException
   {
-    final Candidate result = Collections.min(preselected, mSelectingHeuristic);
+    final Candidate result = mSelectingHeuristic.selectCandidate(preselected);
     if (mSubsumptionEnabled) {
       final Collection<Candidate> subsumedBy = new LinkedList<Candidate>();
       for (final Candidate candidate : preselected) {
@@ -1810,10 +1811,9 @@ public class OPConflictChecker
      */
     MaxL {
       @Override
-      Comparator<Candidate> createSingleHeuristic
-        (final OPConflictChecker checker)
+      Comparator<Candidate> createComparator(final OPConflictChecker checker)
       {
-        return checker.new HeuristicMaxL();
+        return checker.new ComparatorMaxL();
       }
     },
     /**
@@ -1823,10 +1823,9 @@ public class OPConflictChecker
      */
     MaxC {
       @Override
-      Comparator<Candidate> createSingleHeuristic
-        (final OPConflictChecker checker)
+      Comparator<Candidate> createComparator(final OPConflictChecker checker)
       {
-        return checker.new HeuristicMaxC();
+        return checker.new ComparatorMaxC();
       }
     },
     /**
@@ -1835,16 +1834,24 @@ public class OPConflictChecker
      */
     MinSa {
       @Override
-      boolean isEnabled(final OPConflictChecker checker)
+      Comparator<Candidate> createComparator(final OPConflictChecker checker)
       {
-        return checker.mPreconditionMarking != null;
+        if (checker.mPreconditionMarking == null) {
+          return null;
+        } else {
+          return checker.new ComparatorMinSAlpha();
+        }
       }
       @Override
-      Comparator<Candidate> createSingleHeuristic
-        (final OPConflictChecker checker)
+      SelectingHeuristic createHeuristic(final OPConflictChecker checker)
       {
-        return checker.new HeuristicMinSAlpha();
+        if (checker.mPreconditionMarking == null) {
+          return MinS.createHeuristic(checker);
+        } else {
+          return super.createHeuristic(checker);
+        }
       }
+
     },
     /**
      * Chooses the candidate with the minimum estimated number of states
@@ -1852,33 +1859,37 @@ public class OPConflictChecker
      */
     MinS {
       @Override
-      Comparator<Candidate> createSingleHeuristic
-        (final OPConflictChecker checker)
+      Comparator<Candidate> createComparator(final OPConflictChecker checker)
       {
-        return checker.new HeuristicMinS();
+        return checker.new ComparatorMinS();
+      }
+    },
+    /**
+     * Chooses the candidate with the minimum actual number of states
+     * in the synchronous product.
+     */
+    MinSync {
+      @Override
+      SelectingHeuristic createHeuristic(final OPConflictChecker checker)
+      {
+        final Comparator<Candidate> alt = MaxL.createComparator(checker);
+        return checker.new HeuristicMinSync(alt);
       }
     };
 
     /**
-     * returns whether this heuristic is enabled in the current conflict
-     * checker configuration. Only enabled heuristics are included in a
-     * heuristics list returned by {@link
-     * #createSingleHeuristic(OPConflictChecker) createSingleHeuristic()}.
-     */
-    boolean isEnabled(final OPConflictChecker checker)
-    {
-      return true;
-    }
-
-    /**
-     * Creates the selecting heuristic implementing this method.
+     * Creates a comparator to implement this selecting heuristic.
      * This returns an implementation of only one heuristic, which
      * may consider two candidates as equal.
-     * @param checker The conflict checker requesting and using the
+     * @param  checker The conflict checker requesting and using the
      *                heuristic.
+     * @return A comparator, or <CODE>null</CODE> if the heuristic
+     *         is not implemented by a comparator.
      */
-    abstract Comparator<Candidate> createSingleHeuristic
-      (OPConflictChecker checker);
+    Comparator<Candidate> createComparator(final OPConflictChecker checker)
+    {
+      return null;
+    }
 
     /**
      * Creates a selecting heuristic that gives preferences to this method.
@@ -1891,19 +1902,22 @@ public class OPConflictChecker
      * @param checker The conflict checker requesting and using the
      *                heuristic.
      */
-    Comparator<Candidate> createHeuristic(final OPConflictChecker checker)
+    SelectingHeuristic createHeuristic(final OPConflictChecker checker)
     {
       final List<Comparator<Candidate>> list =
         new LinkedList<Comparator<Candidate>>();
-      Comparator<Candidate> heu = createSingleHeuristic(checker);
+      Comparator<Candidate> heu = createComparator(checker);
       list.add(heu);
       for (final SelectingMethod method : values()) {
-        if (method != this && method.isEnabled(checker)) {
-          heu = method.createSingleHeuristic(checker);
-          list.add(heu);
+        if (method != this) {
+          heu = method.createComparator(checker);
+          if (heu != null) {
+            list.add(heu);
+          }
         }
       }
-      return checker.new SelectingComparator(list);
+      final Comparator<Candidate> chain = checker.new ComparatorChain(list);
+      return checker.new SelectingHeuristic(chain);
     }
 
   }
@@ -2455,41 +2469,85 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class SelectionComparator
-  private class SelectingComparator
-    implements Comparator<Candidate>
-  {
+  //# Inner Class SelectingHeuristic
+  private class SelectingHeuristic {
 
     //#######################################################################
     //# Constructor
-    private SelectingComparator(final List<Comparator<Candidate>> list)
+    private SelectingHeuristic(final Comparator<Candidate> comparator)
     {
-      mHeuristics = list;
+      mComparator = comparator;
     }
 
     //#######################################################################
-    //# Interface java.util.Comparator<Candidate>
-    public int compare(final Candidate cand1, final Candidate cand2)
+    //# Candidate Evaluation
+    Comparator<Candidate> getComparator()
     {
-      for (final Comparator<Candidate> heu : mHeuristics) {
-        final int result = heu.compare(cand1, cand2);
-        if (result != 0) {
-          return result;
-        }
-      }
-      return cand1.compareTo(cand2);
+      return mComparator;
+    }
+
+    Candidate selectCandidate(final Collection<Candidate> candidates)
+    throws AnalysisException
+    {
+      return Collections.min(candidates, mComparator);
     }
 
     //#######################################################################
     //# Data Members
-    private final List<Comparator<Candidate>> mHeuristics;
+    private final Comparator<Candidate> mComparator;
 
   }
 
 
   //#########################################################################
-  //# Inner Class SelectingHeuristic
-  private abstract class SelectingHeuristic
+  //# Inner Class HeuristicMinSync
+  private class HeuristicMinSync extends SelectingHeuristic {
+
+    //#######################################################################
+    //# Constructor
+    private HeuristicMinSync(final Comparator<Candidate> comparator)
+    {
+      super(comparator);
+    }
+
+    //#######################################################################
+    //# Overrides for SelectingHeuristic
+    Candidate selectCandidate(final Collection<Candidate> candidates)
+    throws AnalysisException
+    {
+      final ProductDESProxyFactory factory = getFactory();
+      final Comparator<Candidate> comparator = getComparator();
+      int limit = mInternalStepNodeLimit;
+      mCurrentSynchronousProductBuilder.setNodeLimit(limit);
+      Candidate best = null;
+      for (final Candidate candidate : candidates) {
+        final ProductDESProxy des = candidate.createProductDESProxy(factory);
+        mCurrentSynchronousProductBuilder.setModel(des);
+        try {
+          mCurrentSynchronousProductBuilder.run();
+          final AutomatonProxy aut =
+            mCurrentSynchronousProductBuilder.getComputedAutomaton();
+          final int size = aut.getStates().size();
+          if (size < limit) {
+            best = candidate;
+            limit = size;
+            mCurrentSynchronousProductBuilder.setNodeLimit(limit);
+          } else if (best == null || comparator.compare(candidate, best) < 0) {
+            best = candidate;
+          }
+        } catch (final OverflowException overflow) {
+          // skip this one ...
+        }
+      }
+      return best;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class SelectingComparator
+  private abstract class SelectingComparator
     implements Comparator<Candidate>
   {
 
@@ -2516,12 +2574,12 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicMaxL
-  private class HeuristicMaxL extends SelectingHeuristic
+  //# Inner Class ComparatorMaxL
+  private class ComparatorMaxL extends SelectingComparator
   {
 
     //#######################################################################
-    //# Overrides for SelectingHeuristic
+    //# Overrides for SelectingComparator
     double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getLocalEventCount() /
@@ -2532,12 +2590,12 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicMaxC
-  private class HeuristicMaxC extends SelectingHeuristic
+  //# Inner Class ComparatorMaxC
+  private class ComparatorMaxC extends SelectingComparator
   {
 
     //#######################################################################
-    //# Overrides for SelectingHeuristic
+    //# Overrides for SelectingComparator
     double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getCommonEventCount() /
@@ -2548,12 +2606,12 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicMinS
-  private class HeuristicMinS extends SelectingHeuristic
+  //# Inner Class ComparatorMinS
+  private class ComparatorMinS extends SelectingComparator
   {
 
     //#######################################################################
-    //# Overrides for SelectingHeuristic
+    //# Overrides for SelectingComparator
     double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
@@ -2569,12 +2627,12 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicMinSAlpha
-  private class HeuristicMinSAlpha extends SelectingHeuristic
+  //# Inner Class ComparatorMinSAlpha
+  private class ComparatorMinSAlpha extends SelectingComparator
   {
 
     //#######################################################################
-    //# Overrides for SelectingHeuristic
+    //# Overrides for SelectingComparator
     double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
@@ -2586,6 +2644,39 @@ public class OPConflictChecker
       final double localEvents = candidate.getLocalEventCount();
       return product * (totalEvents - localEvents) / totalEvents;
     }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class ComparatorChain
+  private class ComparatorChain
+    implements Comparator<Candidate>
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ComparatorChain(final List<Comparator<Candidate>> list)
+    {
+      mHeuristics = list;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparator<Candidate>
+    public int compare(final Candidate cand1, final Candidate cand2)
+    {
+      for (final Comparator<Candidate> heu : mHeuristics) {
+        final int result = heu.compare(cand1, cand2);
+        if (result != 0) {
+          return result;
+        }
+      }
+      return cand1.compareTo(cand2);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final List<Comparator<Candidate>> mHeuristics;
 
   }
 
@@ -4690,7 +4781,7 @@ public class OPConflictChecker
 
   private AbstractionRule mAbstractionRule;
   private PreselectingHeuristic mPreselectingHeuristic;
-  private Comparator<Candidate> mSelectingHeuristic;
+  private SelectingHeuristic mSelectingHeuristic;
   private SynchronousProductBuilder mCurrentSynchronousProductBuilder;
   private ConflictChecker mCurrentMonolithicConflictChecker;
   private SafetyVerifier mCurrentCompositionalSafetyVerifier;
