@@ -20,6 +20,8 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
+import org.supremica.automata.BDD.SupremicaBDDBitVector.*;
+
 /**
  *
  * @author zhennan
@@ -197,7 +199,6 @@ public class EventDisParDepSets {
             if(anEdge.getGuardActionBlock() != null)
                 guards = anEdge.getGuardActionBlock().getGuards();
             if (guards != null && guards.size() > 0) {
-                manager.localOverflows = manager.getZeroBDD();
                 forwardGuardBDD = manager.guard2BDD(guards.get(0));
             }
             sourceBDD.andWith(destBDD);
@@ -208,10 +209,8 @@ public class EventDisParDepSets {
         private boolean conflicting(final List<BinaryExpressionProxy> actions, final List<BinaryExpressionProxy> others) {
             boolean whetherConflicting = false;
             for (final BinaryExpressionProxy aStatement : actions) {
-                manager.resetLocalOverflows();
                 final BDD aStatementBDD = manager.action2BDD(aStatement);
                 for (final BinaryExpressionProxy anotherStatement : others) {
-                    manager.resetLocalOverflows();
                     final BDD anotherStatementBDD = manager.action2BDD(anotherStatement);
                     if (aStatement.getLeft().equals(anotherStatement.getLeft())&&!aStatementBDD.equals(anotherStatementBDD)) {
                         whetherConflicting = true;

@@ -78,12 +78,14 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_apropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_bpropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
+
 
 /**
  * <P>
@@ -493,6 +495,7 @@ public class IDEMenuBar extends JMenuBar
           }
         }
       }
+      mExamplesMenu.add(mIDE.getActions().editorReadFTAction.getMenuItem());
     }
 
     // Modules

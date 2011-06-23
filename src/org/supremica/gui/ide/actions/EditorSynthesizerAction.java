@@ -20,9 +20,19 @@ import java.util.Vector;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.base.AbstractSubject;
 
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomata;
@@ -119,193 +129,225 @@ public class EditorSynthesizerAction
         {
             return;
         }
-        final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
 
-//        ReduceBDDvars rBDDv = new ReduceBDDvars(exAutomata.getExtendedAutomataList().get(0));
-//        rBDDv.computeOptimalPaths();
+        double numberOfSupervisorStates = 0;
 
-        final BDDExtendedSynthesizer bddSynthesizer = new BDDExtendedSynthesizer(exAutomata,options);
-/*
-        //Create a naive PCG graph
-        int[][] weight = new int[exAutomata.size()][exAutomata.size()];
-        int[] efaDegree = new int[exAutomata.size()];
-        boolean[][] weightComputed = new boolean[exAutomata.size()][exAutomata.size()];
-        for(ExtendedAutomaton efa1:exAutomata)
+        //Time optimization method
+ /*       int upperboundOfTime = 1;
+        while(numberOfSupervisorStates == 0)
         {
-            efaDegree[exAutomata.getExAutomatonIndex(efa1)] = 0;
-            for(ExtendedAutomaton efa2:exAutomata)
+            System.err.println("Time upperbound: "+upperboundOfTime);
+            ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+            final ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+            for(AbstractSubject component: module.getComponentListModifiable())
             {
-                boolean weightComp = false;
-                if(exAutomata.getExAutomatonIndex(efa1) == exAutomata.getExAutomatonIndex(efa2))
-                        weightComp = true;
-
-                weightComputed[exAutomata.getExAutomatonIndex(efa1)][exAutomata.getExAutomatonIndex(efa2)] = weightComp;
-            }
-        }
-
-        for(ExtendedAutomaton efa1:exAutomata)
-        {
-            for(ExtendedAutomaton efa2:exAutomata)
-            {
-                int index1 = exAutomata.getExAutomatonIndex(efa1);
-                int index2 = exAutomata.getExAutomatonIndex(efa2);
-                if(!weightComputed[index1][index2])
+                if(component instanceof SimpleComponentSubject && ((SimpleComponentSubject)component).getName().equals("Clock"))
                 {
-                    ArrayList<EventDeclProxy> commonEvents = new ArrayList<EventDeclProxy>(efa1.getAlphabet());
-                    commonEvents.retainAll(efa2.getAlphabet());
-                    int commonVarsSize = 0;
-                    for(EventDeclProxy event:commonEvents)
-                    {
-                        if(efa1.getGuardVariables(event) != null && efa2.getGuardVariables(event) != null)
-                        {
-                            HashSet<VariableComponentProxy> gVars = new HashSet<VariableComponentProxy>(efa1.getGuardVariables(event));
-                            gVars.retainAll(efa2.getGuardVariables(event));
-                            commonVarsSize += (gVars.size());
-                        }
-                    }
-                    int w = commonEvents.size()+commonVarsSize;
-                    weight[index1][index2] = w;
-                    efaDegree[index1] += w;
-                    efaDegree[index2] += w;
-                    weightComputed[index1][index2] = true;
-                    weightComputed[index2][index1] = true;
+                    SimpleExpressionSubject guard=null;
+                    try{ guard = (SimpleExpressionSubject)(parser.parse("time<="+upperboundOfTime, Operator.TYPE_BOOLEAN)); } catch(final ParseException pe){}
+
+                    ((SimpleComponentSubject)component).getGraph().getEdgesModifiable().get(0).getGuardActionBlock().getGuardsModifiable().remove(0);
+                    ((SimpleComponentSubject)component).getGraph().getEdgesModifiable().get(0).getGuardActionBlock().getGuardsModifiable().add(guard);
+                }
+                else if(component instanceof VariableComponentSubject && ((VariableComponentSubject)component).getName().equals("time"))
+                {
+                    SimpleExpressionSubject range = null;
+                    try{ range = (SimpleExpressionSubject)(parser.parse("0.."+upperboundOfTime,Operator.TYPE_RANGE));} catch(final ParseException pe){}
+                    ((VariableComponentSubject)component).setType(range);
                 }
             }
-        }
 */
-//        System.err.println("SIZE: "+exAutomata.nbrOfEFAsVars);
-//        System.err.println("Number of controllable events: "+exAutomata.controllableAlphabet.size());
-//        System.err.println("Number of theoretical reachable states: "+((double)exAutomata.theoNbrOfReachableStates));
+            final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
 
-//        double LD = (double)max(efaDegree)/(double)exAutomata.nbrOfEFAsVars;
-//        System.err.println("LD: "+ LD);
+    //        ReduceBDDvars rBDDv = new ReduceBDDvars(exAutomata.getExtendedAutomataList().get(0));
+    //        rBDDv.computeOptimalPaths();
 
-        bddSynthesizer.synthesize(options);
-
-        logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
-        logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.getNbrOfRecahableStates());
-        logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+(double)bddSynthesizer.nbrOfStates()+" states.");
-
-
-//        System.err.println("Number of nodes in the safe BDD: "+bddSynthesizer.getResult().nodeCount());
-
-        if(bddSynthesizer.nbrOfStates()>0 && (options.getSaveInFile() || options.getSaveIDDInFile() ||
-                options.getPrintGuard() || options.getAddGuards()))
-        {
-            boolean guardsGenerated = false;
-            HashMap<String,BDDExtendedGuardGenerator> event2guard = null;
-/*            //
-            int minGuardSize = Integer.MAX_VALUE;
-            int maxGuardSize = Integer.MIN_VALUE;
-            double aveGuardSize = 0;
-            for(final String event:event2guard.keySet())
+            final BDDExtendedSynthesizer bddSynthesizer = new BDDExtendedSynthesizer(exAutomata,options);
+            logger.info("Number of used BDD variables: "+bddSynthesizer.bddAutomata.getNumberOfUsedBDDVariables());
+    /*
+            //Create a naive PCG graph
+            int[][] weight = new int[exAutomata.size()][exAutomata.size()];
+            int[] efaDegree = new int[exAutomata.size()];
+            boolean[][] weightComputed = new boolean[exAutomata.size()][exAutomata.size()];
+            for(ExtendedAutomaton efa1:exAutomata)
             {
-                final int guardSize = event2guard.get(event).getNbrOfTerms();
-                if(guardSize < minGuardSize)
-                    minGuardSize = guardSize;
-                if(guardSize > maxGuardSize)
-                    maxGuardSize = guardSize;
-                aveGuardSize += guardSize;
-
-            }
-            System.err.println("Min guard: "+minGuardSize);
-            System.err.println("Max guard: "+maxGuardSize);
-            System.err.println("Average guard: "+aveGuardSize/exAutomata.controllableAlphabet.size());
-*/
-
-            if(options.getSaveInFile() || options.getSaveIDDInFile())
-            {
-                final JFileChooser chooser = new JFileChooser();
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                final int returnVal = chooser.showOpenDialog(ide.getFrame());
-                if (returnVal == JFileChooser.APPROVE_OPTION)
+                efaDegree[exAutomata.getExAutomatonIndex(efa1)] = 0;
+                for(ExtendedAutomaton efa2:exAutomata)
                 {
-                    final String path = chooser.getSelectedFile().getAbsolutePath();
-                    Config.FILE_SAVE_PATH.set(path);
+                    boolean weightComp = false;
+                    if(exAutomata.getExAutomatonIndex(efa1) == exAutomata.getExAutomatonIndex(efa2))
+                            weightComp = true;
 
+                    weightComputed[exAutomata.getExAutomatonIndex(efa1)][exAutomata.getExAutomatonIndex(efa2)] = weightComp;
+                }
+            }
+
+            for(ExtendedAutomaton efa1:exAutomata)
+            {
+                for(ExtendedAutomaton efa2:exAutomata)
+                {
+                    int index1 = exAutomata.getExAutomatonIndex(efa1);
+                    int index2 = exAutomata.getExAutomatonIndex(efa2);
+                    if(!weightComputed[index1][index2])
+                    {
+                        ArrayList<EventDeclProxy> commonEvents = new ArrayList<EventDeclProxy>(efa1.getAlphabet());
+                        commonEvents.retainAll(efa2.getAlphabet());
+                        int commonVarsSize = 0;
+                        for(EventDeclProxy event:commonEvents)
+                        {
+                            if(efa1.getGuardVariables(event) != null && efa2.getGuardVariables(event) != null)
+                            {
+                                HashSet<VariableComponentProxy> gVars = new HashSet<VariableComponentProxy>(efa1.getGuardVariables(event));
+                                gVars.retainAll(efa2.getGuardVariables(event));
+                                commonVarsSize += (gVars.size());
+                            }
+                        }
+                        int w = commonEvents.size()+commonVarsSize;
+                        weight[index1][index2] = w;
+                        efaDegree[index1] += w;
+                        efaDegree[index2] += w;
+                        weightComputed[index1][index2] = true;
+                        weightComputed[index2][index1] = true;
+                    }
+                }
+            }
+    */
+    //        System.err.println("SIZE: "+exAutomata.nbrOfEFAsVars);
+    //        System.err.println("Number of controllable events: "+exAutomata.controllableAlphabet.size());
+    //        System.err.println("Number of theoretical reachable states: "+((double)exAutomata.theoNbrOfReachableStates));
+
+    //        double LD = (double)max(efaDegree)/(double)exAutomata.nbrOfEFAsVars;
+    //        System.err.println("LD: "+ LD);
+
+            bddSynthesizer.synthesize(options);
+
+            logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
+            logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.getNbrOfRecahableStates());
+            logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+(double)bddSynthesizer.nbrOfStates()+" states.");
+            numberOfSupervisorStates = (double)bddSynthesizer.nbrOfStates();
+
+
+    //        System.err.println("Number of nodes in the safe BDD: "+bddSynthesizer.getResult().nodeCount());
+
+            if(bddSynthesizer.nbrOfStates()>0 && (options.getSaveInFile() || options.getSaveIDDInFile() ||
+                    options.getPrintGuard() || options.getAddGuards()))
+            {
+                boolean guardsGenerated = false;
+                HashMap<String,BDDExtendedGuardGenerator> event2guard = null;
+    /*            //
+                int minGuardSize = Integer.MAX_VALUE;
+                int maxGuardSize = Integer.MIN_VALUE;
+                double aveGuardSize = 0;
+                for(final String event:event2guard.keySet())
+                {
+                    final int guardSize = event2guard.get(event).getNbrOfTerms();
+                    if(guardSize < minGuardSize)
+                        minGuardSize = guardSize;
+                    if(guardSize > maxGuardSize)
+                        maxGuardSize = guardSize;
+                    aveGuardSize += guardSize;
+
+                }
+                System.err.println("Min guard: "+minGuardSize);
+                System.err.println("Max guard: "+maxGuardSize);
+                System.err.println("Average guard: "+aveGuardSize/exAutomata.controllableAlphabet.size());
+    */
+
+                if(options.getSaveInFile() || options.getSaveIDDInFile())
+                {
+                    final JFileChooser chooser = new JFileChooser();
+                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    final int returnVal = chooser.showOpenDialog(ide.getFrame());
+                    if (returnVal == JFileChooser.APPROVE_OPTION)
+                    {
+                        final String path = chooser.getSelectedFile().getAbsolutePath();
+                        Config.FILE_SAVE_PATH.set(path);
+
+                        if(!guardsGenerated)
+                        {
+                            bddSynthesizer.generateGuard(eventNames, options);
+                            event2guard = bddSynthesizer.getEventGuardMap();
+                            guardsGenerated = true;
+                        }
+
+                        if(options.getSaveInFile())
+                        {
+                            String name = module.getName();
+                            if(name.isEmpty())
+                                name = "guard_event_list";
+
+                            final File file = new File(path+"/"+name+".xls");
+                            try
+                            {
+                                final FileWriter fstream = new FileWriter(file);
+                                final BufferedWriter out = new BufferedWriter(fstream);
+                                out.write("Event" + "\t" + "Guard size" +"\t"+"# Complement Heuristic was applied"+"\t"+"# Independent Heuristic was applied"+"\t"+"Guard expression");
+                                out.newLine();
+                                out.newLine();
+                                for(final String event:event2guard.keySet())
+                                {
+                                    final BDDExtendedGuardGenerator bddegg = event2guard.get(event);
+                                    String guard = bddegg.getGuard();
+                                    if(guard.equals(bddegg.FALSE))
+                                        guard = "False";
+                                    if(guard.equals(bddegg.TRUE))
+                                        guard = "True";
+                                    out.write(event + "\t" + bddegg.getNbrOfTerms() +"\t"+ bddegg.getNbrOfCompHeuris()+"\t"+bddegg.getNbrOfIndpHeuris()+"\t"+guard);
+                                    out.newLine();
+                                    out.newLine();
+                                }
+                                out.close();
+                            }
+
+                            catch (final Exception e)
+                            {
+                               logger.error("Could not save the event-guard pairs in the file: " + e.getMessage());
+                            }
+                        }
+                    }
+                }
+
+                if(options.getPrintGuard())
+                {
                     if(!guardsGenerated)
                     {
                         bddSynthesizer.generateGuard(eventNames, options);
                         event2guard = bddSynthesizer.getEventGuardMap();
                         guardsGenerated = true;
                     }
-
-                    if(options.getSaveInFile())
+                    for(final String event:event2guard.keySet())
                     {
-                        String name = module.getName();
-                        if(name.isEmpty())
-                            name = "guard_event_list";
+                        final BDDExtendedGuardGenerator bddgg = event2guard.get(event);
+                        String TF =bddgg.getGuard();
+                        if(TF.equals(bddgg.TRUE))
+                            TF = "This event is always ENABLED by the supervisor.";
+                        else if(TF.equals(bddgg.FALSE))
+                            TF = "This event is always DISABLED by the supervisor"+(bddgg.isEventBlocked()?" (Blocked in the synchronization process).":".");
 
-                        final File file = new File(path+"/"+name+".xls");
-                        try
-                        {
-                            final FileWriter fstream = new FileWriter(file);
-                            final BufferedWriter out = new BufferedWriter(fstream);
-                            out.write("Event" + "\t" + "Guard size" +"\t"+"# Complement Heuristic was applied"+"\t"+"# Independent Heuristic was applied"+"\t"+"Guard expression");
-                            out.newLine();
-                            out.newLine();
-                            for(final String event:event2guard.keySet())
-                            {
-                                final BDDExtendedGuardGenerator bddegg = event2guard.get(event);
-                                String guard = bddegg.getGuard();
-                                if(guard.equals(bddegg.FALSE))
-                                    guard = "False";
-                                if(guard.equals(bddegg.TRUE))
-                                    guard = "True";
-                                out.write(event + "\t" + bddegg.getNbrOfTerms() +"\t"+ bddegg.getNbrOfCompHeuris()+"\t"+bddegg.getNbrOfIndpHeuris()+"\t"+guard);
-                                out.newLine();
-                                out.newLine();
-                            }
-                            out.close();
-                        }
+                        logger.info(bddgg.getBestStateSet()+" guard for event "+event+": "+TF);
 
-                        catch (final Exception e)
-                        {
-                           logger.error("Could not save the event-guard pairs in the file: " + e.getMessage());
-                        }
+                        logger.info("Number of terms in the expression: "+bddgg.getNbrOfTerms());
                     }
+                    logger.info("The guards were generated in "+bddSynthesizer.getGuardTimer().toString()+".");
+                }
+
+                if(options.getAddGuards())
+                {
+                    if(!guardsGenerated)
+                    {
+                        bddSynthesizer.generateGuard(eventNames, options);
+                        event2guard = bddSynthesizer.getEventGuardMap();
+                        guardsGenerated = true;
+                    }
+                    bddSynthesizer.addGuardsToAutomata(module);
                 }
             }
+            else if(options.getAddGuards() || options.getSaveIDDInFile() || options.getSaveInFile() || options.getPrintGuard())
+                logger.info("No guards can be generated when there does not exist any supervisor.");
 
-            if(options.getPrintGuard())
-            {
-                if(!guardsGenerated)
-                {
-                    bddSynthesizer.generateGuard(eventNames, options);
-                    event2guard = bddSynthesizer.getEventGuardMap();
-                    guardsGenerated = true;
-                }
-                for(final String event:event2guard.keySet())
-                {
-                    final BDDExtendedGuardGenerator bddgg = event2guard.get(event);
-                    String TF =bddgg.getGuard();
-                    if(TF.equals(bddgg.TRUE))
-                        TF = "This event is always ENABLED by the supervisor.";
-                    else if(TF.equals(bddgg.FALSE))
-                        TF = "This event is always DISABLED by the supervisor"+(bddgg.isEventBlocked()?" (Blocked in the synchronization process).":".");
-
-                    logger.info(bddgg.getBestStateSet()+" guard for event "+event+": "+TF);
-
-                    logger.info("Number of terms in the expression: "+bddgg.getNbrOfTerms());
-                }
-                logger.info("The guards were generated in "+bddSynthesizer.getGuardTimer().toString()+".");
-            }
-
-            if(options.getAddGuards())
-            {
-                if(!guardsGenerated)
-                {
-                    bddSynthesizer.generateGuard(eventNames, options);
-                    event2guard = bddSynthesizer.getEventGuardMap();
-                    guardsGenerated = true;
-                }
-                bddSynthesizer.addGuardsToAutomata(module);
-            }
-        }
-        else if(options.getAddGuards() || options.getSaveIDDInFile() || options.getSaveInFile() || options.getPrintGuard())
-            logger.info("No guards can be generated when there does not exist any supervisor.");
-
-        bddSynthesizer.done();
+            bddSynthesizer.done();
+//            upperboundOfTime ++;
+//        }
 
     }
 

@@ -110,7 +110,7 @@ public class ExtendedAutomataIndexMap {
 
             final String varName = var.getName();
             final String range = var.getType().toString();
-
+            
             if(range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName()))
             {
                 for(int i=theExAutomata.getMinValueofVar(varName);i<=theExAutomata.getMaxValueofVar(varName);i++)

@@ -90,10 +90,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private final ArrayList<ExtendedAutomaton> theExAutomata;
     private Map<String, EventDeclProxy> eventIdToProxyMap;
     private Map<ExtendedAutomaton,Integer> exAutomatonToIndex;
+    private boolean negativeValuesIncluded = false;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
     int domain = 0;
-    Map<String, MinMax> var2MinMaxValMap = null;
+    private Map<String, MinMax> var2MinMaxValMap = null;
+    Map<String, Integer> var2domainMap = null;
 
     public HashSet<EventDeclProxy> uncontrollableAlphabet = null;
     public HashSet<EventDeclProxy> controllableAlphabet = null;
@@ -111,6 +113,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         unionAlphabet = new ArrayList<EventDeclProxy>();
         variables = new ArrayList<VariableComponentProxy>();
         var2MinMaxValMap = new HashMap<String, MinMax>();
+        var2domainMap = new HashMap<String, Integer>();
         uncontrollableAlphabet = new HashSet<EventDeclProxy>();
         controllableAlphabet = new HashSet<EventDeclProxy>();
         plantAlphabet = new HashSet<EventDeclProxy>();
@@ -157,8 +160,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
                 final String varName = var.getName();
                 final String range = var.getType().toString();
-                int lowerBound = -1;
-                int upperBound = -1;
+                int lowerBound = 0;
+                int upperBound = 0;
 
                 if(range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName()))
                 {
@@ -168,9 +171,15 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 else if (range.contains(","))
                 {
                     final StringTokenizer token = new StringTokenizer(range, ", { }");
-                    lowerBound = 0;
                     upperBound = token.countTokens();
                 }
+                else
+                {
+                    throw new IllegalArgumentException("The variable domain is not defined!");
+                }
+
+                if(lowerBound < 0)
+                    negativeValuesIncluded = true;
 
                 final MinMax minMax = new MinMax(lowerBound,upperBound);
                 if(theoNbrOfReachableStates == 0)
@@ -185,13 +194,17 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
     //            int currDomain = upperBound+1-lowerBound;
                 final int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
+                var2domainMap.put(var.getName(), currDomain);
                 if(currDomain>domain)
                     domain = currDomain;
             }
         }
 
+//        negativeValuesIncluded = true;
         //we multiply the domain with 2 to add 1 extra bit for the sign
-        domain *= 2;
+        if(negativeValuesIncluded)
+            domain *= 2;
+        
         for(final AbstractSubject sub:module.getComponentListModifiable())
         {
             if(sub instanceof SimpleComponentSubject)
@@ -214,6 +227,16 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         }
 
         nbrOfEFAsVars = variables.size()+theExAutomata.size();
+    }
+
+    public int getVarDomain(String varName)
+    {
+        return var2domainMap.get(varName);
+    }
+
+    public boolean isNegativeValuesIncluded()
+    {
+        return negativeValuesIncluded;
     }
 
     public List<VariableComponentProxy> getRelatedVars(final VariableComponentProxy var)
