@@ -1621,9 +1621,7 @@ public abstract class TransitionListBuffer
 
     public boolean advance()
     {
-      if (mInnerIterator.advance()) {
-        return true;
-      } else {
+      while (!mInnerIterator.advance()) {
         do {
           mCurrentFromState++;
           if (mCurrentFromState >= mStateTransitions.length) {
@@ -1631,8 +1629,8 @@ public abstract class TransitionListBuffer
           }
         } while (mStateTransitions[mCurrentFromState] == NULL);
         mInnerIterator.reset(mCurrentFromState, mEvent);
-        return advance();
       }
+      return true;
     }
 
     public int getCurrentSourceState()

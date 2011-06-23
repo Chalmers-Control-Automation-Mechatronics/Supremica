@@ -398,6 +398,10 @@ public class OPConflictChecker
         mCurrentCompositionalSafetyVerifier =
           new ModularControllabilityChecker
             (factory, mCurrentMonolithicSafetyVerifier);
+        final int nlimit = getMonolithicStateLimit();
+        mCurrentMonolithicSafetyVerifier.setNodeLimit(nlimit);
+        final int tlimit = getMonolithicTransitionLimit();
+        mCurrentMonolithicSafetyVerifier.setTransitionLimit(tlimit);
       } else {
         mCurrentCompositionalSafetyVerifier = mCompositionalSafetyVerifier;
       }

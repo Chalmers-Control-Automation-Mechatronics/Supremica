@@ -64,7 +64,6 @@ public class ModularControllabilityChecker
     mChecker = checker;
     mStates = 0;
     mLeast = least;
-    setNodeLimit(2000000);
   }
 
 
