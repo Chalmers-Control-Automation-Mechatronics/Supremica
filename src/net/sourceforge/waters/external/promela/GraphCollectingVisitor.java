@@ -120,7 +120,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitVar(final VardefTreeNode t)
   {
-    // TODO Auto-generated method stub
+
     return null;
   }
 
@@ -140,7 +140,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final PlainEventListProxy eventList =
           mFactory.createPlainEventListProxy(list);
       final NodeProxy start = mFactory.createSimpleNodeProxy("empty", eventList, true, null, null, null);
-   //   mNodes.add(start);
+
       for(final Collection<SimpleExpressionProxy> s: sendData){
         String ename="s";
         for(final SimpleExpressionProxy ss: s){
@@ -302,12 +302,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
       chanData =(THashSet<IdentifierProxy>) ch.getRecData();
 
     }else{
-      System.out.println("oh ye");
+
       chanData = (THashSet<IdentifierProxy>)ch.getChannelData();
     }
     return new PromelaGraph(chanData,mFactory);
     }
-   // return new PromelaGraph(mVisitor.getChanEvent().get(chanName),mFactory);
+
   }
 
   public Object visitConstant(final ConstantTreeNode t)
@@ -399,7 +399,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     for(int i=0;i<t.getChildCount();i++){
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       result = PromelaGraph.combineComposition(result,step);
-     // result = PromelaGraph.sequentialComposition(result,step);
+
     }
 
   return result;
@@ -410,14 +410,14 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     while(!(tree instanceof ProctypeTreeNode)){
       tree = tree.getParent();
     }
-    //final String name = t.getParent().getParent().getChild(0).getText();
+
     final String name = tree.getText();
     PromelaGraph result = null;
     final PromelaNode endNode = new PromelaNode(PromelaNode.EndType.END);
     for(int i=0;i<t.getChildCount();i++){
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name,mSourceOfBreakNode);
-    //  result = PromelaGraph.combineComposition(result,step);
+
     }
     return result;
   }
@@ -433,7 +433,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
   }
   public Object visitLabel(final LabelTreeNode t)
   {
-    //TODO
+
     PromelaGraph result = null;
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
     result = PromelaGraph.sequentialComposition(result,step);

@@ -123,6 +123,5 @@ public class PromelaNode
   private final String mGotoLabel;
   private SimpleNodeProxy mNode;
 
-  // TODO Remove this
-  //private boolean mBreak,mEnd,mGoto;
+
 }
