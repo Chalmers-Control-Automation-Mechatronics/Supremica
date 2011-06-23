@@ -128,8 +128,8 @@ public class OPConflictChecker
     mPreselectingMethod = PreselectingMethod.MustL;
     mSelectingMethod = SelectingMethod.MinS;
     mSubsumptionEnabled = false;
-    mInternalStepNodeLimit = super.getNodeLimit();
-    mInternalStepTransitionLimit = super.getTransitionLimit();
+    mLowerInternalStateLimit = mUpperInternalStateLimit = super.getNodeLimit();
+    mInternalTransitionLimit = super.getTransitionLimit();
   }
 
 
@@ -229,34 +229,54 @@ public class OPConflictChecker
   @Override
   public int getNodeLimit()
   {
-    final int limit1 = getInternalStepNodeLimit();
-    final int limit2 = getFinalStepNodeLimit();
+    final int limit1 = getInternalStateLimit();
+    final int limit2 = getMonolithicStateLimit();
     return Math.max(limit1, limit2);
   }
 
   @Override
   public void setNodeLimit(final int limit)
   {
-    setInternalStepNodeLimit(limit);
-    setFinalStepNodeLimit(limit);
+    setInternalStateLimit(limit);
+    setMonolithicStateLimit(limit);
   }
 
-  public int getInternalStepNodeLimit()
+  public int getInternalStateLimit()
   {
-    return mInternalStepNodeLimit;
+    return Math.max(mLowerInternalStateLimit, mUpperInternalStateLimit);
   }
 
-  public void setInternalStepNodeLimit(final int limit)
+  public void setInternalStateLimit(final int limit)
   {
-    mInternalStepNodeLimit = limit;
+    mLowerInternalStateLimit = mUpperInternalStateLimit = limit;
   }
 
-  public int getFinalStepNodeLimit()
+  public int getLowerInternalStateLimit()
+  {
+    return mLowerInternalStateLimit;
+  }
+
+  public void setLowerInternalStateLimit(final int limit)
+  {
+    mLowerInternalStateLimit = limit;
+  }
+
+  public int getUpperInternalStateLimit()
+  {
+    return mUpperInternalStateLimit;
+  }
+
+  public void setUpperInternalStateLimit(final int limit)
+  {
+    mUpperInternalStateLimit = limit;
+  }
+
+  public int getMonolithicStateLimit()
   {
     return super.getNodeLimit();
   }
 
-  public void setFinalStepNodeLimit(final int limit)
+  public void setMonolithicStateLimit(final int limit)
   {
     super.setNodeLimit(limit);
   }
@@ -265,27 +285,35 @@ public class OPConflictChecker
   public void setTransitionLimit(final int limit)
   {
     super.setTransitionLimit(limit);
-    setInternalStepTransitionLimit(limit);
+    setInternalTransitionLimit(limit);
   }
 
-  public int getFinalStepTransitionLimit()
+  @Override
+  public int getTransitionLimit()
+  {
+    final int limit1 = getInternalTransitionLimit();
+    final int limit2 = getMonolithicTransitionLimit();
+    return Math.max(limit1, limit2);
+  }
+
+  public int getMonolithicTransitionLimit()
   {
     return super.getTransitionLimit();
   }
 
-  public void setFinalStepTransitionLimit(final int limit)
+  public void setMonolithicTransitionLimit(final int limit)
   {
     super.setTransitionLimit(limit);
   }
 
-  public int getInternalStepTransitionLimit()
+  public int getInternalTransitionLimit()
   {
-    return mInternalStepTransitionLimit;
+    return mInternalTransitionLimit;
   }
 
-  public void setInternalStepTransitionLimit(final int limit)
+  public void setInternalTransitionLimit(final int limit)
   {
-    mInternalStepTransitionLimit = limit;
+    mInternalTransitionLimit = limit;
   }
 
 
@@ -322,9 +350,7 @@ public class OPConflictChecker
         mCurrentSynchronousProductBuilder = mSynchronousProductBuilder;
       }
       mCurrentSynchronousProductBuilder.setPropositions(mPropositions);
-      final int nlimit = getInternalStepNodeLimit();
-      mCurrentSynchronousProductBuilder.setNodeLimit(nlimit);
-      final int tlimit = getInternalStepTransitionLimit();
+      final int tlimit = getInternalTransitionLimit();
       mCurrentSynchronousProductBuilder.setTransitionLimit(tlimit);
     }
   }
@@ -339,9 +365,9 @@ public class OPConflictChecker
       } else {
         mCurrentMonolithicConflictChecker = mMonolithicConflictChecker;
       }
-      final int nlimit = getFinalStepNodeLimit();
+      final int nlimit = getMonolithicStateLimit();
       mCurrentMonolithicConflictChecker.setNodeLimit(nlimit);
-      final int tlimit = getFinalStepTransitionLimit();
+      final int tlimit = getMonolithicTransitionLimit();
       mCurrentMonolithicConflictChecker.setTransitionLimit(tlimit);
       final KindTranslator translator = getKindTranslator();
       mCurrentMonolithicConflictChecker.setKindTranslator(translator);
@@ -362,9 +388,9 @@ public class OPConflictChecker
       } else {
         mCurrentMonolithicSafetyVerifier = mMonolithicSafetyVerifier;
       }
-      final int nlimit = getFinalStepNodeLimit();
+      final int nlimit = getMonolithicStateLimit();
       mCurrentMonolithicSafetyVerifier.setNodeLimit(nlimit);
-      final int tlimit = getFinalStepTransitionLimit();
+      final int tlimit = getMonolithicTransitionLimit();
       mCurrentMonolithicSafetyVerifier.setTransitionLimit(tlimit);
     }
     if (mCurrentCompositionalSafetyVerifier == null) {
@@ -387,8 +413,10 @@ public class OPConflictChecker
       setUp();
       initialiseEventsToAutomata();
       simplify(true);
-
+      boolean cancheck = true;
+      OverflowException lastOverflow = null;
       Collection<Candidate> candidates;
+      Candidate candidate = null;
       outer:
       do {
         subsystem:
@@ -401,26 +429,49 @@ public class OPConflictChecker
             }
           }
           candidates = mPreselectingHeuristic.findCandidates();
-          while (!candidates.isEmpty()) {
-            final Candidate candidate = selectCandidate(candidates);
+          candidate = selectCandidate(candidates);
+          while (candidate != null) {
             try {
               mEventHasDisappeared = false;
               applyCandidate(candidate);
               simplify(mEventHasDisappeared);
+              cancheck = true;
               continue subsystem;
             } catch (final OverflowException overflow) {
               recordUnsuccessfulComposition();
-              if (mNumOverflows++ >= MAX_OVERFLOWS) {
-                break subsystem;
-              }
               final List<AutomatonProxy> automata = candidate.getAutomata();
               mOverflowCandidates.add(automata);
               candidates.remove(candidate);
+              candidate = selectCandidate(candidates);
             }
           }
-        } while (!candidates.isEmpty());
-        runMonolithicConflictCheck();
-      } while (!mGotGlobalResult && popEventDisjointSubsystem());
+        } while (candidate != null);
+        try {
+          if (cancheck) {
+            runMonolithicConflictCheck();
+            lastOverflow = null;
+          }
+        } catch (final OverflowException overflow) {
+          lastOverflow = overflow;
+          cancheck = false;
+        }
+        if (lastOverflow != null) {
+          if (mCurrentInternalStateLimit < mUpperInternalStateLimit) {
+            mCurrentInternalStateLimit =
+              Math.min(2 * mCurrentInternalStateLimit, mUpperInternalStateLimit);
+            mOverflowCandidates.clear();
+            final Logger logger = getLogger();
+            if (logger.isDebugEnabled()) {
+              final String msg =
+                "State limit increased to " + mCurrentInternalStateLimit + ".";
+              logger.debug(msg);
+            }
+          } else {
+            throw lastOverflow;
+          }
+        }
+      } while (lastOverflow != null ||
+               !mGotGlobalResult && popEventDisjointSubsystem());
 
       if (mPreliminaryCounterexample == null) {
         return setSatisfiedResult();
@@ -498,8 +549,8 @@ public class OPConflictChecker
     setupMonolithicConflictChecker();
     setupSafetyVerifiers();
     mModifyingSteps = new ArrayList<AbstractionStep>();
-    mNumOverflows = 0;
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
+    mCurrentInternalStateLimit = mLowerInternalStateLimit;
     mGotGlobalResult = false;
     mPreliminaryCounterexample = null;
   }
@@ -919,12 +970,13 @@ public class OPConflictChecker
       final List<AutomatonProxy> subSystemAutomataList =
         new ArrayList<AutomatonProxy>(subSystemAutomata);
       Collections.sort(subSystemAutomataList);
-      final SubSystem task =
-        new SubSystem(subSystemEvents, subSystemAutomataList);
+      final SubSystem task = new SubSystem(subSystemEvents,
+                                           subSystemAutomataList,
+                                           mCurrentInternalStateLimit);
       tasks.add(task);
     }
     for (final AutomatonProxy aut : remainingAutomata) {
-      final SubSystem task = new SubSystem(aut);
+      final SubSystem task = new SubSystem(aut, mCurrentInternalStateLimit);
       tasks.add(task);
     }
     final Iterator<SubSystem> iter = tasks.iterator();
@@ -950,7 +1002,8 @@ public class OPConflictChecker
       final List<EventProxy> events =
         new ArrayList<EventProxy>(mEventInfoMap.keySet());
       Collections.sort(events);
-      final SubSystem current = new SubSystem(events, mCurrentAutomata);
+      final SubSystem current =
+        new SubSystem(events, mCurrentAutomata, mCurrentInternalStateLimit);
       mProcessedSubsystems.add(current);
       final SubSystem next = Collections.min(mPostponedSubsystems);
       mPostponedSubsystems.remove(next);
@@ -962,6 +1015,7 @@ public class OPConflictChecker
   private void loadSubSystem(final SubSystem task)
   {
     mCurrentAutomata = task.getAutomata();
+    mCurrentInternalStateLimit = task.getStateLimit();
     mEventInfoMap.clear();
     for (final AutomatonProxy aut : mCurrentAutomata) {
       addEventsToAutomata(aut);
@@ -999,8 +1053,9 @@ public class OPConflictChecker
     Collections.sort(events);
     final ProductDESProxy des = createDES(events, mCurrentAutomata);
     mCurrentMonolithicConflictChecker.setModel(des);
-    removeEventsToAutomata(mCurrentAutomata);
     mCurrentMonolithicConflictChecker.run();
+    // Do not clean up before run, keep data just in case of overflow ...
+    removeEventsToAutomata(mCurrentAutomata);
     final VerificationResult result =
       mCurrentMonolithicConflictChecker.getAnalysisResult();
     recordStatistics(result);
@@ -1228,24 +1283,29 @@ public class OPConflictChecker
    * Performs the second step of candidate selection.
    * @param  preselected  List of preselected candidates from step&nbsp;1.
    * @return Preferred candidate from the given list, taking subsumption
-   *         into account.
+   *         into account, or <CODE>null</CODE> if no suitable candidate
+   *         could be found within the state limits.
    */
   private Candidate selectCandidate(final Collection<Candidate> preselected)
   throws AnalysisException
   {
-    final Candidate result = mSelectingHeuristic.selectCandidate(preselected);
-    if (mSubsumptionEnabled) {
-      final Collection<Candidate> subsumedBy = new LinkedList<Candidate>();
-      for (final Candidate candidate : preselected) {
-        if (candidate.subsumes(result)) {
-          subsumedBy.add(candidate);
+    if (preselected.isEmpty()) {
+      return null;
+    } else {
+      final Candidate result = mSelectingHeuristic.selectCandidate(preselected);
+      if (mSubsumptionEnabled) {
+        final Collection<Candidate> subsumedBy = new LinkedList<Candidate>();
+        for (final Candidate candidate : preselected) {
+          if (candidate.subsumes(result)) {
+            subsumedBy.add(candidate);
+          }
+        }
+        if (!subsumedBy.isEmpty()) {
+          return selectCandidate(subsumedBy);
         }
       }
-      if (!subsumedBy.isEmpty()) {
-        return selectCandidate(subsumedBy);
-      }
+      return result;
     }
-    return result;
   }
 
 
@@ -1401,6 +1461,7 @@ public class OPConflictChecker
       mCurrentSynchronousProductBuilder.addMask(local, tau);
       expectedNumberOfEvents++;
     }
+    mCurrentSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
     try {
       mCurrentSynchronousProductBuilder.run();
       final AutomatonProxy sync =
@@ -1937,7 +1998,7 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Constructors
-    private SubSystem(final AutomatonProxy aut)
+    private SubSystem(final AutomatonProxy aut, final int limit)
     {
       final Collection<EventProxy> events = aut.getEvents();
       final int numEvents = events.size();
@@ -1949,13 +2010,16 @@ public class OPConflictChecker
       }
       mAutomata = new ArrayList<AutomatonProxy>(1);
       mAutomata.add(aut);
+      mStateLimit = limit;
     }
 
     private SubSystem(final List<EventProxy> events,
-                      final List<AutomatonProxy> automata)
+                      final List<AutomatonProxy> automata,
+                      final int limit)
     {
       mEvents = events;
       mAutomata = automata;
+      mStateLimit = limit;
     }
 
     //#######################################################################
@@ -1989,10 +2053,16 @@ public class OPConflictChecker
       return mAutomata;
     }
 
+    private int getStateLimit()
+    {
+      return mStateLimit;
+    }
+
     //#######################################################################
     //# Data Members
     private final List<EventProxy> mEvents;
     private final List<AutomatonProxy> mAutomata;
+    private final int mStateLimit;
 
   }
 
@@ -2517,7 +2587,7 @@ public class OPConflictChecker
     {
       final ProductDESProxyFactory factory = getFactory();
       final Comparator<Candidate> comparator = getComparator();
-      int limit = mInternalStepNodeLimit;
+      int limit = mCurrentInternalStateLimit;
       mCurrentSynchronousProductBuilder.setNodeLimit(limit);
       Candidate best = null;
       for (final Candidate candidate : candidates) {
@@ -3251,7 +3321,6 @@ public class OPConflictChecker
       final KindTranslator translator = getKindTranslator();
       mSimplifier = new OPSearchAutomatonSimplifier(factory, translator);
       mSimplifier.setPropositions(mPropositions);
-      mSimplifier.setNodeLimit(mInternalStepNodeLimit);
     }
 
     //#######################################################################
@@ -3268,6 +3337,7 @@ public class OPConflictChecker
         mSimplifier.setModel(aut);
         mSimplifier.setHiddenEvents(hidden);
         mSimplifier.setOutputHiddenEvent(tau);
+        mSimplifier.setNodeLimit(mCurrentInternalStateLimit);
         mSimplifier.run();
         final PartitionedAutomatonResult result =
           mSimplifier.getAnalysisResult();
@@ -4745,8 +4815,9 @@ public class OPConflictChecker
   private EventProxy mCurrentDefaultMarking;
   private EventProxy mPreconditionMarking;
   private Collection<EventProxy> mPropositions;
-  private int mInternalStepNodeLimit;
-  private int mInternalStepTransitionLimit;
+  private int mLowerInternalStateLimit;
+  private int mUpperInternalStateLimit;
+  private int mInternalTransitionLimit;
 
   private AbstractionMethod mAbstractionMethod;
   private PreselectingMethod mPreselectingMethod;
@@ -4775,7 +4846,7 @@ public class OPConflictChecker
   private List<AbstractionStep> mModifyingSteps;
   private Set<String> mUsedEventNames;
   private Set<List<AutomatonProxy>> mOverflowCandidates;
-  private int mNumOverflows;
+  private int mCurrentInternalStateLimit;
   private boolean mGotGlobalResult;
   private ConflictTraceProxy mPreliminaryCounterexample;
 
@@ -4790,8 +4861,6 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Class Constants
-  private static final int MAX_OVERFLOWS = 50;
-
   private static final byte UNKNOWN_SELFLOOP = 0;
   private static final byte ONLY_SELFLOOP = 1;
   private static final byte NOT_ONLY_SELFLOOP = 2;

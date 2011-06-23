@@ -43,9 +43,9 @@ public class OPSearchConflictCheckerTest extends
   {
     final OPConflictChecker checker = new OPConflictChecker(factory);
     checker.setAbstractionMethod(OPConflictChecker.AbstractionMethod.OPSEARCH);
-    checker.setInternalStepNodeLimit(50000);
-    checker.setFinalStepNodeLimit(100000);
-    checker.setInternalStepTransitionLimit(500000);
+    checker.setInternalStateLimit(50000);
+    checker.setMonolithicStateLimit(100000);
+    checker.setInternalTransitionLimit(500000);
     return checker;
   }
 

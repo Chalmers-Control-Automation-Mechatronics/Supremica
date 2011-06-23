@@ -44,9 +44,9 @@ public class NBAbstractionStandardConflictCheckerTest
   {
     final OPConflictChecker checker = new OPConflictChecker(factory);
     checker.setAbstractionMethod(OPConflictChecker.AbstractionMethod.NB);
-    checker.setInternalStepNodeLimit(5000);
-    checker.setFinalStepNodeLimit(100000);
-    checker.setInternalStepTransitionLimit(500000);
+    checker.setInternalStateLimit(5000);
+    checker.setMonolithicStateLimit(100000);
+    checker.setInternalTransitionLimit(500000);
     //checker.setPreselectingMethod(OPConflictChecker.PreselectingMethod.MaxS);
     //checker.setSelectingMethod(OPConflictChecker.SelectingMethod.MaxL);
     return checker;

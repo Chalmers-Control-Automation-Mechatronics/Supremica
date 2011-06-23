@@ -60,9 +60,11 @@ public class ProjectingModelVerifierFactory
   private ProjectingModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
-    addArgument(new FinalStateLimitArgument());
+    addArgument(new MonolithicStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
-    addArgument(new FinalTransitionLimitArgument());
+    addArgument(new LowerInternalStateLimitArgument());
+    addArgument(new UpperInternalStateLimitArgument());
+    addArgument(new MonolithicTransitionLimitArgument());
     addArgument(new InternalTransitionLimitArgument());
     addArgument(new AbstractionMethodArgument());
     addArgument(new PreselectingMethodArgument());
@@ -102,16 +104,16 @@ public class ProjectingModelVerifierFactory
 
   //#########################################################################
   //# Inner Class FinalStateLimitArgument
-  private static class FinalStateLimitArgument extends
+  private static class MonolithicStateLimitArgument extends
       CommandLineArgumentInteger
   {
 
     //#######################################################################
     //# Constructors
-    private FinalStateLimitArgument()
+    private MonolithicStateLimitArgument()
     {
-      super("-fslimit",
-            "Maximum number of states constructed in final composition");
+      super("-mslimit",
+            "Maximum number of states constructed in final monolithic composition");
     }
 
     //#######################################################################
@@ -122,7 +124,7 @@ public class ProjectingModelVerifierFactory
       final int limit = getValue();
       if (verifier instanceof OPConflictChecker) {
         final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setFinalStepNodeLimit(limit);
+        composer.setMonolithicStateLimit(limit);
       } else {
         verifier.setNodeLimit(limit);
       }
@@ -153,7 +155,7 @@ public class ProjectingModelVerifierFactory
       final int limit = getValue();
       if (verifier instanceof OPConflictChecker) {
         final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setInternalStepNodeLimit(limit);
+        composer.setInternalStateLimit(limit);
       } else {
         verifier.setNodeLimit(limit);
       }
@@ -163,17 +165,17 @@ public class ProjectingModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class FinalTransitionLimitArgument
-  private static class FinalTransitionLimitArgument extends
+  //# Inner Class LowerInternalStateLimitArgument
+  private static class LowerInternalStateLimitArgument extends
       CommandLineArgumentInteger
   {
 
     //#######################################################################
     //# Constructors
-    private FinalTransitionLimitArgument()
+    private LowerInternalStateLimitArgument()
     {
-      super("-ftlimit",
-            "Maximum number of transitions constructed in final composition");
+      super("-lslimit",
+            "Initial maximum number of states for abstraction attempts");
     }
 
     //#######################################################################
@@ -184,7 +186,69 @@ public class ProjectingModelVerifierFactory
       final int limit = getValue();
       if (verifier instanceof OPConflictChecker) {
         final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setFinalStepTransitionLimit(limit);
+        composer.setLowerInternalStateLimit(limit);
+      } else {
+        verifier.setNodeLimit(limit);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class UpperInternalStateLimitArgument
+  private static class UpperInternalStateLimitArgument extends
+      CommandLineArgumentInteger
+  {
+
+    //#######################################################################
+    //# Constructors
+    private UpperInternalStateLimitArgument()
+    {
+      super("-uslimit",
+            "Final maximum number of states for abstraction attempts");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final int limit = getValue();
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
+        composer.setUpperInternalStateLimit(limit);
+      } else {
+        verifier.setNodeLimit(limit);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class FinalTransitionLimitArgument
+  private static class MonolithicTransitionLimitArgument extends
+      CommandLineArgumentInteger
+  {
+
+    //#######################################################################
+    //# Constructors
+    private MonolithicTransitionLimitArgument()
+    {
+      super("-mtlimit",
+            "Maximum number of transitions constructed in final monolithic composition");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final int limit = getValue();
+      if (verifier instanceof OPConflictChecker) {
+        final OPConflictChecker composer = (OPConflictChecker) verifier;
+        composer.setMonolithicTransitionLimit(limit);
       } else {
         verifier.setTransitionLimit(limit);
       }
@@ -215,7 +279,7 @@ public class ProjectingModelVerifierFactory
       final int limit = getValue();
       if (verifier instanceof OPConflictChecker) {
         final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setInternalStepTransitionLimit(limit);
+        composer.setInternalTransitionLimit(limit);
       } else {
         verifier.setTransitionLimit(limit);
       }

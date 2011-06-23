@@ -1,6 +1,6 @@
 /*
  * A test for the Promela importer in Waters.
- * This tests whether a goto-statement inside a if-statement can be processed.
+ * This tests whether a goto-statement inside an if-statement can be processed.
  */
 
 #define a 1

@@ -44,9 +44,9 @@ public class GNBAbstractionStandardConflictCheckerTest extends
   {
     final OPConflictChecker checker = new OPConflictChecker(factory);
     checker.setAbstractionMethod(OPConflictChecker.AbstractionMethod.GNB);
-    checker.setInternalStepNodeLimit(5000);
-    checker.setFinalStepNodeLimit(100000);
-    checker.setInternalStepTransitionLimit(500000);
+    checker.setInternalStateLimit(5000);
+    checker.setMonolithicStateLimit(100000);
+    checker.setInternalTransitionLimit(500000);
     return checker;
   }
 

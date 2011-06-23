@@ -45,7 +45,7 @@ public class GNBAbstractionSICProperty6VerifierTest
   {
     final OPConflictChecker checker = new OPConflictChecker(factory);
     checker.setAbstractionMethod(OPConflictChecker.AbstractionMethod.GNB);
-    checker.setInternalStepNodeLimit(5000);
+    checker.setInternalStateLimit(5000);
     return new SICProperty6Verifier(checker, factory);
   }
 
