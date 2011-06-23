@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,7 @@ import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
-import net.sourceforge.waters.external.promela.ast.GotolTreeNode;
+import net.sourceforge.waters.external.promela.ast.GotoTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.LabelTreeNode;
@@ -62,6 +61,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
   Collection<SimpleComponentProxy> mComponents = new ArrayList<SimpleComponentProxy>();
 
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
+
+  Map<String,PromelaNode> mGotoNode = new HashMap<String,PromelaNode>();
+
   public GraphCollectingVisitor(final EventCollectingVisitor v){
     mVisitor = v;
     mFactory = v.getFactory();
@@ -192,10 +194,31 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitProcTypeStatement(final ProctypeStatementTreeNode t)
   {
+    final List<PromelaNode> removeNode = new ArrayList<PromelaNode>();
+    final List<PromelaEdge> removeEdge = new ArrayList<PromelaEdge>();
+    final List<PromelaEdge> addEdge = new ArrayList<PromelaEdge>();
     PromelaGraph result = null;
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
     result = PromelaGraph.sequentialComposition(result,step);
-
+    for(final PromelaNode n: result.getNodes()){
+      if(n.isGoto()){
+        removeNode.add(n);
+        final String name = n.getGotoLabel();
+        final PromelaNode newNode = mGotoNode.get(name);
+        for(final PromelaEdge e: result.getEdges()){
+          if(e.getTarget()==n){
+            final PromelaLabel label = e.getLabelBlock();
+            final PromelaNode sourceNode = e.getSource();
+            removeEdge.add(e);
+            final PromelaEdge newEdge = new PromelaEdge(sourceNode,newNode,label);
+            addEdge.add(newEdge);
+          }
+        }
+      }
+    }
+    result.getEdges().removeAll(removeEdge);
+    result.getEdges().addAll(addEdge);
+    result.getNodes().removeAll(removeNode);
     return result;
   }
 
@@ -410,26 +433,23 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
   }
   public Object visitLabel(final LabelTreeNode t)
   {
+    //TODO
     PromelaGraph result = null;
-    if(t.getChildCount()>0){
-      /*for(int i=0;i<t.getChildCount();i++){
-        final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-        result = PromelaGraph.sequentialComposition(result,step);
-      }*/
-      final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
-      result = PromelaGraph.sequentialComposition(result,step);
-      return result;
-    }
-    else{
-      final Hashtable<String,LabelTreeNode> labels = new Hashtable<String,LabelTreeNode>(mVisitor.getGotoLabel());
-      visitLabel(labels.get(t.getText()));
-    }
+    final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
+    result = PromelaGraph.sequentialComposition(result,step);
+    mGotoNode.put(t.getText(), result.getStart());
     return result;
   }
-  public Object visitGoto(final GotolTreeNode t)
+
+  public Object visitGoto(final GotoTreeNode t)
   {
-    // TODO Auto-generated method stub
-    return null;
+    final String labelName = t.getText();
+    final PromelaNode node = new PromelaNode(labelName); //creating goto label
+    final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
+    cNodes.add(node);
+    final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
+    final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
+    return result;
   }
 
 

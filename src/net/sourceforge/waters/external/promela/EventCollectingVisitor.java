@@ -14,7 +14,7 @@ import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.ConstantTreeNode;
 import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
-import net.sourceforge.waters.external.promela.ast.GotolTreeNode;
+import net.sourceforge.waters.external.promela.ast.GotoTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
 import net.sourceforge.waters.external.promela.ast.LabelTreeNode;
@@ -404,7 +404,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     return null;
   }
 
-  public Object visitGoto(final GotolTreeNode t)
+  public Object visitGoto(final GotoTreeNode t)
   {
     // TODO Auto-generated method stub
     return null;

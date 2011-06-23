@@ -10,6 +10,11 @@ public class PromelaLabel
   public PromelaLabel(final Collection<SimpleExpressionProxy> label){
     mLabelBlock = label;
   }
+  public PromelaLabel()
+  {
+    // TODO Auto-generated constructor stub
+    mLabelBlock = null;
+  }
   public Collection<SimpleExpressionProxy> getLabel(){
     return mLabelBlock;
   }

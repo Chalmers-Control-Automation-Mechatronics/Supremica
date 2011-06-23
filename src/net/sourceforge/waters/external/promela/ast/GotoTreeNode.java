@@ -4,9 +4,9 @@ import net.sourceforge.waters.external.promela.PromelaVisitor;
 
 import org.antlr.runtime.Token;
 
-public class GotolTreeNode extends PromelaTree
+public class GotoTreeNode extends PromelaTree
 {
-  public GotolTreeNode(final Token token){
+  public GotoTreeNode(final Token token){
       super(token);
       mCondition = token.getText();
   }
