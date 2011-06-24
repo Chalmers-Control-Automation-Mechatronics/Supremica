@@ -17,6 +17,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -26,6 +27,15 @@ import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
+import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_apropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_bpropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
@@ -74,17 +84,6 @@ import org.supremica.gui.ide.actions.SaveAsAction;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
-
-import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_apropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_bpropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
 
 
 /**

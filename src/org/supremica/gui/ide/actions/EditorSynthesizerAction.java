@@ -20,19 +20,9 @@ import java.util.Vector;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.subject.base.AbstractSubject;
 
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomata;
@@ -130,6 +120,7 @@ public class EditorSynthesizerAction
             return;
         }
 
+        @SuppressWarnings("unused")
         double numberOfSupervisorStates = 0;
 
         //Time optimization method
