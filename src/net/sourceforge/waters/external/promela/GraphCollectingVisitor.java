@@ -427,7 +427,6 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name,mSourceOfBreakNode);
     }
-    final String input = name+counter;
     mLabelEnd.put(""+counter,endNode);
 
     return result;
@@ -471,8 +470,6 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     while(!(tree instanceof ProctypeTreeNode)){
       tree = tree.getParent();
     }
-    final String name = tree.getText();
-    final String input = name+counter;
     final PromelaNode node = mLabelEnd.get(""+counter);
     final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
     cNodes.add(node);
