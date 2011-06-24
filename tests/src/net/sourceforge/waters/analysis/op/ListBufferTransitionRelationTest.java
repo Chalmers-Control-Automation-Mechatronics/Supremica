@@ -411,6 +411,21 @@ public class ListBufferTransitionRelationTest extends
     testIteratorTransitionRemoval(group, subdir, name, autname, config);
   }
 
+  public void testReachability()
+  throws Exception
+  {
+    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+      ("test", ComponentKind.PLANT, 2, 0, 2,
+       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    rel.setInitial(0, true);
+    rel.addTransition(0, 1, 0);
+    assertTrue(rel.isReachable(0));
+    assertTrue(rel.isReachable(1));
+    rel.checkReachability();
+    assertTrue(rel.isReachable(0));
+    assertFalse(rel.isReachable(1));
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractAnalysisTest

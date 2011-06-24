@@ -252,12 +252,38 @@ public class LimitedCertainConflictsTRSimplifier
 
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     numReachable = rel.getNumberOfReachableStates();
-    if (numCoreachable == numReachable - 1) {
+    if (numCoreachable == 0) {
+      // No coreachable states. Merge all reachable states into a single
+      // blocking state, and be sure to remove all transitions.
+      if (numReachable > 1) {
+        result = true;
+        final int[] clazz = new int[numReachable];
+        int index = 0;
+        for (int state = 0; state < numStates; state++) {
+          if (rel.isReachable(state)) {
+            clazz[index++] = state;
+            rel.removeOutgoingTransitions(state);
+          }
+        }
+        final int[][] partition = new int[1][];
+        partition[0] = clazz;
+        setResultPartitionArray(partition);
+        applyResultPartitionAutomatically();
+      } else {
+        result = mHasRemovedTransitions;
+        for (int state = 0; state < numStates; state++) {
+          if (rel.isReachable(state)) {
+            result |= rel.removeOutgoingTransitions(state);
+            break;
+          }
+        }
+      }
+    } else if (numCoreachable == numReachable - 1) {
       // Only one state of certain conflicts. No result partition,
       // but let us try to add selfloops and remove events.
       int bstate;
       for (bstate = 0; bstate < numStates; bstate++) {
-        if (mStateInfo[bstate] != COREACHABLE) {
+        if (rel.isReachable(bstate) && mStateInfo[bstate] != COREACHABLE) {
           break;
         }
       }
