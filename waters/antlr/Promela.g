@@ -444,7 +444,7 @@ visibleRule
 	;
 	
 constRule
-	:	TRUE | FALSE | SKIP 
+	:	TRUE | FALSE | SKIP -> ^(SKIP<SkipTreeNode>)
 		| NUMBER -> ^(NUMBER <ConstantTreeNode>)
 		| CHARLITERAL
 	;

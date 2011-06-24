@@ -29,6 +29,7 @@ import net.sourceforge.waters.external.promela.ast.ReceiveTreeNode;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
 import net.sourceforge.waters.external.promela.ast.SendTreeNode;
+import net.sourceforge.waters.external.promela.ast.SkipTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -51,6 +52,7 @@ import org.antlr.runtime.tree.Tree;
 
 public class GraphCollectingVisitor implements PromelaVisitor
 {
+  private int counter;
   private final ModuleProxyFactory mFactory;
   private EventCollectingVisitor mVisitor=null;
   ArrayList<String> labels = new ArrayList<String>();
@@ -63,6 +65,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
 
   Map<String,PromelaNode> mGotoNode = new HashMap<String,PromelaNode>();
+
+  Map<String,PromelaNode> mLabelEnd = new HashMap<String,PromelaNode>();
 
   public GraphCollectingVisitor(final EventCollectingVisitor v){
     mVisitor = v;
@@ -194,6 +198,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitProcTypeStatement(final ProctypeStatementTreeNode t)
   {
+    counter = 0;
     final List<PromelaNode> removeNode = new ArrayList<PromelaNode>();
     final List<PromelaEdge> removeEdge = new ArrayList<PromelaEdge>();
     final List<PromelaEdge> addEdge = new ArrayList<PromelaEdge>();
@@ -381,8 +386,11 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     PromelaGraph result = null;
 
       for(int i=0;i<t.getChildCount();i++){
+
         final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
+        //if(!(t.getChild(i).getChild(0) instanceof SkipTreeNode)){
         result = PromelaGraph.sequentialComposition(result,step);
+      //  }
       }
 
     return result;
@@ -406,6 +414,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
   }
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
+    counter =counter+1;
     Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode)){
       tree = tree.getParent();
@@ -417,8 +426,10 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     for(int i=0;i<t.getChildCount();i++){
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name,mSourceOfBreakNode);
-
     }
+    final String input = name+counter;
+    mLabelEnd.put(""+counter,endNode);
+
     return result;
   }
   public Object visitBreak(final BreakStatementTreeNode t)
@@ -435,9 +446,11 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
   {
 
     PromelaGraph result = null;
+
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
     result = PromelaGraph.sequentialComposition(result,step);
     mGotoNode.put(t.getText(), result.getStart());
+
     return result;
   }
 
@@ -449,6 +462,22 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     cNodes.add(node);
     final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
     final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
+    return result;
+  }
+  public Object visitSkip(final SkipTreeNode t)
+  {
+    // TODO Auto-generated method stub
+    Tree tree = t;
+    while(!(tree instanceof ProctypeTreeNode)){
+      tree = tree.getParent();
+    }
+    final String name = tree.getText();
+    final String input = name+counter;
+    final PromelaNode node = mLabelEnd.get(""+counter);
+    final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
+    cNodes.add(node);
+    final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
+    final PromelaGraph result = new PromelaGraph(cNodes,cEdges,node);
     return result;
   }
 

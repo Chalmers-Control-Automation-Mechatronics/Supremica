@@ -28,6 +28,7 @@ import net.sourceforge.waters.external.promela.ast.ReceiveTreeNode;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
 import net.sourceforge.waters.external.promela.ast.SendTreeNode;
+import net.sourceforge.waters.external.promela.ast.SkipTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -395,16 +396,23 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitLabel(final LabelTreeNode t)
   {
-    for(int i=0;i<t.getChildCount();i++){
+   /* for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     if(t.getChildCount()>0){
       gotoLabel.put(t.getText(),t);
     }
+    */
     return null;
   }
 
   public Object visitGoto(final GotoTreeNode t)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Object visitSkip(final SkipTreeNode t)
   {
     // TODO Auto-generated method stub
     return null;

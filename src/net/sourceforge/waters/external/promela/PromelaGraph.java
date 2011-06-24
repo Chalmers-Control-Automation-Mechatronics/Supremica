@@ -150,6 +150,36 @@ public class PromelaGraph
             }
             nodesOfResult.add(nodesOfSecond.get(0));
             output = new PromelaGraph(nodesOfResult,edgesOfResult,first.getStart());
+          }else{
+            for (final PromelaEdge edge : edgesOfFirst) {
+              if (edge.getTarget().isEnd()) {
+                final PromelaNode sourceNode = edge.getSource();
+                final PromelaLabel label = edge.getLabelBlock();
+                final PromelaEdge newEdge = new PromelaEdge(sourceNode,nodesOfSecond.get(0),label);
+
+                edgesOfResult.add(newEdge);
+              } else if(edge.getSource().isEnd()){
+                final PromelaNode targetNode = edge.getTarget();
+                final PromelaLabel label = edge.getLabelBlock();
+                final PromelaEdge newEdge = new PromelaEdge(nodesOfSecond.get(0),targetNode,label);
+
+                edgesOfResult.add(newEdge);
+              }
+                else {
+
+                edgesOfResult.add(edge);
+              }
+            }
+            //possible bug if first graph only has 1 node
+            final List<PromelaNode> nodesOfResult =
+              new ArrayList<PromelaNode>(nodesOfFirst.size());
+            for (final PromelaNode node : nodesOfFirst) {
+              if(!node.isEnd()){
+                nodesOfResult.add(node);
+              }
+            }
+            nodesOfResult.add(nodesOfSecond.get(0));
+            output = new PromelaGraph(nodesOfResult,edgesOfResult,first.getStart());
           }
       }else{
 

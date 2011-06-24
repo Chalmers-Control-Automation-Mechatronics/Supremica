@@ -19,6 +19,7 @@ import net.sourceforge.waters.external.promela.ast.ReceiveTreeNode;
 import net.sourceforge.waters.external.promela.ast.RunTreeNode;
 import net.sourceforge.waters.external.promela.ast.SemicolonTreeNode;
 import net.sourceforge.waters.external.promela.ast.SendTreeNode;
+import net.sourceforge.waters.external.promela.ast.SkipTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
 
@@ -67,5 +68,7 @@ public interface PromelaVisitor
   public Object visitLabel(LabelTreeNode t);
 
   public Object visitGoto(GotoTreeNode t);
+
+  public Object visitSkip(SkipTreeNode t);
 
 }
