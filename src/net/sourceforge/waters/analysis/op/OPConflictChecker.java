@@ -1937,7 +1937,7 @@ public class OPConflictChecker
       @Override
       SelectingHeuristic createHeuristic(final OPConflictChecker checker)
       {
-        final Comparator<Candidate> alt = MaxL.createComparator(checker);
+        final Comparator<Candidate> alt = MinS.createComparator(checker);
         return checker.new HeuristicMinSync(alt);
       }
     };
@@ -2590,11 +2590,13 @@ public class OPConflictChecker
     throws AnalysisException
     {
       final ProductDESProxyFactory factory = getFactory();
+      final List<Candidate> list = new ArrayList<Candidate>(candidates);
       final Comparator<Candidate> comparator = getComparator();
+      Collections.sort(list, comparator);
       int limit = mCurrentInternalStateLimit;
       mCurrentSynchronousProductBuilder.setNodeLimit(limit);
       Candidate best = null;
-      for (final Candidate candidate : candidates) {
+      for (final Candidate candidate : list) {
         final ProductDESProxy des = candidate.createProductDESProxy(factory);
         mCurrentSynchronousProductBuilder.setModel(des);
         try {
@@ -2602,12 +2604,10 @@ public class OPConflictChecker
           final AutomatonProxy aut =
             mCurrentSynchronousProductBuilder.getComputedAutomaton();
           final int size = aut.getStates().size();
-          if (size < limit) {
+          if (size < limit || best == null) {
             best = candidate;
             limit = size;
             mCurrentSynchronousProductBuilder.setNodeLimit(limit);
-          } else if (best == null || comparator.compare(candidate, best) < 0) {
-            best = candidate;
           }
         } catch (final OverflowException overflow) {
           // skip this one ...
