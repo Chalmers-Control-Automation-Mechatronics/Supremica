@@ -46,6 +46,31 @@ public class ActiveEventsTRSimplifier
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be stored.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
+   *          unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
@@ -119,13 +144,15 @@ public class ActiveEventsTRSimplifier
     private ActiveEventsStateHash()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      mForwardsTauClosureIterator = rel.createSuccessorsTauClosureIterator();
+      final TauClosure forwardTauClosure =
+        rel.createSuccessorsTauClosure(mTransitionLimit);
+      mForwardsTauClosureIterator = forwardTauClosure.createIterator();
       mForwardsEventIterator = rel.createSuccessorsReadOnlyIterator();
-      mBackwardsTauClosureIterator1 =
-        rel.createPredecessorsTauClosureIterator();
+      final TauClosure backwardTauClosure =
+        rel.createPredecessorsTauClosure(mTransitionLimit);
+      mBackwardsTauClosureIterator1 = backwardTauClosure.createIterator();
       mBackwardsEventIterator = rel.createPredecessorsReadOnlyIterator();
-      mBackwardsTauClosureIterator2 =
-        rel.createPredecessorsTauClosureIterator();
+      mBackwardsTauClosureIterator2 = backwardTauClosure.createIterator();
       mCurrentSet1 = new TIntHashSet();
       mCurrentSet2 = new TIntHashSet();
       mPreviousRoot = -1;
@@ -322,6 +349,7 @@ public class ActiveEventsTRSimplifier
       }
     }
 
+
     //#######################################################################
     //# Data Members
     private final TransitionIterator mForwardsTauClosureIterator;
@@ -340,5 +368,10 @@ public class ActiveEventsTRSimplifier
     private static final long serialVersionUID = 1L;
 
   }
+
+
+  //#######################################################################
+  //# Data Members
+  private int mTransitionLimit = Integer.MAX_VALUE;
 
 }

@@ -951,81 +951,49 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Creates an iterator for the tau-closure of this buffer.
-   * The iterator returned is not initialised, so the method
-   * {@link TransitionIterator#resetState(int)} must be used before it can be
-   * used. After initialisation, the first state returned by the iterator is
-   * the start state of iteration, and it is followed by all successors
-   * reachable by sequences of {@link EventEncoding#TAU} events in depth-first
-   * order. The tau-closure iterator is a read-only iterator and does not
-   * implement the {@link TransitionIterator#remove()} method.
+   * Obtains the tau-closure of the successors of this transition relation.
+   * @param  limit    The maximum number of transitions that can be stored.
+   *                  If the number of transitions already in the transition
+   *                  relation plus the number of computed tau transitions
+   *                  exceeds the limit, precomputation is aborted and
+   *                  transitions will be produced on the fly by iterators.
+   *                  It limit of&nbsp;0 forces the tau closure always to
+   *                  be computed on the fly.
+   * @return A {@link TauClosure} object, which can be used to obtain
+   *         a {@link TransitionIterator} over the tau-closure of the
+   *         successor transition relation.
    */
-  public TransitionIterator createSuccessorsTauClosureIterator()
+  public TauClosure createSuccessorsTauClosure(final int limit)
   {
     if (mSuccessorBuffer != null) {
-      return mSuccessorBuffer.createTauClosureIterator();
+      return new TauClosure(mSuccessorBuffer, limit);
     } else {
       throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
   /**
-   * Creates a iterator for the tau-closure of this buffer that is set up
-   * to iterate over all states silently reachable form the given state.
-   * The first state returned by the iterator is the given state,
-   * and it is followed by all successors reachable by sequences of
-   * {@link EventEncoding#TAU} events in depth-first order. The tau-closure
-   * iterator is a read-only iterator and does not implement the
-   * {@link TransitionIterator#remove()} method.
+   * Obtains the tau-closure of the successors of this transition relation.
+   * @param  limit    The maximum number of transitions that can be stored.
+   *                  If the number of transitions already in the transition
+   *                  relation plus the number of computed tau transitions
+   *                  exceeds the limit, precomputation is aborted and
+   *                  transitions will be produced on the fly by iterators.
+   *                  It limit of&nbsp;0 forces the tau closure always to
+   *                  be computed on the fly.
+   * @return A {@link TauClosure} object, which can be used to obtain
+   *         a {@link TransitionIterator} over the tau-closure of the
+   *         predecessor transition relation.
    */
-  public TransitionIterator createSuccessorsTauClosureIterator
-    (final int state)
-  {
-    if (mSuccessorBuffer != null) {
-      return mSuccessorBuffer.createTauClosureIterator(state);
-    } else {
-      throw createNoBufferException(CONFIG_SUCCESSORS);
-    }
-  }
-
-  /**
-   * Creates an iterator for the backwards tau-closure of this buffer.
-   * The iterator returned is not initialised, so the method
-   * {@link TransitionIterator#resetState(int)} must be used before it can be
-   * used. After initialisation, the first state returned by the iterator is
-   * the start state of iteration, and it is followed by all predecessors
-   * reachable by sequences of {@link EventEncoding#TAU} events in depth-first
-   * order. The tau-closure iterator is a read-only iterator and does not
-   * implement the {@link TransitionIterator#remove()} method.
-   */
-  public TransitionIterator createPredecessorsTauClosureIterator()
+  public TauClosure createPredecessorsTauClosure(final int limit)
   {
     if (mPredecessorBuffer != null) {
-      return mPredecessorBuffer.createTauClosureIterator();
+      return new TauClosure(mPredecessorBuffer, limit);
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }
   }
 
-  /**
-   * Creates a iterator for the backwards tau-closure of this buffer
-   * that is set up to iterate over all states from which the given
-   * state is silently reachable.
-   * The first state returned by the iterator is the given state,
-   * and it is followed by all predecessors reachable by sequences of
-   * {@link EventEncoding#TAU} events in depth-first order. The tau-closure
-   * iterator is a read-only iterator and does not implement the
-   * {@link TransitionIterator#remove()} method.
-   */
-  public TransitionIterator createPredecessorsTauClosureIterator
-    (final int state)
-  {
-    if (mPredecessorBuffer != null) {
-      return mPredecessorBuffer.createTauClosureIterator(state);
-    } else {
-      throw createNoBufferException(CONFIG_PREDECESSORS);
-    }
-  }
 
   /**
    * Checks whether this transition relation represents a deterministic

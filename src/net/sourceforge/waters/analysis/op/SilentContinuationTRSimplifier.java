@@ -50,6 +50,31 @@ public class SilentContinuationTRSimplifier
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be stored.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
+   *          unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
@@ -154,11 +179,10 @@ public class SilentContinuationTRSimplifier
     private IncomingEquivalenceStateHash()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      mBackwardsTauClosureIterator1 =
-        rel.createPredecessorsTauClosureIterator();
+      final TauClosure closure = rel.createPredecessorsTauClosure(mTransitionLimit);
+      mBackwardsTauClosureIterator1 = closure.createIterator();
       mBackwardsEventIterator = rel.createPredecessorsReadOnlyIterator();
-      mBackwardsTauClosureIterator2 =
-        rel.createPredecessorsTauClosureIterator();
+      mBackwardsTauClosureIterator2 = closure.createIterator();
       mCurrentSet1 = new TIntHashSet();
       mCurrentSet2 = new TIntHashSet();
       mPreviousRoot = -1;
@@ -301,5 +325,10 @@ public class SilentContinuationTRSimplifier
     private static final long serialVersionUID = 1L;
 
   }
+
+
+  //#######################################################################
+  //# Data Members
+  private int mTransitionLimit = Integer.MAX_VALUE;
 
 }

@@ -156,8 +156,8 @@ public class LimitedCertainConflictsTRSimplifier
     final int numEvents = rel.getNumberOfProperEvents();
     final int eshift = AutomatonTools.log2(numEvents);
     final int root = 1 << (shift + eshift);
-    final TransitionIterator closureIter =
-      rel.createPredecessorsTauClosureIterator();
+    final TauClosure closure = rel.createPredecessorsTauClosure(0);
+    final TransitionIterator closureIter = closure.createIterator();
     final TransitionIterator succIter = rel.createSuccessorsReadOnlyIterator();
     boolean result = false;
     boolean modified;

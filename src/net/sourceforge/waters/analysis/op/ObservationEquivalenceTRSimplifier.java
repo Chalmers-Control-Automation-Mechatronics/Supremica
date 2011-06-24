@@ -14,7 +14,6 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntProcedure;
-import gnu.trove.TIntStack;
 import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
 
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 
@@ -191,8 +189,7 @@ public class ObservationEquivalenceTRSimplifier
   /**
    * Sets the transition limit. The transition limit specifies the maximum
    * number of transitions (including stored silent transitions of the
-   * transitive closure) that will be constructed. An attempt to store more
-   * transitions leads to an {@link OverflowException}.
+   * transitive closure) that will be stored.
    * @param limit
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
    *          unlimited number of transitions.
@@ -311,43 +308,7 @@ public class ObservationEquivalenceTRSimplifier
   {
     if (mTauPreds == null && mEquivalence != Equivalence.BISIMULATION) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
-      final int tau = EventEncoding.TAU;
-      final TransitionIterator iter =
-          rel.createPredecessorsReadOnlyIterator();
-      int numtrans = rel.getNumberOfTransitions();
-      final TIntHashSet hashTauPreds = new TIntHashSet();
-      final TIntArrayList listTauPreds = new TIntArrayList();
-      final TIntStack stack = new TIntStack();
-      mTauPreds = new int[numStates][];
-      for (int s = 0; s < numStates; s++) {
-        if (rel.isReachable(s)) {
-          hashTauPreds.add(s);
-          listTauPreds.add(s);
-          stack.push(s);
-          while (stack.size() > 0) {
-            final int taupred = stack.pop();
-            iter.reset(taupred, tau);
-            while (iter.advance()) {
-              final int pred = iter.getCurrentSourceState();
-              if (hashTauPreds.add(pred)) {
-                listTauPreds.add(pred);
-                stack.push(pred);
-              }
-            }
-          }
-          mTauPreds[s] = listTauPreds.toNativeArray();
-          numtrans += listTauPreds.size();
-          if (numtrans > mTransitionLimit) {
-            throw new OverflowException(OverflowKind.TRANSITION,
-                                        mTransitionLimit);
-          }
-          hashTauPreds.clear();
-          listTauPreds.clear();
-        } else {
-          mTauPreds[s] = EMPTY_ARRAY;
-        }
-      }
+      mTauPreds = rel.createPredecessorsTauClosure(mTransitionLimit);
     }
   }
 
@@ -361,8 +322,10 @@ public class ObservationEquivalenceTRSimplifier
       final int tau = EventEncoding.TAU;
       final TransitionIterator iter0 =
         rel.createAllTransitionsModifyingIterator();
+      final TransitionIterator iter1 = mTauPreds.createIterator();
       final TransitionIterator iter2 =
         rel.createPredecessorsReadOnlyIterator();
+      final TransitionIterator iter3 = mTauPreds.createIterator();
       trans:
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
@@ -371,7 +334,9 @@ public class ObservationEquivalenceTRSimplifier
         }
         final int source0 = iter0.getCurrentSourceState();
         final int target0 = iter0.getCurrentTargetState();
-        for (final int p1 : mTauPreds[target0]) {
+        iter1.resetState(target0);
+        while (iter1.advance()) {
+          final int p1 = iter1.getCurrentSourceState();
           iter2.reset(p1, e);
           while (iter2.advance()) {
             final int p2 = iter2.getCurrentSourceState();
@@ -383,7 +348,9 @@ public class ObservationEquivalenceTRSimplifier
               }
             } else {
               if (doNonTau && (p1 != target0 || p2 != source0)) {
-                for (final int p3 : mTauPreds[p2]) {
+                iter3.resetState(p2);
+                while (iter3.advance()) {
+                  final int p3 = iter3.getCurrentSourceState();
                   if (p3 == source0) {
                     iter0.remove();
                     mHasModifications = true;
@@ -565,7 +532,7 @@ public class ObservationEquivalenceTRSimplifier
       iter.resetEvent(EventEncoding.TAU);
       return iter;
     } else {
-      return new TauClosureTransitionIterator();
+      return mTauPreds.createIterator();
     }
   }
 
@@ -576,7 +543,7 @@ public class ObservationEquivalenceTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       return rel.createPredecessorsReadOnlyIterator(state, event);
     } else if (event == EventEncoding.TAU) {
-      return new TauClosureTransitionIterator(state);
+      return mTauPreds.createIterator(state);
     } else {
       return new ProperEventClosureTransitionIterator(state, event);
     }
@@ -968,112 +935,6 @@ public class ObservationEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class TauClosureTransitionIterator
-  private class TauClosureTransitionIterator implements TransitionIterator
-  {
-
-    //#######################################################################
-    //# Constructor
-    private TauClosureTransitionIterator()
-    {
-      mTarget = -1;
-      mTauPreds = EMPTY_ARRAY;
-      mIndex = -1;
-    }
-
-    private TauClosureTransitionIterator(final int target)
-    {
-      resetState(target);
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
-    public void reset()
-    {
-      mTauPreds = ObservationEquivalenceTRSimplifier.this.mTauPreds[mTarget];
-      mIndex = -1;
-    }
-
-    public void resetEvent(final int event)
-    {
-      if (event == EventEncoding.TAU) {
-        reset();
-      } else {
-        throw new UnsupportedOperationException
-          (ProxyTools.getShortClassName(this) +
-           " only iterates with tau event!");
-      }
-    }
-
-    public void resetState(final int from)
-    {
-      mTarget = from;
-      reset();
-    }
-
-    public void reset(final int from, final int event)
-    {
-      if (event == EventEncoding.TAU) {
-        resetState(from);
-      } else {
-        throw new UnsupportedOperationException
-          (ProxyTools.getShortClassName(this) +
-           " only iterates with tau event!");
-      }
-    }
-
-    public boolean advance()
-    {
-      return ++mIndex < mTauPreds.length;
-    }
-
-    public int getCurrentEvent()
-    {
-      return EventEncoding.TAU;
-    }
-
-    public int getCurrentSourceState()
-    {
-      return getCurrentToState();
-    }
-
-    public int getCurrentToState()
-    {
-      if (mIndex < mTauPreds.length) {
-        return mTauPreds[mIndex];
-      } else {
-        throw new NoSuchElementException("Reading past end of list in "
-            + ProxyTools.getShortClassName(this));
-      }
-    }
-
-    public int getCurrentTargetState()
-    {
-      return mTarget;
-    }
-
-    public int getCurrentFromState()
-    {
-      return mTarget;
-    }
-
-    public void remove()
-    {
-      throw new UnsupportedOperationException(ProxyTools
-          .getShortClassName(this)
-          + " does not support transition removal!");
-    }
-
-    //#######################################################################
-    //# Data Members
-    private int mTarget;
-    private int[] mTauPreds;
-    private int mIndex;
-
-  }
-
-
-  //#########################################################################
   //# Inner Class ProperEventClosureTransitionIterator
   private class ProperEventClosureTransitionIterator implements
       TransitionIterator
@@ -1084,7 +945,9 @@ public class ObservationEquivalenceTRSimplifier
     private ProperEventClosureTransitionIterator()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
+      mTauIterator1 = mTauPreds.createIterator();
       mInnerIterator = rel.createPredecessorsReadOnlyIterator();
+      mTauIterator2 = mTauPreds.createIterator();
       mVisited = new TIntHashSet();
       reset();
     }
@@ -1093,7 +956,9 @@ public class ObservationEquivalenceTRSimplifier
                                                  final int event)
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
+      mTauIterator1 = mTauPreds.createIterator();
       mInnerIterator = rel.createPredecessorsReadOnlyIterator();
+      mTauIterator2 = mTauPreds.createIterator();
       mVisited = new TIntHashSet();
       reset(target, event);
     }
@@ -1102,10 +967,9 @@ public class ObservationEquivalenceTRSimplifier
     //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
     public void reset()
     {
-      mTauPreds1 = mTauPreds[mTarget];
-      mTauPreds2 = EMPTY_ARRAY;
-      mIndex1 = mIndex2 = -1;
-      mVisited.clear();
+      mTauIterator1.resetState(mTarget);
+      mInnerIterator.reset(mTarget, mEvent);
+      mStart = true;
     }
 
     public void resetEvent(final int event)
@@ -1129,12 +993,12 @@ public class ObservationEquivalenceTRSimplifier
     public boolean advance()
     {
       while (seek()) {
-        final int state = mTauPreds2[mIndex2];
+        final int state = mTauIterator2.getCurrentSourceState();
         if (mVisited.add(state)) {
           return true;
         }
       }
-      reset();
+      mStart = true;
       return false;
     }
 
@@ -1150,11 +1014,11 @@ public class ObservationEquivalenceTRSimplifier
 
     public int getCurrentToState()
     {
-      if (mIndex2 < mTauPreds2.length) {
-        return mTauPreds2[mIndex2];
+      if (mStart) {
+        throw new NoSuchElementException("Reading past end of list in " +
+                                         ProxyTools.getShortClassName(this));
       } else {
-        throw new NoSuchElementException("Reading past end of list in "
-            + ProxyTools.getShortClassName(this));
+        return mTauIterator2.getCurrentSourceState();
       }
     }
 
@@ -1179,20 +1043,33 @@ public class ObservationEquivalenceTRSimplifier
     //# Auxiliary Methods
     private boolean seek()
     {
-      if (++mIndex2 < mTauPreds2.length) {
-        return true;
-      } else {
-        while (mIndex1 < 0 || !mInnerIterator.advance()) {
-          if (++mIndex1 >= mTauPreds1.length) {
-            return false;
-          }
-          final int taupred1 = mTauPreds1[mIndex1];
-          mInnerIterator.reset(taupred1, mEvent);
+      if (mStart) {
+        mStart = false;
+        mTauIterator1.advance(); // always succeeds and gives mTarget
+        if (mInnerIterator.advance()) {
+          final int pred = mInnerIterator.getCurrentSourceState();
+          mTauIterator2.resetState(pred);
+          return mTauIterator2.advance(); // always true
+        } else {
+          return false;
         }
-        final int taupred2 = mInnerIterator.getCurrentSourceState();
-        mTauPreds2 = mTauPreds[taupred2];
-        mIndex2 = 0;
+      } else if (mTauIterator2.advance()) {
         return true;
+      } else if (mInnerIterator.advance()) {
+        final int pred = mInnerIterator.getCurrentSourceState();
+        mTauIterator2.resetState(pred);
+        return mTauIterator2.advance(); // always true
+      } else {
+        while (mTauIterator1.advance()) {
+          int pred = mTauIterator1.getCurrentSourceState();
+          mInnerIterator.resetState(pred);
+          if (mInnerIterator.advance()) {
+            pred = mInnerIterator.getCurrentSourceState();
+            mTauIterator2.resetState(pred);
+            return mTauIterator2.advance(); // always true
+          }
+        }
+        return false;
       }
     }
 
@@ -1200,12 +1077,11 @@ public class ObservationEquivalenceTRSimplifier
     // # Data Members
     private int mTarget;
     private int mEvent;
+    private boolean mStart;
 
-    private int[] mTauPreds1;
-    private int mIndex1;
+    private final TransitionIterator mTauIterator1;
     private final TransitionIterator mInnerIterator;
-    private int[] mTauPreds2;
-    private int mIndex2;
+    private final TransitionIterator mTauIterator2;
     private final TIntHashSet mVisited;
 
   }
@@ -1353,16 +1229,11 @@ public class ObservationEquivalenceTRSimplifier
   private Collection<int[]> mInitialPartition;
 
   private int mFirstSplitEvent;
-  private int[][] mTauPreds;
+  private TauClosure mTauPreds;
   private THashSet<SimpleEquivalenceClass> mWS;
   private THashSet<ComplexEquivalenceClass> mWC;
   private THashSet<SimpleEquivalenceClass> mP;
   private SimpleEquivalenceClass[] mStateToClass;
   private boolean mHasModifications;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final int[] EMPTY_ARRAY = new int[0];
 
 }

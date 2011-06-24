@@ -613,6 +613,7 @@ public class OPConflictChecker
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+    bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     if (mPreconditionMarking != null) {
       return new GeneralisedTRSimplifierAbstractionRule(chain);
@@ -637,12 +638,14 @@ public class OPConflictChecker
     chain.add(silentInRemover);
     final ActiveEventsTRSimplifier activeEventsMerger =
       new ActiveEventsTRSimplifier();
+    activeEventsMerger.setTransitionLimit(mInternalTransitionLimit);
     chain.add(activeEventsMerger);
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     chain.add(silentOutRemover);
     final SilentContinuationTRSimplifier silentContinuationRemover =
       new SilentContinuationTRSimplifier();
+    silentContinuationRemover.setTransitionLimit(mInternalTransitionLimit);
     chain.add(silentContinuationRemover);
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
@@ -655,6 +658,7 @@ public class OPConflictChecker
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
@@ -696,6 +700,7 @@ public class OPConflictChecker
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
       new NonAlphaDeterminisationTRSimplifier(bisimulator);
