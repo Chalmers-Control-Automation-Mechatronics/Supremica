@@ -4,7 +4,11 @@
 1. Plants h_PalletTyp1In_syn:1, h_PalletTyp2In_syn:1, and h_PalletOut_syn:1 have been replaced by simpler plants combined with EFA variables, to make the number of pallets parametrisable. The model can be instantiated by specifying the number N of pallets of each type 1 and 2 that go through the system. For parameters up to N=12, the model does not satisfy SIC property V, and up to N=9, it satisfies SIC property VI.
 2. Selfloops labelled NoPalletType2InIO:1, NoPalletType1InIO:1, NoPalletOutIO:1, NoPalletELTU1:1, NoPalletCLTU1:1, NoPalletELTU2:1, NoPalletCLTU2:1, NoPalletELTU3:1, NoPalletCLTU3:1, NoPalletELTU4:1, NoPalletCLTU4:1 have been removed from specifications h_ManageIO:1, h_AltMvInTypes:1, h_ManageTU1:1, h_ManageTU2:1, h_ManageTU3:1, h_ManageTU4:1. It is understood from the corresponding plants that these events can only occur in the states with the selfloops, so deleting the events from the specifications should not change the synchronous product.
 3. Specification h_ManageIO:1 and plant h_QueryPalletAtIO:1 have been decomposed into two automata each, such that their synchronous composition gives the original automaton.
-4. Plants h_CapEL11:1, h_CapEL21:1, h_CapEL31:1 have been removed (changed to properties) as it was found by language inclusion check that they do not restrict the system behaviour.</ns2:Comment>
+4. Plants h_CapEL11:1, h_CapEL21:1, h_CapEL31:1 have been removed (changed to properties) as it was found by language inclusion check that they do not restrict the system behaviour.
+
+Reference:
+Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control. Masters Thesis, Department of Computer Science, McMaster University, Hamilton, Canada, 2006.
+</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="REQUIRED_PARAMETER" Name="N">
             <ConstantAliasExpression>

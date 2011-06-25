@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="aip1_edit" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="aip1_sic5" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Model of AIP automated manufacturing system. This is the first subsystem for multiple AIP model maip3_veri according to R. Song.
+
+The model has been modified by adding the specfication testsic5 for more efficient verification of SIC property V. The model can be verified to be generalised nonblocking with respect to the precondition :alpha. This implies that the model satisfies SIC property V.
+
+Reference:
+Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control. Masters Thesis, Department of Computer Science, McMaster University, Hamilton, Canada, 2006.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="ASDwnAS1:1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="ASDwnAS2:1"/>
@@ -162,6 +168,70 @@
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:Interface"/>
             </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="testsic5">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="48" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-5" X="-25"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":alpha"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="144" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-7" X="-26"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="-64"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="96" X="68"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finishpallets:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="96" X="92"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:1"/>
+                            <SimpleIdentifier Name="finishpallets:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="48" X="124"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="h_ManageIO:1">
             <Graph>
@@ -3672,58 +3742,6 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="Test">
-            <Graph Deterministic="false">
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="57" X="57"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <EventList>
-                            <SimpleIdentifier Name=":alpha"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="224" X="320"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="s1" Source="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="startpallets:1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="-100"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="174" X="166"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="s0" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="finishpallets:1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-17" X="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="106" X="209"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

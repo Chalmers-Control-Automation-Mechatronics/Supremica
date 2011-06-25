@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="high" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="maip3_veri" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Synthesis version of multiple AIP model by R. Song. This high-level controls three copies of the AIP manufacturing system.
+
+Reference:
+Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control. Masters Thesis, Department of Computer Science, McMaster University, Hamilton, Canada, 2006.
+</ns2:Comment>
     <EventDeclList>
         <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="allow_exit"/>
