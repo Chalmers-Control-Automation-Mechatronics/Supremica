@@ -43,6 +43,7 @@ import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AutomatonResult;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -636,10 +637,6 @@ public class OPConflictChecker
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
     chain.add(silentInRemover);
-    final ActiveEventsTRSimplifier activeEventsMerger =
-      new ActiveEventsTRSimplifier();
-    activeEventsMerger.setTransitionLimit(mInternalTransitionLimit);
-    chain.add(activeEventsMerger);
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     chain.add(silentOutRemover);
@@ -650,6 +647,10 @@ public class OPConflictChecker
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
     final int ccindex = chain.add(certainConflictsRemover);
+    final ActiveEventsTRSimplifier activeEventsMerger =
+      new ActiveEventsTRSimplifier();
+    activeEventsMerger.setTransitionLimit(mInternalTransitionLimit);
+    chain.add(activeEventsMerger);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
@@ -1480,6 +1481,10 @@ public class OPConflictChecker
         mCurrentSynchronousProductBuilder.getStateMap();
       return new HidingStep(sync, local, tau, stateMap);
     } finally {
+      final CompositionalVerificationResult stats = getAnalysisResult();
+      final AutomatonResult result =
+        mCurrentSynchronousProductBuilder.getAnalysisResult();
+      stats.addSynchronousProductAnalysisResult(result);
       mCurrentSynchronousProductBuilder.clearMask();
     }
   }
@@ -2643,6 +2648,11 @@ public class OPConflictChecker
           }
         } catch (final OverflowException overflow) {
           // skip this one ...
+        } finally {
+          final CompositionalVerificationResult stats = getAnalysisResult();
+          final AutomatonResult result =
+            mCurrentSynchronousProductBuilder.getAnalysisResult();
+          stats.addSynchronousProductAnalysisResult(result);
         }
       }
       return best;

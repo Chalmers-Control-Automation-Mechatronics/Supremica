@@ -62,6 +62,16 @@ public class AutomatonResult extends AnalysisResult
 
 
   //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AnalysisResult
+  @Override
+  public void merge(final AnalysisResult other)
+  {
+    super.merge(other);
+    mAutomaton = null;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private AutomatonProxy mAutomaton;
 

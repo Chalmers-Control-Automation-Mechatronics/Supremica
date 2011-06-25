@@ -45,8 +45,10 @@ public class CompositionalVerificationResult extends VerificationResult
     mUnsuccessfulCompositionsCount = 0;
     mRedundantEventsCount = 0;
     mSimplifierStatistics = null;
+    mNumberOfSyncProducts = 0;
+    mSynchronousProductStats = null;
     mNumberOfMonolithicRuns = 0;
-    mMonolithicVerificationResult = null;
+    mMonolithicStats = null;
   }
 
 
@@ -91,11 +93,19 @@ public class CompositionalVerificationResult extends VerificationResult
   }
 
   /**
-   * Gets the statistics for the final (monolithic) verification step.
+   * Gets the statistics of the intermediate synchronous product steps.
+   */
+  public AnalysisResult getSynchronousProductAnalysisResult()
+  {
+    return mSynchronousProductStats;
+  }
+
+  /**
+   * Gets the statistics for the final (monolithic) verification steps.
    */
   public VerificationResult getMonolithicVerificationResult()
   {
-    return mMonolithicVerificationResult;
+    return mMonolithicStats;
   }
 
 
@@ -139,13 +149,23 @@ public class CompositionalVerificationResult extends VerificationResult
     }
   }
 
+  public void addSynchronousProductAnalysisResult(final AnalysisResult result)
+  {
+    mNumberOfSyncProducts++;
+    if (mSynchronousProductStats == null) {
+      mSynchronousProductStats = result;
+    } else if (result != null) {
+      mSynchronousProductStats.merge(result);
+    }
+  }
+
   public void addMonolithicVerificationResult(final VerificationResult result)
   {
     mNumberOfMonolithicRuns++;
-    if (mMonolithicVerificationResult == null) {
-      mMonolithicVerificationResult = result;
+    if (mMonolithicStats == null) {
+      mMonolithicStats = result;
     } else if (result != null) {
-      mMonolithicVerificationResult.merge(result);
+      mMonolithicStats.merge(result);
     }
   }
 
@@ -171,11 +191,17 @@ public class CompositionalVerificationResult extends VerificationResult
         stats1.merge(stats2);
       }
     }
-    mNumberOfMonolithicRuns += result.mNumberOfMonolithicRuns;
-    if (mMonolithicVerificationResult == null) {
-      mMonolithicVerificationResult = result.mMonolithicVerificationResult;
+    mNumberOfSyncProducts += result.mNumberOfSyncProducts;
+    if (mSynchronousProductStats == null) {
+      mSynchronousProductStats = result.mSynchronousProductStats;
     } else if (result != null) {
-      mMonolithicVerificationResult.merge(result.mMonolithicVerificationResult);
+      mSynchronousProductStats.merge(result.mSynchronousProductStats);
+    }
+    mNumberOfMonolithicRuns += result.mNumberOfMonolithicRuns;
+    if (mMonolithicStats == null) {
+      mMonolithicStats = result.mMonolithicStats;
+    } else if (result != null) {
+      mMonolithicStats.merge(result.mMonolithicStats);
     }
   }
 
@@ -207,11 +233,17 @@ public class CompositionalVerificationResult extends VerificationResult
         ruleStats.print(writer);
       }
     }
-    if (mMonolithicVerificationResult != null) {
+    if (mSynchronousProductStats != null) {
+      writer.println("--------------------------------------------------");
+      writer.print("Number of synchronous products computed: ");
+      writer.println(mNumberOfSyncProducts);
+      mSynchronousProductStats.print(writer);
+    }
+    if (mMonolithicStats != null) {
       writer.println("--------------------------------------------------");
       writer.print("Number of monolithic verification runs: ");
       writer.println(mNumberOfMonolithicRuns);
-      mMonolithicVerificationResult.print(writer);
+      mMonolithicStats.print(writer);
     }
   }
 
@@ -227,9 +259,13 @@ public class CompositionalVerificationResult extends VerificationResult
         ruleStats.printCSVHorizontalHeadings(writer);
       }
     }
-    if (mMonolithicVerificationResult != null) {
+    if (mSynchronousProductStats != null) {
+      writer.print(",SyncProd,");
+      mSynchronousProductStats.printCSVHorizontalHeadings(writer);
+    }
+    if (mMonolithicStats != null) {
       writer.print(",Monolithic,");
-      mMonolithicVerificationResult.printCSVHorizontalHeadings(writer);
+      mMonolithicStats.printCSVHorizontalHeadings(writer);
     }
   }
 
@@ -248,11 +284,17 @@ public class CompositionalVerificationResult extends VerificationResult
         ruleStats.printCSVHorizontal(writer);
       }
     }
-    if (mMonolithicVerificationResult != null) {
+    if (mSynchronousProductStats != null) {
+      writer.print(',');
+      writer.print(mNumberOfSyncProducts);
+      writer.print(',');
+      mSynchronousProductStats.printCSVHorizontal(writer);
+    }
+    if (mMonolithicStats != null) {
       writer.print(',');
       writer.print(mNumberOfMonolithicRuns);
       writer.print(',');
-      mMonolithicVerificationResult.printCSVHorizontal(writer);
+      mMonolithicStats.printCSVHorizontal(writer);
     }
   }
 
@@ -263,7 +305,9 @@ public class CompositionalVerificationResult extends VerificationResult
   private int mUnsuccessfulCompositionsCount;
   private int mRedundantEventsCount;
   private List<TRSimplifierStatistics> mSimplifierStatistics;
+  private int mNumberOfSyncProducts;
+  private AnalysisResult mSynchronousProductStats;
   private int mNumberOfMonolithicRuns;
-  private VerificationResult mMonolithicVerificationResult;
+  private VerificationResult mMonolithicStats;
 
 }

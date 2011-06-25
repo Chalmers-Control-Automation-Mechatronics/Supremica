@@ -25,8 +25,9 @@ import net.sourceforge.waters.model.base.ProxyTools;
  *
  * This base only provides basic information, so it can be determined whether
  * the analysis operation has terminated and if an exception has occurred. It
- * also can store a Boolean result and the time taken. More specific result data
- * can be added by subclasses.
+ * also can store a Boolean result and the time taken, and it records basic
+ * statistics about automata sizes. More specific result data can be added
+ * by subclasses.
  *
  * @author Robi Malik
  */
@@ -40,6 +41,12 @@ public class AnalysisResult
   {
     mFinished = false;
     mRunTime = -1;
+    mTotalNumberOfAutomata = -1;
+    mTotalNumberOfStates = -1.0;
+    mPeakNumberOfStates = -1.0;
+    mTotalNumberOfTransitions = -1.0;
+    mPeakNumberOfTransitions = -1.0;
+    mPeakNumberOfNodes = -1;
   }
 
 
@@ -122,6 +129,170 @@ public class AnalysisResult
   }
 
   /**
+   * Gets the total number of automata used by the analysis.
+   * @return The number of automata, or <CODE>-1</CODE> if unknown.
+   */
+  public int getTotalNumberOfAutomata()
+  {
+    return mTotalNumberOfAutomata;
+  }
+
+
+  /**
+   * Gets the total number of states constructed by the analysis.
+   * @return The total number of states, or <CODE>-1</CODE> if unknown.
+   */
+  public double getTotalNumberOfStates()
+  {
+    return mTotalNumberOfStates;
+  }
+
+
+  /**
+   * Gets the maximum number of states constructed by the analysis. The peak
+   * number of states should identify the size of the largest automaton
+   * constructed. For monolithic algorithms, it will be equal to the total
+   * number of states, but for compositional algorithms it may be different.
+   * @return The peak number of states, or <CODE>-1</CODE> if unknown.
+   */
+  public double getPeakNumberOfStates()
+  {
+    return mPeakNumberOfStates;
+  }
+
+
+  /**
+   * <P>
+   * Gets the maximum number of nodes used during analysis.
+   * </P>
+   * <P>
+   * A 'node' here represents a basic unit of memory such as a state in a
+   * synchronous product or a BDD node.
+   * </P>
+   * <P>
+   * <I>Note.</I> It does not make much sense to speak of the total number of
+   * nodes in BDD-based algorithms, as the final number of nodes often is much
+   * smaller than the size of interim BDDs. Therefore, no total number of nodes
+   * will be computed.
+   * </P>
+   *
+   * @return The peak number of nodes, or <CODE>-1</CODE> if unknown.
+   */
+  public int getPeakNumberOfNodes()
+  {
+    return mPeakNumberOfNodes;
+  }
+
+
+  /**
+   * Gets the total number of transitions constructed by the analysis.
+   * @return The total number of transitions, or <CODE>-1</CODE> if unknown.
+   */
+  public double getTotalNumberOfTransitions()
+  {
+    return mTotalNumberOfTransitions;
+  }
+
+
+  /**
+   * Gets the maximum number of transitions constructed by the analysis. The
+   * peak number of transitions should identify the size of the largest
+   * automaton constructed. For monolithic algorithms, it will be equal to the
+   * total number of transitions, but for compositional algorithms it may be
+   * different.
+   * @return The peak number of transitions, or <CODE>-1</CODE> if unknown.
+   */
+  public double getPeakNumberOfTransitions()
+  {
+    return mPeakNumberOfTransitions;
+  }
+
+
+  /**
+   * Specifies a value for the total number of automata used by the analysis.
+   */
+  public void setNumberOfAutomata(final int numaut)
+  {
+    mTotalNumberOfAutomata = numaut;
+  }
+
+
+  /**
+   * Specifies a value for both the peak and total number of states constructed
+   * by the analysis.
+   */
+  public void setNumberOfStates(final double numstates)
+  {
+    setTotalNumberOfStates(numstates);
+    setPeakNumberOfStates(numstates);
+  }
+
+
+  /**
+   * Specifies a value for the total number of states constructed by the
+   * analysis.
+   */
+  public void setTotalNumberOfStates(final double numstates)
+  {
+    mTotalNumberOfStates = numstates;
+  }
+
+
+  /**
+   * Specifies a value for the peak number of states constructed by the
+   * analysis.
+   */
+  public void setPeakNumberOfStates(final double numstates)
+  {
+    mPeakNumberOfStates = numstates;
+  }
+
+
+  /**
+   * Specifies a value for both the peak and total number of transitions
+   * constructed by the analysis.
+   */
+  public void setNumberOfTransitions(final double numtrans)
+  {
+    setTotalNumberOfTransitions(numtrans);
+    setPeakNumberOfTransitions(numtrans);
+  }
+
+
+  /**
+   * Specifies a value for the total number of transitions constructed by the
+   * analysis.
+   */
+  public void setTotalNumberOfTransitions(final double numtrans)
+  {
+    mTotalNumberOfTransitions = numtrans;
+  }
+
+
+  /**
+   * Specifies a value for the peak number of transitions constructed by the
+   * analysis.
+   */
+  public void setPeakNumberOfTransitions(final double numtrans)
+  {
+    mPeakNumberOfTransitions = numtrans;
+  }
+
+
+  /**
+   * Specifies the maximum number of nodes used during analysis. A 'node' here
+   * represents a basic unit of memory such as a state in a synchronous product
+   * or a BDD node.
+   */
+  public void setPeakNumberOfNodes(final int numnodes)
+  {
+    mPeakNumberOfNodes = numnodes;
+  }
+
+
+  //#########################################################################
+  //# Merging
+  /**
    * <P>Merges this result with another.</P>
    *
    * <P>This method destructively modifies the contents of this result record
@@ -149,6 +320,18 @@ public class AnalysisResult
       if (mException != null) {
         mException = other.mException;
       }
+      mTotalNumberOfAutomata =
+        mergeAdd(mTotalNumberOfAutomata, other.mTotalNumberOfAutomata);
+      mTotalNumberOfStates =
+        mergeAdd(mTotalNumberOfStates, other.mTotalNumberOfStates);
+      mTotalNumberOfTransitions =
+        mergeAdd(mTotalNumberOfTransitions, other.mTotalNumberOfTransitions);
+      mPeakNumberOfStates =
+        Math.max(mPeakNumberOfStates, other.mPeakNumberOfStates);
+      mPeakNumberOfTransitions =
+        Math.max(mPeakNumberOfTransitions, other.mPeakNumberOfTransitions);
+      mPeakNumberOfNodes =
+        Math.max(mPeakNumberOfNodes, other.mPeakNumberOfNodes);
     } else {
       throw new ClassCastException
         ("Attempting to merge " + ProxyTools.getShortClassName(this) +
@@ -192,6 +375,27 @@ public class AnalysisResult
       final float seconds = 0.001f * mRunTime;
       formatter.format("Total runtime: %.3fs\n", seconds);
     }
+    if (mTotalNumberOfAutomata >= 0) {
+      writer.println("Total number of automata: " + mTotalNumberOfAutomata);
+    }
+    final Formatter formatter = new Formatter(writer);
+    if (mTotalNumberOfStates >= 0) {
+      formatter.format("Total number of states: %.0f\n", mTotalNumberOfStates);
+    }
+    if (mTotalNumberOfTransitions >= 0) {
+      formatter.format("Total number of transitions: %.0f\n",
+                       mTotalNumberOfTransitions);
+    }
+    if (mPeakNumberOfStates >= 0) {
+      formatter.format("Peak number of states: %.0f\n", mPeakNumberOfStates);
+    }
+    if (mPeakNumberOfTransitions >= 0) {
+      formatter.format("Peak number of transitions: %.0f\n",
+                       mPeakNumberOfTransitions);
+    }
+    if (mPeakNumberOfNodes >= 0) {
+      writer.println("Peak number of nodes: " + mPeakNumberOfNodes);
+    }
   }
 
   public void printCSVHorizontal(final PrintWriter writer)
@@ -205,11 +409,42 @@ public class AnalysisResult
     if (mRunTime >= 0) {
       writer.print(mRunTime);
     }
+    writer.print(',');
+    if (mTotalNumberOfAutomata >= 0) {
+      writer.print(mTotalNumberOfAutomata);
+    }
+    writer.print(',');
+    final Formatter formatter = new Formatter(writer);
+    if (mTotalNumberOfStates >= 0) {
+      formatter.format("%.0f", mTotalNumberOfStates);
+    }
+    writer.print(',');
+    if (mTotalNumberOfTransitions >= 0) {
+      formatter.format("%.0f", mTotalNumberOfTransitions);
+    }
+    writer.print(',');
+    if (mPeakNumberOfStates >= 0) {
+      formatter.format("%.0f", mPeakNumberOfStates);
+    }
+    writer.print(',');
+    if (mPeakNumberOfTransitions >= 0) {
+      formatter.format("%.0f", mPeakNumberOfTransitions);
+    }
+    writer.print(',');
+    if (mPeakNumberOfNodes >= 0) {
+      writer.print(mPeakNumberOfNodes);
+    }
   }
 
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     writer.print("Result,RunTime");
+    writer.print(",TotAut");
+    writer.print(",TotStates");
+    writer.print(",TotTrans");
+    writer.print(",PeakStates");
+    writer.print(",PeakTrans");
+    writer.print(",PeakNodes");
   }
 
 
@@ -255,5 +490,11 @@ public class AnalysisResult
   private boolean mSatisfied;
   private long mRunTime;
   private AnalysisException mException;
+  private int mTotalNumberOfAutomata;
+  private double mTotalNumberOfStates;
+  private double mPeakNumberOfStates;
+  private double mTotalNumberOfTransitions;
+  private double mPeakNumberOfTransitions;
+  private int mPeakNumberOfNodes;
 
 }

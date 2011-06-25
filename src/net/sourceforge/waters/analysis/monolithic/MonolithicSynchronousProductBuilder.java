@@ -20,12 +20,12 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AutomatonResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -37,8 +37,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -113,17 +111,8 @@ public class MonolithicSynchronousProductBuilder
   public boolean run()
     throws AnalysisException
   {
-    final Logger logger = getLogger();
-    if (logger.isDebugEnabled()) {
-      final String msg =
-        "ENTER " + ProxyTools.getShortClassName(this) + ".run()";
-      logger.debug(msg);
-    }
-    AutomatonProxy aut = null;
-
     try {
       setUp();
-
       final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
       mStates = new IntArrayMap(tableSize);
       mStateTuples = new ArrayList<int[]>();
@@ -137,18 +126,10 @@ public class MonolithicSynchronousProductBuilder
         final int[] tuple = mUnvisited.remove();
         explore(tuple);
       }
-
-      aut = createAutomaton();
+      final AutomatonProxy aut = createAutomaton();
       return setAutomatonResult(aut);
     } finally {
       tearDown();
-      if (logger.isDebugEnabled()) {
-        final String head = aut == null ? "ABORT" : "EXIT";
-        final String msg =
-          head + " " + ProxyTools.getShortClassName(this) + ".run(): " +
-          mNumStates + " states.";
-        logger.debug(msg);
-      }
     }
   }
 
@@ -164,8 +145,9 @@ public class MonolithicSynchronousProductBuilder
   //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  @Override
   protected void setUp()
-    throws AnalysisException
+  throws AnalysisException
   {
     super.setUp();
 
@@ -328,8 +310,21 @@ public class MonolithicSynchronousProductBuilder
     }
   }
 
+  @Override
+  protected void addStatistics()
+  {
+    super.addStatistics();
+    final AutomatonResult result = getAnalysisResult();
+    result.setNumberOfAutomata(mNumAutomata);
+    result.setNumberOfStates(mNumStates);
+    result.setPeakNumberOfNodes(mNumStates);
+    result.setNumberOfTransitions(mTransitionBuffer.size() / 3);
+  }
+
+  @Override
   protected void tearDown()
   {
+    super.tearDown();
     mEvents = null;
     mCurrentPropositions = null;
     mProjectionMask = null;
@@ -338,17 +333,13 @@ public class MonolithicSynchronousProductBuilder
     mStateMarkings = null;
     mTransitions = null;
     mEventAutomata = null;
-
     mStates = null;
     mStateTuples = null;
     mUnvisited = null;
     mTransitionBuffer = null;
-
     mNDTuple = null;
     mTargetTuple = null;
     mCurrentSuccessors = null;
-
-    super.tearDown();
   }
 
 
