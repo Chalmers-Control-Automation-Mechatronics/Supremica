@@ -1942,7 +1942,7 @@ public class OPConflictChecker
       @Override
       SelectingHeuristic createHeuristic(final OPConflictChecker checker)
       {
-        final Comparator<Candidate> alt = MinS.createComparator(checker);
+        final Comparator<Candidate> alt = MinS.createComparatorChain(checker);
         return checker.new HeuristicMinSync(alt);
       }
     };
@@ -1962,17 +1962,16 @@ public class OPConflictChecker
     }
 
     /**
-     * Creates a selecting heuristic that gives preferences to this method.
-     * The returned heuristic first compares candidates according to this
+     * Creates a comparator to implement this selecting heuristic.
+     * The returned comparator first compares candidates according to this
      * selection methods. If two candidates are found equal, all other enabled
      * selection heuristics are used, in the order in which they are
      * defined in the enumeration. If the candidates are equal under
      * all heuristics, they are compared based on their names. This
      * guarantees that no two candidates are equal.
-     * @param checker The conflict checker requesting and using the
-     *                heuristic.
+     * @param checker The conflict checker requesting and using the comparator.
      */
-    SelectingHeuristic createHeuristic(final OPConflictChecker checker)
+    Comparator<Candidate> createComparatorChain(final OPConflictChecker checker)
     {
       final List<Comparator<Candidate>> list =
         new LinkedList<Comparator<Candidate>>();
@@ -1986,7 +1985,23 @@ public class OPConflictChecker
           }
         }
       }
-      final Comparator<Candidate> chain = checker.new ComparatorChain(list);
+      return checker.new ComparatorChain(list);
+    }
+
+    /**
+     * Creates a selecting heuristic that gives preferences to this method.
+     * The returned heuristic first compares candidates according to this
+     * selection methods. If two candidates are found equal, all other enabled
+     * selection heuristics are used, in the order in which they are
+     * defined in the enumeration. If the candidates are equal under
+     * all heuristics, they are compared based on their names. This
+     * guarantees that no two candidates are equal.
+     * @param checker The conflict checker requesting and using the
+     *                heuristic.
+     */
+    SelectingHeuristic createHeuristic(final OPConflictChecker checker)
+    {
+      final Comparator<Candidate> chain = createComparatorChain(checker);
       return checker.new SelectingHeuristic(chain);
     }
 
