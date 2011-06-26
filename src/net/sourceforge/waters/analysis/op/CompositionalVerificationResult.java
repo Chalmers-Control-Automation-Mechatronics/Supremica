@@ -194,13 +194,13 @@ public class CompositionalVerificationResult extends VerificationResult
     mNumberOfSyncProducts += result.mNumberOfSyncProducts;
     if (mSynchronousProductStats == null) {
       mSynchronousProductStats = result.mSynchronousProductStats;
-    } else if (result != null) {
+    } else if (result.mSynchronousProductStats != null) {
       mSynchronousProductStats.merge(result.mSynchronousProductStats);
     }
     mNumberOfMonolithicRuns += result.mNumberOfMonolithicRuns;
     if (mMonolithicStats == null) {
       mMonolithicStats = result.mMonolithicStats;
-    } else if (result != null) {
+    } else if (result.mMonolithicStats != null) {
       mMonolithicStats.merge(result.mMonolithicStats);
     }
   }
