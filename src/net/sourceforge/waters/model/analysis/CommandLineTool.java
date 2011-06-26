@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //##########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   CommandLineTool
 //##########################################################################
@@ -120,7 +120,7 @@ public class CommandLineTool
           }
         } else if (arg.equals("-csv") && i + 1 < args.length) {
           final String csvname = args[++i];
-          final OutputStream csvstream = new FileOutputStream(csvname);
+          final OutputStream csvstream = new FileOutputStream(csvname, true);
           csv = new PrintWriter(csvstream);
         } else if (arg.startsWith("-D")) {
           final int eqpos = arg.indexOf('=', 2);

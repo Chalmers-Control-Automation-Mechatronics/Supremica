@@ -644,13 +644,13 @@ public class OPConflictChecker
       new SilentContinuationTRSimplifier();
     silentContinuationRemover.setTransitionLimit(mInternalTransitionLimit);
     chain.add(silentContinuationRemover);
-    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
-      new LimitedCertainConflictsTRSimplifier();
-    final int ccindex = chain.add(certainConflictsRemover);
     final ActiveEventsTRSimplifier activeEventsMerger =
       new ActiveEventsTRSimplifier();
     activeEventsMerger.setTransitionLimit(mInternalTransitionLimit);
     chain.add(activeEventsMerger);
+    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
+      new LimitedCertainConflictsTRSimplifier();
+    final int ccindex = chain.add(certainConflictsRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
