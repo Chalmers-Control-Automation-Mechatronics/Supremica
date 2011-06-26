@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.despot
 //# CLASS:   SICProperty5Verifier
 //###########################################################################
@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.hisc;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -73,8 +73,6 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
           new SICPropertyBuilder(model, getFactory());
       final List<EventProxy> answers =
           (List<EventProxy>) builder.getAnswerEvents();
-      final int numAnswers = answers.size();
-      mConflictCheckerStats = new ArrayList<VerificationResult>(numAnswers);
       setConflictCheckerMarkings(builder);
       final ConflictChecker checker = getConflictChecker();
       ProductDESProxy convertedModel = null;
@@ -100,7 +98,6 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
       return setSatisfiedResult();
     } finally {
       tearDown();
-      mConflictCheckerStats = null;
     }
   }
 
@@ -111,42 +108,25 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.ModelAnalyser
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
-  public SICProperty5VerifierVerificationResult getAnalysisResult()
-  {
-    return (SICProperty5VerifierVerificationResult) super.getAnalysisResult();
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
-  @Override
-  protected void setUp() throws AnalysisException
+  protected void setUp()
+  throws AnalysisException
   {
     super.setUp();
-    mPeakNumberOfNodes = -1;
-    mTotalNumberOfStates = mTotalNumberOfTransitions = 0.0;
-    mPeakNumberOfStates = mPeakNumberOfTransitions = -1.0;
+    mFirstResult = true;
+    mFailedAnswer = null;
   }
 
-  @Override
-  protected SICProperty5VerifierVerificationResult createAnalysisResult()
-  {
-    return new SICProperty5VerifierVerificationResult();
-  }
-
-  @Override
   protected void addStatistics()
   {
     super.addStatistics();
-    final SICProperty5VerifierVerificationResult stats = getAnalysisResult();
-    stats.setPeakNumberOfNodes(mPeakNumberOfNodes);
-    stats.setTotalNumberOfStates(mTotalNumberOfStates);
-    stats.setPeakNumberOfStates(mPeakNumberOfStates);
-    stats.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
-    stats.setPeakNumberOfTransitions(mPeakNumberOfTransitions);
-    stats.setConflictCheckerResult(mConflictCheckerStats);
+    final AnalysisResult stats = getAnalysisResult();
+    if (stats != null) {
+      final ProductDESProxy model = getModel();
+      final int numaut = model.getAutomata().size();
+      stats.setNumberOfAutomata(numaut);
+    }
   }
 
 
@@ -162,29 +142,21 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
     checker.setPreconditionMarking(preconditionMark);
   }
 
-  private void recordStatistics(final VerificationResult result)
+  private void recordStatistics(final AnalysisResult result)
   {
-    mPeakNumberOfNodes =
-        Math.max(mPeakNumberOfNodes, result.getPeakNumberOfNodes());
-    mTotalNumberOfStates += result.getTotalNumberOfStates();
-    mPeakNumberOfStates =
-        Math.max(mPeakNumberOfStates, result.getPeakNumberOfStates());
-    mTotalNumberOfTransitions += result.getTotalNumberOfTransitions();
-    mPeakNumberOfTransitions =
-        Math.max(mPeakNumberOfTransitions, result.getPeakNumberOfTransitions());
-    mConflictCheckerStats.add(result);
+     if (mFirstResult) {
+       setAnalysisResult(result);
+       mFirstResult = false;
+     } else {
+       final AnalysisResult present = getAnalysisResult();
+       present.merge(result);
+     }
   }
 
 
   //#########################################################################
   //# Data Members
   private EventProxy mFailedAnswer;
-
-  private int mPeakNumberOfNodes;
-  private double mTotalNumberOfStates;
-  private double mPeakNumberOfStates;
-  private double mTotalNumberOfTransitions;
-  private double mPeakNumberOfTransitions;
-  private List<VerificationResult> mConflictCheckerStats;
+  private boolean mFirstResult;
 
 }

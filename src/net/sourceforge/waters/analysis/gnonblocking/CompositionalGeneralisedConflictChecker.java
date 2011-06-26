@@ -59,20 +59,30 @@ import org.apache.log4j.Logger;
 
 
 /**
+ * The compositional generalised nonblocking verification algorithm.
+ *
+ * <I>References:</I><BR>
+ * Rachel Francis. An implementation of a compositional approach for verifying
+ * generalised nonblocking. Working paper series, No. 04/2011; Department of
+ * Computer Science, University of Waikato, Hamilton, New Zealand, 2011.<BR>
+ * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying
+ * Generalised Nonblocking, Proc. 7th International Conference on Control and
+ * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.
+ *
  * @author Rachel Francis
  */
 
-public class CompositionalGeneralisedConflictChecker extends
-    AbstractConflictChecker
+public class CompositionalGeneralisedConflictChecker
+  extends AbstractConflictChecker
 {
 
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Constructors
   /**
    * Creates a new conflict checker without a model or marking proposition.
    */
-  public CompositionalGeneralisedConflictChecker(
-                                                 final ProductDESProxyFactory factory)
+  public CompositionalGeneralisedConflictChecker
+    (final ProductDESProxyFactory factory)
   {
     super(null, factory);
   }
@@ -86,9 +96,9 @@ public class CompositionalGeneralisedConflictChecker extends
    * @param factory
    *          Factory used for trace construction.
    */
-  public CompositionalGeneralisedConflictChecker(
-                                                 final ProductDESProxy model,
-                                                 final ProductDESProxyFactory factory)
+  public CompositionalGeneralisedConflictChecker
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory)
   {
     super(model, factory);
   }
@@ -108,10 +118,10 @@ public class CompositionalGeneralisedConflictChecker extends
    * @param factory
    *          Factory used for trace construction.
    */
-  public CompositionalGeneralisedConflictChecker(
-                                                 final ProductDESProxy model,
-                                                 final EventProxy marking,
-                                                 final ProductDESProxyFactory factory)
+  public CompositionalGeneralisedConflictChecker
+    (final ProductDESProxy model,
+     final EventProxy marking,
+     final ProductDESProxyFactory factory)
   {
     super(model, marking, factory);
   }
@@ -134,11 +144,11 @@ public class CompositionalGeneralisedConflictChecker extends
    * @param factory
    *          Factory used for trace construction.
    */
-  public CompositionalGeneralisedConflictChecker(
-                                                 final ProductDESProxy model,
-                                                 final EventProxy marking,
-                                                 final EventProxy preMarking,
-                                                 final ProductDESProxyFactory factory)
+  public CompositionalGeneralisedConflictChecker
+    (final ProductDESProxy model,
+     final EventProxy marking,
+     final EventProxy preMarking,
+     final ProductDESProxyFactory factory)
   {
     super(model, marking, preMarking, factory);
   }
@@ -157,8 +167,8 @@ public class CompositionalGeneralisedConflictChecker extends
   @Override
   public CompositionalGeneralisedConflictCheckerVerificationResult getAnalysisResult()
   {
-    return (CompositionalGeneralisedConflictCheckerVerificationResult) super
-        .getAnalysisResult();
+    return (CompositionalGeneralisedConflictCheckerVerificationResult)
+      super.getAnalysisResult();
   }
 
   @Override
@@ -322,7 +332,6 @@ public class CompositionalGeneralisedConflictChecker extends
       final ConflictChecker checker =
           new NativeConflictChecker(model, getUsedMarkingProposition(),
               getFactory());
-     //MarshallingTools.saveModule(model, "/research/vaibhav/sic5_changes_automaton/increased_islimit/4_40k/4_model.wdes");
       // final ConflictChecker checker = new MonolithicConflictChecker(model,
       // getUsedMarkingProposition(), getFactory());
       checker
@@ -591,8 +600,8 @@ public class CompositionalGeneralisedConflictChecker extends
     mPeakNumberOfStates = 0;
     mTotalNumberOfTransitions = 0;
     mPeakNumberOfTransitions = 0;
-    mComposedModelNumberOfStates = 1;
-    mComposedModelNumberOfTransitions = 1;
+    mComposedModelNumberOfStates = 0;
+    mComposedModelNumberOfTransitions = 0;
 
     mTemporaryModifyingSteps = new ArrayList<Step>();
     mUsedPreconditionMarking = null;
@@ -3285,4 +3294,5 @@ public class CompositionalGeneralisedConflictChecker extends
   private double mPeakNumberOfTransitions;
   private double mComposedModelNumberOfStates;
   private double mComposedModelNumberOfTransitions;
+
 }

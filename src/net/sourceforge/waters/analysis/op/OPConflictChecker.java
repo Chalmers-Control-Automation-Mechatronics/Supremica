@@ -1950,18 +1950,6 @@ public class OPConflictChecker
         final Comparator<Candidate> alt = MinS.createComparatorChain(checker);
         return checker.new HeuristicMinSync(alt);
       }
-    },
-    /**
-     * Chooses the candidate with the minimum actual number of states
-     * in the synchronous product.
-     */
-    MinSyncMaxL {
-      @Override
-      SelectingHeuristic createHeuristic(final OPConflictChecker checker)
-      {
-        final Comparator<Candidate> alt = MaxL.createComparatorChain(checker);
-        return checker.new HeuristicMinSync(alt);
-      }
     };
 
     /**

@@ -1,9 +1,22 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
+//# CLASS:   CompositionalGeneralisedConflictCheckerVerificationResult
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 
 
@@ -15,11 +28,13 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
  *
  * @author Rachel Francis
  */
+
 public class CompositionalGeneralisedConflictCheckerVerificationResult extends
     VerificationResult
 {
-  // #########################################################################
-  // # Constructors
+
+  //#########################################################################
+  //# Constructors
   /**
    * Creates a verification result representing an incomplete verification run.
    */
@@ -32,8 +47,9 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
     mAbstractionRuleStats = null;
   }
 
-  // #########################################################################
-  // # Simple Access Methods
+
+  //#########################################################################
+  //# Simple Access Methods
   /**
    * Gets the number of states in the final composed model.
    */
@@ -86,9 +102,9 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
     return mAbstractionRuleStats;
   }
 
-  // #########################################################################
-  // # Providing Statistics
 
+  //#########################################################################
+  //# Providing Statistics
   /**
    * Sets the number of states in the final composed model.
    */
@@ -137,32 +153,60 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
     mUnsuccessfulCompositionCount = count;
   }
 
+
+  //#########################################################################
+  //# Merging
+  @Override
+  public void merge(final AnalysisResult other)
+  {
+    super.merge(other);
+    final CompositionalGeneralisedConflictCheckerVerificationResult result =
+      (CompositionalGeneralisedConflictCheckerVerificationResult) other;
+    mSuccessfulCompositionCount += result.mSuccessfulCompositionCount;
+    mUnsuccessfulCompositionCount += result.mUnsuccessfulCompositionCount;
+    mComposedModelNumberOfStates =
+      Math.max(mComposedModelNumberOfStates,
+               result.mComposedModelNumberOfStates);
+    mComposedModelNumberOfTransitions =
+      Math.max(mComposedModelNumberOfTransitions,
+               result.mComposedModelNumberOfTransitions);
+    final Iterator<AbstractionRuleStatistics> iter1 =
+      mAbstractionRuleStats.iterator();
+    final Iterator<AbstractionRuleStatistics> iter2 =
+      result.mAbstractionRuleStats.iterator();
+    while (iter1.hasNext() && iter2.hasNext()) {
+      final AbstractionRuleStatistics stats1 = iter1.next();
+      final AbstractionRuleStatistics stats2 = iter2.next();
+      stats1.merge(stats2);
+    }
+  }
+
+
   //#########################################################################
   //# Printing
   @Override
   public void print(final PrintWriter writer)
   {
     super.print(writer);
-    writer.println("Number of times a model is successfully composed: "
-        + mSuccessfulCompositionCount);
-    writer.println("Number of times a model is unsuccessfully composed: "
-        + mUnsuccessfulCompositionCount);
+    writer.println("Number of times a model is successfully composed: " +
+                   mSuccessfulCompositionCount);
+    writer.println("Number of times a model is unsuccessfully composed: " +
+                   mUnsuccessfulCompositionCount);
     final double probability =
-        (double) mUnsuccessfulCompositionCount
-            / (double) getTotalCompositionCount();
-    writer.println("Probability of a candidate selection being unsuccessful: "
-        + probability);
-    writer.println("Number of states in final composed model: "
-        + mComposedModelNumberOfStates);
-    writer.println("Number of transitions in final composed model: "
-        + mComposedModelNumberOfTransitions);
-    writer
-        .println("-----------------------Rule Results ----------------------");
+        (double) mUnsuccessfulCompositionCount/
+        (double) getTotalCompositionCount();
+    writer.println("Probability of a candidate selection being unsuccessful: " +
+                   probability);
+    writer.println("Number of states in final composed model: " +
+                   mComposedModelNumberOfStates);
+    writer.println("Number of transitions in final composed model: " +
+                   mComposedModelNumberOfTransitions);
+    writer.println
+      ("-----------------------Rule Results ----------------------");
     for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
       ruleStats.print(writer);
       writer.println();
     }
-
   }
 
   @Override
@@ -186,7 +230,7 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
     writer.print(",States final");
     writer.print(",Tansitions final");
     final AbstractionRuleStatistics ruleStats =
-        new AbstractionRuleStatistics(null);
+      new AbstractionRuleStatistics(null);
     for (int i = 0; i < numRules; i++) {
       ruleStats.printCSVHorizontalHeadings(writer);
     }
@@ -199,8 +243,8 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
     writer.print("," + mSuccessfulCompositionCount);
     writer.print("," + mUnsuccessfulCompositionCount);
     final double probability =
-        (double) mUnsuccessfulCompositionCount
-            / (double) getTotalCompositionCount();
+        (double) mUnsuccessfulCompositionCount /
+        (double) getTotalCompositionCount();
     writer.print("," + probability);
     writer.print("," + mComposedModelNumberOfStates);
     writer.print("," + mComposedModelNumberOfTransitions);
@@ -217,4 +261,5 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
   private int mUnsuccessfulCompositionCount;
   private double mComposedModelNumberOfStates;
   private double mComposedModelNumberOfTransitions;
+
 }

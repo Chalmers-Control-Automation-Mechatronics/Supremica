@@ -1,8 +1,18 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
+//# CLASS:   AbstractionRuleStatistics
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.PrintWriter;
-import java.util.Formatter;
 
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 
@@ -14,11 +24,12 @@ import net.sourceforge.waters.model.base.ProxyTools;
  *
  * @author Rachel Francis
  */
+
 public class AbstractionRuleStatistics
 {
-  // #########################################################################
-  // # Constructors
 
+  //#########################################################################
+  //# Constructors
   public AbstractionRuleStatistics(final Class<? extends AbstractionRule> clazz)
   {
     mRuleClass = clazz;
@@ -33,8 +44,9 @@ public class AbstractionRuleStatistics
     mUnchangedTransitions = 0;
   }
 
-  // #########################################################################
-  // # Simple Access Methods
+
+  //#########################################################################
+  //# Simple Access Methods
   /**
    * Gets the class of the abstraction rule these statistics are for.
    */
@@ -162,8 +174,9 @@ public class AbstractionRuleStatistics
     return mOutputTransitions + mUnchangedTransitions;
   }
 
-  // #########################################################################
-  // # Providing Statistics
+
+  //#########################################################################
+  //# Providing Statistics
   /**
    * Sets the number of times this abstraction rule reduced the size of the
    * model it was applied to.
@@ -243,37 +256,66 @@ public class AbstractionRuleStatistics
     mUnchangedTransitions = sum;
   }
 
-  // #########################################################################
-  // # Printing
+
+  //#########################################################################
+  //# Merging
+  public void merge(final AbstractionRuleStatistics stats)
+  {
+    if (mRuleClass == stats.mRuleClass) {
+      mAppliedCount += stats.mAppliedCount;
+      mReductionCount += stats.mReductionCount;
+      mInputStates = AnalysisResult.mergeAdd(mInputStates, stats.mInputStates);
+      mOutputStates =
+        AnalysisResult.mergeAdd(mOutputStates, stats.mOutputStates);
+      mUnchangedStates =
+        AnalysisResult.mergeAdd(mUnchangedStates, stats.mUnchangedStates);
+      mInputTransitions =
+        AnalysisResult.mergeAdd(mInputTransitions, stats.mInputTransitions);
+      mOutputTransitions =
+        AnalysisResult.mergeAdd(mOutputTransitions, stats.mOutputTransitions);
+      mUnchangedTransitions =
+        AnalysisResult.mergeAdd(mUnchangedTransitions,
+                                stats.mUnchangedTransitions);
+      mRunTime += stats.mRunTime;
+    } else {
+      throw new ClassCastException
+        ("Attempting to merge statistics for " +
+         ProxyTools.getShortClassName(mRuleClass) +
+         " with statistics for " +
+         ProxyTools.getShortClassName(stats.mRuleClass) + "!");
+    }
+  }
+
+
+  //#########################################################################
+  //# Printing
   public void print(final PrintWriter writer)
   {
-    @SuppressWarnings("unused")
-    final Formatter formatter = new Formatter(writer);
     writer.println("Name of rule: " + ProxyTools.getShortClassName(mRuleClass));
     writer.println("Total number of times applied: " + mAppliedCount);
 
     writer.println("Total run time: " + mRunTime);
-    writer.println("Total number of times a reduction occurred: "
-        + mReductionCount);
+    writer.println("Total number of times a reduction occurred: " +
+                   mReductionCount);
     final double probability =
         (double) mReductionCount / (double) mAppliedCount;
     writer.println("Probability of a reduction occurring: " + probability);
     writer.println("Total number of input states: " + getTotalInputStates());
-    writer.println("Total number of input transitions: "
-        + getTotalInputTransitions());
+    writer.println("Total number of input transitions: " +
+                   getTotalInputTransitions());
     writer.println("Total number of output states: " + getTotalOutputStates());
-    writer.println("Total number of output transitions: "
-        + getTotalOutputTransitions());
+    writer.println("Total number of output transitions: " +
+                   getTotalOutputTransitions());
     writer.println("Sum of input states with a reduction: " + mInputStates);
-    writer.println("Sum of input transitions with a reduction: "
-        + mInputTransitions);
+    writer.println("Sum of input transitions with a reduction: " +
+                   mInputTransitions);
     writer.println("Sum of output states with a reduction: " + mOutputStates);
-    writer.println("Sum of output transitions with a reduction: "
-        + mOutputTransitions);
-    writer
-        .println("Sum of input states with no reduction: " + mUnchangedStates);
-    writer.println("Sum of input transitions with no reduction: "
-        + mUnchangedTransitions);
+    writer.println("Sum of output transitions with a reduction: " +
+                   mOutputTransitions);
+    writer.println("Sum of input states with no reduction: " +
+                   mUnchangedStates);
+    writer.println("Sum of input transitions with no reduction: " +
+                   mUnchangedTransitions);
 
   }
 
@@ -306,13 +348,12 @@ public class AbstractionRuleStatistics
     writer.print("," + mReductionCount );
     double probability = (double) mReductionCount / (double) mAppliedCount;
     writer.print("," + probability);
-    probability =
-        (double) (getTotalInputStates() - getTotalOutputStates())
-            / (double) getTotalInputStates();
+    probability = (double) (getTotalInputStates() - getTotalOutputStates()) /
+                  (double) getTotalInputStates();
     writer.print("," + probability);
     probability =
-        (double) (getTotalInputTransitions() - getTotalOutputTransitions())
-            / (double) getTotalInputTransitions();
+      (double) (getTotalInputTransitions() - getTotalOutputTransitions()) /
+      (double) getTotalInputTransitions();
     writer.print("," + probability);
     writer.print("," + getTotalInputStates());
     writer.print("," + getTotalInputTransitions());
@@ -326,8 +367,9 @@ public class AbstractionRuleStatistics
     writer.print("," + mUnchangedTransitions);
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private final Class<? extends AbstractionRule> mRuleClass;
   private long mRunTime;
   private int mAppliedCount;
@@ -338,4 +380,5 @@ public class AbstractionRuleStatistics
   private int mOutputTransitions;
   private int mUnchangedStates;
   private int mUnchangedTransitions;
+
 }
