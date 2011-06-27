@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="aip1efa_bogus" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="aip1efa_sic5a" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Modified model to check whether the aip1 subsystem of the synthesis version R. Song's maip3 model satisfies SIC Property V. The tester automaton testsic5 is simplified version without any local events, which only gives an incomplete verification of SIC Property V.
 This model is to be verified for generalised nonblocking with respect to precondition :alpha. It passes this test for N=3 pallets, which means that the aip1efa model satisfies SIC Property V. For larger values of N, the test fails giving a bogus counterexample, and no conclusion about the SIC Property V of the aip1efa model can be made.
 

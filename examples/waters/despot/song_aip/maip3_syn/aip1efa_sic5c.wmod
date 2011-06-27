@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="aip1efa_sic5" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="aip1efa_sic5c" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Modified model to check whether the aip1 subsystem of the synthesis version R. Song's maip3 model satisfies SIC Property V. This model is to be verified for generalised nonblocking with respect to precondition :alpha. It is not known whether or not the model is generalised nonblocking.
-This model is to be verified for generalised nonblocking with respect to precondition :alpha. It passes this test for N=3 and N=4 pallets, which means that the aip1efa model satisfies SIC Property V. For larger values of N, the result is yet unknown.
+This model is to be verified for generalised nonblocking with respect to precondition :alpha. It passes this test for N=3 and N=5 pallets, which means that the aip1efa model satisfies SIC Property V. For larger values of N, the result is yet unknown.
 
 The following changes have been made in order make the model amenable to compositional verification.
 1. In the SIC5 test automaton, testsic5, only events MvInPalletType1IO:1 and MvInPalletType2IO:1 are considered as local events. The property checked is thus weaker than SIC Property V, as it allows for more alpha-marked states than the standard test automaton.
@@ -183,7 +183,7 @@ Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-bas
             </ns2:AttributeMap>
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="testsic5">
-            <Graph Deterministic="false">
+            <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
@@ -241,8 +241,8 @@ Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-bas
                     </Edge>
                     <Edge Target="S2" Source="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
+                            <SimpleIdentifier Name="MvInPalletType1IO:1"/>
+                            <SimpleIdentifier Name="MvInPalletType2IO:1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="5" X="-10"/>
                             </LabelGeometry>
@@ -258,8 +258,8 @@ Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-bas
                     </Edge>
                     <Edge Target="S2" Source="S2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
+                            <SimpleIdentifier Name="MvInPalletType1IO:1"/>
+                            <SimpleIdentifier Name="MvInPalletType2IO:1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-33" X="-23"/>
                             </LabelGeometry>
@@ -270,16 +270,14 @@ Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-bas
                     </Edge>
                     <Edge Target="S0" Source="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="startpallets:1"/>
-                            <SimpleIdentifier Name="finishpallets:1"/>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
+                            <SimpleIdentifier Name="MvInPalletType1IO:1"/>
+                            <SimpleIdentifier Name="MvInPalletType2IO:1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="5"/>
+                                <Point Y="-4" X="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="24" X="119"/>
+                            <Point Y="27" X="130"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
