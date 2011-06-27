@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="aip1efa_sic5" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Modified model to check whether the aip1 subsystem of the synthesis version R. Song's maip3 model satisfies SIC Property V. This model is to be verified for generalised nonblocking with respect to precondition :alpha. It is not known whether or not the model is generalised nonblocking.
-This model is to be verified for generalised nonblocking with respect to precondition :alpha. It passes this test for N=3 and N=4 pallets, which means that the aip1efa model satisfies SIC Property V. For larger values of N, the result is yet unknown.
+<Module Name="aip1efa_bogus" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Modified model to check whether the aip1 subsystem of the synthesis version R. Song's maip3 model satisfies SIC Property V. The tester automaton testsic5 is simplified version without any local events, which only gives an incomplete verification of SIC Property V.
+This model is to be verified for generalised nonblocking with respect to precondition :alpha. It passes this test for N=3 pallets, which means that the aip1efa model satisfies SIC Property V. For larger values of N, the test fails giving a bogus counterexample, and no conclusion about the SIC Property V of the aip1efa model can be made.
 
 The following changes have been made in order make the model amenable to compositional verification.
-1. In the SIC5 test automaton, testsic5, only events MvInPalletType1IO:1 and MvInPalletType2IO:1 are considered as local events. The property checked is thus weaker than SIC Property V, as it allows for more alpha-marked states than the standard test automaton.
+1. In the SIC5 test automaton, testsic5, all local events have been removed. The property checked is thus weaker than SIC Property V, as it allows for more alpha-marked states than the standard test automaton.
 2. Selfloops labelled NoPalletType2InIO:1, NoPalletType1InIO:1, NoPalletOutIO:1, NoPalletELTU1:1, NoPalletCLTU1:1, NoPalletELTU2:1, NoPalletCLTU2:1, NoPalletELTU3:1, NoPalletCLTU3:1, NoPalletELTU4:1, NoPalletCLTU4:1 have been removed from specifications h_ManageIO:1, h_AltMvInTypes:1, h_ManageTU1:1, h_ManageTU1:2, h_ManageTU1:3, h_ManageTU1:4. It is understood from the corresponding plants that these events can only occur in the states with the selfloops, so deleting the events from the specifications should not change the synchronous product.
 3. Specification h_ManageIO:1 and plant h_QueryPalletAtIO:1 have been decomposed into two automata each, such that their synchronous composition gives the original automaton.
 4. Plants h_CapEL11:1, h_CapEL21:1, h_CapEL31:1 have been removed (changed to properties) as it was found by language inclusion check that they do not restrict the system behaviour.
@@ -193,7 +193,7 @@ Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-bas
                             <Point Y="64" X="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-6" X="-28"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -204,15 +204,7 @@ Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-bas
                             <Point Y="192" X="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S2">
-                        <PointGeometry>
-                            <Point Y="128" X="192"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-7" X="-25"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -239,47 +231,16 @@ Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-bas
                             <Point Y="127" X="79"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S2" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S0" Source="S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="finishpallets:1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S2" Source="S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-33" X="-23"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="127" X="237"/>
-                        </SplineGeometry>
-                    </Edge>
                     <Edge Target="S0" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="startpallets:1"/>
                             <SimpleIdentifier Name="finishpallets:1"/>
-                            <SimpleIdentifier Name="IsPalletType1InIO:1"/>
-                            <SimpleIdentifier Name="IsPalletType2InIO:1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="5"/>
+                                <Point Y="-17" X="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="24" X="119"/>
+                            <Point Y="65" X="141"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
