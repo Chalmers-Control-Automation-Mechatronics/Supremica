@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.despot
 //# CLASS:   SICPropertyBuilder
 //###########################################################################
@@ -183,21 +183,17 @@ public class SICPropertyBuilder
       } else {
         iface.add(event);
       }
-
     }
 
-    if(mSplitting && !local.isEmpty()){
-        for(final EventProxy event : local){
-          final List<EventProxy> local1= Collections.singletonList(event);
-          final String aut_name = "Test:" + event.getName();
-          newAutomata.add(createSIC5Test(answer,iface,local1,aut_name ));
-         // MarshallingTools.saveModule(newAutomata, "/research/vaibhav/sic5_changes_automaton/1.wmod");
-        }
+    if (mSplitting && !local.isEmpty()) {
+      for (final EventProxy event : local) {
+        final List<EventProxy> local1 = Collections.singletonList(event);
+        final String aut_name = "Test:" + event.getName();
+        newAutomata.add(createSIC5Test(answer, iface, local1, aut_name));
+      }
+    } else {
+      newAutomata.add(createSIC5Test(answer, iface, local, "Test:Aut"));
     }
-    else{
-      newAutomata.add(createSIC5Test(answer,iface,local,"Test:Aut"));
-   }
-
 
     // removes markings from automaton event alphabet
     final Collection<EventProxy> newEvents =
@@ -214,8 +210,6 @@ public class SICPropertyBuilder
     final ProductDESProxy newModel =
         mFactory.createProductDESProxy(name, comment, null, newEvents,
                                        newAutomata);
-    // Test Automaton in case of splitting = false;
-    // MarshallingTools.saveProductDES(newModel, "/research/vaibhav/sic5_changes_automaton/"+name+".wmod");
     return newModel;
   }
 
@@ -336,7 +330,6 @@ public class SICPropertyBuilder
   }
 
 
-
   //#########################################################################
   // new sic5 test creator
   private AutomatonProxy createSIC5Test(final EventProxy answer,
@@ -352,16 +345,14 @@ public class SICPropertyBuilder
 
     // creates the 3 states needed (the 3rd is optional, not needed if only
     // request and answer events exist)
-    final List<StateProxy> states = new ArrayList<StateProxy>(2);
-    List<EventProxy> propositions = new ArrayList<EventProxy>(1);
+    final List<StateProxy> states = new ArrayList<StateProxy>(3);
     // initial state has the default marking proposition
-    propositions.add(mMarking);
+    List<EventProxy> propositions = Collections.singletonList(mMarking);
     final StateProxy initialState =
         mFactory.createStateProxy("T1", true, propositions);
     states.add(initialState);
     // next state has the precondition marking
-    propositions = new ArrayList<EventProxy>(1);
-    propositions.add(mPreconditionMarking);
+    propositions = Collections.singletonList(mPreconditionMarking);
     final StateProxy alphaState =
         mFactory.createStateProxy("T2", false, propositions);
     states.add(alphaState);
@@ -372,23 +363,22 @@ public class SICPropertyBuilder
     for (final EventProxy event : newEvents) {
       // self loop on the initial state that includes entire event alphabet
       final TransitionProxy transition =
-          mFactory.createTransitionProxy(initialState, event, initialState);
+        mFactory.createTransitionProxy(initialState, event, initialState);
       transitions.add(transition);
-
       // the transition which accepts any request event
-      if (event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
+      final Map<String,String> attribs = event.getAttributes();
+      final HISCAttributes.EventType etype =
+        HISCAttributes.getEventType(attribs);
+      switch (etype) {
+      case REQUEST:
         final TransitionProxy requestTransition =
             mFactory.createTransitionProxy(initialState, event, alphaState);
         transitions.add(requestTransition);
-      }
-
-      // the transitions which accepts any local event (i.e. non request, non
-      // answer events)
-      else if (!event.getAttributes().equals(HISCAttributes.ATTRIBUTES_ANSWER)
-          && !event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
+        break;
+      case LOWDATA:
+      case DEFAULT:
         if (states.size() < 3) {
           // third state has no propositions
-          propositions = null;
           t3State = mFactory.createStateProxy("T3", false, null);
           states.add(t3State);
         }
@@ -398,8 +388,10 @@ public class SICPropertyBuilder
         final TransitionProxy localSelfLoop =
             mFactory.createTransitionProxy(t3State, event, t3State);
         transitions.add(localSelfLoop);
+        break;
+      default:
+        break;
       }
-
     }
 
     // creates the two answer transitions
@@ -411,7 +403,6 @@ public class SICPropertyBuilder
           mFactory.createTransitionProxy(t3State, answer, initialState);
       transitions.add(finallyAnswer);
     }
-
 
     // adds the two marking propositions to the automaton alphabet
     newEvents.add(mMarking);
@@ -420,111 +411,8 @@ public class SICPropertyBuilder
     final AutomatonProxy newTestAut =
         mFactory.createAutomatonProxy(name, ComponentKind.SPEC,
                                       newEvents, states, transitions);
-    // for mSplitting = false
-    //MarshallingTools.saveModule(newTestAut, "/research/vaibhav/sic5_changes_automaton/maip3_syn/6(mustl,mins)/splitting_false/"+name+".wmod");
-    //for mSplitting = true
-    //MarshallingTools.saveModule(newTestAut, "/research/vaibhav/sic5_changes_automaton/maip3_syn/6(mustl,mins)/splitting_true/"+name+".wmod");
-    return newTestAut;
-
-  }
-
-
-  //# Auxiliary Methods
-  /*
-   * Creates the test automaton added to the model to check SIC Property V
-   * with respect to the given answer event.
-  private AutomatonProxy createSIC5Test(final EventProxy answer)
-  {
-    // removes markings from automaton event alphabet
-    final Collection<EventProxy> newEvents =
-        removePropositions(mModel.getEvents());
-
-
-    // creates the 3 states needed (the 3rd is optional, not needed if only
-    // request and answer events exist)
-    final List<StateProxy> states = new ArrayList<StateProxy>(2);
-    List<EventProxy> propositions = new ArrayList<EventProxy>(1);
-    // initial state has the default marking proposition
-    propositions.add(mMarking);
-    final StateProxy initialState =
-        mFactory.createStateProxy("T1", true, propositions);
-    states.add(initialState);
-    // next state has the precondition marking
-    propositions = new ArrayList<EventProxy>(1);
-    propositions.add(mPreconditionMarking);
-    final StateProxy alphaState =
-        mFactory.createStateProxy("T2", false, propositions);
-    states.add(alphaState);
-    StateProxy t3State = null;
-
-    // creates the transitions needed
-    final List<TransitionProxy> transitions = new ArrayList<TransitionProxy>();
-    for (final EventProxy event : newEvents) {
-      // self loop on the initial state that includes entire event alphabet
-      final TransitionProxy transition =
-          mFactory.createTransitionProxy(initialState, event, initialState);
-      transitions.add(transition);
-
-      // the transition which accepts any request event
-      if (event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
-        final TransitionProxy requestTransition =
-            mFactory.createTransitionProxy(initialState, event, alphaState);
-        transitions.add(requestTransition);
-      }
-
-      // the transitions which accepts any local event (i.e. non request, non
-      // answer events)
-      else if (!event.getAttributes().equals(HISCAttributes.ATTRIBUTES_ANSWER)
-          && !event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
-        if (states.size() < 3) {
-          // third state has no propositions
-          propositions = null;
-          t3State = mFactory.createStateProxy("T3", false, null);
-          states.add(t3State);
-        }
-        final TransitionProxy localTransition =
-            mFactory.createTransitionProxy(alphaState, event, t3State);
-        transitions.add(localTransition);
-        final TransitionProxy localSelfLoop =
-            mFactory.createTransitionProxy(t3State, event, t3State);
-        transitions.add(localSelfLoop);
-      }
-
-    }
-    // creates the two answer transitions
-    final TransitionProxy immediateAnswer =
-        mFactory.createTransitionProxy(alphaState, answer, initialState);
-    transitions.add(immediateAnswer);
-    if (t3State != null) {
-      final TransitionProxy finallyAnswer =
-          mFactory.createTransitionProxy(t3State, answer, initialState);
-      transitions.add(finallyAnswer);
-    }
-
-    // adds the two marking propositions to the automaton alphabet
-    newEvents.add(mMarking);
-    newEvents.add(mPreconditionMarking);
-
-    final AutomatonProxy newTestAut =
-        mFactory.createAutomatonProxy("Test:Aut", ComponentKind.SPEC,
-                                      newEvents, states, transitions);
-
-
-     // final AutomatonProxy newTestAuto =
-      mFactory.createAutomatonProxy("Test:Event", ComponentKind.SPEC,
-                                    newEvents, states, transitions);
-   // String name = "Test:" + getEventName();
-
     return newTestAut;
   }
-   */
-
-
-  // private String getEventName()
-  //{
-    // TODO Auto-generated method stub
-    //return null;
-  //}
 
   private AutomatonProxy createSIC5InterfaceAutomaton
     (final AutomatonProxy aut, final EventProxy answer)
@@ -545,7 +433,6 @@ public class SICPropertyBuilder
     }
 
     final List<StateProxy> newStates = new ArrayList<StateProxy>();
-
     for (final StateProxy state : aut.getStates()) {
       // removes all marking propositions from all states by creating an empty
       // list of propositions
@@ -600,7 +487,6 @@ public class SICPropertyBuilder
     mStateMap.clear();
     return modifiedLowLevelAutomaton;
   }
-
 
   /**
    * Creates the test automaton added to the model to check SIC Property VI.
@@ -802,10 +688,9 @@ public class SICPropertyBuilder
    */
   private ProductDESProxy mModel;
 
-
-
-
   private final ProductDESProxyFactory mFactory;
+
+  private boolean mSplitting = false;
 
   /**
    * A list of the low level automaton that are created with the new marking
@@ -831,8 +716,6 @@ public class SICPropertyBuilder
   /**
    * The tau event used for the test automaton for SIC property VI.
    */
-  private boolean mSplitting = false;
-
   private EventProxy mTau;
 
 }
