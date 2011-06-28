@@ -36,6 +36,10 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
       initialize(d);
     }
 
+    public int getSignBitIndex()
+    {
+        return signBitIndex;
+    }
 
     protected TCSupremicaBDDBitVector buildSupBDDBitVector(int bitNum)
     {
@@ -131,31 +135,41 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
     public ResultOverflows addConsideringOverflows
       (final SupremicaBDDBitVector that)
     {
-        if (bitNum != that.bitNum)
-            throw new BDDException();
+//        if (bitNum != that.bitNum)
+//            throw new BDDException();
 
         BDD c = mFactory.zero();
         BDD highOrderCarryIn = mFactory.zero();
         BDD highOrderCarryOut = mFactory.zero();
-        final TCSupremicaBDDBitVector res = buildSupBDDBitVector(bitNum);
+        final TCSupremicaBDDBitVector res = buildSupBDDBitVector(getLargerLength(that));
 
         for (int n = 0; n < res.bitNum; n++)
         {
+
+            BDD leftBDD = bitvec[signBitIndex];
+            BDD rightBDD = that.bitvec[((TCSupremicaBDDBitVector)that).getSignBitIndex()];
+
+            if(n < this.length())
+                leftBDD = bitvec[n];
+
+            if(n < that.length())
+                rightBDD = that.bitvec[n];
+
             /* bitvec[n] = l[n] ^ r[n] ^ c; */
-            res.bitvec[n] = bitvec[n].xor(that.bitvec[n]);
+            res.bitvec[n] = leftBDD.xor(rightBDD);
             res.bitvec[n].xorWith(c.id());
 
             /* c = (l[n] & r[n]) | (c & (l[n] | r[n])); */
-            final BDD tmp1 = bitvec[n].or(that.bitvec[n]);
+            final BDD tmp1 = leftBDD.or(rightBDD);
             tmp1.andWith(c);
-            final BDD tmp2 = bitvec[n].and(that.bitvec[n]);
+            final BDD tmp2 = leftBDD.and(rightBDD);
             tmp2.orWith(tmp1);
             c = tmp2;
-            if(n == signBitIndex-1)
+            if(n == res.getSignBitIndex()-1)
             {
                 highOrderCarryIn = c.id();
             }
-            if(n == signBitIndex)
+            if(n == res.getSignBitIndex())
             {
                 highOrderCarryOut = c.id();
             }
@@ -181,25 +195,35 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
       return (TCSupremicaBDDBitVector)subConsideringOverflows(that).getResult();
     }
 
-    protected BDD lthe(final SupremicaBDDBitVector r, BDD thanORequal)
+    protected BDD lthe(final SupremicaBDDBitVector that, BDD thanORequal)
     {
-        if (this.bitNum != r.bitNum)
-            throw new BDDException();
+//        if (this.bitNum != r.bitNum)
+//            throw new BDDException();
         
         BDD p = thanORequal;
-        for (int n=0 ; n<bitNum ; n++)
+        for (int n=0 ; n<getLargerLength(that) ; n++)
         {
-            final BDD tmp1 = bitvec[n].apply(r.bitvec[n], BDDFactory.less);
-            final BDD tmp2 = bitvec[n].apply(r.bitvec[n], BDDFactory.biimp);
+            BDD leftBDD = bitvec[signBitIndex];
+            BDD rightBDD = that.bitvec[((TCSupremicaBDDBitVector)that).getSignBitIndex()];
+
+            if(n < this.length())
+                leftBDD = bitvec[n];
+
+            if(n < that.length())
+                rightBDD = that.bitvec[n];
+
+            final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.less);
+            final BDD tmp2 = leftBDD.apply(rightBDD, BDDFactory.biimp);
             tmp2.andWith(p);
             tmp1.orWith(tmp2);
             p = tmp1;
         }
         final BDD SBILBDD = bitvec[signBitIndex];
-        final BDD SBIRBDD = r.bitvec[signBitIndex];
+        final BDD SBIRBDD = that.bitvec[((TCSupremicaBDDBitVector)that).getSignBitIndex()];
         return (SBILBDD.and(SBIRBDD.not())).or((SBILBDD.or(SBIRBDD.not())).and(p));
-    }  
-
+    }
+    
+    //This function needs to be modified
     public void div_rec(final SupremicaBDDBitVector divisor,
                                final SupremicaBDDBitVector remainder,
                                final SupremicaBDDBitVector result,
@@ -215,6 +239,7 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
         final TCSupremicaBDDBitVector tmp = (TCSupremicaBDDBitVector)remainder.add(sub.toTwosComplement());
         final TCSupremicaBDDBitVector newRemainder = (TCSupremicaBDDBitVector)tmp.shl(1, result.bitvec[divisor.bitNum - 1]);
+
         if (step > 1)
             div_rec(divisor, newRemainder, newResult, step - 1);
         
@@ -222,6 +247,7 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         sub.free();
         zero.free();
         isSmaller.free();
+
         result.replaceWith(newResult);
         remainder.replaceWith(newRemainder);
     }

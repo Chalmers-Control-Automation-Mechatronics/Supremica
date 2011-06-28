@@ -27,7 +27,6 @@ public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         initialize(val);
     }
 
-
     public PSupremicaBDDBitVector(final BDDFactory factory,final BDDDomain d)
     {
       this(factory, d.varNum());
@@ -212,6 +211,7 @@ public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         return p;
     }
 
+    //This function needs to be modified
     public void div_rec(final SupremicaBDDBitVector divisor,
                                final SupremicaBDDBitVector remainder,
                                final SupremicaBDDBitVector result,

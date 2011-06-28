@@ -183,18 +183,18 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
                 final MinMax minMax = new MinMax(lowerBound,upperBound);
                 if(theoNbrOfReachableStates == 0)
-                    theoNbrOfReachableStates = (double)(Math.abs(upperBound - lowerBound +1));
+                    theoNbrOfReachableStates = (double)(Math.abs(upperBound - lowerBound + 1));
                 else
-                    theoNbrOfReachableStates *= ((double) Math.abs(upperBound - lowerBound +1));
+                    theoNbrOfReachableStates *= ((double) Math.abs(upperBound - lowerBound + 1));
 
                 if(!var2MinMaxValMap.containsKey(varName))
                 {
                     var2MinMaxValMap.put(varName, minMax);
                 }
 
-    //            int currDomain = upperBound+1-lowerBound;
-                final int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
-                var2domainMap.put(var.getName(), currDomain);
+//                int currDomain = upperBound-lowerBound+1;
+                int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
+                var2domainMap.put(var.getName(), negativeValuesIncluded?currDomain*2:currDomain);
                 if(currDomain>domain)
                     domain = currDomain;
             }
@@ -203,7 +203,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 //        negativeValuesIncluded = true;
         //we multiply the domain with 2 to add 1 extra bit for the sign
         if(negativeValuesIncluded)
+        {
             domain *= 2;
+        }
         
         for(final AbstractSubject sub:module.getComponentListModifiable())
         {
