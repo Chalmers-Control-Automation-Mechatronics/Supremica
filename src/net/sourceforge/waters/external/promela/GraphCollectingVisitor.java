@@ -324,29 +324,26 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitInitial(final InitialTreeNode t)
   {
-  //  duplicatedRun = new ArrayList<String>();
-    final Collection<String> output = new ArrayList<String>();
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
     final PromelaGraph initGraph = collectGraphs((PromelaTree) t.getChild(0));
-
-
     final GraphProxy graph = initGraph.createGraphProxy(mFactory, t.getText());
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
     mComponents.add(component);
-
     return null;
   }
-public Collection<String> distinct(final Collection<String> t,final Collection<String> output){
-  final ArrayList<String> temp = new ArrayList<String>(t);
-  for(int i=0;i<t.size();i++){
-    final String compare = temp.get(i);
-    temp.set(i, null);
-    if(temp.contains(compare)){
-      output.add(compare);
+
+  public Collection<String> distinct(final Collection<String> t,final Collection<String> output){
+    final ArrayList<String> temp = new ArrayList<String>(t);
+    for(int i=0;i<t.size();i++){
+      final String compare = temp.get(i);
+      temp.set(i, null);
+      if(temp.contains(compare)){
+        output.add(compare);
+      }
     }
+    return output;
   }
-  return output;
-}
+
   public Object visitInitialStatement(final InitialStatementTreeNode t)
   {
     //assert t.getText().equals("atomic");
@@ -431,18 +428,18 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     return result;
   }
   public Object visitBreak(final BreakStatementTreeNode t)
-  {//TODO
-    if(!mUnWinding){
+  {
+    if (!mUnWinding) {
       final PromelaNode node = new PromelaNode(PromelaNode.EndType.BREAK);
       final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
       cNodes.add(node);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
       final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
       return result;
-  }else{
-    //create step_* transition
+    } else {
+      //create step_* transition
       Tree tree = t;
-      while(!(tree instanceof ProctypeTreeNode)){
+      while (!(tree instanceof ProctypeTreeNode)) {
         tree = tree.getParent();
       }
       final String name = tree.getText();
@@ -453,7 +450,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-      if(!mVisitor.getEvents().contains(event)){
+      if (!mVisitor.getEvents().contains(event)) {
         mVisitor.getEvents().add(event);
       }
       label.add(ident);
@@ -480,17 +477,17 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
 
   public Object visitGoto(final GotoTreeNode t)
   {
-    if(!mUnWinding){
+    if (!mUnWinding) {
       final String labelName = t.getText();
       final PromelaNode node = new PromelaNode(labelName); //creating goto label
       final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
       cNodes.add(node);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
-      final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
+      final PromelaGraph result = new PromelaGraph(cNodes, cEdges);
       return result;
-    }else{
+    } else {
       Tree tree = t;
-      while(!(tree instanceof ProctypeTreeNode)){
+      while (!(tree instanceof ProctypeTreeNode)) {
         tree = tree.getParent();
       }
       final String name = tree.getText();
@@ -503,7 +500,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-      if(!mVisitor.getEvents().contains(event)){
+      if (!mVisitor.getEvents().contains(event)) {
         mVisitor.getEvents().add(event);
       }
       label.add(ident);
@@ -518,7 +515,6 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
 
   public Object visitSkip(final SkipTreeNode t)
   {
-    // TODO Auto-generated method stub
 /*    Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode)){
       tree = tree.getParent();
@@ -538,16 +534,14 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       cNodes.add(node);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
       final PromelaGraph result = new PromelaGraph(cNodes,cEdges,node);
-    //  System.out.print
       return result;
-    }else{
-  //    System.out.println("true");
+    } else {
+      //    System.out.println("true");
       Tree tree = t;
       while(!(tree instanceof ProctypeTreeNode)){
         tree = tree.getParent();
       }
       final String name = tree.getText();
-      final String labelName = t.getText();
       final PromelaNode node = new PromelaNode(PromelaNode.EndType.END);
       final PromelaNode startNode = new PromelaNode();
       final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
