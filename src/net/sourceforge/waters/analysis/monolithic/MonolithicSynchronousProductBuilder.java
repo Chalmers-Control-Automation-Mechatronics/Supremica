@@ -493,7 +493,7 @@ public class MonolithicSynchronousProductBuilder
     }
 
     final String name = computeOutputName();
-    final ComponentKind kind = ComponentKind.PLANT;
+    final ComponentKind kind = getOutputKind();
     return factory.createAutomatonProxy
       (name, kind, events, states, transitions);
   }

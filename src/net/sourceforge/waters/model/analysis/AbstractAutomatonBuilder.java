@@ -148,7 +148,7 @@ public abstract class AbstractAutomatonBuilder
   //#########################################################################
   //# Data Members
   private String mOuptutName;
-  private ComponentKind mOutputKind;
+  private ComponentKind mOutputKind = ComponentKind.PLANT;
 
 }
 
