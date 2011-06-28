@@ -74,12 +74,12 @@ public class PromelaGraph
   /*
    * connect end node of first graph to start node of second graph
    */
-  public static PromelaGraph sequentialComposition (final PromelaGraph first, final PromelaGraph second,boolean unwind){
+  public static PromelaGraph sequentialComposition (final PromelaGraph first, final PromelaGraph second,final boolean unwind){
     if(first==null){
-      unwind = false;
+      //unwind = false;
       return second;
     }else if(second ==null){
-      unwind = false;
+     // unwind = false;
       return first;
     }else{
       PromelaGraph output=null;
@@ -237,12 +237,14 @@ public class PromelaGraph
         }
 
       }
-
-      output = new PromelaGraph(nodesOfResult,edgesOfResult,first.getStart());
-
+      if(edgesOfFirst.size()!=0){
+        output = new PromelaGraph(nodesOfResult,edgesOfResult,first.getStart());
+      }else{
+        output = new PromelaGraph(nodesOfResult,edgesOfResult,second.getStart());
+      }
 
       }
-      unwind = false;
+
       return output;
     }
 
@@ -267,7 +269,8 @@ public class PromelaGraph
       final List<PromelaNode> nodesOfSecond = second.getNodes();
       final List<PromelaEdge> edgesOfSecond = second.getEdges();
       PromelaGraph output = null;
-
+      //TODO
+      System.out.println(edgesOfFirst.size()+" "+edgesOfSecond.size());
       final PromelaNode newStartNode = new PromelaNode();
       final PromelaNode newEndNode = new PromelaNode(PromelaNode.EndType.END);
       final List<PromelaEdge> edgesOfResult =
@@ -501,7 +504,7 @@ public class PromelaGraph
       }
 
 
-      if(nodesOfFirst.size()==1){
+  /*    if(nodesOfFirst.size()==1){
         final PromelaNode node = nodesOfFirst.get(0);
         if(node.isBreak()){
           indexNode.add(node);
@@ -519,7 +522,10 @@ public class PromelaGraph
         }else if(node.isEnd()){
           //TO DO
         }
-      }else{
+      }
+      */
+    //  else{
+
       for(final PromelaNode n: nodesOfFirst){
         if (n.isBreak()){
           indexNode.add(n);
@@ -557,7 +563,7 @@ public class PromelaGraph
           nodesOfResult.add(n);
         }
       }
-      }
+      //}
       //first.setEnd(newEndNode);
       output = new PromelaGraph(nodesOfResult,edgesOfResult,first.getStart());
       return output;
@@ -797,7 +803,7 @@ public class PromelaGraph
     SimpleNodeProxy proxy;
     for (final PromelaNode node : getNodes()) {
       final boolean initial = (node == this.getStart());
-
+     // System.out.println(name+" "+getNodes().contains(this.getStart()));
       final boolean marked = (node.isEnd());
       proxy = node.createNode(name, index++, initial, marked, mFactory);
       mNodes.add(proxy);
