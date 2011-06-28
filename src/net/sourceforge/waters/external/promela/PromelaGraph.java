@@ -269,8 +269,7 @@ public class PromelaGraph
       final List<PromelaNode> nodesOfSecond = second.getNodes();
       final List<PromelaEdge> edgesOfSecond = second.getEdges();
       PromelaGraph output = null;
-      //TODO
-      System.out.println(edgesOfFirst.size()+" "+edgesOfSecond.size());
+
       final PromelaNode newStartNode = new PromelaNode();
       final PromelaNode newEndNode = new PromelaNode(PromelaNode.EndType.END);
       final List<PromelaEdge> edgesOfResult =
@@ -384,22 +383,25 @@ public class PromelaGraph
 
   public static PromelaGraph doCombineComposition(final PromelaGraph first,
                                                 final PromelaGraph second,
+                                                final PromelaNode start,
                                                 final PromelaNode endNode,
+                                                final PromelaNode secondStart,
                                                 final ModuleProxyFactory factory,
                                                 final String name,
                                                 final Map<PromelaNode,PromelaEdge> toBreakNode,
                                                 final boolean unwind)
   {
-    PromelaNode newStartNode = new PromelaNode();
+    if(!unwind){
+    final PromelaNode newStartNode = start;
     final PromelaNode newEndNode = endNode;
     final HashMap<PromelaNode,PromelaEdge> breakNodeSource = (HashMap<PromelaNode,PromelaEdge>) toBreakNode;
     if(first==null){
+    //  return second;
       final List<PromelaNode> nodesOfSecond = second.getNodes();
       final List<PromelaEdge> edgesOfSecond = second.getEdges();
       final List<PromelaEdge> indexEdge = new ArrayList<PromelaEdge>();
       final List<PromelaNode> indexNode = new ArrayList<PromelaNode>();
       PromelaGraph output = null;
-
 
       final List<PromelaEdge> edgesOfResult =
         new ArrayList<PromelaEdge>();
@@ -412,7 +414,7 @@ public class PromelaGraph
 
       if(!nodesOfSecond.contains(newEndNode)){
         nodesOfResult.add(newEndNode);
-        System.out.println("only once");
+        //System.out.println("only once");
       }
 
 
@@ -420,7 +422,7 @@ public class PromelaGraph
         final PromelaNode node = nodesOfSecond.get(0);
         if(node.isBreak()){
           indexNode.add(node);
-          newStartNode = new PromelaNode();
+         // newStartNode = new PromelaNode();
           second.setStart(newStartNode);
           final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
           final IdentifierProxy ident = factory.createSimpleIdentifierProxy("step_"+name);
@@ -477,98 +479,11 @@ public class PromelaGraph
       //second.setEnd(newEndNode);
       output = new PromelaGraph(nodesOfResult,edgesOfResult,second.getStart());
       return output;
-
-
-    }else if(second ==null){
-     // final ModuleProxyFactory mFactory = factory;
-      final List<PromelaNode> nodesOfFirst = first.getNodes();
-      final List<PromelaEdge> edgesOfFirst = first.getEdges();
-
-      final List<PromelaEdge> indexEdge = new ArrayList<PromelaEdge>();
-      final List<PromelaNode> indexNode = new ArrayList<PromelaNode>();
-      PromelaGraph output = null;
-
-
-     // final PromelaNode newEndNode = endNode;
-      final List<PromelaEdge> edgesOfResult =
-        new ArrayList<PromelaEdge>();
-      final List<PromelaNode> nodesOfResult =
-        new ArrayList<PromelaNode>();
-      PromelaLabel label2;
-      PromelaNode sourceNode;
-      PromelaEdge newEdge;
-
-      if(!nodesOfFirst.contains(newEndNode)){
-        nodesOfResult.add(newEndNode);
-        System.out.println("only once");
-      }
-
-
-  /*    if(nodesOfFirst.size()==1){
-        final PromelaNode node = nodesOfFirst.get(0);
-        if(node.isBreak()){
-          indexNode.add(node);
-          newStartNode = new PromelaNode();
-          first.setStart(newStartNode);
-          final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
-          final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
-
-          label.add(ident);
-          label2 = new PromelaLabel(label);
-          newEdge = new PromelaEdge(newStartNode,newEndNode,label2);
-          edgesOfResult.add(newEdge);
-          nodesOfResult.add(newStartNode);
-
-        }else if(node.isEnd()){
-          //TO DO
-        }
-      }
-      */
-    //  else{
-
-      for(final PromelaNode n: nodesOfFirst){
-        if (n.isBreak()){
-          indexNode.add(n);
-
-          for(final PromelaEdge e: edgesOfFirst){
-            if(e.getTarget()==n){
-              label2 = e.getLabelBlock();
-              sourceNode = e.getSource();
-              newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
-              edgesOfResult.add(newEdge);
-              indexEdge.add(e);
-            }
-          }
-        }else if(n.isEnd()&&n!=newEndNode){
-          indexNode.add(n);
-          final PromelaNode startNode = first.getStart();
-          for(final PromelaEdge e: edgesOfFirst){
-            if(e.getTarget()==n){
-              label2 = e.getLabelBlock();
-              sourceNode = e.getSource();
-              newEdge = new PromelaEdge(sourceNode, startNode, label2);
-              edgesOfResult.add(newEdge);
-              indexEdge.add(e);
-            }
-          }
-        }
-      }
-      for(final PromelaEdge e: edgesOfFirst){
-        if(!indexEdge.contains(e)){
-          edgesOfResult.add(e);
-        }
-      }
-      for(final PromelaNode n: nodesOfFirst){
-        if(!indexNode.contains(n)){
-          nodesOfResult.add(n);
-        }
-      }
-      //}
-      //first.setEnd(newEndNode);
-      output = new PromelaGraph(nodesOfResult,edgesOfResult,first.getStart());
-      return output;
-     // return first;
-    }else{
+    }
+    else if(second==null){
+      return first;
+    }
+    else{
       //if neither first or second are null
       final List<PromelaNode> nodesOfFirst = first.getNodes();
       final List<PromelaEdge> edgesOfFirst = first.getEdges();
@@ -590,7 +505,7 @@ public class PromelaGraph
 
       if(!nodesOfFirst.contains(newEndNode)){
         nodesOfResult.add(newEndNode);
-        System.out.println("only once");
+        //System.out.println("only once");
       }
 
 
@@ -796,6 +711,450 @@ public class PromelaGraph
       return output;
     }
 
+  } /**
+      *Separate unwind
+      */
+    else{
+    //TODO
+    final PromelaNode newStartNode = start;
+    final PromelaNode secondStartNode = new PromelaNode();
+    final PromelaNode newEndNode = endNode;
+    final HashMap<PromelaNode,PromelaEdge> breakNodeSource = (HashMap<PromelaNode,PromelaEdge>) toBreakNode;
+    /*
+     * I'm ignoring this part for now
+     */
+    if(first==null){
+
+      final List<PromelaNode> nodesOfSecond = second.getNodes();
+      final List<PromelaEdge> edgesOfSecond = second.getEdges();
+      final List<PromelaEdge> indexEdge = new ArrayList<PromelaEdge>();
+      final List<PromelaNode> indexNode = new ArrayList<PromelaNode>();
+      PromelaGraph output = null;
+
+      final List<PromelaEdge> edgesOfResult =
+        new ArrayList<PromelaEdge>();
+      final List<PromelaNode> nodesOfResult =
+        new ArrayList<PromelaNode>();
+      PromelaLabel label2;
+
+      PromelaNode sourceNode;
+      PromelaEdge newEdge;
+
+      if(!nodesOfSecond.contains(newEndNode)){
+        nodesOfResult.add(newEndNode);
+        //System.out.println("only once");
+      }
+
+
+      if(nodesOfSecond.size()==1){
+        final PromelaNode node = nodesOfSecond.get(0);
+        if(node.isBreak()){
+          indexNode.add(node);
+         // newStartNode = new PromelaNode();
+          second.setStart(newStartNode);
+          final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
+          final IdentifierProxy ident = factory.createSimpleIdentifierProxy("step_"+name);
+
+          label.add(ident);
+          label2 = new PromelaLabel(label);
+          newEdge = new PromelaEdge(newStartNode,newEndNode,label2);
+          edgesOfResult.add(newEdge);
+          nodesOfResult.add(newStartNode);
+          breakNodeSource.put(newStartNode, newEdge);
+        }else if(node.isEnd()){
+
+        }
+      }else{
+      for(final PromelaNode n: nodesOfSecond){
+        if (n.isBreak()){
+          indexNode.add(n);
+
+          for(final PromelaEdge e: edgesOfSecond){
+            if(e.getTarget()==n){
+              label2 = e.getLabelBlock();
+              sourceNode = e.getSource();
+              newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
+              breakNodeSource.put(sourceNode, newEdge);
+              edgesOfResult.add(newEdge);
+              indexEdge.add(e);
+            }
+          }
+        }else if(n.isEnd()&&n!=newEndNode){
+          indexNode.add(n);
+          final PromelaNode startNode = second.getStart();
+          for(final PromelaEdge e: edgesOfSecond){
+            if(e.getTarget()==n){
+              label2 = e.getLabelBlock();
+              sourceNode = e.getSource();
+              newEdge = new PromelaEdge(sourceNode, startNode, label2);
+              edgesOfResult.add(newEdge);
+              indexEdge.add(e);
+            }
+          }
+        }
+      }
+      for(final PromelaEdge e: edgesOfSecond){
+        if(!indexEdge.contains(e)){
+          edgesOfResult.add(e);
+        }
+      }
+      for(final PromelaNode n: nodesOfSecond){
+        if(!indexNode.contains(n)){
+          nodesOfResult.add(n);
+        }
+      }
+      }
+      //second.setEnd(newEndNode);
+      output = new PromelaGraph(nodesOfResult,edgesOfResult,second.getStart());
+      return output;
+    }
+    else if(second==null){
+      return first;
+    }
+    else{
+      /*
+       * if neither first or second are null
+       */
+      final List<PromelaNode> nodesOfFirst = first.getNodes();
+      final List<PromelaEdge> edgesOfFirst = first.getEdges();
+      final List<PromelaNode> nodesOfSecond = second.getNodes();
+      final List<PromelaEdge> edgesOfSecond = second.getEdges();
+      List<PromelaEdge> indexEdge = new ArrayList<PromelaEdge>();
+      List<PromelaNode> indexNode = new ArrayList<PromelaNode>();
+      PromelaGraph output = null;
+
+
+      final List<PromelaEdge> edgesOfResult =
+        new ArrayList<PromelaEdge>();
+      final List<PromelaNode> nodesOfResult =
+        new ArrayList<PromelaNode>();
+      PromelaLabel label2;
+      PromelaNode targetNode;
+      PromelaNode sourceNode;
+      PromelaEdge newEdge;
+      PromelaLabel secondLabel;
+      PromelaEdge secondEdge;
+      if(!nodesOfFirst.contains(newEndNode)){
+        nodesOfResult.add(newEndNode);
+        //System.out.println("only once");
+      }
+      if(!nodesOfFirst.contains(secondStartNode)){
+        nodesOfResult.add(secondStartNode);
+        //System.out.println("only once");
+      }
+      if(!nodesOfFirst.contains(secondStartNode)){
+        nodesOfResult.add(newStartNode);
+        //System.out.println("only once");
+      }
+      if(nodesOfFirst.size()==1){
+        final PromelaNode node = nodesOfFirst.get(0);
+        if(node.isBreak()){
+          indexNode.add(node);
+
+          first.setStart(newStartNode);
+          final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
+          final IdentifierProxy ident = factory.createSimpleIdentifierProxy("step_"+name);
+
+          label.add(ident);
+          label2 = new PromelaLabel(label);
+          newEdge = new PromelaEdge(newStartNode,newEndNode,label2);
+          edgesOfResult.add(newEdge);
+          nodesOfResult.add(newStartNode);
+          final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+          secondlabel.add(ident);
+          secondLabel = new PromelaLabel(secondlabel);
+          secondEdge = new PromelaEdge(secondStartNode,newEndNode,secondLabel);
+          edgesOfResult.add(secondEdge);
+
+          // one source node from break node
+          breakNodeSource.put(newStartNode,newEdge);
+        }else if(node.isEnd()){
+          //TO DO
+
+        }
+      }else{
+      for(final PromelaNode n: nodesOfFirst){
+        if(n==first.getStart()){
+          indexNode.add(n);
+          for(final PromelaEdge e: edgesOfFirst){
+            if(e.getSource()==n && !e.getTarget().isEnd()&&!e.getTarget().isBreak()){
+              label2 = e.getLabelBlock();
+              targetNode = e.getTarget();
+              newEdge = new PromelaEdge(newStartNode, targetNode, label2);
+              final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+              secondlabel.addAll(label2.getLabel());
+              secondLabel = new PromelaLabel(secondlabel);
+              secondEdge = new PromelaEdge(secondStartNode,targetNode,secondLabel);
+              edgesOfResult.add(secondEdge);
+              edgesOfResult.add(newEdge);
+              indexEdge.add(e);
+            }
+            //take me forever to debug this line @_@
+            else if(e.getSource()==n && e.getTarget().isEnd()){// && !second.getEnd().isBreak()){
+              label2 = e.getLabelBlock();
+              targetNode = e.getTarget();
+              indexNode.add(targetNode);
+              final List<PromelaEdge> tempEdges = new ArrayList<PromelaEdge>(edgesOfResult);
+              for(final PromelaEdge edge: tempEdges){
+                if(edge.getTarget()==edge.getSource()){
+                  label2.getLabel().addAll(edge.getLabelBlock().getLabel());
+                  final List<SimpleExpressionProxy> tempList = new ArrayList<SimpleExpressionProxy>(label2.getLabel());
+
+                  final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+                  final Comparator<SimpleExpressionProxy> comparator =
+                    new ExpressionComparator(optable);
+                  Collections.sort(tempList,comparator);
+                  final Collection<SimpleExpressionProxy> orderedEvent = new ArrayList<SimpleExpressionProxy>(tempList);
+                  label2 = new PromelaLabel(orderedEvent);
+                  edgesOfResult.remove(edge);
+                }
+              }
+
+              newEdge = new PromelaEdge(newStartNode, secondStartNode, label2);
+       /*       final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+              secondlabel.addAll(label2.getLabel());
+              secondLabel = new PromelaLabel(secondlabel);
+              secondEdge = new PromelaEdge(newStartNode,secondStartNode,secondLabel);
+              edgesOfResult.add(secondEdge);
+        */
+              edgesOfResult.add(newEdge);
+              indexEdge.add(e);
+            }
+          }
+        }else if (n.isBreak()){
+          indexNode.add(n);
+
+          for(final PromelaEdge e: edgesOfFirst){
+            if(e.getTarget()==n){
+              label2 = e.getLabelBlock();
+              sourceNode = e.getSource();
+
+              newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
+              if(sourceNode==first.getStart()){
+                newEdge = new PromelaEdge(newStartNode,newEndNode,label2);
+                final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+                secondlabel.addAll(label2.getLabel());
+                secondLabel = new PromelaLabel(secondlabel);
+                secondEdge = new PromelaEdge(secondStartNode,newEndNode,secondLabel);  // L - E
+                edgesOfResult.add(secondEdge);
+
+              }
+              edgesOfResult.add(newEdge);
+              indexEdge.add(e);
+              breakNodeSource.put(sourceNode,newEdge);
+
+            }
+          }
+        }else if(n.isEnd()&&n!=newEndNode){
+          indexNode.add(n);
+          //final PromelaNode startNode = first.getStart();
+          for(final PromelaEdge e: edgesOfFirst){
+            if(e.getTarget()==n){
+              label2 = e.getLabelBlock();
+              sourceNode = e.getSource();
+              if(sourceNode!=first.getStart()){
+              newEdge = new PromelaEdge(sourceNode, secondStartNode, label2); // S -> L
+              edgesOfResult.add(newEdge);
+
+              indexEdge.add(e);
+              }
+             }
+          }
+        }
+      }
+      for(final PromelaEdge e: edgesOfFirst){
+        if(!indexEdge.contains(e)){
+          edgesOfResult.add(e);
+        }
+      }
+      for(final PromelaNode n: nodesOfFirst){
+        if(!indexNode.contains(n)){
+          nodesOfResult.add(n);
+        }
+      }
+      }
+
+      indexEdge = new ArrayList<PromelaEdge>();
+      indexNode = new ArrayList<PromelaNode>();
+
+      if(nodesOfSecond.size()==1){
+        final PromelaNode n = nodesOfSecond.get(0);
+        indexNode.add(n);
+        if(n.isBreak()){
+          final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
+          final IdentifierProxy ident = factory.createSimpleIdentifierProxy("step_"+name);
+          Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+          secondlabel.add(ident);
+          label.add(ident);
+          label2 = new PromelaLabel(label);
+          if(!breakNodeSource.containsKey(first.getStart())){
+            newEdge = new PromelaEdge(first.getStart(),newEndNode,label2);
+            secondLabel = new PromelaLabel(secondlabel);
+            secondEdge = new PromelaEdge(secondStartNode,newEndNode,secondLabel);
+            edgesOfResult.add(newEdge);
+          }else{
+           for(final SimpleExpressionProxy l: breakNodeSource.get(first.getStart()).getLabelBlock().getLabel()){
+             label.add(l);
+           }
+           edgesOfResult.remove(breakNodeSource.get(first.getStart()));
+           newEdge =breakNodeSource.get(first.getStart());
+           for(final SimpleExpressionProxy l: label){
+             newEdge.getLabelBlock().getLabel().add(l);
+           }
+           secondlabel = new ArrayList<SimpleExpressionProxy>();
+           secondlabel.addAll(newEdge.getLabelBlock().getLabel());
+           secondLabel = new PromelaLabel(secondlabel);
+           secondEdge = new PromelaEdge(secondStartNode,newEndNode,secondLabel);
+           edgesOfResult.add(secondEdge);
+          }
+          edgesOfResult.add(newEdge);
+
+        }else if(n.isEnd()){
+          //TO DO
+        }
+      }
+      else{
+
+      for(final PromelaNode n: nodesOfSecond){
+        if(n==second.getStart()){
+          indexNode.add(n);
+          for(final PromelaEdge e: edgesOfSecond){
+            if(e.getSource()==n && !e.getTarget().isEnd()&&!e.getTarget().isBreak()){
+              label2 = e.getLabelBlock();
+              targetNode = e.getTarget();
+              newEdge = new PromelaEdge(first.getStart(), targetNode, label2);
+              final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+              secondlabel.addAll(label2.getLabel());
+              secondLabel = new PromelaLabel(secondlabel);
+              secondEdge = new PromelaEdge(secondStartNode,targetNode,secondLabel);
+              edgesOfResult.add(secondEdge);
+              edgesOfResult.add(newEdge);
+              indexEdge.add(e);
+            }
+            //take me forever to debug this line @_@
+            else if(e.getSource()==n && e.getTarget().isEnd()){// && !second.getEnd().isBreak()){
+              label2 = e.getLabelBlock();
+              targetNode = e.getTarget();
+              indexNode.add(targetNode);
+              final List<PromelaEdge> tempEdges = new ArrayList<PromelaEdge>(edgesOfResult);
+              for(final PromelaEdge edge: tempEdges){
+                if(edge.getTarget()==edge.getSource()){
+                  label2.getLabel().addAll(edge.getLabelBlock().getLabel());
+                  final List<SimpleExpressionProxy> tempList = new ArrayList<SimpleExpressionProxy>(label2.getLabel());
+
+                  final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+                  final Comparator<SimpleExpressionProxy> comparator =
+                    new ExpressionComparator(optable);
+                  Collections.sort(tempList,comparator);
+                  final Collection<SimpleExpressionProxy> orderedEvent = new ArrayList<SimpleExpressionProxy>(tempList);
+                  label2 = new PromelaLabel(orderedEvent);
+                  edgesOfResult.remove(edge);
+                }
+              }
+              final PromelaNode startNode = first.getStart();
+              final PromelaNode endnode = first.getStart();
+              newEdge = new PromelaEdge(startNode, secondStartNode, label2);
+              final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+              secondlabel.addAll(label2.getLabel());
+              secondLabel = new PromelaLabel(secondlabel);
+              secondEdge = new PromelaEdge(secondStartNode,endnode,secondLabel);
+              edgesOfResult.add(secondEdge);
+              edgesOfResult.add(newEdge);
+              indexEdge.add(e);
+            }
+          }
+        }
+        else if (n.isBreak()){
+
+          indexNode.add(n);
+          for(final PromelaEdge e: edgesOfSecond){
+            if(e.getTarget()==n){
+              if(e.getSource()!=second.getStart()){
+              label2 = e.getLabelBlock();
+              sourceNode = e.getSource();
+              //first.getEnd()
+              if(!breakNodeSource.containsKey(sourceNode)){
+                newEdge = new PromelaEdge(sourceNode,newEndNode,label2);
+                final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+                secondlabel.addAll(label2.getLabel());
+                secondLabel = new PromelaLabel(secondlabel);
+                secondEdge = new PromelaEdge(secondStartNode,newEndNode,secondLabel);
+                edgesOfResult.add(secondEdge);
+                }else{
+                 edgesOfResult.remove(breakNodeSource.get(sourceNode));
+                 newEdge =breakNodeSource.get(sourceNode);
+                 for(final SimpleExpressionProxy l: label2.getLabel()){
+                   newEdge.getLabelBlock().getLabel().add(l);
+                 }
+                }
+              edgesOfResult.add(newEdge);
+              final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+              secondlabel.addAll(newEdge.getLabelBlock().getLabel());
+              secondLabel = new PromelaLabel(secondlabel);
+              secondEdge = new PromelaEdge(secondStartNode,newEndNode,secondLabel);
+              edgesOfResult.add(secondEdge);
+              indexEdge.add(e);
+            }
+            else if(e.getSource()==second.getStart()){
+              label2= e.getLabelBlock();
+
+              if(!breakNodeSource.containsKey(first.getStart())){
+                newEdge = new PromelaEdge(first.getStart(),newEndNode,label2);
+                final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+                secondlabel.addAll(label2.getLabel());
+                secondLabel = new PromelaLabel(secondlabel);
+                secondEdge = new PromelaEdge(secondStartNode,newEndNode,secondLabel);
+                edgesOfResult.add(secondEdge);
+                }else{
+                  edgesOfResult.remove(breakNodeSource.get(first.getStart()));
+                 newEdge =breakNodeSource.get(first.getStart());
+                 for(final SimpleExpressionProxy l: label2.getLabel()){
+                   newEdge.getLabelBlock().getLabel().add(l);
+                 }
+                }
+              edgesOfResult.add(newEdge);
+              final Collection<SimpleExpressionProxy> secondlabel = new ArrayList<SimpleExpressionProxy>();
+              secondlabel.addAll(newEdge.getLabelBlock().getLabel());
+              secondLabel = new PromelaLabel(secondlabel);
+              secondEdge = new PromelaEdge(secondStartNode,newEndNode,secondLabel);
+              edgesOfResult.add(secondEdge);
+              indexEdge.add(e);
+            }
+            }
+          }
+        }else if(n.isEnd()&&n!=newEndNode){
+          indexNode.add(n);
+          final PromelaNode startNode = first.getStart();
+          for(final PromelaEdge e: edgesOfSecond){
+            if(e.getTarget()==n && e.getSource()!=second.getStart()){
+              label2 = e.getLabelBlock();
+              sourceNode = e.getSource();
+              newEdge = new PromelaEdge(sourceNode, secondStartNode, label2);
+              edgesOfResult.add(newEdge);
+              indexEdge.add(e);
+            }
+          }
+        }
+      }
+      for(final PromelaEdge e: edgesOfSecond){
+        if(!indexEdge.contains(e)){
+          edgesOfResult.add(e);
+        }
+      }
+      for(final PromelaNode n: nodesOfSecond){
+        if(!indexNode.contains(n)){
+          nodesOfResult.add(n);
+        }
+      }
+      }
+      nodesOfResult.remove(newEndNode);
+      nodesOfResult.add(newEndNode);
+      output = new PromelaGraph(nodesOfResult,edgesOfResult,first.getStart());
+
+      return output;
+    }
+
+  }
   }
   public GraphProxy createGraphProxy(final ModuleProxyFactory mFactory, final String name)
   {

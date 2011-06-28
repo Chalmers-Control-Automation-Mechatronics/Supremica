@@ -264,7 +264,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         ename = "send_"+ename;
         indexEvent = mFactory.createIndexedIdentifierProxy(ename,indexes);
       }
-        System.out.println(indexEvent);
+        //System.out.println(indexEvent);
         return new PromelaGraph(indexEvent);
 
   }
@@ -296,7 +296,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         name = "exch_"+chanName;
 
         indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
-        System.out.println(indexEvent);
+        //System.out.println(indexEvent);
       }else{
         name = "send_"+chanName;
         indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
@@ -324,6 +324,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitInitial(final InitialTreeNode t)
   {
+
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
     final PromelaGraph initGraph = collectGraphs((PromelaTree) t.getChild(0));
     final GraphProxy graph = initGraph.createGraphProxy(mFactory, t.getText());
@@ -343,6 +344,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
     return output;
   }
+
 
   public Object visitInitialStatement(final InitialStatementTreeNode t)
   {
@@ -407,6 +409,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
     final boolean unwinding = mUnWinding;
+    System.out.println(unwinding);
     counter =counter+1;
     Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode)){
@@ -415,12 +418,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
     final String name = tree.getText();
     PromelaGraph result = null;
+    final PromelaNode startNode = new PromelaNode();
+    final PromelaNode secondStartNode = new PromelaNode();
     final PromelaNode endNode = new PromelaNode(PromelaNode.EndType.END);
     for(int i=0;i<t.getChildCount();i++){
       mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
 
-      result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name,mSourceOfBreakNode,unwinding);
+      result = PromelaGraph.doCombineComposition(result,step,startNode,endNode,secondStartNode,mFactory,name,mSourceOfBreakNode,unwinding);
     }
 
     mLabelEnd.put(""+counter,endNode);
@@ -542,6 +547,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         tree = tree.getParent();
       }
       final String name = tree.getText();
+
       final PromelaNode node = new PromelaNode(PromelaNode.EndType.END);
       final PromelaNode startNode = new PromelaNode();
       final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
