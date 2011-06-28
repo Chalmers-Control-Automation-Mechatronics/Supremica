@@ -5,7 +5,6 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TObjectIntHashMap;
 
-import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,8 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
-
+import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AutomatonResult;
@@ -114,7 +112,9 @@ public class MonolithicSynchronousProductBuilder
     try {
       setUp();
       final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
-      mStates = new IntArrayMap(tableSize);
+      final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
+      mStates = new TObjectIntHashMap<int[]>(strategy);
+      mStates.ensureCapacity(tableSize);
       mStateTuples = new ArrayList<int[]>();
       mTransitionBuffer = new TIntArrayList();
       mTransitionBufferLimit = 3 * getTransitionLimit();
@@ -126,16 +126,17 @@ public class MonolithicSynchronousProductBuilder
         final int[] tuple = mUnvisited.remove();
         explore(tuple);
       }
-      final AutomatonProxy aut = createAutomaton();
-      return setAutomatonResult(aut);
+      if (getConstructsAutomaton()) {
+        final AutomatonProxy aut = createAutomaton();
+        return setAutomatonResult(aut);
+      } else {
+        return true;
+      }
     } finally {
       tearDown();
     }
   }
 
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
     return true;
@@ -398,8 +399,10 @@ public class MonolithicSynchronousProductBuilder
                               final boolean isInitial)
     throws OverflowException
   {
-    Integer target = mStates.get(mTargetTuple);
-    if (target == null) {
+    final int target;
+    if (mStates.containsKey(mTargetTuple)) {
+      target = mStates.get(mTargetTuple);
+    } else {
       final int limit = getNodeLimit();
       if (mNumStates >= limit) {
         throw new OverflowException(limit);
@@ -493,7 +496,7 @@ public class MonolithicSynchronousProductBuilder
     }
 
     final String name = computeOutputName();
-    final ComponentKind kind = getOutputKind();
+    final ComponentKind kind = computeOutputKind();
     return factory.createAutomatonProxy
       (name, kind, events, states, transitions);
   }
@@ -700,90 +703,6 @@ public class MonolithicSynchronousProductBuilder
 
 
   //#########################################################################
-  //# Inner Class IntArrayMap
-  private static class IntArrayMap extends AbstractMap<int[],Integer>
-  {
-    private IntArrayMap(final int num)
-    {
-      mMap = new HashMap<IntArray,Integer>(num);
-    }
-
-    public Set<Map.Entry<int[],Integer>> entrySet()
-    {
-      throw new UnsupportedOperationException
-        ("IntArrayMap does not support entrySet()!");
-    }
-
-    public Integer get(final Object o)
-    {
-      final int[] a = (int[]) o;
-      return mMap.get(new IntArray(a));
-    }
-
-    @SuppressWarnings("unused")
-    public Integer get(final int[] a)
-    {
-      return mMap.get(new IntArray(a));
-    }
-
-    @SuppressWarnings("unused")
-    public Integer put(final Object o, final Integer s)
-    {
-      return mMap.put(new IntArray((int[]) o), s);
-    }
-
-    public Integer put(final int[] a, final Integer s)
-    {
-      return mMap.put(new IntArray(a), s);
-    }
-
-    public Collection<Integer> values()
-    {
-      return mMap.values();
-    }
-
-    private final Map<IntArray,Integer> mMap;
-  }
-
-
-  //#########################################################################
-  //# Inner Class IntArray
-  private static class IntArray
-  {
-    public final int[] mArray;
-
-    public IntArray(final int[] array)
-    {
-      mArray = array;
-    }
-
-    public int hashCode()
-    {
-      return Arrays.hashCode(mArray);
-    }
-
-    public boolean equals(final Object o)
-    {
-      final IntArray oth = (IntArray) o;
-      if (oth.mArray.length != mArray.length) {
-        return false;
-      }
-      for (int i = 0; i < mArray.length; i++) {
-        if (mArray[i] != oth.mArray[i]) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    public String toString()
-    {
-      return Arrays.toString(mArray);
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class IntDouble
   private static class IntDouble implements Comparable<IntDouble>
   {
@@ -828,7 +747,7 @@ public class MonolithicSynchronousProductBuilder
 
   private int mNumStates;
   private int mNumInitialStates;
-  private Map<int[],Integer> mStates;
+  private TObjectIntHashMap<int[]> mStates;
   private List<int[]> mStateTuples;
   private Queue<int[]> mUnvisited;
   private TIntArrayList mTransitionBuffer;

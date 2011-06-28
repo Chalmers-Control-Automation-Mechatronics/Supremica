@@ -394,7 +394,7 @@ public class PromelaGraph
     if(!unwind){
     final PromelaNode newStartNode = start;
     final PromelaNode newEndNode = endNode;
-    final HashMap<PromelaNode,PromelaEdge> breakNodeSource = (HashMap<PromelaNode,PromelaEdge>) toBreakNode;
+    final Map<PromelaNode,PromelaEdge> breakNodeSource = toBreakNode;
     if(first==null){
     //  return second;
       final List<PromelaNode> nodesOfSecond = second.getNodes();
@@ -1122,11 +1122,10 @@ public class PromelaGraph
             }
             }
           }
-        }else if(n.isEnd()&&n!=newEndNode){
+        } else if (n.isEnd() && n != newEndNode) {
           indexNode.add(n);
-          final PromelaNode startNode = first.getStart();
-          for(final PromelaEdge e: edgesOfSecond){
-            if(e.getTarget()==n && e.getSource()!=second.getStart()){
+          for (final PromelaEdge e: edgesOfSecond) {
+            if (e.getTarget() == n && e.getSource() != second.getStart()) {
               label2 = e.getLabelBlock();
               sourceNode = e.getSource();
               newEdge = new PromelaEdge(sourceNode, secondStartNode, label2);

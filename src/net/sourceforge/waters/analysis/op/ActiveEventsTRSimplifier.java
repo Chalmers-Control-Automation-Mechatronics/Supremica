@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.op;
 import gnu.trove.HashFunctions;
 import gnu.trove.TIntHashSet;
 
+import net.sourceforge.waters.analysis.tr.WatersIntHashingStrategy;
+import net.sourceforge.waters.analysis.tr.WatersIntIntHashMap;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonTools;
 

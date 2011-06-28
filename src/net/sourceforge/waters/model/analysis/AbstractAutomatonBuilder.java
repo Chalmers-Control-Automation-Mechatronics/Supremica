@@ -74,6 +74,16 @@ public abstract class AbstractAutomatonBuilder
     return mOutputKind;
   }
 
+  public void setConstructsAutomaton(final boolean construct)
+  {
+    mConstructsAutomaton = construct;
+  }
+
+  public boolean getConstructsAutomaton()
+  {
+    return mConstructsAutomaton;
+  }
+
   public AutomatonProxy getComputedAutomaton()
   {
     final AutomatonResult result = getAnalysisResult();
@@ -144,11 +154,40 @@ public abstract class AbstractAutomatonBuilder
     }
   }
 
+  /**
+   * Computes a component for the output automaton.
+   * @return The component kind set by the user, if present, or a default kind
+   *         determined from the automata in the input model.
+   * @see #setOutputKind(ComponentKind) setOutputKind()
+   */
+  protected ComponentKind computeOutputKind()
+  {
+    if (mOutputKind != null) {
+      return mOutputKind;
+    } else {
+      ComponentKind result = null;
+      final ProductDESProxy model = getModel();
+      final Collection<AutomatonProxy> automata = model.getAutomata();
+      for (final AutomatonProxy aut : automata) {
+        final ComponentKind kind = aut.getKind();
+        if (kind == result) {
+          continue;
+        } else if (result == null) {
+          result = kind;
+        } else {
+          return ComponentKind.PLANT;
+        }
+      }
+      return result;
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
   private String mOuptutName;
-  private ComponentKind mOutputKind = ComponentKind.PLANT;
+  private ComponentKind mOutputKind;
+  private boolean mConstructsAutomaton = true;
 
 }
 

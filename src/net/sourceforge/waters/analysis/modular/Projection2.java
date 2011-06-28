@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.modular;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectHashingStrategy;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.AbstractMap;
@@ -26,6 +25,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
@@ -701,30 +701,7 @@ public class Projection2
 
 
   //#######################################################################
-  //# Inner Class IntArrayHashingStrategy
-  private static class IntArrayHashingStrategy
-    implements TObjectHashingStrategy<int[]>
-  {
-
-    //#######################################################################
-    //# Interface gnu.trove.TObjectHashingStrategy
-    public int computeHashCode(final int[] array)
-    {
-      return Arrays.hashCode(array);
-    }
-
-    public boolean equals(final int[] array1, final int[] array2)
-    {
-      return Arrays.equals(array1, array2);
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 1L;
-
-  }
-
-
+  //# Inner Class IntArray
   private static class IntArray
   {
     public final int[] mArray;

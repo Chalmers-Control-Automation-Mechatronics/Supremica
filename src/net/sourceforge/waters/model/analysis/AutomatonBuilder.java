@@ -63,6 +63,19 @@ public interface AutomatonBuilder extends ModelAnalyser
    */
   public ComponentKind getOutputKind();
 
+  /**
+   * Sets whether an automaton is actually constructed by this builder.
+   * This option is set to <CODE>true</CODE> by default, but it can turned off
+   * to run an automaton builder that only produces statistics.
+   */
+  public void setConstructsAutomaton(boolean construct);
+
+  /**
+   * Gets whether an automaton is actually constructed by this builder.
+   * @see #setConstructsAutomaton(boolean) setConstructsAutomaton()
+   */
+  public boolean getConstructsAutomaton();
+
 
   //#########################################################################
   //# More Specific Access to the Results

@@ -43,6 +43,7 @@ import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.AutomatonResult;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
@@ -1471,6 +1472,7 @@ public class OPConflictChecker
       mCurrentSynchronousProductBuilder.addMask(local, tau);
       expectedNumberOfEvents++;
     }
+    mCurrentSynchronousProductBuilder.setConstructsAutomaton(true);
     mCurrentSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
     try {
       mCurrentSynchronousProductBuilder.run();
@@ -2620,15 +2622,17 @@ public class OPConflictChecker
       Collections.sort(list, comparator);
       int limit = mCurrentInternalStateLimit;
       mCurrentSynchronousProductBuilder.setNodeLimit(limit);
+      mCurrentSynchronousProductBuilder.setConstructsAutomaton(false);
       Candidate best = null;
       for (final Candidate candidate : list) {
         final ProductDESProxy des = candidate.createProductDESProxy(factory);
         mCurrentSynchronousProductBuilder.setModel(des);
         try {
           mCurrentSynchronousProductBuilder.run();
-          final AutomatonProxy aut =
-            mCurrentSynchronousProductBuilder.getComputedAutomaton();
-          final int size = aut.getStates().size();
+          final AnalysisResult result =
+            mCurrentSynchronousProductBuilder.getAnalysisResult();
+          final double dsize = result.getTotalNumberOfStates();
+          final int size = (int) Math.round(dsize);
           if (size < limit || best == null) {
             best = candidate;
             limit = size;
