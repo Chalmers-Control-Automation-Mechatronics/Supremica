@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -112,6 +114,34 @@ public abstract class AbstractAutomatonBuilder
     final AutomatonResult result = getAnalysisResult();
     result.setAutomaton(aut);
     return result.isSatisfied();
+  }
+
+  /**
+   * Computes a name for the output automaton.
+   * @return The name set by the user, if present, or a default name computed
+   *         from the names of the automata in the input model.
+   * @see #setOutputName(String) setOutputName()
+   */
+  protected String computeOutputName()
+  {
+    if (mOuptutName != null) {
+      return mOuptutName;
+    } else {
+      final StringBuffer buffer = new StringBuffer("{");
+      final ProductDESProxy model = getModel();
+      final Collection<AutomatonProxy> automata = model.getAutomata();
+      boolean first = true;
+      for (final AutomatonProxy aut : automata) {
+        if (first) {
+          first = false;
+        } else {
+          buffer.append(',');
+        }
+        buffer.append(aut.getName());
+      }
+      buffer.append('}');
+      return buffer.toString();
+    }
   }
 
 

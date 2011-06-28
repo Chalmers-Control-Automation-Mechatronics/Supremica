@@ -128,8 +128,8 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
   //# Auxiliary Methods
   private void setConflictCheckerMarkings(final SICPropertyBuilder builder)
   {
-    builder.setDefaultMarkings();
-    final EventProxy defaultMark = builder.getMarkingProposition();
+    builder.setOutputMarkings();
+    final EventProxy defaultMark = builder.getOutputMarking();
     final EventProxy preconditionMark = builder.getGeneralisedPrecondition();
     final ConflictChecker checker = getConflictChecker();
     checker.setMarkingProposition(defaultMark);

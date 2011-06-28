@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -31,6 +33,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 
 
 /**
@@ -75,14 +78,24 @@ public class SICPropertyBuilder
     return mModel;
   }
 
-  public void setMarkingProposition(final EventProxy marking)
+  public void setInputMarking(final EventProxy marking)
   {
-    mMarking = marking;
+    mInputMarking = marking;
   }
 
-  public EventProxy getMarkingProposition()
+  public EventProxy getInputMarking()
   {
-    return mMarking;
+    return mInputMarking;
+  }
+
+  public void setOutputMarking(final EventProxy marking)
+  {
+    mOutputMarking = marking;
+  }
+
+  public EventProxy getOutputMarking()
+  {
+    return mOutputMarking;
   }
 
   public void setGeneralisedPrecondition(final EventProxy marking)
@@ -103,14 +116,15 @@ public class SICPropertyBuilder
   public boolean getSplitting(){
     return mSplitting;
   }
-  public void setDefaultMarkings()
+
+  public void setOutputMarkings()
   {
-    mMarking =
-      mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
-                                EventKind.PROPOSITION, true);
-    final String alphaNm = ":alpha";
+    final String omega = ":omega";
+    mOutputMarking =
+      mFactory.createEventProxy(omega, EventKind.PROPOSITION, true);
+    final String alpha = ":alpha";
     mPreconditionMarking =
-      mFactory.createEventProxy(alphaNm, EventKind.PROPOSITION, true);
+      mFactory.createEventProxy(alpha, EventKind.PROPOSITION, true);
   }
 
 
@@ -137,8 +151,8 @@ public class SICPropertyBuilder
    */
   public ProductDESProxy createSIC5Model(final EventProxy answer)
   {
-    if (mMarking == null) {
-      mMarking =
+    if (mOutputMarking == null) {
+      mOutputMarking =
           mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
                                     EventKind.PROPOSITION, true);
     }
@@ -152,7 +166,7 @@ public class SICPropertyBuilder
     final List<AutomatonProxy> newAutomata =
       new ArrayList<AutomatonProxy>(numaut);
 
-    // The low level automaton of a model only need modifying once because they
+    // The low level automata of a model only need modifying once because they
     // don't depend on the answer event.
     if (mLowLevelAutomata == null) {
       mLowLevelAutomata = new ArrayList<AutomatonProxy>(numaut);
@@ -176,12 +190,19 @@ public class SICPropertyBuilder
     final List<EventProxy> local= new ArrayList<EventProxy>(numEvents);
 
     for (final EventProxy event : events) {
-      if (event.getKind() == EventKind.PROPOSITION) {
-        // skip
-      } else if (HISCAttributes.getEventType(event.getAttributes()) == HISCAttributes.EventType.DEFAULT) {
-        local.add(event);
-      } else {
-        iface.add(event);
+      if (event.getKind() != EventKind.PROPOSITION) {
+        final Map<String,String> attribs = event.getAttributes();
+        switch (HISCAttributes.getEventType(attribs)) {
+        case REQUEST:
+        case ANSWER:
+        case LOWDATA:
+          iface.add(event);
+          break;
+        case DEFAULT:
+          local.add(event);
+        default:
+          break;
+        }
       }
     }
 
@@ -198,7 +219,7 @@ public class SICPropertyBuilder
     // removes markings from automaton event alphabet
     final Collection<EventProxy> newEvents =
         removePropositions(mModel.getEvents());
-    newEvents.add(mMarking);
+    newEvents.add(mOutputMarking);
     newEvents.add(mPreconditionMarking);
     final String desname = mModel.getName();
     final String ansname = answer.getName();
@@ -214,11 +235,84 @@ public class SICPropertyBuilder
   }
 
   /**
+   * Builds a model for checking SIC Property V with respect to the
+   * given answer event.
+   */
+  public ProductDESProxy createCompositionalSIC5Model(final EventProxy answer)
+  throws AnalysisException
+  {
+    if (mOutputMarking == null) {
+      final String omega = ":omega";
+      mOutputMarking = mFactory.createEventProxy(omega, EventKind.PROPOSITION);
+    }
+    if (mPreconditionMarking == null) {
+      final String alpha = ":alpha";
+      mPreconditionMarking =
+        mFactory.createEventProxy(alpha, EventKind.PROPOSITION);
+    }
+    final Collection<EventProxy> props = new ArrayList<EventProxy>(2);
+    props.add(mOutputMarking);
+    props.add(mPreconditionMarking);
+
+    final Collection<EventProxy> oldEvents = mModel.getEvents();
+    final int numEvents = oldEvents.size();
+    final List<EventProxy> newEvents = new ArrayList<EventProxy>(numEvents);
+    newEvents.addAll(props);
+    final List<EventProxy> iface = new ArrayList<EventProxy>();
+    for (final EventProxy event : oldEvents) {
+      if (event.getKind() != EventKind.PROPOSITION) {
+        newEvents.add(event);
+        final Map<String,String> attribs = event.getAttributes();
+        switch (HISCAttributes.getEventType(attribs)) {
+        case REQUEST:
+        case ANSWER:
+        case LOWDATA:
+          iface.add(event);
+          break;
+        default:
+          break;
+        }
+      }
+    }
+
+    final SynchronousProductBuilder builder =
+      new MonolithicSynchronousProductBuilder(mFactory);
+    builder.setPropositions(props);
+    final Collection<AutomatonProxy> oldAutomata = mModel.getAutomata();
+    final int numaut = oldAutomata.size();
+    final List<AutomatonProxy> newAutomata =
+      new ArrayList<AutomatonProxy>(numaut);
+    for (final AutomatonProxy aut : oldAutomata) {
+      final Map<String,String> attribs = aut.getAttributes();
+      if (HISCAttributes.isInterface(attribs)) {
+        final AutomatonProxy iaut = createSIC5InterfaceAutomaton(aut, answer);
+        newAutomata.add(iaut);
+      } else {
+        final AutomatonProxy laut =
+          createCompositionalSIC5Automaton(aut, answer, iface, builder);
+        newAutomata.add(laut);
+      }
+    }
+    final String desname = mModel.getName();
+    final String ansname = answer.getName();
+    final String name = desname + '-' + ansname.replace(':', '-');
+    final String comment =
+      "Automatically generated from '" + desname +
+      "' to check SIC Property V with respect to answer event '" + ansname +
+      "'.";
+    final ProductDESProxy newModel =
+        mFactory.createProductDESProxy(name, comment, null, newEvents,
+                                       newAutomata);
+    //MarshallingTools.saveModule(newModel, "xxx.wmod");
+    return newModel;
+  }
+
+  /**
    * Builds a model for checking SIC Property VI.
    */
   public ProductDESProxy createSIC6Model()
   {
-    assert mMarking != null :
+    assert mInputMarking != null :
       "SIC Property VI conversion requires default marking of input model!";
     if (mPreconditionMarking == null) {
       final String alphaNm = ":alpha";
@@ -232,7 +326,7 @@ public class SICPropertyBuilder
 
     final Collection<EventProxy> oldEvents = mModel.getEvents();
     final Collection<EventProxy> newEvents =
-      removePropositions(oldEvents, mMarking);
+      removePropositions(oldEvents, mInputMarking);
     newEvents.add(mTau);
 
     final Collection<AutomatonProxy> oldAutomata = mModel.getAutomata();
@@ -245,7 +339,7 @@ public class SICPropertyBuilder
       if (HISCAttributes.isInterface(attribs)) {
         newAut = createSIC6InterfaceAutomaton(oldAut);
       } else {
-        newAut = removePropositions(oldAut, mMarking);
+        newAut = removePropositions(oldAut, mInputMarking);
       }
       newAutomata.add(newAut);
     }
@@ -331,7 +425,52 @@ public class SICPropertyBuilder
 
 
   //#########################################################################
-  // new sic5 test creator
+  //# Auxiliary Methods
+  private AutomatonProxy createCompositionalSIC5Automaton
+    (final AutomatonProxy aut,
+     final EventProxy answer,
+     final List<EventProxy> iface,
+     final SynchronousProductBuilder builder)
+  throws AnalysisException
+  {
+    final Collection<EventProxy> events = aut.getEvents();
+    int numEvents = events.size();
+    final List<EventProxy> local = new ArrayList<EventProxy>(numEvents);
+    final Collection<EventProxy> props = builder.getPropositions();
+    numEvents += iface.size() + props.size();
+    final List<EventProxy> global = new ArrayList<EventProxy>(numEvents);
+    global.addAll(props);
+    global.addAll(iface);
+    for (final EventProxy event : events) {
+      if (event.getKind() == EventKind.PROPOSITION) {
+        global.add(event);
+      } else {
+        final Map<String,String> attribs = event.getAttributes();
+        switch (HISCAttributes.getEventType(attribs)) {
+        case DEFAULT:
+          local.add(event);
+          global.add(event);
+          break;
+        default:
+          break;
+        }
+      }
+    }
+    final AutomatonProxy testaut = createSIC5Test(answer, iface, local, "test");
+    final String name = aut.getName();
+    final ComponentKind kind = aut.getKind();
+    final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
+    automata.add(aut);
+    automata.add(testaut);
+    final ProductDESProxy des =
+      mFactory.createProductDESProxy(name, global, automata);
+    builder.setModel(des);
+    builder.setOutputName(name);
+    builder.setOutputKind(kind);
+    builder.run();
+    return builder.getComputedAutomaton();
+  }
+
   private AutomatonProxy createSIC5Test(final EventProxy answer,
                                         final List<EventProxy> iface,
                                         final List<EventProxy> local,
@@ -347,7 +486,7 @@ public class SICPropertyBuilder
     // request and answer events exist)
     final List<StateProxy> states = new ArrayList<StateProxy>(3);
     // initial state has the default marking proposition
-    List<EventProxy> propositions = Collections.singletonList(mMarking);
+    List<EventProxy> propositions = Collections.singletonList(mOutputMarking);
     final StateProxy initialState =
         mFactory.createStateProxy("T1", true, propositions);
     states.add(initialState);
@@ -375,7 +514,6 @@ public class SICPropertyBuilder
             mFactory.createTransitionProxy(initialState, event, alphaState);
         transitions.add(requestTransition);
         break;
-      case LOWDATA:
       case DEFAULT:
         if (states.size() < 3) {
           // third state has no propositions
@@ -405,9 +543,8 @@ public class SICPropertyBuilder
     }
 
     // adds the two marking propositions to the automaton alphabet
-    newEvents.add(mMarking);
+    newEvents.add(mOutputMarking);
     newEvents.add(mPreconditionMarking);
-
     final AutomatonProxy newTestAut =
         mFactory.createAutomatonProxy(name, ComponentKind.SPEC,
                                       newEvents, states, transitions);
@@ -507,7 +644,7 @@ public class SICPropertyBuilder
       }
     }
     events.add(mTau);
-    events.add(mMarking);
+    events.add(mInputMarking);
     events.add(mPreconditionMarking);
 
     // Create the 2 states ...
@@ -516,7 +653,7 @@ public class SICPropertyBuilder
       mFactory.createStateProxy("T1", true, null);
     states.add(initialState);
     final List<EventProxy> propositions = new ArrayList<EventProxy>(2);
-    propositions.add(mMarking);
+    propositions.add(mInputMarking);
     propositions.add(mPreconditionMarking);
     final StateProxy alphaState =
       mFactory.createStateProxy("T2", false, propositions);
@@ -544,14 +681,14 @@ public class SICPropertyBuilder
   private AutomatonProxy createSIC6InterfaceAutomaton(final AutomatonProxy aut)
   {
     final Collection<EventProxy> oldEvents = aut.getEvents();
-    if (!oldEvents.contains(mMarking)) {
+    if (!oldEvents.contains(mInputMarking)) {
       return removePropositions(aut, null);
     }
     final Collection<EventProxy> newEvents = removePropositions(oldEvents);
-    newEvents.add(mMarking);
+    newEvents.add(mInputMarking);
     newEvents.add(mPreconditionMarking);
     final Collection<EventProxy> marked = new ArrayList<EventProxy>(2);
-    marked.add(mMarking);
+    marked.add(mInputMarking);
     marked.add(mPreconditionMarking);
     final Collection<StateProxy> oldStates = aut.getStates();
     final int numStates = oldStates.size();
@@ -566,7 +703,7 @@ public class SICPropertyBuilder
         final String name = oldState.getName();
         final boolean init = oldState.isInitial();
         final StateProxy newState;
-        if (props.contains(mMarking)) {
+        if (props.contains(mInputMarking)) {
           newState = mFactory.createStateProxy(name, init, marked);
         } else {
           newState = mFactory.createStateProxy(name, init, null);
@@ -706,9 +843,13 @@ public class SICPropertyBuilder
       new HashMap<StateProxy,StateProxy>();
 
   /**
-   * The default marking proposition
+   * The default marking proposition used by the input model.
    */
-  private EventProxy mMarking;
+  private EventProxy mInputMarking;
+  /**
+   * The default marking proposition used by the output model.
+   */
+  private EventProxy mOutputMarking;
   /**
    * The precondition marking.
    */

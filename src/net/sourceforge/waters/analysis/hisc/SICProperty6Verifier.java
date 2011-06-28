@@ -69,7 +69,7 @@ public class SICProperty6Verifier extends AbstractSICConflictChecker
       final SICPropertyBuilder builder =
         new SICPropertyBuilder(model, getFactory());
       final EventProxy defaultMark = getUsedMarkingProposition();
-      builder.setMarkingProposition(defaultMark);
+      builder.setInputMarking(defaultMark);
       ProductDESProxy convertedModel = null;
       convertedModel = builder.createSIC6Model();
       final ConflictChecker checker = getConflictChecker();

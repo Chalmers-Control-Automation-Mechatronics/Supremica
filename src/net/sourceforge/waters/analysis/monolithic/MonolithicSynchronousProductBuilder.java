@@ -492,22 +492,8 @@ public class MonolithicSynchronousProductBuilder
       transitions.add(factory.createTransitionProxy(source, event, target));
     }
 
-    final StringBuffer buffer = new StringBuffer("{");
-    final ProductDESProxy model = getModel();
-    final Collection<AutomatonProxy> automata = model.getAutomata();
-    boolean first = true;
-    for (final AutomatonProxy aut : automata) {
-      if (first) {
-        first = false;
-      } else {
-        buffer.append(',');
-      }
-      buffer.append(aut.getName());
-    }
-    buffer.append('}');
-    final String name = buffer.toString();
+    final String name = computeOutputName();
     final ComponentKind kind = ComponentKind.PLANT;
-
     return factory.createAutomatonProxy
       (name, kind, events, states, transitions);
   }
