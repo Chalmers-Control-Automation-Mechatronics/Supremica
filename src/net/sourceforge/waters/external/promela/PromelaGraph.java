@@ -480,7 +480,7 @@ public class PromelaGraph
 
 
     }else if(second ==null){
-      final ModuleProxyFactory mFactory = factory;
+     // final ModuleProxyFactory mFactory = factory;
       final List<PromelaNode> nodesOfFirst = first.getNodes();
       final List<PromelaEdge> edgesOfFirst = first.getEdges();
 

@@ -380,7 +380,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitBreak(final BreakStatementTreeNode t)
   {
-    if(t.getParent() instanceof DoConditionTreeNode){
+  /*  if(t.getParent() instanceof DoConditionTreeNode){
       PromelaTree tree = t;
       while(!(tree instanceof ProctypeTreeNode)){
         tree = (PromelaTree) tree.getParent();
@@ -391,6 +391,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       mEventDecls.add(event);
 
     }
+    */
     return null;
   }
 
@@ -409,12 +410,24 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitGoto(final GotoTreeNode t)
   {
     // TODO Auto-generated method stub
+
     return null;
   }
 
   public Object visitSkip(final SkipTreeNode t)
   {
     // TODO Auto-generated method stub
+   /* if(!(t.getParent() instanceof SemicolonTreeNode)){
+      PromelaTree tree = t;
+      while(!((tree instanceof ProctypeTreeNode)||(tree instanceof InitialTreeNode))){
+        tree = (PromelaTree) tree.getParent();
+      }
+      final String name = tree.getText();
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+      mEventDecls.add(event);
+    }
+    */
     return null;
   }
 

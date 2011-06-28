@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.antlr.runtime.tree.Tree;
 
@@ -451,6 +452,10 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       cNodes.add(node);
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+      if(!mVisitor.getEvents().contains(event)){
+        mVisitor.getEvents().add(event);
+      }
       label.add(ident);
       final PromelaLabel l = new PromelaLabel(label);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
@@ -497,6 +502,10 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       cNodes.add(startNode);
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+      if(!mVisitor.getEvents().contains(event)){
+        mVisitor.getEvents().add(event);
+      }
       label.add(ident);
       final PromelaLabel l = new PromelaLabel(label);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
@@ -539,13 +548,17 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       }
       final String name = tree.getText();
       final String labelName = t.getText();
-      final PromelaNode node = new PromelaNode(labelName); //creating goto label
+      final PromelaNode node = new PromelaNode(PromelaNode.EndType.END);
       final PromelaNode startNode = new PromelaNode();
       final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
       cNodes.add(node);
       cNodes.add(startNode);
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+      if(!mVisitor.getEvents().contains(event)){
+        mVisitor.getEvents().add(event);
+      }
       label.add(ident);
       final PromelaLabel l = new PromelaLabel(label);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
