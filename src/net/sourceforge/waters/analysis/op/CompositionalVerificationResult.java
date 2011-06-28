@@ -184,7 +184,7 @@ public class CompositionalVerificationResult extends VerificationResult
       final Iterator<TRSimplifierStatistics> iter1 =
         mSimplifierStatistics.iterator();
       final Iterator<TRSimplifierStatistics> iter2 =
-        mSimplifierStatistics.iterator();
+        result.mSimplifierStatistics.iterator();
       while (iter1.hasNext() && iter2.hasNext()) {
         final TRSimplifierStatistics stats1 = iter1.next();
         final TRSimplifierStatistics stats2 = iter2.next();

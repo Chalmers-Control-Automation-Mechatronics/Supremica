@@ -41,6 +41,7 @@ public class AnalysisResult
   {
     mFinished = false;
     mRunTime = -1;
+    mException = null;
     mTotalNumberOfAutomata = -1;
     mTotalNumberOfStates = -1.0;
     mPeakNumberOfStates = -1.0;

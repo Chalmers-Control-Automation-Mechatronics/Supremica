@@ -77,6 +77,7 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
       final ConflictChecker checker = getConflictChecker();
       ProductDESProxy convertedModel = null;
       for (final EventProxy answer : answers) {
+        checkAbort();
         convertedModel = builder.createSIC5Model(answer);
         checker.setModel(convertedModel);
         final VerificationResult result;
@@ -96,6 +97,10 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
         }
       }
       return setSatisfiedResult();
+    } catch (final AnalysisException exception) {
+      final VerificationResult result = getAnalysisResult();
+      result.setException(exception);
+      throw exception;
     } finally {
       tearDown();
     }
@@ -118,17 +123,6 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
     mFailedAnswer = null;
   }
 
-  protected void addStatistics()
-  {
-    super.addStatistics();
-    final AnalysisResult stats = getAnalysisResult();
-    if (stats != null) {
-      final ProductDESProxy model = getModel();
-      final int numaut = model.getAutomata().size();
-      stats.setNumberOfAutomata(numaut);
-    }
-  }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -149,7 +143,11 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
        mFirstResult = false;
      } else {
        final AnalysisResult present = getAnalysisResult();
+       final int numaut1 = present.getTotalNumberOfAutomata();
+       final int numaut2 = result.getTotalNumberOfAutomata();
+       final int numaut = Math.max(numaut1, numaut2);
        present.merge(result);
+       present.setNumberOfAutomata(numaut);
      }
   }
 

@@ -186,7 +186,6 @@ public class CommandLineTool
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
-      final Watchdog watchdog = new Watchdog(checker, timeout);
       final boolean noProperties =
         !(checker instanceof LanguageInclusionChecker);
       final boolean noPropositions = !(checker instanceof ConflictChecker);
@@ -202,6 +201,7 @@ public class CommandLineTool
           ("SIC property check requires a conflict checker, " +
            "but none was configured.");
       }
+      final Watchdog watchdog = new Watchdog(wrapper, timeout);
       final Collection<String> empty = Collections.emptyList();
       final List<String> filenames = factory.configure(checker);
 
@@ -235,7 +235,7 @@ public class CommandLineTool
         factory.postConfigure(checker);
         boolean additions = false;
         try {
-          watchdog.launch(wrapper);
+          watchdog.launch();
           final VerificationResult result = wrapper.getAnalysisResult();
           final long stop = System.currentTimeMillis();
           final boolean satisfied = result.isSatisfied();
@@ -338,19 +338,19 @@ public class CommandLineTool
 
     //#######################################################################
     //# Invocation
-    private boolean launch(final ModelVerifier wrapper)
+    private boolean launch()
     throws AnalysisException
     {
       if (mTimeoutMillis >= 0) {
         final Thread thread = new Thread(this);
         try {
           thread.start();
-          return wrapper.run();
+          return mChecker.run();
         } finally {
           thread.interrupt();
         }
       } else {
-        return wrapper.run();
+        return mChecker.run();
       }
     }
 
