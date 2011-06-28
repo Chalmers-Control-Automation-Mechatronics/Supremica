@@ -600,6 +600,22 @@ public class OPConflictChecker
 
 
   //#########################################################################
+  //# Hooks
+  /**
+   * Creates a product DES consisting of the automata and events in the
+   * given candidate. This hook is invoked before composing the automata
+   * of a selected candidate. It may be overridden by specialised property
+   * verifiers that modify the set of automata prior to composition.
+   * @return A product DES to be passed to a {@link SynchronousProductBuilder}.
+   */
+  protected ProductDESProxy createProductDESProxy(final Candidate candidate)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    return candidate.createProductDESProxy(factory);
+  }
+
+
+  //#########################################################################
   //# Chains
   private AbstractionRule createObservationEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
@@ -1404,25 +1420,26 @@ public class OPConflictChecker
   private HidingStep composeSynchronousProduct(final Candidate candidate)
     throws AnalysisException
   {
-    if (candidate.getNumberOfAutomata() > 1) {
-      return composeSeveralAutomata(candidate);
+    final ProductDESProxy des = createProductDESProxy(candidate);
+    final Collection<EventProxy> local = candidate.getLocalEvents();
+    final ProductDESProxyFactory factory = getFactory();
+    final EventProxy tau = createSilentEvent(candidate, factory);
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    if (automata.size() > 1) {
+      return composeSeveralAutomata(des, local, tau);
     } else {
-      return composeOneAutomaton(candidate);
+      final AutomatonProxy aut = automata.iterator().next();
+      return composeOneAutomaton(aut, local, tau);
     }
   }
 
-  private HidingStep composeOneAutomaton(final Candidate candidate)
+  private HidingStep composeOneAutomaton(final AutomatonProxy aut,
+                                         final Collection<EventProxy> local,
+                                         final EventProxy tau)
     throws OverflowException
   {
-    final List<AutomatonProxy> automata = candidate.getAutomata();
-    assert automata.size() == 1 :
-      "Candidate for hiding has more than one automaton!";
-    final AutomatonProxy aut = automata.iterator().next();
-    final ProductDESProxyFactory factory = getFactory();
     final KindTranslator translator = getKindTranslator();
-    final EventProxy tau = createSilentEvent(candidate, factory);
     final EventEncoding eventEnc = new EventEncoding();
-    final Collection<EventProxy> local = candidate.getLocalEvents();
     eventEnc.addSilentEvent(tau);
     for (final EventProxy event : aut.getEvents()) {
       if (local.contains(event)) {
@@ -1442,6 +1459,7 @@ public class OPConflictChecker
     final boolean change4 = rel.removeRedundantPropositions();
     final EventProxy trueTau = change2 ? null : tau;
     mEventHasDisappeared |= change3;
+    final ProductDESProxyFactory factory = getFactory();
     if (change4) {
       final StateEncoding newStateEnc = new StateEncoding();
       final AutomatonProxy abstracted =
@@ -1458,15 +1476,13 @@ public class OPConflictChecker
     }
   }
 
-  private HidingStep composeSeveralAutomata(final Candidate candidate)
+  private HidingStep composeSeveralAutomata(final ProductDESProxy des,
+                                            final Collection<EventProxy> local,
+                                            final EventProxy tau)
     throws AnalysisException
   {
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = candidate.createProductDESProxy(factory);
     mCurrentSynchronousProductBuilder.setModel(des);
     final Collection<EventProxy> events = des.getEvents();
-    final Collection<EventProxy> local = candidate.getLocalEvents();
-    final EventProxy tau = createSilentEvent(candidate, factory);
     int expectedNumberOfEvents = events.size() - local.size();
     if (tau != null) {
       mCurrentSynchronousProductBuilder.addMask(local, tau);
