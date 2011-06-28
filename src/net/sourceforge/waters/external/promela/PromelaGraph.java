@@ -74,10 +74,12 @@ public class PromelaGraph
   /*
    * connect end node of first graph to start node of second graph
    */
-  public static PromelaGraph sequentialComposition (final PromelaGraph first, final PromelaGraph second){
+  public static PromelaGraph sequentialComposition (final PromelaGraph first, final PromelaGraph second,boolean unwind){
     if(first==null){
+      unwind = false;
       return second;
     }else if(second ==null){
+      unwind = false;
       return first;
     }else{
       PromelaGraph output=null;
@@ -240,6 +242,7 @@ public class PromelaGraph
 
 
       }
+      unwind = false;
       return output;
     }
 
@@ -249,7 +252,8 @@ public class PromelaGraph
    * used for "if" statement, combine both start and end nodes of first and second graph together
    */
   public static PromelaGraph combineComposition(final PromelaGraph first,
-                                                final PromelaGraph second)
+                                                final PromelaGraph second,
+                                                final boolean unwind)
   {
 
 
@@ -380,7 +384,8 @@ public class PromelaGraph
                                                 final PromelaNode endNode,
                                                 final ModuleProxyFactory factory,
                                                 final String name,
-                                                final Map<PromelaNode,PromelaEdge> toBreakNode)
+                                                final Map<PromelaNode,PromelaEdge> toBreakNode,
+                                                final boolean unwind)
   {
     PromelaNode newStartNode = new PromelaNode();
     final PromelaNode newEndNode = endNode;

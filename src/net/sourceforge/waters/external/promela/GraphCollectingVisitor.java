@@ -59,7 +59,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   final ArrayList<String> procNames = new ArrayList<String>();
   ArrayList<String> chanNames = new ArrayList<String>();
   Collection<String> duplicatedRun = new ArrayList<String>();
-
+  boolean mUnWinding=false;
   Collection<SimpleComponentProxy> mComponents = new ArrayList<SimpleComponentProxy>();
 
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
@@ -104,7 +104,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
 
     final PromelaGraph newGraph = new PromelaGraph(ident);
-    g = PromelaGraph.sequentialComposition(newGraph, g);
+    g = PromelaGraph.sequentialComposition(newGraph, g,mUnWinding);
     final GraphProxy graph = g.createGraphProxy(mFactory, procName);
     final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName);
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
@@ -204,7 +204,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final List<PromelaEdge> addEdge = new ArrayList<PromelaEdge>();
     PromelaGraph result = null;
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
-    result = PromelaGraph.sequentialComposition(result,step);
+    result = PromelaGraph.sequentialComposition(result,step,mUnWinding);
     for(final PromelaNode n: result.getNodes()){
       if(n.isGoto()){
         removeNode.add(n);
@@ -388,8 +388,9 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
       for(int i=0;i<t.getChildCount();i++){
 
         final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
+        mUnWinding = false;
         //if(!(t.getChild(i).getChild(0) instanceof SkipTreeNode)){
-        result = PromelaGraph.sequentialComposition(result,step);
+        result = PromelaGraph.sequentialComposition(result,step,mUnWinding);
       //  }
       }
 
@@ -405,15 +406,18 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     PromelaGraph result = null;
 
     for(int i=0;i<t.getChildCount();i++){
+      mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-      result = PromelaGraph.combineComposition(result,step);
+      result = PromelaGraph.combineComposition(result,step,mUnWinding);
 
     }
 
-  return result;
+    return result;
   }
+
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
+    final boolean unwinding = mUnWinding;
     counter =counter+1;
     Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode)){
@@ -424,30 +428,55 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     PromelaGraph result = null;
     final PromelaNode endNode = new PromelaNode(PromelaNode.EndType.END);
     for(int i=0;i<t.getChildCount();i++){
+      mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-      result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name,mSourceOfBreakNode);
+
+      result = PromelaGraph.doCombineComposition(result,step,endNode,mFactory,name,mSourceOfBreakNode,unwinding);
     }
+
     mLabelEnd.put(""+counter,endNode);
 
     return result;
   }
   public Object visitBreak(final BreakStatementTreeNode t)
-  {
-    final PromelaNode node = new PromelaNode(PromelaNode.EndType.BREAK);
-    final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
-    cNodes.add(node);
-    final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
-    final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
-    return result;
-
+  {//TODO
+    if(!mUnWinding){
+      final PromelaNode node = new PromelaNode(PromelaNode.EndType.BREAK);
+      final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
+      cNodes.add(node);
+      final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
+      final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
+      return result;
+  }else{
+    //create step_* transition
+      Tree tree = t;
+      while(!(tree instanceof ProctypeTreeNode)){
+        tree = tree.getParent();
+      }
+      final String name = tree.getText();
+      final PromelaNode node = new PromelaNode(PromelaNode.EndType.BREAK);
+      final PromelaNode startNode = new PromelaNode();
+      final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
+      cNodes.add(node);
+      final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
+      label.add(ident);
+      final PromelaLabel l = new PromelaLabel(label);
+      final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
+      final PromelaEdge edge = new PromelaEdge(startNode,node,l);
+      cEdges.add(edge);
+      final PromelaGraph result = new PromelaGraph(cNodes,cEdges,startNode);
+      return result;
+    }
   }
+
   public Object visitLabel(final LabelTreeNode t)
   {
 
     PromelaGraph result = null;
 
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
-    result = PromelaGraph.sequentialComposition(result,step);
+    result = PromelaGraph.sequentialComposition(result,step,mUnWinding);
     mGotoNode.put(t.getText(), result.getStart());
 
     return result;
@@ -455,14 +484,37 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
 
   public Object visitGoto(final GotoTreeNode t)
   {
-    final String labelName = t.getText();
-    final PromelaNode node = new PromelaNode(labelName); //creating goto label
-    final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
-    cNodes.add(node);
-    final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
-    final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
-    return result;
+    if(!mUnWinding){
+      final String labelName = t.getText();
+      final PromelaNode node = new PromelaNode(labelName); //creating goto label
+      final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
+      cNodes.add(node);
+      final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
+      final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
+      return result;
+    }else{
+      Tree tree = t;
+      while(!(tree instanceof ProctypeTreeNode)){
+        tree = tree.getParent();
+      }
+      final String name = tree.getText();
+      final String labelName = t.getText();
+      final PromelaNode node = new PromelaNode(labelName); //creating goto label
+      final PromelaNode startNode = new PromelaNode();
+      final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
+      cNodes.add(node);
+      final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
+      label.add(ident);
+      final PromelaLabel l = new PromelaLabel(label);
+      final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
+      final PromelaEdge edge = new PromelaEdge(startNode,node,l);
+      cEdges.add(edge);
+      final PromelaGraph result = new PromelaGraph(cNodes,cEdges,startNode);
+      return result;
+    }
   }
+
   public Object visitSkip(final SkipTreeNode t)
   {
     // TODO Auto-generated method stub
@@ -470,6 +522,7 @@ public Collection<String> distinct(final Collection<String> t,final Collection<S
     while(!(tree instanceof ProctypeTreeNode)){
       tree = tree.getParent();
     }
+
     final PromelaNode node = mLabelEnd.get(""+counter);
     final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
     cNodes.add(node);
