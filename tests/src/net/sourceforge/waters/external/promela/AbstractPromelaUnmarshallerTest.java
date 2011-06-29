@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.external.promela
-//# CLASS:   PromelaUnmarshallerTest
+//# CLASS:   AbstractPromelaUnmarshallerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -25,11 +25,23 @@ import net.sourceforge.waters.model.module.ModuleIntegrityChecker;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public class PromelaUnmarshallerTest extends AbstractWatersTest
+public abstract class AbstractPromelaUnmarshallerTest
+  extends AbstractWatersTest
 {
+
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
+  public AbstractPromelaUnmarshallerTest()
+  {
+  }
+
+  public AbstractPromelaUnmarshallerTest(final String name)
+  {
+    super(name);
+  }
+
 
   //#########################################################################
   //# Successful Test Cases
@@ -149,6 +161,11 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
     testImport("p104j");
   }
 
+  public void testImport_p104k() throws Exception
+  {
+    testImport("p104k");
+  }
+
   public void testImport_p105a() throws Exception
   {
     testImport("p105a");
@@ -178,6 +195,11 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
   {
     testImport("p106c");
   }
+
+
+  //#########################################################################
+  //# Hooks
+  abstract ModuleProxyFactory getModuleProxyFactory();
 
 
   //#########################################################################
@@ -249,7 +271,7 @@ public class PromelaUnmarshallerTest extends AbstractWatersTest
   {
     super.setUp();
     mInputDirectory = new File(getWatersInputRoot(), "promela");
-    final ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
+    final ModuleProxyFactory moduleFactory = getModuleProxyFactory();
     mProductDESFactory = ProductDESElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
