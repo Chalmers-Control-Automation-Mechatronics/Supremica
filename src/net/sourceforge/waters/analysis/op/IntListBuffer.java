@@ -26,10 +26,10 @@ import java.util.NoSuchElementException;
  *
  * <P>Lists are stored in large blocks of integer arrays. Each list node
  * occupies two subsequent array elements for the data and the successor
- * node. Each list index points to a dummy head node, which contains no data,
- * but whose next entry references the first actual list node. When lists are
- * deleted, unused nodes are not cleared from memory but retained for possible
- * use in other lists.</P>
+ * node. Each list index points to a dummy head node, whose next entry
+ * references the first actual list node, and which contains the last
+ * node of the list instead of data. When lists are deleted, unused nodes are
+ * not cleared from memory but retained for possible use in other lists.</P>
  *
  * @author Robi Malik
  */
@@ -157,6 +157,31 @@ public class IntListBuffer
     return list;
   }
 
+  /**
+   * Creates a new list and initialises it with data from the given array.
+   * @return The unique list number that identifies the new list in this
+   *         buffer.
+   */
+  public int createList(final int[] array)
+  {
+    if (array.length == 0) {
+      return createList();
+    } else {
+      final int list = allocatePair();
+      int prev = list;
+      int prevdata = NULL;
+      for (final int data : array) {
+        final int current = allocatePair();
+        setDataAndNext(prev, prevdata, current);
+        prev = current;
+        prevdata = data;
+      }
+      setDataAndNext(prev, prevdata, NULL);
+      setData(list, prev);
+      return list;
+    }
+  }
+
   public ReadOnlyIterator createReadOnlyIterator()
   {
     return new ReadOnlyIterator();
@@ -167,12 +192,12 @@ public class IntListBuffer
     return new ReadOnlyIterator(list);
   }
 
-  public Iterator createModifyingIterator()
+  public ModifyingIterator createModifyingIterator()
   {
     return new ModifyingIterator();
   }
 
-  public Iterator createModifyingIterator(final int list)
+  public ModifyingIterator createModifyingIterator(final int list)
   {
     return new ModifyingIterator(list);
   }
@@ -196,7 +221,7 @@ public class IntListBuffer
    * Gets the first data element from the given list.
    * @param  list   The unique list number that identifies the list to be
    *                examined in this buffer.
-   * @throws  IllegalArgumentException to indicate that the list
+   * @throws IllegalArgumentException to indicate that the list
    *                 is {@link #NULL} or empty.
    */
   public int getFirst(final int list)
@@ -214,7 +239,7 @@ public class IntListBuffer
    * list to count it, so its complexity is linear.
    * @param  list   The unique list number that identifies the list to be
    *                examined in this buffer.
-   * @return  The number of elements in the given list.
+   * @return The number of elements in the given list.
    */
   public int getLength(final int list)
   {
@@ -223,6 +248,29 @@ public class IntListBuffer
       count++;
     }
     return count;
+  }
+
+  /**
+   * Determines whether the given list has strictly more than the given
+   * number of elements. This method iterates over the list to count it, so
+   * its complexity is linear, but bounded by the size limit.
+   * @param  list   The unique list number that identifies the list to be
+   *                examined in this buffer.
+   * @param  size   The number of elements to be tested against.
+   * @return <CODE>true</CODE> if the number of elements in the list is
+   *         strictly greater than <CODE>size</CODE>,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isStrictlyLongerThan(final int list, final int size)
+  {
+    int count = 0;
+    for (int next = getNext(list); next != NULL; next = getNext(next)) {
+      if (count >= size) {
+        return true;
+      }
+      count++;
+    }
+    return false;
   }
 
   /**
@@ -417,7 +465,6 @@ public class IntListBuffer
     public boolean advance();
     public int getCurrentData();
     public void setCurrentData(int data);
-    public void remove();
   }
 
 
@@ -496,7 +543,7 @@ public class IntListBuffer
 
   //#########################################################################
   //# Inner Class ModifyingIterator
-  private class ModifyingIterator implements Iterator
+  public class ModifyingIterator implements Iterator
   {
     //#########################################################################
     //# Constructor
@@ -570,6 +617,42 @@ public class IntListBuffer
       } else {
         throw new IllegalStateException
           ("Attempting to remove without previous call to advance()!");
+      }
+    }
+
+    /**
+     * Removes the current item from the list being iterated over,
+     * and adds it to the end of the specified list.
+     * @param  list   The unique list number that identifies the list
+     *                receiving the data.
+     */
+    public void moveTo(final int list)
+    {
+      if (mPrevious != NULL) {
+        final int[] block = mBlocks.get(mCurrent >> BLOCK_SHIFT);
+        final int offset = mCurrent & BLOCK_MASK;
+        final int next = block[offset + OFFSET_NEXT];
+        if (next != NULL) {
+          setNext(mPrevious, next);
+        } else if (mPrevious == mHead) {
+          setDataAndNext(mHead, NULL, NULL);
+        } else {
+          setNext(mPrevious, next);
+          setData(mHead, mPrevious);
+        }
+        block[offset + OFFSET_NEXT] = NULL;
+        final int tail = getData(list);
+        if (tail == NULL) {
+          setDataAndNext(list, mCurrent, mCurrent);
+        } else {
+          setNext(tail, mCurrent);
+          setData(list, mCurrent);
+        }
+        mCurrent = mPrevious;
+        mPrevious = NULL;
+      } else {
+        throw new IllegalStateException
+          ("Attempting to move without previous call to advance()!");
       }
     }
 
