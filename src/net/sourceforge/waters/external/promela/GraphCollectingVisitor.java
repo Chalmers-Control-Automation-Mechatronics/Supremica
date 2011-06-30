@@ -416,18 +416,19 @@ public class GraphCollectingVisitor implements PromelaVisitor
       tree = tree.getParent();
     }
 
-    final String name = tree.getText();
-    PromelaGraph result = null;
-    final PromelaNode startNode = new PromelaNode();
-    final PromelaNode secondStartNode = new PromelaNode();
+ //   final String name = tree.getText();
+    final PromelaGraph result;
+ //   final PromelaNode startNode = new PromelaNode();
+ //   final PromelaNode secondStartNode = new PromelaNode();
     final PromelaNode endNode = new PromelaNode(PromelaNode.EndType.END);
+    final List<PromelaGraph> branches = new ArrayList<PromelaGraph>();
     for(int i=0;i<t.getChildCount();i++){
       mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-
-      result = PromelaGraph.doCombineComposition(result,step,startNode,endNode,secondStartNode,mFactory,name,mSourceOfBreakNode,unwinding);
+      branches.add(step);
+      //result = PromelaGraph.doCombineComposition(result,step,startNode,endNode,secondStartNode,mFactory,name,mSourceOfBreakNode,unwinding);
     }
-
+    result = PromelaGraph.doCombineComposition2(branches, unwinding);
     mLabelEnd.put(""+counter,endNode);
 
     return result;
@@ -458,7 +459,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       if (!mVisitor.getEvents().contains(event)) {
         mVisitor.getEvents().add(event);
       }
-      label.add(ident);
+      final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
+      label.add(ident2);
       final PromelaLabel l = new PromelaLabel(label);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
       final PromelaEdge edge = new PromelaEdge(startNode,node,l);
@@ -508,7 +510,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       if (!mVisitor.getEvents().contains(event)) {
         mVisitor.getEvents().add(event);
       }
-      label.add(ident);
+      final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
+      label.add(ident2);
       final PromelaLabel l = new PromelaLabel(label);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
       final PromelaEdge edge = new PromelaEdge(startNode,node,l);
@@ -559,7 +562,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       if(!mVisitor.getEvents().contains(event)){
         mVisitor.getEvents().add(event);
       }
-      label.add(ident);
+      final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
+      label.add(ident2);
       final PromelaLabel l = new PromelaLabel(label);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
       final PromelaEdge edge = new PromelaEdge(startNode,node,l);

@@ -14,6 +14,15 @@ public class PromelaEdge
   {
     mLabel = label;
   }
+  @Override
+  public boolean equals(final Object e){
+    if(this.getSource()==((PromelaEdge) e).getSource() && this.getTarget()==((PromelaEdge) e).getTarget()){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
   public PromelaLabel getLabelBlock()
   {
     return mLabel;
