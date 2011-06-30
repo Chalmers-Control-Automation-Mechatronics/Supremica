@@ -206,6 +206,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         initialize();
     }
 
+    @SuppressWarnings("unchecked")
     void initialize()
     {
         unionAlphabet = orgExAutomata.getUnionAlphabet();
@@ -263,14 +264,14 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
 
         setVariableOrdering();
-        
+
         //Manually set the variable ordering
 //        manuallySetVariableOrderingNames();
 //        setVariableOrdering(variableOrderingNames);
 
-        for(Object obj:variableOrdering)
+        for(final Object obj:variableOrdering)
         {
-            if(obj instanceof List)
+            if(obj instanceof List<?>)
             {
                 eventDomain = manager.createDomain(((List<EventDeclProxy>) obj).size());
                 eventDomain.setName("Events");
@@ -302,7 +303,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
             if(obj instanceof ExtendedAutomaton)
             {
-                String automatonName = ((ExtendedAutomaton)obj).getName();
+                final String automatonName = ((ExtendedAutomaton)obj).getName();
 
 
     //            System.err.println(automaton.getName());
@@ -369,7 +370,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
         for(final ExtendedAutomaton automaton:theExAutomata)
         {
-            final BDDExtendedAutomaton bddExAutomaton = new BDDExtendedAutomaton(this, automaton);            
+            final BDDExtendedAutomaton bddExAutomaton = new BDDExtendedAutomaton(this, automaton);
 
             if (automaton.isSpecification()) {
                 specs.add(automaton);
@@ -412,7 +413,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         final List<VariableComponentProxy> sortedVarList = new ArrayList<VariableComponentProxy>(new PCGVariableSorter(orgExAutomata).sortVars(orgExAutomata.getVars()));
 //        ArrayList<VariableComponentProxy> sortedVarList = new ArrayList<VariableComponentProxy>(orgExAutomata.getVars());
 
-        for(ExtendedAutomaton automaton:theExAutomata)
+        for(final ExtendedAutomaton automaton:theExAutomata)
         {
 
             variableOrdering.add(automaton);
@@ -439,12 +440,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
 
         variableOrderingNames.add("1");
-        
+
     }
 
-    void setVariableOrdering(List<String> varOrderingNames)
+    void setVariableOrdering(final List<String> varOrderingNames)
     {
-        for(String varName:varOrderingNames)
+        for(final String varName:varOrderingNames)
         {
             if(!varName.equals("1"))
             {
@@ -455,7 +456,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                 else
                 {
 
-                    int isAutomaton = theIndexMap.isStringEFAorVar(varName);
+                    final int isAutomaton = theIndexMap.isStringEFAorVar(varName);
                     if(isAutomaton == 0)
                     {
                         variableOrdering.add(theIndexMap.getExAutomatonWithName(varName));
@@ -1205,7 +1206,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             final int indexVar2 = variableOrderingNames.indexOf(var2);
             for(final String var:variableOrderingNames.subList(indexVar1+1, indexVar2))
             {
-                int isAutomaton = theIndexMap.isStringEFAorVar(var);
+                final int isAutomaton = theIndexMap.isStringEFAorVar(var);
                 if(isAutomaton == 0)
                     output = output.multiply(BigInteger.valueOf(theIndexMap.getExAutomatonWithName(var).getNodes().size()));
                 else if(isAutomaton == 1)
