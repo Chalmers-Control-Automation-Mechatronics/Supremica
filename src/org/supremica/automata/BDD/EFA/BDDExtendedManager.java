@@ -549,7 +549,7 @@ public class BDDExtendedManager
         do
         {
 //            System.err.println("RBackward "+iteration+ "\t" + Qkn.nodeCount());
- /*           try
+/*            try
             {
                 out.write((iteration++) + "\t" + Qkn.nodeCount());
                 out.newLine();
@@ -560,7 +560,7 @@ public class BDDExtendedManager
             Qkn = (Qk.or(image_preImage(Qk,delta_all)).and(forbidden.not())).and(bddExAutomata.getReachableStates());
         } while (!Qkn.equals(Qk));
 
- //       try{out.close();}catch (final Exception e){}
+//        try{out.close();}catch (final Exception e){}
 
 
         return Qkn;
@@ -570,15 +570,12 @@ public class BDDExtendedManager
     {
         final BDD delta_all = ((BDDMonolithicEdges)bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardBDD();
 
-//        delta_all.printDot();
-//        bddExAutomata.getForwardOverflows().printDot();
-
 //        System.err.println(delta_all.support().toString());
 
         BDD Qkn = bddExAutomata.getInitialState().and(forbidden.not());
         BDD Qk = null;
-//        Qkn.printDot();
 /*
+
         FileWriter fstream = null;
         try
         {

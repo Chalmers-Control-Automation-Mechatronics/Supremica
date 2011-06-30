@@ -352,7 +352,7 @@ public class BDDExtendedAutomaton {
     public ArrayList<String> getComplementLocationNames(final ArrayList<String> locationNames)
     {
         final ArrayList<String> output = new ArrayList<String>();
-        for(final NodeProxy location: getExAutomaton().getNodes())
+        for(final NodeProxy location: theExAutomaton.getNodes())
         {
             if(!locationNames.contains(location.getName()))
                 output.add(location.getName());

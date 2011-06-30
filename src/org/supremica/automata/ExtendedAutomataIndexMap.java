@@ -34,6 +34,9 @@ public class ExtendedAutomataIndexMap {
     private final Map<String,Integer> val2indexMap;
     private final Map<Integer,String> index2valMap;
 
+    private Set<String> EFANames = null;
+    private Set<String> variableNames = null;
+
     ExtendedAutomata theExAutomata = null;
 
     @SuppressWarnings("unused")
@@ -77,6 +80,9 @@ public class ExtendedAutomataIndexMap {
         indexToVariableMap = new HashMap<Integer,VariableComponentProxy>(theExAutomata.getVars().size());
         variableStringToIndexMap = new HashMap<String, Integer>(theExAutomata.getVars().size());
 
+        EFANames = new HashSet<String>(theExAutomata.size());
+        variableNames = new HashSet<String>(theExAutomata.getVars().size());
+
         // The automatonIndex and the locationIndex hashmaps are filled
         int automatonIndex = 0;
         for (final ExtendedAutomaton currExAutomaton : theExAutomata)
@@ -85,6 +91,7 @@ public class ExtendedAutomataIndexMap {
             exAutomatonToIndexMap.put(currExAutomaton.getName(), automatonIndex);
             indexToExAutomatonArray[automatonIndex] = currExAutomaton;
             nameToExAutomatonMap.put(currExAutomaton.getName(), currExAutomaton);
+            EFANames.add(currExAutomaton.getName());
             automatonIndex++;
 
             int locationIndex = 0;
@@ -106,6 +113,7 @@ public class ExtendedAutomataIndexMap {
             indexToVariableMap.put(index, var);
             variableToIndexMap.put(var, index);
             variableStringToIndexMap.put(var.getName(),index);
+            variableNames.add(var.getName());
             index++;
 
             final String varName = var.getName();
@@ -169,6 +177,19 @@ public class ExtendedAutomataIndexMap {
         }
     }
 
+    public int isStringEFAorVar(String name)
+    {
+        if(EFANames.contains(name))
+            return 0;
+        else if(variableNames.contains(name))
+        {
+            return 1;
+        }
+
+        return 2;
+
+    }
+
     public Integer getIndexOfVal(final String val)
     {
         return val2indexMap.get(val);
@@ -197,6 +218,11 @@ public class ExtendedAutomataIndexMap {
     public VariableComponentProxy getVariableAt(final int i)
     {
         return indexToVariableMap.get(i);
+    }
+
+    public int getVariableIndexByName(String name)
+    {
+        return variableStringToIndexMap.get(name);
     }
 
     public VariableComponentProxy getCorrepondentVariable(ExtendedAutomaton efa)
