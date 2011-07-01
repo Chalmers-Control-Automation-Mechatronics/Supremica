@@ -409,13 +409,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
     final boolean unwinding = mUnWinding;
-    System.out.println(unwinding);
+   // System.out.println(unwinding);
     counter =counter+1;
     Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode)){
       tree = tree.getParent();
     }
-
+    System.out.println(unwinding+" "+tree.getText());
  //   final String name = tree.getText();
     final PromelaGraph result;
  //   final PromelaNode startNode = new PromelaNode();
@@ -430,7 +430,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
     result = PromelaGraph.doCombineComposition2(branches, unwinding,mFactory);
     mLabelEnd.put(""+counter,endNode);
-
+    mUnWinding = unwinding;
     return result;
   }
   public Object visitBreak(final BreakStatementTreeNode t)
