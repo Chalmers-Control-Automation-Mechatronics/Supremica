@@ -2,6 +2,8 @@ package net.sourceforge.waters.external.promela;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 public class PromelaLabel
@@ -17,5 +19,10 @@ public class PromelaLabel
   }
   public Collection<SimpleExpressionProxy> getLabel(){
     return mLabelBlock;
+  }
+  public Collection<SimpleExpressionProxy> getCloneLabel(final ModuleProxyFactory factory)
+  {
+    final ModuleProxyCloner cloner = factory.getCloner();
+    return cloner.getClonedList(mLabelBlock);
   }
 }

@@ -128,7 +128,7 @@
                             <Point Y="-8" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="B_4">
+                    <SimpleNode Name="B_3">
                         <PointGeometry>
                             <Point Y="144" X="176"/>
                         </PointGeometry>
@@ -136,7 +136,7 @@
                             <Point Y="-3" X="6"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="B_3">
+                    <SimpleNode Name="B_4">
                         <PointGeometry>
                             <Point Y="208" X="176"/>
                         </PointGeometry>
@@ -177,7 +177,7 @@
                             <Point Y="103" X="122"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="B_4" Source="B_2">
+                    <Edge Target="B_3" Source="B_2">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="2"/>
@@ -190,7 +190,7 @@
                             <Point Y="113" X="187"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="B_2" Source="B_4">
+                    <Edge Target="B_2" Source="B_3">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="1"/>
@@ -206,7 +206,7 @@
                             <Point Y="80" X="176"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="B_3" Source="B_4">
+                    <Edge Target="B_4" Source="B_3">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="2"/>
@@ -219,7 +219,7 @@
                             <Point Y="208" X="176"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="B_1" Source="B_3">
+                    <Edge Target="B_1" Source="B_4">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="1"/>
@@ -232,7 +232,7 @@
                             <Point Y="186" X="124"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="B_3" Source="B_1">
+                    <Edge Target="B_4" Source="B_1">
                         <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="2"/>

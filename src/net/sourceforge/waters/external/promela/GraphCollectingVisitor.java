@@ -105,7 +105,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
 
     final PromelaGraph newGraph = new PromelaGraph(ident);
-    g = PromelaGraph.sequentialComposition(newGraph, g,mUnWinding);
+    g = PromelaGraph.sequentialComposition(newGraph, g,mUnWinding,mFactory);
     final GraphProxy graph = g.createGraphProxy(mFactory, procName);
     final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName);
     final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
@@ -205,7 +205,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final List<PromelaEdge> addEdge = new ArrayList<PromelaEdge>();
     PromelaGraph result = null;
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
-    result = PromelaGraph.sequentialComposition(result,step,mUnWinding);
+    result = PromelaGraph.sequentialComposition(result,step,mUnWinding,mFactory);
     for(final PromelaNode n: result.getNodes()){
       if(n.isGoto()){
         removeNode.add(n);
@@ -381,7 +381,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
         mUnWinding = false;
         //if(!(t.getChild(i).getChild(0) instanceof SkipTreeNode)){
-        result = PromelaGraph.sequentialComposition(result,step,mUnWinding);
+        result = PromelaGraph.sequentialComposition(result,step,mUnWinding,mFactory);
       //  }
       }
 
@@ -399,7 +399,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     for(int i=0;i<t.getChildCount();i++){
       mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-      result = PromelaGraph.combineComposition(result,step,mUnWinding);
+      result = PromelaGraph.combineComposition(result,step,mUnWinding,mFactory);
 
     }
 
@@ -428,7 +428,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       branches.add(step);
       //result = PromelaGraph.doCombineComposition(result,step,startNode,endNode,secondStartNode,mFactory,name,mSourceOfBreakNode,unwinding);
     }
-    result = PromelaGraph.doCombineComposition2(branches, unwinding);
+    result = PromelaGraph.doCombineComposition2(branches, unwinding,mFactory);
     mLabelEnd.put(""+counter,endNode);
 
     return result;
@@ -476,7 +476,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     PromelaGraph result = null;
 
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
-    result = PromelaGraph.sequentialComposition(result,step,mUnWinding);
+    result = PromelaGraph.sequentialComposition(result,step,mUnWinding,mFactory);
     mGotoNode.put(t.getText(), result.getStart());
 
     return result;
