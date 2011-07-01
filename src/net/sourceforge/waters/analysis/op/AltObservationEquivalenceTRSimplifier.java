@@ -16,6 +16,8 @@ import gnu.trove.TIntIntHashMap;
 import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -580,13 +582,14 @@ public class AltObservationEquivalenceTRSimplifier
     {
     }
 
-    EquivalenceClass(final ComplexEquivalenceClass parent)
-    {
-      mParent = parent;
-    }
-
     EquivalenceClass(final InfoMap info)
     {
+      mInfo = info;
+    }
+
+    EquivalenceClass(final ComplexEquivalenceClass parent, final InfoMap info)
+    {
+      mParent = parent;
       mInfo = info;
     }
 
@@ -627,6 +630,19 @@ public class AltObservationEquivalenceTRSimplifier
     {
       mParent = null;
     }
+
+    //#######################################################################
+    //# Data Members
+    @Override
+    public String toString()
+    {
+      final StringWriter writer = new StringWriter();
+      final PrintWriter printer = new PrintWriter(writer);
+      dump(printer);
+      return writer.toString();
+    }
+
+    abstract void dump(PrintWriter printer);
 
     //#######################################################################
     //# Data Members
@@ -739,6 +755,7 @@ public class AltObservationEquivalenceTRSimplifier
         }
         splitClasses.clear();
       }
+      mTempClass.clear();
     }
 
     @Override
@@ -756,7 +773,7 @@ public class AltObservationEquivalenceTRSimplifier
       final int newSize = mSize - overflowSize;
       final boolean preds = mOverflowSize >= 0;
       final SimpleEquivalenceClass overflowClass;
-      if (newSize <= overflowSize) {
+      if (newSize >= overflowSize) {
         overflowClass =
           new SimpleEquivalenceClass(overflowList, overflowSize, preds);
         mSize = newSize;
@@ -769,21 +786,20 @@ public class AltObservationEquivalenceTRSimplifier
         setUpStateToClass(true);
       }
       overflowClass.setUpStateToClass(true);
+      final ComplexEquivalenceClass parent = getParent();
       final InfoMap info = getInfo();
-      if (info == null) { // splitter still in W ...
-        mSplitters.add(overflowClass);
-      } else { // not in W, partition stable with respect to this class ...
+      if (parent != null) {
         setInfo(null);
-        final ComplexEquivalenceClass parent = getParent();
-        if (parent == null) {
-          final ComplexEquivalenceClass complex =
-            new ComplexEquivalenceClass(overflowClass, this, info);
-          mSplitters.add(complex);
-        } else {
-          final ComplexEquivalenceClass complex =
-            new ComplexEquivalenceClass(overflowClass, this, parent);
-          parent.replaceChild(this, complex);
-        }
+        final ComplexEquivalenceClass complex =
+          new ComplexEquivalenceClass(overflowClass, this, parent, info);
+        parent.replaceChild(this, complex);
+      } else if (info != null) {
+        setInfo(null);
+        final ComplexEquivalenceClass complex =
+          new ComplexEquivalenceClass(overflowClass, this, info);
+        mSplitters.add(complex);
+      } else {
+        mSplitters.add(overflowClass);
       }
     }
 
@@ -845,30 +861,29 @@ public class AltObservationEquivalenceTRSimplifier
       }
 
       // Create and enqueue complex splitters ...
-      final InfoMap info = getInfo();
       final SimpleEquivalenceClass class1 =
         new SimpleEquivalenceClass(overflow1, size1, false);
       class1.setUpStateToClass(true);
       final SimpleEquivalenceClass class2 =
         new SimpleEquivalenceClass(overflow2, size2, false);
       class2.setUpStateToClass(true);
-      if (info == null) { // splitter still in W ...
-        mSplitters.add(class1);
-        mSplitters.add(class2);
-      } else { // not in W, partition stable with respect to this class ...
+      final InfoMap info = getInfo();
+      final ComplexEquivalenceClass parent = getParent();
+      if (parent != null || info != null) {
         setInfo(null);
         final ComplexEquivalenceClass complex2 =
           new ComplexEquivalenceClass(class2, this);
-        final ComplexEquivalenceClass parent = getParent();
-        final ComplexEquivalenceClass complex1;
+        final ComplexEquivalenceClass complex1 =
+          new ComplexEquivalenceClass(class1, complex2, parent, info);
+        complex2.setParent(complex1);
         if (parent == null) {
-          complex1 = new ComplexEquivalenceClass(class1, complex2, info);
           mSplitters.add(complex1);
         } else {
-          complex1 = new ComplexEquivalenceClass(class1, complex2, parent);
           parent.replaceChild(this, complex1);
         }
-        complex2.setParent(complex1);
+      } else {
+        mSplitters.add(class1);
+        mSplitters.add(class2);
       }
     }
 
@@ -941,6 +956,14 @@ public class AltObservationEquivalenceTRSimplifier
     }
 
     //#######################################################################
+    //# Debugging
+    @Override
+    void dump(final PrintWriter printer)
+    {
+      mClassLists.dumpList(printer, mList);
+    }
+
+    //#######################################################################
     //# Data Members
     int mList;
     int mSize;
@@ -967,22 +990,23 @@ public class AltObservationEquivalenceTRSimplifier
       mBigChild.setParent(this);
     }
 
-    ComplexEquivalenceClass(final EquivalenceClass little,
-                            final EquivalenceClass big,
-                            final ComplexEquivalenceClass parent)
+    ComplexEquivalenceClass(final EquivalenceClass child1,
+                            final EquivalenceClass child2,
+                            final InfoMap info)
     {
-      super(parent);
-      mLittleChild = little;
-      mBigChild = big;
+      super(info);
+      mLittleChild = child1;
+      mBigChild = child2;
       mLittleChild.setParent(this);
       mBigChild.setParent(this);
     }
 
     ComplexEquivalenceClass(final EquivalenceClass child1,
                             final EquivalenceClass child2,
+                            final ComplexEquivalenceClass parent,
                             final InfoMap info)
     {
-      super(info);
+      super(parent, info);
       mLittleChild = child1;
       mBigChild = child2;
       mLittleChild.setParent(this);
@@ -1081,6 +1105,17 @@ public class AltObservationEquivalenceTRSimplifier
     {
       super.enqueue();
       mSplitters.add(this);
+    }
+
+    //#######################################################################
+    //# Debugging
+    void dump(final PrintWriter printer)
+    {
+      printer.write('<');
+      mLittleChild.dump(printer);
+      printer.write(", ");
+      mBigChild.dump(printer);
+      printer.write('>');
     }
 
     //#######################################################################

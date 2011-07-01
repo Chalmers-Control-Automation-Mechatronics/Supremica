@@ -122,7 +122,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_2">
                         <PointGeometry>
-                            <Point Y="144" X="160"/>
+                            <Point Y="144" X="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-8" X="8"/>
@@ -175,11 +175,11 @@
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-1" X="-29"/>
+                                <Point Y="-24" X="-61"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="192" X="155"/>
+                            <Point Y="193" X="161"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="B_2" Source="B_3">
@@ -188,14 +188,14 @@
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="3"/>
+                                <Point Y="-25" X="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="198" X="242"/>
+                            <Point Y="193" X="193"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="144" X="160"/>
+                            <Point Y="144" X="176"/>
                         </EndPointGeometry>
                     </Edge>
                     <Edge Target="B_4" Source="B_3">
@@ -204,12 +204,9 @@
                                 <IntConstant Value="3"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="9" X="-18"/>
+                                <Point Y="6" X="-33"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="243" X="120"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
