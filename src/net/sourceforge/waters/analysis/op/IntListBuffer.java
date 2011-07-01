@@ -251,32 +251,9 @@ public class IntListBuffer
   }
 
   /**
-   * Determines whether the given list has strictly more than the given
-   * number of elements. This method iterates over the list to count it, so
-   * its complexity is linear, but bounded by the size limit.
-   * @param  list   The unique list number that identifies the list to be
-   *                examined in this buffer.
-   * @param  size   The number of elements to be tested against.
-   * @return <CODE>true</CODE> if the number of elements in the list is
-   *         strictly greater than <CODE>size</CODE>,
-   *         <CODE>false</CODE> otherwise.
-   */
-  public boolean isStrictlyLongerThan(final int list, final int size)
-  {
-    int count = 0;
-    for (int next = getNext(list); next != NULL; next = getNext(next)) {
-      if (count >= size) {
-        return true;
-      }
-      count++;
-    }
-    return false;
-  }
-
-  /**
    * Adds the given data to the front of the specified list.
-   * @param  list   The unique list number that identifies the list to be modified
-   *                in this buffer.
+   * @param  list   The unique list number that identifies the list to be
+   *                modified in this buffer.
    * @param  data   The integer data to be stored as the new first element of
    *                the list.
    */
@@ -389,19 +366,32 @@ public class IntListBuffer
 
 
   //#########################################################################
+  //# Low Level Access
+  public int getHead(final int list)
+  {
+    return getNext(list);
+  }
+
+  public int getTail(final int list)
+  {
+    return getData(list);
+  }
+
+  public int getData(final int node)
+  {
+    final int[] block = mBlocks.get(node >> BLOCK_SHIFT);
+    return block[(node & BLOCK_MASK) + OFFSET_DATA];
+  }
+
+  public int getNext(final int node)
+  {
+    final int[] block = mBlocks.get(node >> BLOCK_SHIFT);
+    return block[(node & BLOCK_MASK) + OFFSET_NEXT];
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
-  private int getData(final int list)
-  {
-    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
-    return block[(list & BLOCK_MASK) + OFFSET_DATA];
-  }
-
-  private int getNext(final int list)
-  {
-    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
-    return block[(list & BLOCK_MASK) + OFFSET_NEXT];
-  }
-
   private void setData(final int list, final int data)
   {
     final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
@@ -461,9 +451,46 @@ public class IntListBuffer
   //# Inner Interface Iterator
   public interface Iterator
   {
+    /**
+     * Resets iteration to the start of the given list.
+     * The next call to {@link #advance() will set the iterator to the
+     * first list element.
+     */
     public void reset(int list);
+
+    /**
+     * Resets iteration to the position preceding <CODE>prev</CODE> in the
+     * given list.
+     * @param  list   The unique list number that identifies the list to be
+     *                examined by the iterator.
+     * @param  prev   The index of the node preceding the next node to be
+     *                made accessible when {@link #advance()} is called.
+     *                A value of {@link IntListBuffer#NULL NULL} resets the
+     *                iterator to the start of the list.
+     */
+    public void reset(int list, int prev);
+
+    /**
+     * Advances iteration.
+     * This method moves the iterator one step forward.
+     * It must be called before trying to access the list using the
+     * {@link #getCurrentData()} or {@link #setCurrentData(int)
+     * setCurrentData()} methods.
+     * @return <CODE>true</CODE> if the iteration contains another element
+     *         that is now accessible, or <CODE>false</CODE> if the end of
+     *         the list has been reached.
+     */
     public boolean advance();
+
+    /**
+     * Retrieves the list element at the current position of this iterator.
+     */
     public int getCurrentData();
+
+    /**
+     * Stores the given value in the list at the current position of this
+     * iterator.
+     */
     public void setCurrentData(int data);
   }
 
@@ -492,6 +519,15 @@ public class IntListBuffer
         mCurrent = list;
       } else {
         throw new IllegalArgumentException("List head cannot be NULL!");
+      }
+    }
+
+    public void reset(final int list, final int prev)
+    {
+      if (list == NULL || prev == NULL) {
+        reset(list);
+      } else {
+        mCurrent = prev;
       }
     }
 
@@ -558,7 +594,7 @@ public class IntListBuffer
     }
 
     //#########################################################################
-    //# Data Members
+    //# Interface Iterator
     public void reset(final int list)
     {
       if (list != NULL) {
@@ -566,6 +602,17 @@ public class IntListBuffer
         mHead = mCurrent = list;
       } else {
         throw new IllegalArgumentException("List head cannot be NULL!");
+      }
+    }
+
+    public void reset(final int list, final int prev)
+    {
+      if (list == NULL || prev == NULL) {
+        reset(list);
+      } else {
+        mPrevious = NULL;
+        mHead = list;
+        mCurrent = prev;
       }
     }
 
@@ -596,6 +643,8 @@ public class IntListBuffer
       }
     }
 
+    //#########################################################################
+    //# Specific Access
     public void remove()
     {
       if (mPrevious != NULL) {
