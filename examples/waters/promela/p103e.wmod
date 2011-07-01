@@ -173,10 +173,10 @@
                     </Edge>
                     <Edge Target="C_2" Source="C_1">
                         <LabelBlock>
+                            <SimpleIdentifier Name="step_C"/>
                             <IndexedIdentifier Name="exch_ch">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
-                            <SimpleIdentifier Name="step_C"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-15" X="8"/>
                             </LabelGeometry>

@@ -284,9 +284,6 @@ public class PromelaGraph
       PromelaEdge specialEdge1=null;
       PromelaEdge specialEdge2 = null;
       final Collection<SimpleExpressionProxy> specialLabel = new ArrayList<SimpleExpressionProxy>();
-      boolean simpleFirst = false;
-      boolean simpleSecond = false;
-
 
       for (final PromelaEdge edge : edgesOfFirst) {
         if (edge.getSource() == first.getStart()&& !edge.getTarget().isEnd()) {
@@ -294,13 +291,11 @@ public class PromelaGraph
           targetNode = edge.getTarget();
           newEdge = new PromelaEdge(newStartNode, targetNode, label1);
           edgesOfResult.add(newEdge);
-          simpleFirst = false;
         } else if(edge.getTarget().isEnd()&& edge.getSource()!=first.getStart()){
           label1 = new PromelaLabel(edge.getLabelBlock().getCloneLabel(factory));
           sourceNode = edge.getSource();
           newEdge = new PromelaEdge(sourceNode, newEndNode, label1);
           edgesOfResult.add(newEdge);
-          simpleFirst = false;
         }else if(edge.getTarget().isEnd() && edge.getSource()==first.getStart()){
           label1 = new PromelaLabel(edge.getLabelBlock().getCloneLabel(factory));
           loop1:
@@ -315,7 +310,6 @@ public class PromelaGraph
           }
           //specialLabel.addAll(label1.getLabel());
           specialEdge1 = new PromelaEdge(newStartNode,newEndNode,label1);
-          simpleFirst = true;
           if(!edgesOfResult.contains(specialEdge1)){
             edgesOfResult.add(specialEdge1);
           }else{
@@ -342,7 +336,6 @@ public class PromelaGraph
         }
         else {
           edgesOfResult.add(edge);
-          simpleFirst = false;
         }
       }
 
@@ -352,13 +345,11 @@ public class PromelaGraph
           targetNode = edge.getTarget();
           newEdge = new PromelaEdge(newStartNode, targetNode, label2);
           edgesOfResult.add(newEdge);
-          simpleSecond = false;
         }else if(edge.getTarget().isEnd()&& edge.getSource()!=second.getStart()){
           label2 = new PromelaLabel(edge.getLabelBlock().getCloneLabel(factory));
           sourceNode = edge.getSource();
           newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
           edgesOfResult.add(newEdge);
-          simpleSecond = false;
         }else if(edge.getTarget().isEnd() && edge.getSource()==second.getStart()){
           System.out.println(edge.getLabelBlock().getLabel().toString());
           label2 = new PromelaLabel(edge.getLabelBlock().getCloneLabel(factory));
@@ -398,8 +389,6 @@ public class PromelaGraph
             edgesOfResult.remove(specialEdge2);
             edgesOfResult.add(e);
           }
-     //     edgesOfResult.add(specialEdge2);
-          simpleSecond = true;
         }else if(edge.getTarget().isBreak()&& edge.getSource()==second.getStart()){
           label2 = new PromelaLabel(edge.getLabelBlock().getCloneLabel(factory));
           loop1:
@@ -439,18 +428,15 @@ public class PromelaGraph
             final PromelaEdge e = new PromelaEdge(newStartNode,newEndNode,label);
             edgesOfResult.remove(specialEdge2);
             edgesOfResult.add(e);
-            simpleSecond = true;
             }
         } else if(edge.getTarget().isBreak()&& edge.getSource()!=second.getStart()){
           label2 = new PromelaLabel(edge.getLabelBlock().getCloneLabel(factory));
           sourceNode = edge.getSource();
           newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
           edgesOfResult.add(newEdge);
-          simpleSecond = false;
         }
         else {
           edgesOfResult.add(edge);
-          simpleSecond = false;
         }
       }
       /*
@@ -563,7 +549,6 @@ public class PromelaGraph
           l2.addAll(tempEdge.getLabelBlock().getCloneLabel(factory));
           loop1:
           for(final SimpleExpressionProxy e: edge.getLabelBlock().getCloneLabel(factory)){
-            loop2:
             for(final SimpleExpressionProxy check: tempEdge.getLabelBlock().getCloneLabel(factory)){
               if(comparator.compare(e, check)==0){
                 continue loop1;
@@ -593,7 +578,6 @@ public class PromelaGraph
             l2.addAll(tempEdge.getLabelBlock().getCloneLabel(factory));
             loop1:
               for(final SimpleExpressionProxy e: edge.getLabelBlock().getCloneLabel(factory)){
-                loop2:
                 for(final SimpleExpressionProxy check: tempEdge.getLabelBlock().getCloneLabel(factory)){
                   if(comparator.compare(e, check)==0){
                     continue loop1;
