@@ -56,10 +56,28 @@ public class AltObservationEquivalenceTRSimplifier
   public AltObservationEquivalenceTRSimplifier
     (final ListBufferTransitionRelation rel)
   {
-    super(rel);
+    super(null);
     if (rel != null) {
-      mNumEvents = rel.getNumberOfProperEvents();
+      setTransitionRelation(rel);
     }
+    setInfoEnabled(false);
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  public void setInfoEnabled(final boolean enabled)
+  {
+    if (enabled) {
+      mNoInfo = null;
+    } else if (mNoInfo == null) {
+      mNoInfo = new NoInfoMap();
+    }
+  }
+
+  public boolean getInfoEnabled()
+  {
+    return mNoInfo == null;
   }
 
 
@@ -80,8 +98,11 @@ public class AltObservationEquivalenceTRSimplifier
     mNumEvents = rel.getNumberOfProperEvents();
     mStateShift = AutomatonTools.log2(mNumEvents);
     final int numTrans = rel.getNumberOfTransitions();
-    mInitialInfoSize =
-      mNumReachableStates > 0 ? numTrans / mNumReachableStates : 0;
+    if (mNumReachableStates > 0) {
+      mInitialInfoSize = numTrans / mNumReachableStates;
+    } else {
+      mInitialInfoSize = 0;
+    }
   }
 
   @Override
@@ -313,6 +334,7 @@ public class AltObservationEquivalenceTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     mTempClass = new TIntArrayList(numStates);
+    mMaxInfoSize = 0;
   }
 
   @Override
@@ -566,7 +588,12 @@ public class AltObservationEquivalenceTRSimplifier
 
     InfoMap createInfo()
     {
-      return mInfo = new InfoMap(mInitialInfoSize);
+      if (mNoInfo != null) {
+        mInfo = mNoInfo;
+      } else {
+        mInfo = new HashInfoMap();
+      }
+      return mInfo;
     }
 
     void setInfo(final InfoMap info)
@@ -593,6 +620,15 @@ public class AltObservationEquivalenceTRSimplifier
     //# Interface java.util.Comparable<EquivalenceClass>
     public int compareTo(final EquivalenceClass clazz)
     {
+      if (mInfo == null) {
+        if (clazz.mInfo != null) {
+          return 1;
+        }
+      } else {
+        if (clazz.mInfo == null) {
+          return -1;
+        }
+      }
       return mSize - clazz.mSize;
     }
 
@@ -733,6 +769,7 @@ public class AltObservationEquivalenceTRSimplifier
         splitClasses.clear();
       }
       mTempClass.clear();
+      mMaxInfoSize = Math.max(mMaxInfoSize, info.size());
     }
 
     @Override
@@ -771,13 +808,17 @@ public class AltObservationEquivalenceTRSimplifier
         final ComplexEquivalenceClass complex =
           new ComplexEquivalenceClass(overflowClass, this, parent, info);
         parent.replaceChild(this, complex);
-      } else if (info != null) {
+      } else if (info == null) {
+        mSplitters.add(overflowClass);
+      } else if (info == mNoInfo) {
+        setInfo(null);
+        mSplitters.add(this);
+        mSplitters.add(overflowClass);
+      } else {
         setInfo(null);
         final ComplexEquivalenceClass complex =
           new ComplexEquivalenceClass(overflowClass, this, info);
         mSplitters.add(complex);
-      } else {
-        mSplitters.add(overflowClass);
       }
     }
 
@@ -1015,7 +1056,7 @@ public class AltObservationEquivalenceTRSimplifier
       final int tempSize = mTempClass.size();
       final InfoMap info = getInfo();
       final int infoSize = info.size();
-      final InfoMap littleInfo = new InfoMap(infoSize);
+      final InfoMap littleInfo = new HashInfoMap(infoSize);
       mLittleChild.setInfo(littleInfo);
       mBigChild.setInfo(info);
       final Collection<SimpleEquivalenceClass> splitClasses =
@@ -1071,6 +1112,8 @@ public class AltObservationEquivalenceTRSimplifier
       mTempClass.clear();
       mLittleChild.enqueue();
       mBigChild.enqueue();
+      mMaxInfoSize = Math.max(mMaxInfoSize, info.size());
+      mMaxInfoSize = Math.max(mMaxInfoSize, littleInfo.size());
     }
 
     @Override
@@ -1107,26 +1150,96 @@ public class AltObservationEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class InfoMap
-  private class InfoMap extends TIntIntHashMap
+  //# Inner Interface InfoMap
+  private interface InfoMap {
+
+    public int increment(final int state, final int event);
+
+    public void moveTo(final InfoMap little, final int state, final int event);
+
+    public SplitKind getSplitKind(final InfoMap little,
+                                  final int state,
+                                  final int event);
+
+    public int size();
+
+    public int adjustOrPutValue(int key, int adjust, int init);
+
+    public int get(int key);
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class NoInfoMap
+  private class NoInfoMap
+    implements InfoMap
+  {
+
+    //#######################################################################
+    //# Interface InfoMap
+    public SplitKind getSplitKind(final InfoMap little,
+                                  final int state,
+                                  final int event)
+    {
+      return null;
+    }
+
+    public int increment(final int state, final int event)
+    {
+      return 0;
+    }
+
+    public void moveTo(final InfoMap little, final int state, final int event)
+    {
+    }
+
+    public int size()
+    {
+      return 0;
+    }
+
+    public int adjustOrPutValue(final int key, final int adjust, final int init)
+    {
+      return 0;
+    }
+
+    public int get(final int key)
+    {
+      return 0;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class HashInfoMap
+  private class HashInfoMap
+    extends TIntIntHashMap
+    implements InfoMap
   {
 
     //#######################################################################
     //# Constructors
-    private InfoMap(final int initialSize)
+    private HashInfoMap()
+    {
+      this(mInitialInfoSize);
+    }
+
+    private HashInfoMap(final int initialSize)
     {
       super(initialSize);
     }
 
     //#######################################################################
-    //# Access
-    private int increment(final int state, final int event)
+    //# Interface InfoMap
+    public int increment(final int state, final int event)
     {
       final int key = (state << mStateShift) | event;
       return adjustOrPutValue(key, 1, 1);
     }
 
-    private void moveTo(final InfoMap little, final int state, final int event)
+    public void moveTo(final InfoMap little, final int state, final int event)
     {
       final int key = (state << mStateShift) | event;
       if (adjustOrPutValue(key, -1, 0) == 0) {
@@ -1135,9 +1248,9 @@ public class AltObservationEquivalenceTRSimplifier
       little.adjustOrPutValue(key, 1, 1);
     }
 
-    private SplitKind getSplitKind(final InfoMap little,
-                                   final int state,
-                                   final int event)
+    public SplitKind getSplitKind(final InfoMap little,
+                                  final int state,
+                                  final int event)
     {
       final int key = (state << mStateShift) | event;
       if (get(key) == 0) {
@@ -1347,6 +1460,7 @@ public class AltObservationEquivalenceTRSimplifier
   private int mStateShift;
   private int mFirstSplitEvent;
   private boolean mHasModifications;
+
   private TauClosure mTauPreds;
   private IntListBuffer mClassLists;
   private IntListBuffer.ReadOnlyIterator mClassReadIterator;
@@ -1355,5 +1469,8 @@ public class AltObservationEquivalenceTRSimplifier
   private int[] mPredecessors;
   private Queue<EquivalenceClass> mSplitters;
   private TIntArrayList mTempClass;
+  private InfoMap mNoInfo;
+
+  private int mMaxInfoSize;
 
 }

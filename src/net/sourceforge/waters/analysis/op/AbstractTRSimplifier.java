@@ -95,6 +95,7 @@ public abstract class AbstractTRSimplifier
       return success;
     } catch (final OutOfMemoryError error) {
       tearDown();
+      getLogger().debug("<out of memory>");
       System.gc();
       throw new OverflowException(error);
     } finally {
