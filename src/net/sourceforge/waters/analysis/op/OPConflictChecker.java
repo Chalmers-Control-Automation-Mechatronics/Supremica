@@ -443,13 +443,17 @@ public class OPConflictChecker
               simplify(mEventHasDisappeared);
               cancheck = true;
               continue subsystem;
+            } catch (final OutOfMemoryError error) {
+              getLogger().debug("<out of memory>");
+              // caught - go on ...
             } catch (final OverflowException overflow) {
-              recordUnsuccessfulComposition();
-              final List<AutomatonProxy> automata = candidate.getAutomata();
-              mOverflowCandidates.add(automata);
-              candidates.remove(candidate);
-              candidate = selectCandidate(candidates);
+              // caught - go on ...
             }
+            recordUnsuccessfulComposition();
+            final List<AutomatonProxy> automata = candidate.getAutomata();
+            mOverflowCandidates.add(automata);
+            candidates.remove(candidate);
+            candidate = selectCandidate(candidates);
           }
         } while (candidate != null);
         try {
@@ -457,6 +461,10 @@ public class OPConflictChecker
             runMonolithicConflictCheck();
             lastOverflow = null;
           }
+        } catch (final OutOfMemoryError error) {
+          getLogger().debug("<out of memory>");
+          lastOverflow = new OverflowException(error);
+          cancheck = false;
         } catch (final OverflowException overflow) {
           lastOverflow = overflow;
           cancheck = false;
@@ -2657,6 +2665,9 @@ public class OPConflictChecker
             limit = size;
             mCurrentSynchronousProductBuilder.setNodeLimit(limit);
           }
+        } catch (final OutOfMemoryError error) {
+          getLogger().debug("<out of memory>");
+          // skip this one ...
         } catch (final OverflowException overflow) {
           // skip this one ...
         } finally {
@@ -3253,6 +3264,7 @@ public class OPConflictChecker
         }
       } catch (final OutOfMemoryError error) {
         mSimplifier.reset();
+        getLogger().debug("<out of memory>");
         throw new OverflowException(error);
       } finally {
         mSimplifier.reset();
@@ -3409,6 +3421,7 @@ public class OPConflictChecker
                                               inputEnc, partition, outputEnc);
       } catch (final OutOfMemoryError error) {
         mSimplifier.tearDown();
+        getLogger().debug("<out of memory>");
         throw new OverflowException(error);
       } finally {
         mSimplifier.tearDown();
