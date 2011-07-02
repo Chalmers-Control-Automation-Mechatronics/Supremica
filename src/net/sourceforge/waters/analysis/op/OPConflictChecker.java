@@ -2568,12 +2568,15 @@ public class OPConflictChecker
     public Collection<Candidate> findCandidates()
     {
       final Collection<Candidate> candidates = new LinkedList<Candidate>();
+      final int size = mEventInfoMap.size();
+      final Collection<List<AutomatonProxy>> found =
+        new THashSet<List<AutomatonProxy>>(size);
       for (final EventInfo info : mEventInfoMap.values()) {
         assert info.getNumberOfAutomata() > 0;
         if (info.getNumberOfAutomata() > 1) {
           final List<AutomatonProxy> list = info.getAutomataList();
           Collections.sort(list);
-          if (isPermissibleCandidate(list)) {
+          if (isPermissibleCandidate(list) && found.add(list)) {
             final Set<EventProxy> localEvents = identifyLocalEvents(list);
             final Candidate candidate = new Candidate(list, localEvents);
             candidates.add(candidate);
