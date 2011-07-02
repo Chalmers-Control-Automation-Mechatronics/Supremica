@@ -17,6 +17,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -26,8 +27,12 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -1927,6 +1932,43 @@ public class ListBufferTransitionRelation
     if (mSuccessorBuffer != null) {
       mSuccessorBuffer.checkIntegrity();
     }
+  }
+
+  public void saveModule(final String filename)
+  {
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
+    final int numEvents = getNumberOfProperEvents();
+    final int numProps = getNumberOfPropositions();
+    final Collection<EventProxy> events =
+      new ArrayList<EventProxy>(numEvents + numProps);
+    if (numProps == 1) {
+      final String name = EventDeclProxy.DEFAULT_MARKING_NAME;
+      final EventProxy prop =
+        factory.createEventProxy(name, EventKind.PROPOSITION);
+      events.add(prop);
+    } else {
+      for (int p = 0; p < numProps; p++) {
+        final EventProxy prop =
+          factory.createEventProxy("p" + p, EventKind.PROPOSITION);
+        events.add(prop);
+      }
+    }
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final EventProxy event =
+        factory.createEventProxy("e" + e, EventKind.CONTROLLABLE);
+      events.add(event);
+    }
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    final EventProxy tau;
+    if (isUsedEvent(EventEncoding.TAU)) {
+      tau = factory.createEventProxy("tau", EventKind.UNCONTROLLABLE, false);
+    } else {
+      tau = null;
+    }
+    final EventEncoding enc = new EventEncoding(events, translator, tau);
+    final AutomatonProxy aut = createAutomaton(factory, enc);
+    MarshallingTools.saveModule(aut, filename);
   }
 
 

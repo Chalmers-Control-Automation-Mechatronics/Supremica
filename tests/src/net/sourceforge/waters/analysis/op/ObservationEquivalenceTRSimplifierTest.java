@@ -184,6 +184,30 @@ public class ObservationEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_oeq_15() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_15.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_oeq_16() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_16.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_oeq_17() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_17.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single transition relation simplifier
    * object can perform multiple abstractions in sequence.

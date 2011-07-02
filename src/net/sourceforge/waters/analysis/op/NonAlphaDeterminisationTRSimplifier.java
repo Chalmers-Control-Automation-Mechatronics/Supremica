@@ -30,13 +30,13 @@ public class NonAlphaDeterminisationTRSimplifier
   //#########################################################################
   //# Constructors
   public NonAlphaDeterminisationTRSimplifier
-    (final ObservationEquivalenceTRSimplifier bisimulator)
+    (final AbstractObservationEquivalenceTRSimplifier bisimulator)
   {
     this(bisimulator, null);
   }
 
   public NonAlphaDeterminisationTRSimplifier
-    (final ObservationEquivalenceTRSimplifier bisimulator,
+    (final AbstractObservationEquivalenceTRSimplifier bisimulator,
      final ListBufferTransitionRelation rel)
   {
     super(rel);
@@ -95,8 +95,8 @@ public class NonAlphaDeterminisationTRSimplifier
       if (partition == null) {
         return false;
       }
-      mBisimulator.setInitialPartition(partition);
-      mBisimulator.refineInitialPartitionBasedOnInitialStates();
+      mBisimulator.setUpInitialPartition(partition);
+      mBisimulator.refinePartitionBasedOnInitialStates();
       final boolean modified = mBisimulator.run();
       partition = mBisimulator.getResultPartition();
       setResultPartitionList(partition);
@@ -174,6 +174,6 @@ public class NonAlphaDeterminisationTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private final ObservationEquivalenceTRSimplifier mBisimulator;
+  private final AbstractObservationEquivalenceTRSimplifier mBisimulator;
 
 }

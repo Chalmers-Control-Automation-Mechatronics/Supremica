@@ -57,8 +57,8 @@ public class NonAlphaDeterminisationTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    final ObservationEquivalenceTRSimplifier oeq =
-      new ObservationEquivalenceTRSimplifier();
+    final AltObservationEquivalenceTRSimplifier oeq =
+      new AltObservationEquivalenceTRSimplifier();
     return new NonAlphaDeterminisationTRSimplifier(oeq);
   }
 
