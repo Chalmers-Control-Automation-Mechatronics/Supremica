@@ -221,7 +221,7 @@
                                         <IntConstant Value="124"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-33" X="20"/>
+                                        <Point Y="-36" X="5"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -273,16 +273,14 @@
                             <Point Y="304" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-8" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Target="init_1" Source="init_0">
                         <LabelBlock>
-                            <IndexedIdentifier Name="run_A">
-                                <SimpleIdentifier Name="A_0"/>
-                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="run_A"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-9" X="6"/>
                             </LabelGeometry>
@@ -290,9 +288,7 @@
                     </Edge>
                     <Edge Target="init_2" Source="init_1">
                         <LabelBlock>
-                            <IndexedIdentifier Name="run_A">
-                                <SimpleIdentifier Name="A_1"/>
-                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="run_A"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-8" X="3"/>
                             </LabelGeometry>
@@ -300,9 +296,7 @@
                     </Edge>
                     <Edge Target="init_3" Source="init_2">
                         <LabelBlock>
-                            <IndexedIdentifier Name="run_B">
-                                <SimpleIdentifier Name="B_0"/>
-                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-8" X="4"/>
                             </LabelGeometry>
@@ -313,9 +307,7 @@
                     </Edge>
                     <Edge Target="init_4" Source="init_3">
                         <LabelBlock>
-                            <IndexedIdentifier Name="run_B">
-                                <SimpleIdentifier Name="B_1"/>
-                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-11" X="4"/>
                             </LabelGeometry>
