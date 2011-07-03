@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
   ArrayList<String> chanNames = new ArrayList<String>();
   Collection<String> duplicatedRun = new ArrayList<String>();
   boolean mUnWinding=false;
+  boolean mIsInit = false;
+  Hashtable<String,Integer> copyOfOccur = new Hashtable<String,Integer>();
   Collection<Proxy> mComponents = new ArrayList<Proxy>();
 
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
@@ -75,6 +78,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public GraphCollectingVisitor(final EventCollectingVisitor v){
     mVisitor = v;
     mFactory = v.getFactory();
+   // copyOfOccur = new Hashtable<String,Integer>(mVisitor.getOccur());
   }
   public PromelaGraph collectGraphs(final PromelaTree node)
   {
@@ -106,7 +110,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
     if(mVisitor.getAtomic()){
       ident = mFactory.createSimpleIdentifierProxy("initrun");
     }else{
-      ident = mFactory.createSimpleIdentifierProxy("run_"+procName.toUpperCase());
+      if(occurance==1){
+        ident = mFactory.createSimpleIdentifierProxy("run_"+procName);
+      }else{
+        final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+        final IdentifierProxy id = mFactory.createSimpleIdentifierProxy("procid");
+        indexes.add(id);
+        ident = mFactory.createIndexedIdentifierProxy("run_"+procName, indexes);
+      }
     }
 
     final PromelaGraph newGraph = new PromelaGraph(ident);
@@ -123,9 +134,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
         final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(procName+"_"+i);
         procs.add(id);
       }
-      final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName+"[procid]");
-      final HashMap<String,String> ti = new HashMap<String,String>();
-      ti.put("procid","a");
+      final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
+      //for(int y=1;y<labels.size();y++){
+        final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy("procid");
+        indexes.add(id);
+
+      final IndexedIdentifierProxy name = mFactory.createIndexedIdentifierProxy("proctype_"+procName,indexes);
+
+
       component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
 
       //mComponents.add(component);
@@ -226,6 +242,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitProcTypeStatement(final ProctypeStatementTreeNode t)
   {
+    mIsInit = false;
     counter = 0;
     final List<PromelaNode> removeNode = new ArrayList<PromelaNode>();
     final List<PromelaEdge> removeEdge = new ArrayList<PromelaEdge>();
@@ -351,7 +368,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitInitial(final InitialTreeNode t)
   {
-
+    mIsInit = true;
+    copyOfOccur = new Hashtable<String,Integer>(mVisitor.getOccur());
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("init");
     final PromelaGraph initGraph = collectGraphs((PromelaTree) t.getChild(0));
     final GraphProxy graph = initGraph.createGraphProxy(mFactory, t.getText());
@@ -383,11 +401,37 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitRun(final RunTreeNode t)
   {
-      final String name = t.getChild(0).getText();
-      duplicatedRun.add(name);
-      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name.toUpperCase());
-      final PromelaGraph graph = new PromelaGraph(ident);
-      return graph;
+    final String name = t.getChild(0).getText();
+    PromelaGraph graph=null;
+    if(!mIsInit){
+
+      //duplicatedRun.add(name);
+      final int occurance = mVisitor.getOccur().get(name);
+
+      if(occurance>1){
+        final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+        final IdentifierProxy id = mFactory.createSimpleIdentifierProxy("procid");
+        indexes.add(id);
+        final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
+        graph = new PromelaGraph(ident);
+      }else{
+        final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
+        graph = new PromelaGraph(ident);
+      }
+
+    }else{
+      final int occur1 = mVisitor.getOccur().get(name);
+      final int occur2 = copyOfOccur.get(name);
+      if(occur1-occur2 < occur1){
+        final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+        final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(name+"_"+(occur1-occur2));
+        indexes.add(id);
+        final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
+        graph = new PromelaGraph(ident);
+      }
+      copyOfOccur.put(name,occur2-1);
+    }
+    return graph;
   }
 
   //return graph of init events
