@@ -138,6 +138,7 @@ public class AltObservationEquivalenceTRSimplifier
    *          array in the collection represents a class of equivalent state
    *          codes.
    */
+  @Override
   public void setUpInitialPartition(final Collection<int[]> partition)
   {
     final int size = partition.size();
@@ -161,8 +162,12 @@ public class AltObservationEquivalenceTRSimplifier
    * This method replaces any previously set initial partition.
    * This method is called by default during each {@link #run()} unless
    * the user provides an alternative initial partition.
+   * @param  mask   Marking pattern identifying the markings to be considered.
+   *                Only markings in this pattern will be taken into account
+   *                for the partition.
    */
-  public void setUpInitialPartitionBasedOnMarkings()
+  @Override
+  public void setUpInitialPartitionBasedOnMarkings(final long mask)
   throws OverflowException
   {
     final Equivalence equivalence = getEquivalence();
@@ -177,7 +182,7 @@ public class AltObservationEquivalenceTRSimplifier
       markings = new long[numStates];
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
-          markings[state] = rel.getAllMarkings(state);
+          markings[state] = rel.getAllMarkings(state) & mask;
         }
       }
     }
@@ -189,7 +194,7 @@ public class AltObservationEquivalenceTRSimplifier
         if (rel.isReachable(state)) {
           final long marking;
           if (markings == null) {
-            marking = rel.getAllMarkings(state);
+            marking = rel.getAllMarkings(state) & mask;
           } else {
             marking = markings[state];
           }
@@ -222,7 +227,7 @@ public class AltObservationEquivalenceTRSimplifier
       if (rel.isReachable(state)) {
         final long marking;
         if (markings == null) {
-          marking = rel.getAllMarkings(state);
+          marking = rel.getAllMarkings(state) & mask;
         } else {
           marking = markings[state];
         }
@@ -257,6 +262,7 @@ public class AltObservationEquivalenceTRSimplifier
    *
    * @see NonAlphaDeterminisationTRSimplifier
    */
+  @Override
   public void refinePartitionBasedOnInitialStates()
   throws OverflowException
   {
@@ -319,9 +325,25 @@ public class AltObservationEquivalenceTRSimplifier
     } else {
       mFirstSplitEvent = EventEncoding.TAU;
     }
-    final TransitionRemoval mode = getTransitionRemovalMode();
-    final boolean doTau = mode == TransitionRemoval.ALL;
-    final boolean doNonTau = doTau || mode == TransitionRemoval.NONTAU;
+    final boolean doTau;
+    final boolean doNonTau;
+    switch (getTransitionRemovalMode()) {
+    case NONE:
+    case AFTER:
+    case AFTER_IF_CHANGED:
+      doTau = doNonTau = false;
+      break;
+    case NONTAU:
+      doTau = false;
+      doNonTau = true;
+      break;
+    case ALL:
+      doTau = doNonTau = true;
+      break;
+    default:
+      throw new IllegalStateException("Unknown transition removal mode " +
+                                      getTransitionRemovalMode() + "!");
+    }
     if (mSplitters == null) {
       mHasModifications = false;
       removeRedundantTransitions(doTau, doNonTau);
@@ -377,18 +399,29 @@ public class AltObservationEquivalenceTRSimplifier
   {
     super.applyResultPartition();
     mTauPreds = null;
+    final boolean trivial = (getResultPartition() == null);
     final boolean doTau;
     final boolean doNonTau;
-    final TransitionRemoval mode = getTransitionRemovalMode();
-    if (getResultPartition() != null) {
-      doTau = doNonTau = mode != TransitionRemoval.NONE;
-    } else {
-      doNonTau = mode == TransitionRemoval.AFTER;
-      doTau = doNonTau || mode == TransitionRemoval.NONTAU;
+    switch (getTransitionRemovalMode()) {
+    case NONE:
+      doTau = doNonTau = false;
+      break;
+    case NONTAU:
+      doTau = true;
+      doNonTau = !trivial;
+      break;
+    case ALL:
+    case AFTER_IF_CHANGED:
+      doTau = doNonTau = !trivial;
+      break;
+    case AFTER:
+      doTau = doNonTau = true;
+      break;
+    default:
+      throw new IllegalStateException("Unknown transition removal mode " +
+                                      getTransitionRemovalMode() + "!");
     }
-    if (doTau || doNonTau) {
-      removeRedundantTransitions(doTau, doNonTau);
-    }
+    removeRedundantTransitions(doTau, doNonTau);
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
     rel.removeProperSelfLoopEvents();
@@ -437,7 +470,9 @@ public class AltObservationEquivalenceTRSimplifier
       trans:
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
-        if (e == tau && mode == TransitionRemoval.NONTAU) {
+        if (!rel.isUsedEvent(e)) {
+          continue;
+        } else if (e == tau && mode == TransitionRemoval.NONTAU) {
           continue;
         }
         final int source0 = iter0.getCurrentSourceState();
@@ -739,6 +774,7 @@ public class AltObservationEquivalenceTRSimplifier
     @Override
     void splitOn()
     {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
       final InfoMap info = createInfo();
       final Collection<SimpleEquivalenceClass> splitClasses =
         new THashSet<SimpleEquivalenceClass>();
@@ -746,20 +782,22 @@ public class AltObservationEquivalenceTRSimplifier
       collect(mTempClass);
       final int size = getSize();
       for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
-        final TransitionIterator transIter = getPredecessorIterator(event);
-        for (int i = 0; i < size; i++) {
-          final int state = mTempClass.get(i);
-          transIter.resetState(state);
-          while (transIter.advance()) {
-            final int pred = transIter.getCurrentSourceState();
-            if (visited.add(pred)) {
-              final SimpleEquivalenceClass splitClass = mStateToClass[pred];
-              if (splitClass != null) {
-                splitClass.moveToOverflowList(pred);
-                splitClasses.add(splitClass);
+        if (rel.isUsedEvent(event)) {
+          final TransitionIterator transIter = getPredecessorIterator(event);
+          for (int i = 0; i < size; i++) {
+            final int state = mTempClass.get(i);
+            transIter.resetState(state);
+            while (transIter.advance()) {
+              final int pred = transIter.getCurrentSourceState();
+              if (visited.add(pred)) {
+                final SimpleEquivalenceClass splitClass = mStateToClass[pred];
+                if (splitClass != null) {
+                  splitClass.moveToOverflowList(pred);
+                  splitClasses.add(splitClass);
+                }
               }
+              info.increment(pred, event);
             }
-            info.increment(pred, event);
           }
         }
         visited.clear();
@@ -1052,6 +1090,7 @@ public class AltObservationEquivalenceTRSimplifier
     @Override
     void splitOn()
     {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
       mLittleChild.collect(mTempClass);
       final int tempSize = mTempClass.size();
       final InfoMap info = getInfo();
@@ -1063,51 +1102,54 @@ public class AltObservationEquivalenceTRSimplifier
         new THashSet<SimpleEquivalenceClass>();
       final TIntHashSet visited = new TIntHashSet();
       for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
-        final TransitionIterator transIter = getPredecessorIterator(event);
-        for (int i = 0; i < tempSize; i++) {
-          final int state = mTempClass.get(i);
-          transIter.resetState(state);
-          while (transIter.advance()) {
-            final int pred = transIter.getCurrentSourceState();
-            if (visited.add(pred)) {
-              final SimpleEquivalenceClass splitClass = mStateToClass[pred];
-              if (splitClass != null) {
-                splitClasses.add(splitClass);
+        if (rel.isUsedEvent(event)) {
+          final TransitionIterator transIter = getPredecessorIterator(event);
+          for (int i = 0; i < tempSize; i++) {
+            final int state = mTempClass.get(i);
+            transIter.resetState(state);
+            while (transIter.advance()) {
+              final int pred = transIter.getCurrentSourceState();
+              if (visited.add(pred)) {
+                final SimpleEquivalenceClass splitClass = mStateToClass[pred];
+                if (splitClass != null) {
+                  splitClasses.add(splitClass);
+                }
               }
-            }
-            info.moveTo(littleInfo, pred, event);
-          }
-        }
-        visited.clear();
-        for (final SimpleEquivalenceClass splitClass : splitClasses) {
-          int size1 = 0;
-          int size2 = 0;
-          int overflow1 = IntListBuffer.NULL;
-          int overflow2 = IntListBuffer.NULL;
-          splitClass.reset(mClassWriteIterator);
-          while (mClassWriteIterator.advance()) {
-            final int state = mClassWriteIterator.getCurrentData();
-            final SplitKind kind = info.getSplitKind(littleInfo, state, event);
-            switch (kind) {
-            case BOTH:
-              if (size1++ == 0) {
-                overflow1 = mClassLists.createList();
-              }
-              mClassWriteIterator.moveTo(overflow1);
-              break;
-            case LITTLE:
-              if (size2++ == 0) {
-                overflow2 = mClassLists.createList();
-              }
-              mClassWriteIterator.moveTo(overflow2);
-              break;
-            default:
-              break;
+              info.moveTo(littleInfo, pred, event);
             }
           }
-          splitClass.doComplexSplit(overflow1, size1, overflow2, size2);
+          visited.clear();
+          for (final SimpleEquivalenceClass splitClass : splitClasses) {
+            int size1 = 0;
+            int size2 = 0;
+            int overflow1 = IntListBuffer.NULL;
+            int overflow2 = IntListBuffer.NULL;
+            splitClass.reset(mClassWriteIterator);
+            while (mClassWriteIterator.advance()) {
+              final int state = mClassWriteIterator.getCurrentData();
+              final SplitKind kind =
+                info.getSplitKind(littleInfo, state, event);
+              switch (kind) {
+              case BOTH:
+                if (size1++ == 0) {
+                  overflow1 = mClassLists.createList();
+                }
+                mClassWriteIterator.moveTo(overflow1);
+                break;
+              case LITTLE:
+                if (size2++ == 0) {
+                  overflow2 = mClassLists.createList();
+                }
+                mClassWriteIterator.moveTo(overflow2);
+                break;
+              default:
+                break;
+              }
+            }
+            splitClass.doComplexSplit(overflow1, size1, overflow2, size2);
+          }
+          splitClasses.clear();
         }
-        splitClasses.clear();
       }
       mTempClass.clear();
       mLittleChild.enqueue();

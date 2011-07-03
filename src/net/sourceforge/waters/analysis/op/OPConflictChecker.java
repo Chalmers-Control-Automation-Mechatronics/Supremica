@@ -679,7 +679,8 @@ public class OPConflictChecker
     final AbstractObservationEquivalenceTRSimplifier bisimulator =
       new AltObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
-      (AbstractObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+      (AbstractObservationEquivalenceTRSimplifier.Equivalence.
+       OBSERVATION_EQUIVALENCE);
     bisimulator.setTransitionRemovalMode
       (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
@@ -721,7 +722,8 @@ public class OPConflictChecker
     final AbstractObservationEquivalenceTRSimplifier bisimulator =
       new AltObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
-      (AbstractObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+      (AbstractObservationEquivalenceTRSimplifier.Equivalence.
+       OBSERVATION_EQUIVALENCE);
     bisimulator.setTransitionRemovalMode
       (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
@@ -730,7 +732,16 @@ public class OPConflictChecker
     chain.add(bisimulator);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
       new NonAlphaDeterminisationTRSimplifier(bisimulator);
+    nonAlphaDeterminiser.setTransitionRemovalMode
+      (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.
+       AFTER_IF_CHANGED);
     chain.add(nonAlphaDeterminiser);
+    final AlphaDeterminisationTRSimplifier alphaDeterminiser =
+      new AlphaDeterminisationTRSimplifier(bisimulator);
+    alphaDeterminiser.setTransitionRemovalMode
+      (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.
+       AFTER_IF_CHANGED);
+    chain.add(alphaDeterminiser);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);

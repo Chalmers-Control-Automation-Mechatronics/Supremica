@@ -150,7 +150,28 @@ public abstract class AbstractObservationEquivalenceTRSimplifier
    * This method is called by default during each {@link #run()} unless
    * the user provides an alternative initial partition.
    */
-  public abstract void setUpInitialPartitionBasedOnMarkings()
+  public void setUpInitialPartitionBasedOnMarkings()
+  throws OverflowException
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numProps = rel.getNumberOfPropositions();
+    long mask = 0;
+    for (int prop = 0; prop < numProps; prop++) {
+      mask = rel.addMarking(mask, prop);
+    }
+    setUpInitialPartitionBasedOnMarkings(mask);
+  }
+
+  /**
+   * Sets up an initial partition for the bisimulation algorithm based on
+   * the markings of states in the transition relation.
+   * States with equal sets of markings are placed in the same class.
+   * This method replaces any previously set initial partition.
+   * @param  mask   Marking pattern identifying the markings to be considered.
+   *                Only markings in this pattern will be taken into account
+   *                for the partition.
+   */
+  public abstract void setUpInitialPartitionBasedOnMarkings(long mask)
   throws OverflowException;
 
   /**
@@ -255,7 +276,12 @@ public abstract class AbstractObservationEquivalenceTRSimplifier
      * Disables the first pass. Redundant transitions are removed only in the
      * second pass, which is performed even in case of a trivial partition.
      */
-    AFTER
+    AFTER,
+    /**
+     * Disables the first pass. Redundant transitions are removed only in the
+     * second pass, which is performed only in case of a nontrivial partition.
+     */
+    AFTER_IF_CHANGED
   }
 
 

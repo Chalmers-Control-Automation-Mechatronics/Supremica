@@ -2,40 +2,35 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.op
-//# CLASS:   NonAlphaDeterminisationTRSimplifier
+//# CLASS:   AlphaDeterminisationTRSimplifier
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.op;
 
-import gnu.trove.TIntArrayList;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
- * @author Rachel Francis, Robi Malik
+ * @author Robi Malik
  */
 
-public class NonAlphaDeterminisationTRSimplifier
+public class AlphaDeterminisationTRSimplifier
   extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
   //# Constructors
-  public NonAlphaDeterminisationTRSimplifier
+  public AlphaDeterminisationTRSimplifier
     (final AbstractObservationEquivalenceTRSimplifier bisimulator)
   {
     this(bisimulator, null);
   }
 
-  public NonAlphaDeterminisationTRSimplifier
+  public AlphaDeterminisationTRSimplifier
     (final AbstractObservationEquivalenceTRSimplifier bisimulator,
      final ListBufferTransitionRelation rel)
   {
@@ -74,7 +69,7 @@ public class NonAlphaDeterminisationTRSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
-    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+    return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
   @Override
@@ -91,7 +86,9 @@ public class NonAlphaDeterminisationTRSimplifier
   protected boolean runSimplifier()
   throws AnalysisException
   {
-    if (!hasNonPreconditionMarkedStates()) {
+    if (getPreconditionMarkingID() < 0) {
+      // If there are no alpha-markings,
+      // other rules will have simplified this transition relation already.
       return false;
     }
     final AbstractObservationEquivalenceTRSimplifier.Equivalence eq =
@@ -101,7 +98,6 @@ public class NonAlphaDeterminisationTRSimplifier
     final boolean apply = mBisimulator.getAppliesPartitionAutomatically();
     final TRSimplifierStatistics stats = mBisimulator.getStatistics();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    rel.reverse();
     try {
       mBisimulator.setEquivalence(AbstractObservationEquivalenceTRSimplifier.
                                   Equivalence.OBSERVATION_EQUIVALENCE);
@@ -109,13 +105,33 @@ public class NonAlphaDeterminisationTRSimplifier
       mBisimulator.setAppliesPartitionAutomatically(false);
       mBisimulator.setStatistics(null);
       mBisimulator.setTransitionRelation(rel);
-      List<int[]> partition = createInitialPartition();
-      if (partition == null) {
+      long mask = 0;
+      final int omega = getDefaultMarkingID();
+      if (omega >= 0) {
+        mask = rel.addMarking(mask, omega);
+      }
+      mBisimulator.setUpInitialPartitionBasedOnMarkings(mask);
+      boolean modified = mBisimulator.run();
+      if (!modified) {
         return false;
       }
+      List<int[]> partition = mBisimulator.getResultPartition();
+      mBisimulator.reset();
+      rel.reverse();
+      rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+      switch (mTransitionRemovalMode) {
+      case NONTAU:
+      case ALL:
+        mBisimulator.setTransitionRemovalMode
+          (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);
+        break;
+      default:
+        break;
+      }
+      mBisimulator.setTransitionRelation(rel);
       mBisimulator.setUpInitialPartition(partition);
       mBisimulator.refinePartitionBasedOnInitialStates();
-      final boolean modified = mBisimulator.run();
+      modified = mBisimulator.run();
       partition = mBisimulator.getResultPartition();
       setResultPartitionList(partition);
       applyResultPartitionAutomatically();
@@ -130,67 +146,10 @@ public class NonAlphaDeterminisationTRSimplifier
   }
 
   @Override
-  public void applyResultPartition()
+  protected void applyResultPartition()
   throws AnalysisException
   {
     mBisimulator.applyResultPartition();
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Checks whether the transition relation has at least two states <I>not</I>
-   * marked with the precondition marking. If all but one states are marked,
-   * there is no need to try and simplify.
-   */
-  private boolean hasNonPreconditionMarkedStates()
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int alphaID = getPreconditionMarkingID();
-    final int numStates = rel.getNumberOfStates();
-    int numNonAlphaStates = 0;
-    for (int state = 0; state < numStates; state++) {
-      if (!rel.isMarked(state, alphaID)) {
-        if (++numNonAlphaStates >= 2) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Creates an initial partition. This includes a separate equivalence class
-   * for every state marked alpha, and an equivalence class which contains all
-   * the remaining states.
-   * @return A list containing int[] representing equivalence classes.
-   */
-  private List<int[]> createInitialPartition()
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    final List<int[]> initialPartition = new ArrayList<int[]>();
-    final TIntArrayList remainingStates = new TIntArrayList();
-    final int alphaCode = getPreconditionMarkingID();
-    for (int stateCode = 0; stateCode < numStates; stateCode++) {
-      if (rel.isMarked(stateCode, alphaCode)) {
-        // creates a separate equivalence class for every state marked alpha
-        final int[] alphaClass = new int[1];
-        alphaClass[0] = stateCode;
-        initialPartition.add(alphaClass);
-      } else {
-        // creates an equivalence class for all states which don't fit into the
-        // above two categories
-        remainingStates.add(stateCode);
-      }
-    }
-    if (remainingStates.size() == 0) {
-      return null;
-    }
-    final int[] remainingStatesArray = remainingStates.toNativeArray();
-    initialPartition.add(remainingStatesArray);
-    return initialPartition;
   }
 
 

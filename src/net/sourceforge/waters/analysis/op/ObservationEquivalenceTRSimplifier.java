@@ -127,7 +127,7 @@ public class ObservationEquivalenceTRSimplifier
   }
 
   @Override
-  public void setUpInitialPartitionBasedOnMarkings()
+  public void setUpInitialPartitionBasedOnMarkings(final long mask)
   throws OverflowException
   {
     setUpTauPredecessors();
@@ -142,7 +142,7 @@ public class ObservationEquivalenceTRSimplifier
         markings = new long[numStates];
         for (int state = 0; state < numStates; state++) {
           if (rel.isReachable(state)) {
-            markings[state] = rel.getAllMarkings(state);
+            markings[state] = rel.getAllMarkings(state) & mask;
           }
         }
       }
@@ -151,7 +151,7 @@ public class ObservationEquivalenceTRSimplifier
         if (rel.isReachable(state)) {
           final long marking;
           if (markings == null) {
-            marking = rel.getAllMarkings(state);
+            marking = rel.getAllMarkings(state) & mask;
           } else {
             marking = markings[state];
           }
@@ -161,16 +161,13 @@ public class ObservationEquivalenceTRSimplifier
             if (pred != state) {
               switch (mmode) {
               case MINIMIZE:
-                mHasModifications |=
-                  rel.removeMarkings(pred, marking);
+                mHasModifications |= rel.removeMarkings(pred, marking);
                 // fall through ...
               case UNCHANGED:
-                markings[pred] =
-                  rel.mergeMarkings(marking, markings[pred]);
+                markings[pred] = rel.mergeMarkings(marking, markings[pred]);
                 break;
               case SATURATE:
-                mHasModifications |=
-                  rel.addMarkings(pred, marking);
+                mHasModifications |= rel.addMarkings(pred, marking);
                 break;
               }
             }
@@ -183,7 +180,7 @@ public class ObservationEquivalenceTRSimplifier
         if (rel.isReachable(state)) {
           final long marking;
           if (markings == null) {
-            marking = rel.getAllMarkings(state);
+            marking = rel.getAllMarkings(state) & mask;
           } else {
             marking = markings[state];
           }
@@ -284,9 +281,25 @@ public class ObservationEquivalenceTRSimplifier
       mFirstSplitEvent = EventEncoding.TAU;
     }
     mHasModifications = false;
-    final TransitionRemoval mode = getTransitionRemovalMode();
-    final boolean doTau = mode == TransitionRemoval.ALL;
-    final boolean doNonTau = doTau || mode == TransitionRemoval.NONTAU;
+    final boolean doTau;
+    final boolean doNonTau;
+    switch (getTransitionRemovalMode()) {
+    case NONE:
+    case AFTER:
+    case AFTER_IF_CHANGED:
+      doTau = doNonTau = false;
+      break;
+    case NONTAU:
+      doTau = false;
+      doNonTau = true;
+      break;
+    case ALL:
+      doTau = doNonTau = true;
+      break;
+    default:
+      throw new IllegalStateException("Unknown transition removal mode " +
+                                      getTransitionRemovalMode() + "!");
+    }
     removeRedundantTransitions(doTau, doNonTau);
     setUpInitialPartitionBasedOnMarkings();
     setUpSplitters();
@@ -347,18 +360,29 @@ public class ObservationEquivalenceTRSimplifier
   {
     super.applyResultPartition();
     mTauPreds = null;
-    final TransitionRemoval mode = getTransitionRemovalMode();
+    final boolean trivial = (getResultPartition() == null);
     final boolean doTau;
     final boolean doNonTau;
-    if (getResultPartition() != null) {
-      doTau = doNonTau = mode != TransitionRemoval.NONE;
-    } else {
-      doNonTau = mode == TransitionRemoval.AFTER;
-      doTau = doNonTau || mode == TransitionRemoval.NONTAU;
+    switch (getTransitionRemovalMode()) {
+    case NONE:
+      doTau = doNonTau = false;
+      break;
+    case NONTAU:
+      doTau = true;
+      doNonTau = !trivial;
+      break;
+    case ALL:
+    case AFTER_IF_CHANGED:
+      doTau = doNonTau = !trivial;
+      break;
+    case AFTER:
+      doTau = doNonTau = true;
+      break;
+    default:
+      throw new IllegalStateException("Unknown transition removal mode " +
+                                      getTransitionRemovalMode() + "!");
     }
-    if (doTau || doNonTau) {
-      removeRedundantTransitions(doTau, doNonTau);
-    }
+    removeRedundantTransitions(doTau, doNonTau);
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
     rel.removeProperSelfLoopEvents();
