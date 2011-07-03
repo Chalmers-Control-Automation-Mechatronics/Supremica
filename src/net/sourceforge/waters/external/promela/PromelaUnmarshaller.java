@@ -21,6 +21,7 @@ import java.util.Collections;
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.external.promela.ast.PromelaTree;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
@@ -29,8 +30,6 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-
 import org.anarres.cpp.LexerException;
 import org.antlr.runtime.RecognitionException;
 
@@ -187,7 +186,7 @@ public class PromelaUnmarshaller
 
     // Create automata ...
     final Collection<EventDeclProxy> events = mVisitor.getEvents();
-    final Collection<SimpleComponentProxy> components = mGraphVisitor.getComponents();
+    final Collection<Proxy> components = mGraphVisitor.getComponents();
     final ModuleProxy module =mFactory.createModuleProxy(name, comment, null, null, events, null, components);
     //final ModuleProxy module =mFactory.createModuleProxy(name, comment, null, null, events, null, null);
     return module;

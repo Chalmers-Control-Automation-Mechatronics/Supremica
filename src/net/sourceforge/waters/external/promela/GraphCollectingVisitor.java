@@ -32,8 +32,11 @@ import net.sourceforge.waters.external.promela.ast.SendTreeNode;
 import net.sourceforge.waters.external.promela.ast.SkipTreeNode;
 import net.sourceforge.waters.external.promela.ast.TypeTreeNode;
 import net.sourceforge.waters.external.promela.ast.VardefTreeNode;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -61,7 +64,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   ArrayList<String> chanNames = new ArrayList<String>();
   Collection<String> duplicatedRun = new ArrayList<String>();
   boolean mUnWinding=false;
-  Collection<SimpleComponentProxy> mComponents = new ArrayList<SimpleComponentProxy>();
+  Collection<Proxy> mComponents = new ArrayList<Proxy>();
 
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
 
@@ -78,7 +81,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return (PromelaGraph) node.acceptVisitor(this);
   }
 
-  public Collection<SimpleComponentProxy> getComponents(){
+  public Collection<Proxy> getComponents(){
     return mComponents;
   }
   public Object visitModule(final ModuleTreeNode t)
@@ -92,7 +95,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
   //Now it directly create PromelaGraph object, using events from Event collector; No need to visit further children
   public Object visitProcType(final ProctypeTreeNode t)
   {
+    mUnWinding = false;
     final String procName = t.getText();
+    final int occurance = mVisitor.getOccur().get(procName);
     //visit child 1
     final PromelaTree statement = (PromelaTree) t.getChild(1);
     PromelaGraph g = collectGraphs(statement);
@@ -107,10 +112,32 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final PromelaGraph newGraph = new PromelaGraph(ident);
     g = PromelaGraph.sequentialComposition(newGraph, g,mUnWinding,mFactory);
     final GraphProxy graph = g.createGraphProxy(mFactory, procName);
-    final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName);
-    final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
+    SimpleComponentProxy component;
+    if(occurance ==1){
+      final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName);
+      component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
+      mComponents.add(component);
+    }else{
+      final Collection<SimpleIdentifierProxy> procs = new ArrayList<SimpleIdentifierProxy>();
+      for(int i=0;i<occurance;i++){
+        final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(procName+"_"+i);
+        procs.add(id);
+      }
+      final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName+"[procid]");
+      final HashMap<String,String> ti = new HashMap<String,String>();
+      ti.put("procid","a");
+      component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
 
-    mComponents.add(component);
+      //mComponents.add(component);
+      final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(procs);
+      final Collection<SimpleComponentProxy> c = new ArrayList<SimpleComponentProxy>();
+      //mComponents.add(component);
+      c.add(component);
+      final ForeachComponentProxy f = mFactory.createForeachComponentProxy("procid", en,null,c);
+      mComponents.add(f);
+     // mComponents.add(f);
+    }
+
 
     return null;
   }
@@ -430,7 +457,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
     result = PromelaGraph.doCombineComposition2(branches, unwinding,mFactory);
     mLabelEnd.put(""+counter,endNode);
-    mUnWinding = unwinding;
+
     return result;
   }
   public Object visitBreak(final BreakStatementTreeNode t)

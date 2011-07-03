@@ -64,6 +64,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   //This is the output event table, for each proctype
   private final Collection<EventDeclProxy> mEventDecls = new ArrayList<EventDeclProxy>();
 
+  private final Hashtable<String,Integer> occur = new Hashtable<String,Integer>();
   //########################################################################
   //# Invocation
   public EventCollectingVisitor(final ModuleProxyFactory factory){
@@ -84,6 +85,9 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
   public Hashtable<String,LabelTreeNode> getGotoLabel(){
     return gotoLabel;
+  }
+  public Hashtable<String,Integer> getOccur(){
+    return occur;
   }
   //########################################################################
   //# Interface net.sourceforge.waters.external.promela.PromelaVisitor
@@ -254,7 +258,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitReceive(final ReceiveTreeNode t)
   {
-    if(t.getParent() instanceof DoConditionTreeNode){}
+   // if(t.getParent() instanceof DoConditionTreeNode){}
     /*
     labels = new ArrayList<String>();
 
@@ -306,7 +310,13 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitRun(final RunTreeNode t){
     final String proctypeName = t.getChild(0).getText();
-    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+proctypeName.toUpperCase());
+    if(!occur.containsKey(proctypeName)){
+      occur.put(proctypeName,1);
+    }else{
+      final int size = occur.get(proctypeName);
+      occur.put(proctypeName, size+1);
+    }
+    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+proctypeName);
     final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
     mEventDecls.add(event);
 
