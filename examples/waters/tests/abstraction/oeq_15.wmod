@@ -13,17 +13,6 @@
         <SimpleComponent Kind="SPEC" Name="before">
             <Graph Deterministic="false">
                 <NodeList>
-                    <SimpleNode Initial="true" Name="q2">
-                        <PointGeometry>
-                            <Point Y="160" X="64"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="-1" X="-27"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="4" X="2"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                     <SimpleNode Initial="true" Name="q0">
                         <PointGeometry>
                             <Point Y="128" X="272"/>
@@ -33,28 +22,6 @@
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-24" X="-7"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="q5">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="128" X="160"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-16" X="6"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Initial="true" Name="q3">
-                        <PointGeometry>
-                            <Point Y="224" X="64"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="0" X="-27"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="7" X="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="q1">
@@ -68,6 +35,28 @@
                             <Point Y="-25" X="-12"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Initial="true" Name="q2">
+                        <PointGeometry>
+                            <Point Y="160" X="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-1" X="-27"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="4" X="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="q3">
+                        <PointGeometry>
+                            <Point Y="224" X="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-27"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="-4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="q4">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
@@ -77,6 +66,17 @@
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-14" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-16" X="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="q6">

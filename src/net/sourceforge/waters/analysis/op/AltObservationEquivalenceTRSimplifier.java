@@ -47,7 +47,7 @@ public class AltObservationEquivalenceTRSimplifier
    */
   public AltObservationEquivalenceTRSimplifier()
   {
-    this(null);
+    setInfoEnabled(false);
   }
 
   /**
@@ -56,11 +56,10 @@ public class AltObservationEquivalenceTRSimplifier
   public AltObservationEquivalenceTRSimplifier
     (final ListBufferTransitionRelation rel)
   {
-    super(null);
+    this();
     if (rel != null) {
       setTransitionRelation(rel);
     }
-    setInfoEnabled(false);
   }
 
 
@@ -68,16 +67,12 @@ public class AltObservationEquivalenceTRSimplifier
   //# Configuration
   public void setInfoEnabled(final boolean enabled)
   {
-    if (enabled) {
-      mNoInfo = null;
-    } else if (mNoInfo == null) {
-      mNoInfo = new NoInfoMap();
-    }
+    mInitialInfoSize = enabled ? 0 : -1;
   }
 
   public boolean getInfoEnabled()
   {
-    return mNoInfo == null;
+    return mInitialInfoSize >= 0;
   }
 
 
@@ -97,12 +92,6 @@ public class AltObservationEquivalenceTRSimplifier
     mNumReachableStates = rel.getNumberOfReachableStates();
     mNumEvents = rel.getNumberOfProperEvents();
     mStateShift = AutomatonTools.log2(mNumEvents);
-    final int numTrans = rel.getNumberOfTransitions();
-    if (mNumReachableStates > 0) {
-      mInitialInfoSize = numTrans / mNumReachableStates;
-    } else {
-      mInitialInfoSize = 0;
-    }
   }
 
   @Override
@@ -144,7 +133,7 @@ public class AltObservationEquivalenceTRSimplifier
     final int size = partition.size();
     setUpPartition(size);
     for (final int[] clazz : partition) {
-      final SimpleEquivalenceClass sec = new SimpleEquivalenceClass(clazz);
+      final EquivalenceClass sec = createEquivalenceClass(clazz);
       mSplitters.add(sec);
       if (clazz.length > 1) {
         for (final int state : clazz) {
@@ -221,8 +210,8 @@ public class AltObservationEquivalenceTRSimplifier
     final int numProps = rel.getNumberOfMarkings();
     final int size = numProps > 8 ? 256 : 1 << numProps;
     setUpPartition(size);
-    final TLongObjectHashMap<SimpleEquivalenceClass> prepartition =
-      new TLongObjectHashMap<SimpleEquivalenceClass>();
+    final TLongObjectHashMap<EquivalenceClass> prepartition =
+      new TLongObjectHashMap<EquivalenceClass>();
     for (int state = 0; state < numStates; state++) {
       if (rel.isReachable(state)) {
         final long marking;
@@ -231,20 +220,20 @@ public class AltObservationEquivalenceTRSimplifier
         } else {
           marking = markings[state];
         }
-        SimpleEquivalenceClass sec = prepartition.get(marking);
-        if (sec == null) {
-          sec = new SimpleEquivalenceClass();
-          prepartition.put(marking, sec);
-          mSplitters.add(sec);
+        EquivalenceClass clazz = prepartition.get(marking);
+        if (clazz == null) {
+          clazz = createEquivalenceClass();
+          prepartition.put(marking, clazz);
+          mSplitters.add(clazz);
         }
-        sec.addState(state);
+        clazz.addState(state);
       }
     }
-    final TLongObjectIterator<SimpleEquivalenceClass> mapIter =
+    final TLongObjectIterator<EquivalenceClass> mapIter =
       prepartition.iterator();
     while (mapIter.hasNext()) {
       mapIter.advance();
-      final SimpleEquivalenceClass sec = mapIter.value();
+      final EquivalenceClass sec = mapIter.value();
       sec.setUpStateToClass(false);
     }
   }
@@ -280,12 +269,12 @@ public class AltObservationEquivalenceTRSimplifier
       setUpTauPredecessors();
       iter = mTauPreds.createIterator();
     }
-    final Collection<SimpleEquivalenceClass> splitClasses =
-      new THashSet<SimpleEquivalenceClass>();
+    final Collection<EquivalenceClass> splitClasses =
+      new THashSet<EquivalenceClass>();
     for (int state = 0; state < numStates; state++) {
       if (rel.isInitial(state)) {
         if (initialStates == null) {
-          final SimpleEquivalenceClass splitClass = mStateToClass[state];
+          final EquivalenceClass splitClass = mStateToClass[state];
           if (splitClass != null) {
             splitClass.moveToOverflowList(state);
             splitClasses.add(splitClass);
@@ -295,7 +284,7 @@ public class AltObservationEquivalenceTRSimplifier
           while (iter.advance()) {
             final int pred = iter.getCurrentSourceState();
             if (initialStates.add(pred)) {
-              final SimpleEquivalenceClass splitClass = mStateToClass[pred];
+              final EquivalenceClass splitClass = mStateToClass[pred];
               if (splitClass != null) {
                 splitClass.moveToOverflowList(pred);
                 splitClasses.add(splitClass);
@@ -307,7 +296,7 @@ public class AltObservationEquivalenceTRSimplifier
     }
 
     // Try to split each equivalence class ...
-    for (final SimpleEquivalenceClass splitClass : splitClasses) {
+    for (final EquivalenceClass splitClass : splitClasses) {
       splitClass.splitUsingOverflowList();
     }
   }
@@ -354,6 +343,14 @@ public class AltObservationEquivalenceTRSimplifier
       removeRedundantTransitions(doTau, doNonTau);
     }
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (mInitialInfoSize >= 0) {
+      final int numTrans = rel.getNumberOfTransitions();
+      if (mNumReachableStates > 0) {
+        mInitialInfoSize = numTrans / mNumReachableStates;
+      } else {
+        mInitialInfoSize = 0;
+      }
+    }
     final int numStates = rel.getNumberOfStates();
     mTempClass = new TIntArrayList(numStates);
     mMaxInfoSize = 0;
@@ -363,7 +360,7 @@ public class AltObservationEquivalenceTRSimplifier
   protected boolean runSimplifier()
   throws AnalysisException
   {
-    for (EquivalenceClass splitter = mSplitters.poll();
+    for (Splitter splitter = mSplitters.poll();
          splitter != null && mNumClasses < mNumReachableStates;
          splitter = mSplitters.poll()) {
       splitter.splitOn();
@@ -432,15 +429,33 @@ public class AltObservationEquivalenceTRSimplifier
   //# Auxiliary Methods
   private void setUpPartition(final int numSplitters)
   {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
     mNumClasses = 0;
     mClassLists = new IntListBuffer();
     mClassReadIterator = mClassLists.createReadOnlyIterator();
     mClassWriteIterator = mClassLists.createModifyingIterator();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-    mStateToClass = new SimpleEquivalenceClass[numStates];
+    mStateToClass = new EquivalenceClass[numStates];
     mPredecessors = new int[numStates];
-    mSplitters = new PriorityQueue<EquivalenceClass>(numSplitters);
+    mSplitters = new PriorityQueue<Splitter>(numSplitters);
+  }
+
+  private EquivalenceClass createEquivalenceClass()
+  {
+    if (mInitialInfoSize >= 0) {
+      return new LeafEquivalenceClass();
+    } else {
+      return new PlainEquivalenceClass();
+    }
+  }
+
+  private EquivalenceClass createEquivalenceClass(final int[] states)
+  {
+    if (mInitialInfoSize >= 0) {
+      return new LeafEquivalenceClass(states);
+    } else {
+      return new PlainEquivalenceClass(states);
+    }
   }
 
   private void setUpTauPredecessors() throws OverflowException
@@ -528,7 +543,7 @@ public class AltObservationEquivalenceTRSimplifier
       final List<int[]> partition = new ArrayList<int[]>(mNumClasses);
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
-          final SimpleEquivalenceClass sec = mStateToClass[state];
+          final EquivalenceClass sec = mStateToClass[state];
           if (sec == null) {
             final int[] clazz = new int[1];
             clazz[0] = state;
@@ -555,10 +570,10 @@ public class AltObservationEquivalenceTRSimplifier
   {
     final StringWriter writer = new StringWriter();
     final PrintWriter printer = new PrintWriter(writer);
-    final Collection<SimpleEquivalenceClass> printed =
-      new THashSet<SimpleEquivalenceClass>(mNumClasses);
+    final Collection<EquivalenceClass> printed =
+      new THashSet<EquivalenceClass>(mNumClasses);
     for (int s = 0; s < mStateToClass.length; s++) {
-      final SimpleEquivalenceClass clazz = mStateToClass[s];
+      final EquivalenceClass clazz = mStateToClass[s];
       if (clazz == null) {
         if (s > 0) {
           printer.println();
@@ -576,160 +591,64 @@ public class AltObservationEquivalenceTRSimplifier
     return writer.toString();
   }
 
+
   //#########################################################################
-  //# Inner Class EquivalenceClass
-  private abstract class EquivalenceClass
-    implements Comparable<EquivalenceClass>
+  //# Local Interface Splitter
+  private interface Splitter extends Comparable<Splitter>
   {
 
-    //#######################################################################
-    //# Constructors
-    EquivalenceClass(final int size)
-    {
-      mSize = size;
-    }
+    public ComplexEquivalenceClass getParent();
 
-    EquivalenceClass(final InfoMap info, final int size)
-    {
-      mInfo = info;
-      mSize = size;
-    }
+    public void setParent(ComplexEquivalenceClass parent);
 
-    EquivalenceClass(final ComplexEquivalenceClass parent,
-                     final InfoMap info,
-                     final int size)
-    {
-      mParent = parent;
-      mInfo = info;
-      mSize = size;
-    }
+    public InfoMap getInfo();
 
-    //#######################################################################
-    //# Simple Access
-    ComplexEquivalenceClass getParent()
-    {
-      return mParent;
-    }
+    public void setInfo(InfoMap info);
 
-    InfoMap getInfo()
-    {
-      return mInfo;
-    }
+    public int getSize();
 
-    void setParent(final ComplexEquivalenceClass parent)
-    {
-      mParent = parent;
-    }
+    public void collect(TIntArrayList states);
 
-    InfoMap createInfo()
-    {
-      if (mNoInfo != null) {
-        mInfo = mNoInfo;
-      } else {
-        mInfo = new HashInfoMap();
-      }
-      return mInfo;
-    }
+    public void splitOn();
 
-    void setInfo(final InfoMap info)
-    {
-      mInfo = info;
-    }
+    public void enqueue();
 
-    int getSize()
-    {
-      return mSize;
-    }
-
-    void setSize(final int size)
-    {
-      mSize = size;
-    }
-
-    void incSize()
-    {
-      mSize++;
-    }
-
-    //#######################################################################
-    //# Interface java.util.Comparable<EquivalenceClass>
-    public int compareTo(final EquivalenceClass clazz)
-    {
-      if (mInfo == null) {
-        if (clazz.mInfo != null) {
-          return 1;
-        }
-      } else {
-        if (clazz.mInfo == null) {
-          return -1;
-        }
-      }
-      return mSize - clazz.mSize;
-    }
-
-    //#######################################################################
-    //# To be Overridden
-    abstract void splitOn();
-
-    abstract void collect(TIntArrayList states);
-
-    void enqueue()
-    {
-      mParent = null;
-    }
-
-    //#######################################################################
-    //# Data Members
-    @Override
-    public String toString()
-    {
-      final StringWriter writer = new StringWriter();
-      final PrintWriter printer = new PrintWriter(writer);
-      dump(printer);
-      return writer.toString();
-    }
-
-    abstract void dump(PrintWriter printer);
-
-    //#######################################################################
-    //# Data Members
-    private ComplexEquivalenceClass mParent;
-    private InfoMap mInfo;
-    private int mSize;
+    public void dump(PrintWriter printer);
 
   }
 
 
   //#########################################################################
-  //# Inner Class SimpleEquivalenceClass
-  private class SimpleEquivalenceClass extends EquivalenceClass
+  //# Inner Class EquivalenceClass
+  private abstract class EquivalenceClass
+    implements Splitter
   {
 
     //#######################################################################
     //# Constructors
-    private SimpleEquivalenceClass()
+    EquivalenceClass()
     {
-      super(0);
+      mSize = 0;
       mList = mClassLists.createList();
       mOverflowList = IntListBuffer.NULL;
       mOverflowSize = -1;
       mNumClasses++;
     }
 
-    private SimpleEquivalenceClass(final int list,
-                                   final int size,
-                                   final boolean preds)
+    EquivalenceClass(final int list,
+                     final int size,
+                     final boolean preds)
     {
-      super(size);
+      mSize = size;
       mList = list;
       mOverflowList = IntListBuffer.NULL;
       mOverflowSize = preds ? 0 : -1;
       mNumClasses++;
     }
 
-    private SimpleEquivalenceClass(final int[] states)
+    EquivalenceClass(final int[] states)
     {
-      super(states.length);
+      mSize = states.length;
       mList = mClassLists.createList(states);
       mOverflowList = IntListBuffer.NULL;
       mOverflowSize = -1;
@@ -737,16 +656,51 @@ public class AltObservationEquivalenceTRSimplifier
     }
 
     //#######################################################################
+    //# Interface java.util.Comparable<Splitter>
+    public int compareTo(final Splitter splitter)
+    {
+      return mSize - splitter.getSize();
+    }
+
+    //#######################################################################
+    //# Interface Splitter
+    public int getSize()
+    {
+      return mSize;
+    }
+
+    public void collect(final TIntArrayList states)
+    {
+      reset(mClassReadIterator);
+      while (mClassReadIterator.advance()) {
+        final int state = mClassReadIterator.getCurrentData();
+        states.add(state);
+      }
+    }
+
+
+    //#######################################################################
     //# Initialisation
+    void setSize(final int size)
+    {
+      mSize = size;
+    }
+
+    void setList(final int list, final int size)
+    {
+      mList = list;
+      mSize = size;
+    }
+
     void addState(final int state)
     {
       mClassLists.append(mList, state);
-      incSize();
+      mSize++;
     }
 
     void setUpStateToClass(final boolean force)
     {
-      if (getSize() == 1) {
+      if (mSize == 1) {
         if (force) {
           reset(mClassReadIterator);
           assert mClassReadIterator.advance();
@@ -762,206 +716,12 @@ public class AltObservationEquivalenceTRSimplifier
       }
     }
 
-    //#######################################################################
-    //# Simple Access
-    void reset(final IntListBuffer.Iterator iter)
+    void setPredecessorsInvalid()
     {
-      iter.reset(mList);
-    }
-
-    //#######################################################################
-    //# Algorithm
-    @Override
-    void splitOn()
-    {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final InfoMap info = createInfo();
-      final Collection<SimpleEquivalenceClass> splitClasses =
-        new THashSet<SimpleEquivalenceClass>();
-      final TIntHashSet visited = new TIntHashSet();
-      collect(mTempClass);
-      final int size = getSize();
-      for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
-        if (rel.isUsedEvent(event)) {
-          final TransitionIterator transIter = getPredecessorIterator(event);
-          for (int i = 0; i < size; i++) {
-            final int state = mTempClass.get(i);
-            transIter.resetState(state);
-            while (transIter.advance()) {
-              final int pred = transIter.getCurrentSourceState();
-              if (visited.add(pred)) {
-                final SimpleEquivalenceClass splitClass = mStateToClass[pred];
-                if (splitClass != null) {
-                  splitClass.moveToOverflowList(pred);
-                  splitClasses.add(splitClass);
-                }
-              }
-              info.increment(pred, event);
-            }
-          }
-        }
-        visited.clear();
-        for (final SimpleEquivalenceClass splitClass : splitClasses) {
-          splitClass.splitUsingOverflowList();
-        }
-        splitClasses.clear();
-      }
-      mTempClass.clear();
-      mMaxInfoSize = Math.max(mMaxInfoSize, info.size());
-    }
-
-    @Override
-    void collect(final TIntArrayList states)
-    {
-      reset(mClassReadIterator);
-      while (mClassReadIterator.advance()) {
-        final int state = mClassReadIterator.getCurrentData();
-        states.add(state);
-      }
-    }
-
-    void doSimpleSplit(final int overflowList, final int overflowSize)
-    {
-      final int size = getSize();
-      final int newSize = size - overflowSize;
-      final boolean preds = mOverflowSize >= 0;
-      final SimpleEquivalenceClass overflowClass;
-      if (newSize >= overflowSize) {
-        overflowClass =
-          new SimpleEquivalenceClass(overflowList, overflowSize, preds);
-        setSize(newSize);
-      } else {
-        overflowClass = new SimpleEquivalenceClass(mList, newSize, preds);
-        mList = overflowList;
-        setSize(overflowSize);
-      }
-      if (getSize() == 1) {
-        setUpStateToClass(true);
-      }
-      overflowClass.setUpStateToClass(true);
-      final ComplexEquivalenceClass parent = getParent();
-      final InfoMap info = getInfo();
-      if (parent != null) {
-        setInfo(null);
-        final ComplexEquivalenceClass complex =
-          new ComplexEquivalenceClass(overflowClass, this, parent, info);
-        parent.replaceChild(this, complex);
-      } else if (info == null) {
-        mSplitters.add(overflowClass);
-      } else if (info == mNoInfo) {
-        setInfo(null);
-        mSplitters.add(this);
-        mSplitters.add(overflowClass);
-      } else {
-        setInfo(null);
-        final ComplexEquivalenceClass complex =
-          new ComplexEquivalenceClass(overflowClass, this, info);
-        mSplitters.add(complex);
-      }
-    }
-
-    void doComplexSplit(int overflow1, int size1, int overflow2, int size2)
-    {
-      if (size1 == 0 && size2 == 0) {
-        return;
-      }
-      final int size = getSize();
       mOverflowSize = -1;
-      if (size1 == size) {
-        mList = overflow1;
-        return;
-      } else if (size2 == size) {
-        mList = overflow2;
-        return;
-      } else if (size1 == 0) {
-        doSimpleSplit(overflow2, size2);
-        return;
-      } else if (size2 == 0) {
-        doSimpleSplit(overflow1, size1);
-        return;
-      }
-      final int newSize =size - size1 - size2;
-      if (newSize == 0) {
-        mList = overflow1;
-        doSimpleSplit(overflow2, size2);
-        return;
-      }
-
-      // OK, it really is a three-way split ...
-      // Establish order: overflow1 < overflow2 < this
-      if (size2 < size1) {
-        int tmp = size1;
-        size1 = size2;
-        size2 = tmp;
-        tmp = overflow1;
-        overflow1 = overflow2;
-        overflow2 = tmp;
-      }
-      if (newSize < size2) {
-        setSize(size2);
-        size2 = newSize;
-        int tmp = overflow2;
-        overflow2 = mList;
-        mList = tmp;
-        if (size2 < size1) {
-          tmp = size1;
-          size1 = size2;
-          size2 = tmp;
-          tmp = overflow1;
-          overflow1 = overflow2;
-          overflow2 = tmp;
-        }
-      } else {
-        setSize(newSize);
-      }
-      if (getSize() == 1) {
-        setUpStateToClass(true);
-      }
-
-      // Create and enqueue complex splitters ...
-      final SimpleEquivalenceClass class1 =
-        new SimpleEquivalenceClass(overflow1, size1, false);
-      class1.setUpStateToClass(true);
-      final SimpleEquivalenceClass class2 =
-        new SimpleEquivalenceClass(overflow2, size2, false);
-      class2.setUpStateToClass(true);
-      final InfoMap info = getInfo();
-      final ComplexEquivalenceClass parent = getParent();
-      if (parent != null || info != null) {
-        setInfo(null);
-        final ComplexEquivalenceClass complex2 =
-          new ComplexEquivalenceClass(class2, this);
-        final ComplexEquivalenceClass complex1 =
-          new ComplexEquivalenceClass(class1, complex2, parent, info);
-        complex2.setParent(complex1);
-        if (parent == null) {
-          mSplitters.add(complex1);
-        } else {
-          parent.replaceChild(this, complex1);
-        }
-      } else {
-        mSplitters.add(class1);
-        mSplitters.add(class2);
-      }
     }
 
-    int[] putResult(final int state)
-    {
-      if (mArray == null) {
-        final int size = getSize();
-        mArray = new int[size];
-        mArray[0] = state;
-        mOverflowSize = 1;
-        return mArray;
-      } else {
-        mArray[mOverflowSize++] = state;
-        return null;
-      }
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private void setUpPredecessors()
+    void setUpPredecessors()
     {
       int pred = IntListBuffer.NULL;
       for (int list = mClassLists.getHead(mList);
@@ -973,7 +733,21 @@ public class AltObservationEquivalenceTRSimplifier
       }
     }
 
-    private void moveToOverflowList(final int state)
+    //#######################################################################
+    //# Simple Access
+    int getList()
+    {
+      return mList;
+    }
+
+    void reset(final IntListBuffer.Iterator iter)
+    {
+      iter.reset(mList);
+    }
+
+    //#######################################################################
+    //# Splitting
+    void moveToOverflowList(final int state)
     {
       final int tail;
       switch (mOverflowSize) {
@@ -1001,71 +775,464 @@ public class AltObservationEquivalenceTRSimplifier
       }
     }
 
-    private void splitUsingOverflowList()
+    void splitUsingOverflowList()
     {
       if (mOverflowSize <= 0) {
         return;
       } else if (mOverflowSize == getSize()) {
         mList = mOverflowList;
       } else {
-        doSimpleSplit(mOverflowList, mOverflowSize);
+        doSimpleSplit(mOverflowList, mOverflowSize, mOverflowSize >= 0);
       }
       mOverflowSize = 0;
       mOverflowList = IntListBuffer.NULL;
     }
 
+    abstract void doSimpleSplit(int overflowList,
+                                int overflowSize,
+                                boolean preds);
+
+    //#######################################################################
+    //# Output
+    int[] putResult(final int state)
+    {
+      if (mArray == null) {
+        final int size = getSize();
+        mArray = new int[size];
+        mArray[0] = state;
+        mOverflowSize = 1;
+        return mArray;
+      } else {
+        mArray[mOverflowSize++] = state;
+        return null;
+      }
+    }
+
     //#######################################################################
     //# Debugging
     @Override
-    void dump(final PrintWriter printer)
+    public String toString()
+    {
+      final StringWriter writer = new StringWriter();
+      final PrintWriter printer = new PrintWriter(writer);
+      dump(printer);
+      return writer.toString();
+    }
+
+    public void dump(final PrintWriter printer)
     {
       mClassLists.dumpList(printer, mList);
     }
 
     //#######################################################################
     //# Data Members
-    int mList;
-    int mOverflowList;
-    int mOverflowSize;
-    int[] mArray;
+    private int mSize;
+    private int mList;
+    private int mOverflowList;
+    private int mOverflowSize;
+    private int[] mArray;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class PlainEquivalenceClass
+  private class PlainEquivalenceClass
+    extends EquivalenceClass
+  {
+
+    //#######################################################################
+    //# Constructors
+    private PlainEquivalenceClass()
+    {
+      mIsOpenSplitter = false;
+    }
+
+    private PlainEquivalenceClass(final int list,
+                                  final int size,
+                                  final boolean preds)
+    {
+      super(list, size, preds);
+      mIsOpenSplitter = false;
+    }
+
+    private PlainEquivalenceClass(final int[] states)
+    {
+      super(states);
+    }
+
+    //#######################################################################
+    //# Interface Splitter
+    public ComplexEquivalenceClass getParent()
+    {
+      return null;
+    }
+
+    public void setParent(final ComplexEquivalenceClass parent)
+    {
+    }
+
+    public InfoMap getInfo()
+    {
+      return null;
+    }
+
+    public void setInfo(final InfoMap info)
+    {
+    }
+
+    public void splitOn()
+    {
+      mIsOpenSplitter = false;
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final Collection<EquivalenceClass> splitClasses =
+        new THashSet<EquivalenceClass>();
+      final TIntHashSet visited = new TIntHashSet();
+      collect(mTempClass);
+      final int size = getSize();
+      for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
+        if (rel.isUsedEvent(event)) {
+          final TransitionIterator transIter = getPredecessorIterator(event);
+          for (int i = 0; i < size; i++) {
+            final int state = mTempClass.get(i);
+            transIter.resetState(state);
+            while (transIter.advance()) {
+              final int pred = transIter.getCurrentSourceState();
+              if (visited.add(pred)) {
+                final EquivalenceClass splitClass = mStateToClass[pred];
+                if (splitClass != null) {
+                  splitClass.moveToOverflowList(pred);
+                  splitClasses.add(splitClass);
+                }
+              }
+            }
+          }
+        }
+        visited.clear();
+        for (final EquivalenceClass splitClass : splitClasses) {
+          splitClass.splitUsingOverflowList();
+        }
+        splitClasses.clear();
+      }
+      mTempClass.clear();
+    }
+
+    public void enqueue()
+    {
+      if (!mIsOpenSplitter) {
+        mIsOpenSplitter = true;
+        mSplitters.add(this);
+      }
+    }
+
+    //#######################################################################
+    //# Overrides for EquivalenceClass
+    void doSimpleSplit(final int overflowList,
+                       final int overflowSize,
+                       final boolean preds)
+    {
+      final int size = getSize();
+      final int newSize = size - overflowSize;
+      final PlainEquivalenceClass overflowClass;
+      if (newSize >= overflowSize) {
+        overflowClass =
+          new PlainEquivalenceClass(overflowList, overflowSize, preds);
+        setSize(newSize);
+      } else {
+        final int list = getList();
+        overflowClass = new PlainEquivalenceClass(list, newSize, preds);
+        setList(overflowList, overflowSize);
+      }
+      if (getSize() == 1) {
+        setUpStateToClass(true);
+      }
+      overflowClass.setUpStateToClass(true);
+      overflowClass.enqueue();
+      enqueue();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private boolean mIsOpenSplitter;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class LeafEquivalenceClass
+  private class LeafEquivalenceClass extends EquivalenceClass
+  {
+
+    //#######################################################################
+    //# Constructors
+    private LeafEquivalenceClass()
+    {
+    }
+
+    private LeafEquivalenceClass(final int list,
+                                 final int size,
+                                 final boolean preds)
+    {
+      super(list, size, preds);
+    }
+
+    private LeafEquivalenceClass(final int[] states)
+    {
+      super(states);
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparable<Splitter>
+    public int compareTo(final Splitter splitter)
+    {
+      if (mInfo == null) {
+        if (splitter.getInfo() != null) {
+          return 1;
+        }
+      } else {
+        if (splitter.getInfo() == null) {
+          return -1;
+        }
+      }
+      return super.compareTo(splitter);
+    }
+
+    //#######################################################################
+    //# Interface Splitter
+    public ComplexEquivalenceClass getParent()
+    {
+      return mParent;
+    }
+
+    public void setParent(final ComplexEquivalenceClass parent)
+    {
+      mParent = parent;
+    }
+
+    public InfoMap getInfo()
+    {
+      return mInfo;
+    }
+
+    public void setInfo(final InfoMap info)
+    {
+      mInfo = info;
+    }
+
+    public void splitOn()
+    {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final InfoMap info = new InfoMap();
+      setInfo(info);
+      final Collection<EquivalenceClass> splitClasses =
+        new THashSet<EquivalenceClass>();
+      final TIntHashSet visited = new TIntHashSet();
+      collect(mTempClass);
+      final int size = getSize();
+      for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
+        if (rel.isUsedEvent(event)) {
+          final TransitionIterator transIter = getPredecessorIterator(event);
+          for (int i = 0; i < size; i++) {
+            final int state = mTempClass.get(i);
+            transIter.resetState(state);
+            while (transIter.advance()) {
+              final int pred = transIter.getCurrentSourceState();
+              if (visited.add(pred)) {
+                final EquivalenceClass splitClass = mStateToClass[pred];
+                if (splitClass != null) {
+                  splitClass.moveToOverflowList(pred);
+                  splitClasses.add(splitClass);
+                }
+              }
+              info.increment(pred, event);
+            }
+          }
+        }
+        visited.clear();
+        for (final EquivalenceClass splitClass : splitClasses) {
+          splitClass.splitUsingOverflowList();
+        }
+        splitClasses.clear();
+      }
+      mTempClass.clear();
+      mMaxInfoSize = Math.max(mMaxInfoSize, info.size());
+    }
+
+    public void enqueue()
+    {
+      mParent = null;
+    }
+
+    //#######################################################################
+    //# Overrides for EquivalenceClass
+    @Override
+    void doSimpleSplit(final int overflowList,
+                       final int overflowSize,
+                       final boolean preds)
+    {
+      final int size = getSize();
+      final int newSize = size - overflowSize;
+      final LeafEquivalenceClass overflowClass;
+      if (newSize >= overflowSize) {
+        overflowClass =
+          new LeafEquivalenceClass(overflowList, overflowSize, preds);
+        setSize(newSize);
+      } else {
+        final int list = getList();
+        overflowClass = new LeafEquivalenceClass(list, newSize, preds);
+        setList(overflowList, overflowSize);
+      }
+      if (getSize() == 1) {
+        setUpStateToClass(true);
+      }
+      overflowClass.setUpStateToClass(true);
+      final ComplexEquivalenceClass parent = getParent();
+      if (parent != null) {
+        final ComplexEquivalenceClass complex =
+          new ComplexEquivalenceClass(overflowClass, this, parent, mInfo);
+        parent.replaceChild(this, complex);
+        mInfo = null;
+      } else if (mInfo == null) {
+        mSplitters.add(overflowClass);
+      } else {
+        final ComplexEquivalenceClass complex =
+          new ComplexEquivalenceClass(overflowClass, this, mInfo);
+        mSplitters.add(complex);
+        mInfo = null;
+      }
+    }
+
+
+    //#######################################################################
+    //# Specific Methods
+    void doComplexSplit(int overflow1, int size1, int overflow2, int size2)
+    {
+      if (size1 == 0 && size2 == 0) {
+        return;
+      }
+      final int size = getSize();
+      setPredecessorsInvalid();
+      if (size1 == size) {
+        setList(overflow1, size1);
+        return;
+      } else if (size2 == size) {
+        setList(overflow2, size2);
+        return;
+      } else if (size1 == 0) {
+        doSimpleSplit(overflow2, size2, false);
+        return;
+      } else if (size2 == 0) {
+        doSimpleSplit(overflow1, size1, false);
+        return;
+      }
+      final int newSize = size - size1 - size2;
+      if (newSize == 0) {
+        setList(overflow1, size);
+        doSimpleSplit(overflow2, size2, false);
+        return;
+      }
+
+      // OK, it really is a three-way split ...
+      // Establish order: overflow1 < overflow2 < this
+      if (size2 < size1) {
+        int tmp = size1;
+        size1 = size2;
+        size2 = tmp;
+        tmp = overflow1;
+        overflow1 = overflow2;
+        overflow2 = tmp;
+      }
+      if (newSize < size2) {
+        int tmp = overflow2;
+        overflow2 = getList();
+        setList(tmp, size2);
+        size2 = newSize;
+        if (size2 < size1) {
+          tmp = size1;
+          size1 = size2;
+          size2 = tmp;
+          tmp = overflow1;
+          overflow1 = overflow2;
+          overflow2 = tmp;
+        }
+      } else {
+        setSize(newSize);
+      }
+      if (getSize() == 1) {
+        setUpStateToClass(true);
+      }
+
+      // Create and enqueue complex splitters ...
+      final LeafEquivalenceClass class1 =
+        new LeafEquivalenceClass(overflow1, size1, false);
+      class1.setUpStateToClass(true);
+      final LeafEquivalenceClass class2 =
+        new LeafEquivalenceClass(overflow2, size2, false);
+      class2.setUpStateToClass(true);
+      final ComplexEquivalenceClass parent = getParent();
+      if (parent != null || mInfo != null) {
+        final ComplexEquivalenceClass complex2 =
+          new ComplexEquivalenceClass(class2, this);
+        final ComplexEquivalenceClass complex1 =
+          new ComplexEquivalenceClass(class1, complex2, parent, mInfo);
+        mInfo = null;
+        complex2.setParent(complex1);
+        if (parent == null) {
+          mSplitters.add(complex1);
+        } else {
+          parent.replaceChild(this, complex1);
+        }
+      } else {
+        mSplitters.add(class1);
+        mSplitters.add(class2);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private ComplexEquivalenceClass mParent;
+    private InfoMap mInfo;
 
   }
 
 
   // #########################################################################
   // # Inner Class ComplexEquivalenceClass
-  private class ComplexEquivalenceClass extends EquivalenceClass
+  private class ComplexEquivalenceClass implements Splitter
   {
 
     //#######################################################################
     //# Constructors
-    ComplexEquivalenceClass(final EquivalenceClass little,
-                            final EquivalenceClass big)
+    ComplexEquivalenceClass(final Splitter little,
+                            final Splitter big)
     {
-      super(little.getSize() + big.getSize());
+      mSize = little.getSize() + big.getSize();
       mLittleChild = little;
       mBigChild = big;
       mLittleChild.setParent(this);
       mBigChild.setParent(this);
     }
 
-    ComplexEquivalenceClass(final EquivalenceClass little,
-                            final EquivalenceClass big,
+    ComplexEquivalenceClass(final Splitter little,
+                            final Splitter big,
                             final InfoMap info)
     {
-      super(info, little.getSize() + big.getSize());
+      mSize = little.getSize() + big.getSize();
+      mInfo = info;
       mLittleChild = little;
       mBigChild = big;
       mLittleChild.setParent(this);
       mBigChild.setParent(this);
     }
 
-    ComplexEquivalenceClass(final EquivalenceClass little,
-                            final EquivalenceClass big,
+    ComplexEquivalenceClass(final Splitter little,
+                            final Splitter big,
                             final ComplexEquivalenceClass parent,
                             final InfoMap info)
     {
-      super(parent, info, little.getSize() + big.getSize());
+      mSize = little.getSize() + big.getSize();
+      mParent = parent;
+      mInfo = info;
       mLittleChild = little;
       mBigChild = big;
       mLittleChild.setParent(this);
@@ -1073,33 +1240,66 @@ public class AltObservationEquivalenceTRSimplifier
     }
 
     //#######################################################################
-    //# Simple Access
-    void replaceChild(final EquivalenceClass oldChild,
-                      final EquivalenceClass newChild)
+    //# Interface java.util.Comparable<Splitter>
+    public int compareTo(final Splitter splitter)
     {
-      if (mLittleChild == oldChild) {
-        mLittleChild = newChild;
+      if (mInfo == null) {
+        if (splitter.getInfo() != null) {
+          return 1;
+        }
       } else {
-        mBigChild = newChild;
+        if (splitter.getInfo() == null) {
+          return -1;
+        }
       }
-
+      return mSize - splitter.getSize();
     }
 
     //#######################################################################
-    //# Algorithm
-    @Override
-    void splitOn()
+    //# Interface Splitter
+    public int getSize()
+    {
+      return mSize;
+    }
+
+    public ComplexEquivalenceClass getParent()
+    {
+      return mParent;
+    }
+
+    public void setParent(final ComplexEquivalenceClass parent)
+    {
+      mParent = parent;
+    }
+
+    public InfoMap getInfo()
+    {
+      return mInfo;
+    }
+
+    public void setInfo(final InfoMap info)
+    {
+      mInfo = info;
+    }
+
+    public void collect(final TIntArrayList states)
+    {
+      mLittleChild.collect(states);
+      mBigChild.collect(states);
+    }
+
+    public void splitOn()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
       mLittleChild.collect(mTempClass);
       final int tempSize = mTempClass.size();
       final InfoMap info = getInfo();
       final int infoSize = info.size();
-      final InfoMap littleInfo = new HashInfoMap(infoSize);
+      final InfoMap littleInfo = new InfoMap(infoSize);
       mLittleChild.setInfo(littleInfo);
       mBigChild.setInfo(info);
-      final Collection<SimpleEquivalenceClass> splitClasses =
-        new THashSet<SimpleEquivalenceClass>();
+      final Collection<LeafEquivalenceClass> splitClasses =
+        new THashSet<LeafEquivalenceClass>();
       final TIntHashSet visited = new TIntHashSet();
       for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
@@ -1110,16 +1310,17 @@ public class AltObservationEquivalenceTRSimplifier
             while (transIter.advance()) {
               final int pred = transIter.getCurrentSourceState();
               if (visited.add(pred)) {
-                final SimpleEquivalenceClass splitClass = mStateToClass[pred];
+                final EquivalenceClass splitClass = mStateToClass[pred];
                 if (splitClass != null) {
-                  splitClasses.add(splitClass);
+                  final LeafEquivalenceClass leaf = (LeafEquivalenceClass) splitClass;
+                  splitClasses.add(leaf);
                 }
               }
               info.moveTo(littleInfo, pred, event);
             }
           }
           visited.clear();
-          for (final SimpleEquivalenceClass splitClass : splitClasses) {
+          for (final LeafEquivalenceClass splitClass : splitClasses) {
             int size1 = 0;
             int size2 = 0;
             int overflow1 = IntListBuffer.NULL;
@@ -1158,23 +1359,38 @@ public class AltObservationEquivalenceTRSimplifier
       mMaxInfoSize = Math.max(mMaxInfoSize, littleInfo.size());
     }
 
-    @Override
-    void collect(final TIntArrayList states)
+    public void enqueue()
     {
-      mLittleChild.collect(states);
-      mBigChild.collect(states);
+      mParent = null;
+      mSplitters.add(this);
     }
 
-    @Override
-    void enqueue()
+
+    //#######################################################################
+    //# Simple Access
+    void replaceChild(final EquivalenceClass oldChild,
+                      final Splitter newChild)
     {
-      super.enqueue();
-      mSplitters.add(this);
+      if (mLittleChild == oldChild) {
+        mLittleChild = newChild;
+      } else {
+        mBigChild = newChild;
+      }
+
     }
 
     //#######################################################################
     //# Debugging
-    void dump(final PrintWriter printer)
+    @Override
+    public String toString()
+    {
+      final StringWriter writer = new StringWriter();
+      final PrintWriter printer = new PrintWriter(writer);
+      dump(printer);
+      return writer.toString();
+    }
+
+    public void dump(final PrintWriter printer)
     {
       printer.write('<');
       mLittleChild.dump(printer);
@@ -1185,90 +1401,29 @@ public class AltObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Data Members
-    private EquivalenceClass mLittleChild;
-    private EquivalenceClass mBigChild;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Interface InfoMap
-  private interface InfoMap {
-
-    public int increment(final int state, final int event);
-
-    public void moveTo(final InfoMap little, final int state, final int event);
-
-    public SplitKind getSplitKind(final InfoMap little,
-                                  final int state,
-                                  final int event);
-
-    public int size();
-
-    public int adjustOrPutValue(int key, int adjust, int init);
-
-    public int get(int key);
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class NoInfoMap
-  private class NoInfoMap
-    implements InfoMap
-  {
-
-    //#######################################################################
-    //# Interface InfoMap
-    public SplitKind getSplitKind(final InfoMap little,
-                                  final int state,
-                                  final int event)
-    {
-      return null;
-    }
-
-    public int increment(final int state, final int event)
-    {
-      return 0;
-    }
-
-    public void moveTo(final InfoMap little, final int state, final int event)
-    {
-    }
-
-    public int size()
-    {
-      return 0;
-    }
-
-    public int adjustOrPutValue(final int key, final int adjust, final int init)
-    {
-      return 0;
-    }
-
-    public int get(final int key)
-    {
-      return 0;
-    }
+    private final int mSize;
+    private ComplexEquivalenceClass mParent;
+    private InfoMap mInfo;
+    private Splitter mLittleChild;
+    private Splitter mBigChild;
 
   }
 
 
   //#########################################################################
   //# Inner Class HashInfoMap
-  private class HashInfoMap
+  private class InfoMap
     extends TIntIntHashMap
-    implements InfoMap
   {
 
     //#######################################################################
     //# Constructors
-    private HashInfoMap()
+    private InfoMap()
     {
       this(mInitialInfoSize);
     }
 
-    private HashInfoMap(final int initialSize)
+    private InfoMap(final int initialSize)
     {
       super(initialSize);
     }
@@ -1507,11 +1662,10 @@ public class AltObservationEquivalenceTRSimplifier
   private IntListBuffer mClassLists;
   private IntListBuffer.ReadOnlyIterator mClassReadIterator;
   private IntListBuffer.ModifyingIterator mClassWriteIterator;
-  private SimpleEquivalenceClass[] mStateToClass;
+  private EquivalenceClass[] mStateToClass;
   private int[] mPredecessors;
-  private Queue<EquivalenceClass> mSplitters;
+  private Queue<Splitter> mSplitters;
   private TIntArrayList mTempClass;
-  private InfoMap mNoInfo;
 
   private int mMaxInfoSize;
 
