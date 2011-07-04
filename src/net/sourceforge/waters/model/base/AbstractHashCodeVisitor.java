@@ -145,12 +145,16 @@ public abstract class AbstractHashCodeVisitor
   }
 
   protected int computeListHashCode(final List<? extends Proxy> list)
-    throws VisitorException
+  throws VisitorException
   {
     int result = 0;
     for (final Proxy proxy : list) {
       result *= 5;
-      result += (Integer) proxy.acceptVisitor(this);
+      if (proxy == null) {
+        result += 0xabababab;
+      } else {
+        result += (Integer) proxy.acceptVisitor(this);
+      }
     }
     return result;
   }
