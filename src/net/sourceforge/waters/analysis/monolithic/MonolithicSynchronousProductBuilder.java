@@ -69,6 +69,29 @@ public class MonolithicSynchronousProductBuilder
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * Sets a callback that specifies user-defined actions to be performed
+   * before adding a new state.
+   * @param  callback  The callback to be invoked when adding states,
+   *                   or <CODE>null</CODE> to disable this feature.
+   */
+  public void setStateCallback(final StateCallback callback)
+  {
+    mStateCallback = callback;
+  }
+
+  /**
+   * Gets the callback interface executed when adding a new state.
+   * @see #setStateCallback(StateCallback) setStateCallback()
+   */
+  public StateCallback getStateCallback()
+  {
+    return mStateCallback;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
   public Collection<EventProxy> getPropositions()
   {
@@ -140,6 +163,15 @@ public class MonolithicSynchronousProductBuilder
   public boolean supportsNondeterminism()
   {
     return true;
+  }
+
+
+  //#########################################################################
+  //# Callbacks
+  @SuppressWarnings("unchecked")
+  public final List<EventProxy> getStateMarking(final int aut, final int state)
+  {
+    return (List<EventProxy>) mStateMarkings[aut][state];
   }
 
 
@@ -320,6 +352,9 @@ public class MonolithicSynchronousProductBuilder
     result.setNumberOfStates(mNumStates);
     result.setPeakNumberOfNodes(mNumStates);
     result.setNumberOfTransitions(mTransitionBuffer.size() / 3);
+    if (mStateCallback != null) {
+      mStateCallback.recordStatistics(result);
+    }
   }
 
   @Override
@@ -408,6 +443,9 @@ public class MonolithicSynchronousProductBuilder
         throw new OverflowException(limit);
       }
       target = mNumStates++;
+      if (mStateCallback != null) {
+        mStateCallback.countState(mTargetTuple);
+      }
       final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
       mStates.put(newTuple, target);
       mUnvisited.offer(newTuple);
@@ -512,10 +550,34 @@ public class MonolithicSynchronousProductBuilder
     }
   }
 
-  @SuppressWarnings("unchecked")
-  final List<EventProxy> getStateMarking(final int a, final int code)
+
+  //#########################################################################
+  //# Local Interface StateCallback
+  /**
+   * A callback interface to enable the user to perform custom actions
+   * when a new state is encountered.
+   */
+  public interface StateCallback
   {
-    return (List<EventProxy>) mStateMarkings[a][code];
+
+    /**
+     * This method is called by the {@link MonolithicSynchronousProductBuilder}
+     * before adding a new state to the synchronous product state space.
+     * @param  tuple    Integer array representing state codes of a new
+     *                  state tuple.
+     */
+    public void countState(int[] tuple) throws OverflowException;
+
+    /**
+     * This method is called by the {@link MonolithicSynchronousProductBuilder}
+     * while populating its result.
+     * @param  result   The result record being created. When the method is
+     *                  called, the result already contains all the standard
+     *                  information recorded by the synchronous product
+     *                  builder.
+     */
+    public void recordStatistics(AutomatonResult result);
+
   }
 
 
@@ -732,6 +794,7 @@ public class MonolithicSynchronousProductBuilder
   //# Data Members
   private Collection<EventProxy> mUsedPropositions;
   private Collection<MaskingPair> mMaskingPairs;
+  private StateCallback mStateCallback;
 
   private int mNumAutomata;
   private int mNumInputEvents;

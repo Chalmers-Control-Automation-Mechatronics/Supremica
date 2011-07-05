@@ -54,6 +54,7 @@ import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
@@ -322,12 +323,6 @@ public class OPConflictChecker
     mInternalTransitionLimit = limit;
   }
 
-
-  public void setSynchronousProductBuilder
-    (final SynchronousProductBuilder builder)
-  {
-    mSynchronousProductBuilder = builder;
-  }
 
   public void setMonolithicConflictChecker(final ConflictChecker checker)
   {
@@ -1509,6 +1504,8 @@ public class OPConflictChecker
     }
     mCurrentSynchronousProductBuilder.setConstructsAutomaton(true);
     mCurrentSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
+    mCurrentSynchronousProductBuilder.setStateCallback(null);
+    mCurrentSynchronousProductBuilder.setPropositions(null);
     try {
       mCurrentSynchronousProductBuilder.run();
       final AutomatonProxy sync =
@@ -1987,6 +1984,23 @@ public class OPConflictChecker
         final Comparator<Candidate> alt = MinS.createComparatorChain(checker);
         return checker.new HeuristicMinSync(alt);
       }
+    },
+    /**
+     * Chooses the candidate with the minimum actual number of alpha-marked
+     * states in the synchronous product.
+     */
+    MinSyncA {
+      @Override
+      SelectingHeuristic createHeuristic(final OPConflictChecker checker)
+      {
+        if (checker.mPreconditionMarking == null) {
+          return MinSync.createHeuristic(checker);
+        } else {
+          final Comparator<Candidate> alt =
+            MinSa.createComparatorChain(checker);
+          return checker.new HeuristicMinSyncAlpha(1, 0, alt);
+        }
+      }
     };
 
     /**
@@ -1994,7 +2008,7 @@ public class OPConflictChecker
      * This returns an implementation of only one heuristic, which
      * may consider two candidates as equal.
      * @param  checker The conflict checker requesting and using the
-     *                heuristic.
+     *                 heuristic.
      * @return A comparator, or <CODE>null</CODE> if the heuristic
      *         is not implemented by a comparator.
      */
@@ -2661,7 +2675,10 @@ public class OPConflictChecker
       int limit = mCurrentInternalStateLimit;
       mCurrentSynchronousProductBuilder.setNodeLimit(limit);
       mCurrentSynchronousProductBuilder.setConstructsAutomaton(false);
+      mCurrentSynchronousProductBuilder.setStateCallback(null);
       Candidate best = null;
+      final List<EventProxy> empty = Collections.emptyList();
+      mCurrentSynchronousProductBuilder.setPropositions(empty);
       for (final Candidate candidate : list) {
         final ProductDESProxy des = candidate.createProductDESProxy(factory);
         mCurrentSynchronousProductBuilder.setModel(des);
@@ -2690,6 +2707,107 @@ public class OPConflictChecker
       }
       return best;
     }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class HeuristicMinSync
+  private class HeuristicMinSyncAlpha
+    extends SelectingHeuristic
+    implements MonolithicSynchronousProductBuilder.StateCallback
+  {
+
+    //#######################################################################
+    //# Constructor
+    private HeuristicMinSyncAlpha(final int alphaWeight,
+                                  final int nonAlphaWeight,
+                                  final Comparator<Candidate> comparator)
+    {
+      super(comparator);
+      mAlphaWeight = alphaWeight;
+      mNonAlphaWeight = nonAlphaWeight;
+    }
+
+    //#######################################################################
+    //# Overrides for SelectingHeuristic
+    Candidate selectCandidate(final Collection<Candidate> candidates)
+    throws AnalysisException
+    {
+      final ProductDESProxyFactory factory = getFactory();
+      final List<Candidate> list = new ArrayList<Candidate>(candidates);
+      final Comparator<Candidate> comparator = getComparator();
+      Collections.sort(list, comparator);
+      mCurrentSynchronousProductBuilder.setNodeLimit
+        (mCurrentInternalStateLimit);
+      mCurrentSynchronousProductBuilder.setConstructsAutomaton(false);
+      mCurrentSynchronousProductBuilder.setStateCallback(this);
+      mCurrentMinimum = Integer.MAX_VALUE;
+      Candidate best = null;
+      final List<EventProxy> props =
+        Collections.singletonList(mPreconditionMarking);
+      mCurrentSynchronousProductBuilder.setPropositions(props);
+      for (final Candidate candidate : list) {
+        final ProductDESProxy des = candidate.createProductDESProxy(factory);
+        mCurrentSynchronousProductBuilder.setModel(des);
+        try {
+          mCount = 0;
+          mCurrentSynchronousProductBuilder.run();
+          if (mCount < mCurrentMinimum) {
+            best = candidate;
+            mCurrentMinimum = mCount;
+          }
+        } catch (final OutOfMemoryError error) {
+          getLogger().debug("<out of memory>");
+          // skip this one ...
+        } catch (final OverflowException overflow) {
+          // skip this one ...
+        } finally {
+          final CompositionalVerificationResult stats = getAnalysisResult();
+          final AutomatonResult result =
+            mCurrentSynchronousProductBuilder.getAnalysisResult();
+          stats.addSynchronousProductAnalysisResult(result);
+        }
+      }
+      return best;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.monolithic.
+    //# MonolithicSynchronousProductBuilder.StateCounter
+    public void countState(final int[] tuple)
+      throws OverflowException
+    {
+      boolean alpha = true;
+      for (int a = 0; a < tuple.length; a++) {
+        final List<EventProxy> props =
+          mCurrentSynchronousProductBuilder.getStateMarking(a, tuple[a]);
+        if (props.isEmpty()) {
+          alpha = false;
+          break;
+        }
+      }
+      if (alpha) {
+        mCount += mAlphaWeight;
+      } else {
+        mCount += mNonAlphaWeight;
+      }
+      if (mCount >= mCurrentMinimum) {
+        throw new OverflowException(OverflowKind.NODE, mCurrentMinimum);
+      }
+    }
+
+    public void recordStatistics(final AutomatonResult result)
+    {
+      result.setPeakNumberOfNodes(mCount);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mAlphaWeight;
+    private final int mNonAlphaWeight;
+    private int mCount;
+    private int mCurrentMinimum;
 
   }
 
@@ -4904,7 +5022,7 @@ public class OPConflictChecker
   private PreselectingMethod mPreselectingMethod;
   private SelectingMethod mSelectingMethod;
   private boolean mSubsumptionEnabled;
-  private SynchronousProductBuilder mSynchronousProductBuilder;
+  private MonolithicSynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
   private SafetyVerifier mCompositionalSafetyVerifier;
   private SafetyVerifier mMonolithicSafetyVerifier;
@@ -4934,7 +5052,7 @@ public class OPConflictChecker
   private AbstractionRule mAbstractionRule;
   private PreselectingHeuristic mPreselectingHeuristic;
   private SelectingHeuristic mSelectingHeuristic;
-  private SynchronousProductBuilder mCurrentSynchronousProductBuilder;
+  private MonolithicSynchronousProductBuilder mCurrentSynchronousProductBuilder;
   private ConflictChecker mCurrentMonolithicConflictChecker;
   private SafetyVerifier mCurrentCompositionalSafetyVerifier;
   private SafetyVerifier mCurrentMonolithicSafetyVerifier;
