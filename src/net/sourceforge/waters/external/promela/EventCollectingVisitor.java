@@ -69,6 +69,8 @@ public class EventCollectingVisitor implements PromelaVisitor
   private final Collection<EventDeclProxy> mEventDecls = new ArrayList<EventDeclProxy>();
 
   private final Hashtable<String,Integer> occur = new Hashtable<String,Integer>();
+
+  Collection<SimpleExpressionProxy> mRanges = new ArrayList<SimpleExpressionProxy>();
   //########################################################################
   //# Invocation
   public EventCollectingVisitor(final ModuleProxyFactory factory){
@@ -80,7 +82,9 @@ public class EventCollectingVisitor implements PromelaVisitor
   {
     node.acceptVisitor(this);
   }
-
+  public Collection<SimpleExpressionProxy> getRanges(){
+    return mRanges;
+  }
   public Collection<EventDeclProxy> getEvents(){
     return mEventDecls;
   }
@@ -166,12 +170,13 @@ public class EventCollectingVisitor implements PromelaVisitor
       final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, zero, c255);
       ranges.add(range);
     }
+    mRanges = new ArrayList<SimpleExpressionProxy>(ranges);
     IdentifierProxy ident=null;
     IdentifierProxy ident2 = null;
     if(chanLength ==0){
      ident = mFactory.createSimpleIdentifierProxy("exch_"+chanName);
-     final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
-     mEventDecls.add(event);
+     //final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
+     //mEventDecls.add(event);
     }else if(chanLength==1){
       ident = mFactory.createSimpleIdentifierProxy("send_"+chanName);
       ident2 = mFactory.createSimpleIdentifierProxy("recv_"+chanName);
@@ -349,15 +354,16 @@ public class EventCollectingVisitor implements PromelaVisitor
     final String proctypeName = t.getChild(0).getText();
     if(!occur.containsKey(proctypeName)){
       occur.put(proctypeName,1);
+      if(t.getParent().getParent() instanceof InitialTreeNode){
+        final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+proctypeName);
+        final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
+        mEventDecls.add(event);
+        }
     }else{
       final int size = occur.get(proctypeName);
       occur.put(proctypeName, size+1);
     }
-    if(t.getParent().getParent() instanceof InitialTreeNode){
-    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+proctypeName);
-    final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-    mEventDecls.add(event);
-    }
+
     return null;
   }
 

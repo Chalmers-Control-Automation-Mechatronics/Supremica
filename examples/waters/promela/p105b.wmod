@@ -20,14 +20,7 @@
             </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_A"/>
-        <EventDecl Kind="CONTROLLABLE" Name="run_B">
-            <RangeList>
-                <EnumSetExpression Text="[B_0,B_1]">
-                    <SimpleIdentifier Name="B_0"/>
-                    <SimpleIdentifier Name="B_1"/>
-                </EnumSetExpression>
-            </RangeList>
-        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="proctype_A">
@@ -158,9 +151,7 @@
                         <EdgeList>
                             <Edge Target="B_1" Source="B_0">
                                 <LabelBlock>
-                                    <IndexedIdentifier Name="run_B">
-                                        <SimpleIdentifier Name="procid"/>
-                                    </IndexedIdentifier>
+                                    <SimpleIdentifier Name="run_B"/>
                                     <LabelGeometry Anchor="NW">
                                         <Point Y="-8" X="5"/>
                                     </LabelGeometry>
@@ -191,7 +182,7 @@
         <SimpleComponent Kind="PLANT" Name="init">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="init_0">
+                    <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
                             <Point Y="48" X="80"/>
                         </PointGeometry>
@@ -199,7 +190,7 @@
                             <Point Y="-9" X="10"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="init_1">
+                    <SimpleNode Name="S1">
                         <PointGeometry>
                             <Point Y="128" X="80"/>
                         </PointGeometry>
@@ -207,7 +198,7 @@
                             <Point Y="-4" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="init_2">
+                    <SimpleNode Name="S2">
                         <PointGeometry>
                             <Point Y="208" X="80"/>
                         </PointGeometry>
@@ -215,7 +206,7 @@
                             <Point Y="-7" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="init_3">
+                    <SimpleNode Name="S3">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -228,7 +219,7 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="init_1" Source="init_0">
+                    <Edge Target="S1" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_A"/>
                             <LabelGeometry Anchor="NW">
@@ -236,7 +227,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="init_2" Source="init_1">
+                    <Edge Target="S2" Source="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
@@ -244,7 +235,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="init_3" Source="init_2">
+                    <Edge Target="S3" Source="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">

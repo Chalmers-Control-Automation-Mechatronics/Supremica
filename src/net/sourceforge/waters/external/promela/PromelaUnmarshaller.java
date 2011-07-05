@@ -185,7 +185,7 @@ public class PromelaUnmarshaller
     final String comment = "Imported from Promela file " + source + ".";
 
     // Create automata ...
-    final Collection<EventDeclProxy> events = mVisitor.getEvents();
+    final Collection<EventDeclProxy> events = mGraphVisitor.getEvent();
     final Collection<Proxy> components = mGraphVisitor.getComponents();
     final ModuleProxy module =mFactory.createModuleProxy(name, comment, null, null, events, null, components);
     //final ModuleProxy module =mFactory.createModuleProxy(name, comment, null, null, events, null, null);

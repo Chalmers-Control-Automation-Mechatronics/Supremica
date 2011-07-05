@@ -55,6 +55,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.antlr.runtime.tree.Tree;
 
@@ -70,6 +71,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   Collection<String> duplicatedRun = new ArrayList<String>();
   boolean mUnWinding=false;
   boolean mIsInit = false;
+  int runedOnce = 0;
   Hashtable<String,Integer> copyOfOccur = new Hashtable<String,Integer>();
   Collection<Proxy> mComponents = new ArrayList<Proxy>();
 
@@ -81,14 +83,21 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   List<Message> mOutput = new ArrayList<Message>();
 
+  private Collection<EventDeclProxy> mEvents = new ArrayList<EventDeclProxy>();
+
   public GraphCollectingVisitor(final EventCollectingVisitor v){
     mVisitor = v;
     mFactory = v.getFactory();
+
+    System.out.println("omg");
    // copyOfOccur = new Hashtable<String,Integer>(mVisitor.getOccur());
   }
   public PromelaGraph collectGraphs(final PromelaTree node)
   {
     return (PromelaGraph) node.acceptVisitor(this);
+  }
+  public Collection<EventDeclProxy> getEvent(){
+    return mEvents;
   }
 
   public Collection<Proxy> getComponents(){
@@ -96,6 +105,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   }
   public Object visitModule(final ModuleTreeNode t)
   {
+    mEvents = new ArrayList<EventDeclProxy>(mVisitor.getEvents());
     for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
@@ -122,7 +132,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
         final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
         final IdentifierProxy id = mFactory.createSimpleIdentifierProxy("procid");
         indexes.add(id);
-        ident = mFactory.createIndexedIdentifierProxy("run_"+procName, indexes);
+        //ident = mFactory.createIndexedIdentifierProxy("run_"+procName, indexes);
+        ident = mFactory.createSimpleIdentifierProxy("run_"+procName);
       }
     }
 
@@ -240,7 +251,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final GraphProxy graph = mFactory.createGraphProxy(true, null, mNodes, mEdges);
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("channel_"+name);
       final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
-      mComponents.add(component);
+     // mComponents.add(component);
     }
     for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
@@ -310,12 +321,16 @@ public class GraphCollectingVisitor implements PromelaVisitor
       }
       for(final Message m2: senders){
         boolean isSender = false;
-        for(int i=0;i<labels.size();i++){
-          if(comparator.compare(labels.get(i),m2.getMsg().get(i))==0){
-            isSender = true;
-          }else{
-            isSender = false;
-            break;
+        if(labels.size()==0){
+          isSender=true;
+        }else{
+          for(int i=0;i<labels.size();i++){
+            if(comparator.compare(labels.get(i),m2.getMsg().get(i))==0){
+              isSender = true;
+            }else{
+              isSender = false;
+              break;
+            }
           }
         }
         if(isSender){
@@ -381,17 +396,22 @@ public class GraphCollectingVisitor implements PromelaVisitor
               for(int i=0;i<mVisitor.getOccur().get(rec);i++){
               indexes = new ArrayList<SimpleExpressionProxy>();
               if(m.hasSenders()){
-                for(final String sender: m.getSenders()){
-                  if(mVisitor.getOccur().get(sender)>1){
+                //for(final String sender: m.getSenders()){
+                  if(mVisitor.getOccur().get(name)>1){
                     final IdentifierProxy id = mFactory.createSimpleIdentifierProxy("procid");
                     indexes.add(id);
+                  }else if(m.getSenders().size()>1){
+                    final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(name+"_"+0);
+                    indexes.add(id);
                   }
-                }
+                //}
               }
-             if(mVisitor.getOccur().get(rec)>1){
-             final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(rec+"_"+i);
-             indexes.add(id);
-             }
+             //if(mVisitor.getOccur().get(rec)>1){
+              if(m.getRecipients().size()>1 || mVisitor.getOccur().get(rec)>1){
+                final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(rec+"_"+i);
+                indexes.add(id);
+              }
+             //}
              for(int y=1;y<labels.size();y++){
                final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
                indexes.add(c);
@@ -421,6 +441,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitReceive(final ReceiveTreeNode t)
   {
+    runedOnce++;
+    final ModuleProxyCloner cloner = mFactory.getCloner();
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final Comparator<SimpleExpressionProxy> comparator =
+      new ExpressionComparator(optable);
      //receive statement
     final String chanName = t.getChild(0).getText();
     final ChanInfo ch = mVisitor.getChan().get(chanName);
@@ -428,7 +453,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final THashSet<IdentifierProxy> chanData ;
     labels = new ArrayList<String>();
     labels.add(chanName);
-
+    Tree tree = t;
+    while (!(tree instanceof ProctypeTreeNode)) {
+      tree = tree.getParent();
+    }
+    final String name = tree.getText();
 
     for(int i = 0; i <t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
@@ -444,6 +473,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
         indexes.add(null);
       }
     }
+
+    final Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>();
+    final Collection<SimpleIdentifierProxy> sender = new ArrayList<SimpleIdentifierProxy>();
+    final Collection<SimpleIdentifierProxy> reciever = new ArrayList<SimpleIdentifierProxy>();
+    //mRanges
     final List<SimpleExpressionProxy> index = new ArrayList<SimpleExpressionProxy>(indexes);
     final Message msg = new Message(index);
     final List<IdentifierProxy> events = new ArrayList<IdentifierProxy>();
@@ -458,21 +492,77 @@ public class GraphCollectingVisitor implements PromelaVisitor
               if((msg.getMsg().size()==templabel.size())){
                 final Collection<SimpleExpressionProxy> indexes1 = new ArrayList<SimpleExpressionProxy>();
 
-                if(mVisitor.getOccur().get(send)>1){
-                final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(send+"_"+i);
-                indexes1.add(id);
-                }
-                if(m.hasRecipients()){
-                  for(final String re: m.getRecipients()){
-                    if(mVisitor.getOccur().get(re)>1){
-                      final IdentifierProxy r = mFactory.createSimpleIdentifierProxy("procid");
-                      indexes1.add(r);
+                //if(mVisitor.getOccur().get(send)>1){
+                if(m.getSenders().size()>1 || mVisitor.getOccur().get(send)>1){
+                  final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(send+"_"+i);
+                  boolean testSend=false;
+                  for(final SimpleExpressionProxy s: sender){
+                    if(comparator.compare(s, id)==0){
+                      testSend=false;
+                      break;
+                    }else{
+                      testSend = true;
                     }
                   }
+                  if(sender.size()==0){
+                    testSend=true;
+                  }
+                  if(testSend){
+                    sender.add((SimpleIdentifierProxy)cloner.getClone(id));
+                  }
+                  indexes1.add(id);
+                }
+                //}
+                if(m.hasRecipients()){
+                  //for(final String re: m.getRecipients()){
+                    if(mVisitor.getOccur().get(name)>1){
+                      final IdentifierProxy r = mFactory.createSimpleIdentifierProxy("procid");
+                      indexes1.add(r);
+                      for(int a=0;a<mVisitor.getOccur().get(name);a++){
+                      final SimpleIdentifierProxy r1 = mFactory.createSimpleIdentifierProxy(name+"_"+a);
+                      boolean testSend=false;
+                      for(final SimpleExpressionProxy s: reciever){
+                        if(comparator.compare(s, r1)==0){
+                          testSend=false;
+                          break;
+                        }else{
+                          testSend = true;
+                        }
+                      }
+                      if(reciever.size()==0){
+                        testSend = true;
+                      }
+                      if(testSend){
+                        reciever.add(r1);
+                      }
+                      }
+                    }else if(m.getRecipients().size()>1){
+                      final IdentifierProxy r = mFactory.createSimpleIdentifierProxy(name+"_"+0);
+                      indexes1.add(r);
+                      //final IdentifierProxy r1 = mFactory.createSimpleIdentifierProxy(name+"_"+i);
+                      final SimpleIdentifierProxy r1 = (SimpleIdentifierProxy) cloner.getClone(r);
+                      boolean testSend=false;
+                      for(final SimpleExpressionProxy s: reciever){
+                        if(comparator.compare(s, r1)==0){
+                          testSend=false;
+                          break;
+                        }else{
+                          testSend = true;
+                        }
+                      }
+                      if(reciever.size()==0){
+                        testSend = true;
+                      }
+                      if(testSend){
+                        reciever.add(r1);
+                      }
+                    }
+
+                 // }
                 }
 
                  // final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
-                final ModuleProxyCloner cloner = mFactory.getCloner();
+                //final ModuleProxyCloner cloner = mFactory.getCloner();
                  indexes1.addAll( cloner.getClonedList(msg.getMsg()));
 
                 //create indexedIdentifier
@@ -489,23 +579,79 @@ public class GraphCollectingVisitor implements PromelaVisitor
               } else{
               for(final Message m2: mOutput){
                 if(!m2.equals(msg)){
+                  if(m2.getRecipients().contains(name)){
                    indexes = new ArrayList<SimpleExpressionProxy>();
 
-                   if(mVisitor.getOccur().get(send)>1){
-                   final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(send+"_"+i);
-                   indexes.add(id);
-                   }
-                   if(m.hasRecipients()){
-                     for(final String re: m.getRecipients()){
-                       if(mVisitor.getOccur().get(re)>1){
-                         final IdentifierProxy r = mFactory.createSimpleIdentifierProxy("procid");
-                         indexes.add(r);
+                   //if(mVisitor.getOccur().get(send)>1){
+                   if(m.getSenders().size()>1 || mVisitor.getOccur().get(send)>1){
+                     final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(send+"_"+i);
+                     boolean testSend=false;
+                     for(final SimpleExpressionProxy s: sender){
+                       if(comparator.compare(s, id)==0){
+                         testSend=false;
+                         break;
+                       }else{
+                         testSend = true;
                        }
                      }
+                     if(sender.size()==0){
+                       testSend = true;
+                     }
+                     if(testSend){
+                       sender.add((SimpleIdentifierProxy) cloner.getClone(id));
+                     }
+                     indexes.add(id);
+                   }
+                  // }
+                   if(m.hasRecipients()){
+                     //for(final String re: m.getRecipients()){
+                       if(mVisitor.getOccur().get(name)>1){
+                         final IdentifierProxy r = mFactory.createSimpleIdentifierProxy("procid");
+                         indexes.add(r);
+                         for(int a=0;a<mVisitor.getOccur().get(name);a++){
+                           final SimpleIdentifierProxy r1 = mFactory.createSimpleIdentifierProxy(name+"_"+a);
+                           boolean testSend=false;
+                           for(final SimpleExpressionProxy s: reciever){
+                             if(comparator.compare(s, r1)==0){
+                               testSend=false;
+                               break;
+                             }else{
+                               testSend = true;
+                             }
+                           }
+                           if(reciever.size()==0){
+                             testSend = true;
+                           }
+                           if(testSend){
+                             reciever.add(r1);
+                           }
+
+                       }
+                       }else if(m.getRecipients().size()>1){
+                         final IdentifierProxy r = mFactory.createSimpleIdentifierProxy(name+"_"+0);
+                         final SimpleIdentifierProxy r1 = (SimpleIdentifierProxy) cloner.getClone(r);
+                         boolean testSend=false;
+                         for(final SimpleExpressionProxy s: reciever){
+                           if(comparator.compare(s, r1)==0){
+                             testSend=false;
+                             break;
+                           }else{
+                             testSend = true;
+                           }
+                         }
+                         if(reciever.size()==0){
+                           testSend = true;
+                         }
+                         if(testSend){
+                           reciever.add(r1);
+                         }
+                         indexes.add(r);
+                       }
+                    // }
                    }
 
                     // final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
-                   final ModuleProxyCloner cloner = mFactory.getCloner();
+                  // final ModuleProxyCloner cloner = mFactory.getCloner();
                     indexes.addAll( cloner.getClonedList(m2.getMsg()));
 
                    //create indexedIdentifier
@@ -520,6 +666,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
                    }
                    events.add(indexEvent);
                 }
+                }
 
             }
             }
@@ -529,6 +676,22 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
       }
     }
+    }
+    if(runedOnce==1){
+      if(sender.size()>0){
+        final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(sender);
+        ranges.add(en);
+      }
+      if(reciever.size()>0){
+        final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(reciever);
+        ranges.add(en);
+      }
+      //ranges.addAll(sender);
+      //ranges.addAll(reciever);
+      ranges.addAll(cloner.getClonedList(mVisitor.getRanges()));
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("exch_"+chanName);
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
+      mEvents.add(event);
     }
     return new PromelaGraph(events,mFactory);
     /*
@@ -617,7 +780,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
         final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
         final IdentifierProxy id = mFactory.createSimpleIdentifierProxy("procid");
         indexes.add(id);
-        final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
+        //final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
+        final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
         graph = new PromelaGraph(ident);
       }else{
         final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
@@ -633,7 +797,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
         final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
         final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(name+"_"+(occur1-occur2));
         indexes.add(id);
-        final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
+      //  final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
+        final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
         graph = new PromelaGraph(ident);
       }
       copyOfOccur.put(name,occur2-1);
@@ -741,8 +906,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-      if (!mVisitor.getEvents().contains(event)) {
-        mVisitor.getEvents().add(event);
+      if (!mEvents.contains(event)) {
+        mEvents.add(event);
       }
       final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
       label.add(ident2);
@@ -792,8 +957,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-      if (!mVisitor.getEvents().contains(event)) {
-        mVisitor.getEvents().add(event);
+      if (!mEvents.contains(event)) {
+        mEvents.add(event);
       }
       final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
       label.add(ident2);
@@ -844,8 +1009,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-      if(!mVisitor.getEvents().contains(event)){
-        mVisitor.getEvents().add(event);
+      if(!mEvents.contains(event)){
+        mEvents.add(event);
       }
       final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
       label.add(ident2);
