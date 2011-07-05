@@ -4,7 +4,9 @@ import gnu.trove.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import java.util.Hashtable;
 
@@ -43,6 +45,8 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+
+import org.antlr.runtime.tree.Tree;
 
 
 public class EventCollectingVisitor implements PromelaVisitor
@@ -218,6 +222,15 @@ public class EventCollectingVisitor implements PromelaVisitor
         final IntConstantProxy c2 = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
         indexes2.add(c2);
       }
+      final List<SimpleExpressionProxy> msgList = new ArrayList<SimpleExpressionProxy>(indexes);
+      final Message msg = new Message(msgList);
+      Tree tree = t;
+      while (!(tree instanceof ProctypeTreeNode)) {
+        tree = tree.getParent();
+      }
+      final String n = tree.getText();
+      msg.addSenders(n);
+      ch.addMessages(msg);
         //create indexedIdentifier, and store it for receive statement
       IndexedIdentifierProxy indexEvent = null;
       IndexedIdentifierProxy indexEvent2 = null;
@@ -258,30 +271,51 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitReceive(final ReceiveTreeNode t)
   {
-   // if(t.getParent() instanceof DoConditionTreeNode){}
-    /*
+    data =new ArrayList<String>();
     labels = new ArrayList<String>();
 
     final String chanName = t.getChild(0).getText();
     labels.add(chanName);
 
+    //chan.get(t.getParent().getChild(0).getText()).incSendnumber();
+
     for(int i = 0; i <t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
-    final ChanInfo ch = chan.get(chanName);
-    final int length = ch.getChanLength();
+
+    final String ename = labels.get(0);
+    final ChanInfo ch = chan.get(ename);
+  //  final int length = ch.getChanLength();
     final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
+  //  final Collection<SimpleExpressionProxy> indexes2 = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
+  //  int index = 0;
     for(int y=1;y<labels.size();y++){
+      if(labels.get(y)!=null){
       final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
       indexes.add(c);
+      }else{
+        indexes.add(null);
+      }
     }
-    IndexedIdentifierProxy indexEvent = null;
-    if(length==1){
-      indexEvent = mFactory.createIndexedIdentifierProxy(chanName,indexes);
+
+    Tree tree = t;
+    while (!(tree instanceof ProctypeTreeNode)) {
+      tree = tree.getParent();
     }
-    ch.saveReceive(indexes);
-    return indexEvent;
-    */
+    final String n = tree.getText();
+
+    //final List<Message> msgs = new ArrayList<Message>(ch.getMessages());
+    final Map<String,Integer> senders = new HashMap<String,Integer>();
+
+    final List<SimpleExpressionProxy> msgList = new ArrayList<SimpleExpressionProxy>(indexes);
+    final Message msg = new Message(msgList);
+
+    msg.addRecipients(n);
+  //  for(final Map.Entry<String,Integer> m: senders.entrySet()){
+  //    msg.addSenders(m.getKey());
+  //  }
+    ch.addMessages(msg);
+
     return null;
   }
 
@@ -305,6 +339,9 @@ public class EventCollectingVisitor implements PromelaVisitor
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
       mEventDecls.add(event);
       atomic = true;
+      for(int i=0;i<t.getChildCount();i++){
+        ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+      }
       return null;
   }
 
@@ -316,10 +353,11 @@ public class EventCollectingVisitor implements PromelaVisitor
       final int size = occur.get(proctypeName);
       occur.put(proctypeName, size+1);
     }
+    if(t.getParent().getParent() instanceof InitialTreeNode){
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+proctypeName);
     final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
     mEventDecls.add(event);
-
+    }
     return null;
   }
 
@@ -340,6 +378,9 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitName(final NameTreeNode t)
   {
     // TODO Auto-generated method stub
+    if(t.getParent() instanceof MsgTreeNode){
+      labels.add(null);
+    }
     return null;
   }
 
@@ -414,6 +455,11 @@ public class EventCollectingVisitor implements PromelaVisitor
       gotoLabel.put(t.getText(),t);
     }
     */
+    if(t.getChildCount()>0){
+      for(int i=0;i<t.getChildCount();i++){
+        ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+      }
+    }
     return null;
   }
 

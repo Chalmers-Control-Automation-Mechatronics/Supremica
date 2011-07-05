@@ -19,12 +19,19 @@ public class Message
   }
 
   public void addSenders(final String sender){
+    if(!mSenders.contains(sender))
     mSenders.add(sender);
   }
   public void addRecipients(final String recipient){
+    if(!mRecipients.contains(recipient))
     mRecipients.add(recipient);
   }
-
+  public boolean hasSenders(){
+    return mSenders.size()!=0;
+  }
+  public boolean hasRecipients(){
+    return mRecipients.size()!=0;
+  }
   @Override
   public boolean equals(final Object msg){
     return eqVisitor.isEqualList(this.getMsg(), ((Message)msg).getMsg());

@@ -1,7 +1,5 @@
 package net.sourceforge.waters.external.promela;
 
-import gnu.trove.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,7 +47,7 @@ public class PromelaGraph
 
   }
 
-  public PromelaGraph(final THashSet<IdentifierProxy> events, final ModuleProxyFactory factory){
+  public PromelaGraph(final List<IdentifierProxy> events, final ModuleProxyFactory factory){
     mPromelaStartNode = new PromelaNode();
     final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
     System.out.println(events.size());
@@ -57,7 +55,9 @@ public class PromelaGraph
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final Comparator<SimpleExpressionProxy> comparator =
       new ExpressionComparator(optable);
-    Collections.sort(tempLabel, comparator);
+    if(tempLabel.size()>1){
+      Collections.sort(tempLabel, comparator);
+    }
     final Collection<SimpleExpressionProxy> labelBlock = new ArrayList<SimpleExpressionProxy>(tempLabel);
 
     final PromelaLabel label = new PromelaLabel(labelBlock);
@@ -301,7 +301,7 @@ public class PromelaGraph
           loop1:
           for(final SimpleExpressionProxy e: label1.getLabel()){
             for(final SimpleExpressionProxy e2: specialLabel){
-              if(e.getPlainText()==e2.getPlainText()){
+              if(comparator.compare(e, e2)==0){
                 continue loop1;
               }
             }

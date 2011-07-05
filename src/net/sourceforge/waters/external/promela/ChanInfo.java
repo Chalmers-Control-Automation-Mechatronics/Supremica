@@ -35,6 +35,10 @@ public class ChanInfo{
     private final Collection<Collection<SimpleExpressionProxy>> mReceiveData =
       new ArrayList<Collection<SimpleExpressionProxy>>();
 
+    /*
+     *
+     */
+    private final List<Message> mMessages;
     public ChanInfo(final String n, final int typeL,final int dataL,final List<String> ty){
         mSendCount = 0;
         mRecCount = 0;
@@ -44,6 +48,7 @@ public class ChanInfo{
         for(final String value: ty){
            type.add(value);
         }
+        mMessages = new ArrayList<Message>();
     }
 
     public ChanInfo()
@@ -53,6 +58,30 @@ public class ChanInfo{
       mSendCount=0;
       mRecCount=0;
       mDataLength=0;
+      mMessages = new ArrayList<Message>();
+    }
+    public void addMessages(final Message msg){
+      if(!mMessages.contains(msg)){
+        mMessages.add(msg);
+      }else{
+        if(msg.hasRecipients()){
+          for(final String s: msg.getRecipients()){
+            if(!mMessages.get((mMessages.indexOf(msg))).getRecipients().contains(s)){
+              mMessages.get((mMessages.indexOf(msg))).addRecipients(s);
+            }
+          }
+        }
+        if(msg.hasSenders()){
+          for(final String s: msg.getSenders()){
+            if(!mMessages.get((mMessages.indexOf(msg))).getSenders().contains(s)){
+              mMessages.get((mMessages.indexOf(msg))).addSenders(s);
+            }
+           }
+        }
+      }
+    }
+    public List<Message> getMessages(){
+      return mMessages;
     }
     public void send(final Collection<SimpleExpressionProxy> ident){
        mSendData.add(ident);
