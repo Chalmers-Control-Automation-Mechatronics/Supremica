@@ -350,8 +350,9 @@ public class MonolithicSynchronousProductBuilder
     final AutomatonResult result = getAnalysisResult();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(mNumStates);
-    result.setPeakNumberOfNodes(mNumStates);
-    result.setNumberOfTransitions(mTransitionBuffer.size() / 3);
+    if (mTransitionBuffer != null) {
+      result.setNumberOfTransitions(mTransitionBuffer.size() / 3);
+    }
     if (mStateCallback != null) {
       mStateCallback.recordStatistics(result);
     }
