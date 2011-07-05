@@ -14,8 +14,8 @@
                     <SimpleIdentifier Name="C_1"/>
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="255"/>
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="1"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
