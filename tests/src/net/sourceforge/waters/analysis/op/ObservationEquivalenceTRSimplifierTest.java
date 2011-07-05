@@ -12,20 +12,19 @@ package net.sourceforge.waters.analysis.op;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.op.AltObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 
 
 /**
- * A test for the observation equivalence simplifier
- * ({@link AltObservationEquivalenceTRSimplifier}).
+ * A test for the observation equivalence simplifier (
+ * {@link ObservationEquivalenceTRSimplifier}).
  *
  * This test is to be used with caution because the same bisimulation module
- * ({@link net.sourceforge.waters.analysis.op.AltObservationEquivalenceTRSimplifier
- * AltObservationEquivalenceTRSimplifier}) is used by the abstraction rule and the
- * isomorphism checker that compares the test output with the expected result.
- * Nevertheless, it may be helpful to show the output of observation equivalence
- * and test how silent events are handled by various configurations of the
- * bisimulation algorithm.
+ * ({@link ObservationEquivalenceTRSimplifier}) is used by the abstraction rule
+ * and the isomorphism checker that compares the test output with the expected
+ * result. Nevertheless, it may be helpful to show the output of observation
+ * equivalence and test how silent events are handled by various configurations
+ * of the bisimulation algorithm.
  *
  * @author Robi Malik
  */
@@ -54,7 +53,7 @@ public class ObservationEquivalenceTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    return new AltObservationEquivalenceTRSimplifier();
+    return new ObservationEquivalenceTRSimplifier();
   }
 
 
@@ -86,10 +85,10 @@ public class ObservationEquivalenceTRSimplifierTest
 
   public void test_oeq_4() throws Exception
   {
-    final AltObservationEquivalenceTRSimplifier simplifier =
-      (AltObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
+    final ObservationEquivalenceTRSimplifier simplifier =
+      (ObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
     simplifier.setTransitionRemovalMode
-      (AltObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_4.wmod";
@@ -146,10 +145,10 @@ public class ObservationEquivalenceTRSimplifierTest
 
   public void test_oeq_11() throws Exception
   {
-    final AltObservationEquivalenceTRSimplifier simplifier =
-      (AltObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
+    final ObservationEquivalenceTRSimplifier simplifier =
+      (ObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
     simplifier.setTransitionRemovalMode
-      (AltObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_11.wmod";
@@ -158,10 +157,10 @@ public class ObservationEquivalenceTRSimplifierTest
 
   public void test_oeq_12() throws Exception
   {
-    final AltObservationEquivalenceTRSimplifier simplifier =
-      (AltObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
+    final ObservationEquivalenceTRSimplifier simplifier =
+      (ObservationEquivalenceTRSimplifier) getTransitionRelationSimplifier();
     simplifier.setTransitionRemovalMode
-      (AltObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_12.wmod";

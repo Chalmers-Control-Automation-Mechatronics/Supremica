@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.op
+//# PACKAGE: net.sourceforge.waters.analysis.tr
 //# CLASS:   ListBufferTransitionRelationTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.op;
+package net.sourceforge.waters.analysis.tr;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +15,10 @@ import java.util.Collection;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.IsomorphismChecker;

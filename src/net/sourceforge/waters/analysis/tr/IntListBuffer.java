@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.op
+//# PACKAGE: net.sourceforge.waters.analysis.tr
 //# CLASS:   IntListBuffer
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.op;
+package net.sourceforge.waters.analysis.tr;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

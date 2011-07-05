@@ -11,9 +11,10 @@ package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
-import net.sourceforge.waters.analysis.op.EventEncoding;
-import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.op.TransitionIterator;
+
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 

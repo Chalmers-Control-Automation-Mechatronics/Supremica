@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 

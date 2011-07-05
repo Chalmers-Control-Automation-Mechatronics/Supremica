@@ -32,7 +32,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
-import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;

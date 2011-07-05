@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.op;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AutomatonResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 

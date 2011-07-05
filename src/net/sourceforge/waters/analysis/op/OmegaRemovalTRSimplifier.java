@@ -13,6 +13,8 @@ import java.util.BitSet;
 
 import gnu.trove.TIntStack;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 

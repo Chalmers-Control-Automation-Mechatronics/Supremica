@@ -10,10 +10,10 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
-import net.sourceforge.waters.analysis.op.EventEncoding;
-import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.SilentIncomingTRSimplifier;
-import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;

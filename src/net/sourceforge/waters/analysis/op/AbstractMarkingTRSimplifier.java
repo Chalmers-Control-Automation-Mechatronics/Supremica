@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+
 
 public abstract class AbstractMarkingTRSimplifier
   extends AbstractTRSimplifier

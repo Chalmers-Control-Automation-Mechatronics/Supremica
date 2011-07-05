@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.analysis.op
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.tr
 //# CLASS:   StateBuffer
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.op;
+package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.TIntArrayList;
 

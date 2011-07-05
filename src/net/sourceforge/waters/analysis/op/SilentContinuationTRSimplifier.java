@@ -16,6 +16,11 @@ import java.util.List;
 import gnu.trove.HashFunctions;
 import gnu.trove.TIntHashSet;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.IntListBuffer;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TauClosure;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntHashingStrategy;
 import net.sourceforge.waters.analysis.tr.WatersIntIntHashMap;
 import net.sourceforge.waters.model.analysis.AnalysisException;

@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.op;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -25,19 +26,19 @@ public class AlphaDeterminisationTRSimplifier
   //#########################################################################
   //# Constructors
   public AlphaDeterminisationTRSimplifier
-    (final AbstractObservationEquivalenceTRSimplifier bisimulator)
+    (final ObservationEquivalenceTRSimplifier bisimulator)
   {
     this(bisimulator, null);
   }
 
   public AlphaDeterminisationTRSimplifier
-    (final AbstractObservationEquivalenceTRSimplifier bisimulator,
+    (final ObservationEquivalenceTRSimplifier bisimulator,
      final ListBufferTransitionRelation rel)
   {
     super(rel);
     mBisimulator = bisimulator;
     mTransitionRemovalMode =
-      AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
+      ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
   }
 
 
@@ -48,7 +49,7 @@ public class AlphaDeterminisationTRSimplifier
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public void setTransitionRemovalMode
-    (final AbstractObservationEquivalenceTRSimplifier.TransitionRemoval mode)
+    (final ObservationEquivalenceTRSimplifier.TransitionRemoval mode)
   {
     mTransitionRemovalMode = mode;
   }
@@ -57,7 +58,7 @@ public class AlphaDeterminisationTRSimplifier
    * Gets the mode which redundant transitions are to be removed.
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
-  public AbstractObservationEquivalenceTRSimplifier.TransitionRemoval
+  public ObservationEquivalenceTRSimplifier.TransitionRemoval
     getTransitionRemovalMode()
   {
     return mTransitionRemovalMode;
@@ -91,15 +92,15 @@ public class AlphaDeterminisationTRSimplifier
       // other rules will have simplified this transition relation already.
       return false;
     }
-    final AbstractObservationEquivalenceTRSimplifier.Equivalence eq =
+    final ObservationEquivalenceTRSimplifier.Equivalence eq =
       mBisimulator.getEquivalence();
-    final AbstractObservationEquivalenceTRSimplifier.TransitionRemoval mode =
+    final ObservationEquivalenceTRSimplifier.TransitionRemoval mode =
       mBisimulator.getTransitionRemovalMode();
     final boolean apply = mBisimulator.getAppliesPartitionAutomatically();
     final TRSimplifierStatistics stats = mBisimulator.getStatistics();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     try {
-      mBisimulator.setEquivalence(AbstractObservationEquivalenceTRSimplifier.
+      mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
                                   Equivalence.OBSERVATION_EQUIVALENCE);
       mBisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
       mBisimulator.setAppliesPartitionAutomatically(false);
@@ -123,7 +124,7 @@ public class AlphaDeterminisationTRSimplifier
       case NONTAU:
       case ALL:
         mBisimulator.setTransitionRemovalMode
-          (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);
+          (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);
         break;
       default:
         break;
@@ -155,9 +156,9 @@ public class AlphaDeterminisationTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private final AbstractObservationEquivalenceTRSimplifier mBisimulator;
+  private final ObservationEquivalenceTRSimplifier mBisimulator;
 
-  private AbstractObservationEquivalenceTRSimplifier.TransitionRemoval
+  private ObservationEquivalenceTRSimplifier.TransitionRemoval
     mTransitionRemovalMode;
 
 }

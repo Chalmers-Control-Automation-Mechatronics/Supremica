@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.op;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 

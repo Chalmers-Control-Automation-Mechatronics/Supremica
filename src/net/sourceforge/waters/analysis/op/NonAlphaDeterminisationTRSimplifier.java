@@ -14,8 +14,8 @@ import gnu.trove.TIntArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -30,19 +30,19 @@ public class NonAlphaDeterminisationTRSimplifier
   //#########################################################################
   //# Constructors
   public NonAlphaDeterminisationTRSimplifier
-    (final AbstractObservationEquivalenceTRSimplifier bisimulator)
+    (final ObservationEquivalenceTRSimplifier bisimulator)
   {
     this(bisimulator, null);
   }
 
   public NonAlphaDeterminisationTRSimplifier
-    (final AbstractObservationEquivalenceTRSimplifier bisimulator,
+    (final ObservationEquivalenceTRSimplifier bisimulator,
      final ListBufferTransitionRelation rel)
   {
     super(rel);
     mBisimulator = bisimulator;
     mTransitionRemovalMode =
-      AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
+      ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
   }
 
 
@@ -53,7 +53,7 @@ public class NonAlphaDeterminisationTRSimplifier
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public void setTransitionRemovalMode
-    (final AbstractObservationEquivalenceTRSimplifier.TransitionRemoval mode)
+    (final ObservationEquivalenceTRSimplifier.TransitionRemoval mode)
   {
     mTransitionRemovalMode = mode;
   }
@@ -62,7 +62,7 @@ public class NonAlphaDeterminisationTRSimplifier
    * Gets the mode which redundant transitions are to be removed.
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
-  public AbstractObservationEquivalenceTRSimplifier.TransitionRemoval
+  public ObservationEquivalenceTRSimplifier.TransitionRemoval
     getTransitionRemovalMode()
   {
     return mTransitionRemovalMode;
@@ -94,16 +94,16 @@ public class NonAlphaDeterminisationTRSimplifier
     if (!hasNonPreconditionMarkedStates()) {
       return false;
     }
-    final AbstractObservationEquivalenceTRSimplifier.Equivalence eq =
+    final ObservationEquivalenceTRSimplifier.Equivalence eq =
       mBisimulator.getEquivalence();
-    final AbstractObservationEquivalenceTRSimplifier.TransitionRemoval mode =
+    final ObservationEquivalenceTRSimplifier.TransitionRemoval mode =
       mBisimulator.getTransitionRemovalMode();
     final boolean apply = mBisimulator.getAppliesPartitionAutomatically();
     final TRSimplifierStatistics stats = mBisimulator.getStatistics();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.reverse();
     try {
-      mBisimulator.setEquivalence(AbstractObservationEquivalenceTRSimplifier.
+      mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
                                   Equivalence.OBSERVATION_EQUIVALENCE);
       mBisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
       mBisimulator.setAppliesPartitionAutomatically(false);
@@ -196,9 +196,9 @@ public class NonAlphaDeterminisationTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private final AbstractObservationEquivalenceTRSimplifier mBisimulator;
+  private final ObservationEquivalenceTRSimplifier mBisimulator;
 
-  private AbstractObservationEquivalenceTRSimplifier.TransitionRemoval
+  private ObservationEquivalenceTRSimplifier.TransitionRemoval
     mTransitionRemovalMode;
 
 }

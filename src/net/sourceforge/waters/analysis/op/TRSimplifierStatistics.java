@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.op;
 import java.io.PrintWriter;
 import java.util.Formatter;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 

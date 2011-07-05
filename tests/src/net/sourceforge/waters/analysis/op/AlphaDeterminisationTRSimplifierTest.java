@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.op;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -56,8 +57,8 @@ public class AlphaDeterminisationTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    final AltObservationEquivalenceTRSimplifier oeq =
-      new AltObservationEquivalenceTRSimplifier();
+    final ObservationEquivalenceTRSimplifier oeq =
+      new ObservationEquivalenceTRSimplifier();
     return new AlphaDeterminisationTRSimplifier(oeq);
   }
 

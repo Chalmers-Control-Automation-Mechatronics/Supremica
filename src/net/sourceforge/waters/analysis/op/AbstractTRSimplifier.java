@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.op;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;

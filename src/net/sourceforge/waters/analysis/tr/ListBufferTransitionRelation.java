@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.op
+//# PACKAGE: net.sourceforge.waters.analysis.tr
 //# CLASS:   ListBufferTransitionRelation
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.op;
+package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntStack;
@@ -17,6 +17,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.op.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;

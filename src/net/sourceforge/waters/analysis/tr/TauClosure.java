@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.op
+//# PACKAGE: net.sourceforge.waters.analysis.tr
 //# CLASS:   TauClosure
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.op;
+package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
@@ -96,11 +96,11 @@ public class TauClosure
   /**
    * Creates an iterator over this tau-closure.
    * The iterator returned is not initialised, so the method
-   * {@link TransitionIterator#resetState(int)} must be used before it can be
-   * used. After initialisation, the first state returned by the iterator is
-   * the start state of iteration, and it is followed by all states reachable
-   * by sequences of {@link EventEncoding#TAU} events in depth-first order.
-   * The tau-closure iterator is a read-only iterator and does not
+   * {@link TransitionIterator#resetState(int) resetState()} must be used before
+   * it can be used. After initialisation, the first state returned by the
+   * iterator is the start state of iteration, and it is followed by all states
+   * reachable by sequences of {@link EventEncoding#TAU} events in depth-first
+   * order. The tau-closure iterator is a read-only iterator and does not
    * implement the {@link TransitionIterator#remove()} method.
    */
   public TransitionIterator createIterator()
@@ -121,12 +121,89 @@ public class TauClosure
    * iterator is a read-only iterator and does not implement the
    * {@link TransitionIterator#remove()} method.
    */
-  public TransitionIterator createIterator(final int state)
+  public TransitionIterator createIterator(final int from)
   {
     if (mStoredTransitions == null) {
-      return new OnTheFlyTauClosureIterator(mTransitionBuffer, state);
+      return new OnTheFlyTauClosureIterator(mTransitionBuffer, from);
     } else {
-      return new StoredTauClosureIterator(state);
+      return new StoredTauClosureIterator(from);
+    }
+  }
+
+  /**
+   * Creates an iterator over the event-closure of the underlying transition
+   * relation. The iterator returned by this method produces transitions with an
+   * event e by first following an arbitrary number of {@link EventEncoding#TAU}
+   * event, then executing a transition with event e, followed by another
+   * arbitrary number of {@link EventEncoding#TAU} events.
+   *
+   * The iterator returned is not initialised, so the method
+   * {@link TransitionIterator#reset(int,int) reset()} must be used before it
+   * can be used. The returned iterator is a read-only iterator and does not
+   * implement the {@link TransitionIterator#remove()} method. It can also not
+   * be used to iterate using the silent event {@link EventEncoding#TAU}.
+   */
+  public TransitionIterator createFullEventClosureIterator()
+  {
+    return new FullEventClosureTransitionIterator();
+  }
+
+  /**
+   * Creates an iterator over the event-closure of the underlying transition
+   * relation. The iterator returned by this method produces transitions by
+   * first following an arbitrary number of {@link EventEncoding#TAU} event,
+   * then executing a transition with event the given event, followed by another
+   * arbitrary number of {@link EventEncoding#TAU} events.
+   *
+   * The iterator returned is not initialised, so the method
+   * {@link TransitionIterator#resetState(int) resetState()} must be used before
+   * it can be used. The returned iterator is a read-only iterator and does
+   * not implement the {@link TransitionIterator#remove()} method.
+   *
+   * @param event
+   *          The event used by the iterator. If this is
+   *          {@link EventEncoding#TAU}, the method returns a plain tau-closure
+   *          iterator that can only iterate with the silent event. Otherwise a
+   *          proper event closure iterator is returned, which can be reset to
+   *          iterate over other events except {@link EventEncoding#TAU}.
+   */
+  public TransitionIterator createFullEventClosureIterator(final int event)
+  {
+    if (event == EventEncoding.TAU) {
+      return createIterator();
+    } else {
+      return new FullEventClosureTransitionIterator(event);
+    }
+  }
+
+  /**
+   * Creates an iterator over the event-closure of the underlying transition
+   * relation. The iterator returned by this method produces transitions by
+   * first following an arbitrary number of {@link EventEncoding#TAU} event,
+   * then executing a transition with event the given event, followed by another
+   * arbitrary number of {@link EventEncoding#TAU} events.
+   *
+   * The returned iterator is a read-only iterator and does
+   * not implement the {@link TransitionIterator#remove()} method.
+   *
+   * @param from
+   *          The start state of the iteration. The iterator is set up to
+   *          start iterating from this state with the given event. It can
+   *          also be reset to start iterating from other states.
+   * @param event
+   *          The event used by the iterator. If this is
+   *          {@link EventEncoding#TAU}, the method returns a plain tau-closure
+   *          iterator that can only iterate with the silent event. Otherwise a
+   *          proper event closure iterator is returned, which can be reset to
+   *          iterate over other events except {@link EventEncoding#TAU}.
+   */
+  public TransitionIterator createFullEventClosureIterator(final int from,
+                                                           final int event)
+  {
+    if (event == EventEncoding.TAU) {
+      return createIterator(from);
+    } else {
+      return new FullEventClosureTransitionIterator(from, event);
     }
   }
 
@@ -372,6 +449,166 @@ public class TauClosure
     private int mCurrent;
     private int[] mCurrentArray;
     private int mIndex;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class FullEventClosureTransitionIterator
+  private class FullEventClosureTransitionIterator
+    implements TransitionIterator
+  {
+
+    //#######################################################################
+    //# Constructor
+    private FullEventClosureTransitionIterator()
+    {
+      mTauIterator1 = createIterator();
+      mInnerIterator = mTransitionBuffer.createReadOnlyIterator();
+      mTauIterator2 = createIterator();
+      mVisited = new TIntHashSet();
+      mEvent = -1;
+    }
+
+    private FullEventClosureTransitionIterator(final int event)
+    {
+      mTauIterator1 = createIterator();
+      mInnerIterator = mTransitionBuffer.createReadOnlyIterator(event);
+      mTauIterator2 = createIterator();
+      mVisited = new TIntHashSet();
+      mEvent = event;
+    }
+
+    private FullEventClosureTransitionIterator(final int from, final int event)
+    {
+      mTauIterator1 = createIterator();
+      mInnerIterator = mTransitionBuffer.createReadOnlyIterator(event);
+      mTauIterator2 = createIterator();
+      mVisited = new TIntHashSet();
+      reset(from, event);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    public void reset()
+    {
+      mTauIterator1.resetState(mCurrent);
+      mInnerIterator.reset(mCurrent, mEvent);
+      mVisited.clear();
+      mStart = true;
+    }
+
+    public void resetEvent(final int event)
+    {
+      mEvent = event;
+      reset();
+    }
+
+    public void resetState(final int from)
+    {
+      mCurrent = from;
+      reset();
+    }
+
+    public void reset(final int from, final int event)
+    {
+      mEvent = event;
+      resetState(from);
+    }
+
+    public boolean advance()
+    {
+      while (seek()) {
+        final int state = mTauIterator2.getCurrentToState();
+        if (mVisited.add(state)) {
+          return true;
+        }
+      }
+      mStart = true;
+      return false;
+    }
+
+    public int getCurrentEvent()
+    {
+      return mEvent;
+    }
+
+    public int getCurrentSourceState()
+    {
+      return mTransitionBuffer.getIteratorSourceState(this);
+    }
+
+    public int getCurrentToState()
+    {
+      if (mStart) {
+        throw new NoSuchElementException("Reading past end of list in " +
+                                         ProxyTools.getShortClassName(this));
+      } else {
+        return mTauIterator2.getCurrentToState();
+      }
+    }
+
+    public int getCurrentTargetState()
+    {
+      return mTransitionBuffer.getIteratorTargetState(this);
+    }
+
+    public int getCurrentFromState()
+    {
+      return mCurrent;
+    }
+
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition removal!");
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private boolean seek()
+    {
+      if (mStart) {
+        mStart = false;
+        mTauIterator1.advance(); // always succeeds and gives mCurrent
+        if (mInnerIterator.advance()) {
+          final int pred = mInnerIterator.getCurrentSourceState();
+          mTauIterator2.resetState(pred);
+          return mTauIterator2.advance(); // always true
+        } else {
+          return false;
+        }
+      } else if (mTauIterator2.advance()) {
+        return true;
+      } else if (mInnerIterator.advance()) {
+        final int pred = mInnerIterator.getCurrentSourceState();
+        mTauIterator2.resetState(pred);
+        return mTauIterator2.advance(); // always true
+      } else {
+        while (mTauIterator1.advance()) {
+          int pred = mTauIterator1.getCurrentSourceState();
+          mInnerIterator.resetState(pred);
+          if (mInnerIterator.advance()) {
+            pred = mInnerIterator.getCurrentSourceState();
+            mTauIterator2.resetState(pred);
+            return mTauIterator2.advance(); // always true
+          }
+        }
+        return false;
+      }
+    }
+
+    // #########################################################################
+    // # Data Members
+    private int mCurrent;
+    private int mEvent;
+    private boolean mStart;
+
+    private final TransitionIterator mTauIterator1;
+    private final TransitionIterator mInnerIterator;
+    private final TransitionIterator mTauIterator2;
+    private final TIntHashSet mVisited;
 
   }
 

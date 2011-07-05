@@ -38,6 +38,10 @@ import net.sourceforge.waters.analysis.gnonblocking.Candidate;
 import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
 import net.sourceforge.waters.analysis.monolithic.
   MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -632,13 +636,13 @@ public class OPConflictChecker
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
-    final AbstractObservationEquivalenceTRSimplifier bisimulator =
-      new AltObservationEquivalenceTRSimplifier();
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
     bisimulator.setTransitionRemovalMode
-      (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
-      (AbstractObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     if (mPreconditionMarking != null) {
@@ -676,15 +680,14 @@ public class OPConflictChecker
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
     final int ccindex = chain.add(certainConflictsRemover);
-    final AbstractObservationEquivalenceTRSimplifier bisimulator =
-      new AltObservationEquivalenceTRSimplifier();
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
-      (AbstractObservationEquivalenceTRSimplifier.Equivalence.
-       OBSERVATION_EQUIVALENCE);
+      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
     bisimulator.setTransitionRemovalMode
-      (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
-      (AbstractObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     final MarkingSaturationTRSimplifier saturator =
@@ -719,28 +722,25 @@ public class OPConflictChecker
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     chain.add(silentOutRemover);
-    final AbstractObservationEquivalenceTRSimplifier bisimulator =
-      new AltObservationEquivalenceTRSimplifier();
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
-      (AbstractObservationEquivalenceTRSimplifier.Equivalence.
-       OBSERVATION_EQUIVALENCE);
+      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
     bisimulator.setTransitionRemovalMode
-      (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
-      (AbstractObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
       new NonAlphaDeterminisationTRSimplifier(bisimulator);
     nonAlphaDeterminiser.setTransitionRemovalMode
-      (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.
-       AFTER_IF_CHANGED);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
     chain.add(nonAlphaDeterminiser);
     final AlphaDeterminisationTRSimplifier alphaDeterminiser =
       new AlphaDeterminisationTRSimplifier(bisimulator);
     alphaDeterminiser.setTransitionRemovalMode
-      (AbstractObservationEquivalenceTRSimplifier.TransitionRemoval.
-       AFTER_IF_CHANGED);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
     chain.add(alphaDeterminiser);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
@@ -1771,8 +1771,8 @@ public class OPConflictChecker
     OEQ {
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
-        final AbstractObservationEquivalenceTRSimplifier.Equivalence equivalence =
-          AbstractObservationEquivalenceTRSimplifier.Equivalence.
+        final ObservationEquivalenceTRSimplifier.Equivalence equivalence =
+          ObservationEquivalenceTRSimplifier.Equivalence.
           OBSERVATION_EQUIVALENCE;
         return checker.createObservationEquivalenceChain(equivalence);
       }
@@ -1814,8 +1814,8 @@ public class OPConflictChecker
     WOEQ {
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
-        final AbstractObservationEquivalenceTRSimplifier.Equivalence equivalence =
-          AbstractObservationEquivalenceTRSimplifier.Equivalence.
+        final ObservationEquivalenceTRSimplifier.Equivalence equivalence =
+          ObservationEquivalenceTRSimplifier.Equivalence.
           WEAK_OBSERVATION_EQUIVALENCE;
         return checker.createObservationEquivalenceChain(equivalence);
       }
@@ -3298,7 +3298,7 @@ public class OPConflictChecker
     //#######################################################################
     //# Auxiliary Methods
     private List<int[]> applySimplifier
-      (final AbstractObservationEquivalenceTRSimplifier simplifier,
+      (final ObservationEquivalenceTRSimplifier simplifier,
        final ListBufferTransitionRelation rel,
        final int vtau)
       throws AnalysisException
@@ -3382,7 +3382,7 @@ public class OPConflictChecker
 
     //#########################################################################
     //# Data Members
-    private final AbstractObservationEquivalenceTRSimplifier mSimplifier;
+    private final ObservationEquivalenceTRSimplifier mSimplifier;
 
   }
 
