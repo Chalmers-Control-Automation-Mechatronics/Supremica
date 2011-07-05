@@ -1,7 +1,5 @@
 package net.sourceforge.waters.external.promela;
 
-import gnu.trove.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -194,6 +192,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final String name = t.getChild(0).getText();
     chanNames.add(name);
     final ChanInfo ch = mVisitor.getChan().get(name);
+
     if(ch.getChanLength()==1){
       final Collection<NodeProxy> mNodes = new ArrayList<NodeProxy>();
       final Collection<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
@@ -251,8 +250,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final GraphProxy graph = mFactory.createGraphProxy(true, null, mNodes, mEdges);
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("channel_"+name);
       final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
-     // mComponents.add(component);
+      mComponents.add(component);
     }
+
     for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
@@ -309,7 +309,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         mOutput.add(m);
       }
     }
-    loop1:
+    //loop1:
     for(final Message m: recipients){
 
       final ArrayList<SimpleExpressionProxy> labels = new ArrayList<SimpleExpressionProxy>();
@@ -450,7 +450,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final String chanName = t.getChild(0).getText();
     final ChanInfo ch = mVisitor.getChan().get(chanName);
     final int length = ch.getChanLength();
-    final THashSet<IdentifierProxy> chanData ;
+
     labels = new ArrayList<String>();
     labels.add(chanName);
     Tree tree = t;
@@ -481,7 +481,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final List<SimpleExpressionProxy> index = new ArrayList<SimpleExpressionProxy>(indexes);
     final Message msg = new Message(index);
     final List<IdentifierProxy> events = new ArrayList<IdentifierProxy>();
-    final List<Message> copyOfoutput = new ArrayList<Message>(mOutput);
+    //final List<Message> copyOfoutput = new ArrayList<Message>(mOutput);
     for(final Message m: mOutput){
 
       if(m.equals(msg)){
@@ -629,23 +629,26 @@ public class GraphCollectingVisitor implements PromelaVisitor
                        }
                        }else if(m.getRecipients().size()>1){
                          final IdentifierProxy r = mFactory.createSimpleIdentifierProxy(name+"_"+0);
-                         final SimpleIdentifierProxy r1 = (SimpleIdentifierProxy) cloner.getClone(r);
-                         boolean testSend=false;
-                         for(final SimpleExpressionProxy s: reciever){
-                           if(comparator.compare(s, r1)==0){
-                             testSend=false;
-                             break;
-                           }else{
+                         indexes.add(r);
+                         for(final String n: m.getRecipients()){
+                           final SimpleIdentifierProxy r1 = mFactory.createSimpleIdentifierProxy(n+"_"+0);
+                           //final SimpleIdentifierProxy r1 = (SimpleIdentifierProxy) cloner.getClone(r);
+                           boolean testSend=false;
+                           for(final SimpleExpressionProxy s: reciever){
+                             if(comparator.compare(s, r1)==0){
+                               testSend=false;
+                               break;
+                             }else{
+                               testSend = true;
+                             }
+                           }
+                           if(reciever.size()==0){
                              testSend = true;
                            }
-                         }
-                         if(reciever.size()==0){
-                           testSend = true;
-                         }
-                         if(testSend){
-                           reciever.add(r1);
-                         }
-                         indexes.add(r);
+                           if(testSend){
+                             reciever.add(r1);
+                           }
+                       }
                        }
                     // }
                    }
@@ -688,44 +691,24 @@ public class GraphCollectingVisitor implements PromelaVisitor
       }
       //ranges.addAll(sender);
       //ranges.addAll(reciever);
+
       ranges.addAll(cloner.getClonedList(mVisitor.getRanges()));
+      final int lengthOfChan = mVisitor.getChan().get(chanName).getChanLength();
+      if(lengthOfChan==0){
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("exch_"+chanName);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
       mEvents.add(event);
+      }else{
+        final IdentifierProxy ident1 = mFactory.createSimpleIdentifierProxy("send_"+chanName);
+        final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("recv_"+chanName);
+        final EventDeclProxy event1 = mFactory.createEventDeclProxy(ident1, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
+        final EventDeclProxy event2 = mFactory.createEventDeclProxy(ident2, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, cloner.getClonedList(ranges), null, null);
+        mEvents.add(event1);
+        mEvents.add(event2);
+      }
     }
     return new PromelaGraph(events,mFactory);
-    /*
-    if(labels.size()-1 == ch.getDataLength()){
-      final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
-      for(int y=1;y<labels.size();y++){
-        final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
-        indexes.add(c);
-      }
-      IndexedIdentifierProxy indexEvent;
-      final String name;
-      if(length==0){
 
-        name = "exch_"+chanName;
-
-        indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
-        //System.out.println(indexEvent);
-      }else{
-        name = "send_"+chanName;
-        indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
-      }
-        return new PromelaGraph(indexEvent);
-    }
-    else{
-    if(length==1){
-      chanData =(THashSet<IdentifierProxy>) ch.getRecData();
-
-    }else{
-
-      chanData = (THashSet<IdentifierProxy>)ch.getChannelData();
-    }
-    return new PromelaGraph(chanData,mFactory);
-    }
-  */
   }
 
   public Object visitConstant(final ConstantTreeNode t)

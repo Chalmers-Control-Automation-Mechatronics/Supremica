@@ -10,12 +10,12 @@
                     <SimpleIdentifier Name="B_1"/>
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="33"/>
-                    <IntConstant Value="33"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="121"/>
-                    <IntConstant Value="124"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
@@ -182,7 +182,7 @@
         <SimpleComponent Kind="PLANT" Name="init">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
+                    <SimpleNode Initial="true" Name="init_0">
                         <PointGeometry>
                             <Point Y="48" X="80"/>
                         </PointGeometry>
@@ -190,7 +190,7 @@
                             <Point Y="-9" X="10"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S1">
+                    <SimpleNode Name="init_1">
                         <PointGeometry>
                             <Point Y="128" X="80"/>
                         </PointGeometry>
@@ -198,7 +198,7 @@
                             <Point Y="-4" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S2">
+                    <SimpleNode Name="init_2">
                         <PointGeometry>
                             <Point Y="208" X="80"/>
                         </PointGeometry>
@@ -206,7 +206,7 @@
                             <Point Y="-7" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S3">
+                    <SimpleNode Name="init_3">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -219,7 +219,7 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Target="init_1" Source="init_0">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_A"/>
                             <LabelGeometry Anchor="NW">
@@ -227,7 +227,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S1">
+                    <Edge Target="init_2" Source="init_1">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
@@ -235,7 +235,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S3" Source="S2">
+                    <Edge Target="init_3" Source="init_2">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">

@@ -4,10 +4,7 @@ import gnu.trove.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import java.util.Hashtable;
 
 import net.sourceforge.waters.external.promela.ast.BreakStatementTreeNode;
@@ -44,8 +41,6 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
-
 import org.antlr.runtime.tree.Tree;
 
 
@@ -154,7 +149,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     chan.put(name,new ChanInfo(name, chanLength, datalength,type));
 
-    final String chanName = t.getParent().getChild(0).getText();
+    //final String chanName = t.getParent().getChild(0).getText();
     lowerEnd = new ArrayList<Integer>();
     upperEnd = new ArrayList<Integer>();
     for(int i =1;i<t.getChildCount();i++){
@@ -171,6 +166,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       ranges.add(range);
     }
     mRanges = new ArrayList<SimpleExpressionProxy>(ranges);
+    /*
     IdentifierProxy ident=null;
     IdentifierProxy ident2 = null;
     if(chanLength ==0){
@@ -180,6 +176,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     }else if(chanLength==1){
       ident = mFactory.createSimpleIdentifierProxy("send_"+chanName);
       ident2 = mFactory.createSimpleIdentifierProxy("recv_"+chanName);
+
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
       final Collection<SimpleExpressionProxy> ranges2 = new ArrayList<SimpleExpressionProxy>(size);
       for(int i=0;i<size;i++){
@@ -190,13 +187,15 @@ public class EventCollectingVisitor implements PromelaVisitor
         ranges2.add(range2);
       }
       final EventDeclProxy event2 = mFactory.createEventDeclProxy(ident2, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges2, null, null);
-      mEventDecls.add(event);
-      mEventDecls.add(event2);
+      //mEventDecls.add(event);
+      //mEventDecls.add(event2);
+
+
     }
+*/
 
 
-
-    return ident;
+    return null;
   }
 
   public Object visitSend(final SendTreeNode t){
@@ -310,7 +309,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     final String n = tree.getText();
 
     //final List<Message> msgs = new ArrayList<Message>(ch.getMessages());
-    final Map<String,Integer> senders = new HashMap<String,Integer>();
+
 
     final List<SimpleExpressionProxy> msgList = new ArrayList<SimpleExpressionProxy>(indexes);
     final Message msg = new Message(msgList);

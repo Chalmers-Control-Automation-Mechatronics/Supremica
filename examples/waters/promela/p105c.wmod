@@ -14,12 +14,12 @@
                     <SimpleIdentifier Name="B_1"/>
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="33"/>
-                    <IntConstant Value="33"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="121"/>
-                    <IntConstant Value="124"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
