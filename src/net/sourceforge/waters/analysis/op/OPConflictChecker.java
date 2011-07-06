@@ -828,6 +828,18 @@ public class OPConflictChecker
     }
   }
 
+  /**
+   * Removes the given automata from the current subsystem data structures. This
+   * method is called after a candidate has been composed and simplified. It
+   * removes entries from the automata and event information maps
+   * ({@link #mAutomatonInfoMap} and {@link #mEventInfoMap}), and tests for
+   * events that become redundant. Events are redundant if they are known to be
+   * globally disabled, or if they only ever appear as selfloops. Such events
+   * are added to the list {@link #mRedundantEvents}.
+   * @param victims
+   *          Collection of automata to be removed.
+   * @see #removeRedundantEvents()
+   */
   private void removeEventsToAutomata(final Collection<AutomatonProxy> victims)
   {
     for (final AutomatonProxy aut : victims) {
@@ -874,6 +886,15 @@ public class OPConflictChecker
       !mOverflowCandidates.contains(automata);
   }
 
+  /**
+   * Removes events that have been found to be redundant from the current
+   * subsystem. This method removes any events contained in the list
+   * {@link #mRedundantEvents} from all automata and records the abstraction
+   * as an {@link EventRemovalStep}.
+   * @return <CODE>true</CODE> if the model was modified, <CODE>false</CODE>
+   *         otherwise.
+   * @see #removeEventsToAutomata(Collection) removeEventsToAutomata()
+   */
   private boolean removeRedundantEvents()
   {
     if (mRedundantEvents.isEmpty()) {
@@ -952,6 +973,12 @@ public class OPConflictChecker
     }
   }
 
+  /**
+   * Checks whether the current subsystem can be split into event-disjoint
+   * components, and if so, performs the split by replacing the current
+   * subsystem by its smallest component and adding any split off subsystems
+   * to the list {@link #mPostponedSubsystems}.
+   */
   private boolean findEventDisjointSubsystems()
     throws AnalysisException
   {
@@ -1354,20 +1381,43 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Abstraction Steps
+  /**
+   * Attempts to simplify the current subsystem without composing automata.
+   * This method attempts to simplify automata individually and to remove
+   * redundant events. If events are removed, it also checks whether the
+   * current subsystem can be split into event-disjoint components, and if
+   * so, performs the split and replaces the current subsystem by its
+   * smallest component.
+   * @param  eventsChanged  A flag, indicating that the event alphabet has
+   *                        been changed prior to the call, so the test for
+   *                        event-disjoint subsystems is performed even if
+   *                        no further simplification is possible.
+   * @see #simplifyDirtyAutomata()
+   * @see #removeRedundantEvents()
+   * @see #findEventDisjointSubsystems()
+   */
   private void simplify(final boolean eventsChanged)
     throws AnalysisException
   {
     final boolean change1 = simplifyDirtyAutomata();
     final boolean change2 = removeRedundantEvents();
-    if (change1 || change2 || eventsChanged) {
-      boolean change;
-      do {
+    boolean change = change1 || change2;
+    if (change || eventsChanged) {
+      while (change) {
         change = simplifyDirtyAutomata() && removeRedundantEvents();
-      } while (change);
+      }
       findEventDisjointSubsystems();
     }
   }
 
+  /**
+   * Simplifies any automata that have been marked as <I>dirty</I>.
+   * This method checks all automata in the list {@link #mDirtyAutomata}
+   * and applies the current abstraction rule to each of them.
+   * @return <CODE>true</CODE> if some automaton was changed by abstraction,
+   *         <CODE>false</CODE> otherwise.
+   * @see #mDirtyAutomata
+   */
   private boolean simplifyDirtyAutomata()
     throws AnalysisException
   {
@@ -1390,6 +1440,13 @@ public class OPConflictChecker
     return result;
   }
 
+  /**
+   * Applies the current abstraction rule to the given candidate.
+   * @param  candidate   The candidate representing a set of automata to
+   *                     be composed and simplified.
+   * @return <CODE>true</CODE> if the current subsystem has been changed
+   *         by abstraction, <CODE>false</CODE> otherwise.
+   */
   private boolean applyCandidate(final Candidate candidate)
     throws AnalysisException
   {
@@ -3672,11 +3729,25 @@ public class OPConflictChecker
 
   //#########################################################################
   //# Inner Class EventRemovalStep
+  /**
+   * An abstraction step that consists of removing some events from the
+   * model. Event removal is implemented by replacing automata with simplified
+   * copies that use the same state objects, so trace expansion can be
+   * achieved by replacing only the automata in a trace.
+   */
   private class EventRemovalStep extends AbstractionStep
   {
 
     //#######################################################################
     //# Constructor
+    /**
+     * Creates a new event removal step.
+     * @param  results   List of automata after event removal.
+     * @param  originals List of automata before removal, with indexes
+     *                   matching those of results. The automaton at position
+     *                   <I>i</I> in originals is replaced by the automaton
+     *                   at the same position in results.
+     */
     private EventRemovalStep(final List<AutomatonProxy> results,
                              final List<AutomatonProxy> originals)
     {
@@ -5029,11 +5100,34 @@ public class OPConflictChecker
   private SafetyVerifier mCompositionalSafetyVerifier;
   private SafetyVerifier mMonolithicSafetyVerifier;
 
+  /**
+   * The automata currently being analysed. This list is updated after each
+   * abstraction step and represents the current state of the model. It may
+   * contain abstractions of only part of the original model, if event-disjoint
+   * subsystems are found.
+   * @see #mPostponedSubsystems
+   */
   private List<AutomatonProxy> mCurrentAutomata;
   private Map<AutomatonProxy,AutomatonInfo> mAutomatonInfoMap;
   private Map<EventProxy,EventInfo> mEventInfoMap =
       new HashMap<EventProxy,EventInfo>();
+  /**
+   * List of <I>dirty</I> automata that need simplifying. An automaton is added
+   * to this list if there is the possibility that it can be simplified without
+   * having to be composed with another automaton. Initially, all automata are
+   * considered <I>dirty</I>, and certain abstractions such as event removal
+   * may produce <I>dirty</I> automata at later stages. If there are dirty
+   * automata, it is first attempted to simplify them individually, before
+   * considering the next candidate for composition.
+   * @see #simplifyDirtyAutomata()
+   */
   private Queue<AutomatonProxy> mDirtyAutomata;
+  /**
+   * List of events found to be redundant and scheduled for removal by an
+   * {@link EventRemovalStep}.
+   * @see #removeEventsToAutomata(Collection) removeEventsToAutomata()
+   * @see #removeRedundantEvents()
+   */
   private Collection<EventProxy> mRedundantEvents;
   /**
    * A flag indicating that an event has disappeared unexpectedly.
@@ -5042,7 +5136,17 @@ public class OPConflictChecker
    * the automaton alphabet.
    */
   private boolean mEventHasDisappeared;
+  /**
+   * List of subsystems still to be analysed. If a model can be split into
+   * event-disjoint subsystems, these subsystems are analysed one-by-one.
+   * After splitting a subsystem, parts may be added to this list to be
+   * analysed at a later stage.
+   * @see #findEventDisjointSubsystems()
+   */
   private Collection<SubSystem> mPostponedSubsystems;
+  /**
+   * List of subsystems that have been analysed.
+   */
   private Collection<SubSystem> mProcessedSubsystems;
   private List<AbstractionStep> mModifyingSteps;
   private Set<String> mUsedEventNames;
