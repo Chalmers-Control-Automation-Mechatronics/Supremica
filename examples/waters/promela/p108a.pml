@@ -1,6 +1,6 @@
 /*                                     
  * A test for the Promela importer in Waters.
- * This checks whether an enumeration type is recognised and converted
+ * This checks whether an mtype is recognised and converted to an enumeration
  * in combination with a synchronous channel.
  */
 

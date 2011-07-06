@@ -732,11 +732,13 @@ public class OPConflictChecker
     nonAlphaDeterminiser.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
     chain.add(nonAlphaDeterminiser);
-    final AlphaDeterminisationTRSimplifier alphaDeterminiser =
-      new AlphaDeterminisationTRSimplifier(bisimulator);
-    alphaDeterminiser.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-    chain.add(alphaDeterminiser);
+    if (mPreconditionMarking != null) {
+      final AlphaDeterminisationTRSimplifier alphaDeterminiser =
+        new AlphaDeterminisationTRSimplifier(bisimulator);
+      alphaDeterminiser.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+      chain.add(alphaDeterminiser);
+    }
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
