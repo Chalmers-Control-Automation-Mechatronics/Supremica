@@ -201,10 +201,13 @@ public abstract class AbstractPromelaUnmarshallerTest
     testImport("p105g");
   }
 
+  /*
+   * Sending to yourself?
   public void testImport_p105h() throws Exception
   {
     testImport("p105h");
   }
+  */
 
   public void testImport_p105i() throws Exception
   {
