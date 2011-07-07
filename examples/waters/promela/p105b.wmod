@@ -20,7 +20,14 @@
             </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_A"/>
-        <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="run_B">
+            <RangeList>
+                <EnumSetExpression Text="[B_0,B_1]">
+                    <SimpleIdentifier Name="B_0"/>
+                    <SimpleIdentifier Name="B_1"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="proctype_A">
@@ -151,7 +158,9 @@
                         <EdgeList>
                             <Edge Target="B_1" Source="B_0">
                                 <LabelBlock>
-                                    <SimpleIdentifier Name="run_B"/>
+                                    <IndexedIdentifier Name="run_B">
+                                        <SimpleIdentifier Name="procid"/>
+                                    </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
                                         <Point Y="-8" X="5"/>
                                     </LabelGeometry>

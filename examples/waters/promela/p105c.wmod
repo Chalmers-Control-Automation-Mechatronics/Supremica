@@ -23,8 +23,22 @@
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="run_A"/>
-        <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="run_A">
+            <RangeList>
+                <EnumSetExpression Text="[A_0,A_1]">
+                    <SimpleIdentifier Name="A_0"/>
+                    <SimpleIdentifier Name="A_1"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="run_B">
+            <RangeList>
+                <EnumSetExpression Text="[B_0,B_1]">
+                    <SimpleIdentifier Name="B_0"/>
+                    <SimpleIdentifier Name="B_1"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
         <ForeachComponent Name="procid">
@@ -78,7 +92,9 @@
                         <EdgeList>
                             <Edge Target="A_1" Source="A_0">
                                 <LabelBlock>
-                                    <SimpleIdentifier Name="run_A"/>
+                                    <IndexedIdentifier Name="run_A">
+                                        <SimpleIdentifier Name="procid"/>
+                                    </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
                                         <Point Y="-8" X="5"/>
                                     </LabelGeometry>
@@ -144,7 +160,7 @@
                                     <Point Y="64" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-7" X="9"/>
+                                    <Point Y="-6" X="-32"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_1">
@@ -152,7 +168,7 @@
                                     <Point Y="144" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-6" X="9"/>
+                                    <Point Y="-5" X="-29"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_2">
@@ -163,16 +179,18 @@
                                     <Point Y="224" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-5" X="7"/>
+                                    <Point Y="-10" X="-32"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
                             <Edge Target="B_1" Source="B_0">
                                 <LabelBlock>
-                                    <SimpleIdentifier Name="run_B"/>
+                                    <IndexedIdentifier Name="run_B">
+                                        <SimpleIdentifier Name="procid"/>
+                                    </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-8" X="5"/>
+                                        <Point Y="-13" X="6"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -203,7 +221,7 @@
                                         <IntConstant Value="124"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-33" X="20"/>
+                                        <Point Y="-33" X="3"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
