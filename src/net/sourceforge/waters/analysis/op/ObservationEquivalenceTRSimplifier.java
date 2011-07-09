@@ -50,7 +50,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  * Bisimulation Equivalence. Science of Computer Programming, 13, 219-236,
  * 1990.<BR>
  * Jaana Eloranta. Minimizing the Number of Transitions with Respect to
- * Observation Equivalence. BIT, 31(4), 397--419, 1991.</P>
+ * Observation Equivalence. BIT, 31(4), 397-419, 1991.</P>
  *
  * @author Robi Malik, Simon Ware, Rachel Francis
  */
@@ -89,9 +89,6 @@ public class ObservationEquivalenceTRSimplifier
   public void setEquivalence(final Equivalence mode)
   {
     mEquivalence = mode;
-    if (mode == Equivalence.BISIMULATION) {
-      mTransitionRemovalMode = TransitionRemoval.NONE;
-    }
   }
 
   /**
@@ -224,7 +221,7 @@ public class ObservationEquivalenceTRSimplifier
   public void reset()
   {
     super.reset();
-    mTauPreds = null;
+    mTauClosure = null;
   }
 
 
@@ -308,8 +305,8 @@ public class ObservationEquivalenceTRSimplifier
     }
     mHasModifications = false;
     if (equivalence != Equivalence.BISIMULATION) {
-      setUpTauPredecessors();
-      final TransitionIterator iter = mTauPreds.createIterator();
+      setUpTauClosure();
+      final TransitionIterator iter = mTauClosure.createIterator();
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
           final long marking;
@@ -396,8 +393,8 @@ public class ObservationEquivalenceTRSimplifier
       iter = null;
     } else {
       initialStates = new TIntHashSet();
-      setUpTauPredecessors();
-      iter = mTauPreds.createIterator();
+      setUpTauClosure();
+      iter = mTauClosure.createIterator();
     }
     final Collection<EquivalenceClass> splitClasses =
       new THashSet<EquivalenceClass>();
@@ -438,40 +435,16 @@ public class ObservationEquivalenceTRSimplifier
   throws AnalysisException
   {
     super.setUp();
-    if (getEquivalence() == Equivalence.WEAK_OBSERVATION_EQUIVALENCE) {
-      mFirstSplitEvent = EventEncoding.NONTAU;
-    } else {
-      mFirstSplitEvent = EventEncoding.TAU;
-    }
-    final boolean doTau;
-    final boolean doNonTau;
-    switch (getTransitionRemovalMode()) {
-    case NONE:
-    case AFTER:
-    case AFTER_IF_CHANGED:
-      doTau = doNonTau = false;
-      break;
-    case NONTAU:
-      doTau = false;
-      doNonTau = true;
-      break;
-    case ALL:
-      doTau = doNonTau = true;
-      break;
-    default:
-      throw new IllegalStateException("Unknown transition removal mode " +
-                                      getTransitionRemovalMode() + "!");
-    }
     if (mSplitters == null) {
       mHasModifications = false;
-      removeRedundantTransitions(doTau, doNonTau);
+      removeRedundantTransitions(TransitionRemovalTime.BEFORE);
       final boolean modified = mHasModifications;
       setUpInitialPartitionBasedOnMarkings();
       mHasModifications |= modified;
     } else {
-      removeRedundantTransitions(doTau, doNonTau);
+      removeRedundantTransitions(TransitionRemovalTime.BEFORE);
     }
-    setUpTauPredecessors();
+    setUpTauClosure();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (mInitialInfoSize >= 0) {
       final int numTrans = rel.getNumberOfTransitions();
@@ -520,38 +493,10 @@ public class ObservationEquivalenceTRSimplifier
    * performs a second pass to remove redundant transitions.
    * @see TransitionRemoval
    */
-  @Override
   protected void applyResultPartition()
   throws AnalysisException
   {
-    super.applyResultPartition();
-    mTauPreds = null;
-    final boolean trivial = (getResultPartition() == null);
-    final boolean doTau;
-    final boolean doNonTau;
-    switch (getTransitionRemovalMode()) {
-    case NONE:
-      doTau = doNonTau = false;
-      break;
-    case NONTAU:
-      doTau = true;
-      doNonTau = !trivial;
-      break;
-    case ALL:
-    case AFTER_IF_CHANGED:
-      doTau = doNonTau = !trivial;
-      break;
-    case AFTER:
-      doTau = doNonTau = true;
-      break;
-    default:
-      throw new IllegalStateException("Unknown transition removal mode " +
-                                      getTransitionRemovalMode() + "!");
-    }
-    removeRedundantTransitions(doTau, doNonTau);
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    mEquivalence.applyResultPartition(this);
   }
 
 
@@ -588,7 +533,7 @@ public class ObservationEquivalenceTRSimplifier
     }
   }
 
-  private void setUpTauPredecessors() throws OverflowException
+  private void setUpTauClosure() throws OverflowException
   {
     if (getEquivalence() == Equivalence.BISIMULATION) {
       if (mEventIterator == null) {
@@ -598,12 +543,12 @@ public class ObservationEquivalenceTRSimplifier
         mEventIterator = rel.createPredecessorsReadOnlyIterator();
       }
     } else {
-      if (mTauPreds == null) {
+      if (mTauClosure == null) {
         final ListBufferTransitionRelation rel = getTransitionRelation();
         final int limit = getTransitionLimit();
-        mTauPreds = rel.createPredecessorsTauClosure(limit);
-        mTauIterator = mTauPreds.createIterator();
-        mEventIterator = mTauPreds.createFullEventClosureIterator();
+        mTauClosure = rel.createPredecessorsTauClosure(limit);
+        mTauIterator = mTauClosure.createIterator();
+        mEventIterator = mTauClosure.createFullEventClosureIterator();
       }
     }
   }
@@ -618,29 +563,73 @@ public class ObservationEquivalenceTRSimplifier
     }
   }
 
-  private void removeRedundantTransitions(final boolean doTau,
-                                          final boolean doNonTau)
-    throws OverflowException
+  private void buildResultPartition()
   {
+    if (mNumClasses < mNumReachableStates) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int numStates = rel.getNumberOfStates();
+      final List<int[]> partition = new ArrayList<int[]>(mNumClasses);
+      for (int state = 0; state < numStates; state++) {
+        if (rel.isReachable(state)) {
+          final EquivalenceClass sec = mStateToClass[state];
+          if (sec == null) {
+            final int[] clazz = new int[1];
+            clazz[0] = state;
+            partition.add(clazz);
+          } else {
+            final int[] clazz = sec.putResult(state);
+            if (clazz != null) {
+              partition.add(clazz);
+            }
+          }
+        }
+      }
+      setResultPartitionList(partition);
+    } else {
+      setResultPartitionList(null);
+    }
+  }
+
+  private void applyObservationEquivalencePartition()
+  throws AnalysisException
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (getResultPartition() != null) {
+      mTauClosure = null;
+      super.applyResultPartition();
+      removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
+      rel.removeTauSelfLoops();
+      rel.removeProperSelfLoopEvents();
+    } else {
+      removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
+      if (mHasModifications) {
+        rel.removeProperSelfLoopEvents();
+      }
+    }
+  }
+
+  private void removeRedundantTransitions(final TransitionRemovalTime time)
+  throws AnalysisException
+  {
+    final boolean doTau = mTransitionRemovalMode.getDoTau(time);
+    final boolean doNonTau = mTransitionRemovalMode.getDoNonTau(time);
     if (doTau || doNonTau) {
-      setUpTauPredecessors();
+      setUpTauClosure();
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final int tau = EventEncoding.TAU;
-      final TransitionRemoval mode = getTransitionRemovalMode();
+      final int skipped = doTau ? -1 : tau;
       final TransitionIterator iter0 =
         rel.createAllTransitionsModifyingIterator();
-      final TransitionIterator iter1 = mTauPreds.createIterator();
-      final TransitionIterator iter2 =
-        rel.createPredecessorsReadOnlyIterator();
-      final TransitionIterator iter3 = mTauPreds.createIterator();
+      final TransitionIterator iter1 = mTauClosure.createIterator();
+      final TransitionIterator iter2 = rel.createAnyReadOnlyIterator();
+      final TransitionIterator iter3 = mTauClosure.createIterator();
       trans:
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
-        if (!rel.isUsedEvent(e)) {
-          continue;
-        } else if (e == tau && mode == TransitionRemoval.NONTAU) {
+        if (!rel.isUsedEvent(e) || e == skipped) {
           continue;
         }
+        checkAbort();
         final int source0 = iter0.getCurrentSourceState();
         final int target0 = iter0.getCurrentTargetState();
         iter1.resetState(target0);
@@ -673,34 +662,6 @@ public class ObservationEquivalenceTRSimplifier
       }
     }
   }
-
-  private void buildResultPartition()
-  {
-    if (mNumClasses < mNumReachableStates) {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
-      final List<int[]> partition = new ArrayList<int[]>(mNumClasses);
-      for (int state = 0; state < numStates; state++) {
-        if (rel.isReachable(state)) {
-          final EquivalenceClass sec = mStateToClass[state];
-          if (sec == null) {
-            final int[] clazz = new int[1];
-            clazz[0] = state;
-            partition.add(clazz);
-          } else {
-            final int[] clazz = sec.putResult(state);
-            if (clazz != null) {
-              partition.add(clazz);
-            }
-          }
-        }
-      }
-      setResultPartitionList(partition);
-    } else {
-      setResultPartitionList(null);
-    }
-  }
-
 
   //#########################################################################
   //# Debugging
@@ -1031,7 +992,8 @@ public class ObservationEquivalenceTRSimplifier
       final TIntHashSet visited = new TIntHashSet();
       collect(mTempClass);
       final int size = getSize();
-      for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
+      final int first = mEquivalence.getFirstSplitEvent();
+      for (int event = first; event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
           final TransitionIterator transIter = getPredecessorIterator(event);
           for (int i = 0; i < size; i++) {
@@ -1170,7 +1132,8 @@ public class ObservationEquivalenceTRSimplifier
       final TIntHashSet visited = new TIntHashSet();
       collect(mTempClass);
       final int size = getSize();
-      for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
+      final int first = mEquivalence.getFirstSplitEvent();
+      for (int event = first; event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
           final TransitionIterator transIter = getPredecessorIterator(event);
           for (int i = 0; i < size; i++) {
@@ -1445,7 +1408,8 @@ public class ObservationEquivalenceTRSimplifier
       final Collection<LeafEquivalenceClass> splitClasses =
         new THashSet<LeafEquivalenceClass>();
       final TIntHashSet visited = new TIntHashSet();
-      for (int event = mFirstSplitEvent; event < mNumEvents; event++) {
+      final int first = mEquivalence.getFirstSplitEvent();
+      for (int event = first; event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
           final TransitionIterator transIter = getPredecessorIterator(event);
           for (int i = 0; i < tempSize; i++) {
@@ -1638,25 +1602,76 @@ public class ObservationEquivalenceTRSimplifier
    */
   public enum Equivalence
   {
+
+    //#########################################################################
+    //# Enumeration Values
     /**
      * Bisimulation equivalence. Equivalent states must be able to reach
      * equivalent successors for all traces of events. There are no silent
      * events, and the tau-closure is not computed for this setting.
      */
-    BISIMULATION,
+    BISIMULATION {
+      @Override
+      public int getFirstSplitEvent()
+      {
+        return EventEncoding.TAU;
+      }
+      @Override
+      public void applyResultPartition
+        (final ObservationEquivalenceTRSimplifier simplifier)
+      throws AnalysisException
+      {
+        simplifier.applyObservationEquivalencePartition();
+      }
+    },
     /**
      * Observation equivalence. Equivalent states must be able to reach
      * equivalent successors for all traces of observable events including the
      * empty trace. This setting is the default.
      */
-    OBSERVATION_EQUIVALENCE,
+    OBSERVATION_EQUIVALENCE {
+      @Override
+      public int getFirstSplitEvent()
+      {
+        return EventEncoding.TAU;
+      }
+      @Override
+      public void applyResultPartition
+        (final ObservationEquivalenceTRSimplifier simplifier)
+      throws AnalysisException
+      {
+        simplifier.applyObservationEquivalencePartition();
+      }
+    },
     /**
      * Weak observation equivalence. Equivalent states must be able to reach
      * equivalent successors for all traces of observable events <I>not</I>
      * including the empty trace. This is implemented by not considering the
      * silent event for splitting equivalence classes.
      */
-    WEAK_OBSERVATION_EQUIVALENCE
+    WEAK_OBSERVATION_EQUIVALENCE {
+      @Override
+      public int getFirstSplitEvent()
+      {
+        return EventEncoding.NONTAU;
+      }
+      @Override
+      public void applyResultPartition
+        (final ObservationEquivalenceTRSimplifier simplifier)
+      throws AnalysisException
+      {
+        simplifier.applyObservationEquivalencePartition();
+      }
+    };
+
+    //#########################################################################
+    //# Repartitioning
+    abstract int getFirstSplitEvent();
+
+    abstract void applyResultPartition
+      (ObservationEquivalenceTRSimplifier simplifier)
+    throws AnalysisException;
+
   }
 
 
@@ -1687,17 +1702,31 @@ public class ObservationEquivalenceTRSimplifier
    *
    * <P><I>Reference.</I><BR>
    * Jaana Eloranta. Minimizing the Number of Transitions with Respect to
-   * Observation Equivalence. BIT, 31(4), 397--419, 1991.</P>
+   * Observation Equivalence. BIT, 31(4), 397-419, 1991.</P>
    */
   public enum TransitionRemoval
   {
+
+    //#########################################################################
+    //# Enumeration Values
     /**
      * Disables removal of redundant transitions. This is the only option that
      * works when using bisimulation equivalence
-     * ({@link Equivalence#BISIMULATION}), and it will be automatically selected
+     * ({@link Equivalence#BISIMULATION}), and it will be automatically used
      * when bisimulation equivalence is configured.
      */
-    NONE,
+    NONE {
+      @Override
+      boolean getDoNonTau(final TransitionRemovalTime time)
+      {
+        return false;
+      }
+      @Override
+      boolean getDoTau(final TransitionRemovalTime time)
+      {
+        return false;
+      }
+    },
     /**
      * Enables the first pass to remove of redundant transitions for all events
      * except the silent event with code {@link EventEncoding#TAU}. This option
@@ -1705,7 +1734,18 @@ public class ObservationEquivalenceTRSimplifier
      * performed in addition (even in case of trivial partition, to remove
      * tau-transitions).
      */
-    NONTAU,
+    NONTAU {
+      @Override
+      boolean getDoNonTau(final TransitionRemovalTime time)
+      {
+        return time != TransitionRemovalTime.AFTER_TRIVIAL;
+      }
+      @Override
+      boolean getDoTau(final TransitionRemovalTime time)
+      {
+        return time != TransitionRemovalTime.BEFORE;
+      }
+    },
     /**
      * Enables the first pass to remove all redundant transitions, including
      * silent transitions. This option only is guaranteed to work correctly if
@@ -1713,17 +1753,56 @@ public class ObservationEquivalenceTRSimplifier
      * cannot be guaranteed, consider using {@link #NONTAU} instead. The second
      * pass is performed in addition, if a non-trivial partition has been found.
      */
-    ALL,
+    ALL {
+      @Override
+      boolean getDoNonTau(final TransitionRemovalTime time)
+      {
+        return time != TransitionRemovalTime.AFTER_TRIVIAL;
+      }
+      @Override
+      boolean getDoTau(final TransitionRemovalTime time)
+      {
+        return time != TransitionRemovalTime.AFTER_TRIVIAL;
+      }
+    },
     /**
      * Disables the first pass. Redundant transitions are removed only in the
      * second pass, which is performed even in case of a trivial partition.
      */
-    AFTER,
+    AFTER {
+      @Override
+      boolean getDoNonTau(final TransitionRemovalTime time)
+      {
+        return time != TransitionRemovalTime.BEFORE;
+      }
+      @Override
+      boolean getDoTau(final TransitionRemovalTime time)
+      {
+        return time != TransitionRemovalTime.BEFORE;
+      }
+    },
     /**
      * Disables the first pass. Redundant transitions are removed only in the
      * second pass, which is performed only in case of a nontrivial partition.
      */
-    AFTER_IF_CHANGED
+    AFTER_IF_CHANGED {
+      @Override
+      boolean getDoNonTau(final TransitionRemovalTime time)
+      {
+        return time == TransitionRemovalTime.AFTER_TRIVIAL;
+      }
+      @Override
+      boolean getDoTau(final TransitionRemovalTime time)
+      {
+        return time == TransitionRemovalTime.AFTER_TRIVIAL;
+      }
+    };
+
+    //#########################################################################
+    //# Mode Selection
+    abstract boolean getDoTau(TransitionRemovalTime time);
+    abstract boolean getDoNonTau(TransitionRemovalTime time);
+
   }
 
 
@@ -1780,6 +1859,16 @@ public class ObservationEquivalenceTRSimplifier
 
 
   //#########################################################################
+  //# Inner Enumeration TransitionRemovalTime
+  private enum TransitionRemovalTime
+  {
+    BEFORE,
+    AFTER_TRIVIAL,
+    AFTER_NONTRIVIAL
+  }
+
+
+  //#########################################################################
   //# Data Members
   private Equivalence mEquivalence = Equivalence.OBSERVATION_EQUIVALENCE;
   private TransitionRemoval mTransitionRemovalMode = TransitionRemoval.NONTAU;
@@ -1791,10 +1880,9 @@ public class ObservationEquivalenceTRSimplifier
   private int mNumEvents;
   private int mNumClasses;
   private int mStateShift;
-  private int mFirstSplitEvent;
   private boolean mHasModifications;
 
-  private TauClosure mTauPreds;
+  private TauClosure mTauClosure;
   private TransitionIterator mTauIterator;
   private TransitionIterator mEventIterator;
   private IntListBuffer mClassLists;

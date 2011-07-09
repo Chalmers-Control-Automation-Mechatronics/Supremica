@@ -119,6 +119,10 @@ public class IsomorphismChecker
          ListBufferTransitionRelation.CONFIG_PREDECESSORS);
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(rel);
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+      bisimulator.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
       final boolean result = bisimulator.run();
       if (!result) {
         throw new IsomorphismException
@@ -150,6 +154,10 @@ public class IsomorphismChecker
          ListBufferTransitionRelation.CONFIG_PREDECESSORS);
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(rel);
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+      bisimulator.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
       final boolean result = bisimulator.run();
       if (!result) {
         throw new IsomorphismException
@@ -184,6 +192,10 @@ public class IsomorphismChecker
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(rel);
       final boolean result = bisimulator.run();
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+      bisimulator.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
       if (!result) {
         throw new IsomorphismException
           ("Bisimulator did not identify any states!");

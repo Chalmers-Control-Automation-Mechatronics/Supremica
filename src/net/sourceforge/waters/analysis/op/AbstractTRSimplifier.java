@@ -53,6 +53,11 @@ public abstract class AbstractTRSimplifier
     mPreferredOutputConfiguration = config;
   }
 
+  public int getPreferredOutputConfiguration()
+  {
+    return mPreferredOutputConfiguration;
+  }
+
   public ListBufferTransitionRelation getTransitionRelation()
   {
     return mTransitionRelation;

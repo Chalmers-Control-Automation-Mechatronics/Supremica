@@ -626,12 +626,11 @@ public abstract class TransitionListBuffer
 
   /**
    * Helps to clean up tau selfloops. This method removes all selfloops
-   * associated with the given event and tests whether this results in
-   * the event being redundant. Tau events are recognised by their standard
-   * code {@link EventEncoding#TAU}.
+   * associated with {@link EventEncoding#TAU} and tests whether this results in
+   * the event being redundant.
    * @return <CODE>true</CODE> if all transitions with the tau event
-   *         were selfloops and have been removed, and at least one<CODE>false</CODE>
-   *         otherwise.
+   *         were selfloops and have been removed, or if no tau transitions
+   *         have been found; <CODE>false</CODE> otherwise.
    */
   public boolean removeTauSelfloops()
   {

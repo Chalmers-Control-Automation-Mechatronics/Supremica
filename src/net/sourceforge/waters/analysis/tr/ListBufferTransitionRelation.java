@@ -789,6 +789,27 @@ public class ListBufferTransitionRelation
    * Creates a read-only iterator for this transition relation that is set up
    * to iterate over the incoming or outgoing transitions associated with the
    * given state, whichever is available.
+   * The iterator returned is not initialised, so one of the methods
+   * {@link TransitionIterator#resetState(int)} or
+   * {@link TransitionIterator#reset(int, int)} before it can be used.
+   * Being a read-only iterator, it does not implement the
+   * {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createAnyReadOnlyIterator()
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createReadOnlyIterator();
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createReadOnlyIterator();
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
+   * Creates a read-only iterator for this transition relation that is set up
+   * to iterate over the incoming or outgoing transitions associated with the
+   * given state, whichever is available.
    * The iterator returned produces all transitions associated with the given
    * state in the buffer's defined ordering, no matter what event they use.
    * Being a read-only iterator, it does not implement the
@@ -1454,16 +1475,15 @@ public class ListBufferTransitionRelation
    */
   public boolean isPureSelfloopEvent(final int event)
   {
-    final TransitionListBuffer buffer;
+    final TransitionIterator iter;
     if (mSuccessorBuffer != null) {
-      buffer = mSuccessorBuffer;
+      iter = mSuccessorBuffer.createReadOnlyIterator();
     } else if (mPredecessorBuffer != null) {
-      buffer = mPredecessorBuffer;
+      iter = mPredecessorBuffer.createReadOnlyIterator();
     } else {
       throw createNoBufferException();
     }
     final int numStates = getNumberOfStates();
-    final TransitionIterator iter = buffer.createReadOnlyIterator();
     for (int state = 0; state < numStates; state++) {
       if (isReachable(state)) {
         iter.reset(state, event);
@@ -1484,7 +1504,7 @@ public class ListBufferTransitionRelation
   /**
    * Removes the given event from this transition relation.
    * This method removes the given event including all its transitions
-   * from the transition relation. The event is marked as used,
+   * from the transition relation. The event is marked as unused,
    * and all associated transitions are deleted.
    * @param  event   The ID of the event to be removed.
    */
@@ -1579,7 +1599,7 @@ public class ListBufferTransitionRelation
       }
     } catch (final OverflowException exception) {
       // Can't have overflow because states and events have already been
-      // encoded successfully in rel.
+      // encoded successfully.
       throw new WatersRuntimeException(exception);
     }
     if ((config & CONFIG_SUCCESSORS) == 0) {
@@ -1653,10 +1673,10 @@ public class ListBufferTransitionRelation
    */
   public boolean removeProperSelfLoopEvents()
   {
-    final int tau = EventEncoding.TAU;
+    final int numEvents = getNumberOfProperEvents();
     boolean modified = false;
-    for (int e = 0; e < getNumberOfProperEvents(); e++) {
-      if (e != tau && mUsedEvents.get(e) && isPureSelfloopEvent(e)) {
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      if (mUsedEvents.get(e) && isPureSelfloopEvent(e)) {
         removeEvent(e);
         modified = true;
       }
