@@ -573,30 +573,27 @@ public class TauClosure
         mStart = false;
         mTauIterator1.advance(); // always succeeds and gives mCurrent
         if (mInnerIterator.advance()) {
-          final int pred = mInnerIterator.getCurrentSourceState();
-          mTauIterator2.resetState(pred);
+          final int succ = mInnerIterator.getCurrentToState();
+          mTauIterator2.resetState(succ);
           return mTauIterator2.advance(); // always true
-        } else {
-          return false;
         }
       } else if (mTauIterator2.advance()) {
         return true;
       } else if (mInnerIterator.advance()) {
-        final int pred = mInnerIterator.getCurrentSourceState();
-        mTauIterator2.resetState(pred);
+        final int tausucc = mInnerIterator.getCurrentToState();
+        mTauIterator2.resetState(tausucc);
         return mTauIterator2.advance(); // always true
-      } else {
-        while (mTauIterator1.advance()) {
-          int pred = mTauIterator1.getCurrentSourceState();
-          mInnerIterator.resetState(pred);
-          if (mInnerIterator.advance()) {
-            pred = mInnerIterator.getCurrentSourceState();
-            mTauIterator2.resetState(pred);
-            return mTauIterator2.advance(); // always true
-          }
-        }
-        return false;
       }
+      while (mTauIterator1.advance()) {
+        int succ = mTauIterator1.getCurrentToState();
+        mInnerIterator.resetState(succ);
+        if (mInnerIterator.advance()) {
+          succ = mInnerIterator.getCurrentToState();
+          mTauIterator2.resetState(succ);
+          return mTauIterator2.advance(); // always true
+        }
+      }
+      return false;
     }
 
     // #########################################################################

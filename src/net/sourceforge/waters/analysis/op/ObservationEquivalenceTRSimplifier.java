@@ -264,12 +264,7 @@ public class ObservationEquivalenceTRSimplifier
   public void setUpInitialPartitionBasedOnMarkings()
   throws OverflowException
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numProps = rel.getNumberOfPropositions();
-    long mask = 0;
-    for (int prop = 0; prop < numProps; prop++) {
-      mask = rel.addMarking(mask, prop);
-    }
+    final long mask = getPropositionMask();
     setUpInitialPartitionBasedOnMarkings(mask);
   }
 
@@ -501,7 +496,7 @@ public class ObservationEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Auxiliary Methods
+  //# Algorithm
   private void setUpPartition(final int numSplitters)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -513,24 +508,6 @@ public class ObservationEquivalenceTRSimplifier
     mStateToClass = new EquivalenceClass[numStates];
     mPredecessors = new int[numStates];
     mSplitters = new PriorityQueue<Splitter>(numSplitters);
-  }
-
-  private EquivalenceClass createEquivalenceClass()
-  {
-    if (mInitialInfoSize >= 0) {
-      return new LeafEquivalenceClass();
-    } else {
-      return new PlainEquivalenceClass();
-    }
-  }
-
-  private EquivalenceClass createEquivalenceClass(final int[] states)
-  {
-    if (mInitialInfoSize >= 0) {
-      return new LeafEquivalenceClass(states);
-    } else {
-      return new PlainEquivalenceClass(states);
-    }
   }
 
   private void setUpTauClosure() throws OverflowException
@@ -546,7 +523,12 @@ public class ObservationEquivalenceTRSimplifier
       if (mTauClosure == null) {
         final ListBufferTransitionRelation rel = getTransitionRelation();
         final int limit = getTransitionLimit();
-        mTauClosure = rel.createPredecessorsTauClosure(limit);
+        final int config = rel.getConfiguration();
+        if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
+          mTauClosure = rel.createPredecessorsTauClosure(limit);
+        } else {
+          mTauClosure = rel.createSuccessorsTauClosure(limit);
+        }
         mTauIterator = mTauClosure.createIterator();
         mEventIterator = mTauClosure.createFullEventClosureIterator();
       }
@@ -608,6 +590,30 @@ public class ObservationEquivalenceTRSimplifier
     }
   }
 
+  private void applyWeakObservationEquivalencePartition()
+  throws AnalysisException
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final List<int[]> partition = getResultPartition();
+    if (partition != null) {
+      mTauClosure = null;
+      mTauIterator = mEventIterator = null;
+      final long mask = getPropositionMask();
+      final WeakObservationEquivalencePartitioning partitioner =
+        new WeakObservationEquivalencePartitioning(rel, partition,
+                                                   mask, mTransitionLimit);
+      partitioner.applyPartition();
+      removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
+      rel.removeTauSelfLoops();
+      rel.removeProperSelfLoopEvents();
+    } else {
+      removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
+      if (mHasModifications) {
+        rel.removeProperSelfLoopEvents();
+      }
+    }
+  }
+
   private void removeRedundantTransitions(final TransitionRemovalTime time)
   throws AnalysisException
   {
@@ -630,26 +636,26 @@ public class ObservationEquivalenceTRSimplifier
           continue;
         }
         checkAbort();
-        final int source0 = iter0.getCurrentSourceState();
-        final int target0 = iter0.getCurrentTargetState();
-        iter1.resetState(target0);
+        final int from0 = iter0.getCurrentFromState();
+        final int to0 = iter0.getCurrentToState();
+        iter1.resetState(from0);
         while (iter1.advance()) {
-          final int p1 = iter1.getCurrentSourceState();
+          final int p1 = iter1.getCurrentToState();
           iter2.reset(p1, e);
           while (iter2.advance()) {
-            final int p2 = iter2.getCurrentSourceState();
+            final int p2 = iter2.getCurrentToState();
             if (e == tau) {
-              if (doTau && p1 != target0 && p2 == source0) {
+              if (doTau && p1 != from0 && p2 == to0) {
                 iter0.remove();
                 mHasModifications = true;
                 continue trans;
               }
             } else {
-              if (doNonTau && (p1 != target0 || p2 != source0)) {
+              if (doNonTau && (p1 != from0 || p2 != to0)) {
                 iter3.resetState(p2);
                 while (iter3.advance()) {
-                  final int p3 = iter3.getCurrentSourceState();
-                  if (p3 == source0) {
+                  final int p3 = iter3.getCurrentToState();
+                  if (p3 == to0) {
                     iter0.remove();
                     mHasModifications = true;
                     continue trans;
@@ -662,6 +668,39 @@ public class ObservationEquivalenceTRSimplifier
       }
     }
   }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private long getPropositionMask()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numProps = rel.getNumberOfPropositions();
+    long mask = 0;
+    for (int prop = 0; prop < numProps; prop++) {
+      mask = rel.addMarking(mask, prop);
+    }
+    return mask;
+  }
+
+  private EquivalenceClass createEquivalenceClass()
+  {
+    if (mInitialInfoSize >= 0) {
+      return new LeafEquivalenceClass();
+    } else {
+      return new PlainEquivalenceClass();
+    }
+  }
+
+  private EquivalenceClass createEquivalenceClass(final int[] states)
+  {
+    if (mInitialInfoSize >= 0) {
+      return new LeafEquivalenceClass(states);
+    } else {
+      return new PlainEquivalenceClass(states);
+    }
+  }
+
 
   //#########################################################################
   //# Debugging
@@ -1660,7 +1699,7 @@ public class ObservationEquivalenceTRSimplifier
         (final ObservationEquivalenceTRSimplifier simplifier)
       throws AnalysisException
       {
-        simplifier.applyObservationEquivalencePartition();
+        simplifier.applyWeakObservationEquivalencePartition();
       }
     };
 

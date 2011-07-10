@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.op
-//# CLASS:   ObservationEquivalenceTRSimplifierTest
+//# CLASS:   WeakObservationEquivalenceTRSimplifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -16,8 +16,9 @@ import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 
 
 /**
- * A test for the observation equivalence simplifier (
- * {@link ObservationEquivalenceTRSimplifier}).
+ * A test for the &quot;weak observation equivalence&quot; configuration of
+ * the observation equivalence simplifier
+ * ({@link ObservationEquivalenceTRSimplifier}).
  *
  * This test is to be used with caution because the same bisimulation module
  * ({@link ObservationEquivalenceTRSimplifier}) is used by the abstraction rule
@@ -29,7 +30,7 @@ import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
  * @author Robi Malik
  */
 
-public class ObservationEquivalenceTRSimplifierTest
+public class WeakObservationEquivalenceTRSimplifierTest
   extends AbstractTRSimplifierTest
 {
 
@@ -37,7 +38,7 @@ public class ObservationEquivalenceTRSimplifierTest
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
     final TestSuite testSuite =
-      new TestSuite(ObservationEquivalenceTRSimplifierTest.class);
+      new TestSuite(WeakObservationEquivalenceTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -51,19 +52,40 @@ public class ObservationEquivalenceTRSimplifierTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.op.AbstractTRSimplifierTest
   @Override
-  protected TransitionRelationSimplifier createTransitionRelationSimplifier()
+  protected ObservationEquivalenceTRSimplifier
+    createTransitionRelationSimplifier()
   {
-    return new ObservationEquivalenceTRSimplifier();
+    final ObservationEquivalenceTRSimplifier simplifier =
+      new ObservationEquivalenceTRSimplifier();
+    simplifier.setEquivalence(ObservationEquivalenceTRSimplifier.Equivalence.
+                              WEAK_OBSERVATION_EQUIVALENCE);
+    return simplifier;
   }
 
 
   //#########################################################################
   //# Test Cases
-  public void test_oeq_1() throws Exception
+  public void test_woeq_1() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "oeq_1.wmod";
+    final String name = "woeq_1.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_woeq_2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "woeq_2.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_woeq_3() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "woeq_3.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -207,25 +229,17 @@ public class ObservationEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_oeq_18() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "oeq_18.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
-  }
-
   /**
    * A test to see whether a single transition relation simplifier
    * object can perform multiple abstractions in sequence.
    */
   public void testReentrant() throws Exception
   {
-    test_oeq_1();
+    test_woeq_1();
     test_oeq_2();
     test_oeq_3();
     test_oeq_4();
-    test_oeq_1();
+    test_woeq_1();
     test_oeq_2();
   }
 

@@ -986,7 +986,7 @@ public class OPSearchAutomatonSimplifier
   private boolean createReducedOutputAutomaton(final boolean force)
     throws AnalysisException
   {
-     final ListBufferTransitionRelation rel = createTransitionRelation();
+    final ListBufferTransitionRelation rel = createTransitionRelation();
     final ObservationEquivalenceTRSimplifier simp =
       new ObservationEquivalenceTRSimplifier(rel);
     simp.setEquivalence
