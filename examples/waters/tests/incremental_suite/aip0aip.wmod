@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="rhone_aip" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="aip0aip" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment>All the AIP models except for[AS3] and[TU4] which are disjoint from the rest.</ns2:Comment>
 <ConstantAliasList>
 <ConstantAlias Name=":symbols">
