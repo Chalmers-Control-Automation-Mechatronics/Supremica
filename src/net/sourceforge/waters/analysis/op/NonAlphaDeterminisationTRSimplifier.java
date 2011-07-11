@@ -29,20 +29,20 @@ public class NonAlphaDeterminisationTRSimplifier
 
   //#########################################################################
   //# Constructors
-  public NonAlphaDeterminisationTRSimplifier
-    (final ObservationEquivalenceTRSimplifier bisimulator)
+  public NonAlphaDeterminisationTRSimplifier()
   {
-    this(bisimulator, null);
+    this(null);
   }
 
   public NonAlphaDeterminisationTRSimplifier
-    (final ObservationEquivalenceTRSimplifier bisimulator,
-     final ListBufferTransitionRelation rel)
+    (final ListBufferTransitionRelation rel)
   {
     super(rel);
-    mBisimulator = bisimulator;
-    mTransitionRemovalMode =
-      ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
+    mBisimulator = new ObservationEquivalenceTRSimplifier();
+    mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
+                                Equivalence.OBSERVATION_EQUIVALENCE);
+    mBisimulator.setAppliesPartitionAutomatically(false);
+    mBisimulator.setStatistics(null);
   }
 
 
@@ -55,7 +55,7 @@ public class NonAlphaDeterminisationTRSimplifier
   public void setTransitionRemovalMode
     (final ObservationEquivalenceTRSimplifier.TransitionRemoval mode)
   {
-    mTransitionRemovalMode = mode;
+    mBisimulator.setTransitionRemovalMode(mode);
   }
 
   /**
@@ -65,7 +65,29 @@ public class NonAlphaDeterminisationTRSimplifier
   public ObservationEquivalenceTRSimplifier.TransitionRemoval
     getTransitionRemovalMode()
   {
-    return mTransitionRemovalMode;
+    return mBisimulator.getTransitionRemovalMode();
+  }
+
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be stored.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mBisimulator.setTransitionLimit(limit);
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit()
+  {
+    return mBisimulator.getTransitionLimit();
   }
 
 
@@ -94,39 +116,21 @@ public class NonAlphaDeterminisationTRSimplifier
     if (!hasNonPreconditionMarkedStates()) {
       return false;
     }
-    final ObservationEquivalenceTRSimplifier.Equivalence eq =
-      mBisimulator.getEquivalence();
-    final ObservationEquivalenceTRSimplifier.TransitionRemoval mode =
-      mBisimulator.getTransitionRemovalMode();
-    final boolean apply = mBisimulator.getAppliesPartitionAutomatically();
-    final TRSimplifierStatistics stats = mBisimulator.getStatistics();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.reverse();
-    try {
-      mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
-                                  Equivalence.OBSERVATION_EQUIVALENCE);
-      mBisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
-      mBisimulator.setAppliesPartitionAutomatically(false);
-      mBisimulator.setStatistics(null);
-      mBisimulator.setTransitionRelation(rel);
-      List<int[]> partition = createInitialPartition();
-      if (partition == null) {
-        return false;
-      }
-      mBisimulator.setUpInitialPartition(partition);
-      mBisimulator.refinePartitionBasedOnInitialStates();
-      final boolean modified = mBisimulator.run();
-      partition = mBisimulator.getResultPartition();
-      setResultPartitionList(partition);
-      applyResultPartitionAutomatically();
-      rel.reverse();
-      return modified;
-    } finally {
-      mBisimulator.setEquivalence(eq);
-      mBisimulator.setTransitionRemovalMode(mode);
-      mBisimulator.setAppliesPartitionAutomatically(apply);
-      mBisimulator.setStatistics(stats);
+    mBisimulator.setTransitionRelation(rel);
+    List<int[]> partition = createInitialPartition();
+    if (partition == null) {
+      return false;
     }
+    mBisimulator.setUpInitialPartition(partition);
+    mBisimulator.refinePartitionBasedOnInitialStates();
+    final boolean modified = mBisimulator.run();
+    partition = mBisimulator.getResultPartition();
+    setResultPartitionList(partition);
+    applyResultPartitionAutomatically();
+    rel.reverse();
+    return modified;
   }
 
   @Override
@@ -197,8 +201,5 @@ public class NonAlphaDeterminisationTRSimplifier
   //#########################################################################
   //# Data Members
   private final ObservationEquivalenceTRSimplifier mBisimulator;
-
-  private ObservationEquivalenceTRSimplifier.TransitionRemoval
-    mTransitionRemovalMode;
 
 }

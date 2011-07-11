@@ -137,6 +137,30 @@ public class ObservationEquivalenceTRSimplifier
   }
 
   /**
+   * Determines the propositions used when partitioning.
+   * The propositions mask is only used to distinguish states when setting up
+   * an initial partition. When merging states, all propositions present in
+   * the transition relation are merged.
+   * @param  mask   The bit mask of the significant propositions,
+   *                or <CODE>-1</CODE> to indicate that all propositions
+   *                are significant.
+   * @see #setUpInitialPartitionBasedOnMarkings()
+   */
+  public void setPropositionMask(final long mask)
+  {
+    mPropositionMask = mask;
+  }
+
+  /**
+   * Gets the mask of significant propositions.
+   * @see #setPropositionMask(long) setPropositionMask()
+   */
+  public long getPropositionMask()
+  {
+    return mPropositionMask;
+  }
+
+  /**
    * Sets the transition limit. The transition limit specifies the maximum
    * number of transitions (including stored silent transitions of the
    * transitive closure) that will be stored.
@@ -598,10 +622,10 @@ public class ObservationEquivalenceTRSimplifier
     if (partition != null) {
       mTauClosure = null;
       mTauIterator = mEventIterator = null;
-      final long mask = getPropositionMask();
       final WeakObservationEquivalencePartitioning partitioner =
         new WeakObservationEquivalencePartitioning(rel, partition,
-                                                   mask, mTransitionLimit);
+                                                   mPropositionMask,
+                                                   mTransitionLimit);
       partitioner.applyPartition();
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
@@ -672,17 +696,6 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
-  private long getPropositionMask()
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numProps = rel.getNumberOfPropositions();
-    long mask = 0;
-    for (int prop = 0; prop < numProps; prop++) {
-      mask = rel.addMarking(mask, prop);
-    }
-    return mask;
-  }
-
   private EquivalenceClass createEquivalenceClass()
   {
     if (mInitialInfoSize >= 0) {
@@ -1912,6 +1925,7 @@ public class ObservationEquivalenceTRSimplifier
   private Equivalence mEquivalence = Equivalence.OBSERVATION_EQUIVALENCE;
   private TransitionRemoval mTransitionRemovalMode = TransitionRemoval.NONTAU;
   private MarkingMode mMarkingMode = MarkingMode.UNCHANGED;
+  private long mPropositionMask = ~0;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mInitialInfoSize = -1;
 

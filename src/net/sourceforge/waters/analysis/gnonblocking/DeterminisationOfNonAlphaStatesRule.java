@@ -47,19 +47,16 @@ class DeterminisationOfNonAlphaStatesRule
                                       final Collection<EventProxy> propositions)
   {
     super(factory, translator, propositions,
-          new ObservationEquivalenceTRSimplifier());
-    mTransitionRemovalMode =
-        ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
-    mTransitionLimit = Integer.MAX_VALUE;
+          new NonAlphaDeterminisationTRSimplifier());
   }
 
 
   //#########################################################################
   //# Configuration
   @Override
-  ObservationEquivalenceTRSimplifier getSimplifier()
+  NonAlphaDeterminisationTRSimplifier getSimplifier()
   {
-    return (ObservationEquivalenceTRSimplifier) super.getSimplifier();
+    return (NonAlphaDeterminisationTRSimplifier) super.getSimplifier();
   }
 
   /**
@@ -69,7 +66,8 @@ class DeterminisationOfNonAlphaStatesRule
   void setTransitionRemovalMode
     (final ObservationEquivalenceTRSimplifier.TransitionRemoval mode)
   {
-    mTransitionRemovalMode = mode;
+    final NonAlphaDeterminisationTRSimplifier simplifier = getSimplifier();
+    simplifier.setTransitionRemovalMode(mode);
   }
 
   /**
@@ -79,7 +77,8 @@ class DeterminisationOfNonAlphaStatesRule
   ObservationEquivalenceTRSimplifier.TransitionRemoval
     getTransitionRemovalMode()
   {
-    return mTransitionRemovalMode;
+    final NonAlphaDeterminisationTRSimplifier simplifier = getSimplifier();
+    return simplifier.getTransitionRemovalMode();
   }
 
   /**
@@ -95,7 +94,8 @@ class DeterminisationOfNonAlphaStatesRule
    */
   void setTransitionLimit(final int limit)
   {
-    mTransitionLimit = limit;
+    final NonAlphaDeterminisationTRSimplifier simplifier = getSimplifier();
+    simplifier.setTransitionLimit(limit);
   }
 
   /**
@@ -104,7 +104,8 @@ class DeterminisationOfNonAlphaStatesRule
    */
   int getTransitionLimit()
   {
-    return mTransitionLimit;
+    final NonAlphaDeterminisationTRSimplifier simplifier = getSimplifier();
+    return simplifier.getTransitionLimit();
   }
 
   EventProxy getAlphaMarking()
@@ -138,13 +139,9 @@ class DeterminisationOfNonAlphaStatesRule
     final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
             (autToAbstract, eventEnc, mInputEncoding,
              ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    final ObservationEquivalenceTRSimplifier bisimulator = getSimplifier();
+    final NonAlphaDeterminisationTRSimplifier simplifier = getSimplifier();
     try {
-      bisimulator.setTransitionRelation(rel);
-      bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
-      bisimulator.setTransitionLimit(mTransitionLimit);
-      final NonAlphaDeterminisationTRSimplifier simplifier =
-        new NonAlphaDeterminisationTRSimplifier(bisimulator, rel);
+      simplifier.setTransitionRelation(rel);
       simplifier.setPropositions(alphaCode, -1);
       if (simplifier.run()) {
         mPartition = simplifier.getResultPartition();
@@ -156,10 +153,10 @@ class DeterminisationOfNonAlphaStatesRule
         return autToAbstract;
       }
     } catch (final OutOfMemoryError error) {
-      bisimulator.reset();
+      simplifier.reset();
       throw new OverflowException(error);
     } finally {
-      bisimulator.reset();
+      simplifier.reset();
     }
   }
 
@@ -186,10 +183,6 @@ class DeterminisationOfNonAlphaStatesRule
 
   //#########################################################################
   //# Data Members
-  private ObservationEquivalenceTRSimplifier.TransitionRemoval
-    mTransitionRemovalMode;
-  private int mTransitionLimit;
-
   private AutomatonProxy mAutToAbstract;
   private EventProxy mAlphaMarking;
   private EventProxy mTau;

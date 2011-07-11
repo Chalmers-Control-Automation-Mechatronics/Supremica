@@ -143,13 +143,14 @@ public class WeakObservationEquivalencePartitioning
     mAdditionalTransitions = new PreTransitionBuffer(numEvents);
     final int tau = EventEncoding.TAU;
     final TIntStack tauStack = new TIntStack();
-    final TransitionIterator tauIter =
+    final TransitionIterator tauEventIter =
       mTransitionRelation.createAnyReadOnlyIterator();
     final TIntHashSet tauSuccessors = new TIntHashSet();
     final TIntStack eventStack = new TIntStack();
     final TransitionIterator eventIter =
       mTransitionRelation.createAnyReadOnlyIterator();
     final TIntHashSet eventSuccessors = new TIntHashSet();
+    final TransitionIterator tauStarIter = mTauClosure.createIterator();
     final TransitionIterator closureIter =
       mTauClosure.createFullEventClosureIterator();
     final TIntHashSet eventSuccessorClasses = new TIntHashSet();
@@ -158,6 +159,31 @@ public class WeakObservationEquivalencePartitioning
       final int[] clazz = mPartition.get(c);
       for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
         for (final int root : clazz) {
+          final boolean init = mTransitionRelation.isInitial(root);
+          long nonTauVictimsMarkings =
+            mTransitionRelation.getAllMarkings(root) & mPropositionMask;
+          long tauVictimsMarkings = 0;
+          tauStarIter.resetState(root);
+          tauStarIter.advance();
+          while (tauStarIter.advance()) {
+            final int tausucc = tauStarIter.getCurrentTargetState();
+            final int taucls = mClassMap[tausucc];
+            final long markings =
+              mTransitionRelation.getAllMarkings(tausucc) & mPropositionMask;
+            if (isTauVictim(c, taucls)) {
+              if (init) {
+                mTransitionRelation.setInitial(tausucc, true);
+              }
+              tauVictimsMarkings =
+                mTransitionRelation.mergeMarkings(tauVictimsMarkings, markings);
+            } else {
+              nonTauVictimsMarkings =
+                mTransitionRelation.mergeMarkings(nonTauVictimsMarkings,
+                                                  markings);
+            }
+          }
+          tauVictimsMarkings &= ~nonTauVictimsMarkings;
+          mTransitionRelation.addMarkings(root, tauVictimsMarkings);
           if (tauSuccessors.add(root)) {
             tauStack.push(root);
             do {
@@ -171,9 +197,9 @@ public class WeakObservationEquivalencePartitioning
                   eventSuccessorClasses.add(eclass);
                   do {
                     final int state = eventStack.pop();
-                    tauIter.reset(state, tau);
-                    while (tauIter.advance()) {
-                      final int tausucc = tauIter.getCurrentTargetState();
+                    tauEventIter.reset(state, tau);
+                    while (tauEventIter.advance()) {
+                      final int tausucc = tauEventIter.getCurrentTargetState();
                       final int tauclass = mClassMap[tausucc];
                       if (!isTauVictim(eclass, tauclass) &&
                           eventSuccessors.add(tausucc)) {
@@ -184,9 +210,9 @@ public class WeakObservationEquivalencePartitioning
                   } while (eventStack.size() > 0);
                 }
               }
-              tauIter.reset(taustate, tau);
-              while (tauIter.advance()) {
-                final int target = tauIter.getCurrentTargetState();
+              tauEventIter.reset(taustate, tau);
+              while (tauEventIter.advance()) {
+                final int target = tauEventIter.getCurrentTargetState();
                 final int tclass = mClassMap[target];
                 if (!isTauVictim(c, tclass) && tauSuccessors.add(target)) {
                   tauStack.push(target);
@@ -221,23 +247,13 @@ public class WeakObservationEquivalencePartitioning
     for (int c = 0; c < numClasses; c++) {
       final int[] clazz = mPartition.get(c);
       if (clazz.length > 1) {
-        final boolean init = mTransitionRelation.isInitial(c);
-        long markings = mTransitionRelation.getAllMarkings(c);
         iter.reset(c, tau);
         while (iter.advance()) {
           final int target = iter.getCurrentTargetState();
           if (isTauVictim(c, target)) {
-            if (init) {
-              mTransitionRelation.setInitial(target, true);
-            }
-            final long extraMarkings =
-              mTransitionRelation.getAllMarkings(target) & mPropositionMask;
-            markings =
-              mTransitionRelation.mergeMarkings(markings, extraMarkings);
             iter.remove();
           }
         }
-        mTransitionRelation.setAllMarkings(c, markings);
       }
     }
   }

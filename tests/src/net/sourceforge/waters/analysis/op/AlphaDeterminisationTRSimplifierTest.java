@@ -57,9 +57,7 @@ public class AlphaDeterminisationTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    final ObservationEquivalenceTRSimplifier oeq =
-      new ObservationEquivalenceTRSimplifier();
-    return new AlphaDeterminisationTRSimplifier(oeq);
+    return new AlphaDeterminisationTRSimplifier();
   }
 
   @Override

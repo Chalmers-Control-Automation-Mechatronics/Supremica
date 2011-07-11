@@ -25,20 +25,19 @@ public class AlphaDeterminisationTRSimplifier
 
   //#########################################################################
   //# Constructors
-  public AlphaDeterminisationTRSimplifier
-    (final ObservationEquivalenceTRSimplifier bisimulator)
+  public AlphaDeterminisationTRSimplifier()
   {
-    this(bisimulator, null);
+    this(null);
   }
 
   public AlphaDeterminisationTRSimplifier
-    (final ObservationEquivalenceTRSimplifier bisimulator,
-     final ListBufferTransitionRelation rel)
+    (final ListBufferTransitionRelation rel)
   {
     super(rel);
-    mBisimulator = bisimulator;
-    mTransitionRemovalMode =
-      ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
+    mBisimulator = new ObservationEquivalenceTRSimplifier();
+    mBisimulator.setAppliesPartitionAutomatically(false);
+    mBisimulator.setStatistics(null);
+    mTransitionRemovalMode = mBisimulator.getTransitionRemovalMode();
   }
 
 
@@ -62,6 +61,28 @@ public class AlphaDeterminisationTRSimplifier
     getTransitionRemovalMode()
   {
     return mTransitionRemovalMode;
+  }
+
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be stored.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mBisimulator.setTransitionLimit(limit);
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit()
+  {
+    return mBisimulator.getTransitionLimit();
   }
 
 
@@ -92,58 +113,48 @@ public class AlphaDeterminisationTRSimplifier
       // other rules will have simplified this transition relation already.
       return false;
     }
-    final ObservationEquivalenceTRSimplifier.Equivalence eq =
-      mBisimulator.getEquivalence();
-    final ObservationEquivalenceTRSimplifier.TransitionRemoval mode =
-      mBisimulator.getTransitionRemovalMode();
-    final boolean apply = mBisimulator.getAppliesPartitionAutomatically();
-    final TRSimplifierStatistics stats = mBisimulator.getStatistics();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    try {
-      mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
-                                  Equivalence.OBSERVATION_EQUIVALENCE);
-      mBisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
-      mBisimulator.setAppliesPartitionAutomatically(false);
-      mBisimulator.setStatistics(null);
-      mBisimulator.setTransitionRelation(rel);
-      long mask = 0;
-      final int omega = getDefaultMarkingID();
-      if (omega >= 0) {
-        mask = rel.addMarking(mask, omega);
-      }
-      mBisimulator.setUpInitialPartitionBasedOnMarkings(mask);
-      boolean modified = mBisimulator.run();
-      if (!modified) {
-        return false;
-      }
-      List<int[]> partition = mBisimulator.getResultPartition();
-      mBisimulator.reset();
-      rel.reverse();
-      rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-      switch (mTransitionRemovalMode) {
-      case NONTAU:
-      case ALL:
-        mBisimulator.setTransitionRemovalMode
-          (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);
-        break;
-      default:
-        break;
-      }
-      mBisimulator.setTransitionRelation(rel);
-      mBisimulator.setUpInitialPartition(partition);
-      mBisimulator.refinePartitionBasedOnInitialStates();
-      modified = mBisimulator.run();
-      partition = mBisimulator.getResultPartition();
-      setResultPartitionList(partition);
-      applyResultPartitionAutomatically();
-      rel.reverse();
-      return modified;
-    } finally {
-      mBisimulator.setEquivalence(eq);
-      mBisimulator.setTransitionRemovalMode(mode);
-      mBisimulator.setAppliesPartitionAutomatically(apply);
-      mBisimulator.setStatistics(stats);
+    mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
+                                Equivalence.WEAK_OBSERVATION_EQUIVALENCE);
+    mBisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
+    mBisimulator.setTransitionRelation(rel);
+    long mask = 0;
+    final int omega = getDefaultMarkingID();
+    if (omega >= 0) {
+      mask = rel.addMarking(mask, omega);
     }
+    mBisimulator.setPropositionMask(mask);
+    mBisimulator.setUpInitialPartitionBasedOnMarkings();
+    boolean modified = mBisimulator.run();
+    if (!modified) {
+      return false;
+    }
+    List<int[]> partition = mBisimulator.getResultPartition();
+    mBisimulator.reset();
+    rel.reverse();
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    switch (mTransitionRemovalMode) {
+    case NONTAU:
+    case ALL:
+      mBisimulator.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);
+      break;
+    default:
+      break;
+    }
+    mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
+                                Equivalence.OBSERVATION_EQUIVALENCE);
+    mBisimulator.setTransitionRelation(rel);
+    mBisimulator.setUpInitialPartition(partition);
+    mBisimulator.refinePartitionBasedOnInitialStates();
+    modified = mBisimulator.run();
+    partition = mBisimulator.getResultPartition();
+    setResultPartitionList(partition);
+    mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
+                                Equivalence.WEAK_OBSERVATION_EQUIVALENCE);
+    applyResultPartitionAutomatically();
+    rel.reverse();
+    return modified;
   }
 
   @Override
