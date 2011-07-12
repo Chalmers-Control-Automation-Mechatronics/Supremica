@@ -189,8 +189,8 @@ public class WatersIntIntHashMap
    *          an <code>int</code> value
    * @param value
    *          an <code>int</code> value
-   * @return the previous value associated with <tt>key</tt>, or (int)0 if none
-   *         was found.
+   * @return The previous value associated with <tt>key</tt>,
+   *         or the default value if none was found.
    */
   public int put(final int key, final int value)
   {
@@ -201,26 +201,23 @@ public class WatersIntIntHashMap
   /**
    * Inserts a key/value pair into the map if the specified key is not already
    * associated with a value.
-   *
-   * @param key
-   *          an <code>int</code> value
-   * @param value
-   *          an <code>int</code> value
-   * @return the previous value associated with <tt>key</tt>, or (int)0 if none
-   *         was found.
+   * @return The previous value associated with <tt>key</tt>,
+   *         or the default value if none was found.
    */
   public int putIfAbsent(final int key, final int value)
   {
     final int index = insertionIndex(key);
-    if (index < 0)
+    if (index < 0) {
       return mValues[-index - 1];
-    return doPut(key, value, index);
+    } else {
+      return doPut(key, value, index);
+    }
   }
 
   private int doPut(final int key, final int value, int index)
   {
     byte previousState;
-    int previous = (int) 0;
+    int previous = mDefaultValue;
     boolean isNewMapping = true;
     if (index < 0) {
       index = -index - 1;
@@ -234,7 +231,6 @@ public class WatersIntIntHashMap
     if (isNewMapping) {
       postInsertHook(previousState == FREE);
     }
-
     return previous;
   }
 

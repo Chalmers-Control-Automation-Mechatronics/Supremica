@@ -235,6 +235,28 @@ public class IntListBuffer
   }
 
   /**
+   * Determines whether the given list has more than the specified number
+   * of elements. This method iterates over the list to count it, so its
+   * complexity is linear.
+   * @param  list   The unique list number that identifies the list to be
+   *                examined in this buffer.
+   * @param  size   Number of elements to be checked in the list.
+   * @return <CODE>true</CODE> if the number of elements in the list is
+   *         greater than the given <CODE>size</CODE>;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isStrictlyLongerThan(final int list, final int size)
+  {
+    int count = 0;
+    for (int next = getNext(list); next != NULL; next = getNext(next)) {
+      if (++count > size) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Computes the length of the given list. This method iterates over the
    * list to count it, so its complexity is linear.
    * @param  list   The unique list number that identifies the list to be
