@@ -161,6 +161,7 @@ public class PromelaUnmarshaller
 
     //mVisitor.visitModule(ast);
     mVisitor.collectEvents(ast);
+    mVisitor.makeMsg();
     mGraphVisitor.collectGraphs(ast);
    // mVisitor.output();
 
