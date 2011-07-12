@@ -49,131 +49,131 @@ public class ScheduleDialog
 {
     private static final long serialVersionUID = 1L;
     private static final String[] optimizationMethods = new String[] {
-        SchedulingConstants.MODIFIED_A_STAR, 
-        SchedulingConstants.MILP_GLPK, 
-        SchedulingConstants.MILP_CBC, 
+        SchedulingConstants.MODIFIED_A_STAR,
+        SchedulingConstants.MILP_GLPK,
+        SchedulingConstants.MILP_CBC,
         SchedulingConstants.MILP_CPLEX,
-        SchedulingConstants.VIS_GRAPH, 
-        SchedulingConstants.MULTITHREADED_A_STAR, 
+        SchedulingConstants.VIS_GRAPH,
+        SchedulingConstants.MULTITHREADED_A_STAR,
         "Velocity Balancing"}; //, "Modified IDA*", "Modified SMA*"};
     private static final String[] astarHeuristics = new String[] {
-        SchedulingConstants.ONE_PRODUCT_RELAXATION, 
-        SchedulingConstants.SUBOPTIMAL, 
-        SchedulingConstants.TWO_PRODUCT_RELAXATION, 
-        SchedulingConstants.VIS_GRAPH_TIME_RELAXATION, 
-        SchedulingConstants.VIS_GRAPH_NODE_RELAXATION, 
+        SchedulingConstants.ONE_PRODUCT_RELAXATION,
+        SchedulingConstants.SUBOPTIMAL,
+        SchedulingConstants.TWO_PRODUCT_RELAXATION,
+        SchedulingConstants.VIS_GRAPH_TIME_RELAXATION,
+        SchedulingConstants.VIS_GRAPH_NODE_RELAXATION,
         SchedulingConstants.BRUTE_FORCE_RELAXATION};
     private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
-    private JComboBox optiMethodsBox, heuristicsBox;
-    private JCheckBox nodeExpander, buildAutomaton, vgDrawer, balanceVelocities;
+    private final JComboBox optiMethodsBox, heuristicsBox;
+    private final JCheckBox nodeExpander, buildAutomaton, vgDrawer, balanceVelocities;
     @SuppressWarnings("unused")
 	private int memoryCapacity;
-    private JTextField memoryCapacityField;
-    private JButton okButton, cancelButton;
+    private final JTextField memoryCapacityField;
+    private final JButton okButton, cancelButton;
     JButton autoTestButton; //Tillf
-    private java.util.ArrayList<File> filesToSchedule = new java.util.ArrayList<File>();
-    
+    private final java.util.ArrayList<File> filesToSchedule = new java.util.ArrayList<File>();
+
     private Automata selectedAutomata = null;
     // TODO: do something with this ugly implementation (search for "ugly" in this file)
     // Ugly implementation due to difference between the interfaces for Supremica.java and IDE.java
     private IDEActionInterface ide = null;
-    
+
     Scheduler sched = null;
     public Thread milpThread = null;
-    
+
     private BufferedWriter writer = null; //Tillf
-      
-    public ScheduleDialog(IDEActionInterface ide)
+
+    public ScheduleDialog(final IDEActionInterface ide)
     {
         super(ide.getFrame(), "Schedule Selected Automata", true);
-        
+
         this.ide = ide;
 //        selectedAutomata = getSelectedAutomata();
-        selectedAutomata = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();  
+        selectedAutomata = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         /******** Base components of the dialog ***********/
         okButton = new JButton("Schedule");
         cancelButton = new JButton("Cancel");
-        
-        JLabel optiMethodsLabel = new JLabel("Optimization methods: \t \t");
+
+        final JLabel optiMethodsLabel = new JLabel("Optimization methods: \t \t");
         optiMethodsBox = new JComboBox(optimizationMethods);
-        
-        JLabel heuristicsLabel = new JLabel("Heuristics: \t \t");
+
+        final JLabel heuristicsLabel = new JLabel("Heuristics: \t \t");
         heuristicsBox = new JComboBox(astarHeuristics);
-        
+
         nodeExpander = new JCheckBox("use AK's node expander", false);
         buildAutomaton = new JCheckBox("build schedule", true);
         vgDrawer = new JCheckBox("draw visibility graph", true);
         balanceVelocities = new JCheckBox("balance velocities", false);
-        
+
         memoryCapacityField = new JTextField("300", 10);
-        
+
         /******** Base containers of the dialog ***********/
-        JPanel buttonPanel = new JPanel();
+        final JPanel buttonPanel = new JPanel();
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
-        
-        JPanel optiPanel = new JPanel();
+
+        final JPanel optiPanel = new JPanel();
         optiPanel.add(optiMethodsLabel);
         optiPanel.add(optiMethodsBox);
-        
-        JPanel heuristicsPanel = new JPanel();
+
+        final JPanel heuristicsPanel = new JPanel();
         heuristicsPanel.add(heuristicsLabel);
         heuristicsPanel.add(heuristicsBox);
-        
-        JPanel smaPanel = new JPanel();
+
+        final JPanel smaPanel = new JPanel();
         smaPanel.add(new JLabel("Nr of nodes in memory (SMA*)"));
         smaPanel.add(memoryCapacityField);
-        
-        
+
+
         // 	JPanel expanderPanel = new JPanel();
         // 	expanderPanel.add(nodeExpander);
-        
+
         /********* Composite containers *******************/
-        
-        JPanel algorithmPanel = new JPanel();
+
+        final JPanel algorithmPanel = new JPanel();
         algorithmPanel.setLayout(new GridLayout(2,1));
         algorithmPanel.add(optiPanel);
         algorithmPanel.add(heuristicsPanel);
-        
-        JPanel specPanel = new JPanel();
+
+        final JPanel specPanel = new JPanel();
         specPanel.setLayout(new GridLayout(2, 2));
         specPanel.add(nodeExpander);
         specPanel.add(buildAutomaton);
         specPanel.add(vgDrawer);
         specPanel.add(balanceVelocities);
         //	specPanel.add(smaPanel);
-        
-        JTabbedPane tabbedPane = new JTabbedPane();
+
+        final JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Algorithms", algorithmPanel);
         tabbedPane.addTab("Specifications", specPanel);
-        
+
         // 	/******** Layout of the dialog ***********/
         // 	getContentPane().setLayout(new GridLayout(4, 1));
         // 	getContentPane().add(optiPanel);
         // 	getContentPane().add(heuristicsPanel);
         // 	getContentPane().add(expanderPanel);
         // 	getContentPane().add(buttonPanel);
-        
+
         getContentPane().add("Center", tabbedPane);
         getContentPane().add("South", buttonPanel);
-        
+
         Utility.setDefaultButton(this, okButton);
         Utility.setupDialog(this, 300, 250);
-        
+
         /************* Event Handlers ****************/
         okButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 doit();
             }
         });
-        
+
         cancelButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 if (sched != null)
                 {
@@ -184,20 +184,20 @@ public class ScheduleDialog
                 {
                     done();
                 }
-                
+
             }
         });
-        
+
         optiMethodsBox.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 if (((String)optiMethodsBox.getSelectedItem()).contains("A*"))
                 {
                     heuristicsBox.setEnabled(true);
-                    
+
                     heuristicsBox.removeAllItems();
-                    for (String heuristic : astarHeuristics)
+                    for (final String heuristic : astarHeuristics)
                     {
                             heuristicsBox.addItem(heuristic);
                     }
@@ -205,46 +205,46 @@ public class ScheduleDialog
                 else if (((String)optiMethodsBox.getSelectedItem()).contains(SchedulingConstants.MILP))
                 {
                     heuristicsBox.setEnabled(true);
-                    
+
                     heuristicsBox.removeAllItems();
-                    for (String heuristic : milpHeuristics)
+                    for (final String heuristic : milpHeuristics)
                     {
                         heuristicsBox.addItem(heuristic);
                     }
                 }
-                else 
+                else
                 {
                     heuristicsBox.setEnabled(false);
                 }
             }
         });
-        
+
         // Is only used for automatic scheduling of several files (a whole directory)
         autoTestButton = new JButton("AutoTest");
         buttonPanel.add(autoTestButton);
         autoTestButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 try
                 {
                     prepareAutoTest();
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.error("Exception while performing autotest. " + ex.getMessage());
                 }
             }
         });
     }
-    
+
     public void prepareAutoTest()
             throws Exception
-    {        
-        File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.getAsString());
-        File[] files = rootDir.listFiles(new FilenameFilter()
+    {
+        final File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.getAsString());
+        final File[] files = rootDir.listFiles(new FilenameFilter()
             {
-                public boolean accept(File dir, String name)
+                public boolean accept(final File dir, final String name)
                 {
                     return name.endsWith(".xml");
                 }
@@ -265,7 +265,7 @@ public class ScheduleDialog
 
             writer =  new BufferedWriter(new FileWriter(resultFile));
         }
-        catch (IOException ioe)
+        catch (final IOException ioe)
         {
             logger.error("Error at file creation : " + rootDir + File.separator + optiMethodsBox.getSelectedItem() + "_" + heuristicsBox.getSelectedItem() + ".txt");
         }
@@ -276,10 +276,10 @@ public class ScheduleDialog
         }
 
         autoTestButton.setEnabled(false);
-        
+
         done();
     }
-    
+
     /**
      *      Calls the selected scheduling algorithm.
      *      It is assumed that synchronization has been performed prior to scheduling.
@@ -290,57 +290,57 @@ public class ScheduleDialog
         {
             cancelButton.setText("Stop");
             okButton.setEnabled(false);
-            
+
             readMemoryCapacity();
-            
+
             //temp - only here to be able to test the velocity balancer rapidly
             if (optiMethodsBox.getSelectedItem().equals("Velocity Balancing"))
             {
-                VelocityBalancer vb = new VelocityBalancer(selectedAutomata);
+                final VelocityBalancer vb = new VelocityBalancer(selectedAutomata);
                 for (int i = 0; i < vb.getOptimalSubPlants().size(); i++)
                 {
                     ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(vb.getOptimalSubPlants().getAutomatonAt(i));
                 }
-                
+
                 //temp
-                Automata subControllers = vb.getSubControllers();
+                final Automata subControllers = vb.getSubControllers();
                 for (int i = 0; i < subControllers.size(); i++)
                 {
                     ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(subControllers.getAutomatonAt(i));
                 }
-                
+
                 close();
                 return;
             }
-            
-            String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
+
+            final String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
             if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MODIFIED_A_STAR))
             {
-                if ((selectedAutomata.getPlantAutomata().size() == 2) && 
-                        (selectedHeuristic.equals(SchedulingConstants.VIS_GRAPH_TIME_RELAXATION) || 
+                if ((selectedAutomata.getPlantAutomata().size() == 2) &&
+                        (selectedHeuristic.equals(SchedulingConstants.VIS_GRAPH_TIME_RELAXATION) ||
                         selectedHeuristic.equals(SchedulingConstants.VIS_GRAPH_NODE_RELAXATION)))
                 {
                     sched = new VisGraphScheduler(selectedAutomata, vgDrawer.isSelected());
                 }
                 else if (heuristicsBox.getSelectedItem().equals(SchedulingConstants.SUBOPTIMAL))
                 {
-                    sched = new ModifiedAstar(selectedAutomata, SchedulingConstants.ONE_PRODUCT_RELAXATION, 
-                            nodeExpander.isSelected(), buildAutomaton.isSelected(), balanceVelocities. isSelected(), 
+                    sched = new ModifiedAstar(selectedAutomata, SchedulingConstants.ONE_PRODUCT_RELAXATION,
+                            nodeExpander.isSelected(), buildAutomaton.isSelected(), balanceVelocities. isSelected(),
                             new double[]{30, 40});
-                           
-                    
-                    
-                    
-                    
+
+
+
+
+
 //                    Thread mainThread = Thread.currentThread();
-                    
+
 //                    logger.info("0");
 //                    ApproxWeightsDialog approxWeightsDlg = new ApproxWeightsDialog(this);
 //                    return;
 //                    Thread approxDlgThread = new Thread(approxWeightsDlg);
 //                    approxDlgThread.start();
 //                    mainThread.join();
-//                    
+//
 ////                    while (! approxWeightsDlg.isDone())
 ////                    {
 ////                        mainThread.sleep(1000);
@@ -348,28 +348,28 @@ public class ScheduleDialog
 ////                    synchronized (approxWeightsDlg)
 ////                    {
 ////                        mainThread.wait();
-////                    
+////
 //                    logger.info("1");
 ////                    Thread.currentThread().wait();
 //                    logger.info("2");
-//                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), 
-//                            nodeExpander.isSelected(), buildAutomaton.isSelected(), this, 
+//                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(),
+//                            nodeExpander.isSelected(), buildAutomaton.isSelected(), this,
 //                            approxWeightsDlg.getWeights());
 //                    logger.info("3");
 ////                    }
                 }
                 else
                 {
-                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), 
-                            nodeExpander.isSelected(), buildAutomaton.isSelected(), balanceVelocities.isSelected()); 
+                    sched = new ModifiedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(),
+                            nodeExpander.isSelected(), buildAutomaton.isSelected(), balanceVelocities.isSelected());
                 }
             }
             else if (((String)optiMethodsBox.getSelectedItem()).contains(SchedulingConstants.MILP))
             {
                 if (selectedHeuristic.equals(SchedulingConstants.OPTIMAL))
                 {
-                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected(), 
-                            (String)optiMethodsBox.getSelectedItem(), balanceVelocities.isSelected()); 
+                    sched = new Milp(selectedAutomata, buildAutomaton.isSelected(),
+                            (String)optiMethodsBox.getSelectedItem(), balanceVelocities.isSelected());
                 }
                 else if (selectedHeuristic.equals(SchedulingConstants.SUBOPTIMAL))
                 {
@@ -382,7 +382,7 @@ public class ScheduleDialog
             }
             else if (optiMethodsBox.getSelectedItem().equals(SchedulingConstants.MULTITHREADED_A_STAR))
             {
-                sched = new MultithreadedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(), 
+                sched = new MultithreadedAstar(selectedAutomata, (String) heuristicsBox.getSelectedItem(),
                         nodeExpander.isSelected(), buildAutomaton.isSelected(), false);
             }
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
@@ -394,7 +394,7 @@ public class ScheduleDialog
             {
                 throw new Exception("Unknown optimization method");
             }
-            
+
             // If autotest is used, a print-out is done elsewhere
             if (autoTestButton.isEnabled())
             {
@@ -409,7 +409,7 @@ public class ScheduleDialog
             {
                 Thread.sleep(10);
             }
-            
+
             // ... add the schedule automaton to the GUI...¨(unless autotest is running)
             // If autotest is running, only print error messages
             if (autoTestButton.isEnabled())
@@ -442,13 +442,13 @@ public class ScheduleDialog
                 reset();
             }
         }
-        catch (Exception excp)
+        catch (final Exception excp)
         {
             logger.error("ScheduleDialog::doit " + excp);
             logger.debug(excp.getStackTrace());
         }
     }
-    
+
     /**
      *      Terminates the Schedule Dialog.
      */
@@ -461,7 +461,7 @@ public class ScheduleDialog
                 setVisible(false);
                 dispose();
                 getParent().repaint();
-                
+
                 logger.info("Scheduling done");
             }
             else
@@ -473,29 +473,29 @@ public class ScheduleDialog
                     writer.newLine();
                     writer.newLine();
                 }
-                
+
                 if (filesToSchedule.size() > 0)
                 {
                     // 				getParent().repaint();
-                    
-                    File currFile = filesToSchedule.remove(0);
-                    
+
+                    final File currFile = filesToSchedule.remove(0);
+
                     logger.info("Scheduling " + currFile.getPath());
-                    
+
                     writer.write(currFile.getName());
                     writer.newLine();
-                    
+
 //                    if (currFile.getName().contains(".xml"))
 //                    {
 //                        ActionMan.automataDeleteAll_actionPerformed(ActionMan.getGui());
 //                        ActionMan.openFile(ActionMan.getGui(), currFile);
 //                        ActionMan.getGui().invertSelection();
                         // 					getParent().repaint();
-                        
+
 //                        ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().clear();
-                        //ide.getActiveDocumentContainer().getAnalyzerPanel().addProject();                
+                        //ide.getActiveDocumentContainer().getAnalyzerPanel().addProject();
                         //ide.getIDE().getDocumentContainerManager().openContainer(currFile);
-                    
+
                         // Open the current file
                         ide.getActiveDocumentContainer().getIDE().getDocumentContainerManager().openContainer(currFile);
                         // Switch to the analyzer panel
@@ -503,7 +503,7 @@ public class ScheduleDialog
                                 ide.getActiveDocumentContainer().getAnalyzerPanel());
                         // Select all the automata
                         selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
-                        
+
                         // Schedule using the chosen settings
                         doit();
 //                    }
@@ -516,24 +516,24 @@ public class ScheduleDialog
                 {
                     writer.flush();
                     writer.close();
-                    
+
                     autoTestButton.setEnabled(true);
-                    
+
                     done();
                 }
             }
         }
-        catch (IOException ioe)
+        catch (final IOException ioe)
         {
             logger.error("Error at writing the results of scheduling to file");
         }
     }
-    
+
     void readMemoryCapacity()
     {
         memoryCapacity = (int) (new Integer(memoryCapacityField.getText()));
     }
-    
+
     /**
      * Resets the buttons and the scheduler-instance
      */
@@ -541,10 +541,10 @@ public class ScheduleDialog
     {
         cancelButton.setText("Cancel");
         okButton.setEnabled(true);
-        
+
         sched = null;
     }
-    
+
     public void close()
     {
         setVisible(false);
@@ -556,7 +556,7 @@ public class ScheduleDialog
         return ide;
     }
 
-//    // Ugly implementation 
+//    // Ugly implementation
 //    public Automata getSelectedAutomata()
 //    {
 //        if (ide instanceof Gui)
@@ -569,7 +569,8 @@ public class ScheduleDialog
 //        }
 //    }
 
-    private void addAutomatonToGUI(Automaton scheduleAuto)
+    @SuppressWarnings("deprecation")
+    private void addAutomatonToGUI(final Automaton scheduleAuto)
             throws Exception
     {
         if (scheduleAuto != null)
@@ -593,21 +594,21 @@ public class ScheduleDialog
                 if (ide.getActiveDocumentContainer().getEditorPanel() != null)
                 {
                     // Compile into Waters module
-                    net.sourceforge.waters.model.marshaller.ProductDESImporter importer = 
+                    final net.sourceforge.waters.model.marshaller.ProductDESImporter importer =
                             new net.sourceforge.waters.model.marshaller.ProductDESImporter(
                             net.sourceforge.waters.subject.module.ModuleSubjectFactory.getInstance());
-                    
+
                     // Adds the cost in the state to the name of the state for correct display in the editor
-                    Automaton scheduleAutoForEditor = scheduleAuto.clone();
-                    for (java.util.Iterator<org.supremica.automata.State> states = scheduleAutoForEditor.stateIterator(); states.hasNext(); )
+                    final Automaton scheduleAutoForEditor = scheduleAuto.clone();
+                    for (final java.util.Iterator<org.supremica.automata.State> states = scheduleAutoForEditor.stateIterator(); states.hasNext(); )
                     {
-                        org.supremica.automata.State state = states.next();
+                        final org.supremica.automata.State state = states.next();
                         state.setName(state.getName() + ", cost=" + state.getCost());
                     }
 
-                    net.sourceforge.waters.model.module.SimpleComponentProxy component = 
+                    final net.sourceforge.waters.model.module.SimpleComponentProxy component =
                             importer.importComponent(scheduleAutoForEditor);
-                    try 
+                    try
                     {
                         // Add to current module
                         final net.sourceforge.waters.model.module.IdentifierProxy ident = component.getIdentifier();
@@ -615,16 +616,16 @@ public class ScheduleDialog
                         context.checkNewComponentName(ident);
                         ide.getActiveDocumentContainer().getEditorPanel().addComponent((net.sourceforge.waters.subject.base.AbstractSubject) component);
                         // Add all (new) events to the module
-                        net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
+                        final net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
                         boolean problem = false;
-                        for (org.supremica.automata.LabeledEvent event : scheduleAuto.getAlphabet()) 
+                        for (final org.supremica.automata.LabeledEvent event : scheduleAuto.getAlphabet())
                         {
                             final String name = event.getName();
-                            if (!name.contains("[")) 
+                            if (!name.contains("["))
                             {
                                 boolean found = false;
                                 for (final net.sourceforge.waters.model.module.EventDeclProxy decl : module.getEventDeclList()) {
-                                    if (decl.getName().equals(name)) 
+                                    if (decl.getName().equals(name))
                                     {
                                         found = true;
                                         break;
@@ -640,18 +641,18 @@ public class ScheduleDialog
                                                                                                        null, null, null);
                                     module.getEventDeclListModifiable().add(decl);
                                 }
-                            } 
-                            else 
+                            }
+                            else
                             {
                                 problem = true;
                             }
                         }
-                        if (problem) 
+                        if (problem)
                         {
                             javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", javax.swing.JOptionPane.WARNING_MESSAGE);
                         }
-                    } 
-                    catch (Exception ex) 
+                    }
+                    catch (final Exception ex)
                     {
                         ide.getIDE().error("Could not add " + scheduleAuto + " to editor." + ex);
                     }
@@ -669,51 +670,51 @@ public class ScheduleDialog
     }
 }
 
-    
+
 class ApproxWeightsDialog
         extends JDialog implements Runnable, ActionListener, KeyListener
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	@SuppressWarnings("unused")
-	private Scheduler sched = null;
+	private final Scheduler sched = null;
     private ScheduleDialog parentDlg = null;
-    private JPanel ioPanel = new JPanel();
-    private JPanel btnPanel = new JPanel();
-    private JTextField xField = new JTextField(5);
-    private JTextField yField = new JTextField(5);
-    private JButton okBtn = new JButton("OK");
-    private JButton cancelBtn = new JButton("Cancel");
+    private final JPanel ioPanel = new JPanel();
+    private final JPanel btnPanel = new JPanel();
+    private final JTextField xField = new JTextField(5);
+    private final JTextField yField = new JTextField(5);
+    private final JButton okBtn = new JButton("OK");
+    private final JButton cancelBtn = new JButton("Cancel");
     private double xWeight = -1;
     private double yWeight = -1;
     private boolean threadDone = false;
     private final static Logger logger = LoggerFactory.createLogger(ApproxWeightsDialog.class);
-        
-    public ApproxWeightsDialog(ScheduleDialog scheduleDlg)
+
+    public ApproxWeightsDialog(final ScheduleDialog scheduleDlg)
         throws Exception
     {
         super(scheduleDlg);
         parentDlg = scheduleDlg;
-        
+
         openApproxWeightsDialog();
     }
-    
+
     public void run()
-    {               
-//        try 
+    {
+//        try
 //        {
 //            while (xWeight < 0 || yWeight < 0)
 //            {
 //                repaint();
 //            }
-       
+
         for (int i = 0; i < 5; i++)
         {
             repaint();
-        } 
+        }
 
-            
-            
+
+
             threadDone = true;
             notifyAll();
 //        }
@@ -722,12 +723,12 @@ class ApproxWeightsDialog
 //            ex.printStackTrace();
 //        }
     }
-    
+
     private void openApproxWeightsDialog()
             throws Exception
     {
         // Set the main layout of the dialog box
-        java.awt.BorderLayout headLayout = new java.awt.BorderLayout();
+        final java.awt.BorderLayout headLayout = new java.awt.BorderLayout();
         headLayout.setHgap(5);
         headLayout.setVgap(5);
         setLayout(headLayout);
@@ -756,7 +757,7 @@ class ApproxWeightsDialog
         // Close the dialog box if cancel is called
         cancelBtn.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent ev)
+            public void actionPerformed(final ActionEvent ev)
             {
                 parentDlg.done();
             }
@@ -768,18 +769,18 @@ class ApproxWeightsDialog
 
         // Populate the dialog box: add title, header text, x-y-input-panel and button-panel
         setTitle("Approximation weights for the A*");
-        add(new JLabel(" Set the x- and y-weights used by the A*" + 
+        add(new JLabel(" Set the x- and y-weights used by the A*" +
                 "to find an approximative solution...  "), java.awt.BorderLayout.NORTH);
         add(ioPanel, java.awt.BorderLayout.CENTER);
         add(btnPanel, java.awt.BorderLayout.SOUTH);
 
         // Pack and show the dialog box
         pack();
-        setVisible(true);  
+        setVisible(true);
     }
-    
+
     /**
-     * Returns the weight-values if they are non-negative, i.e if they have 
+     * Returns the weight-values if they are non-negative, i.e if they have
      * been set by the user.
      */
     public double[] getWeights()
@@ -787,17 +788,17 @@ class ApproxWeightsDialog
     {
         return new double[]{xWeight, yWeight};
     }
-    
+
     public boolean isDone()
     {
         return threadDone;
     }
-    
+
     /**
      * Called at the click of the ok-button. If the x- and y-fields are non-empty and
      * non-negative, the weight-values are stored.
      */
-    public void actionPerformed(ActionEvent ev)
+    public void actionPerformed(final ActionEvent ev)
     {
         try
         {
@@ -810,29 +811,29 @@ class ApproxWeightsDialog
             }
 
         }
-        catch (NumberFormatException ex)
+        catch (final NumberFormatException ex)
         {
             logger.error("The weights have incorrect format (must be positive floating numbers).");
         }
-        catch (Exception excp)
+        catch (final Exception excp)
         {
             logger.error("ScheduleDialog::doit " + excp);
             logger.debug(excp.getStackTrace());
         }
     }
-    
+
     /**
      * If return is pressed in the x- or y-field, click the ok-button
      */
-    public void keyPressed(KeyEvent ev)
+    public void keyPressed(final KeyEvent ev)
     {
         if (ev.getKeyCode() == KeyEvent.VK_ENTER)
         {
             okBtn.doClick();
         }
     }
-    
+
     // Necessary methods to implement the KeyListener-interface
-    public void keyReleased(KeyEvent ev){}
-    public void keyTyped(KeyEvent ev){}
+    public void keyReleased(final KeyEvent ev){}
+    public void keyTyped(final KeyEvent ev){}
 }

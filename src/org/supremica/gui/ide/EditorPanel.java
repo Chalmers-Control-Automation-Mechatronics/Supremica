@@ -243,7 +243,7 @@ public class EditorPanel
         }
     }
 
-    // Deprecated!!!
+    @Deprecated
     public void addComponent(final Proxy proxy)
     {
         final SelectionOwner component = mComponentsTab.getPanel();

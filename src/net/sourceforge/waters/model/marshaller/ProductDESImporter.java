@@ -277,11 +277,8 @@ public class ProductDESImporter
     }
   }
 
-
-  //#########################################################################
-  //# Visitor Methods
-  private EventDeclProxy importEventDecl(final EventProxy event)
-    throws ParseException
+  public EventDeclProxy importEventDecl(final EventProxy event)
+  throws ParseException
   {
     final IdentifierProxy ident = importEvent(event);
     final EventKind kind = event.getKind();
@@ -291,6 +288,9 @@ public class ProductDESImporter
       (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
   }
 
+
+  //#########################################################################
+  //# Visitor Methods
   private IdentifierProxy importEvent(final EventProxy event)
     throws ParseException
   {

@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica Automata
+//# PACKAGE: org.supremica.automata.IO
+//# CLASS:   ProjectBuildFromXML
+//###########################################################################
+//# $Id$
+//###########################################################################
 
 /*
  *  Supremica Software License Agreement
@@ -169,32 +177,32 @@ public class ProjectBuildFromXML
     private Timers currTimers = null;
     private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
     private File thisFile = null;
-    
+
     // mappings between id and state/event
     private Map<String, State> idStateMap = new HashMap<String, State>();
     private Map<String, LabeledEvent> idEventMap = new HashMap<String, LabeledEvent>();
-    
+
     public ProjectBuildFromXML()
     {
         this.theProjectFactory = new DefaultProjectFactory();
     }
-    
-    public ProjectBuildFromXML(ProjectFactory theProjectFactory)
+
+    public ProjectBuildFromXML(final ProjectFactory theProjectFactory)
     {
         this.theProjectFactory = theProjectFactory;
     }
-    
-    public Project build(URL url)
+
+    public Project build(final URL url)
     throws Exception
     {
-        String protocol = url.getProtocol();
-        
+        final String protocol = url.getProtocol();
+
         if (protocol.equals("file"))
         {
             inputProtocol = InputProtocol.FileProtocol;
-            
-            String fileName = url.getFile();
-            
+
+            final String fileName = url.getFile();
+
             thisFile = new File(fileName);
         }
         else if (protocol.equals("jar"))
@@ -204,118 +212,118 @@ public class ProjectBuildFromXML
         else
         {
             inputProtocol = InputProtocol.UnknownProtocol;
-            
+
             System.err.println("Unknown protocol: " + protocol);
-            
+
             return null;
         }
-        
-        InputStream stream = url.openStream();
-        
+
+        final InputStream stream = url.openStream();
+
         return build(stream);
     }
-    
+
     @SuppressWarnings("deprecation")
-	public Project build(File file)
+	public Project build(final File file)
     throws Exception
     {
         return build(file.toURL());
     }
-    
-    public Project build(InputStream is)
+
+    public Project build(final InputStream is)
     throws Exception
     {
         return build(is, false);
     }
-    
+
 //    private Project build(File file, boolean validate)
 //    throws Exception
 //    {
 //        return build(file.getCanonicalPath(), validate);
 //    }
-    
-    private Project build(InputStream is, boolean validate)
+
+    private Project build(final InputStream is, final boolean validate)
     throws Exception
     {
-        InputSource source = new InputSource(is);
-        
+        final InputSource source = new InputSource(is);
+
         return build(source, validate);
     }
-    
+
 //    private Project build(String fileName)
 //    throws Exception
 //    {
 //        return build(fileName, false);
 //    }
-    
+
     // changed to public by Arash, we need to load from streams in XML-RPC interface!
-    public Project build(Reader r)
+    public Project build(final Reader r)
     throws Exception
     {
         return build(r, false);
     }
-    
-    private Project build(Reader r, boolean validate)
+
+    private Project build(final Reader r, final boolean validate)
     throws Exception
     {
-        InputSource source = new InputSource(r);
-        
+        final InputSource source = new InputSource(r);
+
         return build(source, validate);
     }
-    
+
     @SuppressWarnings("unused")
-	private Project build(String fileName, boolean validate)
+	private Project build(final String fileName, final boolean validate)
     	throws Exception
     {
-        SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-        
+        final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+
         parserFactory.setValidating(validate);
-        
-        SAXParser parser = parserFactory.newSAXParser();
-        
+
+        final SAXParser parser = parserFactory.newSAXParser();
+
         try
         {
             parser.parse(new File(fileName), this);
         }
-        catch (SAXException ex)
+        catch (final SAXException ex)
         {
             System.out.println(ex.getMessage());
-            
+
             throw new SupremicaException(ex.getMessage());
         }
-        
+
         return currProject;
     }
-    
-    private Project build(InputSource is, boolean validate)
+
+    private Project build(final InputSource is, final boolean validate)
     throws Exception
     {
-        SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-        
+        final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+
         parserFactory.setValidating(validate);
-        
-        SAXParser parser = parserFactory.newSAXParser();
-        
+
+        final SAXParser parser = parserFactory.newSAXParser();
+
         try
         {
             parser.parse(is, this);
         }
-        catch (SAXException ex)
+        catch (final SAXException ex)
         {
             System.err.println(ex.getMessage());
-            
+
             throw new SupremicaException(ex.getMessage());
         }
-        
+
         return currProject;
     }
-    
-    public void setDocumentLocator(Locator locator)
+
+    public void setDocumentLocator(final Locator locator)
     {
         this.locator = locator;
     }
-    
-    public void startElement(String uri, String localName, String name, Attributes attributes)
+
+    public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
     throws SAXException
     {
         // in order of frequency
@@ -336,7 +344,7 @@ public class ProjectBuildFromXML
             // Reset the id maps when parsing a new automaton
             idEventMap = new HashMap<String, LabeledEvent>();
             idStateMap = new HashMap<String, State>();
-            
+
             doAutomaton(attributes);
         }
         else if (projectStr.equals(name))
@@ -426,51 +434,51 @@ public class ProjectBuildFromXML
             throwException("unknown element: " + name);
         }
     }
-    
-    public final void doAutomata(Attributes attributes)
+
+    public final void doAutomata(final Attributes attributes)
     throws SAXException
     {
         doProject(attributes);
     }
-    
-    public final void doAutomaton(Attributes attributes)
+
+    public final void doAutomaton(final Attributes attributes)
     throws SAXException
     {
-        String name = attributes.getValue("name");
+        final String name = attributes.getValue("name");
         if (name == null)
         {
             throwException("name attribute is missing");
         }
-        
+
         currAutomaton = new Automaton(name);
         currAlphabet = currAutomaton.getAlphabet();
-        
-        
-        String type = attributes.getValue("type");
-        
+
+
+        final String type = attributes.getValue("type");
+
         // AutomatonType currType = AutomatonType.UNDEFINED; // Changed to specification
         AutomatonType currType = AutomatonType.SPECIFICATION;
-        
+
         if (type != null)
         {
             currType = AutomatonType.toType(type);
         }
-        
+
         // To deal with old files
         if (currType == AutomatonType.UNDEFINED)
         {
             currType = AutomatonType.SPECIFICATION;
         }
-        
+
         currAutomaton.setType(currType);
-        
+
         // Automaton comment
-        String comment = attributes.getValue("comment");
+        final String comment = attributes.getValue("comment");
         if ((comment != null) &&!comment.equals(""))
         {
             currAutomaton.setComment(comment);
         }
-        
+
         //currAutomaton.setAlphabet(currAlphabet);
         if (currProject.containsAutomaton(currAutomaton.getName()))
         {
@@ -483,8 +491,8 @@ public class ProjectBuildFromXML
             currProject.addAutomaton(currAutomaton);
         }
     }
-    
-    public final void doEvent(Attributes attributes)
+
+    public final void doEvent(final Attributes attributes)
     throws SAXException
     {
         String id = null;
@@ -496,13 +504,13 @@ public class ProjectBuildFromXML
         boolean operatorReset = false;
         boolean immediate = false;
         boolean epsilon = false;
-        int length = attributes.getLength();
+        final int length = attributes.getLength();
         String currName;
-        
+
         for (int i = 0; i < length; i++)
         {
             currName = attributes.getQName(i);
-            
+
             if (idStr.equals(currName))
             {
                 id = attributes.getValue(i);
@@ -540,47 +548,47 @@ public class ProjectBuildFromXML
                 epsilon = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
             }
         }
-        
+
         if (id == null)
         {
             throwException("id attribute is missing");
         }
-        
+
         if (label == null)
         {
             label = id;
         }
-        
+
         // LabeledEvent currEvent = new LabeledEvent(label, id);
-        LabeledEvent currEvent = new LabeledEvent(label);
-        
+        final LabeledEvent currEvent = new LabeledEvent(label);
+
         //              currEvent.setId(id);
         //              currEvent.setLabel(label);
         currEvent.setControllable(controllable);
         currEvent.setPrioritized(prioritized);
-        currEvent.setObservable(observable);
+        // TODO Not sure how to interpret the epsilon attribute  ~~~Robi
+        currEvent.setObservable(observable && !epsilon);
         currEvent.setOperatorIncrease(operatorIncrease);
         currEvent.setOperatorReset(operatorReset);
         currEvent.setImmediate(immediate);
-        currEvent.setUnobservable(epsilon);
-        
+
         // Associate the id with the event
         idEventMap.put(id, currEvent);
-        
+
         try
         {
             currAlphabet.addEvent(currEvent);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
-            
+
             // System.err.println("Exception adding event. " + ex);
             // logger.debug(ex.getStackTrace());
             throw new RuntimeException(ex);
         }
     }
-    
-    public final void doState(Attributes attributes)
+
+    public final void doState(final Attributes attributes)
     throws SAXException
     {
         String id = null;
@@ -589,20 +597,20 @@ public class ProjectBuildFromXML
         boolean accepting = false;
         boolean forbidden = false;
         double cost = State.UNDEF_COST;
-        int length = attributes.getLength();
+        final int length = attributes.getLength();
         String currName;
-        
+
         for (int i = 0; i < length; i++)
         {
             currName = attributes.getQName(i);
-            
+
             if (idStr.equals(currName))
             {
                 id = attributes.getValue(i);
             }
             else if (nameStr.equals(currName))
             {
-                String stateName = attributes.getValue(i);
+                final String stateName = attributes.getValue(i);
                 if (name == null)
                 {
                     name = stateName;
@@ -629,105 +637,105 @@ public class ProjectBuildFromXML
                 cost = Double.valueOf(attributes.getValue(i)).doubleValue();
             }
         }
-        
+
         if (id == null)
         {
             throwException("id attribute is missing");
         }
-        
+
         if (name == null)
         {
             name = id;
         }
-        
+
         if (cost != State.UNDEF_COST)
         {
             name += ", cost=" + cost;
         }
-        
+
         if (currAutomaton.containsStateWithName(name))
         {
             throwException("several states with the same name (" + name + ")");
         }
-        
-        State currState = new State(name);
-        
+
+        final State currState = new State(name);
+
         // currState.setId(id);
         // currState.setName(name);
         currState.setInitial(initial);
         currState.setAccepting(accepting);
         currState.setForbidden(forbidden);
         currState.setCost(cost);
-        
+
         // Associate the id with the state
         idStateMap.put(id, currState);
         currAutomaton.addState(currState);
     }
-    
-    public final void doTransition(Attributes attributes)
+
+    public final void doTransition(final Attributes attributes)
     throws SAXException
     {
         // Transition ::source
-        String sourceId = attributes.getValue("source");
-        
+        final String sourceId = attributes.getValue("source");
+
         if (sourceId == null)
         {
             throwException("source attribute is missing");
         }
-        
+
         // Get the state corresponding to this id
-        State sourceState = idStateMap.get(sourceId);
-        
+        final State sourceState = idStateMap.get(sourceId);
+
         // State sourceState = currAutomaton.getStateWithId(sourceId);
         if (sourceState == null)
         {
             throwException("cannot find source state: " + sourceId);
         }
-        
+
         // Transition::dest
-        String destId = attributes.getValue("dest");
-        
+        final String destId = attributes.getValue("dest");
+
         if (destId == null)
         {
             throwException("dest attribute is missing");
         }
-        
+
         // Get the state corresponding to this id
-        State destState = idStateMap.get(destId);
-        
+        final State destState = idStateMap.get(destId);
+
         // State destState = currAutomaton.getStateWithId(destId);
         if (destState == null)
         {
             throwException("cannot find dest state: " + destId);
         }
-        
+
         // Transition::event
-        String eventId = attributes.getValue("event");
-        
+        final String eventId = attributes.getValue("event");
+
         if (eventId == null)
         {
             throwException("event attribute is missing");
         }
-        
+
         // Get the event corresponding to this id
         if (!idEventMap.containsKey(eventId))
         {
             throwException("event id '" + eventId + "' is not a valid event id");
         }
-        
+
         LabeledEvent event = idEventMap.get(eventId);
-               
+
         // TEMP-solution (use EFA instead)
         double probability = Arc.DEFAULT_PROBABILITY;
-        String probabilityStr = attributes.getValue("probability");
+        final String probabilityStr = attributes.getValue("probability");
         if (probabilityStr != null)
         {
-            probability = Double.valueOf(probabilityStr).doubleValue();    
+            probability = Double.valueOf(probabilityStr).doubleValue();
             if (probability < 0 || probability > 1)
             {
                 throwException("the probability value is out of range");
             }
-            
+
 //            currAutomaton.getAlphabet().removeEvent(event);
             event = new LabeledEvent(event.getLabel() + "_prob_" + (int)(probability*100)); // Multiplication with 100 since Waters cannot accept digital numbers in events names
             if (! currAutomaton.getAlphabet().contains(event))
@@ -735,250 +743,251 @@ public class ProjectBuildFromXML
                 currAutomaton.getAlphabet().addEvent(event);
             }
         }
-        
+
         // Create and add the arc
-        Arc arc = new Arc(sourceState, destState, event, probability);
-        
+        final Arc arc = new Arc(sourceState, destState, event, probability);
+
         // Arc arc = new Arc(sourceState, destState, eventId);
         try
         {
             currAutomaton.addArc(arc);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             throw new SAXException(ex);
         }
     }
-    
-    public final void throwException(String msg)
+
+    public final void throwException(final String msg)
     throws SAXException
     {
-        int line = locator.getLineNumber();
+        final int line = locator.getLineNumber();
         @SuppressWarnings("unused")
+        final
 		int column = locator.getColumnNumber();
-        String exMsg = "Error while parsing at line: " + line + ". Reason: \"" + msg + "\".";
+        final String exMsg = "Error while parsing at line: " + line + ". Reason: \"" + msg + "\".";
         throw new SAXException(exMsg);
     }
-    
-    public final void doProject(Attributes attributes)
+
+    public final void doProject(final Attributes attributes)
     throws SAXException
     {
         currProject = theProjectFactory.getProject();
-        
-        String name = attributes.getValue("name");
-        
+
+        final String name = attributes.getValue("name");
+
         if (name != null)
         {
             currProject.setName(name);
         }
-        
-        String comment = attributes.getValue("comment");
+
+        final String comment = attributes.getValue("comment");
         if ((comment != null) &&!comment.equals(""))
         {
             currProject.setComment(comment);
         }
-        
+
         int majorVersion = 0;
-        String majorStringVersion = attributes.getValue("major");
-        
+        final String majorStringVersion = attributes.getValue("major");
+
         if (majorStringVersion != null)
         {
             majorVersion = Integer.parseInt(majorStringVersion);
         }
-        
+
         if (majorVersion > 0)
         {
             throw new SAXException("Unsupported file format.");
         }
-        
+
         int minorVersion = 0;
-        String minorStringVersion = attributes.getValue("minor");
-        
+        final String minorStringVersion = attributes.getValue("minor");
+
         if (minorStringVersion != null)
         {
             minorVersion = Integer.parseInt(minorStringVersion);
         }
-        
+
         if (minorVersion > 10)
         {
             throw new SAXException("Unsupported file format.");
         }
     }
-    
+
     /*
     public final void doLayout(Attributes attributes)
     throws SAXException
     {
         String width = attributes.getValue("width");
-     
+
         if (width != null)
         {
             int iWidth = Integer.parseInt(width);
-     
+
             currAutomaton.setWidth(iWidth);
         }
-     
+
         String height = attributes.getValue("height");
-     
+
         if (height != null)
         {
             int iHeight = Integer.parseInt(height);
-     
+
             currAutomaton.setHeight(iHeight);
         }
-     
+
         currAutomaton.setHasLayout(true);
     }
      */
-    
+
     /*
     public final void doStateLayout(Attributes attributes)
     throws SAXException
     {
         String id = attributes.getValue("id");
-     
+
         if (id == null)
         {
             throwException("id attribute is missing");
         }
-     
+
         State currState = (State) idStateMap.get(id);
-     
+
         // State currState = currAutomaton.getStateWithId(id);
         if (currState == null)
         {
             throwException("Cannot find state: " + id);
         }
-     
+
         String x = attributes.getValue("x");
         String y = attributes.getValue("y");
-     
+
         if ((x != null) && (y != null))
         {
             int iX = Integer.parseInt(x);
             int iY = Integer.parseInt(y);
-     
+
             currState.setXY(iX, iY);
         }
     }
      **/
-    
+
     /*
     public final void doTransitionLayout(Attributes attributes)
     throws SAXException
     {}
      */
-    
-    public final void doExecution(Attributes attributes)
+
+    public final void doExecution(final Attributes attributes)
     throws SAXException
     {}
-    
-    public final void doInputSignals(Attributes attributes)
+
+    public final void doInputSignals(final Attributes attributes)
     throws SAXException
     {
         currSignals = currProject.getInputSignals();
     }
-    
-    public final void doOutputSignals(Attributes attributes)
+
+    public final void doOutputSignals(final Attributes attributes)
     throws SAXException
     {
         currSignals = currProject.getOutputSignals();
     }
-    
-    public final void doSignal(Attributes attributes)
+
+    public final void doSignal(final Attributes attributes)
     throws SAXException
     {
-        String label = attributes.getValue("label");
-        
+        final String label = attributes.getValue("label");
+
         if (label == null)
         {
             throwException("label attribute is missing");
         }
-        
+
         if (currSignals.hasSignal(label))
         {
             throwException("multiple signals of " + label);
         }
-        
-        String portStr = attributes.getValue("port");
-        
+
+        final String portStr = attributes.getValue("port");
+
         if (portStr == null)
         {
             throwException("port attribute is missing");
         }
-        
-        int port = Integer.parseInt(portStr);
-        Signal newSignal = new BinarySignal(label, port);
-        
+
+        final int port = Integer.parseInt(portStr);
+        final Signal newSignal = new BinarySignal(label, port);
+
         //System.err.println("Signal added:" + label);
         currSignals.addSignal(newSignal);
     }
-    
-    public final void doActions(Attributes attributes)
+
+    public final void doActions(final Attributes attributes)
     throws SAXException
     {
         if (currProject == null)
         {
             throwException("project section is missing");
         }
-        
+
         currActions = currProject.getActions();
     }
-    
-    public final void doAction(Attributes attributes)
+
+    public final void doAction(final Attributes attributes)
     throws SAXException
     {
         if (currActions == null)
         {
             throwException("actions section is missing");
         }
-        
-        String label = attributes.getValue("label");
-        
+
+        final String label = attributes.getValue("label");
+
         if (label == null)
         {
             throwException("label attribute is missing");
         }
-        
+
         if (currActions.hasAction(label))
         {
             throwException("multiple actions of " + label);
         }
-        
+
         currAction = new Action(label);
-        
+
         currActions.addAction(currAction);
     }
-    
-    public final void doControls(Attributes attributes)
+
+    public final void doControls(final Attributes attributes)
     throws SAXException
     {
         if (currProject == null)
         {
             throwException("project section is missing");
         }
-        
+
         currControls = currProject.getControls();
     }
-    
-    public final void doControl(Attributes attributes)
+
+    public final void doControl(final Attributes attributes)
     throws SAXException
     {
         if (currControls == null)
         {
             throwException("controls section is missing");
         }
-        
-        String label = attributes.getValue("label");
-        
+
+        final String label = attributes.getValue("label");
+
         if (label == null)
         {
             throwException("label attribute is missing");
         }
-        
+
         boolean invert = false;
-        String invertStr = attributes.getValue("invert");
-        
+        final String invertStr = attributes.getValue("invert");
+
         if (invertStr != null)
         {
             if (invertStr.equalsIgnoreCase("true"))
@@ -986,94 +995,94 @@ public class ProjectBuildFromXML
                 invert = true;
             }
         }
-        
+
         if (currControls.hasControl(label))
         {
             throwException("multiple controls of " + label);
         }
-        
+
         currControl = new Control(label, invert);
-        
+
         currControls.addControl(currControl);
     }
-    
-    public final void doTimers(Attributes attributes)
+
+    public final void doTimers(final Attributes attributes)
     throws SAXException
     {
         if (currProject == null)
         {
             throwException("project section is missing");
         }
-        
+
         currTimers = currProject.getTimers();
     }
-    
-    public final void doTimer(Attributes attributes)
+
+    public final void doTimer(final Attributes attributes)
     throws SAXException
     {
         if (currTimers == null)
         {
             throwException("timers section is missing");
         }
-        
-        String name = attributes.getValue("name");
-        
+
+        final String name = attributes.getValue("name");
+
         if (name == null)
         {
             throwException("name attribute is missing");
         }
-        
-        String startEvent = attributes.getValue("startEvent");
-        
+
+        final String startEvent = attributes.getValue("startEvent");
+
         if (startEvent == null)
         {
             throwException("startEvent attribute is missing");
         }
-        
-        String timeoutEvent = attributes.getValue("timeoutEvent");
-        
+
+        final String timeoutEvent = attributes.getValue("timeoutEvent");
+
         if (timeoutEvent == null)
         {
             throwException("timeoutEvent attribute is missing");
         }
-        
-        String delayStr = attributes.getValue("delay");
-        
+
+        final String delayStr = attributes.getValue("delay");
+
         if (delayStr == null)
         {
             throwException("delay attribute is missing");
         }
-        
-        int delay = Integer.parseInt(delayStr);
-        
+
+        final int delay = Integer.parseInt(delayStr);
+
         if (currTimers.hasTimer(name))
         {
             throwException("multiple timers of " + name);
         }
-        
-        EventTimer currTimer = new EventTimer(name, startEvent, timeoutEvent, delay);
-        
+
+        final EventTimer currTimer = new EventTimer(name, startEvent, timeoutEvent, delay);
+
         currTimers.addTimer(currTimer);
     }
-    
-    public final void doCommand(Attributes attributes)
+
+    public final void doCommand(final Attributes attributes)
     throws SAXException
     {
         if (currAction == null)
         {
             throwException("action section is missing");
         }
-        
-        String command = attributes.getValue("command");
-        
+
+        final String command = attributes.getValue("command");
+
         if (command == null)
         {
             throwException("command attribute is missing");
         }
-        
+
         boolean value = true;
-        String valueStr = attributes.getValue("value");
-        
+        final String valueStr = attributes.getValue("value");
+
         if (valueStr != null)
         {
             if (valueStr.equalsIgnoreCase("false"))
@@ -1081,28 +1090,28 @@ public class ProjectBuildFromXML
                 value = false;
             }
         }
-        
+
         currAction.addCommand(new Command(command, value));
     }
-    
-    public final void doCondition(Attributes attributes)
+
+    public final void doCondition(final Attributes attributes)
     throws SAXException
     {
         if (currControl == null)
         {
             throwException("control section is missing");
         }
-        
-        String condition = attributes.getValue("condition");
-        
+
+        final String condition = attributes.getValue("condition");
+
         if (condition == null)
         {
             throwException("condition attribute is missing");
         }
-        
+
         boolean invert = false;
-        String invertStr = attributes.getValue("invert");
-        
+        final String invertStr = attributes.getValue("invert");
+
         if (invertStr != null)
         {
             if (invertStr.equalsIgnoreCase("true"))
@@ -1110,44 +1119,44 @@ public class ProjectBuildFromXML
                 invert = true;
             }
         }
-        
+
         currControl.addCondition(new Condition(condition, invert));
     }
-    
+
     @SuppressWarnings("deprecation")
-	public final void doAnimation(Attributes attributes)
+	public final void doAnimation(final Attributes attributes)
     throws SAXException
     {
         if (currProject == null)
         {
             throwException("project section is missing");
         }
-        
-        String path = attributes.getValue("path");
-        
+
+        final String path = attributes.getValue("path");
+
         if (path == null)
         {
             throwException("path attribute is missing");
         }
-        
+
         URL url = null;
-        
+
         try
         {
             url = new URL(path);
         }
-        catch (MalformedURLException ex)
+        catch (final MalformedURLException ex)
         {    // This was not an url
             url = null;
             //System.err.println(ex);
         }
-        
+
         try
         {
             if ((url == null) && (inputProtocol == InputProtocol.FileProtocol))
             {
-                File theAnimFile = new File(path);
-                
+                final File theAnimFile = new File(path);
+
                 if (theAnimFile.isAbsolute())
                 {
                     url = theAnimFile.toURL();
@@ -1156,8 +1165,8 @@ public class ProjectBuildFromXML
                 {    // Make it absolute
                     if (thisFile != null)
                     {
-                        File newAnimFile = new File(thisFile.getParentFile(), path);
-                        
+                        final File newAnimFile = new File(thisFile.getParentFile(), path);
+
                         url = newAnimFile.toURL();
                     }
                     else
@@ -1170,51 +1179,51 @@ public class ProjectBuildFromXML
                 url = ProjectBuildFromXML.class.getResource(path);
             }
         }
-        catch (MalformedURLException ex)
+        catch (final MalformedURLException ex)
         {    // This was not an url
             url = null;
             //System.err.println(ex);
         }
-        
+
         currProject.setAnimationURL(url);
     }
-    
-    
-    
+
+
+
     @SuppressWarnings("deprecation")
-	public final void doUserInterface(Attributes attributes)
+	public final void doUserInterface(final Attributes attributes)
     throws SAXException
     {
         if (currProject == null)
         {
             throwException("project section is missing");
         }
-        
-        String path = attributes.getValue("path");
-        
+
+        final String path = attributes.getValue("path");
+
         if (path == null)
         {
             throwException("path attribute is missing");
         }
-        
+
         URL url = null;
-        
+
         try
         {
             url = new URL(path);
         }
-        catch (MalformedURLException ex)
+        catch (final MalformedURLException ex)
         {    // This was not an url
             url = null;
             //System.err.println(ex);
         }
-        
+
         try
         {
             if ((url == null) && (inputProtocol == InputProtocol.FileProtocol))
             {
-                File theUserInterfaceFile = new File(path);
-                
+                final File theUserInterfaceFile = new File(path);
+
                 if (theUserInterfaceFile.isAbsolute())
                 {
                     url = theUserInterfaceFile.toURL();
@@ -1223,8 +1232,8 @@ public class ProjectBuildFromXML
                 {    // Make it absolute
                     if (thisFile != null)
                     {
-                        File newUserInterfaceFile = new File(thisFile.getParentFile(), path);
-                        
+                        final File newUserInterfaceFile = new File(thisFile.getParentFile(), path);
+
                         url = newUserInterfaceFile.toURL();
                     }
                     else
@@ -1237,12 +1246,12 @@ public class ProjectBuildFromXML
                 url = ProjectBuildFromXML.class.getResource(path);
             }
         }
-        catch (MalformedURLException ex)
+        catch (final MalformedURLException ex)
         {    // This was not an url
             url = null;
             System.err.println(ex);
         }
-        
+
         currProject.setUserInterfaceURL(url);
     }
 }
