@@ -112,8 +112,6 @@ public class EventCollectingVisitor implements PromelaVisitor
       new ExpressionComparator(optable);
     final List<Message> msgs = new ArrayList<Message>(chan.get(channelMsg.get(0)).getMessages());
     mOutput = new ArrayList<Message>();
-    final List<SimpleExpressionProxy> channel_1 = new ArrayList<SimpleExpressionProxy>();
-    final List<SimpleExpressionProxy> channel_2 = new ArrayList<SimpleExpressionProxy>();
     final Hashtable<Integer,List<SimpleExpressionProxy>> table =new Hashtable<Integer,List<SimpleExpressionProxy>>();
     for(int i=0;i<chan.get(channelMsg.get(0)).getDataLength();i++){
       //final List<SimpleExpressionProxy> channelList = new ArrayList<SimpleExpressionProxy>();
@@ -152,10 +150,8 @@ public class EventCollectingVisitor implements PromelaVisitor
         mOutput.add(m);
       }
     }
-    //loop1:
-    final List<ArrayList<SimpleExpressionProxy>> dataList = new ArrayList<ArrayList<SimpleExpressionProxy>>();
-    for(final Message m: recipients){
 
+    for (final Message m : recipients) {
       final ArrayList<SimpleExpressionProxy> labels = new ArrayList<SimpleExpressionProxy>();
       for(final SimpleExpressionProxy s: m.getMsg()){
         if(s==null){
