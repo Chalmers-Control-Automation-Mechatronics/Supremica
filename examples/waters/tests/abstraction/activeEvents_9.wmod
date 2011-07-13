@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="activeEvents_9" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A simple test for the Active Events Rule. This tests states whether unreachable states change the behaviour of the abstraction rule (the should not).</ns2:Comment>
+    <ns2:Comment>A simple test for the Active Events Rule. This tests whether unreachable states change the behaviour of the abstraction rule (they should not).</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>

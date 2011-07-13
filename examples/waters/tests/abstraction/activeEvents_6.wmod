@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="activeEvents_6" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A simple test for the Active Events Rule. This tests whether a multiple tau-linked states are merged or distinguished correctly.</ns2:Comment>
+    <ns2:Comment>A simple test for the Active Events Rule. This tests whether multiple tau-linked states are merged or distinguished correctly.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
