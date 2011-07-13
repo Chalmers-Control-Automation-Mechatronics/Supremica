@@ -68,7 +68,7 @@ public class TauClosure
         iter.resetState(state);
         iter.advance();
         while (iter.advance()) {
-          if (limit-- > 0) {
+          if (--limit == 0) {
             mStoredTransitions = null;
             return;
           }

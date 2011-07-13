@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
 import net.sourceforge.waters.model.base.WatersException;
@@ -56,7 +57,7 @@ public class WatersUnmarshalException extends WatersException {
    * Constructs a new exception with the specified detail message and cause.
    */
   public WatersUnmarshalException(final String message,
-                                  final Throwable cause) 
+                                  final Throwable cause)
   {
     super(message, cause);
   }
@@ -67,7 +68,7 @@ public class WatersUnmarshalException extends WatersException {
    */
   public WatersUnmarshalException(final URI uri)
   {
-    this("Failed to open '" + uri + "'!");
+    mCulprit = uri.toString();
   }
 
   /**
@@ -76,8 +77,8 @@ public class WatersUnmarshalException extends WatersException {
    */
   public WatersUnmarshalException(final URI uri, final Throwable cause)
   {
-    super("Failed to open '" + uri + "'" +
-          (cause == null ? "!" : ": " + cause));
+    super(cause);
+    mCulprit = uri.toString();
   }
 
   /**
@@ -86,7 +87,7 @@ public class WatersUnmarshalException extends WatersException {
    */
   public WatersUnmarshalException(final File filename)
   {
-    this("Failed to load file '" + filename + "'!");
+    mCulprit = filename.toString();
   }
 
   /**
@@ -95,11 +96,38 @@ public class WatersUnmarshalException extends WatersException {
    */
   public WatersUnmarshalException(final File filename, final Throwable cause)
   {
-    super("Failed to load file '" + filename + "'" +
-          (cause == null ? "!" : ": " + cause));
+    super(cause);
+    mCulprit = filename.toString();
   }
-  
-  
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Throwable
+  @Override
+  public String getMessage()
+  {
+    Throwable cause = this;
+    while (cause.getCause() != null) {
+      cause = cause.getCause();
+    }
+    if (cause instanceof IOException) {
+      final String msg = cause.getMessage();
+      if (msg != null) {
+        return msg;
+      }
+    }
+    if (mCulprit != null) {
+      return "Failed to open '" + mCulprit + "'!";
+    }
+    return super.getMessage();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private String mCulprit;
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;

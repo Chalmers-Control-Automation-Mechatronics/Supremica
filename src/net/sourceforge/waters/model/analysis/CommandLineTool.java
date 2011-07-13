@@ -38,6 +38,7 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -263,6 +264,15 @@ public class CommandLineTool
               additions = true;
             }
           }
+        } catch (final OutOfMemoryError error) {
+          final long stop = System.currentTimeMillis();
+          final float difftime = 0.001f * (stop - start);
+          formatter.format("OUT OF MEMORY (%.3f s)\n", difftime);
+          final VerificationResult result = wrapper.getAnalysisResult();
+          if (result != null) {
+            final OverflowException overflow = new OverflowException(error);
+            result.setException(overflow);
+          }
         } catch (final OverflowException overflow) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
@@ -301,10 +311,18 @@ public class CommandLineTool
         first = false;
       }
 
+    } catch (final WatersUnmarshalException exception) {
+      System.err.print("FATAL ERROR (");
+      System.err.print(ProxyTools.getShortClassName(exception));
+      System.err.println(")");
+      final String msg = exception.getMessage();
+      if (msg != null) {
+        System.err.println(exception.getMessage());
+      }
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
-      System.err.println(ProxyTools.getShortClassName(exception) +
-                         " caught in main()!");
+      System.err.print(ProxyTools.getShortClassName(exception));
+      System.err.println(" caught in main()!");
       exception.printStackTrace(System.err);
     } finally {
       if (csv != null) {
