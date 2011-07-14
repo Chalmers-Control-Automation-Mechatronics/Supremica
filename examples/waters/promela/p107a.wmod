@@ -21,7 +21,10 @@
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_A">
             <RangeList>
-                <SimpleIdentifier Name="{A_0,A_1}"/>
+                <EnumSetExpression Text="[A_0,A_1]">
+                    <SimpleIdentifier Name="A_0"/>
+                    <SimpleIdentifier Name="A_1"/>
+                </EnumSetExpression>
             </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_B"/>

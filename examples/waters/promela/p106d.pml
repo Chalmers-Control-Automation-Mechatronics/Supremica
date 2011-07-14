@@ -1,6 +1,6 @@
 /*
  * A test for the Promela importer in Waters.
- * This tests whether a labels with a name starting in "end" produce
+ * This tests whether labels with a name starting in "end" produce
  * marked states.
  */
 
