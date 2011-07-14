@@ -19,7 +19,11 @@
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="run_A"/>
+        <EventDecl Kind="CONTROLLABLE" Name="run_A">
+            <RangeList>
+                <SimpleIdentifier Name="{A_0,A_1}"/>
+            </RangeList>
+        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
         <EventDecl Kind="CONTROLLABLE" Name="recv_name">
             <RangeList>
@@ -189,7 +193,9 @@
                         <EdgeList>
                             <Edge Target="A_1" Source="A_0">
                                 <LabelBlock>
-                                    <SimpleIdentifier Name="run_A"/>
+                                    <IndexedIdentifier Name="run_A">
+                                        <SimpleIdentifier Name="procid"/>
+                                    </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
                                         <Point Y="-8" X="5"/>
                                     </LabelGeometry>

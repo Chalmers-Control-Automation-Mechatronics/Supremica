@@ -6,12 +6,12 @@
         <EventDecl Kind="CONTROLLABLE" Name="send_name">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="255"/>
+                    <IntConstant Value="33"/>
+                    <IntConstant Value="33"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="255"/>
+                    <IntConstant Value="121"/>
+                    <IntConstant Value="124"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
@@ -20,12 +20,12 @@
         <EventDecl Kind="CONTROLLABLE" Name="recv_name">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="255"/>
+                    <IntConstant Value="33"/>
+                    <IntConstant Value="33"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="255"/>
+                    <IntConstant Value="121"/>
+                    <IntConstant Value="124"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
