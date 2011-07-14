@@ -131,6 +131,7 @@ public class AutomataSynthesizer
 			if (stopRequested) return new Automata();
 			result.addAutomaton(retval.automaton);
         }
+
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR)
         {
             // MODULAR (controllability) synthesis
@@ -173,6 +174,85 @@ public class AutomataSynthesizer
             }
             else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
             {
+                
+                // NONBLOCKING and controllable. Plantify the specifications and supervisors!
+            	// if no plants in model, just set everything to type 'plant'
+                if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
+                else {
+                	for (Automaton a : theAutomata) {
+                		a.setComment("plant(" + a.getName() + ")");
+                        a.setType(AutomatonType.PLANT);
+                	}
+                }
+            }
+            
+            // Do the stuff!
+            AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
+            minimizer.setExecutionDialog(executionDialog);
+            
+            MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
+
+            Automata min = minimizer.getCompositionalMinimization(options);
+            for (Automaton sup: min)
+            {
+                
+                sup.setComment("sup(" + min.getName() + ")");
+                sup.setName(null);
+            }
+
+            // Present result
+            if (Config.VERBOSE_MODE.isTrue() && (min.size() == 1) && (min.getFirstAutomaton().nbrOfStates() < 100))
+            {
+                // This may not be true if more advanced simplification rules have been used!
+                logger.info("The following states are allowed by the maximally permissive, "
+                    + "controllable and nonblocking supervisor: " +  min.getFirstAutomaton().getStateSet() + ".");
+            }
+            result.addAutomata(min);
+        }
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+        // Compositional synthesis by using synthesis abstractio(DCDS 2011).
+
+         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.SYNTHESISA)
+        {
+             
+            // Use synthesis Abstraction minimization!
+
+            // Prepare for synthesis
+            // Make a copy
+             
+            theAutomata = new Automata(theAutomata);
+            // Make preparations based on synthesis type
+            SynthesisType type = synthesizerOptions.getSynthesisType();
+            
+            if (type == SynthesisType.NONBLOCKING)
+            {
+                // Only nonblocking? Then everything should be considered controllable!
+                for (Automaton automaton : theAutomata)
+                {
+                    for (LabeledEvent event : automaton.getAlphabet())
+                    {
+                        event.setControllable(true);
+                    }
+                }
+            }
+            else if (type == SynthesisType.CONTROLLABLE)
+            {
+                
+                // Only controllable? Then everything should be considered marked...
+                // and AFTER that, the specs must be plantified!
+                for (Automaton automaton : theAutomata)
+                {
+                    automaton.setAllStatesAccepting();
+                }
+                // Plantify specs
+                MinimizationHelper.plantify(theAutomata);
+            }
+
+            else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
+            {
+
+                
                 // NONBLOCKING and controllable. Plantify the specifications and supervisors!
             	// if no plants in model, just set everything to type 'plant'
                 if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
@@ -187,10 +267,62 @@ public class AutomataSynthesizer
             // Do the stuff!
             AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
             minimizer.setExecutionDialog(executionDialog);
-            MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
+
+            MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptionsSynthesisA();
+           
+//          //Abstract the automata by using synthesis Abstraction
             Automata min = minimizer.getCompositionalMinimization(options);
+            // Replace all the tau event by the original event.
+            //First the blocked events and
+            if( min.getFirstAutomaton().getBlockedEvents().size()>0){
+
+                Alphabet alphabet = min.getFirstAutomaton().getBlockedEvents();
+                for(Iterator<LabeledEvent> itr = alphabet.getUnobservableEvents().iterator(); itr.hasNext();){
+                    TauEvent tauEvent = new TauEvent(itr.next());
+                    LabeledEvent labeledevent = tauEvent.getOriginalEvent();
+                    if(!alphabet.contains(labeledevent)){
+                        alphabet.addEvent(labeledevent);
+                    }
+                    if(alphabet.contains(tauEvent)){
+                    alphabet.removeEvent(tauEvent);}
+                }
+
+            }
+            if( min.getFirstAutomaton().getBlockedEvents().size()>0){
+//
+                Alphabet alphabet = min.getFirstAutomaton().getBlockedEvents();
+                for(Iterator<LabeledEvent> itr = alphabet.getUnobservableEvents().iterator(); itr.hasNext();){
+                    TauEvent tauEvent = new TauEvent(itr.next());
+                    if(alphabet.contains(tauEvent)){
+                    alphabet.removeEvent(tauEvent);}
+                }
+            }
+            //then events of transitions.
+            for (final Iterator<Arc> arcIt = min.getFirstAutomaton().arcIterator(); arcIt.hasNext(); )
+            {
+                final Arc arc = arcIt.next();
+                if (arc.getEvent().isUnobservable())
+                {
+                   LabeledEvent orig = ((TauEvent)arc.getEvent()).getOriginalEvent();
+                   if(!min.getFirstAutomaton().getAlphabet().contains(orig)){
+                   min.getFirstAutomaton().getAlphabet().addEvent(orig);}
+                   arc.setEvent(orig);
+                }
+            }
+            
+            // Applying synthesis on the abstract automaton.
+            MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
+            threadToStop = synthesizer;
+            MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
+            min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
+            if (stopRequested) return new Automata();
+
+            result.addAutomaton(retval.automaton);
             for (Automaton sup: min)
             {
+                if(!sup.isDeterministic()){
+                    logger.warn("The calculated supervisor is nondeterminstic which currently is not supported.");
+                }
                 sup.setComment("sup(" + min.getName() + ")");
                 sup.setName(null);
             }
@@ -202,8 +334,13 @@ public class AutomataSynthesizer
                 logger.info("The following states are allowed by the maximally permissive, "
                     + "controllable and nonblocking supervisor: " +  min.getFirstAutomaton().getStateSet() + ".");
             }
-            result.addAutomata(min);
+            
+//            result.addAutomata(min);
         }
+
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
         {
             // BDD synthesis

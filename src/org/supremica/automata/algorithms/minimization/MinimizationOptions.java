@@ -381,7 +381,7 @@ public final class MinimizationOptions
      * Returns the default options for nonblocking verification - this
      * is with respect to conflict equivalence.
      */
-    public static MinimizationOptions getDefaultSynthesisOptions()
+     public static MinimizationOptions getDefaultSynthesisOptions()
     {
         MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
         options.setMinimizationType(EquivalenceRelation.SUPERVISIONEQUIVALENCE);
@@ -394,4 +394,21 @@ public final class MinimizationOptions
         options.setTargetAlphabet(new Alphabet());
         return options;
     }
+
+    public static MinimizationOptions getDefaultSynthesisOptionsSynthesisA()
+    {
+
+        MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+        options.setMinimizationType(EquivalenceRelation.SYNTHESISABSTRACTION);
+        options.setMinimizationStrategy(MinimizationStrategy.FewestStatesFirst);
+        options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
+        options.setAlsoTransitions(false);
+        options.setKeepOriginal(false);
+        options.setCompositionalMinimization(true);
+        options.setSkipLast(true);
+        options.setTargetAlphabet(new Alphabet());
+        return options;
+    }
+
+
 }

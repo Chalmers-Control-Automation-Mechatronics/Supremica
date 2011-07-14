@@ -56,6 +56,7 @@ public enum SynthesisAlgorithm
     PARTITIONBDD("Partitioning (symbolic)", false),
     MODULAR("Modular"),
     COMPOSITIONAL("Compositional"),
+    SYNTHESISA("Compositional (SynthesisA)"),
     //IDD("IDD"),
     //MonolithicSingleFixpoint("MONOLITHIC (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
     BDD("BDD");    // works, but we cant handle the results yet

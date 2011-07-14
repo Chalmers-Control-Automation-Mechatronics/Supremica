@@ -331,6 +331,26 @@ public class Alphabet
         
         return nbrOfFoundEvents;
     }
+
+    /**
+     * Returns  unobservable events, epsilon events
+     * are assumed to be unobservable
+     */
+
+    public Alphabet getUnobservableEvents()
+    {
+        Alphabet foundEvents = new Alphabet();
+
+        for (LabeledEvent currEvent : this)
+        {
+            if (currEvent.isUnobservable())
+            {
+                foundEvents.add(currEvent);
+            }
+        }
+
+        return foundEvents;
+    }
     
     /**
      * Returns the number of prioritized events.

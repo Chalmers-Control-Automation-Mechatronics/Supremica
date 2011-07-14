@@ -254,6 +254,7 @@ class SynthesizerDialogStandardPanel
             algorithmSelector.addItem(SynthesisAlgorithm.MODULAR);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
+            algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
         }
         else if (typeSelector.getType() == SynthesisType.NONBLOCKING)
         {
@@ -261,12 +262,14 @@ class SynthesizerDialogStandardPanel
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD); 
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
+            algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
         }
         else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
+            algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
         }
         else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE)
         {
@@ -299,10 +302,11 @@ class SynthesizerDialogStandardPanel
         {
             removeUnecessarySupBox.setVisible(false); //X
         }
-        else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL)
+        else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL
+                ||algorithmSelector.getAlgorithm() == SynthesisAlgorithm.SYNTHESISA)
         {
             removeUnecessarySupBox.setVisible(false); //X
-            purgeBox.setVisible(false); //X
+            purgeBox.setVisible(true); //X
         }
         else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR)
         {

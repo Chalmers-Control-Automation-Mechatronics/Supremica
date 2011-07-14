@@ -151,6 +151,7 @@ public class AutomataMinimizationWorker
                 try
                 {
                     final AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
+                    
                     if (theAutomata.size() == 1)
                     {
                         minimizer.setExecutionDialog(executionDialog);

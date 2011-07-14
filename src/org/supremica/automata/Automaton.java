@@ -92,6 +92,8 @@ public class Automaton
     private int uniqueStateIndex = 0;
 
     private AutomatonListeners listeners = null;
+    //The map between tau events and the original event.
+    private HashMap<LabeledEvent,TauEvent> tauEventMap=new HashMap<LabeledEvent,TauEvent>();
 
     /**
      * Creates an empty automaton. Always create with a name.
@@ -1608,12 +1610,7 @@ public class Automaton
         return null;
     }
 
-    /**
-     * Hides (makes unobservable) the supplied events. Optionally preserving controllability.
-     *
-     * Selfloops that hare hidden are removed!
-     */
-    public void hide(final Alphabet hideThese, final boolean preserveControllability)
+        public void oldHide(final Alphabet hideThese, final boolean preserveControllability)
     {
         // Don't hide nothing!
         if ((hideThese == null) || (hideThese.size() == 0))
@@ -1744,6 +1741,54 @@ public class Automaton
                 removeArc(arc);
             }
         }
+    }
+
+
+    /**
+     * Hides (makes unobservable) the supplied events. Optionally preserving controllability.
+     *
+     * Selfloops that hare hidden are removed!
+     *
+     */
+    public void hide(final Alphabet hideThese, final boolean preserveControllability )
+    {
+
+        // new hiding method by using TauEvent class. The old version is oldHides now.
+        // Don't hide nothing!
+        if ((hideThese == null) || (hideThese.size() == 0))
+        {
+            return;
+        }
+        
+            // Modify arcs
+//            final LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
+            for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+            {
+                final Arc arc = arcIt.next();
+                LabeledEvent arcE=arc.getEvent();
+                
+                // Hide this one?
+                if (hideThese.contains(arcE))
+                {
+                    // If this event has been replaced by a new tau...
+                    if(!tauEventMap.containsKey(arcE)){
+                        //creat a new tau tau for the event
+                        TauEvent tau = new TauEvent(arc.getEvent());
+                        getAlphabet().addEvent(tau);
+                        tauEventMap.put(arcE, tau);
+                        arc.setEvent(tau);
+                        
+                    }
+                    else{
+                        // if the event is already hiden find the corresponding tau event and replace the event.
+                        arc.setEvent(tauEventMap.get(arcE));
+                        
+                        
+                    }
+                }
+            }
+        getAlphabet().minus(hideThese);
+
     }
 
     public void removeAllStates()
@@ -2542,4 +2587,28 @@ public class Automaton
     {
         return replaceEvent(old_event, new LabeledEvent(new_label));
     }
+//    public static class TauEvent
+//        extends LabeledEvent
+//{
+//    private LabeledEvent originalEvent;
+//    TauEvent(LabeledEvent e){
+//
+//        super(e);
+//        this.originalEvent=e;
+////       originalEvent.setUnobservable(true);
+//    }
+//    public LabeledEvent getOrigin(){
+//
+//        return originalEvent;
+//    }
+//
+//}
+
+
+
+
+
+
+
 }
+

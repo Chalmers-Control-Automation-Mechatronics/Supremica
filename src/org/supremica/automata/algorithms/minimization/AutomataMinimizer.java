@@ -103,6 +103,7 @@ public class AutomataMinimizer
     private final Automata selection = new Automata();
     private final Automata taskExtra = new Automata();
 
+
     /**
      * Basic constructor.
      */
@@ -181,11 +182,15 @@ public class AutomataMinimizer
         // Initialize statistics count
         AutomatonMinimizer.resetStatistics();
 
+         
+
         // Special pre-minimization stuff
-        if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
+        if ((options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)||
+                (options.getMinimizationType() ==   EquivalenceRelation.SYNTHESISABSTRACTION))
         {
             MinimizationHelper.plantify(theAutomata);
         }
+
 
         // Remove inadequate events...
         for (final Automaton aut: theAutomata)
@@ -216,6 +221,7 @@ public class AutomataMinimizer
         // select some automata to compose and minimize!
         while (theAutomata.size() >= 2)
         {
+               
             /*
 			  // Don't always give the same result
 			  MinimizationTask newTask = getNextMinimizationTask(true);
@@ -249,21 +255,28 @@ public class AutomataMinimizer
                 hideThese = selection.getUnionAlphabet();
                 hideThese.minus(options.getTargetAlphabet());
             }
+            
             taskSelectionTimer.stop();
             if (stopRequested)
             {
                 return null;
             }
-
             // Perform the minimization, unless of course this is the last step
             // and it should be skipped...
             Automaton min;
+
+
+
+
             if (options.getSkipLast() && (theAutomata.size() == selection.size()))
             {
                 // Just synch and hide
+//                logger.info("selection "+selection);
+                
                 min = AutomataSynchronizer.synchronizeAutomata(selection);
+                
+                
                 min.hide(hideThese, preserveControllability);
-
                 // Examine for largest sizes (this is a special case, this is otherwise done in minolithicMinimization())
                 if (min.nbrOfStates() > mostStates)
                 {
@@ -279,6 +292,7 @@ public class AutomataMinimizer
             else
             {
                 // Compose and minimize!
+                
                 min = monolithicMinimization(selection, hideThese);
             }
             if (stopRequested)
@@ -288,7 +302,8 @@ public class AutomataMinimizer
 
             // Early termination
             if ((options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE) ||
-                (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE))
+                (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE) ||
+                (options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION))
             {
                 // If initial state is blocking, we can early terminate!
                 // Easy check: If there's just one state and it is not marked, then it's blocking!
@@ -384,6 +399,7 @@ public class AutomataMinimizer
         //logger.info("Timer time: " + taskSelectionTimer);
         //logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
         // Return the result of the minimization!
+       
         return theAutomata;
     }
 
@@ -826,17 +842,33 @@ public class AutomataMinimizer
     private Automaton monolithicMinimization(final Automata automata, final Alphabet hideThese)
     throws Exception
     {
+//        logger.info("hide these in monolithic"+hideThese);
         //System.err.println("Minimizing " + automata + ", hiding: " + hideThese);
 
         // Synchronize, or if there's just one automaton, just find it
+        
         Automaton aut;
+//        Automata ay=automata.clone();
+//        if(ay.size()== 2){
+//            Automaton aw=ay.getFirstAutomaton();
+//         StateSet st=aw.getStateSet();
+//            StateSet st1=(StateSet)st.clone();
+//            StateSet st2=new StateSet();
+//            while(st1.size()>0){
+//                State s=st1.remove();
+//                if(s.isAccepting()){
+//                    st2.add(s);
+//                }
+//            }
+//            logger.info("comes here!!!!!! "+ st2+ " the name is " + aw.getName());
+//                }
+
         if (automata.size() > 1)
         {
             // Synch
             final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
             synchOptions.setUseShortStateNames(useShortStateNames);
             aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
-
             // Examine for largest sizes
             if (aut.nbrOfStates() > mostStates)
             {
@@ -855,6 +887,7 @@ public class AutomataMinimizer
         }
 
         // Return miminisation of aut
+//        logger.info("in monolithic minimization"+ monolithicMinimization(aut, hideThese).getName()+"selfloops "+ monolithicMinimization(aut, hideThese).nbrOfSelfLoops());
         return monolithicMinimization(aut, hideThese);
     }
 
@@ -865,6 +898,9 @@ public class AutomataMinimizer
     private Automaton monolithicMinimization(Automaton aut, final Alphabet hideThese)
     throws Exception
     {
+//        logger.info("before monolithic minimization "+aut);
+//        logger.info("the number of statesaut "+ aut.nbrOfStates());
+//        logger.info(hideThese);
         /*
         // If supervision equivalence, make the result a kripke automaton!
         if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
@@ -882,6 +918,8 @@ public class AutomataMinimizer
             minimizer.useShortStateNames(useShortStateNames);
             threadToStop = minimizer;
             final Automaton newAut = minimizer.getMinimizedAutomaton(options, hideThese);
+//            logger.info("self loop after minimized automaton"+newAut.nbrOfSelfLoops());
+//            logger.info("states after minimized automaton"+newAut.nbrOfStates());
             aut = newAut;
             threadToStop = null;
             if (stopRequested)

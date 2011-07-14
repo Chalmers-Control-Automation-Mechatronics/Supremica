@@ -52,7 +52,7 @@ package org.supremica.automata;
 
 import java.util.Collections;
 import java.util.Map;
-
+import org.supremica.properties.Config;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -67,9 +67,9 @@ public class LabeledEvent
      * global identifier of an event, appearing in the alphabet. */
     private final String label;
 
-    private boolean controllable = true;
-    private boolean prioritized = true;
-    private boolean observable = true;
+    protected boolean controllable = true;
+    protected boolean prioritized = true;
+    protected boolean observable = true;
     private boolean operatorIncrease = false;
     private boolean operatorReset = false;
     private boolean immediate = false;

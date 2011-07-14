@@ -821,6 +821,90 @@ public class State
         return states;
     }
 
+    public StateSet nextStates(final LabeledEvent theEvent, final boolean forwardconsiderEpsilonClosure,final boolean backwardconsiderEpsilonClosure)
+    {
+        final StateSet states = new StateSet();
+        if(forwardconsiderEpsilonClosure&&backwardconsiderEpsilonClosure){
+            return nextStates(theEvent, true);
+        }
+
+                /* Sometimes we want this!
+                assert (!theEvent.isEpsilon());    // See above!
+                 */
+
+        // Do the stuff
+        Iterator<Arc> outgoingArcsIt;
+        if (backwardconsiderEpsilonClosure)
+        {
+            outgoingArcsIt = epsilonClosure(true).outgoingArcsIterator();
+        }
+        else
+        {
+            outgoingArcsIt = outgoingArcsIterator();
+        }
+
+        while (outgoingArcsIt.hasNext())
+        {
+            final Arc currArc = outgoingArcsIt.next();
+
+            if (currArc.getEvent().equals(theEvent))
+            {
+                if (forwardconsiderEpsilonClosure)
+                {
+                    states.addAll(currArc.getToState().epsilonClosure(true));
+                }
+                else
+                {
+                    states.add(currArc.getToState());
+                }
+            }
+        }
+
+        return states;
+    }
+    //############################################################################
+
+    public StateSet nextStatesWithUncoClosure(final LabeledEvent theEvent, final boolean considerEpsilonClosure)
+    {
+        final StateSet states = new StateSet();
+
+                /* Sometimes we want this!
+                assert (!theEvent.isEpsilon());    // See above!
+                 */
+
+        // Do the stuff
+        Iterator<Arc> outgoingArcsIt;
+        if (considerEpsilonClosure)
+        {
+            outgoingArcsIt = epsilonClosureWithNoCon(true).outgoingArcsIterator();
+        }
+        else
+        {
+            outgoingArcsIt = outgoingArcsIterator();
+        }
+
+        while (outgoingArcsIt.hasNext())
+        {
+            final Arc currArc = outgoingArcsIt.next();
+
+            if (currArc.getEvent().equals(theEvent))
+            {
+                if (considerEpsilonClosure)
+                {
+                    states.addAll(currArc.getToState().epsilonClosure(true));
+                }
+                else
+                {
+                    states.add(currArc.getToState());
+                }
+            }
+        }
+
+        return states;
+    }
+
+    //###########################################################################
+
     /**
      * Calculates and returns (forward) epsilon closure as a StateSet. Optionally, the closure
      * does or does not necessarily include the state from which the closure is calculated.
@@ -833,6 +917,15 @@ public class State
     public StateSet epsilonClosure(final boolean includeSelf)
     {
         return epsilonClosure(includeSelf, true, true);
+    }
+
+    public StateSet epsilonClosureWithNoCon(final boolean includeSelf)
+    {
+        return epsilonClosure(includeSelf, false, true);
+    }
+    public StateSet epsilonClosureWithCon(final boolean includeSelf)
+    {
+        return epsilonClosure(includeSelf, true, false);
     }
     /**
      * Same as epsilonClosure(boolean includeSelf) but you can choose
@@ -877,6 +970,84 @@ public class State
         }
 
         return result;
+    }
+
+
+
+    public StateSet epsilonClosure(final boolean includeSelf, final boolean includeControllable, final boolean includeUncontrollable, boolean select)
+    {
+        if(!select){
+            return epsilonClosure(includeSelf,  includeControllable, includeUncontrollable);
+        }
+        
+        final StateSet result = new StateSet();
+
+        // Include self?
+        if (includeSelf)
+        {
+            result.add(this);
+        }
+
+        // Examine states
+        final LinkedList<State> statesToExamine = new LinkedList<State>();
+        statesToExamine.add(this);
+        while (statesToExamine.size() != 0)
+        {
+            final State currState = statesToExamine.removeFirst();
+
+            for (final Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+            {
+                final Arc currArc = arcIt.next();
+                final State state = currArc.getToState();
+
+                // Is this an epsilon event that we care about?
+                if (!currArc.getEvent().isObservable() && !currArc.isSelfLoop() && !result.contains(state) &&
+                    ((includeControllable && includeUncontrollable) ||
+                    (includeControllable && currArc.getEvent().isControllable()) ||
+                    (includeUncontrollable && !currArc.getEvent().isControllable())))
+                {
+                    statesToExamine.add(state);
+                    if(currArc.getEvent().isControllable()){
+                        state.setSelected(true);
+                    }
+                    result.add(state);
+                }
+            }
+        }
+        return result;
+        
+    }
+
+    public StateSet epsilonClosureOnlyFirst(final boolean includeSelf, final boolean includeControllable, final boolean includeUncontrollable, boolean select)
+    {
+        if(!select){
+            return epsilonClosure(includeSelf,  includeControllable, includeUncontrollable);
+        }
+
+        final StateSet result = new StateSet();
+
+        // Include self?
+        if (includeSelf)
+        {
+            result.add(this);
+        }
+
+        // Examine states
+
+
+            for (final Iterator<Arc> arcIt = this.outgoingArcsIterator(); arcIt.hasNext(); )
+            {
+                final Arc currArc = arcIt.next();
+                final State state = currArc.getToState();
+
+                // Is this an epsilon event that we care about?
+                if(currArc.getEvent().isUnobservable()){
+                    result.add(state);
+                }
+
+        }
+        return result;
+
     }
 
     /**

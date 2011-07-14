@@ -271,16 +271,24 @@ public final class SynthesizerOptions
         return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, true, true, true, true, true, false);
     }
 
+
+
+
+    public static SynthesizerOptions getDefaultSynthesizerOptionsS()
+    {
+        
+        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA, true, true, true, false, false, false);
+    }
     /**
      * Returns the default options for synthesis.
      */
     public static SynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
     {
         SynthesizerOptions options = getDefaultSynthesizerOptions();
-		options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
+	options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
         options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
-        options.removeUnnecessarySupervisors = false;
-        options.reduceSupervisors = false;
+        options.removeUnnecessarySupervisors = true;
+        options.reduceSupervisors = true;
 
         return options;
     }

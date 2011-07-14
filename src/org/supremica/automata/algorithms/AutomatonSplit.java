@@ -249,6 +249,7 @@ public class AutomatonSplit
     private static Automaton removeEvent(Automaton automaton, LabeledEvent event)
     throws Exception
     {
+        
         Automaton result = new Automaton(automaton);
         
         // Remove one event and make deterministic

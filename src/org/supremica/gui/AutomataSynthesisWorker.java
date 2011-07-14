@@ -137,6 +137,7 @@ public class AutomataSynthesisWorker
                 if(ide != null)
                     synthesizer.setExecutionDialog(executionDialog);
                 threadsToStop.add(synthesizer);
+                
                 result.addAutomata(synthesizer.execute());
                 threadsToStop.remove(synthesizer);
             }

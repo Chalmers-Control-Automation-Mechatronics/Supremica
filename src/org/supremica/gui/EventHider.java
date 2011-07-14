@@ -113,7 +113,7 @@ class EventHiderDialog
     {
         // The set of new automata, based on the selected automata
         final Automata newAutomata = new Automata();
-
+        
         // Get the events selected by the user (may be for keeping or for hiding)
         final Alphabet alpha = restrictEvents.getAlphabet();
         Alphabet toBeHidden;

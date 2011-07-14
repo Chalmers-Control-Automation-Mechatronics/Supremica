@@ -67,6 +67,8 @@ public enum EquivalenceRelation
   CONFLICTEQUIVALENCE("Conflict equivalence"),
   /** Supervision equivalence. */
   SUPERVISIONEQUIVALENCE("Supervision equivalence"),
+  /** Synthesis abstraction. */
+  SYNTHESISABSTRACTION("Synthesis abstraction"),
   /** Observation equivalence (aka Weak bisimulation equivalence). */
   OBSERVATIONEQUIVALENCE("Observation equivalence"),
   /** Bisimulation equivalence (aka Strong bisimulation equivalence). */
