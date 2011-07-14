@@ -52,13 +52,13 @@ package org.supremica.automata;
 
 import java.util.Collections;
 import java.util.Map;
-import org.supremica.properties.Config;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.base.ProxyVisitor;
+
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 public class LabeledEvent
     implements EventProxy
