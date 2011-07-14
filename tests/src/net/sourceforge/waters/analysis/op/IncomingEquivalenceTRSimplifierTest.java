@@ -67,7 +67,7 @@ public class IncomingEquivalenceTRSimplifierTest
 
 
   //#########################################################################
-  //# Test Cases
+  //# Test Cases - Active Events Rule
   public void test_activeEvents_1()
   throws Exception
   {
@@ -158,6 +158,60 @@ public class IncomingEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+
+  //#########################################################################
+  //# Test Cases - Silent Continuation Rule
+  public void test_silentContinuation_1()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "silentContinuation_1.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_silentContinuation_2()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "silentContinuation_2.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+
+  //#########################################################################
+  //# Test Cases - Active Events and Silent Continuation Rule Combined
+  public void test_incomingEquivalence_1()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "incomingEquivalence_1.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_incomingEquivalence_2()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "incomingEquivalence_2.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_incomingEquivalence_3()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "incomingEquivalence_3.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+
+  //#########################################################################
+  //# Test Cases - Other
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.

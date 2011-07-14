@@ -81,6 +81,13 @@ import org.apache.log4j.Logger;
  * A compositional conflict checker that can be configured to use different
  * abstraction sequences for its simplification steps.
  *
+ * <I>References:</I><BR>
+ * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
+ * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.
+ * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
+ * Nonblocking, Proc. 7th International Conference on Control and Automation,
+ * ICCA'09, 448-453, Christchurch, New Zealand, 2009.<BR>
+ *
  * @author Robi Malik, Rachel Francis
  */
 
@@ -647,7 +654,8 @@ public class OPConflictChecker
     }
   }
 
-  private AbstractionRule createStandardNonblockingAbstractionChain()
+  private AbstractionRule createStandardNonblockingAbstractionChain
+    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
   throws EventNotFoundException
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
@@ -664,6 +672,11 @@ public class OPConflictChecker
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     chain.add(silentOutRemover);
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    incomingEquivalenceSimplifier.setTransitionLimit(mInternalTransitionLimit);
+    chain.add(incomingEquivalenceSimplifier);
+    /*
     final SilentContinuationTRSimplifier silentContinuationRemover =
       new SilentContinuationTRSimplifier();
     silentContinuationRemover.setTransitionLimit(mInternalTransitionLimit);
@@ -672,13 +685,13 @@ public class OPConflictChecker
       new ActiveEventsTRSimplifier();
     activeEventsMerger.setTransitionLimit(mInternalTransitionLimit);
     chain.add(activeEventsMerger);
+    */
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
     final int ccindex = chain.add(certainConflictsRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+    bisimulator.setEquivalence(equivalence);
     bisimulator.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
@@ -691,8 +704,9 @@ public class OPConflictChecker
     return new StandardTRSimplifierAbstractionRule(chain, ccindex);
   }
 
-  private AbstractionRule createGeneralisedNonblockingAbstractionChain()
-    throws EventNotFoundException
+  private AbstractionRule createGeneralisedNonblockingAbstractionChain
+    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
+  throws EventNotFoundException
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
@@ -719,8 +733,7 @@ public class OPConflictChecker
     chain.add(silentOutRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+    bisimulator.setEquivalence(equivalence);
     bisimulator.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
@@ -1793,53 +1806,60 @@ public class OPConflictChecker
   public enum AbstractionMethod
   {
     /**
-     * Minimisation is performed according to a sequence of abstraction rules
-     * for generalised nonblocking proposed in the paper by R. Malik and
-     * R. Leduc in ICCA&nbsp;2009.
+     * <P>Minimisation is performed according to a sequence of abstraction rules
+     * for generalised nonblocking.</P>
+     * <P><I>Reference:</I> Robi Malik, Ryan Leduc. A Compositional Approach
+     * for Verifying Generalised Nonblocking, Proc. 7th International
+     * Conference on Control and Automation, ICCA'09, 448-453, Christchurch,
+     * New Zealand, 2009.</P>
      */
     GNB {
+      @Override
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
-        throws EventNotFoundException
+      throws EventNotFoundException
       {
-        return checker.createGeneralisedNonblockingAbstractionChain();
+        return checker.createGeneralisedNonblockingAbstractionChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           OBSERVATION_EQUIVALENCE);
       }
     },
     /**
-     * <P>
-     * Minimisation is performed according to a sequence of abstraction rules
-     * for standard nonblocking.
-     * </P>
-     *
+     * <P>Minimisation is performed according to a sequence of abstraction rules
+     * for standard nonblocking.</P>
      * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
      * Verification in Supervisory Control. SIAM Journal of Control and
      * Optimization, 48(3), 1914-1938, 2009.</P>
      */
     NB {
+      @Override
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
-        throws EventNotFoundException
+      throws EventNotFoundException
       {
-        return checker.createStandardNonblockingAbstractionChain();
+        return checker.createStandardNonblockingAbstractionChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           OBSERVATION_EQUIVALENCE);
       }
     },
     /**
      * Automata are minimised according to <I>observation equivalence</I>.
      */
     OEQ {
+      @Override
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
-        final ObservationEquivalenceTRSimplifier.Equivalence equivalence =
-          ObservationEquivalenceTRSimplifier.Equivalence.
-          OBSERVATION_EQUIVALENCE;
-        return checker.createObservationEquivalenceChain(equivalence);
+        return checker.createObservationEquivalenceChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           OBSERVATION_EQUIVALENCE);
       }
     },
     /**
      * Automata are minimised according using <I>observer projection</I>.
      * The present implementation determines a coarsest causal reporter
      * map satisfying the observer property. Nondeterminism in the projected
-     * automata is not resolved, nondeterministic abstraction are used instead.
+     * automata is not resolved, nondeterministic abstractions are used instead.
      */
     OP {
+      @Override
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.new ObserverProjectionAbstractionRule();
@@ -1851,14 +1871,53 @@ public class OPConflictChecker
      * P. Pena, J.E.R. Cury, R. Malik, and S. Lafortune in WODES 2010.
      */
     OPSEARCH {
+      @Override
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.new OPSearchAbstractionRule();
       }
 
+      @Override
       boolean supportsNondeterminism()
       {
         return false;
+      }
+    },
+    /**
+     * <P>Minimisation is performed according to a sequence of abstraction
+     * rules for generalised nonblocking proposed, but using weak observation
+     * equivalence instead of observation equivalence.</P>
+     * <P><I>Reference:</I> Robi Malik, Ryan Leduc. A Compositional Approach
+     * for Verifying Generalised Nonblocking, Proc. 7th International
+     * Conference on Control and Automation, ICCA'09, 448-453, Christchurch,
+     * New Zealand, 2009.</P>
+     */
+    WGNB {
+      @Override
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      throws EventNotFoundException
+      {
+        return checker.createGeneralisedNonblockingAbstractionChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           WEAK_OBSERVATION_EQUIVALENCE);
+      }
+    },
+    /**
+     * <P>Minimisation is performed according to a sequence of abstraction rules
+     * for standard nonblocking, but using weak observation equivalence instead
+     * of observation equivalence.</P>
+     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
+     * Verification in Supervisory Control. SIAM Journal of Control and
+     * Optimization, 48(3), 1914-1938, 2009.</P>
+     */
+    WNB {
+      @Override
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      throws EventNotFoundException
+      {
+        return checker.createStandardNonblockingAbstractionChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           WEAK_OBSERVATION_EQUIVALENCE);
       }
     },
     /**
@@ -1868,18 +1927,17 @@ public class OPConflictChecker
      * transitions.
      */
     WOEQ {
+      @Override
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
-        final ObservationEquivalenceTRSimplifier.Equivalence equivalence =
-          ObservationEquivalenceTRSimplifier.Equivalence.
-          WEAK_OBSERVATION_EQUIVALENCE;
-        return checker.createObservationEquivalenceChain(equivalence);
+        return checker.createObservationEquivalenceChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           WEAK_OBSERVATION_EQUIVALENCE);
       }
     };
 
-    abstract AbstractionRule createAbstractionRule
-      (OPConflictChecker checker)
-      throws EventNotFoundException;
+    abstract AbstractionRule createAbstractionRule(OPConflictChecker checker)
+    throws EventNotFoundException;
 
     boolean supportsNondeterminism()
     {

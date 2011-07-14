@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.tr;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -364,30 +365,6 @@ public class IntListBuffer
 
 
   //#########################################################################
-  //# Debugging
-  public void dumpList(final PrintWriter writer, final int list)
-  {
-    if (list == NULL) {
-      writer.print("NULL");
-    } else {
-      writer.print('[');
-      int next = getNext(list);
-      while (next != NULL) {
-        final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
-        final int offset = next & BLOCK_MASK;
-        final int data = block[offset + OFFSET_DATA];
-        writer.print(data);
-        next = block[offset + OFFSET_NEXT];
-        if (next != NULL) {
-          writer.print(',');
-        }
-      }
-      writer.print(']');
-    }
-  }
-
-
-  //#########################################################################
   //# Low Level Access
   public int getHead(final int list)
   {
@@ -466,6 +443,38 @@ public class IntListBuffer
   {
     setNext(list, mRecycleStart);
     mRecycleStart = list;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  public String toString(final int list)
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter printer = new PrintWriter(writer);
+    dumpList(printer, list);
+    return writer.toString();
+  }
+
+  public void dumpList(final PrintWriter printer, final int list)
+  {
+    if (list == NULL) {
+      printer.print("NULL");
+    } else {
+      printer.print('[');
+      int next = getNext(list);
+      while (next != NULL) {
+        final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+        final int offset = next & BLOCK_MASK;
+        final int data = block[offset + OFFSET_DATA];
+        printer.print(data);
+        next = block[offset + OFFSET_NEXT];
+        if (next != NULL) {
+          printer.print(',');
+        }
+      }
+      printer.print(']');
+    }
   }
 
 
