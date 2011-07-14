@@ -254,8 +254,7 @@ public class AutomataMinimizer
                 selection = new Automata(theAutomata, true);
                 hideThese = selection.getUnionAlphabet();
                 hideThese.minus(options.getTargetAlphabet());
-            }
-            
+            }            
             taskSelectionTimer.stop();
             if (stopRequested)
             {
@@ -264,18 +263,11 @@ public class AutomataMinimizer
             // Perform the minimization, unless of course this is the last step
             // and it should be skipped...
             Automaton min;
-
-
-
-
             if (options.getSkipLast() && (theAutomata.size() == selection.size()))
             {
                 // Just synch and hide
-//                logger.info("selection "+selection);
-                
-                min = AutomataSynchronizer.synchronizeAutomata(selection);
-                
-                
+//                
+                min = AutomataSynchronizer.synchronizeAutomata(selection);     
                 min.hide(hideThese, preserveControllability);
                 // Examine for largest sizes (this is a special case, this is otherwise done in minolithicMinimization())
                 if (min.nbrOfStates() > mostStates)
@@ -848,20 +840,6 @@ public class AutomataMinimizer
         // Synchronize, or if there's just one automaton, just find it
         
         Automaton aut;
-//        Automata ay=automata.clone();
-//        if(ay.size()== 2){
-//            Automaton aw=ay.getFirstAutomaton();
-//         StateSet st=aw.getStateSet();
-//            StateSet st1=(StateSet)st.clone();
-//            StateSet st2=new StateSet();
-//            while(st1.size()>0){
-//                State s=st1.remove();
-//                if(s.isAccepting()){
-//                    st2.add(s);
-//                }
-//            }
-//            logger.info("comes here!!!!!! "+ st2+ " the name is " + aw.getName());
-//                }
 
         if (automata.size() > 1)
         {

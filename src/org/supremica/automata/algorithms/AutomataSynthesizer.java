@@ -295,6 +295,7 @@ public class AutomataSynthesizer
                     TauEvent tauEvent = new TauEvent(itr.next());
                     if(alphabet.contains(tauEvent)){
                     alphabet.removeEvent(tauEvent);}
+                    
                 }
             }
             //then events of transitions.
@@ -304,9 +305,10 @@ public class AutomataSynthesizer
                 if (arc.getEvent().isUnobservable())
                 {
                    LabeledEvent orig = ((TauEvent)arc.getEvent()).getOriginalEvent();
+                   arc.setEvent(orig);
                    if(!min.getFirstAutomaton().getAlphabet().contains(orig)){
                    min.getFirstAutomaton().getAlphabet().addEvent(orig);}
-                   arc.setEvent(orig);
+                   
                 }
             }
             
