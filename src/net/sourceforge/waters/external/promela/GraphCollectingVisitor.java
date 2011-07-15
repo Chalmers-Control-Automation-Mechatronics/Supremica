@@ -198,6 +198,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final String name = t.getChild(0).getText();
     chanNames.add(name);
     final ChanInfo ch = mVisitor.getChan().get(name);
+    @SuppressWarnings("unused")
     final ModuleProxyCloner cloner = mFactory.getCloner();
 /*
     if(ch.getChanLength()==1){
@@ -264,7 +265,6 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
       final Collection<NodeProxy> mNodes = new ArrayList<NodeProxy>();
       final Collection<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
-      final Collection<Collection<SimpleExpressionProxy>> sendData = ch.getSendData();
       final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
       final SimpleIdentifierProxy id =
           mFactory.createSimpleIdentifierProxy(accepting);
@@ -468,14 +468,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
                sendRange.add((SimpleExpressionProxy) cloner.getClone(c));
              }
              final Collection<IdentifierProxy> labelBlock = new ArrayList<IdentifierProxy>();
-             final NodeProxy node = mFactory.createSimpleNodeProxy(cName);
+        //     final NodeProxy node = mFactory.createSimpleNodeProxy(cName);
         //     if(!mChannelNode.contains(node)){
         //       mChannelNode.add(node);
         //     }
              final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("send_"+name, cloner.getClonedList(sendRange));
              labelBlock.add(ident);
-             final LabelBlockProxy label =
-               mFactory.createLabelBlockProxy(labelBlock, null);
+        //     final LabelBlockProxy label =
+        //       mFactory.createLabelBlockProxy(labelBlock, null);
        //      final ArrayList<NodeProxy> templist = new ArrayList<NodeProxy>(mChannelNode);
 
        //      final EdgeProxy edge =mFactory.createEdgeProxy(templist.get(0), node, label, null, null, null, null);
@@ -1090,8 +1090,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
       return result;
     }
   }
-  public void createChannelGraph(){
 
+  @SuppressWarnings("unused")
+  public void createChannelGraph()
+  {
     final String name = chanNames.get(0);
     final ModuleProxyCloner cloner = mFactory.getCloner();
  //   final GraphProxy graph = mFactory.createGraphProxy(true, null, mChannelNode, mChannelEdge);
@@ -1099,6 +1101,5 @@ public class GraphCollectingVisitor implements PromelaVisitor
  //   final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
  //   mCompleteComponents.add(component);
  //   mCompleteComponents.addAll(mComponents);
-
   }
 }
