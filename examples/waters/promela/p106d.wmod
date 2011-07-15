@@ -13,6 +13,7 @@
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_A"/>
         <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="step_A"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="proctype_A">
