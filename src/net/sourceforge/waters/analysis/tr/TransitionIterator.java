@@ -31,9 +31,17 @@ public interface TransitionIterator
 
   /**
    * Restarts this iterator to iterate over transitions associated with
-   * the given event.
+   * only the given event.
    */
   public void resetEvent(int event);
+
+  /**
+   * Restarts this iterator to iterate over transitions associated with
+   * the given range of events.
+   * @param  first   The first event to be included in the iteration.
+   * @param  last    The last event to be included in the iteration.
+   */
+  public void resetEvents(int first, int last);
 
   /**
    * Restarts this iterator to iterate over transitions associated with

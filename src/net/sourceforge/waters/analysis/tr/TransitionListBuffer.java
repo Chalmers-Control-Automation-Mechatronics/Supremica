@@ -1345,39 +1345,58 @@ public abstract class TransitionListBuffer
     private ReadOnlyIterator()
     {
       mCurrent = NULL;
-      mState = mEvent = -1;
+      mFirstEvent = EventEncoding.TAU;
+      mLastEvent = mNumEvents - 1;
+      mState = -1;
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.op.TransitionIterator
     public void reset()
     {
-      if (mState < 0) {
-        throw new IllegalStateException("From-state not defined for reset!");
-      } else {
-        reset(mState, mEvent);
+      if (mState >= 0) {
+        if (mStateTransitions[mState] == NULL) {
+          mCurrent = NULL;
+        } else {
+          int event = mFirstEvent;
+          int code = (mState << mStateShift) | event;
+          mCurrent = mStateEventTransitions.get(code);
+          while (mCurrent == NULL && ++event <= mLastEvent) {
+            code++;
+            mCurrent = mStateEventTransitions.get(code);
+          }
+        }
       }
     }
 
     public void resetEvent(final int event)
     {
-      reset(mState, event);
+      if (event < 0) {
+        mFirstEvent = EventEncoding.TAU;
+        mLastEvent = mNumEvents - 1;
+      } else {
+        mFirstEvent = mLastEvent = event;
+      }
+      reset();
+    }
+
+    public void resetEvents(final int first, final int last)
+    {
+      mFirstEvent = first < EventEncoding.TAU ? EventEncoding.TAU : first;
+      mLastEvent = last >= mNumEvents ? mNumEvents - 1 : last;
+      reset();
     }
 
     public void resetState(final int state)
     {
-      reset(state, mEvent);
+      mState = state;
+      reset();
     }
 
     public void reset(final int state, final int event)
     {
-      if (event < 0) {
-        resetRaw(state, -1, mStateTransitions[state]);
-      } else {
-        final int code = (state << mStateShift) | event;
-        final int list = mStateEventTransitions.get(code);
-        resetRaw(state, event, list);
-      }
+      mState = state;
+      resetEvent(event);
     }
 
     public boolean advance()
@@ -1385,7 +1404,7 @@ public abstract class TransitionListBuffer
       mCurrent = getNext(mCurrent);
       if (mCurrent == NULL) {
         return false;
-      } else if (mEvent >= 0 && getCurrentEvent() != mEvent) {
+      } else if (getCurrentEvent() > mLastEvent) {
         mCurrent = NULL;
         return false;
       } else {
@@ -1431,13 +1450,6 @@ public abstract class TransitionListBuffer
 
     //#######################################################################
     //# Auxiliary Methods
-    void resetRaw(final int state, final int event, final int list)
-    {
-      mCurrent = list;
-      mState = state;
-      mEvent = event;
-    }
-
     int getCurrent()
     {
       return mCurrent;
@@ -1467,7 +1479,8 @@ public abstract class TransitionListBuffer
     //# Data Members
     private int mState;
     private int mCurrent;
-    private int mEvent;
+    private int mFirstEvent;
+    private int mLastEvent;
 
   }
 
@@ -1560,7 +1573,7 @@ public abstract class TransitionListBuffer
                                    final int event)
     {
       mInnerIterator = inner;
-      mEvent = event;
+      mInnerIterator.resetEvent(event);
       mCurrentFromState = -1;
     }
 
@@ -1573,7 +1586,13 @@ public abstract class TransitionListBuffer
 
     public void resetEvent(final int event)
     {
-      mEvent = event;
+      mInnerIterator.resetEvent(event);
+      reset();
+    }
+
+    public void resetEvents(final int first, final int last)
+    {
+      mInnerIterator.resetEvents(first, last);
       reset();
     }
 
@@ -1598,7 +1617,7 @@ public abstract class TransitionListBuffer
             return false;
           }
         } while (mStateTransitions[mCurrentFromState] == NULL);
-        mInnerIterator.reset(mCurrentFromState, mEvent);
+        mInnerIterator.resetState(mCurrentFromState);
       }
       return true;
     }
@@ -1645,7 +1664,6 @@ public abstract class TransitionListBuffer
     //#########################################################################
     //# Data Members
     private final TransitionIterator mInnerIterator;
-    private int mEvent;
     private int mCurrentFromState;
 
   }

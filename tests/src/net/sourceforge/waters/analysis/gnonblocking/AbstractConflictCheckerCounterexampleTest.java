@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.analysis
+//# PACKAGE: net.sourceforge.waters.model.analysis.gnonblocking
 //# CLASS:   AbstractStandardConflictCheckerTest
 //###########################################################################
 //# $Id$
@@ -18,12 +18,12 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public abstract class AbstractConflictCheckerCounterexampleTest extends
-    AbstractConflictCheckerTest
+public abstract class AbstractConflictCheckerCounterexampleTest
+extends AbstractConflictCheckerTest
 {
 
-  // #########################################################################
-  // # Entry points in junit.framework.TestCase
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
   public AbstractConflictCheckerCounterexampleTest()
   {
   }
@@ -33,9 +33,10 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
     super(name);
   }
 
-  // #########################################################################
-  // # Overrides for
-  // # net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest
   protected LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
@@ -46,8 +47,9 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
                                                   checker, projector);
   }
 
-  // #########################################################################
-  // # Auxiliary Methods
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void setConfiguration(final int islimit, final int fslimit,
                                 final int itlimit, final int ftlimit)
   {
@@ -60,8 +62,8 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
   }
 
 
-  // #########################################################################
-  // # Test Cases
+  //#########################################################################
+  //# Test Cases
   public void testFischertechnik() throws Exception
   {
     setConfiguration(10000, 10000, 1000000, 1000000);
@@ -76,21 +78,13 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
     setConfiguration(10000, 10000, 1000000, 1000000);
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "rhone_alps.wmod";
+    final String name = "aip0alps.wmod";
     runModelVerifier(group, dir, name, false);
   }
-
-  /*
-   * public void testRhoneTough() throws Exception { final String group =
-   * "tests"; final String dir = "incremental_suite"; final String name =
-   * "rhone_tough.wmod"; runModelVerifier(group, dir, name, false); // not sure
-   * about result ... }
-   */// TODO:get configs
 
   public void testTbedCTCT() throws Exception
   {
     setConfiguration(10000, 10000, 1000000, 1000000);
-
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "tbed_ctct.wmod";
@@ -109,7 +103,6 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
   public void testVerriegel4B() throws Exception
   {
     setConfiguration(10000, 10000, 1000000, 1000000);
-
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "verriegel4b.wmod";
@@ -119,10 +112,10 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
   public void testTip3Bad() throws Exception
   {
     setConfiguration(2000, 1000000, 200000, 0);
-
     final String group = "tip";
     final String dir = "acsw2006";
     final String name = "tip3_bad.wmod";
     runModelVerifier(group, dir, name, false);
   }
+
 }

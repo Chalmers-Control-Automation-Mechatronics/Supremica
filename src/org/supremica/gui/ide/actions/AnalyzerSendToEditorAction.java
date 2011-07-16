@@ -34,6 +34,7 @@ import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -120,8 +121,11 @@ public class AnalyzerSendToEditorAction extends IDEAction
           if (context.getEventDecl(name) == null && addedNames.add(name)) {
             try {
               final EventDeclProxy decl = importer.importEventDecl(event);
-              final InsertInfo info = new InsertInfo(decl);
-              decls.add(info);
+              final IdentifierProxy ident = decl.getIdentifier();
+              if (ident instanceof SimpleIdentifierProxy) {
+                final InsertInfo info = new InsertInfo(decl);
+                decls.add(info);
+              }
             } catch (final ParseException exception) {
               ide.getIDE().error("Could not add event " + event.getName() +
                                  " to editor: " + exception.getMessage());
