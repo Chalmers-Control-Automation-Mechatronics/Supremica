@@ -13,12 +13,6 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 public class ChanInfo {
 
   // TODO
-  // Add length member, and initialise correctly when creating channel.
-  // private int mLength;
-  // The length is the declared size of the channel, i.e., the number in
-  // square brackets in the Promela source.
-
-  // TODO
   // Each channel has got only one event declaration, so it must be
   // determined at channel level whether sender and receiver arguments
   // are present or not.
@@ -35,12 +29,12 @@ public class ChanInfo {
   // Using the above information, the event declarations can be created
   // as follows.
   //
-  // IF mLength == 0
+  // IF mChanLength == 0
   //   exch_<name>[data]..[data] if neither sender nor recipient present;
   //   exch_<name>[sender][data]..[data] if only sender present;
   //   exch_<name>[rcpt][data]..[data] if only recipient present;
   //   exch_<name>[sender][rcpt][data]..[data] if sender and recipient present.
-  // IF mLength > 0
+  // IF mChanLength > 0
   //   send_<name>[data]..[data] if sender not present
   //   send_<name>[sender][data]..[data] if sender present
   //   plus
