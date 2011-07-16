@@ -1080,8 +1080,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private static final Collection<String> EXTENSIONS =
       Collections.singletonList(DESPOTEXT);
   private static final FileFilter DESPOTFILTER =
-      new StandardExtensionFileFilter(DESPOTEXT, "DESpot project files [*"
-          + DESPOTEXT + "]");
+      new StandardExtensionFileFilter("DESpot project files [*"
+          + DESPOTEXT + "]", DESPOTEXT);
   private static final Collection<FileFilter> FILTERS =
       Collections.singletonList(DESPOTFILTER);
 }

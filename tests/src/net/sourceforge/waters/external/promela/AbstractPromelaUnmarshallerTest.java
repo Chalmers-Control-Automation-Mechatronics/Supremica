@@ -10,15 +10,20 @@
 package net.sourceforge.waters.external.promela;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.net.URI;
+import java.util.Arrays;
+
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleIdentifierChecker;
 import net.sourceforge.waters.model.module.ModuleIntegrityChecker;
@@ -272,6 +277,26 @@ public abstract class AbstractPromelaUnmarshallerTest
   public void testImport_p109b() throws Exception
   {
     testImport("p109b");
+  }
+
+
+  /**
+   * This test tries to compile all Waters module (<CODE>.wmod</CODE> files)
+   * in the Promela directory, to make sure the files are at least consistent.
+   */
+  public void testWatersModules() throws Exception
+  {
+    final String ext = mModuleMarshaller.getDefaultExtension();
+    final String desc = mModuleMarshaller.getDescription();
+    final FileFilter filter = new StandardExtensionFileFilter(desc, ext, false);
+    final File[] files = mInputDirectory.listFiles(filter);
+    Arrays.sort(files);
+    for (final File file : files) {
+      final ModuleProxy module = (ModuleProxy) mDocumentManager.load(file);
+      final ModuleCompiler compiler =
+        new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
+      compiler.compile();
+    }
   }
 
 

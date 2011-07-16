@@ -57,6 +57,6 @@ public class SupremicaMarshaller
     {
         final String ext = getDefaultExtension();
         final String description = getDescription();
-        return StandardExtensionFileFilter.getFilter(ext, description);
+        return StandardExtensionFileFilter.getFilter(description, ext);
     }
 }

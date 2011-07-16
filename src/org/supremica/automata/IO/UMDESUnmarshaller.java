@@ -78,7 +78,7 @@ public class UMDESUnmarshaller
 
     public Collection<FileFilter> getSupportedFileFilters()
     {
-        final FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "UMDES files [*.fsm]");
+        final FileFilter filter = new StandardExtensionFileFilter("UMDES files [*.fsm]", getDefaultExtension());
         return Collections.singletonList(filter);
     }
 

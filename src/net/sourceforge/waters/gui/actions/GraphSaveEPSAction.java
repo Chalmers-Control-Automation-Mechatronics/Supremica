@@ -99,8 +99,8 @@ public class GraphSaveEPSAction
       mFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
       mFileChooser.setMultiSelectionEnabled(false);
       final FileFilter filter =
-        new StandardExtensionFileFilter(EPS,
-                                        "Encapsulated Postscript (*.eps)");
+        new StandardExtensionFileFilter("Encapsulated Postscript (*.eps)",
+                                        EPS);
       mFileChooser.addChoosableFileFilter(filter);
       mFileChooser.setFileFilter(filter);
       final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());

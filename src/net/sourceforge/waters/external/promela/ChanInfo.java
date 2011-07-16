@@ -10,7 +10,49 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
-public class ChanInfo{
+public class ChanInfo {
+
+  // TODO
+  // Add length member, and initialise correctly when creating channel.
+  // private int mLength;
+  // The length is the declared size of the channel, i.e., the number in
+  // square brackets in the Promela source.
+
+  // TODO
+  // Each channel has got only one event declaration, so it must be
+  // determined at channel level whether sender and receiver arguments
+  // are present or not.
+  // A sender argument is present if at least one message is sent by more than
+  // one proctype.
+  // A receiver argument is present if at least one message is received by
+  // more than one proctype.
+  // Once determined whether or not senders and recipients are present, this
+  // information should be stored on the channel.
+  // private boolean mHasMultipleSenders;
+  // private boolean mHasMultipleRecipients;
+
+  // TODO
+  // Using the above information, the event declarations can be created
+  // as follows.
+  //
+  // IF mLength == 0
+  //   exch_<name>[data]..[data] if neither sender nor recipient present;
+  //   exch_<name>[sender][data]..[data] if only sender present;
+  //   exch_<name>[rcpt][data]..[data] if only recipient present;
+  //   exch_<name>[sender][rcpt][data]..[data] if sender and recipient present.
+  // IF mLength > 0
+  //   send_<name>[data]..[data] if sender not present
+  //   send_<name>[sender][data]..[data] if sender present
+  //   plus
+  //   recv_<name>[data]..[data] if recipient not present
+  //   recv_<name>[rcpt][data]..[data] if recipient present
+
+  // TODO
+  // When compiling send and receive statements, look up in the channel
+  // whether or not senders and recipients are used, and use this information
+  // to generate the correct event labels (identifiers). This decision must
+  // be based on the channel, not on the individual messages.
+
     private int mSendCount;
     private int mRecCount;
     private final int mDataLength;
@@ -39,6 +81,7 @@ public class ChanInfo{
      *
      */
     private final List<Message> mMessages;
+
     public ChanInfo(final String n, final int typeL,final int dataL,final List<String> ty){
         mSendCount = 0;
         mRecCount = 0;
@@ -67,14 +110,14 @@ public class ChanInfo{
         if(msg.hasRecipients()){
           for(final String s: msg.getRecipients()){
             if(!mMessages.get((mMessages.indexOf(msg))).getRecipients().contains(s)){
-              mMessages.get((mMessages.indexOf(msg))).addRecipients(s);
+              mMessages.get((mMessages.indexOf(msg))).addRecipient(s);
             }
           }
         }
         if(msg.hasSenders()){
           for(final String s: msg.getSenders()){
             if(!mMessages.get((mMessages.indexOf(msg))).getSenders().contains(s)){
-              mMessages.get((mMessages.indexOf(msg))).addSenders(s);
+              mMessages.get((mMessages.indexOf(msg))).addSender(s);
             }
            }
         }

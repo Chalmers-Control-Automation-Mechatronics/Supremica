@@ -177,10 +177,10 @@ public class EventCollectingVisitor implements PromelaVisitor
         if(isSender){
 
           for(final String s: m2.getSenders()){
-            m.addSenders(s);
+            m.addSender(s);
           }
           for(final String s: m.getRecipients()){
-            m2.addRecipients(s);
+            m2.addRecipient(s);
           }
           if(!mOutput.contains(m)){
             mOutput.add(m);
@@ -337,7 +337,7 @@ public class EventCollectingVisitor implements PromelaVisitor
         tree = tree.getParent();
       }
       final String n = tree.getText();
-      msg.addSenders(n);
+      msg.addSender(n);
       ch.addMessages(msg);
         //create indexedIdentifier, and store it for receive statement
       IndexedIdentifierProxy indexEvent = null;
@@ -411,7 +411,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     final List<SimpleExpressionProxy> msgList = new ArrayList<SimpleExpressionProxy>(indexes);
     final Message msg = new Message(msgList);
 
-    msg.addRecipients(n);
+    msg.addRecipient(n);
     ch.addMessages(msg);
 
     return null;

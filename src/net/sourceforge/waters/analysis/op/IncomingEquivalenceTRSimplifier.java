@@ -145,7 +145,7 @@ public class IncomingEquivalenceTRSimplifier
     final TIntArrayList mergeCandidates = new TIntArrayList();
     final WatersIntHashingStrategy strategy = new IncomingEquivalenceHash();
     mIncomingEquivalenceMap =
-      new WatersIntIntHashMap(numStates, IntListBuffer.NULL, strategy);
+      new WatersIntIntHashMap(3 * numStates, IntListBuffer.NULL, strategy);
     boolean trivial = true;
     boolean change;
     do {

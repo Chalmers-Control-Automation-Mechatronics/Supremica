@@ -301,7 +301,7 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
     Collections.singletonList(MAZEEXT);
   private static final FileFilter MAZEFILTER =
     new StandardExtensionFileFilter
-      (MAZEEXT, "Maze description files [*" + MAZEEXT + "]");
+      ("Maze description files [*" + MAZEEXT + "]", MAZEEXT);
   private static final Collection<FileFilter> FILTERS =
     Collections.singletonList(MAZEFILTER);
 

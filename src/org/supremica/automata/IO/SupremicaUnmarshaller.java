@@ -94,7 +94,7 @@ public class SupremicaUnmarshaller
     {
         final String ext = getDefaultExtension();
         final String description = getDescription();
-        return StandardExtensionFileFilter.getFilter(ext, description);
+        return StandardExtensionFileFilter.getFilter(description, ext);
     }
 
     public Collection<FileFilter> getSupportedFileFilters()

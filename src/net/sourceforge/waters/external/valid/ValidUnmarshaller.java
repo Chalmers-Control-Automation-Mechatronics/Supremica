@@ -166,7 +166,7 @@ public class ValidUnmarshaller
   private static final String DESCR_VPRJ = "VALID Project files [*.vprj]";
   private static final FileFilter VMODFILTER = new MainVmodFileFiler();
   private static final StandardExtensionFileFilter VPRJFILTER =
-    new StandardExtensionFileFilter(EXT_VPRJ, DESCR_VPRJ);
+    new StandardExtensionFileFilter(DESCR_VPRJ, EXT_VPRJ);
 
   static {
     final Collection<String> exts = new LinkedList<String>();

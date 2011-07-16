@@ -77,7 +77,7 @@ public class HISCUnmarshaller
 
     public Collection<FileFilter> getSupportedFileFilters()
     {
-        final FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "HISC Project files [*.prj]");
+        final FileFilter filter = new StandardExtensionFileFilter("HISC Project files [*.prj]", getDefaultExtension());
         return Collections.singletonList(filter);
     }
 

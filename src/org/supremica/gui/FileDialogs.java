@@ -493,7 +493,7 @@ public class FileDialogs
     // Note, could not have variable referred to in anonymous class
     private FileFilter makeFileFilter(final String ext, final String description)
     {
-        return new StandardExtensionFileFilter(ext, description);
+        return new StandardExtensionFileFilter(description, ext);
     }
     
     private FileFilter getFilter(FileFormats fileType)

@@ -79,7 +79,7 @@ public class ADSUnmarshaller
 
     public Collection<FileFilter> getSupportedFileFilters()
     {
-        final FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "ADS files [*.ads]");
+        final FileFilter filter = new StandardExtensionFileFilter("ADS files [*.ads]", getDefaultExtension());
         return Collections.singletonList(filter);
     }
 

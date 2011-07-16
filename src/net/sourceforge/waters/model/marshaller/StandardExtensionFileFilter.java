@@ -7,13 +7,11 @@
 //# $Id$
 //###########################################################################
 
-
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.filechooser.FileFilter;
 
 
 /**
@@ -24,7 +22,8 @@ import javax.swing.filechooser.FileFilter;
  */
 
 public class StandardExtensionFileFilter
-  extends FileFilter
+  extends javax.swing.filechooser.FileFilter
+  implements java.io.FileFilter
 {
 
   //#########################################################################
@@ -35,18 +34,18 @@ public class StandardExtensionFileFilter
    * by creating a lookup table indexed by the extension. If a file filter
    * with a given extension is found, that object is returned, ignoring the
    * description.
-   * @param  ext         The filename extension accepted by the filter,
-   *                     with preceding dot.
    * @param  description A textual description of the files accepted by
    *                     this filter, to be displayed in the file chooser's
    *                     file type selection box.
+   * @param  ext         The filename extension accepted by the filter,
+   *                     with preceding dot.
    */
-  public static StandardExtensionFileFilter getFilter(final String ext,
-						      final String description)
+  public static StandardExtensionFileFilter getFilter(final String description,
+                                                      final String ext)
   {
     StandardExtensionFileFilter filter = mFilterMap.get(ext);
     if (filter == null) {
-      filter = new StandardExtensionFileFilter(ext, description);
+      filter = new StandardExtensionFileFilter(description, ext);
       mFilterMap.put(ext, filter);
     }
     return filter;
@@ -56,18 +55,41 @@ public class StandardExtensionFileFilter
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new file filter.
-   * @param  ext         The filename extension accepted by the filter,
-   *                     with preceding dot.
+   * Creates a new file filter that accepts directories in addition to
+   * files with the given extension.
    * @param  description A textual description of the files accepted by
    *                     this filter, to be displayed in the file chooser's
    *                     file type selection box.
+   * @param  ext         The filename extension accepted by the filter,
+   *                     with preceding dot.
+   * @param  dirs        A flag, indicating that the filter accepts all
+   *                     directories in addition to files with the given
+   *                     extension.
    */
-  public StandardExtensionFileFilter(final String ext,
-				     final String description)
+  public StandardExtensionFileFilter(final String description,
+                                     final String ext)
+  {
+    this(description, ext, true);
+  }
+
+  /**
+   * Creates a new file filter.
+   * @param  description A textual description of the files accepted by
+   *                     this filter, to be displayed in the file chooser's
+   *                     file type selection box.
+   * @param  ext         The filename extension accepted by the filter,
+   *                     with preceding dot.
+   * @param  dirs        A flag, indicating that the filter accepts all
+   *                     directories in addition to files with the given
+   *                     extension.
+   */
+  public StandardExtensionFileFilter(final String description,
+                                     final String ext,
+                                     final boolean dirs)
   {
     mExtension = ext;
     mDescription = description;
+    mAcceptsDirectories = dirs;
   }
 
 
@@ -76,18 +98,18 @@ public class StandardExtensionFileFilter
   public boolean accept(final File file)
   {
     if (file.isDirectory()) {
-      return true;
+      return mAcceptsDirectories;
     } else {
       final String filename = file.getName();
       return accept(filename);
     }
   }
-    
+
   public String getDescription()
   {
     return mDescription;
   }
-    
+
 
   //#########################################################################
   //# Convenience
@@ -115,7 +137,7 @@ public class StandardExtensionFileFilter
    * Checks whether a file has the given extension.
    * @param  file        The file to be checked.
    * @param  ext         The extension looked for, with preceding dot.
-   */ 
+   */
   public static boolean hasExtension(final File file, final String ext)
   {
     return hasExtension(file.getPath(), ext);
@@ -125,7 +147,7 @@ public class StandardExtensionFileFilter
    * Checks whether a file name string has the given extension.
    * @param  filename    The file name to be checked.
    * @param  ext         The extension looked for, with preceding dot.
-   */ 
+   */
   public static boolean hasExtension(final String filename, final String ext)
   {
     final int lastdot = filename.lastIndexOf('.');
@@ -159,6 +181,7 @@ public class StandardExtensionFileFilter
   //# Data Members
   private final String mExtension;
   private final String mDescription;
+  private final boolean mAcceptsDirectories;
 
 
   //#########################################################################

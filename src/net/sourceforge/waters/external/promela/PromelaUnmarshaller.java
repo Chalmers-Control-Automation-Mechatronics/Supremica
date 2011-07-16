@@ -227,9 +227,9 @@ public class PromelaUnmarshaller
   private static final Collection<String> EXTENSIONS =
       Collections.singletonList(PROMELA_EXTENSION);
   private static final FileFilter PROMELA_FILTER =
-      new StandardExtensionFileFilter(PROMELA_EXTENSION,
-                                      "Promela files [*" +
-                                      PROMELA_EXTENSION + "]");
+      new StandardExtensionFileFilter("Promela files [*" +
+      PROMELA_EXTENSION + "]",
+                                      PROMELA_EXTENSION);
   private static final Collection<FileFilter> FILTERS =
       Collections.singletonList(PROMELA_FILTER);
 

@@ -10,45 +10,73 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 public class Message
 {
   private final List<SimpleExpressionProxy> mMsg;
-  final ModuleEqualityVisitor eqVisitor = ModuleEqualityVisitor.getInstance(false);
   private final List<String> mSenders = new ArrayList<String>();
   private final List<String> mRecipients = new ArrayList<String>();
 
-  public Message(final List<SimpleExpressionProxy> msg){
+  public Message(final List<SimpleExpressionProxy> msg)
+  {
     mMsg = new ArrayList<SimpleExpressionProxy>(msg);
   }
 
-  public void addSenders(final String sender){
-    if(!mSenders.contains(sender))
-    mSenders.add(sender);
+  public void addSender(final String sender)
+  {
+    if (!mSenders.contains(sender)) {
+      mSenders.add(sender);
+    }
   }
-  public void addRecipients(final String recipient){
-    if(!mRecipients.contains(recipient))
-    mRecipients.add(recipient);
+
+  public void addRecipient(final String recipient)
+  {
+    if (!mRecipients.contains(recipient)) {
+      mRecipients.add(recipient);
+    }
   }
-  public boolean hasSenders(){
-    return mSenders.size()!=0;
+
+  public boolean hasSenders()
+  {
+    return mSenders.size() != 0;
   }
-  public boolean hasRecipients(){
-    return mRecipients.size()!=0;
+
+  public boolean hasRecipients()
+  {
+    return mRecipients.size() != 0;
   }
+
   @Override
-  public boolean equals(final Object msg){
-    return eqVisitor.isEqualList(this.getMsg(), ((Message)msg).getMsg());
+  public boolean equals(final Object other)
+  {
+    if (getClass() == other.getClass()) {
+      final Message msg = (Message) other;
+      final ModuleEqualityVisitor eqVisitor =
+        ModuleEqualityVisitor.getInstance(false);
+      return eqVisitor.isEqualList(getMsg(), msg.getMsg());
+    } else {
+      return false;
+    }
   }
+
   @Override
-  public int hashCode(){
+  public int hashCode()
+  {
+    final ModuleEqualityVisitor eqVisitor =
+      ModuleEqualityVisitor.getInstance(false);
     final ModuleHashCodeVisitor hashVisitor = eqVisitor.getHashCodeVisitor();
     return hashVisitor.getListHashCode(this.getMsg());
   }
 
-  public List<SimpleExpressionProxy> getMsg(){
+  public List<SimpleExpressionProxy> getMsg()
+  {
     return mMsg;
   }
-  public List<String> getSenders(){
+
+  public List<String> getSenders()
+  {
     return mSenders;
   }
-  public List<String> getRecipients(){
+
+  public List<String> getRecipients()
+  {
     return mRecipients;
   }
+
 }
