@@ -217,7 +217,7 @@ public class ModuleProxyPrinter
     if (text != null) {
       print(text);
     } else {
-      print('{');
+      print('[');
       final List<SimpleIdentifierProxy> items = proxy.getItems();
       final Iterator<SimpleIdentifierProxy> iter = items.iterator();
       while (iter.hasNext()) {
@@ -227,7 +227,7 @@ public class ModuleProxyPrinter
           print(", ");
         }
       }
-      print('}');
+      print(']');
     }
     return null;
   }

@@ -366,6 +366,13 @@ public abstract class AbstractExpressionTest extends TestCase
                  ">, but got <" + parsed + ">!",
                  mEquality.equals(parsed, expr));
       assertEquals("Wrong plain text!", text, parsed.toString());
+      final String etext = expr.toString();
+      final SimpleExpressionProxy eparsed = mParser.parse(etext, mask);
+      assertTrue("Unexpected result in parse-back! - expected: <" + expr +
+                 ">, but got <" + eparsed + ">!",
+                 mEquality.equals(eparsed, expr));
+      assertEquals("Wrong plain text in parse-back!",
+                   etext, eparsed.toString());
     } catch (final ParseException exception) {
       final int pos = exception.getErrorOffset();
       System.out.println(text);
