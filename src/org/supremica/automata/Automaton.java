@@ -1752,7 +1752,7 @@ public class Automaton
      */
     public void hide(final Alphabet hideThese, final boolean preserveControllability )
     {
-        logger.info(hideThese);
+//        logger.info(hideThese);
         hideThese.minus(hideThese.getUnobservableEvents());
         // new hiding method by using TauEvent class. The old version is oldHides now.
         // Don't hide nothing!
