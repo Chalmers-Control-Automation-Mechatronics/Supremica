@@ -1345,7 +1345,7 @@ public abstract class TransitionListBuffer
     private ReadOnlyIterator()
     {
       mCurrent = NULL;
-      mFirstEvent = EventEncoding.TAU;
+      mFirstEvent = 0;
       mLastEvent = mNumEvents - 1;
       mState = -1;
     }
@@ -1355,8 +1355,8 @@ public abstract class TransitionListBuffer
     public void reset()
     {
       if (mState >= 0) {
-        if (mStateTransitions[mState] == NULL) {
-          mCurrent = NULL;
+        if (mFirstEvent == 0) {
+          mCurrent = mStateTransitions[mState];
         } else {
           int event = mFirstEvent;
           int code = (mState << mStateShift) | event;
@@ -1372,7 +1372,7 @@ public abstract class TransitionListBuffer
     public void resetEvent(final int event)
     {
       if (event < 0) {
-        mFirstEvent = EventEncoding.TAU;
+        mFirstEvent = 0;
         mLastEvent = mNumEvents - 1;
       } else {
         mFirstEvent = mLastEvent = event;
@@ -1382,7 +1382,7 @@ public abstract class TransitionListBuffer
 
     public void resetEvents(final int first, final int last)
     {
-      mFirstEvent = first < EventEncoding.TAU ? EventEncoding.TAU : first;
+      mFirstEvent = first < 0 ? 0 : first;
       mLastEvent = last >= mNumEvents ? mNumEvents - 1 : last;
       reset();
     }
