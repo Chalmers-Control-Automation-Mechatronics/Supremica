@@ -197,6 +197,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     }
 
+
     //create Run events
     if(!atomic){
       for(final Map.Entry<String,Integer> s: occur.entrySet()){

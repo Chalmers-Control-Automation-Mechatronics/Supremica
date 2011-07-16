@@ -50,7 +50,7 @@ public class PromelaGraph
   public PromelaGraph(final List<IdentifierProxy> events, final ModuleProxyFactory factory){
     mPromelaStartNode = new PromelaNode();
     final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
-    System.out.println(events.size());
+
     final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(events);
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final Comparator<SimpleExpressionProxy> comparator =
@@ -313,7 +313,7 @@ public class PromelaGraph
           if(!edgesOfResult.contains(specialEdge1)){
             edgesOfResult.add(specialEdge1);
           }else{
-            System.out.println("make sure");
+
             final PromelaEdge tempEdge = edgesOfResult.get(edgesOfResult.indexOf(specialEdge1));
             final List<SimpleExpressionProxy> l = new ArrayList<SimpleExpressionProxy>();
             l.addAll(tempEdge.getLabelBlock().getCloneLabel(factory));
@@ -351,7 +351,7 @@ public class PromelaGraph
           newEdge = new PromelaEdge(sourceNode, newEndNode, label2);
           edgesOfResult.add(newEdge);
         }else if(edge.getTarget().isEnd() && edge.getSource()==second.getStart()){
-          System.out.println(edge.getLabelBlock().getLabel().toString());
+
           label2 = new PromelaLabel(edge.getLabelBlock().getCloneLabel(factory));
           loop1:
             for(final SimpleExpressionProxy e: label2.getLabel()){
@@ -369,7 +369,7 @@ public class PromelaGraph
           if(!edgesOfResult.contains(specialEdge2)){
             edgesOfResult.add(specialEdge2);
           }else{
-            System.out.println("make sure");
+
             final PromelaEdge tempEdge = edgesOfResult.get(edgesOfResult.indexOf(specialEdge2));
 
             final List<SimpleExpressionProxy> l = new ArrayList<SimpleExpressionProxy>();
@@ -409,7 +409,7 @@ public class PromelaGraph
           if(!edgesOfResult.contains(specialEdge2)){
             edgesOfResult.add(specialEdge2);
           }else{
-            System.out.println("make sure");
+
             final PromelaEdge tempEdge = edgesOfResult.get(edgesOfResult.indexOf(specialEdge2));
 
             final List<SimpleExpressionProxy> l = new ArrayList<SimpleExpressionProxy>();
@@ -1378,7 +1378,7 @@ public class PromelaGraph
     SimpleNodeProxy proxy;
     for (final PromelaNode node : getNodes()) {
       final boolean initial = (node == this.getStart());
-     // System.out.println(name+" "+getNodes().contains(this.getStart()));
+
       final boolean marked = (node.isEnd());
       proxy = node.createNode(name, index++, initial, marked, mFactory);
       mNodes.add(proxy);

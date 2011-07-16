@@ -28,9 +28,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A_1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="144" X="80"/>
                         </PointGeometry>
@@ -112,9 +109,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="B_2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="192" X="96"/>
                         </PointGeometry>
@@ -131,9 +125,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="B_4">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="320" X="96"/>
                         </PointGeometry>
@@ -222,9 +213,6 @@
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="init_0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="48" X="80"/>
                         </PointGeometry>
