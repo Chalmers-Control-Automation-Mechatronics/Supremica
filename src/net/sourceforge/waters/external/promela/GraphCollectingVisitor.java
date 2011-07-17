@@ -604,7 +604,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
                 if(!m2.equals(msg)){
                   if(m2.getRecipients().contains(name)){
                    indexes = new ArrayList<SimpleExpressionProxy>();
-
+              //     for(final String send1 : m2.getSenders()){
                    //sender
                    if(mVisitor.getOccur().get(send)>1){
                      final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(send+"_"+i);
@@ -625,6 +625,19 @@ public class GraphCollectingVisitor implements PromelaVisitor
                      }
                      indexes.add(id);
                  //    sendRange.add(id);
+                   }else if (mVisitor.getOccur().get(send)==1){
+                     if(m.getSenders().size()>1){
+                       final Collection<SimpleIdentifierProxy> temp = new ArrayList<SimpleIdentifierProxy>();
+                     //  for(final String s: m.getSenders()){
+                         final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(send+"_"+0);
+                         temp.add(id);
+                         sender.add((SimpleIdentifierProxy) cloner.getClone(id));
+                      // }
+                       //TODO
+                       final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(temp);
+                       indexes.add(en);
+                       //sender.add((SimpleIdentifierProxy) cloner.getClone(en));
+                     }
                    }
 
                    //reciever
@@ -701,6 +714,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
                    if(!test){
                      events.add(indexEvent);
                    }
+             //     }
                 }
                 }
             }
