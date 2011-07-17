@@ -655,8 +655,10 @@ public class TauClosure
 
     public void resetEvent(final int event)
     {
-      mEventIterator.resetEvent(event);
-      reset();
+      mTauIterator.resetState(mFromState);
+      mTauIterator.advance();
+      mEventIterator.reset(mFromState, event);
+      mVisited.clear();
     }
 
     public void resetEvents(final int first, final int last)
@@ -673,8 +675,8 @@ public class TauClosure
 
     public void reset(final int from, final int event)
     {
-      mEventIterator.resetState(event);
-      resetState(from);
+      mFromState = from;
+      resetEvent(event);
     }
 
     public boolean advance()
@@ -796,8 +798,9 @@ public class TauClosure
 
     public void resetEvent(final int event)
     {
-      mEventIterator.resetEvent(event);
-      reset();
+      mEventIterator.reset(mFromState, event);
+      mVisited.clear();
+      mStart = true;
     }
 
     public void resetEvents(final int first, final int last)
@@ -814,8 +817,8 @@ public class TauClosure
 
     public void reset(final int from, final int event)
     {
-      mEventIterator.resetState(event);
-      resetState(from);
+      mFromState = from;
+      resetEvent(event);
     }
 
     public boolean advance()
@@ -938,8 +941,10 @@ public class TauClosure
 
     public void resetEvent(final int event)
     {
-      mEventIterator.resetEvent(event);
-      reset();
+      mTauIterator1.resetState(mCurrent);
+      mEventIterator.reset(mCurrent, event);
+      mVisited.clear();
+      mStart = true;
     }
 
     public void resetEvents(final int first, final int last)
@@ -956,8 +961,8 @@ public class TauClosure
 
     public void reset(final int from, final int event)
     {
-      mEventIterator.resetEvent(event);
-      resetState(from);
+      mCurrent = from;
+      resetEvent(event);
     }
 
     public boolean advance()
