@@ -621,17 +621,32 @@ public class GraphCollectingVisitor implements PromelaVisitor
                        testSend = true;
                      }
                      if(testSend){
+
                        sender.add((SimpleIdentifierProxy) cloner.getClone(id));
                      }
                      indexes.add(id);
                  //    sendRange.add(id);
                    }else if (mVisitor.getOccur().get(send)==1){
-                     if(m.getSenders().size()>1){
+                     if(m2.getSenders().size()>1){
                        final Collection<SimpleIdentifierProxy> temp = new ArrayList<SimpleIdentifierProxy>();
                      //  for(final String s: m.getSenders()){
                          final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(send+"_"+0);
                          temp.add(id);
-                         sender.add((SimpleIdentifierProxy) cloner.getClone(id));
+                         boolean testSend=false;
+                         for(final SimpleExpressionProxy s: sender){
+                           if(comparator.compare(s, id)==0){
+                             testSend=false;
+                             break;
+                           }else{
+                             testSend = true;
+                           }
+                         }
+                         if(sender.size()==0){
+                           testSend = true;
+                         }
+                         if(testSend){
+                           sender.add((SimpleIdentifierProxy) cloner.getClone(id));
+                         }
                       // }
                        //TODO
                        final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(temp);
