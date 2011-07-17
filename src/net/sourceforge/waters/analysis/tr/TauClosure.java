@@ -910,8 +910,7 @@ public class TauClosure
       mTauIterator1 = createIterator();
       mEventIterator = mTransitionBuffer.createReadOnlyIterator();
       mTauIterator2 = createIterator();
-      mVisited = new TIntHashSet();
-      mVisited.setAutoCompactionFactor(0);
+      mVisited = new TIntHashSet(TransitionListBuffer.HASH_STRATEGY);
     }
 
     private FullEventClosureTransitionIterator(final int event)
@@ -919,8 +918,8 @@ public class TauClosure
       mTauIterator1 = createIterator();
       mEventIterator = mTransitionBuffer.createReadOnlyIterator(event);
       mTauIterator2 = createIterator();
-      mVisited = new TIntHashSet();
-      mVisited.setAutoCompactionFactor(0);
+      mVisited = new TIntHashSet(TransitionListBuffer.HASH_STRATEGY);
+      mFirstEvent = event;
     }
 
     private FullEventClosureTransitionIterator(final int from, final int event)
@@ -928,8 +927,7 @@ public class TauClosure
       mTauIterator1 = createIterator();
       mEventIterator = mTransitionBuffer.createReadOnlyIterator();
       mTauIterator2 = createIterator();
-      mVisited = new TIntHashSet();
-      mVisited.setAutoCompactionFactor(0);
+      mVisited = new TIntHashSet(TransitionListBuffer.HASH_STRATEGY);
       reset(from, event);
     }
 
@@ -948,12 +946,14 @@ public class TauClosure
       mTauIterator1.resetState(mCurrent);
       mEventIterator.reset(mCurrent, event);
       mVisited.clear();
+      mFirstEvent = event;
       mStart = true;
     }
 
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
+      mFirstEvent = first;
       reset();
     }
 
@@ -973,7 +973,7 @@ public class TauClosure
     {
       while (seek()) {
         final int state = mTauIterator2.getCurrentToState();
-        final int event = mEventIterator.getCurrentEvent();
+        final int event = mEventIterator.getCurrentEvent() - mFirstEvent;
         final int key = (state << mStateShift) | event;
         if (mVisited.add(key)) {
           return true;
@@ -1053,6 +1053,7 @@ public class TauClosure
 
     //#######################################################################
     //# Data Members
+    private int mFirstEvent;
     private int mCurrent;
     private boolean mStart;
 

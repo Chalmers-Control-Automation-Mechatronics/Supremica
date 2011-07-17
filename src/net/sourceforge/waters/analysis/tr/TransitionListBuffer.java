@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
+import gnu.trove.TIntHashingStrategy;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntIterator;
 import java.util.ArrayList;
@@ -1717,6 +1718,26 @@ public abstract class TransitionListBuffer
 
 
   //#########################################################################
+  //# Inner Class IdentityHashingStrategy
+  private static class IdentityHashingStrategy
+    implements TIntHashingStrategy
+  {
+
+    //#######################################################################
+    //# Interface gnu.trove.TIntHashingStrategy
+    public int computeHashCode(final int key)
+    {
+      return key;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final int mBlockShift;
   private final int mBlockMask;
@@ -1736,6 +1757,9 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Class Constants
+  public static final TIntHashingStrategy HASH_STRATEGY =
+    new IdentityHashingStrategy();
+
   public static final int NULL = 0;
 
   private static final int OFFSET_NEXT = 0;
