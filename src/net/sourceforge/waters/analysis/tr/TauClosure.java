@@ -917,7 +917,7 @@ public class TauClosure
       mTauIterator1 = createIterator();
       mEventIterator = mTransitionBuffer.createReadOnlyIterator();
       mTauIterator2 = createIterator();
-      mVisited = new TIntHashSet(TransitionListBuffer.HASH_STRATEGY);
+      mVisited = new TIntHashSet();
     }
 
     private FullEventClosureTransitionIterator(final int event)
@@ -925,7 +925,7 @@ public class TauClosure
       mTauIterator1 = createIterator();
       mEventIterator = mTransitionBuffer.createReadOnlyIterator(event);
       mTauIterator2 = createIterator();
-      mVisited = new TIntHashSet(TransitionListBuffer.HASH_STRATEGY);
+      mVisited = new TIntHashSet();
       mFirstEvent = event;
     }
 
@@ -934,7 +934,7 @@ public class TauClosure
       mTauIterator1 = createIterator();
       mEventIterator = mTransitionBuffer.createReadOnlyIterator();
       mTauIterator2 = createIterator();
-      mVisited = new TIntHashSet(TransitionListBuffer.HASH_STRATEGY);
+      mVisited = new TIntHashSet();
       reset(from, event);
     }
 
