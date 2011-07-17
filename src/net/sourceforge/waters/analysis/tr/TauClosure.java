@@ -59,9 +59,10 @@ public class TauClosure
   public TauClosure(final TransitionListBuffer buffer, int limit)
   {
     mTransitionBuffer = buffer;
-    final int numStates = mTransitionBuffer.getNumberOfStates();
-    mEventShift = AutomatonTools.log2(numStates);
+    final int numEvents = mTransitionBuffer.getNumberOfEvents();
+    mStateShift = AutomatonTools.log2(numEvents);
     if (limit > 0) {
+      final int numStates = mTransitionBuffer.getNumberOfStates();
       final int[][] trans = new int[numStates][];
       final TransitionIterator iter =
         new OnTheFlyTauClosureIterator(mTransitionBuffer);
@@ -684,7 +685,7 @@ public class TauClosure
       while (seek()) {
         final int state = mEventIterator.getCurrentToState();
         final int event = mEventIterator.getCurrentEvent();
-        final int key = (event << mEventShift) ^ state;
+        final int key = (state << mStateShift) | event;
         if (mVisited.add(key)) {
           return true;
         }
@@ -826,7 +827,7 @@ public class TauClosure
       while (seek()) {
         final int state = mTauIterator.getCurrentToState();
         final int event = mEventIterator.getCurrentEvent();
-        final int key = (event << mEventShift) ^ state;
+        final int key = (state << mStateShift) | event;
         if (mVisited.add(key)) {
           return true;
         }
@@ -910,6 +911,7 @@ public class TauClosure
       mEventIterator = mTransitionBuffer.createReadOnlyIterator();
       mTauIterator2 = createIterator();
       mVisited = new TIntHashSet();
+      mVisited.setAutoCompactionFactor(0);
     }
 
     private FullEventClosureTransitionIterator(final int event)
@@ -918,6 +920,7 @@ public class TauClosure
       mEventIterator = mTransitionBuffer.createReadOnlyIterator(event);
       mTauIterator2 = createIterator();
       mVisited = new TIntHashSet();
+      mVisited.setAutoCompactionFactor(0);
     }
 
     private FullEventClosureTransitionIterator(final int from, final int event)
@@ -926,6 +929,7 @@ public class TauClosure
       mEventIterator = mTransitionBuffer.createReadOnlyIterator();
       mTauIterator2 = createIterator();
       mVisited = new TIntHashSet();
+      mVisited.setAutoCompactionFactor(0);
       reset(from, event);
     }
 
@@ -970,7 +974,7 @@ public class TauClosure
       while (seek()) {
         final int state = mTauIterator2.getCurrentToState();
         final int event = mEventIterator.getCurrentEvent();
-        final int key = (event << mEventShift) ^ state;
+        final int key = (state << mStateShift) | event;
         if (mVisited.add(key)) {
           return true;
         }
@@ -1076,7 +1080,7 @@ public class TauClosure
   /**
    * Shift amount for state/event pair encoding in iterators.
    */
-  private final int mEventShift;
+  private final int mStateShift;
 
 
   //#########################################################################
