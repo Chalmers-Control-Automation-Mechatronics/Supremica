@@ -123,6 +123,7 @@ public class IsomorphismChecker
         (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
       bisimulator.setTransitionRemovalMode
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
+      bisimulator.setAppliesPartitionAutomatically(false);
       final boolean result = bisimulator.run();
       if (!result) {
         throw new IsomorphismException

@@ -1357,15 +1357,16 @@ public abstract class TransitionListBuffer
     {
       if (mState >= 0) {
         if (mFirstEvent == 0) {
-          mCurrent = mStateTransitions[mState];
+          setCurrent(mStateTransitions[mState]);
         } else {
           int event = mFirstEvent;
           int code = (mState << mStateShift) | event;
-          mCurrent = mStateEventTransitions.get(code);
-          while (mCurrent == NULL && ++event <= mLastEvent) {
+          int current = mStateEventTransitions.get(code);
+          while (current == NULL && ++event <= mLastEvent) {
             code++;
-            mCurrent = mStateEventTransitions.get(code);
+            current = mStateEventTransitions.get(code);
           }
+          setCurrent(current);
         }
       }
     }
@@ -1402,7 +1403,10 @@ public abstract class TransitionListBuffer
 
     public boolean advance()
     {
-      mCurrent = getNext(mCurrent);
+      if (mCurrent == NULL) {
+        return false;
+      }
+      setCurrent(mNext);
       if (mCurrent == NULL) {
         return false;
       } else if (getCurrentEvent() > mLastEvent) {
@@ -1459,21 +1463,22 @@ public abstract class TransitionListBuffer
     void setCurrent(final int current)
     {
       mCurrent = current;
+      if (current != NULL) {
+        final int[] block = mBlocks.get(current >>> mBlockShift);
+        final int offset = current & mBlockMask;
+        mCurrentData = block[offset + OFFSET_DATA];
+        mNext = block[offset + OFFSET_NEXT];
+      }
     }
 
     int getCurrentData()
     {
       if (mCurrent != NULL) {
-        return getData(mCurrent);
+        return mCurrentData;
       } else {
         throw new NoSuchElementException
           ("Reading past end of list in TransitionListBuffer!");
       }
-    }
-
-    int getState()
-    {
-      return mState;
     }
 
     //#######################################################################
@@ -1482,6 +1487,8 @@ public abstract class TransitionListBuffer
     private int mCurrent;
     private int mFirstEvent;
     private int mLastEvent;
+    private int mCurrentData;
+    private int mNext;
 
   }
 
@@ -1518,7 +1525,7 @@ public abstract class TransitionListBuffer
         throw new IllegalStateException
           ("Attempting to remove nonexistent element in TransitionListBuffer!");
       }
-      final int state = getState();
+      final int state = getCurrentFromState();
       final boolean isRoot = (mStateTransitions[state] == mPrevious);
       final int prevEvent = isRoot ? -1 : getEvent(mPrevious);
       final int[] block = mBlocks.get(current >>> mBlockShift);

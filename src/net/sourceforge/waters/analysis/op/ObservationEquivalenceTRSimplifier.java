@@ -1062,12 +1062,12 @@ public class ObservationEquivalenceTRSimplifier
               }
             }
           }
+          visited.clear();
+          for (final EquivalenceClass splitClass : splitClasses) {
+            splitClass.splitUsingOverflowList();
+          }
+          splitClasses.clear();
         }
-        visited.clear();
-        for (final EquivalenceClass splitClass : splitClasses) {
-          splitClass.splitUsingOverflowList();
-        }
-        splitClasses.clear();
       }
       mTempClass.clear();
     }
