@@ -7083,7 +7083,7 @@ Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-bas
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <SimpleComponent Kind="PLANT" Name="copy_of_h_PalletOut_syn:1">
+        <SimpleComponent Kind="PLANT" Name="h_PalletOut_syn:1">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s0">

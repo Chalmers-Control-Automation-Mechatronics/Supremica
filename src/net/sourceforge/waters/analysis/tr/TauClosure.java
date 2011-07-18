@@ -918,6 +918,7 @@ public class TauClosure
       mEventIterator = mTransitionBuffer.createReadOnlyIterator();
       mTauIterator2 = createIterator();
       mVisited = new TIntHashSet();
+      mUniqueEvent = -1;
     }
 
     private FullEventClosureTransitionIterator(final int event)
@@ -926,7 +927,7 @@ public class TauClosure
       mEventIterator = mTransitionBuffer.createReadOnlyIterator(event);
       mTauIterator2 = createIterator();
       mVisited = new TIntHashSet();
-      mFirstEvent = event;
+      mUniqueEvent = event;
     }
 
     private FullEventClosureTransitionIterator(final int from, final int event)
@@ -953,14 +954,14 @@ public class TauClosure
       mTauIterator1.resetState(mCurrent);
       mEventIterator.reset(mCurrent, event);
       mVisited.clear();
-      mFirstEvent = event;
+      mUniqueEvent = event;
       mStart = true;
     }
 
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
-      mFirstEvent = first;
+      mUniqueEvent = first == last ? first : -1;
       reset();
     }
 
@@ -978,12 +979,21 @@ public class TauClosure
 
     public boolean advance()
     {
-      while (seek()) {
-        final int state = mTauIterator2.getCurrentToState();
-        final int event = mEventIterator.getCurrentEvent() - mFirstEvent;
-        final int key = (event << mEventShift) | state;
-        if (mVisited.add(key)) {
-          return true;
+      if (mUniqueEvent >= 0) {
+        while (seek()) {
+          final int state = mTauIterator2.getCurrentToState();
+          if (mVisited.add(state)) {
+            return true;
+          }
+        }
+      } else {
+        while (seek()) {
+          final int state = mTauIterator2.getCurrentToState();
+          final int event = mEventIterator.getCurrentEvent();
+          final int key = (event << mEventShift) | state;
+          if (mVisited.add(key)) {
+            return true;
+          }
         }
       }
       mStart = true;
@@ -992,7 +1002,11 @@ public class TauClosure
 
     public int getCurrentEvent()
     {
-      return mEventIterator.getCurrentEvent();
+      if (mUniqueEvent >= 0) {
+        return mUniqueEvent;
+      } else {
+        return mEventIterator.getCurrentEvent();
+      }
     }
 
     public int getCurrentSourceState()
@@ -1060,7 +1074,7 @@ public class TauClosure
 
     //#######################################################################
     //# Data Members
-    private int mFirstEvent;
+    private int mUniqueEvent;
     private int mCurrent;
     private boolean mStart;
 
