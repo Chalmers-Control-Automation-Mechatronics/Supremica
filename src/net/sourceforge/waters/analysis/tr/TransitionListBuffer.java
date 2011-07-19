@@ -1348,19 +1348,19 @@ public abstract class TransitionListBuffer
       mCurrent = NULL;
       mFirstEvent = 0;
       mLastEvent = mNumEvents - 1;
-      mState = -1;
+      mFromState = -1;
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.op.TransitionIterator
     public void reset()
     {
-      if (mState >= 0) {
+      if (mFromState >= 0) {
         if (mFirstEvent == 0) {
-          setCurrent(mStateTransitions[mState]);
+          setCurrent(mStateTransitions[mFromState]);
         } else {
           int event = mFirstEvent;
-          int code = (mState << mStateShift) | event;
+          int code = (mFromState << mStateShift) | event;
           int current = mStateEventTransitions.get(code);
           while (current == NULL && ++event <= mLastEvent) {
             code++;
@@ -1391,14 +1391,19 @@ public abstract class TransitionListBuffer
 
     public void resetState(final int state)
     {
-      mState = state;
+      mFromState = state;
       reset();
     }
 
     public void reset(final int state, final int event)
     {
-      mState = state;
+      mFromState = state;
       resetEvent(event);
+    }
+
+    public void resume(final int state)
+    {
+      resetState(state);
     }
 
     public boolean advance()
@@ -1409,7 +1414,9 @@ public abstract class TransitionListBuffer
       setCurrent(mNext);
       if (mCurrent == NULL) {
         return false;
-      } else if (getCurrentEvent() > mLastEvent) {
+      }
+      final int event = mCurrentData & mEventMask;
+      if (event > mLastEvent) {
         mCurrent = NULL;
         return false;
       } else {
@@ -1424,17 +1431,13 @@ public abstract class TransitionListBuffer
 
     public int getCurrentFromState()
     {
-      if (mCurrent != NULL) {
-        return mState;
-      } else {
-        throw new NoSuchElementException
-          ("Reading past end of list in TransitionListBuffer!");
-      }
+      return mFromState;
     }
 
     public int getCurrentEvent()
     {
-      return getCurrentData() & mEventMask;
+      assert mCurrent != NULL;
+      return mCurrentData & mEventMask;
     }
 
     public int getCurrentTargetState()
@@ -1444,7 +1447,8 @@ public abstract class TransitionListBuffer
 
     public int getCurrentToState()
     {
-      return getCurrentData() >>> mStateShift;
+      assert mCurrent != NULL;
+      return mCurrentData >>> mStateShift;
     }
 
     public void remove()
@@ -1471,19 +1475,9 @@ public abstract class TransitionListBuffer
       }
     }
 
-    int getCurrentData()
-    {
-      if (mCurrent != NULL) {
-        return mCurrentData;
-      } else {
-        throw new NoSuchElementException
-          ("Reading past end of list in TransitionListBuffer!");
-      }
-    }
-
     //#######################################################################
     //# Data Members
-    private int mState;
+    private int mFromState;
     private int mCurrent;
     private int mFirstEvent;
     private int mLastEvent;
@@ -1614,6 +1608,11 @@ public abstract class TransitionListBuffer
     public void reset(final int from, final int event)
     {
       resetState(from);
+    }
+
+    public void resume(final int state)
+    {
+      resetState(state);
     }
 
     public boolean advance()

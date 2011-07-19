@@ -28,6 +28,7 @@ import java.util.Queue;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -539,9 +540,10 @@ public class ObservationEquivalenceTRSimplifier
     if (getEquivalence() == Equivalence.BISIMULATION) {
       if (mEventIterator == null) {
         final ListBufferTransitionRelation rel = getTransitionRelation();
-        mEventIterator =
+        final TransitionIterator inner =
           rel.createPredecessorsReadOnlyIterator(EventEncoding.TAU);
-        mEventIterator = rel.createPredecessorsReadOnlyIterator();
+        mEventIterator =
+          new OneEventCachingTransitionIterator(inner, EventEncoding.TAU);
       }
     } else {
       if (mTauClosure == null) {
@@ -554,7 +556,11 @@ public class ObservationEquivalenceTRSimplifier
           mTauClosure = rel.createSuccessorsTauClosure(limit);
         }
         mTauIterator = mTauClosure.createIterator();
-        mEventIterator = mTauClosure.createFullEventClosureIterator();
+        if (mInitialInfoSize < 0) {
+          mTauIterator = new OneEventCachingTransitionIterator
+                               (mTauIterator, EventEncoding.TAU);
+        }
+        mEventIterator = mTauClosure.createFullEventClosureIterator(-1);
       }
     }
   }
@@ -562,6 +568,7 @@ public class ObservationEquivalenceTRSimplifier
   private TransitionIterator getPredecessorIterator(final int event)
   {
     if (event == EventEncoding.TAU) {
+      mTauIterator.reset();
       return mTauIterator;
     } else {
       mEventIterator.resetEvent(event);
@@ -1041,28 +1048,25 @@ public class ObservationEquivalenceTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final Collection<EquivalenceClass> splitClasses =
         new THashSet<EquivalenceClass>();
-      final TIntHashSet visited = new TIntHashSet();
       collect(mTempClass);
       final int size = getSize();
       final int first = mEquivalence.getFirstSplitEvent();
       for (int event = first; event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
-          final TransitionIterator transIter = getPredecessorIterator(event);
+          final TransitionIterator transIter =
+            getPredecessorIterator(event);
           for (int i = 0; i < size; i++) {
             final int state = mTempClass.get(i);
-            transIter.resetState(state);
+            transIter.resume(state);
             while (transIter.advance()) {
               final int pred = transIter.getCurrentSourceState();
-              if (visited.add(pred)) {
-                final EquivalenceClass splitClass = mStateToClass[pred];
-                if (splitClass != null) {
-                  splitClass.moveToOverflowList(pred);
-                  splitClasses.add(splitClass);
-                }
+              final EquivalenceClass splitClass = mStateToClass[pred];
+              if (splitClass != null) {
+                splitClass.moveToOverflowList(pred);
+                splitClasses.add(splitClass);
               }
             }
           }
-          visited.clear();
           for (final EquivalenceClass splitClass : splitClasses) {
             splitClass.splitUsingOverflowList();
           }
@@ -1187,7 +1191,8 @@ public class ObservationEquivalenceTRSimplifier
       final int first = mEquivalence.getFirstSplitEvent();
       for (int event = first; event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
-          final TransitionIterator transIter = getPredecessorIterator(event);
+          final TransitionIterator transIter =
+            getPredecessorIterator(event);
           for (int i = 0; i < size; i++) {
             final int state = mTempClass.get(i);
             transIter.resetState(state);
@@ -1203,12 +1208,12 @@ public class ObservationEquivalenceTRSimplifier
               info.increment(pred, event);
             }
           }
+          visited.clear();
+          for (final EquivalenceClass splitClass : splitClasses) {
+            splitClass.splitUsingOverflowList();
+          }
+          splitClasses.clear();
         }
-        visited.clear();
-        for (final EquivalenceClass splitClass : splitClasses) {
-          splitClass.splitUsingOverflowList();
-        }
-        splitClasses.clear();
       }
       mTempClass.clear();
       mMaxInfoSize = Math.max(mMaxInfoSize, info.size());
@@ -1463,7 +1468,8 @@ public class ObservationEquivalenceTRSimplifier
       final int first = mEquivalence.getFirstSplitEvent();
       for (int event = first; event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
-          final TransitionIterator transIter = getPredecessorIterator(event);
+          final TransitionIterator transIter =
+            getPredecessorIterator(event);
           for (int i = 0; i < tempSize; i++) {
             final int state = mTempClass.get(i);
             transIter.resetState(state);

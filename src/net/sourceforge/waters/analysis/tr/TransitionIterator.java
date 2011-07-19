@@ -56,6 +56,17 @@ public interface TransitionIterator
   public void reset(int from, int event);
 
   /**
+   * Restarts this iterator to iterate over transitions associated with
+   * the given from-state, but without clearing any stored history. This is
+   * an optional operation implemented by some iterators that store previously
+   * returned results to prevent duplicates, in which case this method makes
+   * it possible to continue from a different start state without clearing the
+   * previously returned results. Iterators that do not store results can
+   * implement this method by calling {@link #resetState(int) resetState()}.
+   */
+  public void resume(int from);
+
+  /**
    * Advances iteration. This method advances the iterator to next transition.
    * It needs to be called before trying to access the first transition in the
    * iteration.
