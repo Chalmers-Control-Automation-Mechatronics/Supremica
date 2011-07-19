@@ -1,8 +1,8 @@
-/*                                     
+/*
  * A test for the Promela importer in Waters.
- * In this model, two different processes send send and receive on the
+ * In this model, two different processes send and receive on the
  * same channel. Messages need to be indexed by senders and receivers,
- * but careful care needs to be taken as to who send and receives what.
+ * but careful care needs to be taken as to who sends and receives what.
  */
 
 chan ch = [0] of { byte };
@@ -15,7 +15,7 @@ proctype A()
 
 proctype B()
 {
-  	ch!2;
+        ch!2;
         ch!3;
 }
 
