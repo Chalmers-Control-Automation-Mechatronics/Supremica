@@ -134,8 +134,11 @@ public class CachingTransitionIterator implements TransitionIterator
   //# Auxiliary Methods
   private void clear()
   {
-    if (!mVisited.isEmpty()) {
+    final int size = mVisited.size();
+    if (size > 100) {
       mVisited = new TIntHashSet();
+    } else if (size > 0) {
+      mVisited.clear();
     }
   }
 

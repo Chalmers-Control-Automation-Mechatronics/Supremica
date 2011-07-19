@@ -1408,13 +1408,10 @@ public abstract class TransitionListBuffer
 
     public boolean advance()
     {
-      if (mCurrent == NULL) {
+      if (mCurrent == NULL || mNext == NULL) {
         return false;
       }
       setCurrent(mNext);
-      if (mCurrent == NULL) {
-        return false;
-      }
       final int event = mCurrentData & mEventMask;
       if (event > mLastEvent) {
         mCurrent = NULL;

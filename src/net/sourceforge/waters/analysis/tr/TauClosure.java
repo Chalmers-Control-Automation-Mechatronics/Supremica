@@ -11,6 +11,8 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
+import gnu.trove.TIntStack;
+
 import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -374,10 +376,10 @@ public class TauClosure
     {
       super(from);
       mTransitionBuffer = buffer;
-      mOpen = new TIntArrayList();
-      mVisited = new TIntHashSet();
+      mStack = new TIntStack();
       mInner = mTransitionBuffer.createReadOnlyIterator();
       mInner.resetEvent(EventEncoding.TAU);
+      mVisited = new TIntHashSet();
       mCurrentState = -1;
     }
 
@@ -385,45 +387,41 @@ public class TauClosure
     //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
     public void reset()
     {
-      mOpen.clear();
-      mVisited.clear();
-      mInner.resetState(-1);
+      mStack.clear();
+      final int size = mVisited.size();
+      if (size > 100) {
+        mVisited = new TIntHashSet();
+      } else if (size > 0) {
+        mVisited.clear();
+      }
       mCurrentState = -1;
     }
 
     public boolean advance()
     {
-      if (mVisited.isEmpty()) {
-        final int from = getCurrentFromState();
-        mCurrentState = from;
-        mOpen.add(from);
-        mVisited.add(from);
-        mInner.resetState(-1);
+      if (mCurrentState < 0) {
+        mCurrentState = getCurrentFromState();
+        mVisited.add(mCurrentState);
+        mInner.resetState(mCurrentState);
         return true;
       }
       while (true) {
         while (mInner.advance()) {
           final int next = mInner.getCurrentToState();
           if (mVisited.add(next)) {
-            mOpen.add(next);
+            mStack.push(next);
             mCurrentState = next;
             return true;
           }
         }
-        if (mOpen.isEmpty()) {
+        if (mStack.size() == 0) {
           mCurrentState = -1;
           return false;
         } else {
-          final int end = mOpen.size() - 1;
-          final int state = mOpen.remove(end);
+          final int state = mStack.pop();
           mInner.resetState(state);
         }
       }
-    }
-
-    public int getCurrentEvent()
-    {
-      return EventEncoding.TAU;
     }
 
     public int getCurrentSourceState()
@@ -456,10 +454,10 @@ public class TauClosure
     //#######################################################################
     //# Data Members
     private final TransitionListBuffer mTransitionBuffer;
-
-    private final TIntArrayList mOpen;
-    private final TIntHashSet mVisited;
+    private final TIntStack mStack;
     private final TransitionIterator mInner;
+
+    private TIntHashSet mVisited;
     private int mCurrentState;
 
   }
