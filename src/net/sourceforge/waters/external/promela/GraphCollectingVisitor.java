@@ -649,8 +649,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
                          }
                       // }
                        //TODO
-                       final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(temp);
-                       indexes.add(en);
+                       //final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(temp);
+                       indexes.add((SimpleExpressionProxy) cloner.getClone(id));
                        //sender.add((SimpleIdentifierProxy) cloner.getClone(en));
                      }
                    }
