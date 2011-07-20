@@ -1806,8 +1806,9 @@ public class OPConflictChecker
   public enum AbstractionMethod
   {
     /**
-     * <P>Minimisation is performed according to a sequence of abstraction rules
-     * for generalised nonblocking.</P>
+      * <P>Minimisation is performed according to a sequence of abstraction
+     * rules for generalised nonblocking proposed, but using weak observation
+     * equivalence instead of observation equivalence.</P>
      * <P><I>Reference:</I> Robi Malik, Ryan Leduc. A Compositional Approach
      * for Verifying Generalised Nonblocking, Proc. 7th International
      * Conference on Control and Automation, ICCA'09, 448-453, Christchurch,
@@ -1820,12 +1821,13 @@ public class OPConflictChecker
       {
         return checker.createGeneralisedNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           OBSERVATION_EQUIVALENCE);
+           WEAK_OBSERVATION_EQUIVALENCE);
       }
     },
     /**
      * <P>Minimisation is performed according to a sequence of abstraction rules
-     * for standard nonblocking.</P>
+     * for standard nonblocking, but using weak observation
+     * equivalence instead of observation equivalence.</P>
      * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
      * Verification in Supervisory Control. SIAM Journal of Control and
      * Optimization, 48(3), 1914-1938, 2009.</P>
@@ -1837,7 +1839,7 @@ public class OPConflictChecker
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           OBSERVATION_EQUIVALENCE);
+           WEAK_OBSERVATION_EQUIVALENCE);
       }
     },
     /**
@@ -1881,43 +1883,6 @@ public class OPConflictChecker
       boolean supportsNondeterminism()
       {
         return false;
-      }
-    },
-    /**
-     * <P>Minimisation is performed according to a sequence of abstraction
-     * rules for generalised nonblocking proposed, but using weak observation
-     * equivalence instead of observation equivalence.</P>
-     * <P><I>Reference:</I> Robi Malik, Ryan Leduc. A Compositional Approach
-     * for Verifying Generalised Nonblocking, Proc. 7th International
-     * Conference on Control and Automation, ICCA'09, 448-453, Christchurch,
-     * New Zealand, 2009.</P>
-     */
-    WGNB {
-      @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
-      throws EventNotFoundException
-      {
-        return checker.createGeneralisedNonblockingAbstractionChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE);
-      }
-    },
-    /**
-     * <P>Minimisation is performed according to a sequence of abstraction rules
-     * for standard nonblocking, but using weak observation equivalence instead
-     * of observation equivalence.</P>
-     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
-     * Verification in Supervisory Control. SIAM Journal of Control and
-     * Optimization, 48(3), 1914-1938, 2009.</P>
-     */
-    WNB {
-      @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
-      throws EventNotFoundException
-      {
-        return checker.createStandardNonblockingAbstractionChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE);
       }
     },
     /**
