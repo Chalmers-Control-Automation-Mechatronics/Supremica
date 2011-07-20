@@ -253,31 +253,30 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     final ChanInfo c = chan.elements().nextElement();
     final int lengthOfChan = c.getChanLength();
-    final int dataLength = c.getDataLength();
     final String chanName = chan.keys().nextElement();
     boolean sending = false;
-    boolean reciving = false;
-    for(final Message m: mOutput){
-      if(!sending){
-        if(m.getSenders().size()>1){
+    boolean receiving = false;
+    for (final Message m : mOutput) {
+      if (!sending) {
+        if (m.getSenders().size() > 1) {
           c.setSenders(true);
           //c.addSenders(sendRange);
           final Collection<String> tempList = new ArrayList<String>();
-          for(final String s: sendRange){
-            final String temp = s+"_0";
-            for(int i=0;i<occur.get(s);i++){
+          for (final String s : sendRange) {
+            final String temp = s + "_0";
+            for (int i = 0; i < occur.get(s); i++) {
               tempList.add(temp);
             }
           }
           c.addSenders(tempList);
           sending = true;
-        }else if(m.getSenders().size()==1){
-          final int occurance = occur.get(m.getSenders().get(0));
-          c.setSenders(occurance>1);
-          if(occurance>1){
+        } else if (m.getSenders().size() == 1) {
+          final int occurrences = occur.get(m.getSenders().get(0));
+          c.setSenders(occurrences > 1);
+          if (occurrences > 1) {
             final Collection<String> tempList = new ArrayList<String>();
-            for(int i=0;i<occur.get(sendRange.get(0));i++){
-              final String temp = sendRange.get(0)+"_"+i;
+            for (int i = 0; i < occur.get(sendRange.get(0)); i++) {
+              final String temp = sendRange.get(0) + "_" + i;
               tempList.add(temp);
             }
             c.addSenders(tempList);
@@ -285,35 +284,34 @@ public class EventCollectingVisitor implements PromelaVisitor
           }
         }
       }
-
-      if(!reciving){
-        if(m.getRecipients().size()>1){
+      if (!receiving) {
+        if (m.getRecipients().size() > 1) {
           c.setRecipients(true);
           final Collection<String> tempList = new ArrayList<String>();
-          for(final String s: recRange){
-            final String temp = s+"_0";
-            for(int i=0;i<occur.get(s);i++){
+          for (final String s : recRange) {
+            final String temp = s + "_0";
+            for (int i = 0; i < occur.get(s); i++) {
               tempList.add(temp);
             }
           }
           c.addRecipients(tempList);
-          reciving = true;
-        }else if(m.getRecipients().size()==1){
+          receiving = true;
+        } else if (m.getRecipients().size() == 1) {
           final int occurance = occur.get(m.getRecipients().get(0));
-          c.setRecipients(occurance>1);
-          if(occurance>1){
+          c.setRecipients(occurance > 1);
+          if (occurance > 1) {
             final Collection<String> tempList = new ArrayList<String>();
-            for(int i=0;i<occur.get(recRange.get(0));i++){
-              final String temp = recRange.get(0)+"_"+i;
+            for (int i = 0; i < occur.get(recRange.get(0)); i++) {
+              final String temp = recRange.get(0) + "_" + i;
               tempList.add(temp);
             }
             c.addRecipients(tempList);
-            reciving = true;
+            receiving = true;
           }
         }
       }
     }
-    final Collection<SimpleExpressionProxy> specialSend = new ArrayList<SimpleExpressionProxy>();
+  final Collection<SimpleExpressionProxy> specialSend = new ArrayList<SimpleExpressionProxy>();
     final Collection<SimpleExpressionProxy> specialRec = new ArrayList<SimpleExpressionProxy>();
     if(c.isSenderPresent()){
       if(c.getSenders().size()==1){
@@ -480,6 +478,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     //final String chanName = t.getParent().getChild(0).getText();
     lowerEnd = new ArrayList<Integer>();
     upperEnd = new ArrayList<Integer>();
+    @SuppressWarnings("unused")
     final ArrayList<String> rangeData = new ArrayList<String>();
     for(int i =1;i<t.getChildCount();i++){
       ((PromelaTree) t.getChild(i)).acceptVisitor(this);

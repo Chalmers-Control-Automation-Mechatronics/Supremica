@@ -479,6 +479,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     /*
      * Used to create Event declaration
      */
+    @SuppressWarnings("unused")
     final Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>();
     final Collection<SimpleIdentifierProxy> sender = new ArrayList<SimpleIdentifierProxy>();
     final Collection<SimpleIdentifierProxy> reciever = new ArrayList<SimpleIdentifierProxy>();
@@ -731,10 +732,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
       }
     }
     }
+    /*
     final Collection<SimpleExpressionProxy> sendRange = new ArrayList<SimpleExpressionProxy>();
     final Collection<SimpleExpressionProxy> recRange = new ArrayList<SimpleExpressionProxy>();
     final int lengthOfChan = mVisitor.getChan().get(chanName).getChanLength();
- /*   if(runedOnce==1){
+    if(runedOnce==1){
       if(sender.size()>0){
         final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(sender);
         ranges.add(en);
