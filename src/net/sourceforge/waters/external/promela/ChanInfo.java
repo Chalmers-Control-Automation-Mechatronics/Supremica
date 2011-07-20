@@ -22,8 +22,8 @@ public class ChanInfo {
   // more than one proctype.
   // Once determined whether or not senders and recipients are present, this
   // information should be stored on the channel.
-  // private boolean mHasMultipleSenders;
-  // private boolean mHasMultipleRecipients;
+  private boolean mHasMultipleSenders;
+  private boolean mHasMultipleRecipients;
 
   // TODO
   // Using the above information, the event declarations can be created
@@ -70,7 +70,8 @@ public class ChanInfo {
       new ArrayList<Collection<SimpleExpressionProxy>>();
     private final Collection<Collection<SimpleExpressionProxy>> mReceiveData =
       new ArrayList<Collection<SimpleExpressionProxy>>();
-
+    List<String> senders = new ArrayList<String>();
+    List<String> recipients = new ArrayList<String>();
     /*
      *
      */
@@ -86,8 +87,34 @@ public class ChanInfo {
            type.add(value);
         }
         mMessages = new ArrayList<Message>();
+        mHasMultipleSenders = false;
+        mHasMultipleRecipients = false;
+    }
+    public void addSenders(final Collection<String> c){
+      senders.addAll(c);
+    }
+    public void addRecipients(final Collection<String> c){
+      recipients.addAll(c);
+    }
+    public void setSenders(final boolean b){
+      mHasMultipleSenders = b;
     }
 
+    public void setRecipients(final boolean b){
+      mHasMultipleRecipients = b;
+    }
+    public boolean isSenderPresent(){
+      return mHasMultipleSenders;
+    }
+    public boolean isRecipientPresent(){
+      return mHasMultipleRecipients;
+    }
+    public List<String> getSenders(){
+      return senders;
+    }
+    public List<String> getRecipients(){
+      return recipients;
+    }
     public ChanInfo()
     {
       mChanLength=0;
@@ -96,6 +123,8 @@ public class ChanInfo {
       mRecCount=0;
       mDataLength=0;
       mMessages = new ArrayList<Message>();
+      mHasMultipleSenders = false;
+      mHasMultipleRecipients = false;
     }
     public void addMessages(final Message msg){
       if(!mMessages.contains(msg)){
@@ -117,6 +146,7 @@ public class ChanInfo {
         }
       }
     }
+
     public List<Message> getMessages(){
       return mMessages;
     }

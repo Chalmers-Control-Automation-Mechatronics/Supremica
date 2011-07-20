@@ -168,6 +168,7 @@ mtypeRule
 @init  { paraphrases.push("in mtype definition"); }
 @after { paraphrases.pop(); }
 	:	MTYPE (ASSIGN)? BLOCKBEGIN NAME (COMMA NAME)* BLOCKEND (SEMICOLON)*
+	-> ^(MTYPE<TypeTreeNode> (NAME<NameTreeNode>)*  )
 	;
 
 utypeRule
@@ -358,6 +359,7 @@ optionsRule
 ivarRule
 	:	NAME (ALTPARENOPEN constRule ALTPARENCLOSE)? (ASSIGN (any_exprRule) )?
 		-> ^(NAME<NameTreeNode> (constRule)? (any_exprRule)? )  //(ch_initRule)?
+	//	| (ASSIGN (any_exprRule))?
 	//|	NAME ASSIGN ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typeRule (COMMA typeRule)* BLOCKEND (SEMICOLON)*
 	//	-> ^(NAME STATEMENT constRule typeRule*)
 	;
@@ -420,7 +422,7 @@ typenameRule
 		 | BYTE -> ^(BYTE<TypeTreeNode>)
 		 | SHORT 
 		| INT 
-		| MTYPE 
+		| MTYPE ->^(MTYPE<TypeTreeNode>)
 		| unameRule
 		
 	;
@@ -434,6 +436,7 @@ channelRule
 	:	CHAN NAME (ASSIGN)?  ALTPARENOPEN constRule ALTPARENCLOSE OF BLOCKBEGIN typenameRule (COMMA typenameRule)* BLOCKEND (SEMICOLON)*
 		-> ^(CHAN<ChannelTreeNode> NAME<NameTreeNode> ^( CHAN<ChannelStatementTreeNode> constRule typenameRule*) )
 	;													 
+
 
 unameRule
 	:	NAME

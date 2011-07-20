@@ -13,6 +13,7 @@ public class Message
   private final List<String> mSenders = new ArrayList<String>();
   private final List<String> mRecipients = new ArrayList<String>();
 
+
   public Message(final List<SimpleExpressionProxy> msg)
   {
     mMsg = new ArrayList<SimpleExpressionProxy>(msg);

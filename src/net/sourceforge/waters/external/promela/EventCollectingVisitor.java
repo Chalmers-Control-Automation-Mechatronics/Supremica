@@ -66,6 +66,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   ArrayList<Integer> lowerEnd = new ArrayList<Integer>();
   ArrayList<Integer> upperEnd = new ArrayList<Integer>();
+  ArrayList<String> rangeData = new ArrayList<String>();
   final Hashtable<String,THashSet<IdentifierProxy>> procEvent = new Hashtable<String,THashSet<IdentifierProxy>>();
   final Hashtable<String,LabelTreeNode> gotoLabel = new Hashtable<String,LabelTreeNode>();
   //This is the output event table, for each proctype
@@ -77,6 +78,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   List<Message> mOutput = new ArrayList<Message>();
   List<String> channelMsg = new ArrayList<String>();
+  Hashtable<String,String> mGlobalVar = new Hashtable<String,String>();
   //########################################################################
   //# Invocation
   public EventCollectingVisitor(final ModuleProxyFactory factory){
@@ -130,7 +132,7 @@ public class EventCollectingVisitor implements PromelaVisitor
         table.get(i).add(m.getMsg().get(i));
       }
     }
-    final Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>();
+    Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>();
     for(int i=0;i<table.size();i++){
       Collections.sort(table.get(i),comparator);
       final BinaryOperator op = optable.getRangeOperator();
@@ -196,6 +198,195 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
 
     }
+    final ArrayList<Message> tempstore = new ArrayList<Message>();
+    for(final Message msg: mOutput){
+      if(msg.getMsg().contains(null)){
+        tempstore.add(msg);
+      }
+    }
+    //mOutput.removeAll(tempstore);
+    for(final Message m1: tempstore){
+      for(final Message m2: mOutput){
+        if(m2.getSenders().size()==m1.getSenders().size()){
+          boolean test = false;
+          for(final String s: m2.getSenders()){
+            if(m1.getSenders().contains(s)){
+              test = true;
+            }else{
+              test = false;
+              break;
+            }
+          }
+          if(test){
+            for(final String s: m1.getRecipients()){
+              if(!m2.getRecipients().contains(s)){
+                m2.addRecipient(s);
+              }
+            }
+          }
+        }
+      }
+    }
+    final List<String> sendRange = new ArrayList<String>();
+    final List<String> recRange = new ArrayList<String>();
+    ranges = new ArrayList<SimpleExpressionProxy>();
+    for(final Message m: mOutput){
+      for(final String s: m.getSenders()){
+        if(sendRange.size()==0){
+          sendRange.add(s);
+        }else{
+          if(!sendRange.contains(s)){
+            sendRange.add(s);
+          }
+        }
+      }
+      for(final String s: m.getRecipients()){
+        if(recRange.size()==0){
+          recRange.add(s);
+        }else{
+          if(!recRange.contains(s)){
+            recRange.add(s);
+          }
+        }
+      }
+    }
+
+    final ChanInfo c = chan.elements().nextElement();
+    final int lengthOfChan = c.getChanLength();
+    final int dataLength = c.getDataLength();
+    final String chanName = chan.keys().nextElement();
+    boolean sending = false;
+    boolean reciving = false;
+    for(final Message m: mOutput){
+      if(!sending){
+        if(m.getSenders().size()>1){
+          c.setSenders(true);
+          //c.addSenders(sendRange);
+          final Collection<String> tempList = new ArrayList<String>();
+          for(final String s: sendRange){
+            final String temp = s+"_0";
+            for(int i=0;i<occur.get(s);i++){
+              tempList.add(temp);
+            }
+          }
+          c.addSenders(tempList);
+          sending = true;
+        }else if(m.getSenders().size()==1){
+          final int occurance = occur.get(m.getSenders().get(0));
+          c.setSenders(occurance>1);
+          if(occurance>1){
+            final Collection<String> tempList = new ArrayList<String>();
+            for(int i=0;i<occur.get(sendRange.get(0));i++){
+              final String temp = sendRange.get(0)+"_"+i;
+              tempList.add(temp);
+            }
+            c.addSenders(tempList);
+            sending = true;
+          }
+        }
+      }
+
+      if(!reciving){
+        if(m.getRecipients().size()>1){
+          c.setRecipients(true);
+          final Collection<String> tempList = new ArrayList<String>();
+          for(final String s: recRange){
+            final String temp = s+"_0";
+            for(int i=0;i<occur.get(s);i++){
+              tempList.add(temp);
+            }
+          }
+          c.addRecipients(tempList);
+          reciving = true;
+        }else if(m.getRecipients().size()==1){
+          final int occurance = occur.get(m.getRecipients().get(0));
+          c.setRecipients(occurance>1);
+          if(occurance>1){
+            final Collection<String> tempList = new ArrayList<String>();
+            for(int i=0;i<occur.get(recRange.get(0));i++){
+              final String temp = recRange.get(0)+"_"+i;
+              tempList.add(temp);
+            }
+            c.addRecipients(tempList);
+            reciving = true;
+          }
+        }
+      }
+    }
+    final Collection<SimpleExpressionProxy> specialSend = new ArrayList<SimpleExpressionProxy>();
+    final Collection<SimpleExpressionProxy> specialRec = new ArrayList<SimpleExpressionProxy>();
+    if(c.isSenderPresent()){
+      if(c.getSenders().size()==1){
+        final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(c.getSenders().get(0));
+        ranges.add(ident);
+        specialSend.add(ident);
+      }else if(c.getSenders().size()>1){
+        final Collection<SimpleIdentifierProxy> tempList = new ArrayList<SimpleIdentifierProxy>();
+        for(final String s: c.getSenders()){
+          final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(s);
+          tempList.add(ident);
+        }
+        final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(tempList);
+        ranges.add(en);
+        specialSend.add(en);
+      }
+    }
+
+    if(c.isRecipientPresent()){
+      if(c.getRecipients().size()==1){
+        final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(c.getRecipients().get(0));
+        ranges.add(ident);
+        specialRec.add(ident);
+      }else if(c.getRecipients().size()>1){
+        final Collection<SimpleIdentifierProxy> tempList = new ArrayList<SimpleIdentifierProxy>();
+        for(final String s: c.getRecipients()){
+          final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(s);
+          tempList.add(ident);
+        }
+        final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(tempList);
+        ranges.add(en);
+        specialRec.add(en);
+      }
+    }
+   /*
+    for(int i=0;i<dataLength;i++){
+      List<SimpleExpressionProxy> tempList = new ArrayList<SimpleExpressionProxy>();
+      for(Message m: mOutput){
+        if(tempList.size()==0){
+          tempList.add(m.getMsg().get(i));
+        }else{
+          boolean test = true;
+          for(SimpleExpressionProxy s: tempList){
+            if(comparator.compare(s, m.getMsg().get(i))!=0){
+              test = false;
+              break;
+            }
+          }
+          if(test){
+            tempList.add(m.getMsg().get(i));
+          }
+        }
+      }
+      Collections.sort(tempList, comparator);
+    //  List<SimpleExpres>
+    }
+*/
+    ranges.addAll(mRanges);
+    specialSend.addAll(mRanges);
+    specialRec.addAll(mRanges);
+    //now create event decls
+    if(lengthOfChan==0){
+      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("exch_"+chanName);
+      final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
+        mEventDecls.add(event);
+      }else{
+        final IdentifierProxy ident1 = mFactory.createSimpleIdentifierProxy("send_"+chanName);
+        final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("recv_"+chanName);
+        final EventDeclProxy event1 = mFactory.createEventDeclProxy(ident1, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, specialSend, null, null);
+        final EventDeclProxy event2 = mFactory.createEventDeclProxy(ident2, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, specialRec, null, null);
+        mEventDecls.add(event1);
+        mEventDecls.add(event2);
+      }
 
 
     //create Run events
@@ -289,6 +480,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     //final String chanName = t.getParent().getChild(0).getText();
     lowerEnd = new ArrayList<Integer>();
     upperEnd = new ArrayList<Integer>();
+    final ArrayList<String> rangeData = new ArrayList<String>();
     for(int i =1;i<t.getChildCount();i++){
       ((PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
@@ -483,6 +675,9 @@ public class EventCollectingVisitor implements PromelaVisitor
     if(t.getParent() instanceof ChannelTreeNode){
       channelMsg.add(t.getText());
     }
+    if(t.getParent() instanceof TypeTreeNode){
+      mGlobalVar.put(t.getText(),t.getParent().getText());
+    }
     return null;
   }
 
@@ -499,9 +694,13 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitType(final TypeTreeNode t)
   {
+    //TODO
     if(t.getText().equals("byte")){
       lowerEnd.add(0);
       upperEnd.add(255);
+    }
+    if(t.getText().equals("mtype")){
+     // rangeData.add
     }
     return null;
   }

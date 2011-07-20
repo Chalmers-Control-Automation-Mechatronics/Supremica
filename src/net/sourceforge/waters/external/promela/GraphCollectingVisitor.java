@@ -408,18 +408,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
                sendRange.add((SimpleExpressionProxy) cloner.getClone(c));
              }
              final Collection<IdentifierProxy> labelBlock = new ArrayList<IdentifierProxy>();
-        //     final NodeProxy node = mFactory.createSimpleNodeProxy(cName);
-        //     if(!mChannelNode.contains(node)){
-        //       mChannelNode.add(node);
-        //     }
+
              final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("send_"+name, cloner.getClonedList(sendRange));
              labelBlock.add(ident);
-        //     final LabelBlockProxy label =
-        //       mFactory.createLabelBlockProxy(labelBlock, null);
-       //      final ArrayList<NodeProxy> templist = new ArrayList<NodeProxy>(mChannelNode);
 
-       //      final EdgeProxy edge =mFactory.createEdgeProxy(templist.get(0), node, label, null, null, null, null);
-       //      mChannelEdge.add(edge);
              //create indexedIdentifier
              IndexedIdentifierProxy indexEvent;
              String ename = labels.get(0);
@@ -742,7 +734,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final Collection<SimpleExpressionProxy> sendRange = new ArrayList<SimpleExpressionProxy>();
     final Collection<SimpleExpressionProxy> recRange = new ArrayList<SimpleExpressionProxy>();
     final int lengthOfChan = mVisitor.getChan().get(chanName).getChanLength();
-    if(runedOnce==1){
+ /*   if(runedOnce==1){
       if(sender.size()>0){
         final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(sender);
         ranges.add(en);
@@ -772,7 +764,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         mEvents.add(event1);
         mEvents.add(event2);
       }
-    }
+    }*/
     return new PromelaGraph(events,mFactory);
   }
 

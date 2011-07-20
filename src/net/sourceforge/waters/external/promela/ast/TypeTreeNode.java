@@ -11,7 +11,7 @@ public class TypeTreeNode extends PromelaTree
 		mType = token.getText();
 	}
 	public String toString(){
-		return "Type";
+		return mType;
 	}
 	private final String mType;
 	public String getValue()
