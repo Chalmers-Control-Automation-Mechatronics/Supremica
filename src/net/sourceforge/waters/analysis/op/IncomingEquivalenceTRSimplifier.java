@@ -144,7 +144,7 @@ public class IncomingEquivalenceTRSimplifier
     final TIntArrayList mergeCandidates = new TIntArrayList();
     final WatersIntHashingStrategy strategy = new IncomingEquivalenceHash();
     mIncomingEquivalenceMap =
-      new WatersIntIntHashMap(3 * numStates, IntListBuffer.NULL, strategy);
+      new WatersIntIntHashMap(2 * numStates, IntListBuffer.NULL, strategy);
     boolean trivial = true;
     boolean change;
     do {
@@ -412,8 +412,12 @@ public class IncomingEquivalenceTRSimplifier
      */
     private boolean incomingEquivalenceEquals(final int root1)
     {
-      if (mStateClasses[root1] == this) {
+      final ClassInfo info1 = mStateClasses[root1];
+      if (info1 == this) {
         return true;
+      } else if (incomingEquivalenceHashCode() !=
+                 info1.incomingEquivalenceHashCode()) {
+        return false;
       }
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final int numEvents = rel.getNumberOfProperEvents();
@@ -460,8 +464,8 @@ public class IncomingEquivalenceTRSimplifier
         while (mPredecessorsFullEventClosureIterator.advance()) {
           final int pred1 =
             mPredecessorsFullEventClosureIterator.getCurrentSourceState();
-          final ClassInfo info1 = mStateClasses[pred1];
-          final int code1 = info1.getFirstState();
+          final ClassInfo predinfo1 = mStateClasses[pred1];
+          final int code1 = predinfo1.getFirstState();
           if (preds1.add(code1) && !preds0.contains(code1)) {
             return false;
           }
@@ -588,6 +592,8 @@ public class IncomingEquivalenceTRSimplifier
       final ClassInfo info1 = mStateClasses[root1];
       if (info1 == this) {
         return true;
+      } else if (activeEventsHashCode() != info1.activeEventsHashCode()) {
+        return false;
       }
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final int tau = EventEncoding.TAU;
@@ -642,8 +648,7 @@ public class IncomingEquivalenceTRSimplifier
                 if (visited.add(succ1)) {
                   mStack1.push(succ1);
                 }
-              } else if (mEvents1.add(event1) &&
-                         !mEvents0.contains(event1)) {
+              } else if (mEvents1.add(event1) && !mEvents0.contains(event1)) {
                 return false;
               }
             }
@@ -653,6 +658,7 @@ public class IncomingEquivalenceTRSimplifier
       } finally {
         mEvents0.clear();
         mEvents1.clear();
+        mStack1.clear();
       }
     }
 

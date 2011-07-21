@@ -146,7 +146,7 @@ public class WeakObservationEquivalencePartitioning
     final TransitionIterator tauEventIter =
       mTransitionRelation.createAnyReadOnlyIterator();
     final TIntHashSet tauSuccessors = new TIntHashSet();
-    final TIntHashSet tauClasses = new TIntHashSet();
+    final TIntHashSet succClasses = new TIntHashSet();
     final TIntStack eventStack = new TIntStack();
     final TransitionIterator eventIter =
       mTransitionRelation.createAnyReadOnlyIterator();
@@ -154,7 +154,6 @@ public class WeakObservationEquivalencePartitioning
     final TransitionIterator tauStarIter = mTauClosure.createIterator();
     final TransitionIterator closureIter =
       mTauClosure.createFullEventClosureIterator(-1);
-    final TIntHashSet eventSuccessorClasses = new TIntHashSet();
     final int numClasses = mPartition.size();
     for (int c = 0; c < numClasses; c++) {
       final int[] clazz = mPartition.get(c);
@@ -165,13 +164,14 @@ public class WeakObservationEquivalencePartitioning
         while (tauStack.size() > 0) {
           final int src = tauStack.pop();
           final int srccls = mClassMap[src];
-          tauClasses.add(srccls);
+          succClasses.add(srccls);
           markings |= mTransitionRelation.getAllMarkings(src);
           eventIter.reset(src, EventEncoding.TAU);
           while (eventIter.advance()) {
             final int target = eventIter.getCurrentTargetState();
             final int targetcls = mClassMap[target];
-            if (!isTauVictim(srccls, targetcls) && tauSuccessors.add(target)) {
+            if (!isTauVictim(srccls, targetcls) &&
+                tauSuccessors.add(target)) {
               tauStack.push(target);
             }
           }
@@ -186,7 +186,7 @@ public class WeakObservationEquivalencePartitioning
         while (tauStarIter.advance()) {
           final int target = tauStarIter.getCurrentTargetState();
           final int targetcls = mClassMap[target];
-          if (!tauClasses.contains(targetcls)) {
+          if (!succClasses.contains(targetcls)) {
             if (init) {
               mTransitionRelation.setInitial(target, true);
             }
@@ -196,84 +196,62 @@ public class WeakObservationEquivalencePartitioning
           }
         }
       }
-      tauClasses.clear();
+      succClasses.clear();
+
       for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
         for (final int root : clazz) {
-          final boolean init = mTransitionRelation.isInitial(root);
-          long nonTauVictimsMarkings =
-            mTransitionRelation.getAllMarkings(root) & mPropositionMask;
-          long tauVictimsMarkings = 0;
-          tauStarIter.resetState(root);
-          tauStarIter.advance();
-          while (tauStarIter.advance()) {
-            final int tausucc = tauStarIter.getCurrentTargetState();
-            final int taucls = mClassMap[tausucc];
-            markings =
-              mTransitionRelation.getAllMarkings(tausucc) & mPropositionMask;
-            if (isTauVictim(c, taucls)) {
-              if (init) {
-                mTransitionRelation.setInitial(tausucc, true);
+          tauSuccessors.add(root);
+          tauStack.push(root);
+          while (tauStack.size() > 0) {
+            final int tausucc1 = tauStack.pop();
+            final int taucls1 = mClassMap[tausucc1];
+            eventIter.reset(tausucc1, EventEncoding.TAU);
+            while (eventIter.advance()) {
+              final int tautarget1 = eventIter.getCurrentTargetState();
+              final int tautargetcls1 = mClassMap[tautarget1];
+              if (!isTauVictim(taucls1, tautargetcls1) &&
+                  tauSuccessors.add(tautarget1)) {
+                tauStack.push(tautarget1);
               }
-              tauVictimsMarkings =
-                mTransitionRelation.mergeMarkings(tauVictimsMarkings, markings);
-            } else {
-              nonTauVictimsMarkings =
-                mTransitionRelation.mergeMarkings(nonTauVictimsMarkings,
-                                                  markings);
+            }
+            eventIter.reset(tausucc1, event);
+            while (eventIter.advance()) {
+              final int etarget = eventIter.getCurrentTargetState();
+              if (eventSuccessors.add(etarget)) {
+                eventStack.push(etarget);
+                int ecls = mClassMap[etarget];
+                succClasses.add(ecls);
+                do {
+                  final int estate = eventStack.pop();
+                  ecls = mClassMap[estate];
+                  tauEventIter.reset(estate, tau);
+                  while (tauEventIter.advance()) {
+                    final int tausucc2 = tauEventIter.getCurrentTargetState();
+                    final int taucls2 = mClassMap[tausucc2];
+                    if (!isTauVictim(ecls, taucls2) &&
+                        eventSuccessors.add(tausucc2)) {
+                      eventStack.push(tausucc2);
+                      succClasses.add(taucls2);
+                    }
+                  }
+                } while (eventStack.size() > 0);
+              }
             }
           }
-          tauVictimsMarkings &= ~nonTauVictimsMarkings;
-          mTransitionRelation.addMarkings(root, tauVictimsMarkings);
-          if (tauSuccessors.add(root)) {
-            tauStack.push(root);
-            do {
-              final int taustate = tauStack.pop();
-              eventIter.reset(taustate, event);
-              while (eventIter.advance()) {
-                final int etarget = eventIter.getCurrentTargetState();
-                if (eventSuccessors.add(etarget)) {
-                  eventStack.push(etarget);
-                  final int eclass = mClassMap[etarget];
-                  eventSuccessorClasses.add(eclass);
-                  do {
-                    final int state = eventStack.pop();
-                    tauEventIter.reset(state, tau);
-                    while (tauEventIter.advance()) {
-                      final int tausucc = tauEventIter.getCurrentTargetState();
-                      final int tauclass = mClassMap[tausucc];
-                      if (!isTauVictim(eclass, tauclass) &&
-                          eventSuccessors.add(tausucc)) {
-                        eventStack.push(tausucc);
-                        eventSuccessorClasses.add(tauclass);
-                      }
-                    }
-                  } while (eventStack.size() > 0);
-                }
-              }
-              tauEventIter.reset(taustate, tau);
-              while (tauEventIter.advance()) {
-                final int target = tauEventIter.getCurrentTargetState();
-                final int tclass = mClassMap[target];
-                if (!isTauVictim(c, tclass) && tauSuccessors.add(target)) {
-                  tauStack.push(target);
-                }
-              }
-            } while (tauStack.size() > 0);
-          }
+          tauSuccessors.clear();
+          eventSuccessors.clear();
         }
-        tauSuccessors.clear();
-        eventSuccessors.clear();
         for (final int root : clazz) {
           closureIter.reset(root, event);
           while (closureIter.advance()) {
             final int target = closureIter.getCurrentTargetState();
             final int tclass = mClassMap[target];
-            if (eventSuccessorClasses.add(tclass)) {
+            if (succClasses.add(tclass)) {
               mAdditionalTransitions.addTransition(c, event, tclass);
             }
           }
         }
-        eventSuccessorClasses.clear();
+        succClasses.clear();
       }
     }
   }

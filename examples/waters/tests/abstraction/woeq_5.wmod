@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="woeq_5" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for the weak observation equivalence simplifier. This tests whether initial states and transitions are correctly added across tau-victims not directly linked to the start state.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name=":symbols">
             <ConstantAliasExpression>
@@ -249,15 +250,18 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="96" X="144"/>
+                            <Point Y="48" X="64"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-20" X="0"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="5" X="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="q1">
                         <PointGeometry>
-                            <Point Y="96" X="272"/>
+                            <Point Y="48" X="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="5" X="5"/>
@@ -268,7 +272,7 @@
                             <SimpleIdentifier Name=":alpha"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="224" X="272"/>
+                            <Point Y="176" X="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="1" X="-33"/>
@@ -279,10 +283,13 @@
                             <SimpleIdentifier Name=":alpha"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="224" X="400"/>
+                            <Point Y="176" X="320"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-19" X="0"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point Y="10" X="-10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="q5">
@@ -290,8 +297,11 @@
                             <SimpleIdentifier Name=":alpha"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="320" X="272"/>
+                            <Point Y="272" X="192"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-32"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-1" X="8"/>
                         </LabelGeometry>
@@ -306,10 +316,10 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="106" X="208"/>
+                            <Point Y="58" X="128"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="96" X="272"/>
+                            <Point Y="48" X="192"/>
                         </EndPointGeometry>
                     </Edge>
                     <Edge Target="q23" Source="q4">
@@ -320,7 +330,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="213" X="337"/>
+                            <Point Y="165" X="257"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="q23" Source="q1">
@@ -331,7 +341,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="162" X="262"/>
+                            <Point Y="114" X="182"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="q0" Source="q1">
@@ -342,10 +352,10 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="96" X="272"/>
+                            <Point Y="48" X="192"/>
                         </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="89" X="208"/>
+                            <Point Y="41" X="128"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="q5" Source="q23">
@@ -356,10 +366,10 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="224" X="272"/>
+                            <Point Y="176" X="192"/>
                         </StartPointGeometry>
                         <EndPointGeometry>
-                            <Point Y="320" X="272"/>
+                            <Point Y="272" X="192"/>
                         </EndPointGeometry>
                     </Edge>
                     <Edge Target="q4" Source="q23">
@@ -370,10 +380,10 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="224" X="272"/>
+                            <Point Y="176" X="192"/>
                         </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="234" X="337"/>
+                            <Point Y="186" X="257"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="q1" Source="q23">
@@ -384,10 +394,10 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="224" X="272"/>
+                            <Point Y="176" X="192"/>
                         </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="160" X="286"/>
+                            <Point Y="112" X="206"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="q5" Source="q4">
@@ -395,15 +405,12 @@
                             <SimpleIdentifier Name="unload"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q23" Source="q23">
+                    <Edge Target="q4" Source="q4">
                         <LabelBlock>
                             <SimpleIdentifier Name="unload"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-44"/>
-                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="227" X="228"/>
+                            <Point Y="177" X="365"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
