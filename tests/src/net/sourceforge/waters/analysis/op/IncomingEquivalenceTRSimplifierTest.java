@@ -209,6 +209,15 @@ public class IncomingEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_incomingEquivalence_4()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "incomingEquivalence_4.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
 
   //#########################################################################
   //# Test Cases - Other

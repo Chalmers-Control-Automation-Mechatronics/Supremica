@@ -96,6 +96,16 @@ public abstract class AbstractPromelaUnmarshallerTest
     testImport("p102a");
   }
 
+  public void testImport_p102e() throws Exception
+  {
+    testImport("p102e");
+  }
+
+  public void testImport_p102f() throws Exception
+  {
+    testImport("p102f");
+  }
+
   public void testImport_p103a() throws Exception
   {
     testImport("p103a");
