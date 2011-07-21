@@ -112,6 +112,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final Comparator<SimpleExpressionProxy> comparator =
       new ExpressionComparator(optable);
+
     final List<Message> msgs = new ArrayList<Message>(chan.get(channelMsg.get(0)).getMessages());
     mOutput = new ArrayList<Message>();
     final Hashtable<Integer,List<SimpleExpressionProxy>> table =new Hashtable<Integer,List<SimpleExpressionProxy>>();
@@ -233,7 +234,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     for(final Message m: mOutput){
       for(final String s: m.getSenders()){
         if(sendRange.size()==0){
-          sendRange.add(s);
+            sendRange.add(s);
         }else{
           if(!sendRange.contains(s)){
             sendRange.add(s);
@@ -242,7 +243,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
       for(final String s: m.getRecipients()){
         if(recRange.size()==0){
-          recRange.add(s);
+            recRange.add(s);
         }else{
           if(!recRange.contains(s)){
             recRange.add(s);
@@ -250,22 +251,28 @@ public class EventCollectingVisitor implements PromelaVisitor
         }
       }
     }
-
+    Collections.sort(sendRange);
+    Collections.sort(recRange);
+    final List<Message> cloneOutput = new ArrayList<Message>(mOutput);
+    cloneOutput.removeAll(tempstore);
     final ChanInfo c = chan.elements().nextElement();
     final int lengthOfChan = c.getChanLength();
     final String chanName = chan.keys().nextElement();
     boolean sending = false;
+
     boolean receiving = false;
-    for (final Message m : mOutput) {
-      if (!sending) {
-        if (m.getSenders().size() > 1) {
+    for(final Message m: cloneOutput){
+      if(!sending){
+        if(m.getSenders().size()>1){
           c.setSenders(true);
           //c.addSenders(sendRange);
           final Collection<String> tempList = new ArrayList<String>();
           for (final String s : sendRange) {
             final String temp = s + "_0";
             for (int i = 0; i < occur.get(s); i++) {
-              tempList.add(temp);
+              if(!c.getSenders().contains(temp)){
+                tempList.add(temp);
+              }
             }
           }
           c.addSenders(tempList);
@@ -277,12 +284,15 @@ public class EventCollectingVisitor implements PromelaVisitor
             final Collection<String> tempList = new ArrayList<String>();
             for (int i = 0; i < occur.get(sendRange.get(0)); i++) {
               final String temp = sendRange.get(0) + "_" + i;
-              tempList.add(temp);
+              if(!c.getSenders().contains(temp)){
+                tempList.add(temp);
+              }
             }
             c.addSenders(tempList);
             sending = true;
           }
         }
+
       }
       if (!receiving) {
         if (m.getRecipients().size() > 1) {
@@ -291,7 +301,9 @@ public class EventCollectingVisitor implements PromelaVisitor
           for (final String s : recRange) {
             final String temp = s + "_0";
             for (int i = 0; i < occur.get(s); i++) {
-              tempList.add(temp);
+              if(!c.getRecipients().contains(temp)){
+                tempList.add(temp);
+              }
             }
           }
           c.addRecipients(tempList);
@@ -303,13 +315,16 @@ public class EventCollectingVisitor implements PromelaVisitor
             final Collection<String> tempList = new ArrayList<String>();
             for (int i = 0; i < occur.get(recRange.get(0)); i++) {
               final String temp = recRange.get(0) + "_" + i;
-              tempList.add(temp);
+              if(!c.getRecipients().contains(temp)){
+                tempList.add(temp);
+              }
             }
             c.addRecipients(tempList);
             receiving = true;
           }
         }
       }
+
     }
   final Collection<SimpleExpressionProxy> specialSend = new ArrayList<SimpleExpressionProxy>();
     final Collection<SimpleExpressionProxy> specialRec = new ArrayList<SimpleExpressionProxy>();
@@ -317,16 +332,17 @@ public class EventCollectingVisitor implements PromelaVisitor
       if(c.getSenders().size()==1){
         final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(c.getSenders().get(0));
         ranges.add(ident);
-        specialSend.add(ident);
+        specialSend.add((SimpleExpressionProxy) cloner.getClone(ident));
       }else if(c.getSenders().size()>1){
         final Collection<SimpleIdentifierProxy> tempList = new ArrayList<SimpleIdentifierProxy>();
         for(final String s: c.getSenders()){
           final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(s);
           tempList.add(ident);
         }
+
         final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(tempList);
         ranges.add(en);
-        specialSend.add(en);
+        specialSend.add((SimpleExpressionProxy) cloner.getClone(en));
       }
     }
 
@@ -334,7 +350,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       if(c.getRecipients().size()==1){
         final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(c.getRecipients().get(0));
         ranges.add(ident);
-        specialRec.add(ident);
+        specialRec.add((SimpleExpressionProxy) cloner.getClone(ident));
       }else if(c.getRecipients().size()>1){
         final Collection<SimpleIdentifierProxy> tempList = new ArrayList<SimpleIdentifierProxy>();
         for(final String s: c.getRecipients()){
@@ -343,35 +359,13 @@ public class EventCollectingVisitor implements PromelaVisitor
         }
         final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(tempList);
         ranges.add(en);
-        specialRec.add(en);
+        specialRec.add((SimpleExpressionProxy) cloner.getClone(en));
       }
     }
-   /*
-    for(int i=0;i<dataLength;i++){
-      List<SimpleExpressionProxy> tempList = new ArrayList<SimpleExpressionProxy>();
-      for(Message m: mOutput){
-        if(tempList.size()==0){
-          tempList.add(m.getMsg().get(i));
-        }else{
-          boolean test = true;
-          for(SimpleExpressionProxy s: tempList){
-            if(comparator.compare(s, m.getMsg().get(i))!=0){
-              test = false;
-              break;
-            }
-          }
-          if(test){
-            tempList.add(m.getMsg().get(i));
-          }
-        }
-      }
-      Collections.sort(tempList, comparator);
-    //  List<SimpleExpres>
-    }
-*/
+
     ranges.addAll(mRanges);
     specialSend.addAll(mRanges);
-    specialRec.addAll(mRanges);
+    specialRec.addAll(cloner.getClonedList(mRanges));
     //now create event decls
     if(lengthOfChan==0){
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("exch_"+chanName);
