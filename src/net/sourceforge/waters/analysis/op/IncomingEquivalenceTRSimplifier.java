@@ -249,7 +249,7 @@ public class IncomingEquivalenceTRSimplifier
       mActiveEventsHash.reset(list);
       mActiveEventsMap.forEachValue(mActiveEventsHash);
       mActiveEventsMap.clear();
-      mActiveEventsHash.mergeList(list);
+      mActiveEventsHash.mergeList(list, false);
       return mActiveEventsHash.hasMerged();
     } else {
       return false;
@@ -670,8 +670,12 @@ public class IncomingEquivalenceTRSimplifier
      *                All states from the given class into this class.
      *                The other class becomes invalid and should no longer
      *                be used after this operation.
+     * @param  activeEventsHashCode  Whether the active events sets of the
+     *                merged classes are known to be equal. If this is
+     *                <CODE>false</CODE>, any cached hash code will be
+     *                cleared.
      */
-    private void merge(final ClassInfo info)
+    private void merge(final ClassInfo info, final boolean activeEventsEquals)
     {
       mStateListReadIterator.reset(info.mStates);
       while (mStateListReadIterator.advance()) {
@@ -683,7 +687,7 @@ public class IncomingEquivalenceTRSimplifier
       } else {
         mStates = mListBuffer.catenateDestructively(info.mStates, mStates);
       }
-      if (mActiveEventsHashCode != info.mActiveEventsHashCode) {
+      if (!activeEventsEquals) {
         mActiveEventsHashCode = -1;
       }
       if (mHasOutgoingTau != null) {
@@ -829,7 +833,7 @@ public class IncomingEquivalenceTRSimplifier
     //# Interface gnu.trove.TIntProcedure
     public boolean execute(final int list)
     {
-      final ClassInfo root = mergeList(list);
+      final ClassInfo root = mergeList(list, true);
       if (root.hasOutgoingTau()) {
         final int state = root.getFirstState();
         mListBuffer.append(mTauCollector, state);
@@ -852,7 +856,7 @@ public class IncomingEquivalenceTRSimplifier
 
     //#######################################################################
     //# Auxiliary Methods
-    private ClassInfo mergeList(final int list)
+    private ClassInfo mergeList(final int list, final boolean activeEventsEquals)
     {
       if (mListBuffer.isEmpty(list)) {
         return null;
@@ -868,7 +872,7 @@ public class IncomingEquivalenceTRSimplifier
         while (mClassListReadIterator.advance()) {
           state = mClassListReadIterator.getCurrentData();
           final ClassInfo info = mStateClasses[state];
-          root.merge(info);
+          root.merge(info, activeEventsEquals);
         }
         mListBuffer.dispose(list);
         mHasMerged = true;
