@@ -727,6 +727,7 @@ public class ObservationEquivalenceTRSimplifier
   @Override
   public String toString()
   {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
     final StringWriter writer = new StringWriter();
     final PrintWriter printer = new PrintWriter(writer);
     final Collection<EquivalenceClass> printed =
@@ -734,12 +735,14 @@ public class ObservationEquivalenceTRSimplifier
     for (int s = 0; s < mStateToClass.length; s++) {
       final EquivalenceClass clazz = mStateToClass[s];
       if (clazz == null) {
-        if (s > 0) {
-          printer.println();
+        if (rel.isReachable(s)) {
+          if (s > 0) {
+            printer.println();
+          }
+          printer.print('[');
+          printer.print(s);
+          printer.print(']');
         }
-        printer.print('[');
-        printer.print(s);
-        printer.print(']');
       } else if (printed.add(clazz)) {
         if (s > 0) {
           printer.println();

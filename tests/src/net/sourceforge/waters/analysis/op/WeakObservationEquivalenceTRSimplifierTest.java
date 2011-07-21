@@ -97,6 +97,14 @@ public class WeakObservationEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_woeq_5() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "woeq_5.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   public void test_oeq_2() throws Exception
   {
     final String group = "tests";

@@ -146,17 +146,57 @@ public class WeakObservationEquivalencePartitioning
     final TransitionIterator tauEventIter =
       mTransitionRelation.createAnyReadOnlyIterator();
     final TIntHashSet tauSuccessors = new TIntHashSet();
+    final TIntHashSet tauClasses = new TIntHashSet();
     final TIntStack eventStack = new TIntStack();
     final TransitionIterator eventIter =
       mTransitionRelation.createAnyReadOnlyIterator();
     final TIntHashSet eventSuccessors = new TIntHashSet();
     final TransitionIterator tauStarIter = mTauClosure.createIterator();
     final TransitionIterator closureIter =
-      mTauClosure.createFullEventClosureIterator();
+      mTauClosure.createFullEventClosureIterator(-1);
     final TIntHashSet eventSuccessorClasses = new TIntHashSet();
     final int numClasses = mPartition.size();
     for (int c = 0; c < numClasses; c++) {
       final int[] clazz = mPartition.get(c);
+      long markings = 0;
+      for (final int root : clazz) {
+        tauSuccessors.add(root);
+        tauStack.push(root);
+        while (tauStack.size() > 0) {
+          final int src = tauStack.pop();
+          final int srccls = mClassMap[src];
+          tauClasses.add(srccls);
+          markings |= mTransitionRelation.getAllMarkings(src);
+          eventIter.reset(src, EventEncoding.TAU);
+          while (eventIter.advance()) {
+            final int target = eventIter.getCurrentTargetState();
+            final int targetcls = mClassMap[target];
+            if (!isTauVictim(srccls, targetcls) && tauSuccessors.add(target)) {
+              tauStack.push(target);
+            }
+          }
+        }
+        tauSuccessors.clear();
+      }
+      markings = ~markings & mPropositionMask;
+      for (final int root : clazz) {
+        final boolean init = mTransitionRelation.isInitial(root);
+        tauStarIter.resetState(root);
+        tauStarIter.advance();
+        while (tauStarIter.advance()) {
+          final int target = tauStarIter.getCurrentTargetState();
+          final int targetcls = mClassMap[target];
+          if (!tauClasses.contains(targetcls)) {
+            if (init) {
+              mTransitionRelation.setInitial(target, true);
+            }
+            final long missing =
+              mTransitionRelation.getAllMarkings(target) & markings;
+            mTransitionRelation.addMarkings(root, missing);
+          }
+        }
+      }
+      tauClasses.clear();
       for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
         for (final int root : clazz) {
           final boolean init = mTransitionRelation.isInitial(root);
@@ -168,7 +208,7 @@ public class WeakObservationEquivalencePartitioning
           while (tauStarIter.advance()) {
             final int tausucc = tauStarIter.getCurrentTargetState();
             final int taucls = mClassMap[tausucc];
-            final long markings =
+            markings =
               mTransitionRelation.getAllMarkings(tausucc) & mPropositionMask;
             if (isTauVictim(c, taucls)) {
               if (init) {
