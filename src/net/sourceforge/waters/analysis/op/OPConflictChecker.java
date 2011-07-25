@@ -641,9 +641,9 @@ public class OPConflictChecker
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
     bisimulator.setTransitionRemovalMode
-    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
-    (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     if (mPreconditionMarking != null) {
@@ -662,12 +662,10 @@ public class OPConflictChecker
     final ObserverProjectionTRSimplifier op =
       new ObserverProjectionTRSimplifier();
     op.setTransitionLimit(mInternalTransitionLimit);
+    op.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     chain.add(op);
-    if (mPreconditionMarking != null) {
-      return new GeneralisedTRSimplifierAbstractionRule(chain);
-    } else {
-      return new ObserverProjectionAbstractionRule(chain, op);
-    }
+    return new ObserverProjectionAbstractionRule(chain, op);
   }
 
   private AbstractionRule createStandardNonblockingAbstractionChain
