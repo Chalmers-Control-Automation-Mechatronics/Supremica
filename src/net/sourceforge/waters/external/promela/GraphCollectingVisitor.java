@@ -562,11 +562,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
     /*
      * Used to create Event declaration
-     */
-    @SuppressWarnings("unused")
     final Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>();
-    final Collection<SimpleIdentifierProxy> sender = new ArrayList<SimpleIdentifierProxy>();
-    final Collection<SimpleIdentifierProxy> reciever = new ArrayList<SimpleIdentifierProxy>();
+    final Collection<SimpleIdentifierProxy> senders = new ArrayList<SimpleIdentifierProxy>();
+    final Collection<SimpleIdentifierProxy> receivers = new ArrayList<SimpleIdentifierProxy>();
+     */
 
     final List<SimpleExpressionProxy> index = new ArrayList<SimpleExpressionProxy>(indexes);
     final Message msg = new Message(index);
@@ -575,7 +574,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
  //   if(msg.getMsg().contains(null)){
       for(final Message m: ch.getOutput()){
         if(m.equals(msg)){
-          for(final String send: m.getSenders()){
+          for(@SuppressWarnings("unused") final String send: m.getSenders()){
             loop2:
             for(final Message m2: ch.getMessages()){
               if(m2.getMsg().contains(null)){

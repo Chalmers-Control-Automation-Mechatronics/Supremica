@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.HashFunctions;
 import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntStack;
@@ -642,15 +641,32 @@ public class OPConflictChecker
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
     bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+    (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     if (mPreconditionMarking != null) {
       return new GeneralisedTRSimplifierAbstractionRule(chain);
     } else {
       return new TRSimplifierAbstractionRule(chain);
+    }
+  }
+
+  private AbstractionRule createObserverProjectionChain()
+  {
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+    final ObserverProjectionTRSimplifier op =
+      new ObserverProjectionTRSimplifier();
+    op.setTransitionLimit(mInternalTransitionLimit);
+    chain.add(op);
+    if (mPreconditionMarking != null) {
+      return new GeneralisedTRSimplifierAbstractionRule(chain);
+    } else {
+      return new ObserverProjectionAbstractionRule(chain, op);
     }
   }
 
@@ -1864,7 +1880,7 @@ public class OPConflictChecker
       @Override
       AbstractionRule createAbstractionRule(final OPConflictChecker checker)
       {
-        return checker.new ObserverProjectionAbstractionRule();
+        return checker.createObserverProjectionChain();
       }
     },
     /**
@@ -3422,184 +3438,39 @@ public class OPConflictChecker
   //#########################################################################
   //# Inner Class ObserverProjectionAbstractionRule
   private class ObserverProjectionAbstractionRule
-    extends AbstractionRule
+    extends TRSimplifierAbstractionRule
   {
 
     //#######################################################################
     //# Constructors
-    private ObserverProjectionAbstractionRule()
+    private ObserverProjectionAbstractionRule
+      (final ChainTRSimplifier chain,
+       final ObserverProjectionTRSimplifier op)
     {
-      mSimplifier = new ObservationEquivalenceTRSimplifier();
-      mSimplifier.setAppliesPartitionAutomatically(false);
-      mStatistics = mSimplifier.getStatistics();
-      mSimplifier.setStatistics(null);
+      super(chain);
+      mOPSimplifier = op;
     }
 
     //#######################################################################
-    //# Rule Application
-    ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
-                                         final EventProxy tau)
-    throws AnalysisException
+    //# Overrides for class TRSimplifierAbstractionRule
+    @Override
+    EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                      final EventProxy tau)
     {
-      final long start = System.currentTimeMillis();
+      final EventEncoding eventEnc = super.createEventEncoding(aut, tau);
       final ProductDESProxyFactory factory = getFactory();
       final String name = "vtau:" + aut.getName();
-      final KindTranslator translator = getKindTranslator();
       final EventProxy vtau =
         factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
-      final EventEncoding eventEnc =
-        new EventEncoding(aut, translator, tau, mPropositions,
-                          EventEncoding.FILTER_PROPOSITIONS);
       final KindTranslator id = IdenticalKindTranslator.getInstance();
       final int codeOfVTau = eventEnc.addEvent(vtau, id, false);
-      final StateEncoding inputStateEnc = new StateEncoding(aut);
-      final ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation
-        (aut, eventEnc, inputStateEnc,
-         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-      mStatistics.recordStart(rel);
-      mSimplifier.setTransitionRelation(rel);
-      try {
-        final List<int[]> partition =
-          applySimplifier(mSimplifier, rel, codeOfVTau);
-        if (partition != null) {
-          mStatistics.recordFinish(rel, true);
-          final StateEncoding outputStateEnc = new StateEncoding();
-          final AutomatonProxy convertedAut =
-            rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          /*
-          final IsomorphismChecker checker =
-            new IsomorphismChecker(factory, false);
-          checker.checkObservationEquivalence(aut, convertedAut, tau);
-           */
-          return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                                inputStateEnc, partition,
-                                                outputStateEnc);
-        } else {
-          mStatistics.recordFinish(rel, false);
-          return null;
-        }
-      } catch (final AnalysisException exception) {
-        mStatistics.recordOverflow(rel);
-        throw exception;
-      } catch (final OutOfMemoryError error) {
-        mSimplifier.reset();
-        getLogger().debug("<out of memory>");
-        mStatistics.recordOverflow(rel);
-        throw new OverflowException(error);
-      } finally {
-        mSimplifier.reset();
-        final long stop = System.currentTimeMillis();
-        mStatistics.recordRunTime(stop - start);
-      }
-    }
-
-    @Override
-    void storeStatistics()
-    {
-      final CompositionalVerificationResult result = getAnalysisResult();
-      final List<TRSimplifierStatistics> list =
-        Collections.singletonList(mStatistics);
-      result.setSimplifierStatistics(list);
-    }
-
-    @Override
-    void resetStatistics()
-    {
-      mStatistics = mSimplifier.createStatistics();
-      mSimplifier.setStatistics(null);
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private List<int[]> applySimplifier
-      (final ObservationEquivalenceTRSimplifier simplifier,
-       final ListBufferTransitionRelation rel,
-       final int vtau)
-      throws AnalysisException
-    {
-      final int tau = EventEncoding.TAU;
-      final int numTransBefore = rel.getNumberOfTransitions();
-      List<int[]> partition;
-      while (true) {
-        checkAbort();
-        final boolean modified = simplifier.run();
-        if (!modified && rel.getNumberOfTransitions() == numTransBefore) {
-          return null;
-        }
-        partition = simplifier.getResultPartition();
-        if (partition == null) {
-          break;
-        } else if (!makeEventsVisible(rel, partition, vtau)) {
-          break;
-        }
-        simplifier.setUpInitialPartition(partition);
-      }
-      simplifier.applyResultPartition();
-      simplifier.reset();
-      rel.replaceEvent(vtau, tau);
-      rel.removeEvent(vtau);
-      rel.removeRedundantPropositions();
-      return partition;
-    }
-
-    private boolean makeEventsVisible
-      (final ListBufferTransitionRelation rel,
-       final List<int[]> partition,
-       final int vtau)
-    {
-      final int numStates = rel.getNumberOfStates();
-      final TIntIntHashMap pmap = new TIntIntHashMap(numStates);
-      int code = 0;
-      for (final int[] array : partition) {
-        for (final int state : array) {
-          pmap.put(state, code);
-        }
-        code++;
-      }
-      final TransitionIterator iter =
-        rel.createPredecessorsModifyingIterator();
-      final TIntArrayList victims = new TIntArrayList();
-      final int tau = EventEncoding.TAU;
-      boolean modified = false;
-      for (int target= 0; target < numStates; target++) {
-        if (rel.isReachable(target)) {
-          final int targetClass = pmap.get(target);
-          iter.reset(target, tau);
-          while (iter.advance()) {
-            final int source = iter.getCurrentSourceState();
-            final int sourceClass = pmap.get(source);
-            if (sourceClass != targetClass) {
-              iter.remove();
-              victims.add(source);
-            }
-          }
-          if (!victims.isEmpty()) {
-            modified = true;
-            rel.addTransitions(victims, vtau, target);
-            victims.clear();
-          }
-        }
-      }
-      return modified;
-    }
-
-    //#########################################################################
-    //# Interface net.sourceforge.waters.model.analysis.Abortable
-    public void requestAbort()
-    {
-      mSimplifier.requestAbort();
-    }
-
-    public boolean isAborting()
-    {
-      return mSimplifier.isAborting();
+      mOPSimplifier.setVisibleTau(codeOfVTau);
+      return eventEnc;
     }
 
     //#########################################################################
     //# Data Members
-    private final ObservationEquivalenceTRSimplifier mSimplifier;
-    private TRSimplifierStatistics mStatistics;
+    private final ObserverProjectionTRSimplifier mOPSimplifier;
 
   }
 
