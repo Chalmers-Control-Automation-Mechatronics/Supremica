@@ -76,7 +76,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   Collection<SimpleExpressionProxy> mRanges = new ArrayList<SimpleExpressionProxy>();
 
-  List<Message> mOutput = new ArrayList<Message>();
+  //List<Message> mOutput = new ArrayList<Message>();
   List<String> channelMsg = new ArrayList<String>();
   Hashtable<String,String> mGlobalVar = new Hashtable<String,String>();
   Hashtable<String,List<Message>> mSendersMsg = new Hashtable<String,List<Message>>();
@@ -116,11 +116,13 @@ public class EventCollectingVisitor implements PromelaVisitor
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final Comparator<SimpleExpressionProxy> comparator =
       new ExpressionComparator(optable);
-
-    final List<Message> msgs = new ArrayList<Message>(chan.get(channelMsg.get(0)).getMessages());
-    mOutput = new ArrayList<Message>();
+    for(final Map.Entry<String,ChanInfo> chanIn: chan.entrySet())
+    {
+    //final List<Message> msgs = new ArrayList<Message>(chan.get(channelMsg.get(0)).getMessages());
+    final List<Message> msgs = new ArrayList<Message>(chanIn.getValue().getMessages());
+    final List<Message> mOutput = chanIn.getValue().getOutput();
     final Hashtable<Integer,List<SimpleExpressionProxy>> table =new Hashtable<Integer,List<SimpleExpressionProxy>>();
-    for(int i=0;i<chan.get(channelMsg.get(0)).getDataLength();i++){
+    for(int i=0;i<chanIn.getValue().getDataLength();i++){
       //final List<SimpleExpressionProxy> channelList = new ArrayList<SimpleExpressionProxy>();
       table.put(i,new ArrayList<SimpleExpressionProxy>());
     }
@@ -259,9 +261,12 @@ public class EventCollectingVisitor implements PromelaVisitor
     Collections.sort(recRange);
     final List<Message> cloneOutput = new ArrayList<Message>(mOutput);
     cloneOutput.removeAll(tempstore);
-    final ChanInfo c = chan.elements().nextElement();
+    //final ChanInfo c = chan.elements().nextElement();
+   // final int lengthOfChan = c.getChanLength();
+   // final String chanName = chan.keys().nextElement();
+    final ChanInfo c = chanIn.getValue();
     final int lengthOfChan = c.getChanLength();
-    final String chanName = chan.keys().nextElement();
+    final String chanName = chanIn.getKey();
     boolean sending = false;
 
     boolean receiving = false;
@@ -383,7 +388,7 @@ public class EventCollectingVisitor implements PromelaVisitor
         mEventDecls.add(event1);
         mEventDecls.add(event2);
       }
-
+  }
 
     //create Run events
     if(!atomic){
@@ -413,9 +418,9 @@ public class EventCollectingVisitor implements PromelaVisitor
 
 
   }
-  public List<Message> getMsg(){
-    return mOutput;
-  }
+ // public List<Message> getMsg(){
+ //   return mOutput;
+ // }
   //########################################################################
   //# Interface net.sourceforge.waters.external.promela.PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)

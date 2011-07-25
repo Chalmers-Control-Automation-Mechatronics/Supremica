@@ -76,7 +76,7 @@ public class ChanInfo {
      *
      */
     private final List<Message> mMessages;
-
+    List<Message> output = new ArrayList<Message>();
     public ChanInfo(final String n, final int typeL,final int dataL,final List<String> ty){
         mSendCount = 0;
         mRecCount = 0;
@@ -89,6 +89,9 @@ public class ChanInfo {
         mMessages = new ArrayList<Message>();
         mHasMultipleSenders = false;
         mHasMultipleRecipients = false;
+    }
+    public List<Message> getOutput(){
+      return output;
     }
     public void addSenders(final Collection<String> c){
       senders.addAll(c);

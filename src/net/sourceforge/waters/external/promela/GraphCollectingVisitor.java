@@ -80,7 +80,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   Map<String,PromelaNode> mLabelEnd = new HashMap<String,PromelaNode>();
 
-  List<Message> mOutput = new ArrayList<Message>();
+//  List<Message> mOutput = new ArrayList<Message>();
 
  // final Collection<NodeProxy> mChannelNode = new ArrayList<NodeProxy>();
  // final Collection<EdgeProxy> mChannelEdge = new ArrayList<EdgeProxy>();
@@ -107,7 +107,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)
   {
     mEvents = new ArrayList<EventDeclProxy>(mVisitor.getEvents());
-    mOutput = new ArrayList<Message>(mVisitor.getMsg());
+  //  mOutput = new ArrayList<Message>(mVisitor.getMsg());
     for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
@@ -214,7 +214,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final NodeProxy start = mFactory.createSimpleNodeProxy("empty", eventList, true, null, null, null);
       mNodes.add(start);
       loop1:
-      for(final Message msg : mVisitor.getMsg()){
+      for(final Message msg : ch.getOutput()){
         if(msg.getMsg().contains(null)){
           continue loop1;
         }
@@ -379,7 +379,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final ChanInfo c = ch;
       final Collection<SimpleIdentifierProxy> senders = new ArrayList<SimpleIdentifierProxy>();
       final Collection<SimpleIdentifierProxy> recvs = new ArrayList<SimpleIdentifierProxy>();
-      for(final Message m: mOutput){
+      for(final Message m: ch.getOutput()){
 
         if(m.equals(msg)){
           if(c.isSenderPresent()){
@@ -573,7 +573,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final List<IdentifierProxy> events = new ArrayList<IdentifierProxy>();
 
  //   if(msg.getMsg().contains(null)){
-      for(final Message m: mOutput){
+      for(final Message m: ch.getOutput()){
         if(m.equals(msg)){
           for(final String send: m.getSenders()){
             for(final Message m2: mVisitor.getSenderMsg().get(send)){
