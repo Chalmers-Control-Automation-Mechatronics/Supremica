@@ -410,7 +410,8 @@ public class IncomingEquivalenceTRSimplifier
      * Determines whether the states in this class are incoming equivalent
      * to the given state.
      */
-    private boolean incomingEquivalenceEquals(final int root1)
+    @SuppressWarnings("unused")
+    private boolean newIncomingEquivalenceEquals(final int root1)
     {
       final ClassInfo info1 = mStateClasses[root1];
       if (info1 == this) {
@@ -477,11 +478,18 @@ public class IncomingEquivalenceTRSimplifier
       return true;
     }
 
-    @SuppressWarnings("unused")
-    private boolean oldIncomingEquivalenceEquals(final int root1)
+    /**
+     * Determines whether the states in this class are incoming equivalent
+     * to the given state.
+     */
+    private boolean incomingEquivalenceEquals(final int root1)
     {
-      if (mStateClasses[root1] == this) {
+      final ClassInfo info1 = mStateClasses[root1];
+      if (info1 == this) {
         return true;
+      } else if (incomingEquivalenceHashCode() !=
+                 info1.incomingEquivalenceHashCode()) {
+        return false;
       }
       mPredecessorsPostEventClosureIterator.resetEvents(EventEncoding.NONTAU,
                                                         Integer.MAX_VALUE);
@@ -526,8 +534,8 @@ public class IncomingEquivalenceTRSimplifier
             mPredecessorsPostEventClosureIterator.getCurrentSourceState();
           final int event1 =
             mPredecessorsPostEventClosureIterator.getCurrentEvent();
-          final ClassInfo info1 = mStateClasses[pred1];
-          final int key1 = info1.getFirstState() | (event1 << mEventShift);
+          final ClassInfo predinfo1 = mStateClasses[pred1];
+          final int key1 = predinfo1.getFirstState() | (event1 << mEventShift);
           if (keys1.add(key1) && !keys0.contains(key1)) {
             return false;
           }

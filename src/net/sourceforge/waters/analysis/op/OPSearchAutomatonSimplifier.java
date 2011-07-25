@@ -35,6 +35,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AutomatonResult;
@@ -430,7 +431,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void setUpVerifier()
-    throws OverflowException
+    throws AbortException, OverflowException
   {
     final int numStates = mOriginalStates.length;
     mVerifierStatePairs = new TLongArrayList(numStates);
@@ -442,7 +443,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void rebuildVerifier()
-    throws OverflowException
+    throws AbortException, OverflowException
   {
     mVerifierStatePairs.clear();
     mVerifierStateMap.clear();
@@ -457,13 +458,15 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void buildVerifier()
-    throws OverflowException
+    throws AbortException, OverflowException
   {
     final int numStates = mOriginalStates.length;
     for (int s = 0; s < numStates; s++) {
+      checkAbort();
       expandVerifierPairSingleton(s);
     }
     for (int pindex = 0; pindex < mVerifierStatePairs.size(); pindex++) {
+      checkAbort();
       final long pair = mVerifierStatePairs.get(pindex);
       final int pcode = pindex + mOriginalStates.length;
       expandVerifierPairEncoded(pcode, pair);
@@ -740,7 +743,7 @@ public class OPSearchAutomatonSimplifier
   //#########################################################################
   //# OP-Search Algorithm
   private void doOPSearchStep()
-    throws OverflowException
+    throws AbortException, OverflowException
   {
     final long trans = findOPSearchTransition();
     final int source = (int) (trans & 0xffffffffL);

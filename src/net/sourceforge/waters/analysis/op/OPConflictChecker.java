@@ -3431,6 +3431,8 @@ public class OPConflictChecker
     {
       mSimplifier = new ObservationEquivalenceTRSimplifier();
       mSimplifier.setAppliesPartitionAutomatically(false);
+      mStatistics = mSimplifier.getStatistics();
+      mSimplifier.setStatistics(null);
     }
 
     //#######################################################################
@@ -3439,26 +3441,29 @@ public class OPConflictChecker
                                          final EventProxy tau)
     throws AnalysisException
     {
+      final long start = System.currentTimeMillis();
+      final ProductDESProxyFactory factory = getFactory();
+      final String name = "vtau:" + aut.getName();
+      final KindTranslator translator = getKindTranslator();
+      final EventProxy vtau =
+        factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
+      final EventEncoding eventEnc =
+        new EventEncoding(aut, translator, tau, mPropositions,
+                          EventEncoding.FILTER_PROPOSITIONS);
+      final KindTranslator id = IdenticalKindTranslator.getInstance();
+      final int codeOfVTau = eventEnc.addEvent(vtau, id, false);
+      final StateEncoding inputStateEnc = new StateEncoding(aut);
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation
+        (aut, eventEnc, inputStateEnc,
+         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+      mStatistics.recordStart(rel);
+      mSimplifier.setTransitionRelation(rel);
       try {
-        final ProductDESProxyFactory factory = getFactory();
-        final String name = "vtau:" + aut.getName();
-        final KindTranslator translator = getKindTranslator();
-        final EventProxy vtau =
-          factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
-        final EventEncoding eventEnc =
-          new EventEncoding(aut, translator, tau, mPropositions,
-                            EventEncoding.FILTER_PROPOSITIONS);
-        final KindTranslator id = IdenticalKindTranslator.getInstance();
-        final int codeOfVTau = eventEnc.addEvent(vtau, id, false);
-        final StateEncoding inputStateEnc = new StateEncoding(aut);
-        final ListBufferTransitionRelation rel =
-          new ListBufferTransitionRelation
-            (aut, eventEnc, inputStateEnc,
-             ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-        mSimplifier.setTransitionRelation(rel);
         final List<int[]> partition =
           applySimplifier(mSimplifier, rel, codeOfVTau);
         if (partition != null) {
+          mStatistics.recordFinish(rel, true);
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy convertedAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
@@ -3471,14 +3476,21 @@ public class OPConflictChecker
                                                 inputStateEnc, partition,
                                                 outputStateEnc);
         } else {
+          mStatistics.recordFinish(rel, false);
           return null;
         }
+      } catch (final AnalysisException exception) {
+        mStatistics.recordOverflow(rel);
+        throw exception;
       } catch (final OutOfMemoryError error) {
         mSimplifier.reset();
         getLogger().debug("<out of memory>");
+        mStatistics.recordOverflow(rel);
         throw new OverflowException(error);
       } finally {
         mSimplifier.reset();
+        final long stop = System.currentTimeMillis();
+        mStatistics.recordRunTime(stop - start);
       }
     }
 
@@ -3486,13 +3498,16 @@ public class OPConflictChecker
     void storeStatistics()
     {
       final CompositionalVerificationResult result = getAnalysisResult();
-      result.setSimplifierStatistics(mSimplifier);
+      final List<TRSimplifierStatistics> list =
+        Collections.singletonList(mStatistics);
+      result.setSimplifierStatistics(list);
     }
 
     @Override
     void resetStatistics()
     {
-      mSimplifier.createStatistics();
+      mStatistics = mSimplifier.createStatistics();
+      mSimplifier.setStatistics(null);
     }
 
     //#######################################################################
@@ -3507,6 +3522,7 @@ public class OPConflictChecker
       final int numTransBefore = rel.getNumberOfTransitions();
       List<int[]> partition;
       while (true) {
+        checkAbort();
         final boolean modified = simplifier.run();
         if (!modified && rel.getNumberOfTransitions() == numTransBefore) {
           return null;
@@ -3583,6 +3599,7 @@ public class OPConflictChecker
     //#########################################################################
     //# Data Members
     private final ObservationEquivalenceTRSimplifier mSimplifier;
+    private TRSimplifierStatistics mStatistics;
 
   }
 
@@ -3601,6 +3618,7 @@ public class OPConflictChecker
       final KindTranslator translator = getKindTranslator();
       mSimplifier = new OPSearchAutomatonSimplifier(factory, translator);
       mSimplifier.setPropositions(mPropositions);
+      mStatistics = new TRSimplifierStatistics(mSimplifier, true, true);
     }
 
     //#######################################################################
@@ -3609,8 +3627,11 @@ public class OPConflictChecker
                                          final EventProxy tau)
     throws AnalysisException
     {
+      final long start = System.currentTimeMillis();
       try {
+        mStatistics.recordStart(aut);
         if (tau == null) {
+          mStatistics.recordFinish(aut, false);
           return null;
         }
         final Collection<EventProxy> hidden = Collections.singletonList(tau);
@@ -3623,30 +3644,43 @@ public class OPConflictChecker
           mSimplifier.getAnalysisResult();
         final AutomatonProxy convertedAut = result.getAutomaton();
         if (aut == convertedAut) {
+          mStatistics.recordFinish(aut, false);
           return null;
         }
+        mStatistics.recordFinish(convertedAut, true);
         final StateEncoding inputEnc = result.getInputEncoding();
         final StateEncoding outputEnc = result.getOutputEncoding();
         final List<int[]> partition = result.getPartition();
         return new ObservationEquivalenceStep(convertedAut, aut, tau,
                                               inputEnc, partition, outputEnc);
+      } catch (final AnalysisException exception) {
+        mStatistics.recordOverflow(aut);
+        throw exception;
       } catch (final OutOfMemoryError error) {
         mSimplifier.tearDown();
         getLogger().debug("<out of memory>");
+        mStatistics.recordOverflow(aut);
         throw new OverflowException(error);
       } finally {
         mSimplifier.tearDown();
+        final long stop = System.currentTimeMillis();
+        mStatistics.recordRunTime(stop - start);
       }
     }
 
     @Override
     void storeStatistics()
     {
+      final CompositionalVerificationResult result = getAnalysisResult();
+      final List<TRSimplifierStatistics> list =
+        Collections.singletonList(mStatistics);
+      result.setSimplifierStatistics(list);
     }
 
     @Override
     void resetStatistics()
     {
+      mStatistics = new TRSimplifierStatistics(mSimplifier, true, true);
     }
 
     //#########################################################################
@@ -3664,6 +3698,7 @@ public class OPConflictChecker
     //#########################################################################
     //# Data Members
     private final OPSearchAutomatonSimplifier mSimplifier;
+    private TRSimplifierStatistics mStatistics;
 
   }
 

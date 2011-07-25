@@ -15,6 +15,8 @@ import java.util.Formatter;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
@@ -30,7 +32,7 @@ public class TRSimplifierStatistics
 
   //#########################################################################
   //# Constructors
-  public TRSimplifierStatistics(final TransitionRelationSimplifier simplifier,
+  public TRSimplifierStatistics(final Object simplifier,
                                 final boolean trans, final boolean markings)
   {
     mSimplifierClass = simplifier.getClass();
@@ -56,7 +58,7 @@ public class TRSimplifierStatistics
   /**
    * Gets the class of the simplifier these statistics are for.
    */
-  public Class<? extends TransitionRelationSimplifier> getSimplifierClass()
+  public Class<?> getSimplifierClass()
   {
     return mSimplifierClass;
   }
@@ -209,6 +211,20 @@ public class TRSimplifierStatistics
     }
   }
 
+  public void recordStart(final AutomatonProxy aut)
+  {
+    mApplicationCount++;
+    if (mInputStates >= 0) {
+      mInputStates += aut.getStates().size();
+      mInputTransitions += aut.getTransitions().size();
+    }
+    if (mInputMarkings >= 0) {
+      for (final StateProxy state : aut.getStates()) {
+        mInputMarkings += state.getPropositions().size();
+      }
+    }
+  }
+
   public void recordFinish(final ListBufferTransitionRelation rel,
                            final boolean success)
   {
@@ -232,10 +248,42 @@ public class TRSimplifierStatistics
     }
   }
 
+  public void recordFinish(final AutomatonProxy aut, final boolean success)
+  {
+    if (success) {
+      mReductionCount++;
+      if (mOutputStates >= 0) {
+        mOutputStates += aut.getStates().size();
+        mOutputTransitions += aut.getTransitions().size();
+      }
+      if (mOutputMarkings >= 0) {
+        for (final StateProxy state : aut.getStates()) {
+          mOutputMarkings += state.getPropositions().size();
+        }
+      }
+    } else {
+      if (mUnchangedStates >= 0) {
+        mUnchangedStates += aut.getStates().size();
+        mUnchangedTransitions += aut.getTransitions().size();
+      }
+      if (mUnchangedMarkings >= 0) {
+        for (final StateProxy state : aut.getStates()) {
+          mUnchangedMarkings += state.getPropositions().size();
+        }
+      }
+    }
+  }
+
   public void recordOverflow(final ListBufferTransitionRelation rel)
   {
     mOverflowCount++;
     recordFinish(rel, false);
+  }
+
+  public void recordOverflow(final AutomatonProxy aut)
+  {
+    mOverflowCount++;
+    recordFinish(aut, false);
   }
 
   public void recordRunTime(final long runTime)
@@ -390,7 +438,7 @@ public class TRSimplifierStatistics
 
   //#########################################################################
   //# Data Members
-  private final Class<? extends TransitionRelationSimplifier> mSimplifierClass;
+  private final Class<?> mSimplifierClass;
 
   private int mApplicationCount;
   private int mOverflowCount;

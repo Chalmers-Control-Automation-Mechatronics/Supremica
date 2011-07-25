@@ -126,6 +126,11 @@ public class CompositionalVerificationResult extends VerificationResult
     mRedundantEventsCount += count;
   }
 
+  public void setSimplifierStatistics(final List<TRSimplifierStatistics> stats)
+  {
+    mSimplifierStatistics = stats;
+  }
+
   public void setSimplifierStatistics
     (final TransitionRelationSimplifier simplifier)
   {

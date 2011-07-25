@@ -1254,7 +1254,6 @@ public abstract class TransitionListBuffer
         list = mStateTransitions[from];
         if (list == NULL) {
           list = mStateTransitions[from] = createList();
-          toString();
         }
       }
       mStateEventTransitions.put(fromCode, list);
