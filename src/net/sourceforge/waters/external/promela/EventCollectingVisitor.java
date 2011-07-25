@@ -277,10 +277,19 @@ public class EventCollectingVisitor implements PromelaVisitor
           //c.addSenders(sendRange);
           final Collection<String> tempList = new ArrayList<String>();
           for (final String s : sendRange) {
+            if(occur.get(s)==1){
             final String temp = s + "_0";
             for (int i = 0; i < occur.get(s); i++) {
               if(!c.getSenders().contains(temp)){
                 tempList.add(temp);
+              }
+            }
+            }else if(occur.get(s)>1){
+              for(int i=0;i<occur.get(s);i++){
+                final String temp = s+"_"+i;
+                if(!c.getSenders().contains(temp)){
+                  tempList.add(temp);
+                }
               }
             }
           }

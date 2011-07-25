@@ -576,7 +576,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
       for(final Message m: ch.getOutput()){
         if(m.equals(msg)){
           for(final String send: m.getSenders()){
-            for(final Message m2: mVisitor.getSenderMsg().get(send)){
+            loop2:
+            for(final Message m2: ch.getMessages()){
+              if(m2.getMsg().contains(null)){
+                continue loop2;
+              }
               final Collection<SimpleIdentifierProxy> senders = new ArrayList<SimpleIdentifierProxy>();
               final Collection<SimpleIdentifierProxy> recvs = new ArrayList<SimpleIdentifierProxy>();
               if(ch.isSenderPresent()){
@@ -598,10 +602,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
                 Collections.sort(m.getRecipients());
                // for(final String n: m.getRecipients()){
                   if(mVisitor.getOccur().get(name)>1){
-                    for(int i=0;i<mVisitor.getOccur().get(name);i++){
+                    //for(int i=0;i<mVisitor.getOccur().get(name);i++){
                       final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy("procid");
                       recvs.add(ident);
-                    }
+                   // }
                   }else if(mVisitor.getOccur().get(name)==1){
                     final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(name+"_"+0);
                     recvs.add(ident);
@@ -610,25 +614,25 @@ public class GraphCollectingVisitor implements PromelaVisitor
               }
               Collection<SimpleExpressionProxy> data = new ArrayList<SimpleExpressionProxy>();
               if(msg.getMsg().contains(null)){
-              if(indexes.size()==1){
-                data = cloner.getClonedList(m2.getMsg());
-              }else if(indexes.size()>1){
-                //TODO
-                boolean test = false;
-                final ArrayList<SimpleExpressionProxy> l = new ArrayList<SimpleExpressionProxy>(indexes);
-                for(int i=0;i<indexes.size()-1;i++){
-                  if(comparator.compare(m2.getMsg().get(i),l.get(i))==0){
-                    test = true;
-                  }else{
-                    test = false;
-                    break;
+                if(indexes.size()==1){
+                  data = cloner.getClonedList(m2.getMsg());
+                }else if(indexes.size()>1){
+                  //TODO
+                  boolean test = false;
+                  final ArrayList<SimpleExpressionProxy> l = new ArrayList<SimpleExpressionProxy>(indexes);
+                  for(int i=0;i<indexes.size()-1;i++){
+                    if(comparator.compare(m2.getMsg().get(i),l.get(i))==0){
+                      test = true;
+                    }else{
+                      test = false;
+                      break;
+                    }
+                  }
+
+                  if(test){
+                    data = cloner.getClonedList(m2.getMsg());
                   }
                 }
-
-                if(test){
-                  data = cloner.getClonedList(m2.getMsg());
-                }
-              }
               }else{
                 data=cloner.getClonedList(indexes);
               }
