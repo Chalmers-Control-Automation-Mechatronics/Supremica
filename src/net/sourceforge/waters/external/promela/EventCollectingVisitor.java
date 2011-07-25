@@ -79,6 +79,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   List<Message> mOutput = new ArrayList<Message>();
   List<String> channelMsg = new ArrayList<String>();
   Hashtable<String,String> mGlobalVar = new Hashtable<String,String>();
+  Hashtable<String,List<Message>> mSendersMsg = new Hashtable<String,List<Message>>();
   //########################################################################
   //# Invocation
   public EventCollectingVisitor(final ModuleProxyFactory factory){
@@ -92,6 +93,9 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
   public Collection<SimpleExpressionProxy> getRanges(){
     return mRanges;
+  }
+  public Hashtable<String,List<Message>> getSenderMsg(){
+    return mSendersMsg;
   }
   public Collection<EventDeclProxy> getEvents(){
     return mEventDecls;
@@ -517,11 +521,22 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
       final List<SimpleExpressionProxy> msgList = new ArrayList<SimpleExpressionProxy>(indexes);
       final Message msg = new Message(msgList);
+
       Tree tree = t;
       while (!(tree instanceof ProctypeTreeNode)) {
         tree = tree.getParent();
       }
       final String n = tree.getText();
+      if(mSendersMsg.containsKey(n)){
+        final List<Message> l = mSendersMsg.get(n);
+        l.add(msg);
+        //System.out.println("123");
+        mSendersMsg.put(n, l);
+      }else{
+        final List<Message> l = new ArrayList<Message>();
+        l.add(msg);
+        mSendersMsg.put(n, l);
+      }
       msg.addSender(n);
       ch.addMessages(msg);
         //create indexedIdentifier, and store it for receive statement
