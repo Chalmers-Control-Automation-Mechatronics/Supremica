@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="p102c" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Imported from Promela file p102c.pml.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="recv_ch">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="2"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="3"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="run_A"/>
+        <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="send_ch">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="2"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="3"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="channel_ch">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="128"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="1" X="-26"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="3" X="-47"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s_1_2_3">
+                        <PointGeometry>
+                            <Point Y="32" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="-26"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s_1_2_4">
+                        <PointGeometry>
+                            <Point Y="128" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s_2_3_3">
+                        <PointGeometry>
+                            <Point Y="224" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="-24"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s_1_2_3" Source="empty">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="send_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="-104"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="80" X="119"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="s_1_2_3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="recv_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="80" X="136"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s_1_2_4" Source="empty">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="send_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="120" X="177"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="s_1_2_4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="recv_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="137" X="174"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s_2_3_3" Source="empty">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="send_ch">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="3"/>
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="-103"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="176" X="118"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="s_2_3_3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="recv_ch">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="3"/>
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="175" X="137"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="proctype_A">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A_0">
+                        <PointGeometry>
+                            <Point Y="64" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-7" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="A_1">
+                        <PointGeometry>
+                            <Point Y="144" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="A_2">
+                        <PointGeometry>
+                            <Point Y="224" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-5" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="A_3">
+                        <PointGeometry>
+                            <Point Y="304" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-5" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="A_4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="384" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="A_1" Source="A_0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="run_A"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="A_2" Source="A_1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="send_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="A_3" Source="A_2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="send_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-4" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="A_4" Source="A_3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="send_ch">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="3"/>
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="proctype_B">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="B_0">
+                        <PointGeometry>
+                            <Point Y="64" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-7" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="B_1">
+                        <PointGeometry>
+                            <Point Y="144" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="B_2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="224" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-5" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="B_1" Source="B_0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="run_B"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="B_2" Source="B_1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="recv_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="recv_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="recv_ch">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="3"/>
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="init">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="init_0">
+                        <PointGeometry>
+                            <Point Y="48" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="init_1">
+                        <PointGeometry>
+                            <Point Y="128" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-4" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="init_2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="208" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-7" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="init_1" Source="init_0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="run_A"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="init_2" Source="init_1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="run_B"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
