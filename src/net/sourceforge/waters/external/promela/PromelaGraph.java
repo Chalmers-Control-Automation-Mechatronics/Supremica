@@ -490,14 +490,22 @@ public class PromelaGraph
 
   }
 
-  public static PromelaGraph doCombineComposition2(final List<PromelaGraph> branches, final boolean unwinding,final ModuleProxyFactory factory){
+  public static PromelaGraph doCombineComposition2(final List<PromelaGraph> branches,
+                                                   final boolean unwinding,
+                                                   final boolean isEnd,
+                                                   final ModuleProxyFactory factory){
     //comparator
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final Comparator<SimpleExpressionProxy> comparator =
       new ExpressionComparator(optable);
     //create nodes
     final List<PromelaNode> nodes = new ArrayList<PromelaNode>();
-    final PromelaNode newStartNode = new PromelaNode();
+    final PromelaNode newStartNode;
+  //  if(isEnd){
+   //   newStartNode = new PromelaNode(PromelaNode.EndType.END);
+   // }else{
+      newStartNode = new PromelaNode();
+ //  }
     PromelaNode secondStart;
     nodes.add(newStartNode);
     for(final PromelaGraph branch: branches){
@@ -508,6 +516,7 @@ public class PromelaGraph
       }
     }
     if(unwinding){
+      //TODO
       secondStart = new PromelaNode();
       nodes.add(secondStart);
     }else{

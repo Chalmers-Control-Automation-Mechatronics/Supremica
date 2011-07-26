@@ -300,6 +300,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
       mComponents.add(component);
     }
+
     for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
@@ -574,7 +575,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
  //   if(msg.getMsg().contains(null)){
       for(final Message m: ch.getOutput()){
         if(m.equals(msg)){
-          for(@SuppressWarnings("unused") final String send: m.getSenders()){
+     //     for(@SuppressWarnings("unused") final String send: m.getSenders()){
             loop2:
             for(final Message m2: ch.getMessages()){
               if(m2.getMsg().contains(null)){
@@ -619,8 +620,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
                   //TODO
                   boolean test = false;
                   final ArrayList<SimpleExpressionProxy> l = new ArrayList<SimpleExpressionProxy>(indexes);
-                  for(int i=0;i<indexes.size()-1;i++){
-                    if(comparator.compare(m2.getMsg().get(i),l.get(i))==0){
+                  for(int i=0;i<indexes.size();i++){
+                    if(l.get(i)==null){
+                      test = true;
+                    }else if(comparator.compare(m2.getMsg().get(i),l.get(i))==0){
                       test = true;
                     }else{
                       test = false;
@@ -634,6 +637,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
                 }
               }else{
                 data=cloner.getClonedList(indexes);
+              }
+              if(data.size()==0){
+                continue loop2;
               }
               if(senders.size()>=1 && recvs.size()>=1){
                 for(final SimpleIdentifierProxy s1: senders){
@@ -750,7 +756,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
 
             }
-          }
+    //      }
         }
       }
  //   }
@@ -1149,6 +1155,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
     final boolean unwinding = mUnWinding;
+   // final boolean isEnd = checkEnd((PromelaTree) t.getParent());
     counter =counter+1;
     Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode)){
@@ -1163,7 +1170,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       branches.add(step);
     }
-    result = PromelaGraph.doCombineComposition2(branches, unwinding,mFactory);
+    final boolean isEnd = false;
+    result = PromelaGraph.doCombineComposition2(branches, unwinding,isEnd,mFactory);
     mLabelEnd.put(""+counter,endNode);
 
     return result;
@@ -1333,5 +1341,17 @@ public class GraphCollectingVisitor implements PromelaVisitor
  //   final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
  //   mCompleteComponents.add(component);
  //   mCompleteComponents.addAll(mComponents);
+  }
+  public boolean checkEnd(final PromelaTree t){
+    if(t instanceof LabelTreeNode){
+    final String temp = t.getText();
+    if(temp.length()>=3){
+      final String end = temp.substring(0, 3);
+      if(end.toLowerCase().equals("end")){
+        return true;
+      }
+    }
+    }
+    return false;
   }
 }

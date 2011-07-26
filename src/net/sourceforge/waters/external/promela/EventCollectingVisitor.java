@@ -191,18 +191,49 @@ public class EventCollectingVisitor implements PromelaVisitor
           for(final String s: m.getRecipients()){
             m2.addRecipient(s);
           }
-          if(!mOutput.contains(m)){
+          /*if(!mOutput.contains(m)){
             mOutput.add(m);
+          }*/
+          boolean test = true;
+          for(final Message t1: mOutput){
+            if(t1.equals(m)){
+              test = false;
+              break;
+            }else{
+              test = true;
+            }
           }
-          mOutput.add(m2);
+          if(test) mOutput.add(m);
+
         }
-        if(!mOutput.contains(m2)){
+        /*if(!mOutput.contains(m2)){
           mOutput.add(m2);
+        }*/
+        boolean test = true;
+        for(final Message t1: mOutput){
+          if(t1.equals(m2)){
+            test = false;
+            break;
+          }else{
+            test = true;
+          }
+        }
+        if(test) mOutput.add(m2);
+
+      }
+      boolean test = true;
+      for(final Message t1: mOutput){
+        if(t1.equals(m)){
+          test = false;
+          break;
+        }else{
+          test = true;
         }
       }
-      if(!mOutput.contains(m)){
+      if(test) mOutput.add(m);
+      /*if(!mOutput.contains(m)){
         mOutput.add(m);
-      }
+      }*/
 
     }
     final ArrayList<Message> tempstore = new ArrayList<Message>();
