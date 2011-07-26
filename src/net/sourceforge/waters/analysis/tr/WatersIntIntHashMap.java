@@ -19,7 +19,8 @@ import java.util.Arrays;
 
 
 /**
- * An open addressed map implementation for int keys and int values.
+ * An open addressed map implementation for <CODE>int</CODE> keys and
+ * <CODE>int</CODE> values.
  *
  * This is a modified version of {@link gnu.trove.TIntIntHashMap} that supports
  * configurable equality of keys.
@@ -80,7 +81,8 @@ public class WatersIntIntHashMap
    * @param defaultValue
    *          value to be returned when looking up a nonexistent key.
    */
-  public WatersIntIntHashMap(final int initialCapacity, final int defaultValue,
+  public WatersIntIntHashMap(final int initialCapacity,
+                             final int defaultValue,
                              final float loadFactor)
   {
     super(initialCapacity, loadFactor);
@@ -173,11 +175,10 @@ public class WatersIntIntHashMap
    *          an <code>int</code> value
    * @return the actual capacity chosen
    */
-  protected int setUp(final int initialCapacity)
+  @Override
+  public int setUp(final int initialCapacity)
   {
-    int capacity;
-
-    capacity = super.setUp(initialCapacity);
+    final int capacity = super.setUp(initialCapacity);
     mValues = new int[capacity];
     return capacity;
   }

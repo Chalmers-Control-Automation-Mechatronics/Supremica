@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import net.sourceforge.waters.model.base.ProxyTools;
+
 
 /**
  * <P>A memory efficient container to store several linked lists of
@@ -480,8 +482,9 @@ public class IntListBuffer
 
   //#########################################################################
   //# Inner Interface Iterator
-  public interface Iterator
+  public interface Iterator extends WatersIntIterator
   {
+
     /**
      * Resets iteration to the start of the given list.
      * The next call to {@link #advance() will set the iterator to the
@@ -502,23 +505,6 @@ public class IntListBuffer
     public void reset(int list, int prev);
 
     /**
-     * Advances iteration.
-     * This method moves the iterator one step forward.
-     * It must be called before trying to access the list using the
-     * {@link #getCurrentData()} or {@link #setCurrentData(int)
-     * setCurrentData()} methods.
-     * @return <CODE>true</CODE> if the iteration contains another element
-     *         that is now accessible, or <CODE>false</CODE> if the end of
-     *         the list has been reached.
-     */
-    public boolean advance();
-
-    /**
-     * Retrieves the list element at the current position of this iterator.
-     */
-    public int getCurrentData();
-
-    /**
      * Stores the given value in the list at the current position of this
      * iterator.
      */
@@ -534,7 +520,7 @@ public class IntListBuffer
     //# Constructor
     private ReadOnlyIterator()
     {
-      mCurrent = NULL;
+      mHead = mCurrent = NULL;
     }
 
     private ReadOnlyIterator(final int list)
@@ -543,23 +529,10 @@ public class IntListBuffer
     }
 
     //#########################################################################
-    //# Interface Iterator
-    public void reset(final int list)
+    //# Interface WatersIntIterator
+    public void reset()
     {
-      if (list != NULL) {
-        mCurrent = list;
-      } else {
-        throw new IllegalArgumentException("List head cannot be NULL!");
-      }
-    }
-
-    public void reset(final int list, final int prev)
-    {
-      if (list == NULL || prev == NULL) {
-        reset(list);
-      } else {
-        mCurrent = prev;
-      }
+      mCurrent = mHead;
     }
 
     public boolean advance()
@@ -578,6 +551,33 @@ public class IntListBuffer
       }
     }
 
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support removal of elements!");
+    }
+
+    //#########################################################################
+    //# Interface Iterator
+    public void reset(final int list)
+    {
+      if (list != NULL) {
+        mHead = mCurrent = list;
+      } else {
+        throw new IllegalArgumentException("List head cannot be NULL!");
+      }
+    }
+
+    public void reset(final int list, final int prev)
+    {
+      if (list == NULL || prev == NULL) {
+        reset(list);
+      } else {
+        mCurrent = prev;
+      }
+    }
+
     public void setCurrentData(final int data)
     {
       if (mCurrent != NULL) {
@@ -586,12 +586,6 @@ public class IntListBuffer
         throw new NoSuchElementException
           ("Writing past end of list in IntListBuffer!");
       }
-    }
-
-    public void remove()
-    {
-      throw new UnsupportedOperationException
-        ("ReadOnlyIterator does not support removal of elements!");
     }
 
     //#########################################################################
@@ -603,6 +597,7 @@ public class IntListBuffer
 
     //#########################################################################
     //# Data Members
+    private int mHead;
     private int mCurrent;
 
   }
@@ -622,6 +617,55 @@ public class IntListBuffer
     private ModifyingIterator(final int list)
     {
       reset(list);
+    }
+
+    //#########################################################################
+    //# Interface WatersIntIterator
+    public void reset()
+    {
+      mPrevious = NULL;
+      mCurrent = mHead;
+    }
+
+    public boolean advance()
+    {
+      mPrevious = mCurrent;
+      mCurrent = getNext(mCurrent);
+      return mCurrent != NULL;
+    }
+
+    public int getCurrentData()
+    {
+      if (mCurrent != NULL) {
+        return getData(mCurrent);
+      } else {
+        throw new NoSuchElementException
+          ("Reading past end of list in IntListBuffer!");
+      }
+    }
+
+    public void remove()
+    {
+      if (mPrevious != NULL) {
+        final int[] block = mBlocks.get(mCurrent >> BLOCK_SHIFT);
+        final int offset = mCurrent & BLOCK_MASK;
+        final int next = block[offset + OFFSET_NEXT];
+        if (next != NULL) {
+          setNext(mPrevious, next);
+        } else if (mPrevious == mHead) {
+          setDataAndNext(mHead, NULL, NULL);
+        } else {
+          setNext(mPrevious, next);
+          setData(mHead, mPrevious);
+        }
+        block[offset + OFFSET_NEXT] = mRecycleStart;
+        mRecycleStart = mCurrent;
+        mCurrent = mPrevious;
+        mPrevious = NULL;
+      } else {
+        throw new IllegalStateException
+          ("Attempting to remove without previous call to advance()!");
+      }
     }
 
     //#########################################################################
@@ -647,23 +691,6 @@ public class IntListBuffer
       }
     }
 
-    public boolean advance()
-    {
-      mPrevious = mCurrent;
-      mCurrent = getNext(mCurrent);
-      return mCurrent != NULL;
-    }
-
-    public int getCurrentData()
-    {
-      if (mCurrent != NULL) {
-        return getData(mCurrent);
-      } else {
-        throw new NoSuchElementException
-          ("Reading past end of list in IntListBuffer!");
-      }
-    }
-
     public void setCurrentData(final int data)
     {
       if (mCurrent != NULL) {
@@ -676,30 +703,6 @@ public class IntListBuffer
 
     //#########################################################################
     //# Specific Access
-    public void remove()
-    {
-      if (mPrevious != NULL) {
-        final int[] block = mBlocks.get(mCurrent >> BLOCK_SHIFT);
-        final int offset = mCurrent & BLOCK_MASK;
-        final int next = block[offset + OFFSET_NEXT];
-        if (next != NULL) {
-          setNext(mPrevious, next);
-        } else if (mPrevious == mHead) {
-          setDataAndNext(mHead, NULL, NULL);
-        } else {
-          setNext(mPrevious, next);
-          setData(mHead, mPrevious);
-        }
-        block[offset + OFFSET_NEXT] = mRecycleStart;
-        mRecycleStart = mCurrent;
-        mCurrent = mPrevious;
-        mPrevious = NULL;
-      } else {
-        throw new IllegalStateException
-          ("Attempting to remove without previous call to advance()!");
-      }
-    }
-
     /**
      * Removes the current item from the list being iterated over,
      * and adds it to the end of the specified list.

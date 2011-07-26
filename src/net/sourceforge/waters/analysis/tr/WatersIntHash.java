@@ -126,10 +126,10 @@ abstract public class WatersIntHash
    * @param initialCapacity an <code>int</code> value
    * @return the actual capacity chosen
    */
-  protected int setUp(final int initialCapacity) {
-    int capacity;
-
-    capacity = super.setUp(initialCapacity);
+  @Override
+  public int setUp(final int initialCapacity)
+  {
+    final int capacity = super.setUp(initialCapacity);
     _set = new int[capacity];
     return capacity;
   }
@@ -289,4 +289,50 @@ abstract public class WatersIntHash
   {
     return val1 == val2;
   }
+
+
+  //########################################################################
+  //# Inner Class HashIterator
+  final class HashIterator implements WatersIntIterator
+  {
+    //######################################################################
+    //# Constructor
+    HashIterator()
+    {
+      reset();
+    }
+
+    //######################################################################
+    //# Interface net.sourceforge.waters.analysis.tr.WatersIntIterator
+    public void reset()
+    {
+      mIndex = -1;
+    }
+
+    public boolean advance()
+    {
+      while (mIndex < _states.length) {
+        mIndex++;
+        if (_states[mIndex] == FULL) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    public int getCurrentData()
+    {
+      return _set[mIndex];
+    }
+
+    public void remove()
+    {
+      removeAt(mIndex);
+    }
+
+    //######################################################################
+    //# Data Members
+    private int mIndex;
+  }
+
 }
