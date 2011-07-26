@@ -738,7 +738,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
         }
       }
-    return new PromelaGraph(events,mFactory);
+    final boolean isEnd = checkEnd(t.getParent());
+    //  final boolean isEnd = false;
+      return new PromelaGraph(events,isEnd,mFactory);
   }
 
   public Object visitConstant(final ConstantTreeNode t)
@@ -838,11 +840,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitCondition(final ConditionTreeNode t)
   {
     PromelaGraph result = null;
-
+    final boolean isEnd = checkEnd(t.getParent());
     for(int i=0;i<t.getChildCount();i++){
       mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-      result = PromelaGraph.combineComposition(result,step,mUnWinding,mFactory);
+      result = PromelaGraph.combineComposition(result,step,mUnWinding,isEnd,mFactory);
 
     }
 
@@ -852,7 +854,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
     final boolean unwinding = mUnWinding;
-   // final boolean isEnd = checkEnd((PromelaTree) t.getParent());
+    final boolean isEnd = checkEnd(t.getParent());
     counter =counter+1;
     Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode)){
@@ -867,7 +869,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       branches.add(step);
     }
-    final boolean isEnd = false;
+   // final boolean isEnd = false;
     result = PromelaGraph.doCombineComposition2(branches, unwinding,isEnd,mFactory);
     mLabelEnd.put(""+counter,endNode);
 
@@ -1033,21 +1035,17 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     final String name = chanNames.get(0);
     final ModuleProxyCloner cloner = mFactory.getCloner();
- //   final GraphProxy graph = mFactory.createGraphProxy(true, null, mChannelNode, mChannelEdge);
- //  final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("channel_"+name);
- //   final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
- //   mCompleteComponents.add(component);
- //   mCompleteComponents.addAll(mComponents);
+
   }
-  public boolean checkEnd(final PromelaTree t){
+  public boolean checkEnd(final Tree t){
     if(t instanceof LabelTreeNode){
-    final String temp = t.getText();
-    if(temp.length()>=3){
-      final String end = temp.substring(0, 3);
-      if(end.toLowerCase().equals("end")){
-        return true;
+      final String temp = t.getText();
+      if(temp.length()>=3){
+        final String end = temp.substring(0, 3);
+        if(end.toLowerCase().equals("end")){
+          return true;
+        }
       }
-    }
     }
     return false;
   }

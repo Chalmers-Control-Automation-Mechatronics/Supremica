@@ -241,9 +241,9 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
       if(test) chanIn.getValue().addMsgList(m);
     }
-      //a++;
+
     }
-   // while(a<=recipients.size());
+
 
     final ArrayList<Message> tempstore = new ArrayList<Message>();
     for(final Message msg: chanIn.getValue().getOutput()){

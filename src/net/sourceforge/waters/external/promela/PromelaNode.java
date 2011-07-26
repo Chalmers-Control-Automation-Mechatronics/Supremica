@@ -103,7 +103,9 @@ public class PromelaNode
     mEndType = EndType.BREAK;
   }
   public void setEnd(final boolean i){
-    mEndType = EndType.END;
+    if(i){
+      mEndType = EndType.END;
+    }
   }
 
 

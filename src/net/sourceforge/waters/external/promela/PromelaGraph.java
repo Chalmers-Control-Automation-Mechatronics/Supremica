@@ -12,6 +12,7 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -47,20 +48,43 @@ public class PromelaGraph
 
   }
 
-  public PromelaGraph(final List<IdentifierProxy> events, final ModuleProxyFactory factory){
+  public PromelaGraph(final List<IdentifierProxy> events, final ModuleProxyFactory mFactory){
     mPromelaStartNode = new PromelaNode();
     final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
-
-    final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(events);
+    final ModuleProxyCloner cloner = mFactory.getCloner();
+    final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(cloner.getClonedList(events));
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final Comparator<SimpleExpressionProxy> comparator =
       new ExpressionComparator(optable);
     if(tempLabel.size()>1){
       Collections.sort(tempLabel, comparator);
     }
-    final Collection<SimpleExpressionProxy> labelBlock = new ArrayList<SimpleExpressionProxy>(tempLabel);
+    //final Collection<SimpleExpressionProxy> labelBlock = new ArrayList<SimpleExpressionProxy>(tempLabel);
 
-    final PromelaLabel label = new PromelaLabel(labelBlock);
+    final PromelaLabel label = new PromelaLabel(tempLabel);
+
+    final PromelaEdge edge = new PromelaEdge(mPromelaStartNode, promelaEndNode, label);
+    mPromelaEdges.add(edge);
+    mPromelaNodes.add(mPromelaStartNode);
+    mPromelaNodes.add(promelaEndNode);
+
+  }
+
+  public PromelaGraph(final List<IdentifierProxy> events, final boolean isEnd, final ModuleProxyFactory mFactory){
+    mPromelaStartNode = new PromelaNode();
+    mPromelaStartNode.setEnd(isEnd);
+    final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
+    final ModuleProxyCloner cloner = mFactory.getCloner();
+    final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(cloner.getClonedList(events));
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final Comparator<SimpleExpressionProxy> comparator =
+      new ExpressionComparator(optable);
+    if(tempLabel.size()>1){
+      Collections.sort(tempLabel, comparator);
+    }
+    //final Collection<SimpleExpressionProxy> labelBlock = new ArrayList<SimpleExpressionProxy>(tempLabel);
+
+    final PromelaLabel label = new PromelaLabel(tempLabel);
 
     final PromelaEdge edge = new PromelaEdge(mPromelaStartNode, promelaEndNode, label);
     mPromelaEdges.add(edge);
@@ -253,6 +277,7 @@ public class PromelaGraph
   public static PromelaGraph combineComposition(final PromelaGraph first,
                                                 final PromelaGraph second,
                                                 final boolean unwind,
+                                                final boolean isEnd,
                                                 final ModuleProxyFactory factory)
   {
 
@@ -273,6 +298,7 @@ public class PromelaGraph
       PromelaGraph output = null;
 
       final PromelaNode newStartNode = new PromelaNode();
+      newStartNode.setEnd(isEnd);
       final PromelaNode newEndNode = new PromelaNode(PromelaNode.EndType.END);
       final List<PromelaEdge> edgesOfResult =
         new ArrayList<PromelaEdge>();  // edgesOfFirst.size() + edgesOfSecond.size()
@@ -439,36 +465,7 @@ public class PromelaGraph
           edgesOfResult.add(edge);
         }
       }
-      /*
-      if(simpleFirst&& simpleSecond){
-      //  edgesOfResult.remove(specialEdge1);
-      //  edgesOfResult.remove(specialEdge2);
-        PromelaLabel label = new PromelaLabel(specialLabel);
-        PromelaEdge edge = new PromelaEdge(newStartNode, newEndNode,label);
-        if(!edgesOfResult.contains(edge)){
-          edgesOfResult.add(edge);
-        }else{
-          System.out.println("make sure");
-          final PromelaEdge tempEdge = edgesOfResult.get(edgesOfResult.indexOf(edge));
-          final Collection<SimpleExpressionProxy> l = new ArrayList<SimpleExpressionProxy>();
-          l.addAll(tempEdge.getLabelBlock().getCloneLabel(factory));
-          loop1:
-          for(final SimpleExpressionProxy e: specialLabel){
-            for(final SimpleExpressionProxy e2: l){
-              if(e.getPlainText()==e2.getPlainText()){
-                continue loop1;
-              }
-            }
-            l.add(e);
-          }
-          label = new PromelaLabel(l);
-          edge = new PromelaEdge(newStartNode,newEndNode,label);
-          edgesOfResult.add(edge);
-        }
-        simpleFirst = false;
-        simpleSecond = false;
-      }
-*/
+
       final List<PromelaNode> nodesOfResult =
         new ArrayList<PromelaNode>();  //nodesOfFirst.size()+nodesOfSecond.size()-2
       for (final PromelaNode node : nodesOfFirst) {
@@ -500,12 +497,9 @@ public class PromelaGraph
       new ExpressionComparator(optable);
     //create nodes
     final List<PromelaNode> nodes = new ArrayList<PromelaNode>();
-    final PromelaNode newStartNode;
-  //  if(isEnd){
-   //   newStartNode = new PromelaNode(PromelaNode.EndType.END);
-   // }else{
-      newStartNode = new PromelaNode();
- //  }
+    final PromelaNode newStartNode = new PromelaNode();
+    newStartNode.setEnd(isEnd);
+
     PromelaNode secondStart;
     nodes.add(newStartNode);
     for(final PromelaGraph branch: branches){
