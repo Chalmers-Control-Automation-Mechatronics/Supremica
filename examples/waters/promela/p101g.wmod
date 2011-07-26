@@ -1,172 +1,170 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="p101b" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Imported from Promela file p101b.pml.</ns2:Comment>
+<Module Name="p101g" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Imported from Promela file p101g.pml.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="exch_ch">
+        <EventDecl Kind="CONTROLLABLE" Name="run_producer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="run_consumer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="exch_msg">
             <RangeList>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="1"/>
-                    <IntConstant Value="2"/>
+                    <IntConstant Value="1"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
+                    <IntConstant Value="4"/>
                     <IntConstant Value="4"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="run_A"/>
-        <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="exch_ack">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT" Name="proctype_A">
+        <SimpleComponent Kind="PLANT" Name="proctype_producer">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="A_0">
+                    <SimpleNode Initial="true" Name="producer_0">
                         <PointGeometry>
-                            <Point Y="64" X="80"/>
+                            <Point Y="48" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="9"/>
+                            <Point Y="-9" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="A_1">
+                    <SimpleNode Name="producer_1">
                         <PointGeometry>
-                            <Point Y="144" X="80"/>
+                            <Point Y="128" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="9"/>
+                            <Point Y="-8" X="11"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="A_2">
+                    <SimpleNode Name="producer_2">
                         <PointGeometry>
-                            <Point Y="224" X="80"/>
+                            <Point Y="208" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="7"/>
+                            <Point Y="-8" X="10"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="A_3">
-                        <PointGeometry>
-                            <Point Y="304" X="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="7"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="A_4">
+                    <SimpleNode Name="producer_3">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="384" X="80"/>
+                            <Point Y="288" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="8"/>
+                            <Point Y="-6" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="A_1" Source="A_0">
+                    <Edge Target="producer_1" Source="producer_0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="run_A"/>
+                            <SimpleIdentifier Name="run_producer"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="5"/>
+                                <Point Y="-12" X="8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="A_2" Source="A_1">
+                    <Edge Target="producer_2" Source="producer_1">
                         <LabelBlock>
-                            <IndexedIdentifier Name="exch_ch">
-                                <IntConstant Value="1"/>
-                                <IntConstant Value="3"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="A_3" Source="A_2">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="exch_ch">
+                            <IndexedIdentifier Name="exch_msg">
                                 <IntConstant Value="1"/>
                                 <IntConstant Value="4"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="2"/>
+                                <Point Y="-9" X="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="A_4" Source="A_3">
+                    <Edge Target="producer_3" Source="producer_2">
                         <LabelBlock>
-                            <IndexedIdentifier Name="exch_ch">
-                                <IntConstant Value="2"/>
-                                <IntConstant Value="0"/>
+                            <IndexedIdentifier Name="exch_ack">
+                                <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="3"/>
+                                <Point Y="-7" X="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="proctype_B">
+        <SimpleComponent Kind="PLANT" Name="proctype_consumer">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="B_0">
+                    <SimpleNode Initial="true" Name="consumer_0">
                         <PointGeometry>
-                            <Point Y="64" X="80"/>
+                            <Point Y="48" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="9"/>
+                            <Point Y="-6" X="6"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="B_1">
+                    <SimpleNode Name="consumer_1">
                         <PointGeometry>
-                            <Point Y="144" X="80"/>
+                            <Point Y="128" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="9"/>
+                            <Point Y="-7" X="6"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="B_2">
+                    <SimpleNode Name="consumer_2">
+                        <PointGeometry>
+                            <Point Y="208" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="consumer_3">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="224" X="80"/>
+                            <Point Y="288" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="7"/>
+                            <Point Y="-6" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="B_1" Source="B_0">
+                    <Edge Target="consumer_1" Source="consumer_0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="run_B"/>
+                            <SimpleIdentifier Name="run_consumer"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="5"/>
+                                <Point Y="-9" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="B_2" Source="B_1">
+                    <Edge Target="consumer_2" Source="consumer_1">
                         <LabelBlock>
-                            <IndexedIdentifier Name="exch_ch">
-                                <IntConstant Value="1"/>
-                                <IntConstant Value="3"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="exch_ch">
+                            <IndexedIdentifier Name="exch_msg">
                                 <IntConstant Value="1"/>
                                 <IntConstant Value="4"/>
                             </IndexedIdentifier>
-                            <IndexedIdentifier Name="exch_ch">
-                                <IntConstant Value="2"/>
-                                <IntConstant Value="0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="consumer_3" Source="consumer_2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="exch_ack">
+                                <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="3"/>
+                                <Point Y="-10" X="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -181,7 +179,7 @@
                             <Point Y="48" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="10"/>
+                            <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_1">
@@ -189,7 +187,7 @@
                             <Point Y="128" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="8"/>
+                            <Point Y="-7" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_2">
@@ -200,22 +198,22 @@
                             <Point Y="208" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="9"/>
+                            <Point Y="-6" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Target="init_1" Source="init_0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="run_A"/>
+                            <SimpleIdentifier Name="run_producer"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="6"/>
+                                <Point Y="-8" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Target="init_2" Source="init_1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="run_B"/>
+                            <SimpleIdentifier Name="run_consumer"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-7" X="5"/>
                             </LabelGeometry>

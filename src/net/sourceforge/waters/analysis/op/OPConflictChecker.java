@@ -82,7 +82,7 @@ import org.apache.log4j.Logger;
  *
  * <I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
- * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.
+ * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
  * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
  * Nonblocking, Proc. 7th International Conference on Control and Automation,
  * ICCA'09, 448-453, Christchurch, New Zealand, 2009.<BR>
@@ -712,6 +712,12 @@ public class OPConflictChecker
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
+    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+      new NonAlphaDeterminisationTRSimplifier();
+    nonAlphaDeterminiser.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+    nonAlphaDeterminiser.setTransitionLimit(mInternalTransitionLimit);
+    chain.add(nonAlphaDeterminiser);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
