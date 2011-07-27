@@ -195,24 +195,16 @@ public class WatersIntHashSet
 
   //#########################################################################
   //# Overrides for java.lang.Object
-  /**
-   * @return a deep clone of this collection.
-   */
-  @Override
-  public Object clone()
-  {
-    return (WatersIntHashSet) super.clone();
-  }
-
   @Override
   public boolean equals(final Object other)
   {
     if (other.getClass() == getClass()) {
       final WatersIntHashSet that = (WatersIntHashSet) other;
-      if (that.size() != this.size()) {
+      if (that.size() != size()) {
         return false;
       }
-      return forEach(new EqProcedure(that));
+      final EqProcedure proc = that.new EqProcedure();
+      return forEach(proc);
     } else {
       return false;
     }
@@ -263,7 +255,6 @@ public class WatersIntHashSet
   public void clear()
   {
     super.clear();
-    Arrays.fill(_set, 0, _set.length, (int) 0);
     Arrays.fill(_states, 0, _states.length, FREE);
   }
 
@@ -311,6 +302,27 @@ public class WatersIntHashSet
   {
     final int index = index(value);
     return index < 0 ? mDefaultValue : _set[index];
+  }
+
+  /**
+   * Attempts to add the given value to this set.
+   * @return The number equal to the given value now present in the set.
+   *         If the set already contained a number considered equal to the
+   *         value before the call, that number is returned. Otherwise, the
+   *         new value is added and returned.
+   */
+  public int getOrAdd(final int value)
+  {
+    final int index = insertionIndex(value);
+    if (index >= 0) {
+      final byte previousState = _states[index];
+      _set[index] = value;
+      _states[index] = FULL;
+      postInsertHook(previousState == FREE);
+      return value;
+    } else {
+      return _set[-index - 1];
+    }
   }
 
   /**
@@ -397,25 +409,14 @@ public class WatersIntHashSet
 
   //########################################################################
   //# Inner Class EqProcedure
-  private static final class EqProcedure implements TIntProcedure
+  private final class EqProcedure implements TIntProcedure
   {
-    //######################################################################
-    //# Constructor
-    private EqProcedure(final WatersIntHashSet otherSet)
-    {
-      mOtherSet = otherSet;
-    }
-
     //######################################################################
     //# Interface gnu.trove.TIntProcedure
     public final boolean execute(final int value)
     {
-      return mOtherSet.contains(value);
+      return contains(value);
     }
-
-    //######################################################################
-    //# Data Members
-    private final WatersIntHashSet mOtherSet;
   }
 
 
