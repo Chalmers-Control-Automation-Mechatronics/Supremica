@@ -38,7 +38,7 @@ public class PreTransitionBuffer
     mBlocks = new ArrayList<int[]>();
     mCurrentState = mCurrentEvent = mCurrentOffset = -1;
     mCurrentBlock = null;
-    mCurrentFanout = mMaxFanout = 0;
+    mNumTransitions = mCurrentFanout = mMaxFanout = 0;
   }
 
 
@@ -57,6 +57,15 @@ public class PreTransitionBuffer
       mCurrentFanout++;
     }
     append(to);
+    mNumTransitions++;
+  }
+
+  /**
+   * Gets the number of transitions added to this buffer.
+   */
+  public int size()
+  {
+    return mNumTransitions;
   }
 
 
@@ -195,6 +204,7 @@ public class PreTransitionBuffer
   private final int mEventMask;
   private final List<int[]> mBlocks;
 
+  private int mNumTransitions;
   private int mCurrentState;
   private int mCurrentEvent;
   private int[] mCurrentBlock;

@@ -327,15 +327,11 @@ public class EventCollectingVisitor implements PromelaVisitor
     final ChanInfo c = chanIn.getValue();
     final int lengthOfChan = c.getChanLength();
     final String chanName = chanIn.getKey();
-    boolean sending = false;
-
-    final boolean receiving = false;
     for(final Message m: cloneOutput){
     //  if(!sending){
       if(!c.isSenderPresent()){
       if(m.getSenders().size()>1){
         c.setSenders(true);
-        sending = true;
       }else if(m.getSenders().size()==1){
         final int occurrences = occur.get(m.getSenders().get(0));
      //   if(occurrences>1){
@@ -385,7 +381,6 @@ public class EventCollectingVisitor implements PromelaVisitor
             }
           }
           c.addSenders(tempList);
-          sending = true;
         } else if (m.getSenders().size() == 1) {
           final int occurrences = occur.get(m.getSenders().get(0));
       //    c.setSenders(occurrences > 1);
@@ -420,7 +415,6 @@ public class EventCollectingVisitor implements PromelaVisitor
           c.addRecipients(tempList);
 
         } else if (m.getRecipients().size() == 1) {
-          final int occurance = occur.get(m.getRecipients().get(0));
      //     c.setRecipients(occurance > 1);
           if (c.isRecipientPresent()) {
             final Collection<String> tempList = new ArrayList<String>();

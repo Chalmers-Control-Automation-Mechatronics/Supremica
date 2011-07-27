@@ -48,16 +48,16 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
   //#########################################################################
   //# Constructors
-  public IntSetBuffer(final int maxData)
+  public IntSetBuffer(final int numValues)
   {
-    this(maxData, 0);
+    this(numValues, 0);
   }
 
-  public IntSetBuffer(final int maxData, final int initialSize)
+  public IntSetBuffer(final int numValues, final int initialSize)
   {
-    mSizeShift = AutomatonTools.log2(maxData + 2);
+    mSizeShift = AutomatonTools.log2(numValues + 1);
     mSizeMask = (1 << mSizeShift) - 1;
-    mDataShift = AutomatonTools.log2(maxData + 1);
+    mDataShift = AutomatonTools.log2(numValues);
     mDataMask = (1 << mDataShift) - 1;
     mBlocks = new ArrayList<int[]>();
     final int[] block = new int[BLOCK_SIZE];

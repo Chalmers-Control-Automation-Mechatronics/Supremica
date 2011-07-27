@@ -605,6 +605,14 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Creates a markings pattern representing an empty set of propositions.
+   */
+  public long createMarkings()
+  {
+    return mStateBuffer.createMarkings();
+  }
+
+  /**
    * Creates a markings pattern for the given propositions.
    * @param  props    Collection of proposition IDs defining a state marking.
    * @return A number identifying the given combination of propositions.

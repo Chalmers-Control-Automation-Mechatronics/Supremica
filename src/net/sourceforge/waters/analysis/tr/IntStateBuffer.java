@@ -370,6 +370,14 @@ public class IntStateBuffer
   }
 
   /**
+   * Creates markings pattern representing an empty set of propositions.
+   */
+  public long createMarkings()
+  {
+    return 0;
+  }
+
+  /**
    * Creates markings pattern for the given propositions.
    * @param  props    Collection of proposition IDs defining a state marking.
    * @return A number identifying the given combination of propositions.
