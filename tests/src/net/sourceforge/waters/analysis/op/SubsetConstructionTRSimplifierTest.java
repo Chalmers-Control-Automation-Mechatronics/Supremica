@@ -51,26 +51,58 @@ public class SubsetConstructionTRSimplifierTest
 
   //#########################################################################
   //# Test Cases
+  public void test_determinisation_1()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_1.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_determinisation_2()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_2.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_determinisation_3()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_3.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_determinisation_4()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_4.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
+   */
   public void testReentrant() throws Exception
   {
-    test_determinisation_12();
+    test_determinisation_4();
+    test_determinisation_3();
+    test_determinisation_2();
     test_determinisation_1();
     test_determinisation_2();
     test_determinisation_3();
-    test_determinisation_11();
-    test_determinisation_13();
     test_determinisation_4();
-    test_determinisation_20();
-    test_determinisation_8();
-    test_determinisation_14();
-    test_determinisation_1();
-    test_determinisation_10();
+    test_determinisation_3();
     test_determinisation_2();
-    test_determinisation_9();
+    test_determinisation_1();
   }
-   */
 
 }

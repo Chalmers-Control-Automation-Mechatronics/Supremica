@@ -503,6 +503,15 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Gets a marking pattern containing all propositions currently marked
+   * as used.
+   */
+  public long getUsedPropositions()
+  {
+    return mStateBuffer.getUsedPropositions();
+  }
+
+  /**
    * Gets a number that identifies the complete set of markings for the
    * given state.
    * @param  state   ID of the state to be examined.
@@ -1576,10 +1585,10 @@ public class ListBufferTransitionRelation
 
   /**
    * Reconfigures the current set of transition buffers.
-   * @param  config   Configuration flags defining which transition buffers
-   *                  are to be used from now on. Should be one of
-   *                  {@link #CONFIG_SUCCESSORS},
-   *                  {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @param  config       Configuration flags defining which transition buffers
+   *                      are to be used from now on. Should be one of
+   *                      {@link #CONFIG_SUCCESSORS},
+   *                      {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
    */
   public void reconfigure(final int config)
   {
@@ -1635,6 +1644,35 @@ public class ListBufferTransitionRelation
           null : new IncomingTransitionListBuffer(mSuccessorBuffer);
     mSuccessorBuffer = newSucc;
     mPredecessorBuffer = newPred;
+  }
+
+  /**
+   * Resets this transition relation to use a different state set.
+   * @param  newStates    State buffer containing new states and markings.
+   * @param  numTrans     Estimated number of transitions.
+   * @param  config       Configuration flags defining which transition buffers
+   *                      are to be used from now on. Should be one of
+   *                      {@link #CONFIG_SUCCESSORS},
+   *                      {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @throws OverflowException
+   */
+  public void reset(final IntStateBuffer newStates,
+                    final int numTrans,
+                    final int config)
+  throws OverflowException
+  {
+    checkConfig(config);
+    final int numEvents = getNumberOfProperEvents();
+    final int numStates = newStates.getNumberOfStates();
+    mStateBuffer = newStates;
+    if ((config & CONFIG_SUCCESSORS) != 0) {
+      mSuccessorBuffer =
+        new OutgoingTransitionListBuffer(numEvents, numStates, numTrans);
+    }
+    if ((config & CONFIG_PREDECESSORS) != 0) {
+      mPredecessorBuffer =
+        new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
+    }
   }
 
 

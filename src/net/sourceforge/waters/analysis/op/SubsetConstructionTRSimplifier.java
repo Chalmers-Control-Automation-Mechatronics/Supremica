@@ -14,6 +14,7 @@ import gnu.trove.TIntHashSet;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
+import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
@@ -22,7 +23,6 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -192,17 +192,18 @@ public class SubsetConstructionTRSimplifier
         final int set = mSetOffsets.get(source);
         for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
           checkAbort();
+          mEventIterator.resetEvent(event);
           iter.reset(set);
           while (iter.advance()) {
             final int state = iter.getCurrentData();
-            mEventIterator.reset(state, event);
+            mEventIterator.resume(state);
             while (mEventIterator.advance()) {
               final int target = mEventIterator.getCurrentTargetState();
               current.add(target);
             }
           }
-          final int offset = mStateSetBuffer.add(current);
           if (!current.isEmpty()) {
+            final int offset = mStateSetBuffer.add(current);
             if (mTransitionBuffer.size() >= mTransitionLimit) {
               throw new OverflowException(OverflowKind.TRANSITION,
                                           mTransitionLimit);
@@ -236,33 +237,34 @@ public class SubsetConstructionTRSimplifier
   {
     if (mSetOffsets != null) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final String name = rel.getName();
-      final ComponentKind kind = rel.getKind();
       final int numDetStates = mSetOffsets.size();
-      final int numEvents = rel.getNumberOfProperEvents();
       final int numProps = rel.getNumberOfPropositions();
-      final int config = getPreferredInputConfiguration();
-      final ListBufferTransitionRelation detRel =
-        new ListBufferTransitionRelation(name, kind, numEvents,
-                                         numProps, numDetStates, config);
-      detRel.setInitial(0, true);
+      final long usedProps = rel.getUsedPropositions();
+      final IntStateBuffer detStates =
+        new IntStateBuffer(numDetStates, numProps, usedProps);
+      detStates.setInitial(0, true);
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       for (int detstate = 0; detstate < numDetStates; detstate++) {
-        long markings = detRel.createMarkings();
+        long markings = detStates.createMarkings();
         final int offset = mSetOffsets.get(detstate);
         iter.reset(offset);
         while (iter.advance()) {
           final int state = iter.getCurrentData();
           final long stateMarkings = rel.getAllMarkings(state);
-          markings = detRel.mergeMarkings(markings, stateMarkings);
+          markings = detStates.mergeMarkings(markings, stateMarkings);
         }
-        detRel.setAllMarkings(detstate, markings);
+        detStates.setAllMarkings(detstate, markings);
       }
+      detStates.removeRedundantPropositions();
       mSetOffsets = null;
       mStateSetBuffer = null;
-      mTransitionBuffer.addOutgoingTransitions(detRel);
+      final int numTrans = mTransitionBuffer.size();
+      final int config = getPreferredInputConfiguration();
+      rel.reset(detStates, numTrans, config);
+      rel.removeEvent(EventEncoding.TAU);
+      mTransitionBuffer.addOutgoingTransitions(rel);
       mTransitionBuffer = null;
-      setTransitionRelation(detRel);
+      rel.removeProperSelfLoopEvents();
     }
   }
 
