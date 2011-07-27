@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="determinisation_27" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="nonalphadet_27" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A test for the non-alpha determinisation rule. This test checks whether states reachable by tau-transitions from different alpha-marked states are kept separate.</ns2:Comment>
     <EventDeclList>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>

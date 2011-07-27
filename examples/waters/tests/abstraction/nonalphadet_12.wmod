@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="determinisation_11" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This test checks whether two states which can be reached by exactly the same strings but other strings also exist can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
+<Module Name="nonalphadet_12" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This test checks whether the alpha marking not being in the model alphabet can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -56,9 +56,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="S3">
-                        <EventList>
-                            <SimpleIdentifier Name=":alpha"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="80" X="16"/>
                         </PointGeometry>
@@ -80,7 +77,6 @@
                     </Edge>
                     <Edge Target="S1" Source="S3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
                             <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
                     </Edge>

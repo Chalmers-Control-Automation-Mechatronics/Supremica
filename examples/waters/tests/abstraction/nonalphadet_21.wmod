@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="determinisation_23" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This test checks whether with all states explicitly marked :alpha can be handled correctly. Without :alpha markings, states S0, S1, and S2 could be merged, but with the states marked :alpha, the automaton cannot be simplified.</ns2:Comment>
+<Module Name="nonalphadet_21" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This test checks that states which are reachable by the exact same strings, and both have the alpha marking can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -11,6 +11,7 @@
         <EventDecl Kind="CONTROLLABLE" Name="e2"/>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
         <EventDecl Kind="PROPOSITION" Name=":alpha"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e3"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">
@@ -27,6 +28,39 @@
                             <Point Y="4" X="-23"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point Y="80" X="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-27"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="32" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="S1">
                         <EventList>
                             <SimpleIdentifier Name=":alpha"/>
@@ -38,65 +72,32 @@
                             <Point Y="-15" X="-23"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S3">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                            <SimpleIdentifier Name=":alpha"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="80" X="176"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="7" X="1"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name=":alpha"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="80" X="48"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="0" X="-27"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-16"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Target="S2" Source="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="0" X="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
+                    <Edge Target="S5" Source="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
                     <Edge Target="S1" Source="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="-24"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S3" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S3" Source="S2">
-                        <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
-                            <SimpleIdentifier Name="e2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-2" X="2"/>
+                                <Point Y="-23" X="-29"/>
                             </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S4" Source="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>

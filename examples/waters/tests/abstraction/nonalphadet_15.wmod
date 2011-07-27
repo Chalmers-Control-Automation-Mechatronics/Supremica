@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="determinisation_14" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This test checks whether two states reachable by exactly the same strings, except one path has an omega marked state can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
+<Module Name="nonalphadet_15" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This test checks whether a state and its successor which both need merging can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -26,9 +26,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="32" X="112"/>
                         </PointGeometry>
@@ -97,7 +94,7 @@
                     </Edge>
                     <Edge Target="S5" Source="S2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="e3"/>
+                            <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>
@@ -125,27 +122,13 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="32" X="192"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S5">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="128" X="192"/>
+                            <Point Y="80" X="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="10" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S3">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="80" X="112"/>
                         </PointGeometry>
@@ -163,11 +146,6 @@
                     <Edge Target="S4" Source="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S5" Source="S3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e3"/>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>

@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
- * A test for the determinisation of non alpha states rule
+ * A test for the nonalphadet of non alpha states rule
  * ({@link NonAlphaDeterminisationTRSimplifier}).
  *
  * This test is to be used with caution because the same bisimulation module (
@@ -77,31 +77,31 @@ public class NonAlphaDeterminisationTRSimplifierTest
 
   //#########################################################################
   //# Test Cases
-  public void test_determinisation_1() throws Exception
+  public void test_nonalphadet_1() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_1.wmod";
+    final String name = "nonalphadet_1.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_2() throws Exception
+  public void test_nonalphadet_2() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_2.wmod";
+    final String name = "nonalphadet_2.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_3() throws Exception
+  public void test_nonalphadet_3() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_3.wmod";
+    final String name = "nonalphadet_3.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_4() throws Exception
+  public void test_nonalphadet_4() throws Exception
   {
     final NonAlphaDeterminisationTRSimplifier simplifier =
       (NonAlphaDeterminisationTRSimplifier) getTransitionRelationSimplifier();
@@ -109,199 +109,199 @@ public class NonAlphaDeterminisationTRSimplifierTest
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_4.wmod";
+    final String name = "nonalphadet_4.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_5() throws Exception
+  public void test_nonalphadet_5() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_5.wmod";
+    final String name = "nonalphadet_5.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_6() throws Exception
+  public void test_nonalphadet_6() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_6.wmod";
+    final String name = "nonalphadet_6.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_7() throws Exception
+  public void test_nonalphadet_7() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_7.wmod";
+    final String name = "nonalphadet_7.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_8() throws Exception
+  public void test_nonalphadet_8() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_8.wmod";
+    final String name = "nonalphadet_8.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_9() throws Exception
+  public void test_nonalphadet_9() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_9.wmod";
+    final String name = "nonalphadet_9.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_10() throws Exception
+  public void test_nonalphadet_10() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_10.wmod";
+    final String name = "nonalphadet_10.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_11() throws Exception
+  public void test_nonalphadet_11() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_11.wmod";
+    final String name = "nonalphadet_11.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_12() throws Exception
+  public void test_nonalphadet_12() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_12.wmod";
+    final String name = "nonalphadet_12.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_13() throws Exception
+  public void test_nonalphadet_13() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_13.wmod";
+    final String name = "nonalphadet_13.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_14() throws Exception
+  public void test_nonalphadet_14() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_14.wmod";
+    final String name = "nonalphadet_14.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_15() throws Exception
+  public void test_nonalphadet_15() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_15.wmod";
+    final String name = "nonalphadet_15.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_16() throws Exception
+  public void test_nonalphadet_16() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_16.wmod";
+    final String name = "nonalphadet_16.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_17() throws Exception
+  public void test_nonalphadet_17() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_17.wmod";
+    final String name = "nonalphadet_17.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_18() throws Exception
+  public void test_nonalphadet_18() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_18.wmod";
+    final String name = "nonalphadet_18.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_19() throws Exception
+  public void test_nonalphadet_19() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_19.wmod";
+    final String name = "nonalphadet_19.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_20() throws Exception
+  public void test_nonalphadet_20() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_20.wmod";
+    final String name = "nonalphadet_20.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_21() throws Exception
+  public void test_nonalphadet_21() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_21.wmod";
+    final String name = "nonalphadet_21.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_22() throws Exception
+  public void test_nonalphadet_22() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_22.wmod";
+    final String name = "nonalphadet_22.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_23() throws Exception
+  public void test_nonalphadet_23() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_23.wmod";
+    final String name = "nonalphadet_23.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_24() throws Exception
+  public void test_nonalphadet_24() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_24.wmod";
+    final String name = "nonalphadet_24.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_25() throws Exception
+  public void test_nonalphadet_25() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_25.wmod";
+    final String name = "nonalphadet_25.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_26() throws Exception
+  public void test_nonalphadet_26() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_26.wmod";
+    final String name = "nonalphadet_26.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_27() throws Exception
+  public void test_nonalphadet_27() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_27.wmod";
+    final String name = "nonalphadet_27.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_determinisation_28() throws Exception
+  public void test_nonalphadet_28() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_28.wmod";
+    final String name = "nonalphadet_28.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -311,20 +311,20 @@ public class NonAlphaDeterminisationTRSimplifierTest
    */
   public void testReentrant() throws Exception
   {
-    test_determinisation_12();
-    test_determinisation_1();
-    test_determinisation_2();
-    test_determinisation_3();
-    test_determinisation_11();
-    test_determinisation_13();
-    test_determinisation_4();
-    test_determinisation_20();
-    test_determinisation_8();
-    test_determinisation_14();
-    test_determinisation_1();
-    test_determinisation_10();
-    test_determinisation_2();
-    test_determinisation_9();
+    test_nonalphadet_12();
+    test_nonalphadet_1();
+    test_nonalphadet_2();
+    test_nonalphadet_3();
+    test_nonalphadet_11();
+    test_nonalphadet_13();
+    test_nonalphadet_4();
+    test_nonalphadet_20();
+    test_nonalphadet_8();
+    test_nonalphadet_14();
+    test_nonalphadet_1();
+    test_nonalphadet_10();
+    test_nonalphadet_2();
+    test_nonalphadet_9();
   }
 
 }

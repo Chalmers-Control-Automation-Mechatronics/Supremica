@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="determinisation_21" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This test checks that states which are reachable by the exact same strings, and both have the alpha marking can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
+<Module Name="nonalphadet_20" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This test checks that states which are reachable by the exact same strings, but one has an alpha marking can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -18,9 +18,6 @@
             <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Name="S2">
-                        <EventList>
-                            <SimpleIdentifier Name=":alpha"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="128" X="112"/>
                         </PointGeometry>
@@ -29,6 +26,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":alpha"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="80" X="48"/>
                         </PointGeometry>

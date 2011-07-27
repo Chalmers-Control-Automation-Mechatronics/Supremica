@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="determinisation_28" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="nonalphadet_28" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A test for the non-alpha determinisation rule. This test checks whether a sequence of multiple tau-transitions starting from the initial state can be collapsed.</ns2:Comment>
     <EventDeclList>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="determinisation_5" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This test checks whether redundant transitions originating from loops of silent transitions can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
+<Module Name="nonalphadet_6" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This test checks whether redundant tau transitions originating from loops of silent transitions can be handled correctly by the determinsation of non alpha states algorithm. The critical question here is whether the tau transition from S0 to S2 is retained in the abstraction.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -17,7 +17,7 @@
                 <LabelBlock>
                     <SimpleIdentifier Name=":alpha"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="183" X="61"/>
+                        <Point Y="190" X="11"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
@@ -97,7 +97,7 @@
                     </Edge>
                     <Edge Target="S2" Source="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
+                            <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="2" X="-10"/>
                             </LabelGeometry>
@@ -117,7 +117,7 @@
                 <LabelBlock>
                     <SimpleIdentifier Name=":alpha"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="206" X="8"/>
+                        <Point Y="160" X="72"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
@@ -148,6 +148,7 @@
                     <Edge Target="S2" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
+                            <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="2" X="-10"/>
                             </LabelGeometry>

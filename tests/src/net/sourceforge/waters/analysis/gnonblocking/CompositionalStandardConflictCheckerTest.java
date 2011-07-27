@@ -90,11 +90,11 @@ public class CompositionalStandardConflictCheckerTest extends
       (RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule.class);
   }
 
-  public void testInvoke_Determinisation() throws Exception
+  public void testInvoke_NonAlphaDet() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_invoke.wmod";
+    final String name = "nonalphadet_invoke.wmod";
     runModelVerifier(group, subdir, name, false);
     checkRuleApplicationCounts(DeterminisationOfNonAlphaStatesRule.class);
   }

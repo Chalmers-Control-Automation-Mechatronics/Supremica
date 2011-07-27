@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="determinisation_25" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="nonalphadet_24" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>This test checks whether an automaton with only one state (alpha marked), and no transitions can be correctly handled by the DeterminisationOfNonAlphaStates rule.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
@@ -15,14 +15,11 @@
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">
             <Graph Deterministic="false">
-                <LabelBlock>
-                    <SimpleIdentifier Name=":alpha"/>
-                    <LabelGeometry Anchor="NW">
-                        <Point Y="169" X="66"/>
-                    </LabelGeometry>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":alpha"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="80" X="48"/>
                         </PointGeometry>
