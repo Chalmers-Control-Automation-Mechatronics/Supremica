@@ -135,7 +135,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       }
     }
 
-    final PromelaGraph newGraph = new PromelaGraph(ident);
+    final PromelaGraph newGraph = new PromelaGraph(ident,false);
     g = PromelaGraph.sequentialComposition(newGraph, g,mUnWinding,mFactory);
     final GraphProxy graph = g.createGraphProxy(mFactory, procName);
     SimpleComponentProxy component;
@@ -158,7 +158,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
 
       component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
-
+      //mFactory.c
 
       final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(procs);
       final Collection<SimpleComponentProxy> c = new ArrayList<SimpleComponentProxy>();
@@ -566,6 +566,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
               if(m2.getMsg().contains(null)){
                 continue loop2;
               }
+              if(!m2.getMsg().contains(null) && !m.getMsg().contains(null)){
+                for(int i=0;i< m.getMsg().size();i++){
+                  if(comparator.compare(m.getMsg().get(i),m2.getMsg().get(i))!=0){
+                    continue loop2;
+                  }
+                }
+              }
               final Collection<SimpleIdentifierProxy> senders = new ArrayList<SimpleIdentifierProxy>();
               final Collection<SimpleIdentifierProxy> recvs = new ArrayList<SimpleIdentifierProxy>();
               if(ch.isSenderPresent()){
@@ -778,7 +785,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     //assert t.getText().equals("atomic");
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("initrun");
-    final PromelaGraph initGraph = new PromelaGraph(ident);
+    final PromelaGraph initGraph = new PromelaGraph(ident,false);
     return initGraph;
   }
 
@@ -786,6 +793,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     final String name = t.getChild(0).getText();
     PromelaGraph graph=null;
+    final boolean isEnd = checkEnd(t.getParent());
     if(!mIsInit){
 
     }else{
@@ -799,12 +807,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
         indexes.add(id);
         //final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
         final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
-        graph = new PromelaGraph(ident);
+        graph = new PromelaGraph(ident,isEnd);
       }
       copyOfOccur.put(name,occur2-1);
       }else{
         final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
-        graph = new PromelaGraph(ident);
+        graph = new PromelaGraph(ident,isEnd);
       }
     }
     return graph;

@@ -118,7 +118,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       new ExpressionComparator(optable);
     for(final Map.Entry<String,ChanInfo> chanIn: chan.entrySet())
     {
-      System.out.println(chanIn.getKey()+"  "+chanIn.getValue());
+    //System.out.println(chanIn.getKey()+"  "+chanIn.getValue());
     //final List<Message> msgs = new ArrayList<Message>(chan.get(channelMsg.get(0)).getMessages());
     final List<Message> msgs = new ArrayList<Message>(chanIn.getValue().getMessages());
     //final List<Message> mOutput = chanIn.getValue().getOutput();
@@ -151,12 +151,34 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     final List<Message> recipients = new ArrayList<Message>();
     final List<Message> senders = new ArrayList<Message>();
+ /*   for(final Message m: msgs){
+      if(m.hasSenders()){
+        senders.add(m);
+        chanIn.getValue().addMsgList(m);
+      }else if(m.hasRecipients()){
+        recipients.add(m);
+        chanIn.getValue().addMsgList(m);
+      }else{
+        chanIn.getValue().addMsgList(m);
+      }
+    }
+    for(final Message m: msgs){
+      if(!m.hasRecipients()){
+
+      }
+    }
+*/
+
     for(final Message m: msgs){
       if(!m.hasSenders()){
         recipients.add(m);
         chanIn.getValue().addMsgList(m);
       }else if(!m.hasRecipients()){
         senders.add(m);
+        chanIn.getValue().addMsgList(m);
+      }else if(m.hasRecipients() && m.hasSenders()){
+        senders.add(m);
+        recipients.add(m);
         chanIn.getValue().addMsgList(m);
       }else{
         chanIn.getValue().addMsgList(m);
@@ -215,9 +237,7 @@ public class EventCollectingVisitor implements PromelaVisitor
           if(test) chanIn.getValue().addMsgList(m);
 
         }
-        /*if(!mOutput.contains(m2)){
-          mOutput.add(m2);
-        }*/
+
         boolean test = true;
         for(final Message t1: chanIn.getValue().getOutput()){
           if(t1.equals(m2)){
@@ -309,11 +329,42 @@ public class EventCollectingVisitor implements PromelaVisitor
     final String chanName = chanIn.getKey();
     boolean sending = false;
 
-    boolean receiving = false;
+    final boolean receiving = false;
     for(final Message m: cloneOutput){
-      if(!sending){
+    //  if(!sending){
+      if(!c.isSenderPresent()){
+      if(m.getSenders().size()>1){
+        c.setSenders(true);
+        sending = true;
+      }else if(m.getSenders().size()==1){
+        final int occurrences = occur.get(m.getSenders().get(0));
+     //   if(occurrences>1){
+          c.setSenders(occurrences>1);
+     //   }
+      }
+      }
+ //     }
+  //    if(!receiving){
+      if(!c.isRecipientPresent()){
+      if(m.getRecipients().size()>1){
+        c.setRecipients(true);
+        //receiving = true;
+      }else if(m.getRecipients().size()==1){
+        final int occurrences = occur.get(m.getRecipients().get(0));
+        c.setRecipients(occurrences>1);
+      //  if(occurrences>1){
+      //    c.setRecipients(true);
+         // receiving = true;
+      //  }
+      }
+
+    }
+     }
+ //   }
+    for(final Message m: cloneOutput){
+ //     if(!sending){
         if(m.getSenders().size()>1){
-          c.setSenders(true);
+         // c.setSenders(true);
           //c.addSenders(sendRange);
           final Collection<String> tempList = new ArrayList<String>();
           for (final String s : sendRange) {
@@ -337,24 +388,26 @@ public class EventCollectingVisitor implements PromelaVisitor
           sending = true;
         } else if (m.getSenders().size() == 1) {
           final int occurrences = occur.get(m.getSenders().get(0));
-          c.setSenders(occurrences > 1);
-          if (occurrences > 1) {
+      //    c.setSenders(occurrences > 1);
+          if (c.isSenderPresent()) {
             final Collection<String> tempList = new ArrayList<String>();
-            for (int i = 0; i < occur.get(sendRange.get(0)); i++) {
-              final String temp = sendRange.get(0) + "_" + i;
+           // for (int i = 0; i < occur.get(sendRange.get(0)); i++) {
+            for(int i=0;i<occurrences;i++){
+              //final String temp = sendRange.get(0) + "_" + i;
+              final String temp = m.getSenders().get(0)+"_"+i;
               if(!c.getSenders().contains(temp)){
                 tempList.add(temp);
               }
             }
             c.addSenders(tempList);
-            sending = true;
+//            sending = true;
           }
         }
 
-      }
-      if (!receiving) {
+//      }
+//      if (!receiving) {
         if (m.getRecipients().size() > 1) {
-          c.setRecipients(true);
+         // c.setRecipients(true);
           final Collection<String> tempList = new ArrayList<String>();
           for (final String s : recRange) {
             final String temp = s + "_0";
@@ -365,11 +418,11 @@ public class EventCollectingVisitor implements PromelaVisitor
             }
           }
           c.addRecipients(tempList);
-          receiving = true;
+
         } else if (m.getRecipients().size() == 1) {
           final int occurance = occur.get(m.getRecipients().get(0));
-          c.setRecipients(occurance > 1);
-          if (occurance > 1) {
+     //     c.setRecipients(occurance > 1);
+          if (c.isRecipientPresent()) {
             final Collection<String> tempList = new ArrayList<String>();
             for (int i = 0; i < occur.get(recRange.get(0)); i++) {
               final String temp = recRange.get(0) + "_" + i;
@@ -378,10 +431,10 @@ public class EventCollectingVisitor implements PromelaVisitor
               }
             }
             c.addRecipients(tempList);
-            receiving = true;
+   //         receiving = true;
           }
         }
-      }
+ //     }
 
     }
   final Collection<SimpleExpressionProxy> specialSend = new ArrayList<SimpleExpressionProxy>();

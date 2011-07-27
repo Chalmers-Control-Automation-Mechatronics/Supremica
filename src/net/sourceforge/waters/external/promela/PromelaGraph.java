@@ -32,9 +32,10 @@ public class PromelaGraph
     mPromelaEdges = edges;
   }
 
-  public PromelaGraph(final IdentifierProxy ident)
+  public PromelaGraph(final IdentifierProxy ident, final boolean isEnd)
   {
     mPromelaStartNode = new PromelaNode();
+    mPromelaStartNode.setEndLabel(isEnd);
     final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
 
     final Collection<SimpleExpressionProxy> labelBlock = new ArrayList<SimpleExpressionProxy>();
@@ -72,7 +73,7 @@ public class PromelaGraph
 
   public PromelaGraph(final List<IdentifierProxy> events, final boolean isEnd, final ModuleProxyFactory mFactory){
     mPromelaStartNode = new PromelaNode();
-    mPromelaStartNode.setEnd(isEnd);
+    mPromelaStartNode.setEndLabel(isEnd);
     final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
     final ModuleProxyCloner cloner = mFactory.getCloner();
     final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(cloner.getClonedList(events));
@@ -298,7 +299,7 @@ public class PromelaGraph
       PromelaGraph output = null;
 
       final PromelaNode newStartNode = new PromelaNode();
-      newStartNode.setEnd(isEnd);
+      newStartNode.setEndLabel(isEnd);
       final PromelaNode newEndNode = new PromelaNode(PromelaNode.EndType.END);
       final List<PromelaEdge> edgesOfResult =
         new ArrayList<PromelaEdge>();  // edgesOfFirst.size() + edgesOfSecond.size()
@@ -498,7 +499,7 @@ public class PromelaGraph
     //create nodes
     final List<PromelaNode> nodes = new ArrayList<PromelaNode>();
     final PromelaNode newStartNode = new PromelaNode();
-    newStartNode.setEnd(isEnd);
+    newStartNode.setEndLabel(isEnd);
 
     PromelaNode secondStart;
     nodes.add(newStartNode);
@@ -1382,13 +1383,20 @@ public class PromelaGraph
     for (final PromelaNode node : getNodes()) {
       final boolean initial = (node == this.getStart());
 
-      final boolean marked = (node.isEnd());
+      final boolean marked = (node.isEnd() || node.isEndLabel());
       proxy = node.createNode(name, index++, initial, marked, mFactory);
       mNodes.add(proxy);
     }
+
+    final ModuleProxyCloner cloner = mFactory.getCloner();
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final Comparator<SimpleExpressionProxy> comparator =
+      new ExpressionComparator(optable);
+
     for(final PromelaEdge e : this.getEdges()){
       final Collection<Proxy> label = new ArrayList<Proxy>();
       label.addAll(e.getLabelBlock().getLabel());
+
       final LabelBlockProxy labelBlock =
         mFactory.createLabelBlockProxy(label, null);
 
@@ -1398,7 +1406,26 @@ public class PromelaGraph
       final EdgeProxy edge = mFactory.createEdgeProxy(source, target, labelBlock, null, null, null, null);
       mEdges.add(edge);
     }
-    final GraphProxy graph = mFactory.createGraphProxy(true, null, mNodes, mEdges);
+    boolean isDetermine = true;
+    loop1:
+    for(final PromelaNode node: getNodes()){
+      final List<SimpleExpressionProxy> labels = new ArrayList<SimpleExpressionProxy>();
+      for(final PromelaEdge e: getEdges()){
+        if(e.getSource()==node){
+          labels.addAll(cloner.getClonedList(e.getLabelBlock().getLabel()));
+        }
+      }
+      for(int i=0;i<labels.size();i++){
+        for(int j=i+1;j<labels.size();j++){
+          if(comparator.compare(labels.get(i), labels.get(j))==0){
+            isDetermine = false;
+            break loop1;
+          }
+        }
+      }
+    }
+
+    final GraphProxy graph = mFactory.createGraphProxy(isDetermine, null, mNodes, mEdges);
     return graph;
   }
 
