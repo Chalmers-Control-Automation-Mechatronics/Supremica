@@ -103,7 +103,8 @@ public class CoreachabilityTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_allStatesImplicitlyMarkedAlpha() throws Exception
+  // All states implicitly marked alpha.
+  public void test_noncoreachableStatesRemoval_3() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -191,7 +192,7 @@ public class CoreachabilityTRSimplifierTest
   {
     test_noncoreachableStatesRemoval_1();
     test_reachableLoop();
-    test_allStatesImplicitlyMarkedAlpha();
+    test_noncoreachableStatesRemoval_3();
     test_selfLoops();
     test_reachableBeforeNotAfter();
     test_multipleIncomingTransitions();
@@ -206,7 +207,7 @@ public class CoreachabilityTRSimplifierTest
     test_stateWithReachableAndNonreachablePath();
     test_noTransitions();
     test_unreachableLoop();
-    test_allStatesImplicitlyMarkedAlpha();
+    test_noncoreachableStatesRemoval_3();
     test_multipleOutgoingTransitions();
     test_stateWithReachableAndNonreachablePath();
     test_reachableLoop();

@@ -311,12 +311,12 @@ public abstract class AbstractTRSimplifierTest
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau = getEvent(aut, TAU);
     final EventEncoding enc = new EventEncoding(aut, translator, tau);
-    final EventProxy alpha = getEvent(aut, ALPHA);
+    final EventProxy alpha = getEvent(des, ALPHA);
     mAlphaID = enc.getEventCode(alpha);
     if (alpha != null && mAlphaID < 0) {
       mAlphaID = enc.addEvent(alpha, translator, true);
     }
-    final EventProxy omega = getEvent(aut, OMEGA);
+    final EventProxy omega = getEvent(des, OMEGA);
     mOmegaID = enc.getEventCode(omega);
     if (omega != null && mOmegaID < 0) {
       mOmegaID = enc.addEvent(omega, translator, true);

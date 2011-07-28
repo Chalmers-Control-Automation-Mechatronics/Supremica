@@ -71,7 +71,7 @@ public class LimitedCertainConflictsTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "determinisation_10.wmod";
+    final String name = "nonalphadet_10.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
