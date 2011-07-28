@@ -228,6 +228,16 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     return null;
   }
 
+  protected EventProxy getEvent(final AutomatonProxy aut, final String name)
+  {
+    for (final EventProxy event : aut.getEvents()) {
+      if (event.getName().equals(name)) {
+        return event;
+      }
+    }
+    return null;
+  }
+
   protected List<EventProxy> getUnobservableEvents(final ProductDESProxy des)
   {
     final List<EventProxy> result = new LinkedList<EventProxy>();

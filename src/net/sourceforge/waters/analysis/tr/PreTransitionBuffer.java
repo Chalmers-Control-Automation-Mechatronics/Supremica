@@ -16,6 +16,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.des.AutomatonTools;
 
 
@@ -31,10 +33,27 @@ public class PreTransitionBuffer
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new pre-transition buffer.
+   * @param  numEvents   Number of proper events in event encoding.
+   */
   public PreTransitionBuffer(final int numEvents)
+  {
+    this(numEvents, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Creates a new pre-transition buffer.
+   * @param  numEvents   Number of proper events in event encoding.
+   * @param  limit       Maximum number of transitions that can be added.
+   *                     Adding more transitions than the limit results
+   *                     in an {@link OverflowException} being thrown.
+   */
+  public PreTransitionBuffer(final int numEvents, final int limit)
   {
     mStateShift = AutomatonTools.log2(numEvents);
     mEventMask = (1 << mStateShift) - 1;
+    mTransitionLimit = limit;
     mBlocks = new ArrayList<int[]>();
     mCurrentState = mCurrentEvent = mCurrentOffset = -1;
     mCurrentBlock = null;
@@ -44,20 +63,34 @@ public class PreTransitionBuffer
 
   //#########################################################################
   //# Recording Transitions
+  /**
+   * Adds a new transition to this buffer
+   * @param  from        From-state of new transition.
+   * @param  event       Event code for the new transition.
+   * @param  to          To-state of new transition.
+   * @throws OverflowException if the addition of another transition would
+   *         cause the buffer to contain more transitions than specified
+   *         by its transition limit.
+   */
   public void addTransition(final int from, final int event, final int to)
+  throws OverflowException
   {
-    if (mCurrentState != from || mCurrentEvent != event) {
-      close();
-      final int key = (from << mStateShift) | event;
-      append(key);
-      mCurrentState = from;
-      mCurrentEvent = event;
-      mCurrentFanout = 1;
+    if (mNumTransitions < mTransitionLimit) {
+      if (mCurrentState != from || mCurrentEvent != event) {
+        close();
+        final int key = (from << mStateShift) | event;
+        append(key);
+        mCurrentState = from;
+        mCurrentEvent = event;
+        mCurrentFanout = 1;
+      } else {
+        mCurrentFanout++;
+      }
+      append(to);
+      mNumTransitions++;
     } else {
-      mCurrentFanout++;
+      throw new OverflowException(OverflowKind.TRANSITION, mTransitionLimit);
     }
-    append(to);
-    mNumTransitions++;
   }
 
   /**
@@ -202,6 +235,7 @@ public class PreTransitionBuffer
   //# Data Members
   private final int mStateShift;
   private final int mEventMask;
+  private final int mTransitionLimit;
   private final List<int[]> mBlocks;
 
   private int mNumTransitions;

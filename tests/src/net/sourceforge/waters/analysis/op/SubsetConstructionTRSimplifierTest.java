@@ -9,6 +9,14 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import gnu.trove.TIntArrayList;
+
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -46,6 +54,43 @@ public class SubsetConstructionTRSimplifierTest
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     return new SubsetConstructionTRSimplifier();
+  }
+
+  @Override
+  protected EventEncoding createEventEncoding(final ProductDESProxy des,
+                                              final AutomatonProxy aut)
+  {
+    final EventEncoding enc = super.createEventEncoding(des, aut);
+    final int numEvents = enc.getNumberOfProperEvents();
+    mForbiddenEvents = new TIntArrayList();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final EventProxy event = enc.getProperEvent(e);
+      final String name = event.getName();
+      if (name.startsWith(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+        mForbiddenEvents.add(e);
+      }
+    }
+    return enc;
+  }
+
+  @Override
+  protected void configureTransitionRelationSimplifier()
+  {
+    super.configureTransitionRelationSimplifier();
+    final SubsetConstructionTRSimplifier simplifier =
+      getTransitionRelationSimplifier();
+    simplifier.clearForbiddenEvents();
+    for (int e = 0; e < mForbiddenEvents.size(); e++) {
+      final int event = mForbiddenEvents.get(e);
+      simplifier.setForbiddenEvent(event, true);
+    }
+  }
+
+  @Override
+  protected SubsetConstructionTRSimplifier getTransitionRelationSimplifier()
+  {
+    return (SubsetConstructionTRSimplifier)
+      super.getTransitionRelationSimplifier();
   }
 
 
@@ -87,6 +132,24 @@ public class SubsetConstructionTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_determinisation_5()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_5.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_determinisation_6()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_6.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
@@ -100,9 +163,18 @@ public class SubsetConstructionTRSimplifierTest
     test_determinisation_2();
     test_determinisation_3();
     test_determinisation_4();
+    test_determinisation_5();
+    test_determinisation_6();
+    test_determinisation_5();
+    test_determinisation_4();
     test_determinisation_3();
     test_determinisation_2();
     test_determinisation_1();
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private TIntArrayList mForbiddenEvents;
 
 }

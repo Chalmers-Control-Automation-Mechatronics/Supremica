@@ -23,6 +23,7 @@ import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 
 
 /**
@@ -138,6 +139,7 @@ public class WeakObservationEquivalencePartitioning
   }
 
   private void collectionAdditionalTransitions()
+  throws OverflowException
   {
     final int numEvents = mTransitionRelation.getNumberOfProperEvents();
     mAdditionalTransitions = new PreTransitionBuffer(numEvents);

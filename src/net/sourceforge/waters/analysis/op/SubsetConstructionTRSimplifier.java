@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import java.util.BitSet;
+
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 
@@ -43,8 +45,7 @@ public class SubsetConstructionTRSimplifier
     this(null);
   }
 
-  public SubsetConstructionTRSimplifier
-    (final ListBufferTransitionRelation rel)
+  public SubsetConstructionTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -94,6 +95,47 @@ public class SubsetConstructionTRSimplifier
     return mTransitionLimit;
   }
 
+  /**
+   * Clears the set of forbidden events.
+   * @see #setForbiddenEvent(int,boolean) setForbiddenEvent()
+   */
+  public void clearForbiddenEvents()
+  {
+    mForbiddenEvents = null;
+  }
+
+  /**
+   * Sets whether the given event is to be considered as forbidden.
+   * Forbidden events are typically selfloop-only events with the property
+   * that state exploration ends as soon as a state with a forbidden event
+   * enabled is encountered. When subset construction encounters a state
+   * with a forbidden event enabled, it adds selfloops with all forbidden
+   * events to that state, but suppresses any other outgoing transitions
+   * from that state.
+   */
+  public void setForbiddenEvent(final int event, final boolean forbidden)
+  {
+    if (mForbiddenEvents == null) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int numEvents = rel == null ? 0 : rel.getNumberOfProperEvents();
+      mForbiddenEvents = new BitSet(numEvents);
+    }
+    mForbiddenEvents.set(event, forbidden);
+  }
+
+  /**
+   * Returns whether the given event is considered as forbidden.
+   * @see #setForbiddenEvent(int,boolean) setForbiddenEvent()
+   */
+  public boolean isForbiddenEvent(final int event)
+  {
+    if (mForbiddenEvents == null) {
+      return false;
+    } else {
+      return mForbiddenEvents.get(event);
+    }
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
@@ -137,17 +179,46 @@ public class SubsetConstructionTRSimplifier
     } else if (!rel.isDeterministic()) {
       mIsDeterministic = false;
       mTauIterator = null;
-      final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       mEventIterator = new OneEventCachingTransitionIterator(iter);
     } else {
       mIsDeterministic = true;
       return;
     }
+
+    final int numEvents = rel.getNumberOfProperEvents();
+    int normalIndex = 0;
+    int forbiddenIndex = 0;
+    for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
+      if (rel.isUsedEvent(event)) {
+        if (isForbiddenEvent(event)) {
+          forbiddenIndex++;
+        } else {
+          normalIndex++;
+        }
+      }
+    }
+    mForbiddenEventIndexes = new int[forbiddenIndex];
+    mNormalEventIndexes = new int[normalIndex];
+    normalIndex = 0;
+    forbiddenIndex = 0;
+    for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
+      if (rel.isUsedEvent(event)) {
+        if (isForbiddenEvent(event)) {
+          mForbiddenEventIndexes[forbiddenIndex++] = event;
+        } else {
+          mNormalEventIndexes[normalIndex++] = event;
+        }
+      }
+    }
+    if (forbiddenIndex > 0) {
+      mForbiddenEventIterator = rel.createSuccessorsReadOnlyIterator();
+    }
+
     final int numStates = rel.getNumberOfStates();
     mSetOffsets = new TIntArrayList(numStates);
     mStateSetBuffer = new IntSetBuffer(numStates);
-    final int numEvents = rel.getNumberOfProperEvents();
-    mTransitionBuffer = new PreTransitionBuffer(numEvents);
+    mTransitionBuffer = new PreTransitionBuffer(numEvents, mTransitionLimit);
   }
 
   @Override
@@ -185,12 +256,28 @@ public class SubsetConstructionTRSimplifier
       }
 
       // 2. Expand subset states.
-      final int numEvents = rel.getNumberOfProperEvents();
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       final TIntArrayList current = new TIntArrayList();
       for (int source = 0; source < mSetOffsets.size(); source++) {
         final int set = mSetOffsets.get(source);
-        for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
+        boolean forbidden = false;
+        for (final int event : mForbiddenEventIndexes) {
+          checkAbort();
+          iter.reset(set);
+          while (iter.advance()) {
+            final int state = iter.getCurrentData();
+            mForbiddenEventIterator.reset(state, event);
+            if (mForbiddenEventIterator.advance()) {
+              mTransitionBuffer.addTransition(source, event, source);
+              forbidden = true;
+              break;
+            }
+          }
+        }
+        if (forbidden) {
+          continue;
+        }
+        for (final int event : mNormalEventIndexes) {
           checkAbort();
           mEventIterator.resetEvent(event);
           iter.reset(set);
@@ -204,10 +291,6 @@ public class SubsetConstructionTRSimplifier
           }
           if (!current.isEmpty()) {
             final int offset = mStateSetBuffer.add(current);
-            if (mTransitionBuffer.size() >= mTransitionLimit) {
-              throw new OverflowException(OverflowKind.TRANSITION,
-                                          mTransitionLimit);
-            }
             current.clear();
             final int target;
             if (offset > last) {
@@ -271,18 +354,23 @@ public class SubsetConstructionTRSimplifier
   @Override
   protected void tearDown()
   {
-    mTauIterator = mEventIterator = null;
+    mForbiddenEventIndexes = mNormalEventIndexes = null;
+    mTauIterator = mForbiddenEventIterator = mEventIterator = null;
   }
 
 
   //#########################################################################
   //# Data Members
-  private int mStateLimit = Integer.MAX_VALUE;;
+  private int mStateLimit = Integer.MAX_VALUE;
   private int mTransitionLimit = Integer.MAX_VALUE;
+  private BitSet mForbiddenEvents = null;
 
   private boolean mIsDeterministic;
+  private int[] mForbiddenEventIndexes;
+  private int[] mNormalEventIndexes;
   private TransitionIterator mTauIterator;
   private TransitionIterator mEventIterator;
+  private TransitionIterator mForbiddenEventIterator;
   private TIntArrayList mSetOffsets;
   private IntSetBuffer mStateSetBuffer;
   private PreTransitionBuffer mTransitionBuffer;
