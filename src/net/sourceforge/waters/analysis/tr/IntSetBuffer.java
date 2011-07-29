@@ -14,7 +14,6 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntProcedure;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -71,16 +70,14 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   //# Access Methods
   /**
    * Adds the data in the given array as a set to this integer set buffer.
-   * @param  data   Array of integers forming a new set. The array should
-   *                not contain any duplicates, and it will be sorted as
-   *                a side effect of this method.
+   * @param  data   Array of integers forming a new set. The array must be
+   *                ordered and free from duplicates.
    * @return A unique set index identifying a set with the given contents in
    *         this buffer. This may be a newly created or an already existent
    *         set.
    */
   public int add(final int[] data)
   {
-    Arrays.sort(data);
     final int count = data.length;
     final int words = getNumberOfWords(count);
     ensureCapacity(words);
@@ -119,16 +116,14 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
   /**
    * Adds the data in the given list as a set to this integer set buffer.
-   * @param  data   List of integers forming a new set. The list should
-   *                not contain any duplicates, and it will be sorted as
-   *                a side effect of this method.
+   * @param  data   List of integers forming a new set. The list must be
+   *                ordered and free from duplicates.
    * @return A unique set index identifying a set with the given contents in
    *         this buffer. This may be a newly created or an already existent
    *         set.
    */
   public int add(final TIntArrayList data)
   {
-    data.sort();
     final int count = data.size();
     final int words = getNumberOfWords(count);
     ensureCapacity(words);
@@ -178,6 +173,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
     final Collector collector = getCollector();
     data.forEach(collector);
     final TIntArrayList collected = collector.getCollected();
+    collected.sort();
     return add(collected);
   }
 

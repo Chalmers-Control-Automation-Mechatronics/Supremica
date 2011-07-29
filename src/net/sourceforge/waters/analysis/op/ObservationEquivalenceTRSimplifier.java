@@ -267,7 +267,8 @@ public class ObservationEquivalenceTRSimplifier
     final int size = partition.size();
     setUpPartition(size);
     for (final int[] clazz : partition) {
-      final EquivalenceClass sec = createEquivalenceClass(clazz);
+      final EquivalenceClass sec =
+        mEquivalence.createEquivalenceClass(this, clazz);
       sec.enqueue(true);
       if (clazz.length > 1) {
         for (final int state : clazz) {
@@ -307,13 +308,10 @@ public class ObservationEquivalenceTRSimplifier
   public void setUpInitialPartitionBasedOnMarkings(final long mask)
   throws OverflowException
   {
-    final Equivalence equivalence = getEquivalence();
-    final MarkingMode mmode = getMarkingMode();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final long[] markings;
-    if (equivalence == Equivalence.BISIMULATION ||
-        mmode == MarkingMode.SATURATE) {
+    if (!mEquivalence.respectsTau() || mMarkingMode == MarkingMode.SATURATE) {
       markings = null;
     } else {
       markings = new long[numStates];
@@ -324,7 +322,7 @@ public class ObservationEquivalenceTRSimplifier
       }
     }
     mHasModifications = false;
-    if (equivalence != Equivalence.BISIMULATION) {
+    if (mEquivalence.respectsTau()) {
       setUpTauClosure();
       final TransitionIterator iter = mTauClosure.createIterator();
       for (int state = 0; state < numStates; state++) {
@@ -339,7 +337,7 @@ public class ObservationEquivalenceTRSimplifier
           while (iter.advance()) {
             final int pred = iter.getCurrentSourceState();
             if (pred != state) {
-              switch (mmode) {
+              switch (mMarkingMode) {
               case MINIMIZE:
                 mHasModifications |= rel.removeMarkings(pred, marking);
                 // fall through ...
@@ -370,7 +368,7 @@ public class ObservationEquivalenceTRSimplifier
         }
         EquivalenceClass clazz = prepartition.get(marking);
         if (clazz == null) {
-          clazz = createEquivalenceClass();
+          clazz = mEquivalence.createEquivalenceClass(this);
           prepartition.put(marking, clazz);
         }
         clazz.addState(state);
@@ -408,13 +406,13 @@ public class ObservationEquivalenceTRSimplifier
     final int numStates = rel.getNumberOfStates();
     final TIntHashSet initialStates;
     final TransitionIterator iter;
-    if (getEquivalence() == Equivalence.BISIMULATION) {
-      initialStates = null;
-      iter = null;
-    } else {
+    if (mEquivalence.respectsTau()) {
       initialStates = new TIntHashSet();
       setUpTauClosure();
       iter = mTauClosure.createIterator();
+    } else {
+      initialStates = null;
+      iter = null;
     }
     final Collection<EquivalenceClass> splitClasses =
       new THashSet<EquivalenceClass>();
@@ -537,7 +535,7 @@ public class ObservationEquivalenceTRSimplifier
 
   private void setUpTauClosure() throws OverflowException
   {
-    if (getEquivalence() == Equivalence.BISIMULATION) {
+    if (!mEquivalence.respectsTau()) {
       if (mEventIterator == null) {
         final ListBufferTransitionRelation rel = getTransitionRelation();
         final TransitionIterator inner =
@@ -648,8 +646,9 @@ public class ObservationEquivalenceTRSimplifier
   private void removeRedundantTransitions(final TransitionRemovalTime time)
   throws AnalysisException
   {
-    final boolean doTau = mTransitionRemovalMode.getDoTau(time);
-    final boolean doNonTau = mTransitionRemovalMode.getDoNonTau(time);
+    final TransitionRemoval mode = mEquivalence.getTransitionRemovalMode(this);
+    final boolean doTau = mode.getDoTau(time);
+    final boolean doNonTau = mode.getDoNonTau(time);
     if (doTau || doNonTau) {
       setUpTauClosure();
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -1110,7 +1109,7 @@ public class ObservationEquivalenceTRSimplifier
       }
       overflowClass.setUpStateToClass(true);
       overflowClass.enqueue(false);
-      enqueue(false);
+      mEquivalence.enqueueBigBrother(this);
     }
 
     //#######################################################################
@@ -1663,9 +1662,39 @@ public class ObservationEquivalenceTRSimplifier
    */
   public enum Equivalence
   {
-
-    //#########################################################################
+    //#######################################################################
     //# Enumeration Values
+    /**
+     * Language equivalence. This method only works for a deterministic
+     * automaton, in which case it achieves minimisation according to
+     * Hopcroft's algorithm. It is implemented like the bisimulation
+     * algorithm, but not allowing tau events, and never splitting on
+     * the larger class resulting from a split.
+     */
+    DETERMINISTIC_MINSTATE {
+      @Override
+      boolean respectsTau()
+      {
+        return false;
+      }
+      @Override
+      EquivalenceClass createEquivalenceClass
+        (final ObservationEquivalenceTRSimplifier simplifier)
+      {
+        return simplifier.new PlainEquivalenceClass();
+      }
+      @Override
+      EquivalenceClass createEquivalenceClass
+        (final ObservationEquivalenceTRSimplifier simplifier,
+         final int[] states)
+      {
+        return simplifier.new PlainEquivalenceClass(states);
+      }
+      @Override
+      void enqueueBigBrother(final PlainEquivalenceClass clazz)
+      {
+      }
+    },
     /**
      * Bisimulation equivalence. Equivalent states must be able to reach
      * equivalent successors for all traces of events. There are no silent
@@ -1673,16 +1702,14 @@ public class ObservationEquivalenceTRSimplifier
      */
     BISIMULATION {
       @Override
+      boolean respectsTau()
+      {
+        return false;
+      }
+      @Override
       public int getFirstSplitEvent()
       {
         return EventEncoding.TAU;
-      }
-      @Override
-      public void applyResultPartition
-        (final ObservationEquivalenceTRSimplifier simplifier)
-      throws AnalysisException
-      {
-        simplifier.applyObservationEquivalencePartition();
       }
     },
     /**
@@ -1690,20 +1717,7 @@ public class ObservationEquivalenceTRSimplifier
      * equivalent successors for all traces of observable events including the
      * empty trace. This setting is the default.
      */
-    OBSERVATION_EQUIVALENCE {
-      @Override
-      public int getFirstSplitEvent()
-      {
-        return EventEncoding.TAU;
-      }
-      @Override
-      public void applyResultPartition
-        (final ObservationEquivalenceTRSimplifier simplifier)
-      throws AnalysisException
-      {
-        simplifier.applyObservationEquivalencePartition();
-      }
-    },
+    OBSERVATION_EQUIVALENCE,
     /**
      * Weak observation equivalence. Equivalent states must be able to reach
      * equivalent successors for all traces of observable events <I>not</I>
@@ -1717,7 +1731,7 @@ public class ObservationEquivalenceTRSimplifier
         return EventEncoding.NONTAU;
       }
       @Override
-      public void applyResultPartition
+      void applyResultPartition
         (final ObservationEquivalenceTRSimplifier simplifier)
       throws AnalysisException
       {
@@ -1725,14 +1739,51 @@ public class ObservationEquivalenceTRSimplifier
       }
     };
 
-    //#########################################################################
-    //# Repartitioning
-    abstract int getFirstSplitEvent();
+    //#######################################################################
+    //# Equivalence Characteristics
+    boolean respectsTau()
+    {
+      return true;
+    }
 
-    abstract void applyResultPartition
-      (ObservationEquivalenceTRSimplifier simplifier)
-    throws AnalysisException;
+    EquivalenceClass createEquivalenceClass
+      (final ObservationEquivalenceTRSimplifier simplifier)
+    {
+      return simplifier.createEquivalenceClass();
+    }
 
+    EquivalenceClass createEquivalenceClass
+      (final ObservationEquivalenceTRSimplifier simplifier, final int[] states)
+    {
+      return simplifier.createEquivalenceClass(states);
+    }
+
+    int getFirstSplitEvent()
+    {
+      return respectsTau() ? EventEncoding.TAU : EventEncoding.NONTAU;
+    }
+
+    void enqueueBigBrother(final PlainEquivalenceClass clazz)
+    {
+      clazz.enqueue(false);
+    }
+
+    TransitionRemoval getTransitionRemovalMode
+      (final ObservationEquivalenceTRSimplifier simplifier)
+    {
+      if (respectsTau()) {
+        return simplifier.getTransitionRemovalMode();
+      } else {
+        return TransitionRemoval.NONE;
+      }
+    }
+
+    void applyResultPartition
+      (final ObservationEquivalenceTRSimplifier simplifier)
+    throws AnalysisException
+    {
+      simplifier.applyObservationEquivalencePartition();
+    }
   }
 
 
@@ -1768,13 +1819,14 @@ public class ObservationEquivalenceTRSimplifier
   public enum TransitionRemoval
   {
 
-    //#########################################################################
+    //#######################################################################
     //# Enumeration Values
     /**
      * Disables removal of redundant transitions. This is the only option that
-     * works when using bisimulation equivalence
+     * works when using deterministic minimisation
+     * ({@link Equivalence#DETERMINISTIC_MINSTATE}) or bisimulation equivalence
      * ({@link Equivalence#BISIMULATION}), and it will be automatically used
-     * when bisimulation equivalence is configured.
+     * when these equivalences are configured.
      */
     NONE {
       @Override
@@ -1859,7 +1911,7 @@ public class ObservationEquivalenceTRSimplifier
       }
     };
 
-    //#########################################################################
+    //#######################################################################
     //# Mode Selection
     abstract boolean getDoTau(TransitionRemovalTime time);
     abstract boolean getDoNonTau(TransitionRemovalTime time);

@@ -285,6 +285,7 @@ public class SubsetConstructionTRSimplifier
             }
           }
           if (!current.isEmpty()) {
+            current.sort();
             final int offset = mStateSetBuffer.add(current);
             current.clear();
             final int target;

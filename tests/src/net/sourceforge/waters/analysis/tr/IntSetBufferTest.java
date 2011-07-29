@@ -47,7 +47,7 @@ public class IntSetBufferTest extends AbstractWatersTest
     final IntSetBuffer buffer = new IntSetBuffer(4);
     final int[] data1 = {1, 2, 3};
     final int[] data2 = {1, 2};
-    final int[] data3 = {4, 2};
+    final int[] data3 = {2, 4};
     final int offset1 = buffer.add(data1);
     final int offset2 = buffer.add(data2);
     assertFalse("Got the same offset for different sets!", offset1 == offset2);
@@ -66,18 +66,18 @@ public class IntSetBufferTest extends AbstractWatersTest
   {
     final IntSetBuffer buffer = new IntSetBuffer(7);
     final TIntArrayList data1 = new TIntArrayList(3);
-    data1.add(3);
-    data1.add(2);
     data1.add(1);
+    data1.add(2);
+    data1.add(3);
     final TIntArrayList data2 = new TIntArrayList(2);
     data2.add(7);
     final TIntArrayList data3 = new TIntArrayList(6);
     data3.add(1);
-    data3.add(7);
-    data3.add(4);
     data3.add(3);
+    data3.add(4);
     data3.add(5);
     data3.add(6);
+    data3.add(7);
     final int offset1 = buffer.add(data1);
     final int offset2 = buffer.add(data2);
     assertFalse("Got the same offset for different sets!", offset1 == offset2);
@@ -90,15 +90,6 @@ public class IntSetBufferTest extends AbstractWatersTest
     assertEquals("Unexpected offset for existing set!", offset2, alt2);
     final int alt3 = buffer.add(data3);
     assertEquals("Unexpected offset for existing set!", offset3, alt3);
-    final TIntArrayList data3a = new TIntArrayList(6);
-    data3a.add(7);
-    data3a.add(6);
-    data3a.add(5);
-    data3a.add(4);
-    data3a.add(3);
-    data3a.add(1);
-    final int alt3a = buffer.add(data3a);
-    assertEquals("Unexpected offset for existing set!", offset3, alt3a);
   }
 
   public void testAddHashSets()
@@ -128,7 +119,7 @@ public class IntSetBufferTest extends AbstractWatersTest
   public void testSmallIterator()
   {
     final IntSetBuffer buffer = new IntSetBuffer(4);
-    final int[] data = {3, 2, 1};
+    final int[] data = {1, 2, 3};
     final int offset = buffer.add(data);
     final WatersIntIterator iter = buffer.iterator(offset);
     assertTrue("Premature end of iteration!", iter.advance());
@@ -143,17 +134,16 @@ public class IntSetBufferTest extends AbstractWatersTest
   public void testBigIterator()
   {
     final int MAXCOUNT = 100;
-    final IntSetBuffer buffer = new IntSetBuffer(MAXCOUNT - 1);
+    final IntSetBuffer buffer = new IntSetBuffer(MAXCOUNT + 1);
     final IntSetBuffer.IntSetIterator iter = buffer.iterator();
     final TIntArrayList list = new TIntArrayList(MAXCOUNT);
     for (int count = 0; count <= MAXCOUNT; count++) {
-      for (int i = count - 1; i >= 0; i--) {
-        list.add(i);
+      if (count > 0) {
+        list.add(count);
       }
       final int offset = buffer.add(list);
-      list.clear();
       iter.reset(offset);
-      for (int i = 0; i < count; i++) {
+      for (int i = 1; i <= count; i++) {
         assertTrue("Premature end of iteration!", iter.advance());
         assertEquals("Unexpected data in iteration!", i, iter.getCurrentData());
       }
