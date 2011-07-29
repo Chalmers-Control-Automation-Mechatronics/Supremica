@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="forbid-sync" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Expected synchronous product result for forbid test case.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="a"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name=":forbidden_a"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name=":forbidden_b"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="AB">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <PointGeometry>
+                            <Point Y="96" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-19" X="1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point Y="96" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-23" X="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q3">
+                        <PointGeometry>
+                            <Point Y="192" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="-26"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":forbidden_a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="130" X="191"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q3" Source="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":forbidden_b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-32" X="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="194" X="132"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

@@ -4,6 +4,7 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -90,6 +91,45 @@ public class MonolithicSynchronousProductBuilder
     return mStateCallback;
   }
 
+  /**
+   * Sets the given event to be considered as forbidden.
+   * Forbidden events are typically selfloop-only events with the property
+   * that state exploration ends as soon as a state with a forbidden event
+   * enabled is encountered. When state exploration encounters a state
+   * with a forbidden event enabled, it suppresses any further outgoing
+   * transitions from that state.
+   */
+  public void addForbiddenEvent(final EventProxy event)
+  {
+    final Collection<EventProxy> hidden = Collections.singletonList(event);
+    addMask(hidden, event, true);
+  }
+
+  /**
+   * Specifies an event mask for hiding. Events can be masked or hidden
+   * by specifying a set of events to be masked and a replacement event.
+   * When creating transitions of the output automaton, all events in the
+   * mask will be replaced by the specified event. This method can be called
+   * multiply; in this case, the result is undefined if the specified event
+   * sets are not disjoint.
+   * @param  hidden      A set of events to be replaced.
+   * @param  replacement An event to be used instead of any of the hidden
+   *                     events.
+   * @param  forbidden   Whether the given events should be considered as
+   *                     forbidden in addition.
+   * @see #addForbiddenEvent(EventProxy) addForbiddenEvent()
+   */
+  public void addMask(final Collection<EventProxy> hidden,
+                      final EventProxy replacement,
+                      final boolean forbidden)
+  {
+    if (mMaskingPairs == null) {
+      mMaskingPairs = new LinkedList<MaskingPair>();
+    }
+    final MaskingPair pair = new MaskingPair(hidden, replacement, forbidden);
+    mMaskingPairs.add(pair);
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
@@ -106,11 +146,7 @@ public class MonolithicSynchronousProductBuilder
   public void addMask(final Collection<EventProxy> hidden,
                       final EventProxy replacement)
   {
-    if (mMaskingPairs == null) {
-      mMaskingPairs = new LinkedList<MaskingPair>();
-    }
-    final MaskingPair pair = new MaskingPair(hidden, replacement);
-    mMaskingPairs.add(pair);
+    addMask(hidden, replacement, false);
   }
 
   public void clearMask()
@@ -190,7 +226,6 @@ public class MonolithicSynchronousProductBuilder
     mNumEvents = events.size();
     mNumAutomata = automata.size();
 
-    mEvents = new ArrayList<EventProxy>(mNumEvents);
     TObjectIntHashMap<EventProxy> eventToIndex =
       new TObjectIntHashMap<EventProxy>(mNumInputEvents);
     if (mUsedPropositions == null) {
@@ -198,42 +233,64 @@ public class MonolithicSynchronousProductBuilder
     } else {
       mCurrentPropositions = mUsedPropositions;
     }
-    int e = 0;
+    final Collection<EventProxy> forbidden = new THashSet<EventProxy>();
+    if (mMaskingPairs != null) {
+      for (final MaskingPair pair : mMaskingPairs) {
+        if (pair.isForbidden()) {
+          final Collection<EventProxy> hidden = pair.getHiddenEvents();
+          forbidden.addAll(hidden);
+        }
+      }
+    }
+    int nextForbidden = 0;
+    int nextNormal = forbidden.size();
     for (final EventProxy event : events) {
       if (event.getKind() == EventKind.PROPOSITION) {
         if (mUsedPropositions == null) {
           mCurrentPropositions.add(event);
         }
+      } else if (forbidden.contains(event)) {
+        eventToIndex.put(event, nextForbidden++);
       } else {
-        mEvents.add(event);
-        eventToIndex.put(event, e++);
+        eventToIndex.put(event, nextNormal++);
       }
     }
-    mNumInputEvents = mNumEvents = mEvents.size();
+    mNumForbiddenEvents = nextForbidden;
+    mNumInputEvents = nextNormal;
     if (mMaskingPairs != null) {
       mProjectionMask = new int[mNumInputEvents];
-      for (e = 0; e < mNumInputEvents; e++) {
+      for (int e = 0; e < mNumInputEvents; e++) {
         mProjectionMask[e] = e;
       }
       for (final MaskingPair pair : mMaskingPairs) {
         final EventProxy replacement = pair.getReplacement();
+        final int e;
         if (eventToIndex.containsKey(replacement)) {
           e = eventToIndex.get(replacement);
         } else {
-          e = mNumEvents++;
+          e = nextNormal++;
           eventToIndex.put(replacement, e);
-          mEvents.add(replacement);
         }
         for (final EventProxy hidden : pair.getHiddenEvents()) {
           final int h = eventToIndex.get(hidden);
           mProjectionMask[h] = e;
         }
       }
-      mCurrentSuccessors = new TIntHashSet[mNumEvents];
-      for (e = 0; e < mNumEvents; e++) {
+      mCurrentSuccessors = new TIntHashSet[nextNormal];
+      for (int e = 0; e < nextNormal; e++) {
         mCurrentSuccessors[e] = new TIntHashSet();
       }
     }
+    mNumEvents = nextNormal;
+    mEvents = new EventProxy[nextNormal];
+    final TObjectIntIterator<EventProxy> iter = eventToIndex.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final EventProxy event = iter.key();
+      final int e = iter.value();
+      mEvents[e] = event;
+    }
+
     final int numProps = mCurrentPropositions.size();
     mOriginalStates = new StateProxy[mNumAutomata][];
     mAllMarkings = new HashMap<List<EventProxy>,List<EventProxy>>();
@@ -301,7 +358,7 @@ public class MonolithicSynchronousProductBuilder
       }
       for (final EventProxy event : localEvents) {
         if (event.getKind() != EventKind.PROPOSITION) {
-          e = eventToIndex.get(event);
+          final int e = eventToIndex.get(event);
           mTransitions[a][e] = new int[numStates][];
           for (int source = 0; source < numStates; source++) {
             final TIntArrayList list = autTransitionLists[e][source];
@@ -317,7 +374,7 @@ public class MonolithicSynchronousProductBuilder
 
     mEventAutomata = new int[mNumInputEvents][];
     final List<IntDouble> list = new ArrayList<IntDouble>(mNumAutomata);
-    for (e = 0; e < mNumInputEvents; e++) {
+    for (int e = 0; e < mNumInputEvents; e++) {
       for (a = 0; a < mNumAutomata; a++) {
         if (mTransitions[a][e] != null) {
           final int numStates = mTransitions[a][e].length;
@@ -391,8 +448,19 @@ public class MonolithicSynchronousProductBuilder
         mCurrentSuccessors[e].clear();
       }
     }
+    forbidden:
+    for (int e = 0; e < mNumForbiddenEvents; e++) {
+      for (final int a : mEventAutomata[e]) {
+        if (mTransitions[a][e] != null &&
+            mTransitions[a][e][sourceTuple[a]] == null) {
+          continue forbidden;
+        }
+      }
+      addTransition(source, e, source);
+      return;
+    }
     events:
-    for (int e = 0; e < mNumInputEvents; e++) {
+    for (int e = mNumForbiddenEvents; e < mNumInputEvents; e++) {
       Arrays.fill(mNDTuple, null);
       for (final int a : mEventAutomata[e]) {
         if (mTransitions[a][e] != null) {
@@ -455,25 +523,33 @@ public class MonolithicSynchronousProductBuilder
     // Only add a transition if not adding in an initial state,
     // and avoid duplicates.
     if (!isInitial) {
-      if (mProjectionMask == null) {
+      addTransition(source, event, target);
+    }
+  }
+
+  private void addTransition(final int source,
+                             final int event,
+                             final int target)
+  throws OverflowException
+  {
+    if (mProjectionMask == null) {
+      if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
+        throw new OverflowException(OverflowKind.TRANSITION,
+                                    getTransitionLimit());
+      }
+      mTransitionBuffer.add(source);
+      mTransitionBuffer.add(event);
+      mTransitionBuffer.add(target);
+    } else {
+      final int masked = mProjectionMask[event];
+      if (mCurrentSuccessors[masked].add(target)) {
         if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
           throw new OverflowException(OverflowKind.TRANSITION,
                                       getTransitionLimit());
         }
         mTransitionBuffer.add(source);
-        mTransitionBuffer.add(event);
+        mTransitionBuffer.add(masked);
         mTransitionBuffer.add(target);
-      } else {
-        final int masked = mProjectionMask[event];
-        if (mCurrentSuccessors[masked].add(target)) {
-          if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-            throw new OverflowException(OverflowKind.TRANSITION,
-                                        getTransitionLimit());
-          }
-          mTransitionBuffer.add(source);
-          mTransitionBuffer.add(masked);
-          mTransitionBuffer.add(target);
-        }
       }
     }
   }
@@ -483,15 +559,28 @@ public class MonolithicSynchronousProductBuilder
     final int numEvents = mNumEvents + mCurrentPropositions.size();
     final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
     if (mMaskingPairs == null) {
-      events.addAll(mEvents);
+      for (final EventProxy event : mEvents) {
+        events.add(event);
+      }
     } else {
-      final THashSet<EventProxy> hidden = new THashSet<EventProxy>(mNumEvents);
+      final THashSet<EventProxy> skip = new THashSet<EventProxy>(mNumEvents);
       for (final MaskingPair pair : mMaskingPairs) {
-        hidden.addAll(pair.getHiddenEvents());
+        final Collection<EventProxy> hidden = pair.getHiddenEvents();
+        skip.addAll(hidden);
+      }
+      for (final MaskingPair pair : mMaskingPairs) {
+        final EventProxy replacement = pair.getReplacement();
+        skip.remove(replacement);
       }
       for (final EventProxy event : mEvents) {
-        if (!hidden.contains(event)) {
+        if (skip.add(event)) {
           events.add(event);
+        }
+      }
+      for (final MaskingPair pair : mMaskingPairs) {
+        final EventProxy replacement = pair.getReplacement();
+        if (skip.add(replacement)) {
+          events.add(replacement);
         }
       }
     }
@@ -528,7 +617,7 @@ public class MonolithicSynchronousProductBuilder
       int code = mTransitionBuffer.get(t++);
       final StateProxy source = states.get(code);
       code = mTransitionBuffer.get(t++);
-      final EventProxy event = mEvents.get(code);
+      final EventProxy event = mEvents[code];
       code = mTransitionBuffer.get(t++);
       final StateProxy target = states.get(code);
       transitions.add(factory.createTransitionProxy(source, event, target));
@@ -589,10 +678,12 @@ public class MonolithicSynchronousProductBuilder
     //#######################################################################
     //# Constructor
     private MaskingPair(final Collection<EventProxy> hidden,
-                        final EventProxy replacement)
+                        final EventProxy replacement,
+                        final boolean forbidden)
     {
       mHiddenEvents = hidden;
       mReplacement = replacement;
+      mForbidden = forbidden;
     }
 
     //#######################################################################
@@ -607,10 +698,16 @@ public class MonolithicSynchronousProductBuilder
       return mReplacement;
     }
 
+    private boolean isForbidden()
+    {
+      return mForbidden;
+    }
+
     //#######################################################################
     //# Data Members
     private final Collection<EventProxy> mHiddenEvents;
     private final EventProxy mReplacement;
+    private final boolean mForbidden;
   }
 
 
@@ -798,9 +895,10 @@ public class MonolithicSynchronousProductBuilder
   private StateCallback mStateCallback;
 
   private int mNumAutomata;
+  private int mNumForbiddenEvents;
   private int mNumInputEvents;
   private int mNumEvents;
-  private List<EventProxy> mEvents;
+  private EventProxy[] mEvents;
   private Collection<EventProxy> mCurrentPropositions;
   private int[] mProjectionMask;
   private StateProxy[][] mOriginalStates;

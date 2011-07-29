@@ -109,9 +109,8 @@ public class SubsetConstructionTRSimplifier
    * Forbidden events are typically selfloop-only events with the property
    * that state exploration ends as soon as a state with a forbidden event
    * enabled is encountered. When subset construction encounters a state
-   * with a forbidden event enabled, it adds selfloops with all forbidden
-   * events to that state, but suppresses any other outgoing transitions
-   * from that state.
+   * with a forbidden event enabled, it suppresses any further outgoing
+   * transitions from that state.
    */
   public void setForbiddenEvent(final int event, final boolean forbidden)
   {
@@ -258,9 +257,9 @@ public class SubsetConstructionTRSimplifier
       // 2. Expand subset states.
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       final TIntArrayList current = new TIntArrayList();
+      states:
       for (int source = 0; source < mSetOffsets.size(); source++) {
         final int set = mSetOffsets.get(source);
-        boolean forbidden = false;
         for (final int event : mForbiddenEventIndexes) {
           checkAbort();
           iter.reset(set);
@@ -269,13 +268,9 @@ public class SubsetConstructionTRSimplifier
             mForbiddenEventIterator.reset(state, event);
             if (mForbiddenEventIterator.advance()) {
               mTransitionBuffer.addTransition(source, event, source);
-              forbidden = true;
-              break;
+              continue states;
             }
           }
-        }
-        if (forbidden) {
-          continue;
         }
         for (final int event : mNormalEventIndexes) {
           checkAbort();

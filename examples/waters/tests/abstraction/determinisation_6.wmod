@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="determinisation_6" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This is a simple test for the subset construction algorithm. This tests whether a two forbidden events enabled in the same state are recognised and handled correctly.</ns2:Comment>
+    <ns2:Comment>This is a simple test for the subset construction algorithm. This tests makes sure that only the first of two forbidden events enabled in the same state is retained in the output.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -128,6 +128,7 @@
             <Graph Deterministic="false">
                 <LabelBlock>
                     <SimpleIdentifier Name="e2"/>
+                    <SimpleIdentifier Name=":forbidden2"/>
                     <SimpleIdentifier Name=":accepting"/>
                     <LabelGeometry Anchor="NW">
                         <Point Y="41" X="175"/>
@@ -166,9 +167,8 @@
                     <Edge Target="S12" Source="S12">
                         <LabelBlock>
                             <SimpleIdentifier Name=":forbidden1"/>
-                            <SimpleIdentifier Name=":forbidden2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-32" X="-38"/>
+                                <Point Y="-22" X="-35"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>

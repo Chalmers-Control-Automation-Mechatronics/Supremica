@@ -9,11 +9,17 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.util.Collection;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractSynchronousProductBuilderTest;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class MonolithicSynchronousProductBuilderTest
@@ -37,10 +43,43 @@ public class MonolithicSynchronousProductBuilderTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractAutomatonBuilderTest
+  @Override
   protected MonolithicSynchronousProductBuilder
     createAutomatonBuilder(final ProductDESProxyFactory factory)
   {
     return new MonolithicSynchronousProductBuilder(factory);
+  }
+
+  @Override
+  protected MonolithicSynchronousProductBuilder getAutomatonBuilder()
+  {
+    return (MonolithicSynchronousProductBuilder) super.getAutomatonBuilder();
+  }
+
+  @Override
+  protected void configureAutomatonBuilder(final ProductDESProxy des)
+  {
+    super.configureAutomatonBuilder(des);
+    final MonolithicSynchronousProductBuilder builder = getAutomatonBuilder();
+    final Collection<EventProxy> events = des.getEvents();
+    for (final EventProxy event : events) {
+      final EventKind kind = event.getKind();
+      final String name = event.getName();
+      if (kind != EventKind.PROPOSITION &&
+          name.startsWith(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+        builder.addForbiddenEvent(event);
+      }
+    }
+  }
+
+  //#########################################################################
+  //# Specific Test Cases
+  public void testForbid() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "forbid";
+    runAutomatonBuilder(group, subdir, name);
   }
 
 }
