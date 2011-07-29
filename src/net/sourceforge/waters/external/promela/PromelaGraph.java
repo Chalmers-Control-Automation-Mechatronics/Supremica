@@ -1402,9 +1402,10 @@ public class PromelaGraph
 
       final NodeProxy source = e.getSource().getNode();
       final NodeProxy target = e.getTarget().getNode();
-
-      final EdgeProxy edge = mFactory.createEdgeProxy(source, target, labelBlock, null, null, null, null);
-      mEdges.add(edge);
+     // if(!label.isEmpty()){
+        final EdgeProxy edge = mFactory.createEdgeProxy(source, target, labelBlock, null, null, null, null);
+        mEdges.add(edge);
+    //  }
     }
     boolean isDetermine = true;
     loop1:

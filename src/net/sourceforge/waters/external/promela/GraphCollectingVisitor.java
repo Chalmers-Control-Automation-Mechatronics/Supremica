@@ -244,10 +244,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
         }
         final LabelBlockProxy label =
               mFactory.createLabelBlockProxy(labelBlock, null);
-        final EdgeProxy sendEdge =
-              mFactory.createEdgeProxy(start, node, label, null, null, null, null);
-        mEdges.add(sendEdge);
-
+        if(!labelBlock.isEmpty()){
+          final EdgeProxy sendEdge =
+                mFactory.createEdgeProxy(start, node, label, null, null, null, null);
+          mEdges.add(sendEdge);
+        }
         final Collection<IdentifierProxy> labelBlock2 = new ArrayList<IdentifierProxy>();
 
         for(int i=0;i<msg.getRecipients().size();i++){
@@ -279,9 +280,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
         }
         final LabelBlockProxy label2 =
             mFactory.createLabelBlockProxy(labelBlock2, null);
-        final EdgeProxy recvEdge =
-            mFactory.createEdgeProxy(node, start, label2, null, null, null, null);
-        mEdges.add(recvEdge);
+        if(!labelBlock2.isEmpty()){
+          final EdgeProxy recvEdge =
+              mFactory.createEdgeProxy(node, start, label2, null, null, null, null);
+          mEdges.add(recvEdge);
+        }
       }
 
       final GraphProxy graph = mFactory.createGraphProxy(true, null, mNodes, mEdges);
