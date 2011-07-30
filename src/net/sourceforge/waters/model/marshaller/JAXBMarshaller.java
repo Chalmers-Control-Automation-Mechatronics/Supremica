@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import javax.swing.filechooser.FileFilter;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -66,7 +67,7 @@ public abstract class JAXBMarshaller
     mExporter = exporter;
     mImporter = importer;
     final SchemaFactory factory =
-      SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
+      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     final URL url = JAXBMarshaller.class.getResource(schemaname);
     final Schema schema = factory.newSchema(url);
     final JAXBContext context = JAXBContext.newInstance(packname);
@@ -237,7 +238,5 @@ public abstract class JAXBMarshaller
   private final JAXBDocumentImporter<D,T> mImporter;
   private final Marshaller mJAXBMarshaller;
   private final Unmarshaller mJAXBUnmarshaller;
-  private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
-
 
 }
