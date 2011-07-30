@@ -221,6 +221,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
           final String procname = msg.getSenders().get(i);
           if(mVisitor.getOccur().get(procname)==1){
             final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+            if(ch.isSenderPresent()){
+              final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+0);
+              indexes.add(ident);
+            }
             for(final SimpleExpressionProxy s:  msg.getMsg()){
               final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
               indexes.add(c1);
@@ -256,6 +260,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
           if(mVisitor.getOccur().get(procname)==1){
 
             final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+            if(ch.isRecipientPresent()){
+              final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+0);
+              indexes.add(ident);
+            }
             for(final SimpleExpressionProxy s:  msg.getMsg()){
               final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
               indexes.add(c1);
@@ -345,7 +353,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       new ExpressionComparator(optable);
       final String chanName = t.getChild(0).getText();
       final ChanInfo ch = mVisitor.getChan().get(chanName);
-      System.out.println(ch);
+      //System.out.println(ch);
       final int length = ch.getChanLength();
       Tree tree = t;
       while (!(tree instanceof ProctypeTreeNode)) {
@@ -374,6 +382,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       for(final Message m: ch.getOutput()){
 
         if(m.equals(msg)){
+          if(!m.hasRecipients() && ch.getChanLength()==0) break;
           if(c.isSenderPresent()){
 
             if(mVisitor.getOccur().get(name)>1){
@@ -513,7 +522,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
       }
       }
-      System.out.println("");
+      //System.out.println("");
       return new PromelaGraph(events,mFactory);
 
   }

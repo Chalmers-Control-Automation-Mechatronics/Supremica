@@ -44,6 +44,7 @@ public class PromelaGraph
 
     final PromelaEdge edge = new PromelaEdge(mPromelaStartNode,promelaEndNode,label);
     mPromelaEdges.add(edge);
+
     mPromelaNodes.add(mPromelaStartNode);
     mPromelaNodes.add(promelaEndNode);
 
@@ -63,9 +64,10 @@ public class PromelaGraph
     //final Collection<SimpleExpressionProxy> labelBlock = new ArrayList<SimpleExpressionProxy>(tempLabel);
 
     final PromelaLabel label = new PromelaLabel(tempLabel);
-
-    final PromelaEdge edge = new PromelaEdge(mPromelaStartNode, promelaEndNode, label);
-    mPromelaEdges.add(edge);
+    if(tempLabel.size()>0){
+      final PromelaEdge edge = new PromelaEdge(mPromelaStartNode, promelaEndNode, label);
+      mPromelaEdges.add(edge);
+    }
     mPromelaNodes.add(mPromelaStartNode);
     mPromelaNodes.add(promelaEndNode);
 

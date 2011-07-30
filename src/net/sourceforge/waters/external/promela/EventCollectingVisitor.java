@@ -121,53 +121,16 @@ public class EventCollectingVisitor implements PromelaVisitor
     //System.out.println(chanIn.getKey()+"  "+chanIn.getValue());
     //final List<Message> msgs = new ArrayList<Message>(chan.get(channelMsg.get(0)).getMessages());
     final List<Message> msgs = new ArrayList<Message>(chanIn.getValue().getMessages());
-    //final List<Message> mOutput = chanIn.getValue().getOutput();
+
     final Hashtable<Integer,List<SimpleExpressionProxy>> table =new Hashtable<Integer,List<SimpleExpressionProxy>>();
     for(int i=0;i<chanIn.getValue().getDataLength();i++){
-      //final List<SimpleExpressionProxy> channelList = new ArrayList<SimpleExpressionProxy>();
+
       table.put(i,new ArrayList<SimpleExpressionProxy>());
     }
-   // table.put(0,channel_1);
-   // table.put(1,channel_2);
-    loop1:
-    for(final Message m: msgs){
-      for(final SimpleExpressionProxy s: m.getMsg()){
-        if(s==null){
-          continue loop1;
-        }
-      }
-      for(int i=0;i<m.getMsg().size();i++){
-        table.get(i).add(m.getMsg().get(i));
-      }
-    }
-    Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>();
-    for(int i=0;i<table.size();i++){
-      Collections.sort(table.get(i),comparator);
-      final BinaryOperator op = optable.getRangeOperator();
-      final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
-      ranges.add(range);
-    }
-    mRanges = new ArrayList<SimpleExpressionProxy>(ranges);
 
+    Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>();
     final List<Message> recipients = new ArrayList<Message>();
     final List<Message> senders = new ArrayList<Message>();
- /*   for(final Message m: msgs){
-      if(m.hasSenders()){
-        senders.add(m);
-        chanIn.getValue().addMsgList(m);
-      }else if(m.hasRecipients()){
-        recipients.add(m);
-        chanIn.getValue().addMsgList(m);
-      }else{
-        chanIn.getValue().addMsgList(m);
-      }
-    }
-    for(final Message m: msgs){
-      if(!m.hasRecipients()){
-
-      }
-    }
-*/
 
     for(final Message m: msgs){
       if(!m.hasSenders()){
@@ -187,8 +150,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     //int a = 0;
     for (final Message m : chanIn.getValue().getOutput()) {
-    //do{
-    //  final Message m = recipients.get(a);
+
       final ArrayList<SimpleExpressionProxy> labels = new ArrayList<SimpleExpressionProxy>();
       if(recipients.contains(m)){
         for(final SimpleExpressionProxy s: m.getMsg()){
@@ -223,7 +185,6 @@ public class EventCollectingVisitor implements PromelaVisitor
           for(final String s: m.getRecipients()){
             m2.addRecipient(s);
           }
-
 
           boolean test = true;
           for(final Message t1: chanIn.getValue().getOutput()){
@@ -261,9 +222,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
       if(test) chanIn.getValue().addMsgList(m);
     }
-
     }
-
 
     final ArrayList<Message> tempstore = new ArrayList<Message>();
     for(final Message msg: chanIn.getValue().getOutput()){
@@ -334,13 +293,10 @@ public class EventCollectingVisitor implements PromelaVisitor
         c.setSenders(true);
       }else if(m.getSenders().size()==1){
         final int occurrences = occur.get(m.getSenders().get(0));
-     //   if(occurrences>1){
           c.setSenders(occurrences>1);
-     //   }
       }
       }
- //     }
-  //    if(!receiving){
+
       if(!c.isRecipientPresent()){
       if(m.getRecipients().size()>1){
         c.setRecipients(true);
@@ -348,20 +304,14 @@ public class EventCollectingVisitor implements PromelaVisitor
       }else if(m.getRecipients().size()==1){
         final int occurrences = occur.get(m.getRecipients().get(0));
         c.setRecipients(occurrences>1);
-      //  if(occurrences>1){
-      //    c.setRecipients(true);
-         // receiving = true;
-      //  }
+
       }
 
     }
      }
- //   }
+
     for(final Message m: cloneOutput){
- //     if(!sending){
         if(m.getSenders().size()>1){
-         // c.setSenders(true);
-          //c.addSenders(sendRange);
           final Collection<String> tempList = new ArrayList<String>();
           for (final String s : sendRange) {
             if(occur.get(s)==1){
@@ -395,14 +345,11 @@ public class EventCollectingVisitor implements PromelaVisitor
               }
             }
             c.addSenders(tempList);
-//            sending = true;
           }
         }
 
-//      }
-//      if (!receiving) {
+
         if (m.getRecipients().size() > 1) {
-         // c.setRecipients(true);
           final Collection<String> tempList = new ArrayList<String>();
           for (final String s : recRange) {
             final String temp = s + "_0";
@@ -415,7 +362,6 @@ public class EventCollectingVisitor implements PromelaVisitor
           c.addRecipients(tempList);
 
         } else if (m.getRecipients().size() == 1) {
-     //     c.setRecipients(occurance > 1);
           if (c.isRecipientPresent()) {
             final Collection<String> tempList = new ArrayList<String>();
             for (int i = 0; i < occur.get(recRange.get(0)); i++) {
@@ -425,11 +371,8 @@ public class EventCollectingVisitor implements PromelaVisitor
               }
             }
             c.addRecipients(tempList);
-   //         receiving = true;
           }
         }
- //     }
-
     }
   final Collection<SimpleExpressionProxy> specialSend = new ArrayList<SimpleExpressionProxy>();
     final Collection<SimpleExpressionProxy> specialRec = new ArrayList<SimpleExpressionProxy>();
@@ -468,9 +411,57 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
     }
 
-    ranges.addAll(mRanges);
-    specialSend.addAll(mRanges);
-    specialRec.addAll(cloner.getClonedList(mRanges));
+    loop1:
+      for(final Message m: msgs){
+        for(final SimpleExpressionProxy s: m.getMsg()){
+          if(s==null){
+            continue loop1;
+          }
+        }
+        if(m.hasRecipients()){
+          for(int i=0;i<m.getMsg().size();i++){
+            table.get(i).add(m.getMsg().get(i));
+          }
+        }
+      }
+    Collection<SimpleExpressionProxy> dataRange;
+    if(chanIn.getValue().getChanLength()==0){
+      dataRange = new ArrayList<SimpleExpressionProxy>();
+      for(int i=0;i<table.size();i++){
+
+        Collections.sort(table.get(i),comparator);
+        final BinaryOperator op = optable.getRangeOperator();
+        final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
+        dataRange.add(range);
+      }
+      //mRanges = new ArrayList<SimpleExpressionProxy>(dataRange);
+      ranges.addAll(dataRange);
+    }else{
+      dataRange = new ArrayList<SimpleExpressionProxy>();
+      for(int i=0;i<table.size();i++){
+        Collections.sort(table.get(i),comparator);
+        final BinaryOperator op = optable.getRangeOperator();
+        final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
+        dataRange.add(range);
+      }
+      specialRec.addAll(cloner.getClonedList(dataRange));
+
+      dataRange = new ArrayList<SimpleExpressionProxy>();
+      for(int i=0;i<table.size();i++){
+        for(final Message m: chanIn.getValue().getOutput()){
+          if(!m.hasRecipients()){
+            table.get(i).add(m.getMsg().get(i));
+          }
+        }
+        Collections.sort(table.get(i),comparator);
+        final BinaryOperator op = optable.getRangeOperator();
+        final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
+        dataRange.add(range);
+      }
+      specialSend.addAll(dataRange);
+    }
+
+
     //now create event decls
     if(lengthOfChan==0){
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("exch_"+chanName);
