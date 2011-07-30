@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.op
+//# PACKAGE: net.sourceforge.waters.analysis.tr
 //# CLASS:   WatersIntIntHashMap
 //###########################################################################
 //# $Id$

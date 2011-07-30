@@ -31,7 +31,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
@@ -1861,7 +1860,7 @@ public class CompositionalGeneralisedConflictChecker
     (final AutomatonProxy abstractedAut,
      final AutomatonProxy autToAbstract,
      final EventProxy tau,
-     final ObserverProjectionTransitionRelation tr)
+     final OldTransitionRelation tr)
   {
     return new RemovalOfTauTransitionsStep(abstractedAut, autToAbstract, tau,
         tr);
@@ -2138,7 +2137,7 @@ public class CompositionalGeneralisedConflictChecker
     RemovalOfTransitionsStep(final AutomatonProxy resultAut,
                              final AutomatonProxy originalAut,
                              final EventProxy tau,
-                             final ObserverProjectionTransitionRelation tr)
+                             final OldTransitionRelation tr)
 
     {
       super(resultAut, originalAut);
@@ -2178,7 +2177,7 @@ public class CompositionalGeneralisedConflictChecker
       return mReverseOutputStateMap;
     }
 
-    ObserverProjectionTransitionRelation getTransitionRelation()
+    OldTransitionRelation getTransitionRelation()
     {
       return mTransitionRelation;
     }
@@ -2186,7 +2185,7 @@ public class CompositionalGeneralisedConflictChecker
     void createTransitionRelation()
     {
       mTransitionRelation =
-          new ObserverProjectionTransitionRelation(getOriginalAutomaton(),
+          new OldTransitionRelation(getOriginalAutomaton(),
               mPropositions);
       mCodeOfTau = mTransitionRelation.getEventInt(mTau);
       final EventProxy alpha = getUsedPreconditionMarkingProposition();
@@ -2621,7 +2620,7 @@ public class CompositionalGeneralisedConflictChecker
      */
     private final TObjectIntHashMap<StateProxy> mReverseOutputStateMap;
 
-    private ObserverProjectionTransitionRelation mTransitionRelation;
+    private OldTransitionRelation mTransitionRelation;
     private int mCodeOfTau;
     private int mCodeOfAlpha;
     private final EventProxy mTau;
@@ -2722,7 +2721,7 @@ public class CompositionalGeneralisedConflictChecker
 
     protected boolean isTraceEndState(final int stateFound)
     {
-      final ObserverProjectionTransitionRelation rel = getTransitionRelation();
+      final OldTransitionRelation rel = getTransitionRelation();
       final int alpha = getAlphaCode();
       return rel.isMarked(stateFound, alpha);
     }
@@ -2834,7 +2833,7 @@ public class CompositionalGeneralisedConflictChecker
 
     protected boolean isTraceEndState(final int stateFound)
     {
-      final ObserverProjectionTransitionRelation rel = getTransitionRelation();
+      final OldTransitionRelation rel = getTransitionRelation();
       return rel.isInitial(stateFound);
     }
 
@@ -2922,7 +2921,7 @@ public class CompositionalGeneralisedConflictChecker
       } else {
         final ProductDESProxyFactory factory = getFactory();
         final AutomatonProxy aut = getOriginalAutomaton();
-        final ObserverProjectionTransitionRelation rel =
+        final OldTransitionRelation rel =
             getTransitionRelation();
         final StateProxy[] originalStates = getOriginalStates();
         final List<TraceStepProxy> substeps = new LinkedList<TraceStepProxy>();
@@ -3087,7 +3086,7 @@ public class CompositionalGeneralisedConflictChecker
       (final AutomatonProxy resultAut,
        final AutomatonProxy originalAut,
        final EventProxy tau,
-       final ObserverProjectionTransitionRelation tr)
+       final OldTransitionRelation tr)
     {
       super(resultAut, originalAut, tau, tr);
     }
@@ -3207,7 +3206,7 @@ public class CompositionalGeneralisedConflictChecker
 
     protected boolean isTraceEndState(final int stateFound)
     {
-      final ObserverProjectionTransitionRelation rel = getTransitionRelation();
+      final OldTransitionRelation rel = getTransitionRelation();
       final int alpha = getAlphaCode();
       return rel.isMarked(stateFound, alpha);
     }

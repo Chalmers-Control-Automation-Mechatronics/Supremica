@@ -14,7 +14,6 @@ import gnu.trove.TIntIterator;
 import gnu.trove.TIntStack;
 
 import java.util.Collection;
-import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -98,7 +97,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
     }
     boolean modified = false;
     mTR =
-        new ObserverProjectionTransitionRelation(autToAbstract,
+        new OldTransitionRelation(autToAbstract,
             getPropositions());
     final int alphaID = mTR.getEventInt(mAlphaMarking);
     int defaultID = mTR.getEventInt(mDefaultMarking);
@@ -196,6 +195,6 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
   private AutomatonProxy mAutToAbstract;
 
   private boolean mIsAborting;
-  private ObserverProjectionTransitionRelation mTR;
+  private OldTransitionRelation mTR;
 
 }

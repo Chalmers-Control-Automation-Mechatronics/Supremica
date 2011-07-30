@@ -17,7 +17,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.op.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;

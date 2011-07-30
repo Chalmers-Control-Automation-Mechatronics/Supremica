@@ -15,7 +15,6 @@ import gnu.trove.TIntStack;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.Collection;
-import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -82,7 +81,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   {
     mAutToAbstract = autToAbstract;
     mTR =
-        new ObserverProjectionTransitionRelation(autToAbstract,
+        new OldTransitionRelation(autToAbstract,
             getPropositions());
     final int tauID = mTR.getEventInt(tau);
     if (tauID == -1) {
@@ -181,6 +180,6 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   private StateProxy[] mOriginalIntToStateMap;
   private TObjectIntHashMap<StateProxy> mResultingStateToIntMap;
   private boolean mIsAborting;
-  private ObserverProjectionTransitionRelation mTR = null;
+  private OldTransitionRelation mTR = null;
 
 }

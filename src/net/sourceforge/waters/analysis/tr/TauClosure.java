@@ -289,7 +289,7 @@ public class TauClosure
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     public void resetEvent(final int event)
     {
       if (event == EventEncoding.TAU) {
@@ -384,7 +384,7 @@ public class TauClosure
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     public void reset()
     {
       mStack.clear();
@@ -485,7 +485,7 @@ public class TauClosure
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     public void reset()
     {
       final int from = getCurrentFromState();
@@ -554,7 +554,7 @@ public class TauClosure
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     public void reset()
     {
       mTauIterator.resetState(mFromState);
@@ -675,7 +675,7 @@ public class TauClosure
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     public void reset()
     {
       mEventIterator.resetState(mFromState);
@@ -793,7 +793,7 @@ public class TauClosure
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     public void reset()
     {
       mTauIterator1.resetState(mFromState);

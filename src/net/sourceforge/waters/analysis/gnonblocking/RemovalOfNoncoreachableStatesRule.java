@@ -13,8 +13,8 @@ import gnu.trove.TObjectIntHashMap;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.analysis.op.CoreachabilityTRSimplifier;
-import net.sourceforge.waters.analysis.op.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.abstraction.CoreachabilityTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;

@@ -46,7 +46,7 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   }
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+  //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
   public void reset()
   {
     assert mEvent >= 0;

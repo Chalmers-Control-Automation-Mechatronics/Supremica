@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.op
+//# PACKAGE: net.sourceforge.waters.analysis.tr
 //# CLASS:   WatersIntHash
 //###########################################################################
 //# $Id$
@@ -271,7 +271,7 @@ abstract public class WatersIntHash
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.op.WatersIntHashingStrategy
+  //# Interface net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
   /**
    * Default implementation of TIntHashingStrategy:
    * delegates hashing to HashFunctions.hash(int).

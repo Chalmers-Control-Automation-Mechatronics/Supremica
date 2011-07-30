@@ -55,8 +55,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.op.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;

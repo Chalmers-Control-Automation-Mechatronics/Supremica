@@ -11,8 +11,8 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.OPConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
-import net.sourceforge.waters.analysis.op.OPConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;

@@ -51,7 +51,7 @@ package org.supremica.automata.algorithms.minimization;
 
 import java.util.*;
 
-import net.sourceforge.waters.analysis.op.OPSearchAutomatonSimplifier;
+import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;

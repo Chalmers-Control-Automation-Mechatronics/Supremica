@@ -1351,7 +1351,7 @@ public abstract class TransitionListBuffer
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.op.TransitionIterator
+    //# Interface net.sourceforge.waters.tr.TransitionIterator
     public void reset()
     {
       if (mFromState >= 0) {
@@ -1496,7 +1496,7 @@ public abstract class TransitionListBuffer
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.op.TransitionIterator
+    //# Interface net.sourceforge.waters.tr.TransitionIterator
     public boolean advance()
     {
       mPrevious = getCurrent();
@@ -1576,7 +1576,7 @@ public abstract class TransitionListBuffer
     }
 
     //#########################################################################
-    //# Interface net.sourceforge.waters.op.TransitionIterator
+    //# Interface net.sourceforge.waters.tr.TransitionIterator
     public void reset()
     {
       mCurrentFromState = -1;

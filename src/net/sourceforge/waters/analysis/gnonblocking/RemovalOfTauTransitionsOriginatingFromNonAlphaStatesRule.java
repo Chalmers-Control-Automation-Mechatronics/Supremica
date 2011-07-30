@@ -11,8 +11,8 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.analysis.op.OnlySilentOutgoingTRSimplifier;
-import net.sourceforge.waters.analysis.op.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;

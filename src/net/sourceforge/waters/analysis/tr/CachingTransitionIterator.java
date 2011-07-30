@@ -51,7 +51,7 @@ public class CachingTransitionIterator implements TransitionIterator
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+  //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
   public void reset()
   {
     mInnerIterator.reset();
