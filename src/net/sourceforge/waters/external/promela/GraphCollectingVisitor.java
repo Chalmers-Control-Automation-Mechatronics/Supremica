@@ -206,7 +206,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       mNodes.add(start);
       loop1:
       for(final Message msg : ch.getOutput()){
-        if(msg.getMsg().contains(null)){
+        if(msg.getMsg().contains(null) || msg.getSenders().size()==0){
           continue loop1;
         }
         String ename = "s";
@@ -256,6 +256,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         final Collection<IdentifierProxy> labelBlock2 = new ArrayList<IdentifierProxy>();
 
         for(int i=0;i<msg.getRecipients().size();i++){
+          if(!msg.hasSenders()) break;
           final String procname = msg.getRecipients().get(i);
           if(mVisitor.getOccur().get(procname)==1){
 
@@ -570,9 +571,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final Message msg = new Message(index);
     final List<IdentifierProxy> events = new ArrayList<IdentifierProxy>();
 
-
+      loop1:
       for(final Message m: ch.getOutput()){
         if(m.equals(msg)){
+            if(!m.hasSenders()) break loop1;
             loop2:
             for(final Message m2: ch.getMessages()){
               if(m2.getMsg().contains(null)){

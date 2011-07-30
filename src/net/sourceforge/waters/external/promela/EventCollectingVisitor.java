@@ -418,11 +418,12 @@ public class EventCollectingVisitor implements PromelaVisitor
             continue loop1;
           }
         }
-        if(m.hasRecipients()){
+        if(m.hasRecipients() && m.hasSenders()){
           for(int i=0;i<m.getMsg().size();i++){
             table.get(i).add(m.getMsg().get(i));
           }
         }
+
       }
     Collection<SimpleExpressionProxy> dataRange;
     if(chanIn.getValue().getChanLength()==0){
