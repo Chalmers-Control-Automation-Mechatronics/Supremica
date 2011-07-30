@@ -19,9 +19,9 @@ class Expression {
 		newExpr = replaceWordOp(/false/, ' 0 ')
 		newExpr = replaceWordOp(/and/, ' & ')
 		newExpr = replaceWordOp(/or/, ' | ')
-		newExpr = newExpr.replace(':=', '£££')
+		newExpr = newExpr.replace(':=', '###')
 		newExpr = newExpr.replace('=', '==')
-		newExpr = newExpr.replace('£££', '=')
+		newExpr = newExpr.replace('###', '=')
 		newExpr = replaceWordOp(/not/, ' !')
 		newExpr = newExpr.replace('.', '_')
 		newExpr = newExpr.replaceAll(/\(\s+/){'('}
