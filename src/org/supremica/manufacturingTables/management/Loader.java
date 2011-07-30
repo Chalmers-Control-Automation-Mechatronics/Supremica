@@ -63,7 +63,6 @@ import java.io.*;
 import javax.xml.bind.*;
 import javax.xml.validation.*;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.XMLConstants;
 import org.xml.sax.SAXException;
 
 //import net.sourceforge.fuber.xsd.libraryelement.*;
@@ -74,13 +73,15 @@ public class Loader
 {
     private JAXBContext jaxbContext;
     private Unmarshaller u;
-    
-    
+    private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
+
+
+
     public Loader()
     {
     }
-    
-    public Object loadFactory(String path, String fileName)
+
+    public Object loadFactory(final String path, final String fileName)
     throws JAXBException, SAXException
     {
         // Create JAXBContext and unmarshaller for factory
@@ -90,15 +91,16 @@ public class Loader
             //System.err.println("jaxbcontext created");
             u = jaxbContext.createUnmarshaller();
             //System.err.println("unmarshaller created");
-            
+
             // enable validation
-            String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
-            SchemaFactory factory = SchemaFactory.newInstance(language);
-            StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/Factory.xsd"));
-            Schema schema = factory.newSchema(ss);
+
+            final String language = W3C_XML_SCHEMA_NS_URI;
+            final SchemaFactory factory = SchemaFactory.newInstance(language);
+            final StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/Factory.xsd"));
+            final Schema schema = factory.newSchema(ss);
             u.setSchema(schema);
             System.err.println("validation is on");
-            
+
             // We will allow the Unmarshaller's default
             // ValidationEventHandler to receive notification of warnings
             // and errors which will be sent to java.lang.System.err.  The default
@@ -107,17 +109,17 @@ public class Loader
             // first error or fatal error.
             return load(path, fileName);
         }
-        catch(SAXException se)
+        catch(final SAXException se)
         {
             throw se;
         }
-        catch(JAXBException je)
+        catch(final JAXBException je)
         {
             throw je;
         }
     }
-    
-    public Object loadEOP(String path, String fileName)
+
+    public Object loadEOP(final String path, final String fileName)
     throws JAXBException, SAXException
     {
         // Create JAXBContext and unmarshaller for EOP
@@ -126,27 +128,27 @@ public class Loader
             jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.eop");
             u = jaxbContext.createUnmarshaller();
             // enable validation
-            String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
-            SchemaFactory factory = SchemaFactory.newInstance(language);
-            StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/EOP.xsd"));
-            Schema schema = factory.newSchema(ss);
+            final String language = W3C_XML_SCHEMA_NS_URI;
+            final SchemaFactory factory = SchemaFactory.newInstance(language);
+            final StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/EOP.xsd"));
+            final Schema schema = factory.newSchema(ss);
             u.setSchema(schema);
             System.err.println("validation is on");
-            
+
             // Se comment about validation above.
             return load(path, fileName);
         }
-        catch(SAXException se)
+        catch(final SAXException se)
         {
             throw se;
         }
-        catch(JAXBException je)
+        catch(final JAXBException je)
         {
             throw je;
         }
     }
-    
-    public Object loadCOP(String path, String fileName)
+
+    public Object loadCOP(final String path, final String fileName)
     throws JAXBException, SAXException
     {
         // Create JAXBContext and unmarshaller for COP
@@ -155,38 +157,38 @@ public class Loader
             jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.rop");
             u = jaxbContext.createUnmarshaller();
             // enable validation
-            String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
-            SchemaFactory factory = SchemaFactory.newInstance(language);
-            StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/ROP.xsd"));
-            Schema schema = factory.newSchema(ss);
+            final String language = W3C_XML_SCHEMA_NS_URI;
+            final SchemaFactory factory = SchemaFactory.newInstance(language);
+            final StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/ROP.xsd"));
+            final Schema schema = factory.newSchema(ss);
             u.setSchema(schema);
             System.err.println("validation is on");
-            
+
             // Se comment about validation above.
             return load(path, fileName);
         }
-        catch(SAXException se)
+        catch(final SAXException se)
         {
             throw se;
         }
-        catch(JAXBException je)
+        catch(final JAXBException je)
         {
             throw je;
         }
     }
-    
-    private Object load(String path, String fileName)
-    {               
+
+    private Object load(final String path, final String fileName)
+    {
         try
         {
-            File theFile = getFile(path, fileName);
-            
+            final File theFile = getFile(path, fileName);
+
             if(theFile!=null)
             {
                 // Unmarshall from the file
-                Object o = u.unmarshal(theFile);
+                final Object o = u.unmarshal(theFile);
                 java.lang.System.err.println("The file is unmarshalled");
-                
+
                 return o;
             }
             else
@@ -194,26 +196,26 @@ public class Loader
                 java.lang.System.err.println("Problems reading the file!");
             }
         }
-        catch(UnmarshalException ue)
+        catch(final UnmarshalException ue)
         {
             java.lang.System.err.println("Invalid XML code (UnmarshalException)" );
             ue.printStackTrace();
         }
-        catch(JAXBException je)
+        catch(final JAXBException je)
         {
             java.lang.System.err.println("JAXBException caught!");
             je.printStackTrace();
         }
         return null;
     }
-    
-    
-    private File getFile(String path, String fileName)
+
+
+    private File getFile(final String path, final String fileName)
     {
         File theFile = new File(fileName);
         if (path !=null)
         {
-            File pathFile = new File(path);
+            final File pathFile = new File(path);
             if (pathFile.isDirectory())
             {
                 theFile = new File(path, fileName);
