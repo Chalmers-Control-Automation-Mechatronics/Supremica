@@ -106,6 +106,11 @@ public abstract class AbstractPromelaUnmarshallerTest
     testImport("p101i");
   }
 
+  public void testImport_p101j() throws Exception
+  {
+    testImport("p101j");
+  }
+
   public void testImport_p102a() throws Exception
   {
     testImport("p102a");
@@ -139,6 +144,11 @@ public abstract class AbstractPromelaUnmarshallerTest
   public void testImport_p102i() throws Exception
   {
     testImport("p102i");
+  }
+
+  public void testImport_p102j() throws Exception
+  {
+    testImport("p102j");
   }
 
   public void testImport_p103a() throws Exception
@@ -292,6 +302,11 @@ public abstract class AbstractPromelaUnmarshallerTest
   public void testImport_p105n() throws Exception
   {
     testImport("p105n");
+  }
+
+  public void testImport_p105o() throws Exception
+  {
+    testImport("p105o");
   }
 
   public void testImport_p106a() throws Exception
