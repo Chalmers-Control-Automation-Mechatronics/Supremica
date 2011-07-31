@@ -13,6 +13,7 @@ proctype A()
   ab!0;
   ab!1;
   abc!2(1);
+  abc!2(3);
 }
 
 proctype B()
@@ -20,6 +21,7 @@ proctype B()
   byte val;
   ab?val;
   abc!2(2);
+  abc!2(3);
 }
 
 proctype C()
