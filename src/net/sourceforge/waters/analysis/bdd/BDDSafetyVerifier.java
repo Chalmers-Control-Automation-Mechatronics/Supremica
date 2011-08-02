@@ -34,6 +34,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.log4j.Logger;
+
 /**
  * <P>A BDD implementation of a general safety verifier.</P>
  *
@@ -198,28 +200,33 @@ public class BDDSafetyVerifier
       setSatisfiedResult();
       return null;
     } else {
+      final Logger logger = getLogger();
       final EventBDD[] eventBDDs = super.createEventBDDs();
       final VerificationResult result = getAnalysisResult();
       if (!result.isFinished()) {
         final Partitioning<ConditionPartitionBDD> condPartitioning =
           new Partitioning<ConditionPartitionBDD>(ConditionPartitionBDD.class);
-        int condcount = 0;
+        int condcount0 = 0;
         for (final EventBDD eventBDD : eventBDDs) {
           final BDD cond = eventBDD.getControllabilityConditionBDD();
           if (cond != null) {
             final ConditionPartitionBDD part =
               new ConditionPartitionBDD(eventBDD);
             condPartitioning.add(part);
-            condcount++;
+            condcount0++;
           }
         }
         final BDDFactory bddFactory = getBDDFactory();
         final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
+        final double limit = getPartitioningGrowthLimit();
         final Collection<ConditionPartitionBDD> conditions =
-          condPartitioning.mergePartitions(automatonBDDs, bddFactory);
+          condPartitioning.mergePartitions(automatonBDDs, bddFactory, limit);
         mConditionBDDs = new ArrayList<ConditionPartitionBDD>(conditions);
-        getLogger().debug("Merged conditions: " + condcount +
-                          " >> " + mConditionBDDs.size());
+        final int condcount1 = mConditionBDDs.size();
+        if (logger.isDebugEnabled() && condcount0 > condcount1) {
+          logger.debug("Merged conditions: " + condcount0 +
+                       " >> " + condcount1);
+        }
       }
       return eventBDDs;
     }

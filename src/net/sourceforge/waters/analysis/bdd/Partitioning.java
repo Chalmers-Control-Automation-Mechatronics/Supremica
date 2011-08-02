@@ -58,21 +58,42 @@ class Partitioning<P extends PartitionBDD>
   //#########################################################################
   //# Algorithm
   SortedSet<P> mergePartitions(final AutomatonBDD[] automatonBDDs,
-                               final BDDFactory factory)
+                               final BDDFactory factory,
+                               final double partitioningGrowthLimit)
   {
-    final int count = mPartitions.size();
-    final Collection<P> completed = new ArrayList<P>(count);
-    while (!mPartitions.isEmpty()) {
-      final Iterator<P> iter = mPartitions.iterator();
-      final P part = iter.next();
-      iter.remove();
-      final P merged = merge(part, automatonBDDs, factory);
-      if (merged == null) {
-        completed.add(part);
+    if (mPartitions.isEmpty()) {
+      // nothing ...
+    } else if (partitioningGrowthLimit == Double.POSITIVE_INFINITY) {
+      PartitionBDD composition = null;
+      for (final P part : mPartitions) {
+        if (composition == null) {
+          composition = part.clone();
+        } else {
+          final PartitionBDD next =
+            composition.compose(part, automatonBDDs, factory);
+          composition.dispose();
+          composition = next;
+        }
       }
+      mPartitions.clear();
+      final P result = mClass.cast(composition);
+      mPartitions.add(result);
+    } else if (partitioningGrowthLimit > 0.0) {
+      final int count = mPartitions.size();
+      final Collection<P> completed = new ArrayList<P>(count);
+      while (!mPartitions.isEmpty()) {
+        final Iterator<P> iter = mPartitions.iterator();
+        final P part = iter.next();
+        iter.remove();
+        final P merged =
+          merge(part, automatonBDDs, factory, partitioningGrowthLimit);
+        if (merged == null) {
+          completed.add(part);
+        }
+      }
+      mPartitions.clear();
+      mPartitions.addAll(completed);
     }
-    mPartitions.clear();
-    mPartitions.addAll(completed);
     return mPartitions;
   }
 
@@ -81,10 +102,10 @@ class Partitioning<P extends PartitionBDD>
   //# Auxiliary Methods
   private P merge(final P part,
                   final AutomatonBDD[] automatonBDDs,
-                  final BDDFactory factory)
+                  final BDDFactory factory,
+                  final double partitioningGrowthLimit)
   {
     final BitSet automata0 = part.getAutomata();
-    final int numautomata0 = automata0.cardinality();
     final int size0 = part.getNodeCount();
     PartitionBDD bestcomposition = null;
     P bestcandidate = null;
@@ -94,20 +115,12 @@ class Partitioning<P extends PartitionBDD>
       if (!automata0.intersects(automata1)) {
         continue;
       }
-      final BitSet intersection = (BitSet) automata0.clone();
-      intersection.and(automata1);
-      if (!intersection.equals(automata0) && !intersection.equals(automata1)) {
-        final int numintersect = intersection.cardinality();
-        if (numautomata0 - numintersect > 1 ||
-            automata1.cardinality() - numintersect > 1) {
-          continue;
-        }
-      }
       final int size1 = candidate.getNodeCount();
       final PartitionBDD composition =
         part.compose(candidate, automatonBDDs, factory);
       final int size = composition.getNodeCount();
-      if (size >= bestsize || size > 2 * (size0 + size1)) {
+      if (size >= bestsize ||
+          size > partitioningGrowthLimit * (size0 + size1)) {
         composition.dispose();
         continue;
       }

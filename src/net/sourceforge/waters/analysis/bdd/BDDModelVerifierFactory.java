@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.bdd;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentDouble;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -58,6 +59,7 @@ public class BDDModelVerifierFactory
     addArgument(new CommandLineArgumentPack());
     addArgument(new CommandLineArgumentOrder());
     addArgument(new CommandLineArgumentDynamic());
+    addArgument(new CommandLineArgumentGrowthLimit());
   }
 
 
@@ -90,7 +92,6 @@ public class BDDModelVerifierFactory
   private static class CommandLineArgumentPack
     extends CommandLineArgumentEnum<BDDPackage>
   {
-
     //#######################################################################
     //# Constructor
     private CommandLineArgumentPack()
@@ -108,7 +109,6 @@ public class BDDModelVerifierFactory
       final BDDPackage pack = getValue();
       bddVerifier.setBDDPackage(pack);
     }
-
   }
 
 
@@ -117,7 +117,6 @@ public class BDDModelVerifierFactory
   private static class CommandLineArgumentOrder
     extends CommandLineArgumentEnum<VariableOrdering>
   {
-
     //#######################################################################
     //# Constructor
     private CommandLineArgumentOrder()
@@ -136,7 +135,6 @@ public class BDDModelVerifierFactory
       final VariableOrdering ordering = getValue();
       bddVerifier.setVariableOrdering(ordering);
     }
-
   }
 
 
@@ -145,7 +143,6 @@ public class BDDModelVerifierFactory
   private static class CommandLineArgumentDynamic
     extends CommandLineArgumentFlag
   {
-
     //#######################################################################
     //# Constructor
     private CommandLineArgumentDynamic()
@@ -163,7 +160,32 @@ public class BDDModelVerifierFactory
       final boolean enable = getValue();
       bddVerifier.setReorderingEnabled(enable);
     }
-
   }
+
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentOrder
+  private static class CommandLineArgumentGrowthLimit
+    extends CommandLineArgumentDouble
+  {
+    //#######################################################################
+    //# Constructor
+    private CommandLineArgumentGrowthLimit()
+    {
+      super("-part", "Maximum growth factor when merging partitioned BDDs");
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModelVerifier verifier)
+    {
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final double limit = getValue();
+      bddVerifier.setPartitioningGrowthLimit(limit);
+    }
+  }
+
 
 }

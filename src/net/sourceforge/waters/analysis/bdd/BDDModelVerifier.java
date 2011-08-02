@@ -45,6 +45,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.apache.log4j.Logger;
+
 /**
  * An abstract base class for all BDD-based model verifiers.</P>
  *
@@ -114,6 +116,7 @@ public abstract class BDDModelVerifier
     mBDDPackage = bddpackage;
     mVariableOrdering = VariableOrdering.FORCE;
     mIsReorderingEnabled = true;
+    mPartitioningGrowthLimit = Double.POSITIVE_INFINITY;
   }
 
 
@@ -147,6 +150,16 @@ public abstract class BDDModelVerifier
   public void setReorderingEnabled(final boolean enable)
   {
     mIsReorderingEnabled = enable;
+  }
+
+  public double getPartitioningGrowthLimit()
+  {
+    return mPartitioningGrowthLimit;
+  }
+
+  public void setPartitioningGrowthLimit(final double limit)
+  {
+    mPartitioningGrowthLimit = limit < 0 ? Double.POSITIVE_INFINITY : limit;
   }
 
 
@@ -351,22 +364,25 @@ public abstract class BDDModelVerifier
 
     final Partitioning<TransitionPartitionBDD> transPartitioning =
       new Partitioning<TransitionPartitionBDD>(TransitionPartitionBDD.class);
-    int transcount = 0;
+    int transcount0 = 0;
     for (final EventBDD eventBDD : eventBDDs) {
       final BDD trans = eventBDD.getTransitionsBDD();
       if (trans != null) {
         final TransitionPartitionBDD part =
           new TransitionPartitionBDD(eventBDD);
         transPartitioning.add(part);
-        transcount++;
+        transcount0++;
       }
     }
     final Collection<TransitionPartitionBDD> transitions =
-      transPartitioning.mergePartitions(mAutomatonBDDs, mBDDFactory);
+      transPartitioning.mergePartitions(mAutomatonBDDs, mBDDFactory,
+                                        mPartitioningGrowthLimit);
     mTransitionBDDs = new ArrayList<TransitionPartitionBDD>(transitions);
-    getLogger().debug("Merged transitions: " + transcount +
-                      " >> " + mTransitionBDDs.size());
-
+    final int transcount1 = mTransitionBDDs.size();
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled() && transcount0 > transcount1) {
+      logger.debug("Merged transitions: " + transcount0 + " >> " + transcount1);
+    }
     return eventBDDs;
   }
 
@@ -399,11 +415,14 @@ public abstract class BDDModelVerifier
     for (final TransitionPartitionBDD trans : mTransitionBDDs) {
       trans.buildForwardCubes(mAutomatonBDDs, mBDDFactory);
     }
+    final Logger logger = getLogger();
     BDD current = getInitialStateBDD();
     do {
       final int numnodes = mBDDFactory.getNodeNum();
-      getLogger().debug("Depth " + mLevels.size() + ", " +
-                        numnodes + " nodes ...");
+      if (logger.isDebugEnabled()) {
+        logger.debug("Depth " + mLevels.size() + ", " +
+                     numnodes + " nodes ...");
+      }
       if (numnodes > mPeakNodes) {
         mPeakNodes = numnodes;
         if (numnodes > getNodeLimit()) {
@@ -448,10 +467,13 @@ public abstract class BDDModelVerifier
       endset.free();
     }
     int level = 0;
+    final Logger logger = getLogger();
     do {
       final int numnodes = mBDDFactory.getNodeNum();
-      getLogger().debug("Coreachability " + (level++) + ", " +
-                        numnodes + " nodes ...");
+      if (logger.isDebugEnabled()) {
+        logger.debug("Coreachability " + (level++) + ", " +
+                     numnodes + " nodes ...");
+      }
       if (numnodes > mPeakNodes) {
         mPeakNodes = numnodes;
         if (numnodes > getNodeLimit()) {
@@ -798,6 +820,7 @@ public abstract class BDDModelVerifier
   private BDDPackage mBDDPackage;
   private VariableOrdering mVariableOrdering;
   private boolean mIsReorderingEnabled;
+  private double mPartitioningGrowthLimit;
 
   private int mNumAutomata;
   private BDDFactory mBDDFactory;

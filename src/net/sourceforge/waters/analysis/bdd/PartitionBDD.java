@@ -18,6 +18,7 @@ import java.util.Set;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -26,7 +27,7 @@ import net.sourceforge.waters.model.des.EventProxy;
  */
 
 abstract class PartitionBDD
-  implements Comparable<PartitionBDD>
+  implements Cloneable, Comparable<PartitionBDD>
 {
 
   //#########################################################################
@@ -79,13 +80,28 @@ abstract class PartitionBDD
   }
 
   /**
-   * Free the BDD representing this partition, if it is an atomic parition
+   * Free the BDD representing this partition, if it is an atomic partition
    * member.
    */
   void disposeComposedBDD()
   {
     if (!mIsAtomic) {
       dispose();
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface java.lang.Cloneable
+  @Override
+  public PartitionBDD clone()
+  {
+    try {
+      final PartitionBDD result = (PartitionBDD) super.clone();
+      result.mBDD = mBDD.id();
+      return result;
+    } catch (final CloneNotSupportedException exception) {
+      throw new WatersRuntimeException(exception);
     }
   }
 
