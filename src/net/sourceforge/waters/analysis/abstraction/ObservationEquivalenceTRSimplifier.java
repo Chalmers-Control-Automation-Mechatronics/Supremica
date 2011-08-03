@@ -39,19 +39,24 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 /**
  * <P>A bisimulation and observation equivalence partitioning algorithm.</P>
  *
- * <P>This transition relation simplifier can simplify a given nondeterministic
- * automaton according to common equivalences such as bisimulation and
- * observation equivalence. The implementation is based on the bisimulation
- * algorithm by Jean-Claude Fernandez. When computing observation equivalence,
- * it can additionally be configured to remove redundant transitions before and
- * after partitioning.</P>
+ * <P>This transition relation simplifier can simplify a given deterministic or
+ * nondeterministic automaton according to common equivalences such as
+ * bisimulation and observation equivalence. The implementation is based on the
+ * bisimulation algorithm by Jean-Claude Fernandez. When computing observation
+ * equivalence, it can additionally be configured to remove redundant
+ * transitions before and after partitioning.</P>
  *
- * <P><I>References.</I><BR>
+ * <P>
+ * <I>References.</I><BR>
  * Jean-Claude Fernandez. An Implementation of an Efficient Algorithm for
- * Bisimulation Equivalence. Science of Computer Programming, 13, 219-236,
- * 1990.<BR>
+ * Bisimulation Equivalence. Science of Computer Programming,
+ * <STRONG>13</STRONG>, 219-236, 1990.<BR>
+ * J. E. Hopcroft. An <I>n</I>&nbsp;log&nbsp;<I>n</I> Algorithm for Minimizing
+ * States in a Finite Automaton. In: Z. Kohavi and A. Paz, eds., Theory of
+ * Machines and Computations, Academic Press, New York, 397-419, 1971.<BR>
  * Jaana Eloranta. Minimizing the Number of Transitions with Respect to
- * Observation Equivalence. BIT, 31(4), 397-419, 1991.</P>
+ * Observation Equivalence. BIT, <STRONG>31</STRONG>(4), 397-419, 1991.
+ * </P>
  *
  * @author Robi Malik, Simon Ware, Rachel Francis
  */
@@ -1659,17 +1664,31 @@ public class ObservationEquivalenceTRSimplifier
   //# Inner Enumeration Equivalence
   /**
    * Possible equivalences for partitioning a transition relation.
+
+ * Jean-Claude Fernandez. An Implementation of an Efficient Algorithm for
+ * Bisimulation Equivalence. Science of Computer Programming,
+ * <STRONG>13</STRONG>, 219-236, 1990.<BR>
+ * J. E. Hopcroft. An <I>n</I>&nbsp;log&nbsp;<I>n</I> Algorithm for Minimizing
+ * States in a Finite Automaton. In: Z. Kohavi and A. Paz, eds., Theory of
+ * Machines and Computations, Academic Press, New York, 397-419, 1971.<BR>
+ * Jaana Eloranta. Minimizing the Number of Transitions with Respect to
+ * Observation Equivalence. BIT, <STRONG>31</STRONG>(4), 397-419, 1991.
    */
   public enum Equivalence
   {
     //#######################################################################
     //# Enumeration Values
     /**
-     * Language equivalence. This method only works for a deterministic
-     * automaton, in which case it achieves minimisation according to
-     * Hopcroft's algorithm. It is implemented like the bisimulation
-     * algorithm, but not allowing tau events, and never splitting on
-     * the larger class resulting from a split.
+     * <P>Language equivalence. This method only works for a deterministic
+     * automaton, in which case it achieves minimisation according to Hopcroft's
+     * algorithm. It is implemented like the bisimulation algorithm, but not
+     * allowing tau events, and never splitting on the larger class resulting
+     * from a split.</P>
+     *
+     * <P><I>Reference.</I> J. E. Hopcroft. An <I>n</I>&nbsp;log&nbsp;<I>n</I>
+     * Algorithm for Minimizing States in a Finite Automaton. In: Z. Kohavi and
+     * A. Paz, eds., Theory of Machines and Computations, Academic Press, New
+     * York, 397-419, 1971.</P>
      */
     DETERMINISTIC_MINSTATE {
       @Override
@@ -1696,9 +1715,13 @@ public class ObservationEquivalenceTRSimplifier
       }
     },
     /**
-     * Bisimulation equivalence. Equivalent states must be able to reach
+     * <P>Bisimulation equivalence. Equivalent states must be able to reach
      * equivalent successors for all traces of events. There are no silent
-     * events, and the tau-closure is not computed for this setting.
+     * events, and the tau-closure is not computed for this setting.</P>
+     *
+     * <P><I>Reference.</I> Jean-Claude Fernandez. An Implementation of an
+     * Efficient Algorithm for Bisimulation Equivalence. Science of Computer
+     * Programming, <STRONG>13</STRONG>, 219-236, 1990.</P>
      */
     BISIMULATION {
       @Override
@@ -1719,10 +1742,15 @@ public class ObservationEquivalenceTRSimplifier
      */
     OBSERVATION_EQUIVALENCE,
     /**
-     * Weak observation equivalence. Equivalent states must be able to reach
+     * <P>Weak observation equivalence. Equivalent states must be able to reach
      * equivalent successors for all traces of observable events <I>not</I>
      * including the empty trace. This is implemented by not considering the
-     * silent event for splitting equivalence classes.
+     * silent event for splitting equivalence classes.</P>
+     *
+     * <P><I>Reference.</I> Rong Su, Jan H. van Schuppen, Jacobus E. Rooda,
+     * Albert T. Hofkamp. Nonconflict check by using sequential automaton
+     * abstractions based on weak observation equivalence. Automatica,
+     * <STRONG>46</STRONG>(6), 968--978, 2010.</P>
      */
     WEAK_OBSERVATION_EQUIVALENCE {
       @Override

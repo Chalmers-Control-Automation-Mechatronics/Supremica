@@ -669,7 +669,8 @@ public class OPConflictChecker
   }
 
   private AbstractionRule createStandardNonblockingAbstractionChain
-    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
+    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+     final boolean includeNonAlphaDeterminisation)
   throws EventNotFoundException
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
@@ -712,12 +713,14 @@ public class OPConflictChecker
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
-    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-      new NonAlphaDeterminisationTRSimplifier();
-    nonAlphaDeterminiser.setTransitionRemovalMode
+    if (includeNonAlphaDeterminisation) {
+      final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+        new NonAlphaDeterminisationTRSimplifier();
+      nonAlphaDeterminiser.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-    nonAlphaDeterminiser.setTransitionLimit(mInternalTransitionLimit);
-    chain.add(nonAlphaDeterminiser);
+      nonAlphaDeterminiser.setTransitionLimit(mInternalTransitionLimit);
+      chain.add(nonAlphaDeterminiser);
+    }
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
@@ -1859,7 +1862,26 @@ public class OPConflictChecker
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE);
+           WEAK_OBSERVATION_EQUIVALENCE, false);
+      }
+    },
+    /**
+     * <P>Minimisation is performed according to a sequence of abstraction rules
+     * for standard nonblocking, but using weak observation equivalence instead
+     * of observation equivalence, and with an additional step of non-alpha
+     * determinisation at the end.</P>
+     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
+     * Verification in Supervisory Control. SIAM Journal of Control and
+     * Optimization, 48(3), 1914-1938, 2009.</P>
+     */
+    NBA {
+      @Override
+      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      throws EventNotFoundException
+      {
+        return checker.createStandardNonblockingAbstractionChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           WEAK_OBSERVATION_EQUIVALENCE, true);
       }
     },
     /**
@@ -1888,9 +1910,13 @@ public class OPConflictChecker
       }
     },
     /**
-     * Automata are minimised according using an <I>observer projection</I>
-     * obtained by the OP-search algorithm presented in the paper by
-     * P. Pena, J.E.R. Cury, R. Malik, and S. Lafortune in WODES 2010.
+     * <P>Automata are minimised according using an <I>observer projection</I>
+     * obtained by the OP-search algorithm.</P>
+     *
+     * <P><I>Reference.</I> P. N. Pena, J. E. R. Cury, R. Malik, S. Lafortune.
+     * Efficient Computation of Observer Projections using OP-Verifiers.
+     * Proc. 10th Workshop on Discrete Event Systems, WODES'10, Berlin, 2010,
+     * 416-421.</P>
      */
     OPSEARCH {
       @Override
@@ -1906,10 +1932,15 @@ public class OPConflictChecker
       }
     },
     /**
-     * Automata are minimised according to <I>weak observation equivalence</I>.
-     * Initial states and markings are not saturated, silent transitions
-     * are retained instead in a bid to reduce the overall number of
-     * transitions.
+     * <P>Automata are minimised according to <I>weak observation
+     * equivalence</I>. Initial states and markings are not saturated, silent
+     * transitions are retained instead in a bid to reduce the overall number of
+     * transitions.</P>
+     *
+     * <P><I>Reference.</I> Rong Su, Jan H. van Schuppen, Jacobus E. Rooda,
+     * Albert T. Hofkamp. Nonconflict check by using sequential automaton
+     * abstractions based on weak observation equivalence. Automatica,
+     * <STRONG>46</STRONG>(6), 968--978, 2010.</P>
      */
     WOEQ {
       @Override
