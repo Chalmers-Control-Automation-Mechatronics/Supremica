@@ -10,7 +10,7 @@ public class NameTreeNode extends PromelaTree
     mInitState = token.getText();
   }
   public String toString(){
-      return "name";
+      return mInitState;
   }
   private final String mInitState;
   public String getValue()

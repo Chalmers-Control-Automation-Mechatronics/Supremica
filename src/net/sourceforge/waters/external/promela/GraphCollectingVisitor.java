@@ -73,7 +73,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   Hashtable<String,Integer> copyOfOccur = new Hashtable<String,Integer>();
   Collection<Proxy> mComponents = new ArrayList<Proxy>();
 
-
+  private Hashtable<String,List<String>> proctypeVar = new Hashtable<String,List<String>>();
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
 
   Map<String,PromelaNode> mGotoNode = new HashMap<String,PromelaNode>();
@@ -111,6 +111,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   //Now it directly create PromelaGraph object, using events from Event collector; No need to visit further children
   public Object visitProcType(final ProctypeTreeNode t)
   {
+    proctypeVar = new Hashtable<String,List<String>>();
     mUnWinding = false;
     final String procName = t.getText();
     final int occurance = mVisitor.getOccur().get(procName);
@@ -225,9 +226,15 @@ public class GraphCollectingVisitor implements PromelaVisitor
               final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+0);
               indexes.add(ident);
             }
-            for(final SimpleExpressionProxy s:  msg.getMsg()){
-              final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
-              indexes.add(c1);
+            for(int a=0;a<ch.getType().size();a++){
+              final SimpleExpressionProxy s = msg.getMsg().get(a);
+              if(ch.getType().get(a).equals("byte")){
+                final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+                indexes.add(c1);
+              }else if(ch.getType().get(a).equals("mtype")){
+                final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
+                indexes.add(c1);
+              }
             }
             final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("send_"+name, indexes);
             labelBlock.add(ident);
@@ -237,9 +244,15 @@ public class GraphCollectingVisitor implements PromelaVisitor
               final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
               final IdentifierProxy identName = mFactory.createSimpleIdentifierProxy(procname+"_"+a);
               indexes.add(identName);
-              for(final SimpleExpressionProxy s:  msg.getMsg()){
-                final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
-                indexes.add(c1);
+              for(int b=0;b<ch.getType().size();b++){
+                final SimpleExpressionProxy s = msg.getMsg().get(b);
+                if(ch.getType().get(b).equals("byte")){
+                  final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+                  indexes.add(c1);
+                }else if(ch.getType().get(b).equals("mtype")){
+                  final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
+                  indexes.add(c1);
+                }
               }
               final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("send_"+name, indexes);
               labelBlock.add(ident);
@@ -265,9 +278,15 @@ public class GraphCollectingVisitor implements PromelaVisitor
               final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+0);
               indexes.add(ident);
             }
-            for(final SimpleExpressionProxy s:  msg.getMsg()){
-              final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
-              indexes.add(c1);
+            for(int a=0;a<ch.getType().size();a++){
+              final SimpleExpressionProxy s = msg.getMsg().get(a);
+              if(ch.getType().get(a).equals("byte")){
+                final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+                indexes.add(c1);
+              }else if(ch.getType().get(a).equals("mtype")){
+                final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
+                indexes.add(c1);
+              }
             }
             final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("recv_"+name, indexes);
             labelBlock2.add(ident);
@@ -278,9 +297,15 @@ public class GraphCollectingVisitor implements PromelaVisitor
               final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
               final IdentifierProxy identName = mFactory.createSimpleIdentifierProxy(procname+"_"+a);
               indexes.add(identName);
-              for(final SimpleExpressionProxy s:  msg.getMsg()){
-                final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
-                indexes.add(c1);
+              for(int b=0;b<ch.getType().size();b++){
+                final SimpleExpressionProxy s = msg.getMsg().get(b);
+                if(ch.getType().get(b).equals("byte")){
+                  final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+                  indexes.add(c1);
+                }else if(ch.getType().get(b).equals("mtype")){
+                  final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
+                  indexes.add(c1);
+                }
               }
               final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("recv_"+name, indexes);
               labelBlock2.add(ident);
@@ -370,9 +395,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
       }
 
       final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
-      for(int y=1;y<labels.size();y++){
-        final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
-        indexes.add(c);
+      for(int y=0;y<ch.getType().size();y++){
+        if(ch.getType().get(y).equals("byte")){
+          final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
+          indexes.add(c);
+        }else if(ch.getType().get(y).equals("mtype")){
+          final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(labels.get(y+1));
+          indexes.add(c);
+        }
       }
       final List<SimpleExpressionProxy> index = new ArrayList<SimpleExpressionProxy>(indexes);
       final Message msg = new Message(index);
@@ -554,13 +584,18 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
     final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
     final Collection<SimpleExpressionProxy> templabel = new ArrayList<SimpleExpressionProxy>();
-    for(int y=1;y<labels.size();y++){
-      if(labels.get(y)!=null){
-      final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y)));
+    for(int y=0;y<ch.getType().size();y++){
+      if(ch.getType().get(y).equals("byte")){
+      if(labels.get(y+1)!=null){
+      final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
       indexes.add(c);
       templabel.add(c);
       }else{
         indexes.add(null);
+      }
+      }else if(ch.getType().get(y).equals("mtype")){
+        final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(labels.get(y+1));
+        indexes.add(c);
       }
     }
     /*
@@ -837,10 +872,36 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     if(t.getParent() instanceof RunTreeNode){
       procNames.add(t.getText());
+    }else if(t.getParent() instanceof MsgTreeNode){
+      if(proctypeVar.isEmpty() || proctypeVar.get(t.getText()).size()==0){
+        labels.add(null);
+      }else if(proctypeVar.get(t.getText()).size()>0){
+        for(final String s: proctypeVar.get(t.getText())){
+          labels.add(s);
+        }
+        //labels.add(e)
+      }
+    }else if(t.getParent() instanceof SendTreeNode){
+      if(!mVisitor.getChanMsg().contains(t.getText())){
+        if(mVisitor.getGlobalVar().get("mtype").contains(t.getText())){
+          labels.add(t.getText());
+        }
+      }
     }
-    if(t.getParent() instanceof MsgTreeNode){
-      labels.add(null);
+    else if(t.getParent() instanceof ReceiveTreeNode){
+      if(!mVisitor.getChanMsg().contains(t.getText())){
+        Tree tree = t;
+        while (!(tree instanceof ProctypeTreeNode)) {
+          tree = tree.getParent();
+        }
+        if(mVisitor.getGlobalVar().get("mtype").contains(t.getText()) || proctypeVar.get(tree.getText()).contains(t.getText())){
+          labels.add(t.getText());
+        }
+      }else{
+       // labels.add(t.getText());
+      }
     }
+
     return null;
   }
 

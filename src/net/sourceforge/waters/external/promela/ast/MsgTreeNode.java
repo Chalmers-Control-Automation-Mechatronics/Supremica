@@ -19,7 +19,7 @@ public class MsgTreeNode extends PromelaTree
   }
 
   public String toString(){
-    return "MsgArgument";
+    return mChanState;
   }
 
   public String getValue()
