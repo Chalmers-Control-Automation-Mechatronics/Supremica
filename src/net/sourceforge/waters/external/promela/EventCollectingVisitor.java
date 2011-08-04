@@ -67,7 +67,6 @@ public class EventCollectingVisitor implements PromelaVisitor
   ArrayList<String> lowerEnd = new ArrayList<String>();
   ArrayList<String> upperEnd = new ArrayList<String>();
   ArrayList<String> rangeData = new ArrayList<String>();
-  private String flag;
   private Hashtable<String,String> proctypeVar = new Hashtable<String,String>();
   final Hashtable<String,THashSet<IdentifierProxy>> procEvent = new Hashtable<String,THashSet<IdentifierProxy>>();
   final Hashtable<String,LabelTreeNode> gotoLabel = new Hashtable<String,LabelTreeNode>();
@@ -120,7 +119,6 @@ public class EventCollectingVisitor implements PromelaVisitor
   public void makeMsg(){
     final ModuleProxyCloner cloner = mFactory.getCloner();
     //TODO
-    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final Comparator<SimpleExpressionProxy> comparator =
       new ExpressionComparator(optable);
     for(final Map.Entry<String,ChanInfo> chanIn: chan.entrySet())
@@ -440,7 +438,8 @@ public class EventCollectingVisitor implements PromelaVisitor
 
         Collections.sort(table.get(i),comparator);
         if(chanIn.getValue().getType().contains("mtype")){
-          final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy((Collection<? extends SimpleIdentifierProxy>) cloner.getClonedList(table.get(i)));
+          final EnumSetExpressionProxy en =
+              createChannelArgumentEnum(cloner, table, i);
           dataRange.add(en);
         }else{
           final BinaryOperator op = optable.getRangeOperator();
@@ -455,7 +454,8 @@ public class EventCollectingVisitor implements PromelaVisitor
       for(int i=0;i<table.size();i++){
         Collections.sort(table.get(i),comparator);
         if(chanIn.getValue().getType().contains("mtype")){
-          final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy((Collection<? extends SimpleIdentifierProxy>) cloner.getClonedList(table.get(i)));
+          final EnumSetExpressionProxy en =
+            createChannelArgumentEnum(cloner, table, i);
           dataRange.add(en);
         }else{
         final BinaryOperator op = optable.getRangeOperator();
@@ -474,7 +474,8 @@ public class EventCollectingVisitor implements PromelaVisitor
         }
         Collections.sort(table.get(i),comparator);
         if(chanIn.getValue().getType().contains("mtype")){
-          final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy((Collection<? extends SimpleIdentifierProxy>) table.get(i));
+          final EnumSetExpressionProxy en =
+            createChannelArgumentEnum(cloner, table, i);
           dataRange.add(en);
         }else{
           final BinaryOperator op = optable.getRangeOperator();
@@ -529,6 +530,26 @@ public class EventCollectingVisitor implements PromelaVisitor
 
 
   }
+
+  private EnumSetExpressionProxy createChannelArgumentEnum
+    (final ModuleProxyCloner cloner,
+     final Hashtable<Integer,List<SimpleExpressionProxy>> table,
+     final int argIndex)
+  {
+    final List<SimpleExpressionProxy> rangeValues = table.get(argIndex);
+    final int numValues = rangeValues.size();
+    final List<SimpleIdentifierProxy> enumValues =
+      new ArrayList<SimpleIdentifierProxy>(numValues);
+    for (final SimpleExpressionProxy value : rangeValues) {
+      final SimpleIdentifierProxy cloned =
+        (SimpleIdentifierProxy) cloner.getClone(value);
+      enumValues.add(cloned);
+    }
+    final EnumSetExpressionProxy en =
+      mFactory.createEnumSetExpressionProxy(enumValues);
+    return en;
+  }
+
  // public List<Message> getMsg(){
  //   return mOutput;
  // }
