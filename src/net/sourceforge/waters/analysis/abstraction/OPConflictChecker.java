@@ -30,10 +30,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.gnonblocking.Candidate;
 import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
 import net.sourceforge.waters.analysis.monolithic.
   MonolithicSynchronousProductBuilder;
@@ -55,7 +55,6 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -67,6 +66,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -330,9 +330,9 @@ public class OPConflictChecker
   }
 
 
-  public void setMonolithicConflictChecker(final ConflictChecker checker)
+  public void setMonolithicChecker(final ConflictChecker checker)
   {
-    mMonolithicConflictChecker = checker;
+    mMonolithicChecker = checker;
   }
 
   public void setCompositionalSafetyVerifier(final SafetyVerifier checker)
@@ -343,6 +343,19 @@ public class OPConflictChecker
   public void setMonolithicSafetyVerifier(final SafetyVerifier checker)
   {
     mMonolithicSafetyVerifier = checker;
+  }
+
+
+  //#########################################################################
+  //# Specific Access
+  protected void setAbstractionProcudure(final AbstractionProcedure proc)
+  {
+    mAbstractionProcedure = proc;
+  }
+
+  protected AbstractionProcedure getAbstractionProcedure()
+  {
+    return mAbstractionProcedure;
   }
 
 
@@ -362,26 +375,24 @@ public class OPConflictChecker
     }
   }
 
-  private void setupMonolithicConflictChecker()
+  private void setupMonolithicChecker()
     throws EventNotFoundException
   {
-    if (mCurrentMonolithicConflictChecker == null) {
-      if (mMonolithicConflictChecker == null) {
+    if (mCurrentMonolithicChecker == null) {
+      if (mMonolithicChecker == null) {
         final ProductDESProxyFactory factory = getFactory();
-        mCurrentMonolithicConflictChecker = new NativeConflictChecker(factory);
+        mCurrentMonolithicChecker = new NativeConflictChecker(factory);
       } else {
-        mCurrentMonolithicConflictChecker = mMonolithicConflictChecker;
+        mCurrentMonolithicChecker = mMonolithicChecker;
       }
       final int nlimit = getMonolithicStateLimit();
-      mCurrentMonolithicConflictChecker.setNodeLimit(nlimit);
+      mCurrentMonolithicChecker.setNodeLimit(nlimit);
       final int tlimit = getMonolithicTransitionLimit();
-      mCurrentMonolithicConflictChecker.setTransitionLimit(tlimit);
+      mCurrentMonolithicChecker.setTransitionLimit(tlimit);
       final KindTranslator translator = getKindTranslator();
-      mCurrentMonolithicConflictChecker.setKindTranslator(translator);
-      mCurrentMonolithicConflictChecker.setMarkingProposition
-        (mCurrentDefaultMarking);
-      mCurrentMonolithicConflictChecker.setPreconditionMarking
-        (mPreconditionMarking);
+      mCurrentMonolithicChecker.setKindTranslator(translator);
+      mCurrentMonolithicChecker.setMarkingProposition(mCurrentDefaultMarking);
+      mCurrentMonolithicChecker.setPreconditionMarking(mPreconditionMarking);
     }
   }
 
@@ -426,14 +437,15 @@ public class OPConflictChecker
       simplify(true);
       boolean cancheck = true;
       OverflowException lastOverflow = null;
+      final CompositionalVerificationResult result = getAnalysisResult();
       Collection<Candidate> candidates;
       Candidate candidate = null;
       outer:
       do {
         subsystem:
         do {
-          if (checkSubsystemTrivial()) {
-            if (mGotGlobalResult) {
+          if (isSubsystemTrivial(mCurrentAutomata)) {
+            if (result.isFinished()) {
               break outer;
             } else {
               continue outer;
@@ -463,7 +475,7 @@ public class OPConflictChecker
         } while (candidate != null);
         try {
           if (cancheck) {
-            runMonolithicConflictCheck();
+            runMonolithicCheck();
             lastOverflow = null;
           }
         } catch (final OutOfMemoryError error) {
@@ -490,15 +502,16 @@ public class OPConflictChecker
           }
         }
       } while (lastOverflow != null ||
-               !mGotGlobalResult && popEventDisjointSubsystem());
+               !result.isFinished() && popEventDisjointSubsystem());
 
-      if (mPreliminaryCounterexample == null) {
+      if (!result.isFinished() || result.isSatisfied()) {
         return setSatisfiedResult();
       } else {
-        mAbstractionRule.resetStatistics();
+        mAbstractionProcedure.resetStatistics();
         restoreAutomata();
-        final ConflictTraceProxy trace =
-          expandTrace(mPreliminaryCounterexample);
+        ConflictTraceProxy trace =
+          (ConflictTraceProxy) result.getCounterExample();
+        trace = expandTrace(trace);
         return setFailedResult(trace);
       }
     } catch (final AnalysisException exception) {
@@ -523,14 +536,14 @@ public class OPConflictChecker
   public void requestAbort()
   {
     super.requestAbort();
-    if (mAbstractionRule != null) {
-      mAbstractionRule.requestAbort();
+    if (mAbstractionProcedure != null) {
+      mAbstractionProcedure.requestAbort();
     }
     if (mCurrentSynchronousProductBuilder != null) {
       mCurrentSynchronousProductBuilder.requestAbort();
     }
-    if (mCurrentMonolithicConflictChecker != null) {
-      mCurrentMonolithicConflictChecker.requestAbort();
+    if (mCurrentMonolithicChecker != null) {
+      mCurrentMonolithicChecker.requestAbort();
     }
     if (mCurrentCompositionalSafetyVerifier != null) {
       mCurrentCompositionalSafetyVerifier.requestAbort();
@@ -560,18 +573,16 @@ public class OPConflictChecker
       markings[1] = mPreconditionMarking;
       mPropositions = Arrays.asList(markings);
     }
-    mAbstractionRule = mAbstractionMethod.createAbstractionRule(this);
-    mAbstractionRule.storeStatistics();
+    mAbstractionProcedure = mAbstractionMethod.createAbstractionRule(this);
+    mAbstractionProcedure.storeStatistics();
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
     mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
     setupSynchronousProductBuilder();
-    setupMonolithicConflictChecker();
+    setupMonolithicChecker();
     setupSafetyVerifiers();
     mModifyingSteps = new ArrayList<AbstractionStep>();
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
     mCurrentInternalStateLimit = mLowerInternalStateLimit;
-    mGotGlobalResult = false;
-    mPreliminaryCounterexample = null;
   }
 
   protected void tearDown()
@@ -579,11 +590,11 @@ public class OPConflictChecker
     super.tearDown();
     mCurrentDefaultMarking = null;
     mPropositions = null;
-    mAbstractionRule = null;
+    mAbstractionProcedure = null;
     mPreselectingHeuristic = null;
     mSelectingHeuristic = null;
     mCurrentSynchronousProductBuilder = null;
-    mCurrentMonolithicConflictChecker = null;
+    mCurrentMonolithicChecker = null;
     mCurrentCompositionalSafetyVerifier = null;
     mCurrentMonolithicSafetyVerifier = null;
     mCurrentAutomata = null;
@@ -596,7 +607,6 @@ public class OPConflictChecker
     mModifyingSteps = null;
     mUsedEventNames = null;
     mOverflowCandidates = null;
-    mPreliminaryCounterexample = null;
   }
 
   @Override
@@ -615,22 +625,98 @@ public class OPConflictChecker
   //#########################################################################
   //# Hooks
   /**
-   * Creates a product DES consisting of the automata and events in the
-   * given candidate. This hook is invoked before composing the automata
-   * of a selected candidate. It may be overridden by specialised property
-   * verifiers that modify the set of automata prior to composition.
-   * @return A product DES to be passed to a {@link SynchronousProductBuilder}.
+   * Creates a product DES consisting for an abstraction step. This hook is
+   * invoked before composing the automata of a selected candidate or before
+   * running a final monolithic check. It may be overridden by specialised
+   * property verifiers that modify the set of automata prior to composition.
+   * @param  events       List of events for monolithic model.
+   * @param  automata     List of automata for monolithic model.
+   * @param  intermediate <CODE>true</CODE> if this composition is used for
+   *                      an intermediate abstraction step; <CODE>false</CODE>
+   *                      if it is a final verification step.
+   * @return A product DES to be passed to a synchronous product builder or
+   *         monolithic verifier.
    */
-  protected ProductDESProxy createProductDESProxy(final Candidate candidate)
+  protected ProductDESProxy createProductDESProxy
+    (final List<EventProxy> events,
+     final List<AutomatonProxy> automata,
+     final boolean intermediate)
   {
     final ProductDESProxyFactory factory = getFactory();
-    return candidate.createProductDESProxy(factory);
+    final String name = Candidate.getCompositionName(automata);
+    final String comment =
+      "Automatically generated by " + ProxyTools.getShortClassName(this);
+    return factory.createProductDESProxy(name, comment, null, events, automata);
+  }
+
+  /**
+   * Creates a counterexample. This hook is invoked to create a counterexample
+   * from a given list trace steps. It should create trace of the correct type.
+   * @param  automata     Automata to be put in the counterexample.
+   * @param  steps        List of steps constituting the counterexample.
+   */
+  protected ConflictTraceProxy createTrace
+    (final Collection<AutomatonProxy> automata,
+     final List<TraceStepProxy> steps)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final String tracename = getTraceName();
+    final ProductDESProxy model = getModel();
+    final CompositionalVerificationResult result = getAnalysisResult();
+    final ConflictTraceProxy trace =
+      (ConflictTraceProxy) result.getCounterExample();
+    final ConflictKind kind = trace.getKind();
+    return factory.createConflictTraceProxy(tracename,
+                                            null,  // comment?
+                                            null,
+                                            model,
+                                            automata,
+                                            steps,
+                                            kind);
+  }
+
+  /**
+   * Checks whether the given automata form a trivial subsystem.
+   * This hook is called before evaluating heuristics and choosing the
+   * next candidate. It checks whether it can be determined directly
+   * whether or not the current subsystem subsystem satisfies the property
+   * in question, and whether this already leads to a result for the
+   * global system.
+   * @param  automata     The automata in the current subsystem, which are
+   *                      to be checked by this method.
+   * @return <CODE>true</CODE> if the subsystem can be determined to satisfy
+   *         or not to satisfy the property being checked. If <CODE>true</CODE>
+   *         is returned, the verification result is updated to contain the
+   *         correct result and a counterexample for the abstracted model,
+   *         if the property being checked is not satisfied.
+   */
+  protected boolean isSubsystemTrivial
+    (final Collection<AutomatonProxy> automata)
+  throws AnalysisException
+  {
+
+    final byte status = getSubsystemPropositionStatus(automata);
+    if ((status & NONE_ALPHA) != 0) {
+      // The global system is nonblocking.
+      final CompositionalVerificationResult result = getAnalysisResult();
+      result.setSatisfied(true);
+      return true;
+    } else if ((status & ALL_OMEGA) != 0) {
+      // This subsystem is trivially nonblocking.
+      return true;
+    } else if ((status & NONE_OMEGA) != 0) {
+      // The global system is blocking if and only if alpha is reachable
+      checkAlphaReachable((status & ALL_ALPHA) == 0);
+      return true;
+    } else {
+      return false;
+    }
   }
 
 
   //#########################################################################
   //# Chains
-  private AbstractionRule createObservationEquivalenceChain
+  private AbstractionProcedure createObservationEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
@@ -647,13 +733,13 @@ public class OPConflictChecker
     bisimulator.setTransitionLimit(mInternalTransitionLimit);
     chain.add(bisimulator);
     if (mPreconditionMarking != null) {
-      return new GeneralisedTRSimplifierAbstractionRule(chain);
+      return new GeneralisedConflictCheckerAbstractionProcedure(chain);
     } else {
-      return new TRSimplifierAbstractionRule(chain);
+      return new ConflictCheckerAbstractionProcedure(chain);
     }
   }
 
-  private AbstractionRule createObserverProjectionChain()
+  private AbstractionProcedure createObserverProjectionChain()
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final TransitionRelationSimplifier loopRemover =
@@ -665,10 +751,10 @@ public class OPConflictChecker
     op.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     chain.add(op);
-    return new ObserverProjectionAbstractionRule(chain, op);
+    return new ObserverProjectionAbstractionProcedure(chain, op);
   }
 
-  private AbstractionRule createStandardNonblockingAbstractionChain
+  private AbstractionProcedure createStandardNonblockingAbstractionChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
      final boolean includeNonAlphaDeterminisation)
   throws EventNotFoundException
@@ -691,16 +777,6 @@ public class OPConflictChecker
       new IncomingEquivalenceTRSimplifier();
     incomingEquivalenceSimplifier.setTransitionLimit(mInternalTransitionLimit);
     chain.add(incomingEquivalenceSimplifier);
-    /*
-    final SilentContinuationTRSimplifier silentContinuationRemover =
-      new SilentContinuationTRSimplifier();
-    silentContinuationRemover.setTransitionLimit(mInternalTransitionLimit);
-    chain.add(silentContinuationRemover);
-    final ActiveEventsTRSimplifier activeEventsMerger =
-      new ActiveEventsTRSimplifier();
-    activeEventsMerger.setTransitionLimit(mInternalTransitionLimit);
-    chain.add(activeEventsMerger);
-    */
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
     final int ccindex = chain.add(certainConflictsRemover);
@@ -724,10 +800,10 @@ public class OPConflictChecker
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
-    return new StandardTRSimplifierAbstractionRule(chain, ccindex);
+    return new StandardConflictCheckerAbstractionProcedure(chain, ccindex);
   }
 
-  private AbstractionRule createGeneralisedNonblockingAbstractionChain
+  private AbstractionProcedure createGeneralisedNonblockingAbstractionChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
   throws EventNotFoundException
   {
@@ -778,7 +854,7 @@ public class OPConflictChecker
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
-    return new GeneralisedTRSimplifierAbstractionRule(chain, recoveryIndex);
+    return new GeneralisedConflictCheckerAbstractionProcedure(chain, recoveryIndex);
   }
 
 
@@ -822,7 +898,7 @@ public class OPConflictChecker
         mRedundantEvents.add(event);
       }
     }
-    mPostponedSubsystems = new LinkedList<SubSystem>();
+    mPostponedSubsystems = new PriorityQueue<SubSystem>();
     mProcessedSubsystems = new LinkedList<SubSystem>();
   }
 
@@ -1102,7 +1178,8 @@ public class OPConflictChecker
 
   private boolean popEventDisjointSubsystem()
   {
-    if (mPostponedSubsystems.isEmpty()) {
+    final SubSystem next = mPostponedSubsystems.poll();
+    if (next == null) {
       return false;
     } else {
       final List<EventProxy> events =
@@ -1111,8 +1188,6 @@ public class OPConflictChecker
       final SubSystem current =
         new SubSystem(events, mCurrentAutomata, mCurrentInternalStateLimit);
       mProcessedSubsystems.add(current);
-      final SubSystem next = Collections.min(mPostponedSubsystems);
-      mPostponedSubsystems.remove(next);
       loadSubSystem(next);
       return true;
     }
@@ -1140,7 +1215,7 @@ public class OPConflictChecker
     }
   }
 
-  private void runMonolithicConflictCheck()
+  private void runMonolithicCheck()
     throws AnalysisException
   {
     final Logger logger = getLogger();
@@ -1157,58 +1232,34 @@ public class OPConflictChecker
     events.addAll(mEventInfoMap.keySet());
     events.add(mCurrentDefaultMarking);
     Collections.sort(events);
-    final ProductDESProxy des = createDES(events, mCurrentAutomata);
-    mCurrentMonolithicConflictChecker.setModel(des);
-    mCurrentMonolithicConflictChecker.run();
+    final ProductDESProxy des =
+      createProductDESProxy(events, mCurrentAutomata, false);
+    mCurrentMonolithicChecker.setModel(des);
+    mCurrentMonolithicChecker.run();
     // Do not clean up before run, keep data just in case of overflow ...
     removeEventsToAutomata(mCurrentAutomata);
-    final VerificationResult result =
-      mCurrentMonolithicConflictChecker.getAnalysisResult();
-    recordStatistics(result);
-    if (!result.isSatisfied()) {
-      mPreliminaryCounterexample =
-        mCurrentMonolithicConflictChecker.getCounterExample();
+    final VerificationResult subresult =
+      mCurrentMonolithicChecker.getAnalysisResult();
+    recordStatistics(subresult);
+    if (!subresult.isSatisfied()) {
+      final CompositionalVerificationResult result = getAnalysisResult();
+      final ConflictTraceProxy trace =
+        mCurrentMonolithicChecker.getCounterExample();
+      result.setCounterExample(trace);
       checkAlphaReachable(false);
-      mGotGlobalResult = true;
     }
-  }
-
-  private ProductDESProxy createDES(final List<EventProxy> events,
-                                    final List<AutomatonProxy> automata)
-  {
-    final ProductDESProxyFactory factory = getFactory();
-    final String name = Candidate.getCompositionName(automata);
-    return factory.createProductDESProxy(name, events, automata);
   }
 
 
   //#########################################################################
   //# Proposition Analysis
-  private boolean checkSubsystemTrivial()
-    throws AnalysisException
-  {
-    final byte status = getSubsystemPropositionStatus();
-    if ((status & NONE_ALPHA) != 0) {
-      // The global system is nonblocking.
-      return mGotGlobalResult = true;
-    } else if ((status & ALL_OMEGA) != 0) {
-      // This subsystem is trivially nonblocking.
-      return true;
-    } else if ((status & NONE_OMEGA) != 0) {
-      // The global system is blocking if and only if alpha is reachable
-      checkAlphaReachable((status & ALL_ALPHA) == 0);
-      return mGotGlobalResult = true;
-    } else {
-      return false;
-    }
-  }
-
-  private byte getSubsystemPropositionStatus()
-    throws EventNotFoundException
+  private byte getSubsystemPropositionStatus
+    (final Collection<AutomatonProxy> automata)
+  throws EventNotFoundException
   {
     byte all = ALL_ALPHA | ALL_OMEGA;
     byte none = 0;
-    for (final AutomatonProxy aut : mCurrentAutomata) {
+    for (final AutomatonProxy aut : automata) {
       final AutomatonInfo info = getAutomatonInfo(aut);
       if (info.isNeverPreconditionMarked()) {
         return NONE_ALPHA;
@@ -1242,9 +1293,11 @@ public class OPConflictChecker
   private boolean checkAlphaReachable(final boolean includeCurrent)
     throws AnalysisException
   {
+    final CompositionalVerificationResult result = getAnalysisResult();
     if (mPreconditionMarking == null) {
-      if (mPreliminaryCounterexample == null) {
-        mPreliminaryCounterexample = createInitialStateTrace();
+      if (result.getCounterExample() == null) {
+        final ConflictTraceProxy trace = createInitialStateTrace();
+        result.setCounterExample(trace);
       }
       return true;
     } else {
@@ -1256,26 +1309,32 @@ public class OPConflictChecker
                                        translator);
       final List<ConflictTraceProxy> traces =
         new LinkedList<ConflictTraceProxy>();
+      final TraceProxy trace = result.getCounterExample();
+      if (trace != null) {
+        final ConflictTraceProxy conflict = (ConflictTraceProxy) trace;
+        traces.add(conflict);
+      }
       if (includeCurrent) {
         if (!isAlphaReachable(builder, mEventInfoMap.keySet(),
                               mCurrentAutomata, traces)) {
+          result.setSatisfied(true);
           return false;
         }
       }
       for (final SubSystem subsys : mPostponedSubsystems) {
         if (!isAlphaReachable(builder, subsys, traces)) {
+          result.setSatisfied(true);
           return false;
         }
       }
       for (final SubSystem subsys : mProcessedSubsystems) {
         if (!isAlphaReachable(builder, subsys, traces)) {
+          result.setSatisfied(true);
           return false;
         }
       }
-      if (mPreliminaryCounterexample != null) {
-        traces.add(mPreliminaryCounterexample);
-      }
-      mPreliminaryCounterexample = mergeLanguageInclusionTraces(traces);
+      final ConflictTraceProxy merged = mergeLanguageInclusionTraces(traces);
+      result.setCounterExample(merged);
       return true;
     }
   }
@@ -1298,7 +1357,8 @@ public class OPConflictChecker
   {
     final List<EventProxy> eventList = new ArrayList<EventProxy>(events);
     Collections.sort(eventList);
-    final ProductDESProxy des = createDES(eventList, automata);
+    final ProductDESProxy des =
+      createProductDESProxy(eventList, automata, false);
     builder.setInputModel(des);
     builder.run();
     final ProductDESProxy languageInclusionModel = builder.getOutputModel();
@@ -1497,7 +1557,7 @@ public class OPConflictChecker
       tau = syncStep.getHiddenEvent();
     }
     recordStatistics(aut);
-    final AbstractionStep simpStep = mAbstractionRule.applyRule(aut, tau);
+    final AbstractionStep simpStep = mAbstractionProcedure.run(aut, tau);
     if (syncStep != null || simpStep != null) {
       if (syncStep != null) {
         mModifyingSteps.add(syncStep);
@@ -1529,7 +1589,9 @@ public class OPConflictChecker
   private HidingStep composeSynchronousProduct(final Candidate candidate)
     throws AnalysisException
   {
-    final ProductDESProxy des = createProductDESProxy(candidate);
+    final List<EventProxy> events = candidate.getAllEvents();
+    final List<AutomatonProxy> automata1 = candidate.getAutomata();
+    final ProductDESProxy des = createProductDESProxy(events, automata1, true);
     final Collection<EventProxy> local = candidate.getLocalEvents();
     final ProductDESProxyFactory factory = getFactory();
     final EventProxy tau = createSilentEvent(candidate, factory);
@@ -1664,17 +1726,9 @@ public class OPConflictChecker
       check.addAll(step.getOriginalAutomata());
       //checkCounterExample(traceSteps, check);
     }
-    final ProductDESProxyFactory factory = getFactory();
-    final String tracename = getTraceName();
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
-    return factory.createConflictTraceProxy(tracename,
-                                            null,  // comment?
-                                            null,
-                                            model,
-                                            automata,
-                                            traceSteps,
-                                            trace.getKind());
+    return createTrace(automata, traceSteps);
   }
 
   @SuppressWarnings("unused")
@@ -1839,7 +1893,7 @@ public class OPConflictChecker
      */
     GNB {
       @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionProcedure createAbstractionRule(final OPConflictChecker checker)
       throws EventNotFoundException
       {
         return checker.createGeneralisedNonblockingAbstractionChain
@@ -1857,7 +1911,7 @@ public class OPConflictChecker
      */
     NB {
       @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionProcedure createAbstractionRule(final OPConflictChecker checker)
       throws EventNotFoundException
       {
         return checker.createStandardNonblockingAbstractionChain
@@ -1876,7 +1930,7 @@ public class OPConflictChecker
      */
     NBA {
       @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionProcedure createAbstractionRule(final OPConflictChecker checker)
       throws EventNotFoundException
       {
         return checker.createStandardNonblockingAbstractionChain
@@ -1889,7 +1943,7 @@ public class OPConflictChecker
      */
     OEQ {
       @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionProcedure createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.createObservationEquivalenceChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
@@ -1904,7 +1958,7 @@ public class OPConflictChecker
      */
     OP {
       @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionProcedure createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.createObserverProjectionChain();
       }
@@ -1920,9 +1974,9 @@ public class OPConflictChecker
      */
     OPSEARCH {
       @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionProcedure createAbstractionRule(final OPConflictChecker checker)
       {
-        return checker.new OPSearchAbstractionRule();
+        return checker.new OPSearchAbstractionProcedure();
       }
 
       @Override
@@ -1944,7 +1998,7 @@ public class OPConflictChecker
      */
     WOEQ {
       @Override
-      AbstractionRule createAbstractionRule(final OPConflictChecker checker)
+      AbstractionProcedure createAbstractionRule(final OPConflictChecker checker)
       {
         return checker.createObservationEquivalenceChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
@@ -1952,7 +2006,7 @@ public class OPConflictChecker
       }
     };
 
-    abstract AbstractionRule createAbstractionRule(OPConflictChecker checker)
+    abstract AbstractionProcedure createAbstractionRule(OPConflictChecker checker)
     throws EventNotFoundException;
 
     boolean supportsNondeterminism()
@@ -2801,7 +2855,6 @@ public class OPConflictChecker
     Candidate selectCandidate(final Collection<Candidate> candidates)
     throws AnalysisException
     {
-      final ProductDESProxyFactory factory = getFactory();
       final List<Candidate> list = new ArrayList<Candidate>(candidates);
       final Comparator<Candidate> comparator = getComparator();
       Collections.sort(list, comparator);
@@ -2813,7 +2866,10 @@ public class OPConflictChecker
       final List<EventProxy> empty = Collections.emptyList();
       mCurrentSynchronousProductBuilder.setPropositions(empty);
       for (final Candidate candidate : list) {
-        final ProductDESProxy des = candidate.createProductDESProxy(factory);
+        final List<EventProxy> events = candidate.getAllEvents();
+        final List<AutomatonProxy> automata = candidate.getAutomata();
+        final ProductDESProxy des =
+          createProductDESProxy(events, automata, true);
         mCurrentSynchronousProductBuilder.setModel(des);
         try {
           mCurrentSynchronousProductBuilder.run();
@@ -2867,7 +2923,6 @@ public class OPConflictChecker
     Candidate selectCandidate(final Collection<Candidate> candidates)
     throws AnalysisException
     {
-      final ProductDESProxyFactory factory = getFactory();
       final List<Candidate> list = new ArrayList<Candidate>(candidates);
       final Comparator<Candidate> comparator = getComparator();
       Collections.sort(list, comparator);
@@ -2881,7 +2936,10 @@ public class OPConflictChecker
         Collections.singletonList(mPreconditionMarking);
       mCurrentSynchronousProductBuilder.setPropositions(props);
       for (final Candidate candidate : list) {
-        final ProductDESProxy des = candidate.createProductDESProxy(factory);
+        final List<EventProxy> events = candidate.getAllEvents();
+        final List<AutomatonProxy> automata = candidate.getAutomata();
+        final ProductDESProxy des =
+          createProductDESProxy(events, automata, true);
         mCurrentSynchronousProductBuilder.setModel(des);
         try {
           mCount = 0;
@@ -3082,53 +3140,39 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class AbstractionRule
-  private abstract class AbstractionRule
+  //# Inner Class AbstractionProcedure
+  protected abstract class AbstractionProcedure
     implements Abortable
   {
-
     //#######################################################################
     //# Rule Application
-    abstract AbstractionStep applyRule(final AutomatonProxy aut,
-                                       final EventProxy tau)
+    protected abstract AbstractionStep run(final AutomatonProxy aut,
+                                           final EventProxy tau)
       throws AnalysisException;
 
-    abstract void storeStatistics();
+    protected abstract void storeStatistics();
 
-    abstract void resetStatistics();
-
-    //#######################################################################
-    //# Trace Recovery
-    EventProxy getUsedPreconditionMarking()
-    {
-      return null;
-    }
-
-    BitSet recoverMarkings(final AutomatonProxy aut, final EventProxy tau)
-    throws AnalysisException
-    {
-      return null;
-    }
-
+    protected abstract void resetStatistics();
   }
 
 
   //#########################################################################
-  //# Inner Class TRSimplifierAbstractionRule
-  private class TRSimplifierAbstractionRule
-    extends AbstractionRule
+  //# Inner Class TRSimplifierAbstractionProcedure
+  protected abstract class TRSimplifierAbstractionProcedure
+    extends AbstractionProcedure
   {
-
     //#######################################################################
     //# Constructor
-    TRSimplifierAbstractionRule(final TransitionRelationSimplifier simplifier)
+    protected TRSimplifierAbstractionProcedure
+      (final TransitionRelationSimplifier simplifier)
     {
       mSimplifier = simplifier;
     }
 
     //#######################################################################
-    //# Overrides for AbstractionRule
-    AbstractionStep applyRule(final AutomatonProxy aut, final EventProxy tau)
+    //# Overrides for AbstractionProcedure
+    protected AbstractionStep run(final AutomatonProxy aut,
+                                  final EventProxy tau)
       throws AnalysisException
     {
       try {
@@ -3164,14 +3208,14 @@ public class OPConflictChecker
     }
 
     @Override
-    void storeStatistics()
+    protected void storeStatistics()
     {
       final CompositionalVerificationResult result = getAnalysisResult();
       result.setSimplifierStatistics(mSimplifier);
     }
 
     @Override
-    void resetStatistics()
+    protected void resetStatistics()
     {
       mSimplifier.createStatistics();
     }
@@ -3190,33 +3234,72 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Simple Access
-    TransitionRelationSimplifier getSimplifier()
+    protected TransitionRelationSimplifier getSimplifier()
     {
       return mSimplifier;
     }
 
     //#######################################################################
     //# Auxiliary Methods
-    EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                      final EventProxy tau)
+    protected EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                                final EventProxy tau)
     {
       final KindTranslator translator = getKindTranslator();
+      return new EventEncoding(aut, translator, tau, mPropositions,
+                               EventEncoding.FILTER_PROPOSITIONS);
+    }
+
+    protected abstract AbstractionStep createStep
+      (final AutomatonProxy input,
+       final StateEncoding inputStateEnc,
+       final AutomatonProxy output,
+       final StateEncoding outputStateEnc,
+       final EventProxy tau);
+
+    //#######################################################################
+    //# Data Members
+    private final TransitionRelationSimplifier mSimplifier;
+  }
+
+
+  //#########################################################################
+  //# Inner Class ConflictCheckerAbstractionProcedure
+  private class ConflictCheckerAbstractionProcedure
+    extends TRSimplifierAbstractionProcedure
+  {
+
+    //#######################################################################
+    //# Constructor
+    ConflictCheckerAbstractionProcedure
+      (final TransitionRelationSimplifier simplifier)
+    {
+      super(simplifier);
+    }
+
+    //#######################################################################
+    //# Overrides for TRSimplifierAbstractionProcedure
+    @Override
+    protected EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                                final EventProxy tau)
+    {
       final EventEncoding eventEnc =
-        new EventEncoding(aut, translator, tau, mPropositions,
-                          EventEncoding.FILTER_PROPOSITIONS);
-      final int markingID = eventEnc.getEventCode(mCurrentDefaultMarking);
-      mSimplifier.setDefaultMarkingID(markingID);
+        super.createEventEncoding(aut, tau);
+      final TransitionRelationSimplifier simplifier = getSimplifier();
+      final int omega = eventEnc.getEventCode(mCurrentDefaultMarking);
+      simplifier.setDefaultMarkingID(omega);
       return eventEnc;
     }
 
-    AbstractionStep createStep(final AutomatonProxy input,
-                               final StateEncoding inputStateEnc,
-                               final AutomatonProxy output,
-                               final StateEncoding outputStateEnc,
-                               final EventProxy tau)
+    @Override
+    protected AbstractionStep createStep(final AutomatonProxy input,
+                                         final StateEncoding inputStateEnc,
+                                         final AutomatonProxy output,
+                                         final StateEncoding outputStateEnc,
+                                         final EventProxy tau)
     {
-      final List<int[]> partition = mSimplifier.getResultPartition();
-      if (mSimplifier.isObservationEquivalentAbstraction()) {
+      final TransitionRelationSimplifier simplifier = getSimplifier();
+      final List<int[]> partition = simplifier.getResultPartition();
+      if (simplifier.isObservationEquivalentAbstraction()) {
         return new ObservationEquivalenceStep(output, input, tau,
                                               inputStateEnc, partition,
                                               false, outputStateEnc);
@@ -3228,20 +3311,30 @@ public class OPConflictChecker
     }
 
     //#######################################################################
-    //# Data Members
-    private final TransitionRelationSimplifier mSimplifier;
+    //# Trace Recovery
+    protected EventProxy getUsedPreconditionMarking()
+    {
+      return null;
+    }
+
+    protected BitSet recoverMarkings(final AutomatonProxy aut,
+                                     final EventProxy tau)
+    throws AnalysisException
+    {
+      return null;
+    }
 
   }
 
+
   //#########################################################################
   //# Inner Class StandardTRSimplifierAbstractionRule
-  private class StandardTRSimplifierAbstractionRule
-    extends TRSimplifierAbstractionRule
+  private class StandardConflictCheckerAbstractionProcedure
+    extends ConflictCheckerAbstractionProcedure
   {
-
     //#######################################################################
     //# Constructor
-    private StandardTRSimplifierAbstractionRule
+    private StandardConflictCheckerAbstractionProcedure
       (final ChainTRSimplifier chain, final int ccindex)
     {
       super(chain);
@@ -3255,7 +3348,7 @@ public class OPConflictChecker
     //#######################################################################
     //# Simple Access
     @Override
-    ChainTRSimplifier getSimplifier()
+    protected ChainTRSimplifier getSimplifier()
     {
       return (ChainTRSimplifier) super.getSimplifier();
     }
@@ -3271,10 +3364,10 @@ public class OPConflictChecker
     }
 
     //#######################################################################
-    //# Auxiliary Methods
+    //# Overrides for class TRSimplifierAbstractionProcedure
     @Override
-    EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                      final EventProxy tau)
+    protected EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                                final EventProxy tau)
     {
       final EventEncoding eventEnc = super.createEventEncoding(aut, tau);
       int markingID = eventEnc.getEventCode(mCurrentDefaultMarking);
@@ -3289,11 +3382,11 @@ public class OPConflictChecker
     }
 
     @Override
-    AbstractionStep createStep(final AutomatonProxy input,
-                               final StateEncoding inputStateEnc,
-                               final AutomatonProxy output,
-                               final StateEncoding outputStateEnc,
-                               final EventProxy tau)
+    protected AbstractionStep createStep(final AutomatonProxy input,
+                                         final StateEncoding inputStateEnc,
+                                         final AutomatonProxy output,
+                                         final StateEncoding outputStateEnc,
+                                         final EventProxy tau)
     {
       if (mCertainConflictsSimplifier != null &&
           mCertainConflictsSimplifier.hasRemovedTransitions()) {
@@ -3322,25 +3415,23 @@ public class OPConflictChecker
     //# Data Members
     private LimitedCertainConflictsTRSimplifier mCertainConflictsSimplifier;
     private final int mCertainConflictsIndex;
-
   }
 
 
   //#########################################################################
-  //# Inner Class GeneralisedTRSimplifierAbstractionRule
-  private class GeneralisedTRSimplifierAbstractionRule
-    extends TRSimplifierAbstractionRule
+  //# Inner Class GeneralisedConflictCheckerAbstractionProcedure
+  private class GeneralisedConflictCheckerAbstractionProcedure
+    extends ConflictCheckerAbstractionProcedure
   {
-
     //#######################################################################
-    //# Constructor
-    private GeneralisedTRSimplifierAbstractionRule
+    //# Constructors
+    private GeneralisedConflictCheckerAbstractionProcedure
       (final ChainTRSimplifier simplifier)
     {
       this(simplifier, -1);
     }
 
-    private GeneralisedTRSimplifierAbstractionRule
+    private GeneralisedConflictCheckerAbstractionProcedure
       (final ChainTRSimplifier simplifier, final int recoveryIndex)
     {
       super(simplifier);
@@ -3360,44 +3451,16 @@ public class OPConflictChecker
     //#######################################################################
     //# Simple Access
     @Override
-    EventProxy getUsedPreconditionMarking()
-    {
-      return mUsedPreconditionMarking;
-    }
-
-    @Override
-    ChainTRSimplifier getSimplifier()
+    protected ChainTRSimplifier getSimplifier()
     {
       return (ChainTRSimplifier) super.getSimplifier();
     }
 
-    @Override
-    MergeStep createStep(final AutomatonProxy input,
-                         final StateEncoding inputStateEnc,
-                         final AutomatonProxy output,
-                         final StateEncoding outputStateEnc,
-                         final EventProxy tau)
-    {
-      final ChainTRSimplifier simplifier = getSimplifier();
-      final List<int[]> partition = simplifier.getResultPartition();
-      final boolean reduced =
-        simplifier.isReducedMarking(mPreconditionMarkingID);
-      if (simplifier.isObservationEquivalentAbstraction()) {
-        return new ObservationEquivalenceStep(output, input, tau,
-                                              inputStateEnc, partition,
-                                              reduced, outputStateEnc);
-      } else {
-        return new ConflictEquivalenceStep(output, input, tau,
-                                           inputStateEnc, partition,
-                                           reduced, outputStateEnc);
-      }
-    }
-
     //#######################################################################
-    //# Auxiliary Methods
+    //# Overrides for class TRSimplifierAbstractionProcedure
     @Override
-    EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                      final EventProxy tau)
+    protected EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                                final EventProxy tau)
     {
       final KindTranslator translator = getKindTranslator();
       final EventEncoding eventEnc =
@@ -3420,7 +3483,38 @@ public class OPConflictChecker
     }
 
     @Override
-    BitSet recoverMarkings(final AutomatonProxy aut, final EventProxy tau)
+    protected MergeStep createStep(final AutomatonProxy input,
+                                   final StateEncoding inputStateEnc,
+                                   final AutomatonProxy output,
+                                   final StateEncoding outputStateEnc,
+                                   final EventProxy tau)
+    {
+      final ChainTRSimplifier simplifier = getSimplifier();
+      final List<int[]> partition = simplifier.getResultPartition();
+      final boolean reduced =
+        simplifier.isReducedMarking(mPreconditionMarkingID);
+      if (simplifier.isObservationEquivalentAbstraction()) {
+        return new ObservationEquivalenceStep(output, input, tau,
+                                              inputStateEnc, partition,
+                                              reduced, outputStateEnc);
+      } else {
+        return new ConflictEquivalenceStep(output, input, tau,
+                                           inputStateEnc, partition,
+                                           reduced, outputStateEnc);
+      }
+    }
+
+    //#######################################################################
+    //# Overrides for class ConflictCheckerAbstractionProcedure
+    @Override
+    protected EventProxy getUsedPreconditionMarking()
+    {
+      return mUsedPreconditionMarking;
+    }
+
+    @Override
+    protected BitSet recoverMarkings(final AutomatonProxy aut,
+                                     final EventProxy tau)
     throws AnalysisException
     {
       try {
@@ -3471,14 +3565,13 @@ public class OPConflictChecker
 
 
   //#########################################################################
-  //# Inner Class ObserverProjectionAbstractionRule
-  private class ObserverProjectionAbstractionRule
-    extends TRSimplifierAbstractionRule
+  //# Inner Class ObserverProjectionAbstractionProcedure
+  private class ObserverProjectionAbstractionProcedure
+    extends ConflictCheckerAbstractionProcedure
   {
-
     //#######################################################################
     //# Constructors
-    private ObserverProjectionAbstractionRule
+    private ObserverProjectionAbstractionProcedure
       (final ChainTRSimplifier chain,
        final ObserverProjectionTRSimplifier op)
     {
@@ -3487,10 +3580,10 @@ public class OPConflictChecker
     }
 
     //#######################################################################
-    //# Overrides for class TRSimplifierAbstractionRule
+    //# Overrides for class TRSimplifierAbstractionProcedure
     @Override
-    EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                      final EventProxy tau)
+    protected EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                                final EventProxy tau)
     {
       final EventEncoding eventEnc = super.createEventEncoding(aut, tau);
       final ProductDESProxyFactory factory = getFactory();
@@ -3506,19 +3599,18 @@ public class OPConflictChecker
     //#########################################################################
     //# Data Members
     private final ObserverProjectionTRSimplifier mOPSimplifier;
-
   }
 
 
   //#########################################################################
-  //# Inner Class OPSearchAbstractionRule
-  private class OPSearchAbstractionRule
-    extends AbstractionRule
+  //# Inner Class OPSearchAbstractionProcedure
+  private class OPSearchAbstractionProcedure
+    extends AbstractionProcedure
   {
 
     //#######################################################################
     //# Constructors
-    private OPSearchAbstractionRule()
+    private OPSearchAbstractionProcedure()
     {
       final ProductDESProxyFactory factory = getFactory();
       final KindTranslator translator = getKindTranslator();
@@ -3529,8 +3621,8 @@ public class OPConflictChecker
 
     //#######################################################################
     //# Rule Application
-    ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
-                                         final EventProxy tau)
+    protected ObservationEquivalenceStep run(final AutomatonProxy aut,
+                                             final EventProxy tau)
     throws AnalysisException
     {
       final long start = System.currentTimeMillis();
@@ -3575,7 +3667,7 @@ public class OPConflictChecker
     }
 
     @Override
-    void storeStatistics()
+    protected void storeStatistics()
     {
       final CompositionalVerificationResult result = getAnalysisResult();
       final List<TRSimplifierStatistics> list =
@@ -3584,7 +3676,7 @@ public class OPConflictChecker
     }
 
     @Override
-    void resetStatistics()
+    protected void resetStatistics()
     {
       mStatistics = new TRSimplifierStatistics(mSimplifier, true, true);
     }
@@ -3605,7 +3697,6 @@ public class OPConflictChecker
     //# Data Members
     private final OPSearchAutomatonSimplifier mSimplifier;
     private TRSimplifierStatistics mStatistics;
-
   }
 
 
@@ -3983,8 +4074,13 @@ public class OPConflictChecker
       mEventEncoding = enc;
       mTransitionRelation = rel;
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      final EventProxy alpha = mAbstractionRule.getUsedPreconditionMarking();
-      mPreconditionMarkingID = enc.getEventCode(alpha);
+      final AbstractionProcedure proc = getAbstractionProcedure();
+      if (proc instanceof ConflictCheckerAbstractionProcedure) {
+        final ConflictCheckerAbstractionProcedure cproc =
+          (ConflictCheckerAbstractionProcedure) proc;
+        final EventProxy alpha = cproc.getUsedPreconditionMarking();
+        mPreconditionMarkingID = enc.getEventCode(alpha);
+      }
     }
 
     void tearDownTraceConversion()
@@ -4166,17 +4262,23 @@ public class OPConflictChecker
     void recoverPreconditionMarking()
       throws AnalysisException
     {
-      final EventProxy alpha = mAbstractionRule.getUsedPreconditionMarking();
-      mPreconditionMarkingID = mEventEncoding.getEventCode(alpha);
-      if (mHasReducedPreconditionMarking) {
-        final AutomatonProxy aut = getOriginalAutomaton();
-        mRecoveredPreconditionMarking =
-          mAbstractionRule.recoverMarkings(aut, mTau);
-        if (mPreconditionMarkingID < 0) {
-          final KindTranslator translator = getKindTranslator();
-          mPreconditionMarkingID =
-            mEventEncoding.addEvent(alpha, translator, true);
+      final AbstractionProcedure proc = getAbstractionProcedure();
+      if (proc instanceof ConflictCheckerAbstractionProcedure) {
+        final ConflictCheckerAbstractionProcedure cproc =
+          (ConflictCheckerAbstractionProcedure) proc;
+        final EventProxy alpha = cproc.getUsedPreconditionMarking();
+        mPreconditionMarkingID = mEventEncoding.getEventCode(alpha);
+        if (mHasReducedPreconditionMarking) {
+          final AutomatonProxy aut = getOriginalAutomaton();
+          mRecoveredPreconditionMarking = cproc.recoverMarkings(aut, mTau);
+          if (mPreconditionMarkingID < 0) {
+            final KindTranslator translator = getKindTranslator();
+            mPreconditionMarkingID =
+              mEventEncoding.addEvent(alpha, translator, true);
+          }
         }
+      } else {
+        mPreconditionMarkingID = -1;
       }
     }
 
@@ -4663,14 +4765,14 @@ public class OPConflictChecker
       // OK, expanded trace is not blocking.
       // We need to try to add steps into certain conflicts and further
       // into blocking, or prove that the rest of the system blocks ...
-      final StandardTRSimplifierAbstractionRule rule =
-        (StandardTRSimplifierAbstractionRule) mAbstractionRule;
-      final ChainTRSimplifier chain = rule.getSimplifier();
+      final StandardConflictCheckerAbstractionProcedure proc =
+        (StandardConflictCheckerAbstractionProcedure) getAbstractionProcedure();
+      final ChainTRSimplifier chain = proc.getSimplifier();
       final int config = chain.getPreferredInputConfiguration();
       rel = new ListBufferTransitionRelation
         (originalAut, eventEnc, mOriginalStateEncoding, config);
       chain.setTransitionRelation(rel);
-      final int ccindex = rule.getCertainConflictsIndex();
+      final int ccindex = proc.getCertainConflictsIndex();
       chain.runTo(ccindex);
       final List<int[]> partition1 = chain.getResultPartition();
       final List<int[]> partition2 = computeQuotientPartition(partition1);
@@ -4684,7 +4786,7 @@ public class OPConflictChecker
       SearchRecord record = convertedSteps.get(numConvertedSteps - 1);
       final int lastConvertedState = record.getState();
       final LimitedCertainConflictsTRSimplifier simplifier =
-        rule.getCertainConflictsSimplifier();
+        proc.getCertainConflictsSimplifier();
       final int lconfig = simplifier.getPreferredInputConfiguration();
       ListBufferTransitionRelation copy =
         new ListBufferTransitionRelation(rel, lconfig);
@@ -5060,7 +5162,7 @@ public class OPConflictChecker
   private SelectingMethod mSelectingMethod;
   private boolean mSubsumptionEnabled;
   private MonolithicSynchronousProductBuilder mSynchronousProductBuilder;
-  private ConflictChecker mMonolithicConflictChecker;
+  private ConflictChecker mMonolithicChecker;
   private SafetyVerifier mCompositionalSafetyVerifier;
   private SafetyVerifier mMonolithicSafetyVerifier;
 
@@ -5107,7 +5209,7 @@ public class OPConflictChecker
    * analysed at a later stage.
    * @see #findEventDisjointSubsystems()
    */
-  private Collection<SubSystem> mPostponedSubsystems;
+  private Queue<SubSystem> mPostponedSubsystems;
   /**
    * List of subsystems that have been analysed.
    */
@@ -5116,14 +5218,12 @@ public class OPConflictChecker
   private Set<String> mUsedEventNames;
   private Set<List<AutomatonProxy>> mOverflowCandidates;
   private int mCurrentInternalStateLimit;
-  private boolean mGotGlobalResult;
-  private ConflictTraceProxy mPreliminaryCounterexample;
 
-  private AbstractionRule mAbstractionRule;
+  private AbstractionProcedure mAbstractionProcedure;
   private PreselectingHeuristic mPreselectingHeuristic;
   private SelectingHeuristic mSelectingHeuristic;
   private MonolithicSynchronousProductBuilder mCurrentSynchronousProductBuilder;
-  private ConflictChecker mCurrentMonolithicConflictChecker;
+  private ConflictChecker mCurrentMonolithicChecker;
   private SafetyVerifier mCurrentCompositionalSafetyVerifier;
   private SafetyVerifier mCurrentMonolithicSafetyVerifier;
 

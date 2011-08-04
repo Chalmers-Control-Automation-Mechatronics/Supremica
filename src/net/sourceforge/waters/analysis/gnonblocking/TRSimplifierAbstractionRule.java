@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   TRSimplifierAbstractionRule
+//# CLASS:   TRSimplifierAbstractionProcedure
 //###########################################################################
 //# $Id$
 //###########################################################################

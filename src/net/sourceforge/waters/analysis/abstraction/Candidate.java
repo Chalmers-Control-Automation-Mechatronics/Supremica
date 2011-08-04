@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.abstraction
 //# CLASS:   Candidate
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.gnonblocking;
+package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.THashSet;
 
@@ -17,10 +17,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -30,7 +29,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * events, this class provides some support to evaluate different heuristics
  * for candidate selection.
  *
- * @see CompositionalGeneralisedConflictChecker
+ * @see OPConflictChecker
  * @author Rachel Francis
  */
 
@@ -209,40 +208,17 @@ public class Candidate implements Comparable<Candidate>
   //#########################################################################
   //# Model Creation
   /**
-   * Creates a product DES containing all the automata and events in this
-   * candidate.
-   *
-   * @param factory
-   *          The factory to be used to create the proxies.
+   * Returns an ordered list of all events in the automata of this candidate,
+   * including propositions.
    */
-  public ProductDESProxy createProductDESProxy
-    (final ProductDESProxyFactory factory)
+  public List<EventProxy> getAllEvents()
   {
-    final String name = toString();
-    final Collection<EventProxy> events = getAllEvents();
-    return factory.createProductDESProxy
-             (name, "Automatically created from candidate.",
-              null, events, mAutomata);
+    return getAllEvents(mAutomata);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  /**
-   * Returns an ordered list of all events in the automata of this candidate,
-   * including propositions.
-   */
-  private List<EventProxy> getAllEvents()
-  {
-    final Set<EventProxy> set = new THashSet<EventProxy>();
-    for (final AutomatonProxy aut : mAutomata) {
-      set.addAll(aut.getEvents());
-    }
-    final List<EventProxy> list = new ArrayList<EventProxy>(set);
-    Collections.sort(list);
-    return list;
-  }
-
   /**
    * Determines the total number of events in the automata of this candidate,
    * not including propositions, and stores the result in {@link #mEventCount}.
@@ -325,6 +301,22 @@ public class Candidate implements Comparable<Candidate>
     }
     buffer.append('}');
     return buffer.toString();
+  }
+
+  /**
+   * Returns an ordered list of all events in the given automata,
+   * including propositions.
+   */
+  public static List<EventProxy> getAllEvents
+    (final Collection<AutomatonProxy> automata)
+  {
+    final Set<EventProxy> set = new THashSet<EventProxy>();
+    for (final AutomatonProxy aut : automata) {
+      set.addAll(aut.getEvents());
+    }
+    final List<EventProxy> list = new ArrayList<EventProxy>(set);
+    Collections.sort(list);
+    return list;
   }
 
 

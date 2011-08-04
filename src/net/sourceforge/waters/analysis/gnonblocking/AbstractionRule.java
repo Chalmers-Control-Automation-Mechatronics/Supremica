@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   AbstractionRule
+//# CLASS:   AbstractionProcedure
 //###########################################################################
 //# $Id$
 //###########################################################################

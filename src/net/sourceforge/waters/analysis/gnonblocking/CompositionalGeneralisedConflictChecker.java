@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -252,6 +253,7 @@ public class CompositionalGeneralisedConflictChecker
   {
     setUp();
     try {
+      final ProductDESProxyFactory factory = getFactory();
       ProductDESProxy model = getModel();
       mapEventsToAutomata(model);
       final List<Step> modifyingSteps = new ArrayList<Step>();
@@ -265,31 +267,36 @@ public class CompositionalGeneralisedConflictChecker
         if (translator.getComponentKind(aut) == ComponentKind.PROPERTY) {
           modified = true;
         } else {
+          AutomatonProxy abstractedAut = aut;
           final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
           final Set<EventProxy> localEvents = identifyLocalEvents(autAsList);
           if (localEvents.size() > 0) {
             try {
-              final AutomatonProxy abstractedAut =
-                  hideAndAbstract(aut, localEvents);
-              remainingAut.add(abstractedAut);
+              abstractedAut = hideAndAbstract(aut, localEvents);
               modified = true;
               modifyingSteps.addAll(mTemporaryModifyingSteps);
             } catch (final OverflowException exception) {
-              remainingAut.add(aut);
+              // abstractedAut remains aut ...
             }
             mTemporaryModifyingSteps.clear();
           } else {
-            remainingAut.add(aut);
+            // abstractedAut remains aut ...
           }
+          remainingAut.add(abstractedAut);
         }
       }
       if (modified) {
-        final Candidate candidate = new Candidate(remainingAut, null);
-        model = candidate.createProductDESProxy(getFactory());
+        final String name = Candidate.getCompositionName(remainingAut);
+        final String comment =
+          "Simplified initial model for CompositionalGeneralisedConflictChecker";
+        final List<EventProxy> events = Candidate.getAllEvents(remainingAut);
+        model = factory.createProductDESProxy
+          (name, comment, null, events, remainingAut);
         mapEventsToAutomata(model);
       }
 
-      outer: while (remainingAut.size() > 1) {
+      outer:
+      while (remainingAut.size() > 1) {
         final List<Candidate> candidates = findCandidates(model);
         Candidate candidate;
         AutomatonProxy syncProduct = null;
@@ -316,8 +323,13 @@ public class CompositionalGeneralisedConflictChecker
               updateEventsToAutomata(abstractedAut, candidate.getAutomata());
             }
             // updates the current model to find candidates from
-            final Candidate newModel = new Candidate(remainingAut, null);
-            model = newModel.createProductDESProxy(getFactory());
+            final String name = Candidate.getCompositionName(remainingAut);
+            final String comment =
+              "Intermediate model for CompositionalGeneralisedConflictChecker";
+            final List<EventProxy> events = Candidate.getAllEvents(remainingAut);
+            model = factory.createProductDESProxy
+              (name, comment, null, events, remainingAut);
+            mapEventsToAutomata(model);
             mSuccessfulCompositionCount++;
             modifyingSteps.addAll(mTemporaryModifyingSteps);
             break;
@@ -733,11 +745,15 @@ public class CompositionalGeneralisedConflictChecker
   {
     // creates a model which includes only the candidate, to build the
     // synchronous product of
-    final ProductDESProxy candidateModel =
-        candidate.createProductDESProxy(getFactory());
+    final ProductDESProxyFactory factory = getFactory();
+    final String name = candidate.toString();
+    final List<EventProxy> events = candidate.getAllEvents();
+    final List<AutomatonProxy> automata = candidate.getAutomata();
+    final ProductDESProxy candidateModel = factory.createProductDESProxy
+      (name, "Automatically created from candidate.", null, events, automata);
 
     final MonolithicSynchronousProductBuilder composer =
-        new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
+        new MonolithicSynchronousProductBuilder(candidateModel, factory);
     composer.setPropositions(mPropositions);
     composer.setTransitionLimit(mSyncProductTransitionLimit);
     composer.setNodeLimit(mSyncProductNodeLimit);

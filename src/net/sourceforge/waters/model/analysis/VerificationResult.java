@@ -51,8 +51,17 @@ public class VerificationResult extends AnalysisResult
    */
   public void setCounterExample(final TraceProxy counterexample)
   {
-    setSatisfied(false);
+    super.setSatisfied(false);
     mCounterExample = counterexample;
+  }
+
+  @Override
+  public void setSatisfied(final boolean sat)
+  {
+    super.setSatisfied(sat);
+    if (sat) {
+      mCounterExample = null;
+    }
   }
 
 
