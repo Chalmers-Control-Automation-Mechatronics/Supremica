@@ -68,7 +68,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   ArrayList<String> upperEnd = new ArrayList<String>();
   ArrayList<String> rangeData = new ArrayList<String>();
   private String flag;
-  private Hashtable<String,List<String>> proctypeVar = new Hashtable<String,List<String>>();
+  private Hashtable<String,String> proctypeVar = new Hashtable<String,String>();
   final Hashtable<String,THashSet<IdentifierProxy>> procEvent = new Hashtable<String,THashSet<IdentifierProxy>>();
   final Hashtable<String,LabelTreeNode> gotoLabel = new Hashtable<String,LabelTreeNode>();
   //This is the output event table, for each proctype
@@ -80,7 +80,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   //List<Message> mOutput = new ArrayList<Message>();
   List<String> channelMsg = new ArrayList<String>();
-  Hashtable<String,List<String>> mGlobalVar = new Hashtable<String,List<String>>();
+  Hashtable<String,String> mGlobalVar = new Hashtable<String,String>();
   Hashtable<String,List<Message>> mSendersMsg = new Hashtable<String,List<Message>>();
   //########################################################################
   //# Invocation
@@ -114,7 +114,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   public List<String> getChanMsg(){
     return channelMsg;
   }
-  public Hashtable<String,List<String>> getGlobalVar(){
+  public Hashtable<String,String> getGlobalVar(){
     return mGlobalVar;
   }
   public void makeMsg(){
@@ -435,12 +435,18 @@ public class EventCollectingVisitor implements PromelaVisitor
     Collection<SimpleExpressionProxy> dataRange;
     if(chanIn.getValue().getChanLength()==0){
       dataRange = new ArrayList<SimpleExpressionProxy>();
+
       for(int i=0;i<table.size();i++){
 
         Collections.sort(table.get(i),comparator);
-        final BinaryOperator op = optable.getRangeOperator();
-        final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
-        dataRange.add(range);
+        if(chanIn.getValue().getType().contains("mtype")){
+          final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy((Collection<? extends SimpleIdentifierProxy>) cloner.getClonedList(table.get(i)));
+          dataRange.add(en);
+        }else{
+          final BinaryOperator op = optable.getRangeOperator();
+          final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
+          dataRange.add(range);
+        }
       }
       //mRanges = new ArrayList<SimpleExpressionProxy>(dataRange);
       ranges.addAll(dataRange);
@@ -448,9 +454,14 @@ public class EventCollectingVisitor implements PromelaVisitor
       dataRange = new ArrayList<SimpleExpressionProxy>();
       for(int i=0;i<table.size();i++){
         Collections.sort(table.get(i),comparator);
+        if(chanIn.getValue().getType().contains("mtype")){
+          final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy((Collection<? extends SimpleIdentifierProxy>) cloner.getClonedList(table.get(i)));
+          dataRange.add(en);
+        }else{
         final BinaryOperator op = optable.getRangeOperator();
         final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
         dataRange.add(range);
+        }
       }
       specialRec.addAll(cloner.getClonedList(dataRange));
 
@@ -462,9 +473,14 @@ public class EventCollectingVisitor implements PromelaVisitor
           }
         }
         Collections.sort(table.get(i),comparator);
-        final BinaryOperator op = optable.getRangeOperator();
-        final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
-        dataRange.add(range);
+        if(chanIn.getValue().getType().contains("mtype")){
+          final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy((Collection<? extends SimpleIdentifierProxy>) table.get(i));
+          dataRange.add(en);
+        }else{
+          final BinaryOperator op = optable.getRangeOperator();
+          final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
+          dataRange.add(range);
+        }
       }
       specialSend.addAll(dataRange);
     }
@@ -532,7 +548,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
 
   public Object visitProcType(final ProctypeTreeNode t){
-    proctypeVar = new Hashtable<String,List<String>>();
+    proctypeVar = new Hashtable<String,String>();
     for(int i=0;i<t.getChildCount();i++){
         final PromelaTree node = (PromelaTree)t.getChild(i);
         node.acceptVisitor(this);
@@ -623,7 +639,7 @@ public class EventCollectingVisitor implements PromelaVisitor
           indexes2.add(c2);
         }else if(ch.getType().get(y).equals("mtype")){
          // for(final String var : mGlobalVar.get("mtype")){
-          if(mGlobalVar.get("mtype").contains(labels.get(y+1))){
+          if(mGlobalVar.get(labels.get(y+1)).equals("mtype")){
             final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(labels.get(y+1));
             indexes.add(c);
             indexes2.add((SimpleExpressionProxy) cloner.getClone(c));
@@ -702,8 +718,13 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     final String ename = labels.get(0);
     final ChanInfo ch = chan.get(ename);
+    Tree tree = t;
+    while (!(tree instanceof ProctypeTreeNode)) {
+      tree = tree.getParent();
+    }
+    final String n = tree.getText();
 
-    final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
+    final List<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
 
     for(int y=0;y<ch.getType().size();y++){
 
@@ -715,16 +736,27 @@ public class EventCollectingVisitor implements PromelaVisitor
           indexes.add(null);
         }
      }else if(ch.getType().get(y).equals("mtype")){
-        final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(labels.get(y+1));
-        indexes.add(c);
+       //if(mGlobalVar.get(labels.get(y+1)).equals("mtype")){
+       if(proctypeVar.containsKey(labels.get(y+1))){
+         if(proctypeVar.get(labels.get(y+1)).equals("mtype")){
+           for(final Map.Entry<String,String> s: mGlobalVar.entrySet()){
+             //indexes = new ArrayList<SimpleExpressionProxy>();
+             if(s.getValue().equals("mtype")){
+               final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(s.getKey());
+               indexes.add(c);
+               final Message msg = new Message(indexes);
+               msg.addRecipient(n);
+               ch.addMessages(msg);
+               indexes.remove(c);
+             }
+           }
+           return null;
+         }
+       }
       }
     }
 
-    Tree tree = t;
-    while (!(tree instanceof ProctypeTreeNode)) {
-      tree = tree.getParent();
-    }
-    final String n = tree.getText();
+
 
     final List<SimpleExpressionProxy> msgList = new ArrayList<SimpleExpressionProxy>(indexes);
     final Message msg = new Message(msgList);
@@ -792,11 +824,11 @@ public class EventCollectingVisitor implements PromelaVisitor
     //if(tree.getText().equals("mtype")){
       for(int i=1;i<t.getChildCount();i++){
         if(tree.getText().equals("mtype")){
-          final List<String> temp = mGlobalVar.get("mtype");
-          proctypeVar.put(t.getChild(i).getText(),temp);
+          //final List<String> temp = mGlobalVar.get("mtype");
+          proctypeVar.put(t.getChild(i).getText(),"mtype");
         }else if(tree.getText().equals("byte")){
-          final List<String> temp = new ArrayList<String>();
-          proctypeVar.put(t.getChild(i).getText(),temp);
+          //final List<String> temp = new ArrayList<String>();
+          proctypeVar.put(t.getChild(i).getText(),"byte");
         }
       }
    // }
@@ -807,25 +839,25 @@ public class EventCollectingVisitor implements PromelaVisitor
   {
     System.out.println("");
     if(t.getParent() instanceof MsgTreeNode){
-      if(proctypeVar.isEmpty() || proctypeVar.get(t.getText()).size()==0){
-        labels.add(null);
-      }else if(proctypeVar.get(t.getText()).size()>0){
-        for(final String s: proctypeVar.get(t.getText())){
-          labels.add(s);
-        }
+      if(proctypeVar.isEmpty() || (!proctypeVar.containsKey(t.getText()))){
+        //labels.add(t.getText());
+      }else if(proctypeVar.containsKey(t.getText())){
+
+          labels.add(t.getText());
+
         //labels.add(e)
       }
     }else if(t.getParent() instanceof ChannelTreeNode){
       channelMsg.add(t.getText());
     }
     else if(t.getParent() instanceof TypeTreeNode){
-      final List<String> temp = mGlobalVar.get(t.getParent().getText());
-      temp.add(t.getText());
-      mGlobalVar.put(t.getParent().getText(), temp);
+      //final List<String> temp = mGlobalVar.get(t.getParent().getText());
+      //temp.add(t.getText());
+      mGlobalVar.put(t.getText(), t.getParent().getText());
     }
     else if(t.getParent() instanceof SendTreeNode){
       if(!channelMsg.contains(t.getText())){
-        if(mGlobalVar.get("mtype").contains(t.getText())){
+        if(mGlobalVar.containsKey(t.getText())){
           labels.add(t.getText());
         }
       }
@@ -836,16 +868,13 @@ public class EventCollectingVisitor implements PromelaVisitor
         while (!(tree instanceof ProctypeTreeNode)) {
           tree = tree.getParent();
         }
-        if(mGlobalVar.get("mtype").contains(t.getText()) || proctypeVar.get(tree.getText()).contains(t.getText())){
+        if(mGlobalVar.containsKey(t.getText()) || proctypeVar.containsKey(t.getText())){
           labels.add(t.getText());
         }
       }else{
-       // labels.add(t.getText());
       }
     }
-   // if(t.getParent() instanceof VardefTreeNode){
 
-   // }
     return null;
   }
 
@@ -864,14 +893,11 @@ public class EventCollectingVisitor implements PromelaVisitor
   {
     //TODO
     if(t.getText().equals("byte")){
-      flag = "byte";
+      //flag = "byte";
       lowerEnd.add("0");
       upperEnd.add("255");
     }
     if(t.getText().equals("mtype") && t.getParent() instanceof ModuleTreeNode){
-     // rangeData.add
-      final List<String> temp = new ArrayList<String>();
-      mGlobalVar.put(t.getText(), temp);
       if(t.getChildCount()>0){
         for(int i=0;i<t.getChildCount();i++){
           ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
@@ -880,7 +906,7 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
     if(t.getText().equals("mtype") && t.getParent() instanceof ChannelStatementTreeNode)
     {
-      flag = "mtype";
+      //flag = "mtype";
 
     }
 
