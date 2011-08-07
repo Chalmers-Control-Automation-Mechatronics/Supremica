@@ -164,14 +164,22 @@
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_2">
-                                <EventList>
-                                    <SimpleIdentifier Name=":accepting"/>
-                                </EventList>
                                 <PointGeometry>
                                     <Point Y="224" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-10" X="-32"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="B_3">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="304" X="80"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point Y="-7" X="-32"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
@@ -210,6 +218,33 @@
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
                                         <Point Y="-33" X="3"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="B_3" Source="B_2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="exch_ch">
+                                        <SimpleIdentifier Name="A_0"/>
+                                        <SimpleIdentifier Name="procid"/>
+                                        <SimpleIdentifier Name="FALSE"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="exch_ch">
+                                        <SimpleIdentifier Name="A_0"/>
+                                        <SimpleIdentifier Name="procid"/>
+                                        <SimpleIdentifier Name="TRUE"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="exch_ch">
+                                        <SimpleIdentifier Name="A_1"/>
+                                        <SimpleIdentifier Name="procid"/>
+                                        <SimpleIdentifier Name="FALSE"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="exch_ch">
+                                        <SimpleIdentifier Name="A_1"/>
+                                        <SimpleIdentifier Name="procid"/>
+                                        <SimpleIdentifier Name="TRUE"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-34" X="4"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>

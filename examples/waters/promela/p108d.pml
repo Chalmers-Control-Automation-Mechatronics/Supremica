@@ -1,31 +1,29 @@
 /*                                     
  * A test for the Promela importer in Waters.
- * This checks whether the compiler can distinguish mtype and byte arguments
- * in the same channel.
+ * This checks whether the compiler distinguish mtype constants and
+ * variables in receive statements.
  */
 
-mtype = { DATA, FV }
+mtype = { TRUE, FALSE }
 
-chan ch = [0] of { mtype, byte };
+chan ch = [0] of { mtype };
 
 proctype A()
 {
-  do
-  :: ch!DATA(0)
-  :: ch!DATA(1)
-  :: ch!FV(0) ; break
-  od
+        ch!TRUE;
+        ch!FALSE;
 }
 
 proctype B()
 {
-  mtype data;
-  byte value;
-  ch?data(value);
+        byte x;
+        ch?TRUE;
+        ch?x;
 }
 
 init
 {
-  run A();
-  run B()
+        run A();
+        run A();
+        run B()
 }
