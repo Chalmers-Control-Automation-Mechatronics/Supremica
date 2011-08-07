@@ -688,19 +688,18 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
       msg.addSender(n);
       ch.addMessages(msg);
-        //create indexedIdentifier, and store it for receive statement
+
+      //create indexedIdentifier, and store it for receive statement
       IndexedIdentifierProxy indexEvent = null;
-      IndexedIdentifierProxy indexEvent2 = null;
-      String name;
-      if(length==0){
-        name = "exch_"+ename;
-        indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
-       // indexEvent2 = mFactory.createIndexedIdentifierProxy(name,indexes2);
-      }else if(length==1){
-        name = "send_"+ename;
-        indexEvent = mFactory.createIndexedIdentifierProxy(name,indexes);
-        name = "recv_"+ename;
-        indexEvent2 = mFactory.createIndexedIdentifierProxy(name,indexes2);
+      if (length == 0) {
+        final String name = "exch_" + ename;
+        indexEvent = mFactory.createIndexedIdentifierProxy(name, indexes);
+        // indexEvent2 = mFactory.createIndexedIdentifierProxy(name,indexes2);
+      } else if (length == 1) {
+        final String name = "send_" + ename;
+        indexEvent = mFactory.createIndexedIdentifierProxy(name, indexes);
+        // name = "recv_"+ename;
+        // indexEvent2 = mFactory.createIndexedIdentifierProxy(name,indexes2);
       }
 
         THashSet<IdentifierProxy> temp = (THashSet<IdentifierProxy>) ch.getChannelData();
