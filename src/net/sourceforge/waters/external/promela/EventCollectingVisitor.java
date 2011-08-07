@@ -716,10 +716,10 @@ public class EventCollectingVisitor implements PromelaVisitor
           }
         }
         if(!same){
-          temp.add(indexEvent);
-          ch.addChannelData(indexEvent);
-          ch.send(indexEvent.getIndexes());
-          ch.addReceiveData(indexEvent2);
+          //temp.add(indexEvent);
+          //ch.addChannelData(indexEvent);
+          //ch.send(indexEvent.getIndexes());
+         // ch.addReceiveData(indexEvent2);
         }
 
         return indexEvent;
@@ -750,7 +750,8 @@ public class EventCollectingVisitor implements PromelaVisitor
     for(int y=0;y<ch.getType().size();y++){
 
      if(ch.getType().get(y).equals("byte")){
-        if(labels.get(y+1)!=null){
+        //if(labels.get(y+1)!=null){
+       if(!proctypeVar.containsKey(labels.get(y+1))){
         final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
         indexes.add(c);
         }else{
@@ -842,17 +843,17 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitVar(final VardefTreeNode t)
   {
     final Tree tree = t.getChild(0);
-    //if(tree.getText().equals("mtype")){
+
       for(int i=1;i<t.getChildCount();i++){
         if(tree.getText().equals("mtype")){
-          //final List<String> temp = mGlobalVar.get("mtype");
+
           proctypeVar.put(t.getChild(i).getText(),"mtype");
         }else if(tree.getText().equals("byte")){
-          //final List<String> temp = new ArrayList<String>();
+
           proctypeVar.put(t.getChild(i).getText(),"byte");
         }
       }
-   // }
+
     return null;
   }
 

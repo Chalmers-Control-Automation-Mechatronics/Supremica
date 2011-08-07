@@ -182,6 +182,17 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitVar(final VardefTreeNode t)
   {
+    final Tree tree = t.getChild(0);
+
+    for(int i=1;i<t.getChildCount();i++){
+      if(tree.getText().equals("mtype")){
+
+        proctypeVar.put(t.getChild(i).getText(),"mtype");
+      }else if(tree.getText().equals("byte")){
+
+        proctypeVar.put(t.getChild(i).getText(),"byte");
+      }
+    }
     return null;
   }
 
@@ -588,12 +599,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final Hashtable<Message,Collection<SimpleExpressionProxy>> temp = new Hashtable<Message,Collection<SimpleExpressionProxy>>();
     for(int y=0;y<ch.getType().size();y++){
       if(ch.getType().get(y).equals("byte")){
-      if(labels.get(y+1)!=null){
-      final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
-      indexes.add(c);
-      templabel.add(c);
-      }else{
-        indexes.add(null);
+      //if(labels.get(y+1)!=null){
+        if(!proctypeVar.containsKey(labels.get(y+1))){
+          final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
+          indexes.add(c);
+          templabel.add(c);
+        }else{
+          indexes.add(null);
       }
       final Message msg = new Message(cloner.getClonedList(indexes));
       msgList.add(msg);
