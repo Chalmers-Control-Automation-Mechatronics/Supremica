@@ -229,22 +229,14 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="240" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="init_4">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="304" X="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -275,14 +267,6 @@
                         <StartPointGeometry>
                             <Point Y="176" X="80"/>
                         </StartPointGeometry>
-                    </Edge>
-                    <Edge Target="init_4" Source="init_3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="run_B"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
