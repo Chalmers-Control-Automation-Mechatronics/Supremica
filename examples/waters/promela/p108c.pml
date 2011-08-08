@@ -4,7 +4,7 @@
  * multiple senders and recipients.
  */
 
-mtype = { TRUE, FALSE }
+mtype { TRUE, FALSE }
 
 chan ch = [0] of { mtype };
 
@@ -16,7 +16,7 @@ proctype A()
 
 proctype B()
 {
-        byte x;
+        mtype x;
         ch?x;
 	ch?x;
 }
