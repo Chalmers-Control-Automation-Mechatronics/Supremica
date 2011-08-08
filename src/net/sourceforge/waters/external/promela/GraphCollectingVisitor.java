@@ -610,15 +610,23 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final Message msg = new Message(cloner.getClonedList(indexes));
       msgList.add(msg);
       }else if(ch.getType().get(y).equals("mtype")){
-        for(final Map.Entry<String,String> s: mVisitor.getGlobalVar().entrySet()){
-          indexes = new ArrayList<SimpleExpressionProxy>();
-          if(s.getValue().equals("mtype")){
-            final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(s.getKey());
-            indexes.add(c);
-            final Message msg = new Message(cloner.getClonedList(indexes));
-            msgList.add(msg);
-            temp.put(msg,indexes);
+        if(!mVisitor.getGlobalVar().containsKey(labels.get(y+1))){
+          for(final Map.Entry<String,String> s: mVisitor.getGlobalVar().entrySet()){
+            indexes = new ArrayList<SimpleExpressionProxy>();
+            if(s.getValue().equals("mtype")){
+              final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(s.getKey());
+              indexes.add(c);
+              final Message msg = new Message(cloner.getClonedList(indexes));
+              msgList.add(msg);
+              temp.put(msg,indexes);
+            }
           }
+        }else{
+          final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(labels.get(y+1));
+          indexes.add(c);
+          final Message msg = new Message(cloner.getClonedList(indexes));
+          msgList.add(msg);
+          temp.put(msg,indexes);
         }
       }
     }
@@ -644,7 +652,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         if(isSame){
             if(!m.hasSenders()) break loop1;
             loop2:
-            for(final Message m2: ch.getMessages()){
+            for(final Message m2: ch.getOutput()){
               if(m2.getMsg().contains(null)){
                 continue loop2;
               }
@@ -911,12 +919,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
     if(t.getParent() instanceof RunTreeNode){
       procNames.add(t.getText());
     }else if(t.getParent() instanceof MsgTreeNode){
-      if(proctypeVar.isEmpty() || !proctypeVar.containsKey(t.getText())){
+     // if(proctypeVar.isEmpty() || (!proctypeVar.containsKey(t.getText()) && !mVisitor.getGlobalVar().containsKey(t.getText()))){
         //labels.add(null);
-      }else if(proctypeVar.containsKey(t.getText())){
-
+     // }else
+      if(proctypeVar.containsKey(t.getText()) || mVisitor.getGlobalVar().containsKey(t.getText())){
           labels.add(t.getText());
-
       }
     }else if(t.getParent() instanceof SendTreeNode){
       if(!mVisitor.getChanMsg().contains(t.getText())){
