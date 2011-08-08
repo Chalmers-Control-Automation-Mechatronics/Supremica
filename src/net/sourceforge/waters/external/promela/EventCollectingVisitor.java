@@ -454,13 +454,14 @@ public class EventCollectingVisitor implements PromelaVisitor
 
       for(int i=0;i<table.size();i++){
 
-        Collections.sort(table.get(i),comparator);
+        //Collections.sort(table.get(i),comparator);
         //if(chanIn.getValue().getType().contains("mtype")){
         if(chanIn.getValue().getType().get(i).equals("mtype")){
           final EnumSetExpressionProxy en =
               createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
           dataRange.add(en);
         }else{
+          Collections.sort(table.get(i),comparator);
           final BinaryOperator op = optable.getRangeOperator();
           final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
           dataRange.add(range);
@@ -472,13 +473,14 @@ public class EventCollectingVisitor implements PromelaVisitor
     }else{
       dataRange = new ArrayList<SimpleExpressionProxy>();
       for(int i=0;i<table.size();i++){
-        Collections.sort(table.get(i),comparator);
+
       ///  if(chanIn.getValue().getType().contains("mtype")){
         if(chanIn.getValue().getType().get(i).equals("mtype")){
           final EnumSetExpressionProxy en =
             createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
           dataRange.add(en);
         }else{
+        Collections.sort(table.get(i),comparator);
         final BinaryOperator op = optable.getRangeOperator();
         final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
         dataRange.add(range);
@@ -493,13 +495,14 @@ public class EventCollectingVisitor implements PromelaVisitor
             table.get(i).add(m.getMsg().get(i));
           }
         }
-        Collections.sort(table.get(i),comparator);
+
      //   if(chanIn.getValue().getType().contains("mtype")){
         if(chanIn.getValue().getType().get(i).equals("mtype")){
           final EnumSetExpressionProxy en =
             createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
           dataRange.add(en);
         }else{
+          Collections.sort(table.get(i),comparator);
           final BinaryOperator op = optable.getRangeOperator();
           final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
           dataRange.add(range);
@@ -605,7 +608,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   */
  //   final Comparator<SimpleExpressionProxy> comparator =
  //       new ExpressionComparator(optable);
-    Collections.sort(enumValues);
+   // Collections.sort(enumValues);
     //if(isMtype){
     final EnumSetExpressionProxy en =
       mFactory.createEnumSetExpressionProxy(enumValues);
