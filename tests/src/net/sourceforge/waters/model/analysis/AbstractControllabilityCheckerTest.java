@@ -90,7 +90,7 @@ public abstract class AbstractControllabilityCheckerTest
   public void testSmallFactory2() throws Exception
   {
     final String group = "handwritten";
-    final String name = "small_factory_2.wdes";
+    final String name = "small_factory_2.wmod";
     runModelVerifier(group, name, true);
   }
 

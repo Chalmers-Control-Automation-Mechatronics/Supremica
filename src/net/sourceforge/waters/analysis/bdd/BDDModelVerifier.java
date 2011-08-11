@@ -350,15 +350,13 @@ public abstract class BDDModelVerifier
       mIsFullyDeterministic &= autBDD.isDeterministic();
     }
 
-    if (!mIsFullyDeterministic) {
-      final int numvars = mBDDFactory.varNum();
-      mAutomatonBDDbyVarIndex = new AutomatonBDD[numvars];
-      for (final AutomatonBDD autBDD : mAutomatonBDDs) {
-        final int first = autBDD.getFirstVariableIndex();
-        final int last = autBDD.getLastVariableIndex();
-        for (int i = first; i <= last; i++) {
-          mAutomatonBDDbyVarIndex[i] = autBDD;
-        }
+    final int numvars = mBDDFactory.varNum();
+    mAutomatonBDDbyVarIndex = new AutomatonBDD[numvars];
+    for (final AutomatonBDD autBDD : mAutomatonBDDs) {
+      final int first = autBDD.getFirstVariableIndex();
+      final int last = autBDD.getLastVariableIndex();
+      for (int i = first; i <= last; i++) {
+        mAutomatonBDDbyVarIndex[i] = autBDD;
       }
     }
 
@@ -430,6 +428,7 @@ public abstract class BDDModelVerifier
         }
       }
       if (containsBadState(current)) {
+        recordStateCount(current);
         current.free();
         return null;
       }
@@ -449,6 +448,7 @@ public abstract class BDDModelVerifier
       current = next;
       reorder();
     } while (true);
+    recordStateCount(current);
     return current;
   }
 
@@ -812,6 +812,18 @@ public abstract class BDDModelVerifier
       final StateProxy state = autBDD.getState(code);
       statemap.put(aut, state);
     }
+  }
+
+
+  //#########################################################################
+  //# Statistics
+  private void recordStateCount(final BDD bdd)
+  {
+    final BDDStateCounter counter =
+      new BDDStateCounter(mBDDFactory, mAutomatonBDDbyVarIndex);
+    final double count = counter.count(bdd);
+    final VerificationResult result = getAnalysisResult();
+    result.setNumberOfStates(count);
   }
 
 

@@ -93,10 +93,10 @@ class AutomatonBDD
       factory.setVarNum(mFirstVariableIndex + 2 * mNumberOfBits);
     }
     final int power2 = 1 << mNumberOfBits;
-    final int firstuse2 = numreached + numreached - power2;
+    mFirstUse2 = numreached + numreached - power2;
     int index = 0;
     for (final StateCode code : reached) {
-      if (index >= firstuse2) {
+      if (index >= mFirstUse2) {
         code.setStateCode(index, true);
         mStateArray[index++] = code;
         mStateArray[index++] = code;
@@ -140,6 +140,11 @@ class AutomatonBDD
   boolean isNextStateVariable(final int varindex)
   {
     return ((varindex - mFirstVariableIndex) & 1) != 0;
+  }
+
+  int getFirstUse2()
+  {
+    return mFirstUse2;
   }
 
   int getAutomatonIndex()
@@ -599,6 +604,7 @@ class AutomatonBDD
   private final int mAutomatonIndex;
   private final int mNumberOfBits;
   private final int mFirstVariableIndex;
+  private final int mFirstUse2;
   private final StateCode[] mStateArray;
   private final Map<StateProxy,StateCode> mStateMap;
   private Set<EventProxy> mNondeterministicEvents;
