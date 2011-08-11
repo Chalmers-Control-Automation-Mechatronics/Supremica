@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="small_factory_2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="machine_buffer" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="start1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="finish1"/>
@@ -7,9 +7,6 @@
         <EventDecl Kind="CONTROLLABLE" Name="repair1"/>
         <EventDecl Kind="CONTROLLABLE" Name="start2"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="break2"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="finish2"/>
-        <EventDecl Kind="CONTROLLABLE" Name="repair2"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="machine1">
@@ -85,82 +82,6 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="machine2">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="idle">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="32" X="112"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="9"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="working">
-                        <PointGeometry>
-                            <Point Y="128" X="48"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="7" X="-37"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="down">
-                        <PointGeometry>
-                            <Point Y="128" X="176"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="-15"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="working" Source="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="start2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-40"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="76" X="67"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="idle" Source="working">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="finish2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="-12"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="88" X="91"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="down" Source="working">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="break2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-19"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="idle" Source="down">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="repair2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="81" X="143"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="buffer">
             <Graph>
                 <NodeList>
@@ -216,66 +137,6 @@
                         </LabelBlock>
                         <SplineGeometry>
                             <Point Y="111" X="142"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="repair">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="m2ok">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="64" X="128"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="-50"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="m2down">
-                        <PointGeometry>
-                            <Point Y="160" X="128"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="-63"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="m2ok" Source="m2ok">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="repair1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="66" X="166"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="m2down" Source="m2ok">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="break2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="5"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="114" X="141"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="m2ok" Source="m2down">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="repair2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="-52"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="112" X="112"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

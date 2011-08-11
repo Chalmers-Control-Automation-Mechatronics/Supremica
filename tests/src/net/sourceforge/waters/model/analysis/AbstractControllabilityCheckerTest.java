@@ -87,6 +87,13 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, name, false);
   }
 
+  public void testMachineBuffer() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "machine_buffer.wmod";
+    runModelVerifier(group, name, true);
+  }
+
   public void testSmallFactory2() throws Exception
   {
     final String group = "handwritten";

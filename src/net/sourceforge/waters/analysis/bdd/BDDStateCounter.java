@@ -78,8 +78,13 @@ class BDDStateCounter
       autindex++;
       autBDD = mOrderedAutomatonBDDs.get(autindex);
     }
-    final int numbits = autBDD.getNumberOfStateBits();
-    return factor * getOpenCount(bdd, autindex, 0, 0, numbits);
+    double result = mCache.get(bdd);
+    if (result == 0.0) {
+      final int numbits = autBDD.getNumberOfStateBits();
+      result = getOpenCount(bdd, autindex, 0, 0, numbits);
+      mCache.put(bdd, result);
+    }
+    return factor * result;
   }
 
   private double getOpenCount(final BDD bdd,
@@ -93,8 +98,10 @@ class BDDStateCounter
     }
     final AutomatonBDD autBDD = mOrderedAutomatonBDDs.get(autindex);
     final int firstuse2 = autBDD.getFirstUse2();
-    if (truemask >= firstuse2) {
-      if (((truemask | falsemask) & 1) == 0) {
+    if (truemask >= firstuse2) { // truemask is the lowest possible value.
+      if ((truemask & 1) != 0) {
+        return 0.0;
+      } else if ((falsemask & 1) == 0) {
         openbits--;
       }
       return getClosedCount(bdd, autindex, openbits);
@@ -104,7 +111,17 @@ class BDDStateCounter
     final int maxcode = mask & ~falsemask;
     if (maxcode < firstuse2) {
       return getClosedCount(bdd, autindex, openbits);
-    } else if (bdd.isOne()) {
+    }
+    final int varindex;
+    final boolean newvar;
+    if (bdd.isOne()) {
+      varindex = -1;
+      newvar = true;
+    } else {
+      varindex = bdd.var();
+      newvar = (mAutomatonBDDbyVarIndex[varindex] != autBDD);
+    }
+    if (newvar) {
       final int bothmask = falsemask | truemask;
       int bit = numbits - 1;
       int bitmask = 1 << bit;
@@ -119,7 +136,6 @@ class BDDStateCounter
     }
     final BDD low = bdd.low();
     final BDD high = bdd.high();
-    final int varindex = bdd.var();
     final int bitindex = autBDD.getBitIndex(varindex);
     final int bitmask = 1 << bitindex;
     openbits--;
@@ -142,17 +158,11 @@ class BDDStateCounter
     if (mAutomatonBDDbyVarIndex[varindex] != autBDD) {
       return (1 << openbits) * getOpenCount(bdd, autindex + 1);
     }
-    final double cached = mCache.get(bdd);
-    if (cached != 0.0) {
-      return cached;
-    }
     final BDD low = bdd.low();
     final BDD high = bdd.high();
     openbits--;
-    final double result = getClosedCount(low, autindex, openbits) +
-                          getClosedCount(high, autindex, openbits);
-    mCache.put(bdd, result);
-    return result;
+    return getClosedCount(low, autindex, openbits) +
+           getClosedCount(high, autindex, openbits);
   }
 
   private double getStateProduct(final int autindex)
