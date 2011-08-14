@@ -77,7 +77,11 @@ public class TestSynthesisAbstractionMinimizer
       (EquivalenceRelation.SYNTHESISABSTRACTION);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mIsomorphismChecker = new IsomorphismChecker(factory, true);
-    setNodeLimit();
+    final String prop = System.getProperty("waters.analysis.statelimit");
+    if (prop != null) {
+      final int limit = Integer.parseInt(prop);
+      mMinimizationOptions.setComponentSizeLimit(limit);
+    }
   }
 
   protected void tearDown()
@@ -354,6 +358,7 @@ public class TestSynthesisAbstractionMinimizer
   @Override
   protected void configure(final ModuleCompiler compiler)
   {
+    super.configure(compiler);
     compiler.setOptimizationEnabled(false);
   }
 
@@ -366,20 +371,35 @@ public class TestSynthesisAbstractionMinimizer
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy beforeW = findAutomaton(des, BEFORE);
     final Automaton beforeS = mAutomatonBuilder.build(beforeW);
+    final Alphabet hidden = getEventsToHide(beforeS);
     mAutomatonMinimizer = new AutomatonMinimizer(beforeS);
-    final Alphabet alphabet = beforeS.getAlphabet();
-    final Alphabet hidden = new Alphabet();
-    for (final LabeledEvent event : alphabet) {
-      if (!event.isObservable()) {
-        event.setObservable(true);
-        hidden.add(event);
-      }
-    }
     final Automaton result =
       mAutomatonMinimizer.getMinimizedAutomaton(mMinimizationOptions, hidden);
     result.setName("result");
     checkResult(des, result);
     getLogger().info("Done " + des.getName());
+  }
+
+  /**
+   * Gets the set of events to be hidden from the given automaton.
+   * This method finds all events marked as unobservable in the automaton
+   * alphabet and returns them. These events are then set to be observable,
+   * so a set of observable events to be hidden can be passed to the
+   * {@link AutomatonMinimizer}.
+   * @param   aut     The automaton being minimised.
+   * @return  Alphabet of events that were observable.
+   */
+  private Alphabet getEventsToHide(final Automaton aut)
+  {
+    final Alphabet hidden = new Alphabet();
+    for (final LabeledEvent event : aut.getAlphabet()) {
+      if (!event.isObservable()) {
+        event.setObservable(true);
+        hidden.add(event);
+      }
+    }
+    // Do we also need to change events on arcs? Seemingly not ...
+    return hidden;
   }
 
   private void checkResult(final ProductDESProxy des,
@@ -395,15 +415,6 @@ public class TestSynthesisAbstractionMinimizer
     final AutomatonProxy expected =
       after == null ? findAutomaton(des, BEFORE) : after;
     mIsomorphismChecker.checkIsomorphism(result, expected);
-  }
-
-  private void setNodeLimit()
-  {
-    final String prop = System.getProperty("waters.analysis.statelimit");
-    if (prop != null) {
-      final int limit = Integer.parseInt(prop);
-      mMinimizationOptions.setComponentSizeLimit(limit);
-    }
   }
 
 
