@@ -10,7 +10,7 @@
         </EventDecl>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="SPEC" Name="before">
+        <SimpleComponent Kind="PLANT" Name="before">
             <Graph/>
         </SimpleComponent>
     </ComponentList>

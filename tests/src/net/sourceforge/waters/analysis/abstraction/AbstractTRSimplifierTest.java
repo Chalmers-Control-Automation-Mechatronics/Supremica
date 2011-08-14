@@ -114,6 +114,62 @@ public abstract class AbstractTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_basic_1() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "basic_1.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_basic_2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "basic_2.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_basic_3() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "basic_3.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_basic_4() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "basic_4.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_basic_5() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "basic_5.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_basic_6() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "basic_6.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_basic_7() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "basic_7.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
 
   //#########################################################################
   //# Instantiating and Checking Modules

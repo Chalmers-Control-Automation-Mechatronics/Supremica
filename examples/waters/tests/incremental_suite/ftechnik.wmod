@@ -2,10 +2,10 @@
 <Module Name="ftechnik" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment>From 'Task Description of a Flexible Production Cell with Real Time Properties' by A. Loetzbeyer and R. Muehlfeld. Different products enter on a conveyor belt and two cranes move the products between four stations before leving them on a conveyor belt at the other end of the cell. This is the 'ftechnik' example.
 
-The components named 'nocoll' define the proper behaviour for collision avoidance.</ns2:Comment>
+The components named 'nocoll' define the proper behaviour for collision avoidance.
+The model is not controllable and blocking. It has 120960000 reachable states and the diameter is 24.</ns2:Comment>
 <ConstantAliasList>
-<ConstantAlias>
-<SimpleIdentifier Name="STATION"/>
+<ConstantAlias Name="STATION">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="S1"/>
@@ -422,8 +422,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="belt"/>
+<SimpleComponent Kind="SPEC" Name="belt">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="B1_start"/>
@@ -710,8 +709,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="belt_drop"/>
+<SimpleComponent Kind="SPEC" Name="belt_drop">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="L_drop_B2">
@@ -832,8 +830,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="belt_pick"/>
+<SimpleComponent Kind="SPEC" Name="belt_pick">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="L_pick_B1">
@@ -1194,8 +1191,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="init"/>
+<SimpleComponent Kind="SPEC" Name="init">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init"/>
@@ -1344,8 +1340,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="init_L1X1"/>
+<SimpleComponent Kind="SPEC" Name="init_L1X1">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init"/>
@@ -1486,8 +1481,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="init_L2X8"/>
+<SimpleComponent Kind="SPEC" Name="init_L2X8">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init"/>
@@ -2104,8 +2098,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="magnet_L1"/>
+<SimpleComponent Kind="SPEC" Name="magnet_L1">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init_done"/>
@@ -3017,8 +3010,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="magnet_L2"/>
+<SimpleComponent Kind="SPEC" Name="magnet_L2">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init_done"/>
@@ -4045,8 +4037,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="PROPERTY">
-<SimpleIdentifier Name="nocoll_X2"/>
+<SimpleComponent Kind="PROPERTY" Name="nocoll_X2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="L_at_X1">
@@ -4195,8 +4186,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PROPERTY">
-<SimpleIdentifier Name="nocoll_X3"/>
+<SimpleComponent Kind="PROPERTY" Name="nocoll_X3">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="L_at_X2">
@@ -4345,8 +4335,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PROPERTY">
-<SimpleIdentifier Name="nocoll_X4"/>
+<SimpleComponent Kind="PROPERTY" Name="nocoll_X4">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="L_at_X3">
@@ -4495,8 +4484,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PROPERTY">
-<SimpleIdentifier Name="nocoll_X5"/>
+<SimpleComponent Kind="PROPERTY" Name="nocoll_X5">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="L_at_X4">
@@ -4645,8 +4633,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PROPERTY">
-<SimpleIdentifier Name="nocoll_X6"/>
+<SimpleComponent Kind="PROPERTY" Name="nocoll_X6">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="L_at_X5">
@@ -4795,8 +4782,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PROPERTY">
-<SimpleIdentifier Name="nocoll_X7"/>
+<SimpleComponent Kind="PROPERTY" Name="nocoll_X7">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="L_at_X6">
@@ -4945,8 +4931,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="observer_L1x"/>
+<SimpleComponent Kind="SPEC" Name="observer_L1x">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init_done"/>
@@ -6009,8 +5994,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="observer_L2x"/>
+<SimpleComponent Kind="SPEC" Name="observer_L2x">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init_done"/>
@@ -7073,8 +7057,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="plant_move_L1x"/>
+<SimpleComponent Kind="PLANT" Name="plant_move_L1x">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init"/>
@@ -8244,8 +8227,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="plant_move_L2x"/>
+<SimpleComponent Kind="PLANT" Name="plant_move_L2x">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init"/>
@@ -10063,8 +10045,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="safety2L1"/>
+<SimpleComponent Kind="SPEC" Name="safety2L1">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init_done"/>
@@ -11297,8 +11278,7 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="safety2L2"/>
+<SimpleComponent Kind="SPEC" Name="safety2L2">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="init_done"/>
@@ -13887,4 +13867,3 @@ The components named 'nocoll' define the proper behaviour for collision avoidanc
 </ForeachComponent>
 </ComponentList>
 </Module>
-

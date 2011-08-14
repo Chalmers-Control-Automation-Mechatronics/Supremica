@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="aip0tough" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>Model of the AIP automated manufacturing system created by Ryan Leduc in 2000 (?). This model is not controllable and blocking. The number of reachable states is 10249072178 and the diameter is 340.</ns2:Comment>
 <ConstantAliasList>
-<ConstantAlias>
-<SimpleIdentifier Name="AS1_2"/>
+<ConstantAlias Name="AS1_2">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
@@ -10,8 +10,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="TU1_2"/>
+<ConstantAlias Name="TU1_2">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
@@ -19,8 +18,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="TU1_2_4"/>
+<ConstantAlias Name="TU1_2_4">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
@@ -29,8 +27,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="TUall"/>
+<ConstantAlias Name="TUall">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="TU1"/>
@@ -40,8 +37,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="AS1to3"/>
+<ConstantAlias Name="AS1to3">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="AS1"/>
@@ -539,8 +535,7 @@
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSect1_1"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSect1_1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="PalletArvGEL_2">
@@ -635,8 +630,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSect1_2"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSect1_2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="ASDwn">
@@ -749,8 +743,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSect2_1"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSect2_1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="PalletArvGEL_2">
@@ -845,8 +838,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSect2_2"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSect2_2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="ASDwn">
@@ -959,8 +951,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSect3_1"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSect3_1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="PalletArvGEL_2">
@@ -1089,8 +1080,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSect3_2"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSect3_2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="PalletArvGEL_1">
@@ -1243,8 +1233,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSect4_1"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSect4_1">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="PalletArvG4_2"/>
@@ -1365,8 +1354,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSect4_2"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSect4_2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="PalletArvGEL_1">
@@ -1487,8 +1475,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSectCL_1"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSectCL_1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="LibPallet">
@@ -1629,8 +1616,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSectCL_2"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSectCL_2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="LibPallet">
@@ -1771,8 +1757,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSectCL_3"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSectCL_3">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="LibPallet">
@@ -1913,8 +1898,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_DepConvSectCL_4"/>
+<SimpleComponent Kind="PLANT" Name="h_DepConvSectCL_4">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="LibPallet">
@@ -2055,8 +2039,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_DetWhichStnUp"/>
+<SimpleComponent Kind="SPEC" Name="h_DetWhichStnUp">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="DetStnsUp"/>
@@ -2362,8 +2345,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_GlobOfProt"/>
+<SimpleComponent Kind="SPEC" Name="h_GlobOfProt">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="IntroPallet"/>
@@ -2596,8 +2578,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_HndlComEventsAS"/>
+<SimpleComponent Kind="SPEC" Name="h_HndlComEventsAS">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="DetStnsUp"/>
@@ -2880,8 +2861,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_InterConvSectCL"/>
+<SimpleComponent Kind="PLANT" Name="h_InterConvSectCL">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="InterCLFull">
@@ -3057,8 +3037,7 @@
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_IntfAssmbStn3"/>
+<SimpleComponent Kind="PLANT" Name="h_IntfAssmbStn3">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="PalletRepd">
@@ -3131,8 +3110,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_IntfIOStation"/>
+<SimpleComponent Kind="PLANT" Name="h_IntfIOStation">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="IntroPallet"/>
@@ -3372,8 +3350,7 @@
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_IntfTU3"/>
+<SimpleComponent Kind="PLANT" Name="h_IntfTU3">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="LibPallet">
@@ -3522,8 +3499,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_ManageTU1"/>
+<SimpleComponent Kind="SPEC" Name="h_ManageTU1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="InterCLFull">
@@ -3935,8 +3911,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_ManageTU2"/>
+<SimpleComponent Kind="SPEC" Name="h_ManageTU2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="InterCLFull">
@@ -4348,8 +4323,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_ManageTU3"/>
+<SimpleComponent Kind="SPEC" Name="h_ManageTU3">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="DetStnsUp"/>
@@ -4653,8 +4627,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_ManageTU4"/>
+<SimpleComponent Kind="SPEC" Name="h_ManageTU4">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="InterCLFull">
@@ -4939,8 +4912,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL1"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="IsPalletCL">
@@ -5154,8 +5126,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL2"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="IsPalletCL">
@@ -5369,8 +5340,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL3"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL3">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="LibPallet">
@@ -5584,8 +5554,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL4_1"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL4_1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="LibPallet">
@@ -5790,8 +5759,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL4_2"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL4_2">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="IntroPallet"/>
@@ -5880,8 +5848,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL5_1"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL5_1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="InterCLFull">
@@ -6010,8 +5977,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL5_2"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL5_2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="InterCLFull">
@@ -6140,8 +6106,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL5_3"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL5_3">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="InterCLFull">
@@ -6270,8 +6235,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="h_OFProtEL5_4"/>
+<SimpleComponent Kind="SPEC" Name="h_OFProtEL5_4">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="InterCLFull">
@@ -6400,8 +6364,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_PalletArvGateSen4_2"/>
+<SimpleComponent Kind="PLANT" Name="h_PalletArvGateSen4_2">
 <Graph>
 <LabelBlock>
 <SimpleIdentifier Name="PalletArvG4_2"/>
@@ -6579,8 +6542,7 @@
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="h_PalletArvGateSenCl3"/>
+<SimpleComponent Kind="PLANT" Name="h_PalletArvGateSenCl3">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="LibPallet">
@@ -7293,4 +7255,3 @@
 </ForeachComponent>
 </ComponentList>
 </Module>
-

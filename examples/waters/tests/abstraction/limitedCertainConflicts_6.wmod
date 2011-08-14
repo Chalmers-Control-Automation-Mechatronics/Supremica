@@ -117,8 +117,11 @@
             <Graph Deterministic="false">
                 <LabelBlock>
                     <SimpleIdentifier Name=":accepting"/>
+                    <SimpleIdentifier Name="a"/>
+                    <SimpleIdentifier Name="b"/>
+                    <SimpleIdentifier Name="c"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="30" X="178"/>
+                        <Point Y="24" X="89"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>

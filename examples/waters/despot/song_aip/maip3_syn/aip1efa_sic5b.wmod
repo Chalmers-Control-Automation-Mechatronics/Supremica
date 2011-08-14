@@ -9,6 +9,10 @@ The following changes have been made in order make the model amenable to composi
 3. Specification h_ManageIO:1 and plant h_QueryPalletAtIO:1 have been decomposed into two automata each, such that their synchronous composition gives the original automaton.
 4. Plants h_CapEL11:1, h_CapEL21:1, h_CapEL31:1 have been removed (changed to properties) as it was found by language inclusion check that they do not restrict the system behaviour.
 
+These are the numbers of reachable states of this model for some parameters:
+N=3: 1376197836 reachable states, diameter 272.
+N=4: 13637751306 reachable states, diameter 350 (not checked-just guessing).
+
 Reference:
 Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control. Masters Thesis, Department of Computer Science, McMaster University, Hamilton, Canada, 2006.
 </ns2:Comment>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="agvb" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-<ns2:Comment>Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).</ns2:Comment>
+<ns2:Comment>Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).
+The model has 22929408 reachable states, and the diameter is 186.</ns2:Comment>
 <EventDeclList>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 <EventDecl Kind="PROPOSITION" Name=":forbidden"/>

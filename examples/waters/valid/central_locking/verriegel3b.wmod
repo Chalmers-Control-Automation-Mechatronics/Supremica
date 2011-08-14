@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="verriegel3b" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Central locking system model from KorSys project. This variant of the original version with three individual doors has been made blocking by removing the 'noreset' automaton.</ns2:Comment>
+    <ns2:Comment>Central locking system model from KorSys project. This variant of the original version with three individual doors has been made blocking by removing the 'noreset' automaton.
+The model is controllable and blocking. It has 1320488568 reachable states and the diameter is 91.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name="HeckTueren">
             <ConstantAliasExpression>
@@ -340,21 +341,21 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":0">
-                        <NodeRef Name="AU1"/>
                         <NodeRef Name="AU2"/>
                         <NodeRef Name="AU3"/>
+                        <NodeRef Name="AU1"/>
                         <BoxGeometry>
                             <Box Y="256" X="112" Width="144" Height="240"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name=":1">
-                        <NodeRef Name="ER"/>
-                        <NodeRef Name="AU3"/>
                         <NodeRef Name="FS"/>
-                        <NodeRef Name="AU1"/>
-                        <NodeRef Name="VR"/>
                         <NodeRef Name="AU2"/>
                         <NodeRef Name=":0"/>
+                        <NodeRef Name="AU3"/>
+                        <NodeRef Name="ER"/>
+                        <NodeRef Name="VR"/>
+                        <NodeRef Name="AU1"/>
                         <BoxGeometry>
                             <Box Y="64" X="32" Width="336" Height="448"/>
                         </BoxGeometry>
@@ -1224,17 +1225,17 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":1">
-                        <NodeRef Name="IN"/>
-                        <NodeRef Name="RQVR"/>
-                        <NodeRef Name="ZS"/>
-                        <NodeRef Name="SER"/>
-                        <NodeRef Name="VR"/>
                         <NodeRef Name="RQZS"/>
-                        <NodeRef Name="COD"/>
-                        <NodeRef Name="RQSER"/>
                         <NodeRef Name="TSTZS"/>
+                        <NodeRef Name="COD"/>
                         <NodeRef Name="ER"/>
+                        <NodeRef Name="SER"/>
+                        <NodeRef Name="RQSER"/>
+                        <NodeRef Name="VR"/>
+                        <NodeRef Name="ZS"/>
+                        <NodeRef Name="RQVR"/>
                         <NodeRef Name="RQER"/>
+                        <NodeRef Name="IN"/>
                         <BoxGeometry>
                             <Box Y="16" X="112" Width="480" Height="416"/>
                         </BoxGeometry>
@@ -2392,30 +2393,30 @@
                                 </LabelGeometry>
                             </SimpleNode>
                             <GroupNode Name=":0">
-                                <NodeRef Name="zs4"/>
-                                <NodeRef Name="er1"/>
-                                <NodeRef Name="er3"/>
-                                <NodeRef Name="vr5"/>
-                                <NodeRef Name="vr2"/>
-                                <NodeRef Name="vr3"/>
-                                <NodeRef Name="er2"/>
-                                <NodeRef Name="ER"/>
-                                <NodeRef Name="vr4"/>
-                                <NodeRef Name="vr1"/>
-                                <NodeRef Name="vr8"/>
-                                <NodeRef Name="zs9"/>
-                                <NodeRef Name="ZS"/>
-                                <NodeRef Name="zs1"/>
-                                <NodeRef Name="VR"/>
-                                <NodeRef Name="vr7"/>
                                 <NodeRef Name="zs2"/>
-                                <NodeRef Name="zs8"/>
-                                <NodeRef Name="zs6"/>
-                                <NodeRef Name="zs7"/>
                                 <NodeRef Name="zs5"/>
+                                <NodeRef Name="zs8"/>
+                                <NodeRef Name="zs9"/>
+                                <NodeRef Name="er3"/>
+                                <NodeRef Name="ER"/>
+                                <NodeRef Name="zs6"/>
+                                <NodeRef Name="zs1"/>
+                                <NodeRef Name="vr2"/>
+                                <NodeRef Name="er1"/>
+                                <NodeRef Name="VR"/>
+                                <NodeRef Name="vr8"/>
+                                <NodeRef Name="vr1"/>
+                                <NodeRef Name="vr5"/>
                                 <NodeRef Name="vr6"/>
                                 <NodeRef Name="IN"/>
+                                <NodeRef Name="zs7"/>
+                                <NodeRef Name="ZS"/>
+                                <NodeRef Name="vr4"/>
+                                <NodeRef Name="zs4"/>
+                                <NodeRef Name="vr3"/>
                                 <NodeRef Name="zs3"/>
+                                <NodeRef Name="vr7"/>
+                                <NodeRef Name="er2"/>
                                 <BoxGeometry>
                                     <Box Y="64" X="80" Width="512" Height="416"/>
                                 </BoxGeometry>
@@ -4147,30 +4148,30 @@
                                 </LabelGeometry>
                             </SimpleNode>
                             <GroupNode Name=":1">
-                                <NodeRef Name="vr7"/>
-                                <NodeRef Name="ZS"/>
-                                <NodeRef Name="vr2"/>
-                                <NodeRef Name="er1"/>
-                                <NodeRef Name="ER"/>
-                                <NodeRef Name="zs3"/>
-                                <NodeRef Name="VR"/>
-                                <NodeRef Name="IN"/>
-                                <NodeRef Name="zs7"/>
-                                <NodeRef Name="er3"/>
                                 <NodeRef Name="zs8"/>
-                                <NodeRef Name="vr3"/>
-                                <NodeRef Name="zs2"/>
-                                <NodeRef Name="zs1"/>
-                                <NodeRef Name="zs5"/>
-                                <NodeRef Name="zs6"/>
-                                <NodeRef Name="er2"/>
-                                <NodeRef Name="vr1"/>
-                                <NodeRef Name="vr6"/>
-                                <NodeRef Name="zs4"/>
-                                <NodeRef Name="zs9"/>
-                                <NodeRef Name="vr8"/>
-                                <NodeRef Name="vr5"/>
                                 <NodeRef Name="vr4"/>
+                                <NodeRef Name="vr8"/>
+                                <NodeRef Name="vr1"/>
+                                <NodeRef Name="er3"/>
+                                <NodeRef Name="ER"/>
+                                <NodeRef Name="er1"/>
+                                <NodeRef Name="zs5"/>
+                                <NodeRef Name="vr3"/>
+                                <NodeRef Name="vr6"/>
+                                <NodeRef Name="zs7"/>
+                                <NodeRef Name="IN"/>
+                                <NodeRef Name="zs1"/>
+                                <NodeRef Name="vr2"/>
+                                <NodeRef Name="zs4"/>
+                                <NodeRef Name="vr7"/>
+                                <NodeRef Name="zs3"/>
+                                <NodeRef Name="vr5"/>
+                                <NodeRef Name="zs6"/>
+                                <NodeRef Name="zs2"/>
+                                <NodeRef Name="ZS"/>
+                                <NodeRef Name="zs9"/>
+                                <NodeRef Name="er2"/>
+                                <NodeRef Name="VR"/>
                                 <BoxGeometry>
                                     <Box Y="32" X="48" Width="544" Height="432"/>
                                 </BoxGeometry>
@@ -5308,19 +5309,19 @@
                             </SimpleNode>
                             <GroupNode Name=":1">
                                 <NodeRef Name="vr1"/>
-                                <NodeRef Name="er1"/>
-                                <NodeRef Name="zs3"/>
-                                <NodeRef Name="er3"/>
                                 <NodeRef Name="vr4"/>
+                                <NodeRef Name="zs2"/>
                                 <NodeRef Name="zs4"/>
-                                <NodeRef Name="er2"/>
-                                <NodeRef Name="vr2"/>
-                                <NodeRef Name="vr5"/>
-                                <NodeRef Name="er4"/>
                                 <NodeRef Name="IN"/>
                                 <NodeRef Name="zs1"/>
-                                <NodeRef Name="zs2"/>
+                                <NodeRef Name="er1"/>
+                                <NodeRef Name="vr5"/>
+                                <NodeRef Name="er3"/>
+                                <NodeRef Name="er2"/>
+                                <NodeRef Name="er4"/>
+                                <NodeRef Name="vr2"/>
                                 <NodeRef Name="vr3"/>
+                                <NodeRef Name="zs3"/>
                                 <BoxGeometry>
                                     <Box Y="64" X="48" Width="512" Height="496"/>
                                 </BoxGeometry>
@@ -5840,21 +5841,21 @@
                                 </LabelGeometry>
                             </SimpleNode>
                             <GroupNode Name=":0">
-                                <NodeRef Name="zs4"/>
-                                <NodeRef Name="vr3"/>
-                                <NodeRef Name="vr4"/>
-                                <NodeRef Name="IN"/>
-                                <NodeRef Name="er4"/>
                                 <NodeRef Name="zs3b"/>
-                                <NodeRef Name="vr1"/>
+                                <NodeRef Name="vr3"/>
                                 <NodeRef Name="zs1"/>
-                                <NodeRef Name="er2"/>
-                                <NodeRef Name="vr2"/>
-                                <NodeRef Name="zs2"/>
-                                <NodeRef Name="er3"/>
                                 <NodeRef Name="zs5"/>
-                                <NodeRef Name="er1"/>
                                 <NodeRef Name="zs3a"/>
+                                <NodeRef Name="zs4"/>
+                                <NodeRef Name="zs2"/>
+                                <NodeRef Name="er1"/>
+                                <NodeRef Name="vr1"/>
+                                <NodeRef Name="er4"/>
+                                <NodeRef Name="vr2"/>
+                                <NodeRef Name="vr4"/>
+                                <NodeRef Name="er2"/>
+                                <NodeRef Name="IN"/>
+                                <NodeRef Name="er3"/>
                                 <BoxGeometry>
                                     <Box Y="16" X="32" Width="512" Height="544"/>
                                 </BoxGeometry>

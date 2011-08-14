@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tbed_hisc" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>HISC version of the Ryan Leduc's train testbed system.</ns2:Comment>
+    <ns2:Comment>HISC version of Ryan Leduc's train testbed system. This model was is a re-implementation of the original model [1] developed in 2011 using Hierarchical Interface-Based Supervisory Control (HISC). The model is controllable and nonblocking. It has 5991593916308 reachable states and a diameter of 561.
+
+Reference:
+[1] Ryan J. Leduc. PLC Implementation of a DES Supervisor for a Manufacturing Testbed:  An Implementation Perspective. Masters Thesis, Dept. of Electrical Engineering, Univerisity of Toronto, Canada, 1996.</ns2:Comment>
     <EventDeclList>
         <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="en_train1"/>

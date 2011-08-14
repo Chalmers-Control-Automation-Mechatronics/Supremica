@@ -774,7 +774,7 @@ Class-Path: ${manifest.pathlist}</echo>
                     <exclude name="**/TestPackage*.java"/>
                     <exclude name="**/Abstract*.java"/>
                     <exclude name="**/Native*.java"/>
-                    <exclude name="**/Large*Test.java"/>
+                    <exclude name="**/Large*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
@@ -825,17 +825,16 @@ Class-Path: ${manifest.pathlist}</echo>
         </junit>
     </target>
     
-    <target name="-run_test_controllability" depends="-jar_supremica,-jar_supremica_tests">
+    <target name="-run_test_minimization" depends="-jar_supremica,-jar_supremica_tests">
         <mkdir dir="${logs.results}"/>
         <delete>
-            <fileset dir="${logs.results}/analysis" includes="**/log4j.log"/>
+            <fileset dir="${logs.results}/algorithms/minimization" includes="**/log4j.log"/>
         </delete>
         <junit printsummary="on" fork="true" maxmemory="512m">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
-                    <exclude name="**/ModularLanguageInclusionCheckerTest.java"/>
-                    <exclude name="**/ProjectingLanguageInclusionCheckerTest.java"/>
+                    <include name="org/supremica/automata/algorithms/minimization/*.java"/>
                 </fileset>
             </batchtest>
             <classpath>
@@ -942,7 +941,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="test" depends="-run_tests,test_report"
      description="Runs unit tests and produces a test report. This is a comprehensive test that takes several minutes."/>
 
-    <target name="test_controllability" depends="-run_test_controllability,test_report"/>
+    <target name="test_min" depends="-run_test_minimization,test_report"/>
     
     <target name="test_short" depends="-run_tests_short,test_report"
      description="Runs unit tests and produces a test report. This is a shorter test that should take less than a minute."/>

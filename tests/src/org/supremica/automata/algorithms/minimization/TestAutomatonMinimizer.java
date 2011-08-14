@@ -98,7 +98,7 @@ public class TestAutomatonMinimizer
     {
         super(name);
     }
-    
+
     /**
      * Assembles and returns a test suite
      * for all the test methods of this test case.
@@ -108,34 +108,34 @@ public class TestAutomatonMinimizer
         final TestSuite suite = new TestSuite(TestAutomatonMinimizer.class);
         return suite;
     }
-    
+
     public static void main(final String[] args)
     {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     protected void setUp() throws Exception
     {
         super.setUp();
         final DocumentManager manager = getDocumentManager();
         mBuilder = new ProjectBuildFromWaters(manager);
     }
-    
-    
+
+
     //#######################################################################
     //# Supremica Test Cases
     public void testLanguageEquivalenceMinimization()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.MachineBufferMachine));
-            SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.MachineBufferMachine));
+            final SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
             syncOptions.setForbidUncontrollableStates(true);
-            AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+            final AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
             synchronizer.execute();
-            Automaton synch = synchronizer.getAutomaton();
-            Alphabet alpha = synch.getAlphabet();
+            final Automaton synch = synchronizer.getAutomaton();
+            final Alphabet alpha = synch.getAlphabet();
             Alphabet hide = new Alphabet();
             hide.addEvent(alpha.getEvent("Start1"));
             hide.addEvent(alpha.getEvent("Start2"));
@@ -143,52 +143,52 @@ public class TestAutomatonMinimizer
             hide.addEvent(alpha.getEvent("End2"));
             hide = AlphabetHelpers.minus(alpha, hide);
             synch.hide(hide, false);
-            
-            MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+
+            final MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
             options.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
-            
+
             // Test language equivalence minimization
-            AutomatonMinimizer minimizer = new AutomatonMinimizer(synch);
-            Automaton languageMin = minimizer.getMinimizedAutomaton(options);
+            final AutomatonMinimizer minimizer = new AutomatonMinimizer(synch);
+            final Automaton languageMin = minimizer.getMinimizedAutomaton(options);
             assertTrue(languageMin.nbrOfStates() == 8);
             assertTrue(languageMin.nbrOfTransitions() == 18);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testObservationEquivalenceMinimization()
     {
         try
         {
             // Test
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
-            MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
+            final MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
             options.setMinimizationType(EquivalenceRelation.OBSERVATIONEQUIVALENCE);
             options.setAlsoTransitions(true);
             options.setKeepOriginal(true);
-            
+
             AutomatonMinimizer minimizer;
             Automaton observationMin;
-            
+
             // Test observation equivalence minimization
             minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.a"));
             observationMin = minimizer.getMinimizedAutomaton(options);
             assertTrue((observationMin.nbrOfStates() == 5) &&
                 (observationMin.nbrOfTransitions() == 6) &&
                 (observationMin.getStateWithName("1").nbrOfOutgoingArcs() == 2));
-            
+
             // Test observation equivalence minimization
             minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
             observationMin = minimizer.getMinimizedAutomaton(options);
             assertTrue((observationMin.nbrOfStates() == 5) &&
                 (observationMin.nbrOfTransitions() == 9) &&
                 (observationMin.getStateWithName("0").nbrOfOutgoingArcs() == 3));
-            
+
             // Test a part of the dining philosophers example (observation equivalence minimization)
             minimizer = new AutomatonMinimizer(theProject.getAutomaton("P1F1F2"));
             observationMin = minimizer.getMinimizedAutomaton(options);
@@ -196,13 +196,13 @@ public class TestAutomatonMinimizer
             assertTrue(observationMin.nbrOfTransitions() == 10);
             assertTrue(observationMin.nbrOfEpsilonTransitions() == 2);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testBisimulationEquivalenceMinimization()
     {
         // Check if the library with the native methods is ok
@@ -211,19 +211,19 @@ public class TestAutomatonMinimizer
             System.err.println("Library BisimulationEquivalence not in library path, test skipped.");
             return;
         }
-        
+
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.BisimulationEquivalence));
-            MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.BisimulationEquivalence));
+            final MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
             options.setMinimizationType(EquivalenceRelation.BISIMULATIONEQUIVALENCE);
             options.setAlsoTransitions(true);
             options.setKeepOriginal(true);
-            
+
             AutomatonMinimizer minimizer;
             Automaton min;
-            
+
             //System.err.println("Fernandez");
             // Test bisimulation equivalence minimization
             minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Fernandez)"));
@@ -231,7 +231,7 @@ public class TestAutomatonMinimizer
             assertTrue((min.nbrOfStates() == 3) &&
                 (min.nbrOfTransitions() == 3) &&
                 (min.getStateWithName("2,0,1").nbrOfOutgoingArcs() == 2));
-            
+
             //System.err.println("Westin");
             // Test bisimulation equivalence minimization
             minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Westin)"));
@@ -240,48 +240,48 @@ public class TestAutomatonMinimizer
                 (min.nbrOfTransitions() == 4) &&
                 (min.getStateWithName("q2,q1,p1").nbrOfOutgoingArcs() == 2));
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testConflictEquivalenceMinimization()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.ConflictEquivalence));
-            
-            Automata tests = theProject.getPlantAutomata();
-            Automata min = new Automata();
-            Automata key = theProject.getSpecificationAutomata();
-            
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.ConflictEquivalence));
+
+            final Automata tests = theProject.getPlantAutomata();
+            final Automata min = new Automata();
+            final Automata key = theProject.getSpecificationAutomata();
+
             // Iterate over tests and minimize each individually
-            Iterator<Automaton> autIt = tests.iterator();
+            final Iterator<Automaton> autIt = tests.iterator();
             while (autIt.hasNext())
             {
-                Automaton currAutomaton = autIt.next();
-                
+                final Automaton currAutomaton = autIt.next();
+
                 // Minimize this one
-                AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
-                MinimizationOptions options = new MinimizationOptions();
+                final AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
+                final MinimizationOptions options = new MinimizationOptions();
                 options.setMinimizationType(EquivalenceRelation.CONFLICTEQUIVALENCE);
                 options.setCompositionalMinimization(false);
                 options.setAlsoTransitions(true);
                 options.setKeepOriginal(true);
                 options.setMinimizationStrategy(MinimizationStrategy.MostStatesFirst);
-                Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
+                final Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
                 min.addAutomaton(newAutomaton);
             }
-            
+
             // Compare the minimized automata with the correct solution
             for (int i=0; i<min.size(); i++)
             {
-                Automaton currMin = min.getAutomatonAt(i);
-                Automaton currKey = key.getAutomatonAt(i);
-                
+                final Automaton currMin = min.getAutomatonAt(i);
+                final Automaton currKey = key.getAutomatonAt(i);
+
                 assertTrue(currMin.nbrOfStates() == currKey.nbrOfStates());
                 assertTrue(currMin.getAlphabet().equals(currKey.getAlphabet()));
                 assertTrue(currMin.nbrOfTransitions() == currKey.nbrOfTransitions());
@@ -290,14 +290,14 @@ public class TestAutomatonMinimizer
                 assertTrue(currMin.getInitialState().nbrOfIncomingArcs() == currKey.getInitialState().nbrOfIncomingArcs());
             }
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
-    
+
+
     //#######################################################################
     //# Waters Test Cases
     public void testAutomatonMinimizerForWaters()
@@ -316,7 +316,7 @@ public class TestAutomatonMinimizer
 			getUniqueWatersEvents(minevents, des);
         assertEquals("Unexpected event set in result!", target, fixedevents);
     }
-    
+
     public void testAutomataMinimizerForWaters()
     throws Exception
     {
@@ -338,8 +338,8 @@ public class TestAutomatonMinimizer
 			getUniqueWatersEvents(minevents, des);
         assertEquals("Unexpected event set in result!", target, fixedevents);
     }
-    
-    
+
+
     //#######################################################################
     //# Auxiliary Methods for Waters Test
     private ProductDESProxy getBmwDES()
@@ -354,14 +354,14 @@ public class TestAutomatonMinimizer
         final File file = new File(subdir, filename);
         return getCompiledDES(file);
     }
-    
+
     private AutomatonProxy getComfortFunctionAutomaton
         (final ProductDESProxy des)
     {
         final String autname = "comfort_function";
         return findAutomaton(des, autname);
     }
-    
+
     private Set<EventProxy> getReqCloseHidingAlhabet
 		(final ProductDESProxy des, final AutomatonProxy aut)
     {
@@ -372,7 +372,7 @@ public class TestAutomatonMinimizer
         target.remove(victim);
         return target;
     }
-    
+
     private MinimizationOptions getMinimizationOptions
         (final AutomatonProxy aut, final Alphabet target)
     {
@@ -408,11 +408,12 @@ public class TestAutomatonMinimizer
 	 */
 	private Set<EventProxy> getUniqueWatersEvents
 		(final Collection<EventProxy> alphabet, final ProductDESProxy des)
-		throws DuplicateNameException, NameNotFoundException
+	throws DuplicateNameException, NameNotFoundException
 	{
 		final int size = alphabet.size();
 		final Set<EventProxy> result = new HashSet<EventProxy>(size);
 		for (final EventProxy supevent : alphabet) {
+		  if (supevent.isObservable()) {
 			final String name = supevent.getName();
 			final EventProxy event = findEvent(des, name);
 			final boolean added = result.add(event);
@@ -421,13 +422,14 @@ public class TestAutomatonMinimizer
 					("Duplicate event name '" + name +
 					 "' in Supremica alphabet!");
 			}
+		  }
 		}
 		return result;
 	}
 
-    
+
     //#######################################################################
     //# Data Members
     private ProjectBuildFromWaters mBuilder;
-    
+
 }

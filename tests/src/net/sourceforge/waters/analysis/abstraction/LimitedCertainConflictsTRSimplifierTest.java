@@ -66,6 +66,15 @@ public class LimitedCertainConflictsTRSimplifierTest
 
   //#########################################################################
   //# Test Cases
+  @Override
+  public void test_basic_7() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "limitedCertainConflicts_basic_7.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   public void test_nonblocking()
   throws Exception
   {

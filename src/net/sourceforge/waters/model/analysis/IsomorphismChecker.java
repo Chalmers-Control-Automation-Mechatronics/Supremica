@@ -436,7 +436,7 @@ public class IsomorphismChecker
     final boolean init = state.isInitial();
     final Collection<EventProxy> props = state.getPropositions();
     final Collection<EventProxy> extra =
-      index == 1 ? mExtraProperties1 : mExtraProperties2;
+      index == 1 ? mExtraProperties2 : mExtraProperties1;
     final Collection<EventProxy> allProps;
     if (extra.isEmpty()) {
       allProps = props;

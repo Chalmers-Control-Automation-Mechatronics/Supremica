@@ -354,13 +354,15 @@ public class LimitedCertainConflictsTRSimplifier
     // 3. Add selfloops to certain conflicts and try to remove events
     rel.removeTauSelfLoops();
     final int bstate = end - 1;
-    final int numEvents = rel.getNumberOfProperEvents();
-    for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if (rel.isUsedEvent(event)) {
-        rel.addTransition(bstate, event, bstate);
+    if (bstate > 0) {
+      final int numEvents = rel.getNumberOfProperEvents();
+      for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
+        if (rel.isUsedEvent(event)) {
+          rel.addTransition(bstate, event, bstate);
+        }
       }
+      rel.removeProperSelfLoopEvents();
     }
-    rel.removeProperSelfLoopEvents();
     rel.removeOutgoingTransitions(bstate);
   }
 
