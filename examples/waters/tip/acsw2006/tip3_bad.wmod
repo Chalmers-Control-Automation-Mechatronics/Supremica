@@ -1,248 +1,250 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tip3_bad" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Model of the interaction between a mobile client and event-based servers of a Tourist Information System described in: Annika Hinze, Petra Malik, Robi Malik. Interaction Design for a Mobile Context-Aware System using Discrete Event Modelling Proc 29th Australasian Computer Science Conference (ACSC'06), 257-266, 2006.
+
+This is the blocking version. The model is controllable and blocking. The number of reachable states is 52471498496, and the diameter is 64.</ns2:Comment>
     <ConstantAliasList>
-        <ConstantAlias>
-            <SimpleIdentifier Name="SIGHTS"/>
+        <ConstantAlias Name="SIGHTS">
             <ConstantAliasExpression>
-              <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-              </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
             </ConstantAliasExpression>
         </ConstantAlias>
     </ConstantAliasList>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="map_req_detail">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="br_show_rec">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="ens_norec">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="map_hide"/>
         <EventDecl Kind="CONTROLLABLE" Name="ens_new_location"/>
         <EventDecl Kind="CONTROLLABLE" Name="cb_new_rec">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="ens_req_detail"/>
         <EventDecl Kind="CONTROLLABLE" Name="map_show_location"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="ens_new_sight">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="cb_new_sight">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="cb_req_detail">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="map_remove">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="ens_at">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="ens_notat">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="cb_update_location"/>
         <EventDecl Kind="CONTROLLABLE" Name="map_expose"/>
         <EventDecl Kind="CONTROLLABLE" Name="br_expose_detail">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="br_remove_sight">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="br_hide"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="br_select_sight_list"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="map_click"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="tau_noclick"/>
         <EventDecl Kind="CONTROLLABLE" Name="br_remove_rec">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="loc_new_location"/>
         <EventDecl Kind="CONTROLLABLE" Name="cb_new_location">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="br_show_sight">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="br_expose"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="ens_new_detail">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="ens_new_rec">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="br_expose_rec_list"/>
         <EventDecl Kind="CONTROLLABLE" Name="cb_new_detail">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="map_show">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="br_req_detail">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="map_select">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="br_select_rec_list"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="map_select_location"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="br_select">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="map_new_location"/>
         <EventDecl Kind="CONTROLLABLE" Name="br_expose_sight_list"/>
         <EventDecl Kind="CONTROLLABLE" Name="cb_uncache">
-          <RangeList>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="ens_rec">
-          <RangeList>
-            <EnumSetExpression>
-                <SimpleIdentifier Name="UID"/>
-            </EnumSetExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <IntConstant Value="3"/>
-            </BinaryExpression>
-          </RangeList>
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="UID"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
@@ -757,8 +759,7 @@
                 </SimpleComponent>
             </ComponentList>
         </ForeachComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="br_expose_3"/>
+        <SimpleComponent Kind="PLANT" Name="br_expose_3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="br_expose"/>
@@ -859,8 +860,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="br_expose_rec_list"/>
+        <SimpleComponent Kind="SPEC" Name="br_expose_rec_list">
             <Graph>
                 <LabelBlock>
                     <IndexedIdentifier Name="br_expose_detail">
@@ -2048,8 +2048,7 @@
                 </ForeachComponent>
             </ComponentList>
         </ForeachComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="br_expose_sight_list"/>
+        <SimpleComponent Kind="SPEC" Name="br_expose_sight_list">
             <Graph>
                 <LabelBlock>
                     <IndexedIdentifier Name="br_expose_detail">
@@ -2418,8 +2417,7 @@
                 </SimpleComponent>
             </ComponentList>
         </ForeachComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="br_tofront_3"/>
+        <SimpleComponent Kind="SPEC" Name="br_tofront_3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="br_expose"/>
@@ -3191,8 +3189,7 @@
                 </ForeachComponent>
             </ComponentList>
         </ForeachComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="cb_new_location"/>
+        <SimpleComponent Kind="SPEC" Name="cb_new_location">
             <Graph>
                 <LabelBlock>
                     <IndexedIdentifier Name="cb_new_location">
@@ -3433,8 +3430,7 @@
                 </SimpleComponent>
             </ComponentList>
         </ForeachComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="cb_update_location"/>
+        <SimpleComponent Kind="SPEC" Name="cb_update_location">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="cb_update_location"/>
@@ -3925,8 +3921,7 @@
                 </SimpleComponent>
             </ComponentList>
         </ForeachComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="map_expose_3"/>
+        <SimpleComponent Kind="PLANT" Name="map_expose_3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="br_expose"/>
@@ -4502,8 +4497,7 @@
                 </ForeachComponent>
             </ComponentList>
         </ForeachComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="map_show_location"/>
+        <SimpleComponent Kind="SPEC" Name="map_show_location">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="cb_update_location"/>
@@ -4556,8 +4550,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="nbl_noclick"/>
+        <SimpleComponent Kind="PLANT" Name="nbl_noclick">
             <Graph>
                 <LabelBlock>
                     <IndexedIdentifier Name="br_select">
