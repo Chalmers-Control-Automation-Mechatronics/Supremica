@@ -89,7 +89,7 @@ public class VerticalFlowLayout
 	//************************************************************************
 	// Data
 	//************************************************************************
-	private Vector /* Array */<AlignedComponent> m_components;
+	private final Vector /* Array */<AlignedComponent> m_components;
 	private boolean m_bUniformWidths;
 	private int m_vGap;
 	private int m_externalPadLeft;
@@ -121,7 +121,7 @@ public class VerticalFlowLayout
 		Component m_comp;
 		String m_alignment;
 
-		public AlignedComponent(Component comp, String alignment)
+		public AlignedComponent(final Component comp, final String alignment)
 		{
 			m_comp = comp;
 			m_alignment = alignment;
@@ -166,7 +166,7 @@ public class VerticalFlowLayout
 	 * or not
 	 * @param vGap vertical gap
 	 */
-	public VerticalFlowLayout(boolean uniformWidths, int vGap)
+	public VerticalFlowLayout(final boolean uniformWidths, final int vGap)
 	{
 		m_bUniformWidths = uniformWidths;
 		m_vGap = vGap;
@@ -184,7 +184,7 @@ public class VerticalFlowLayout
 	 * @param comp the component to be added
 	 * @exception IllegalArgumentException Invalid component or constraint.
 	 */
-	public void addLayoutComponent(String name, Component comp)
+	public void addLayoutComponent(String name, final Component comp)
 	{
 
 		// Make sure we have a valid component
@@ -208,7 +208,7 @@ public class VerticalFlowLayout
 		{
 
 			// Yes, valid
-			AlignedComponent alcomp = new AlignedComponent(comp, name);
+			final AlignedComponent alcomp = new AlignedComponent(comp, name);
 
 			m_components.add(alcomp);
 		}
@@ -230,11 +230,11 @@ public class VerticalFlowLayout
 	 * @param comp the component to be removed
 	 * @exception IllegalArgumentException Invalid component.
 	 */
-	public void removeLayoutComponent(Component comp)
+	public void removeLayoutComponent(final Component comp)
 	{
 		if (comp != null)
 		{
-			Enumeration<AlignedComponent> e = m_components.elements();
+			final Enumeration<AlignedComponent> e = m_components.elements();
 
 			if (e != null)
 			{
@@ -242,10 +242,10 @@ public class VerticalFlowLayout
 				{
 
 					// Get the component/alignment pair
-					AlignedComponent alcomp = e.nextElement();
+					final AlignedComponent alcomp = e.nextElement();
 
 					// Pull just the component out and see if there's a match
-					Component currComp = alcomp.getComponent();
+					final Component currComp = alcomp.getComponent();
 
 					if (comp == currComp)
 					{
@@ -277,7 +277,7 @@ public class VerticalFlowLayout
 	 * @see #preferredLayoutSize
 	 * @return minimum layout size
 	 */
-	public Dimension minimumLayoutSize(Container parent)
+	public Dimension minimumLayoutSize(final Container parent)
 	{
 		return parent.getSize();
 	}
@@ -297,7 +297,7 @@ public class VerticalFlowLayout
 	 * @see #minimumLayoutSize
 	 * @return preferred preferred layout size
 	 */
-	public Dimension preferredLayoutSize(Container parent)
+	public Dimension preferredLayoutSize(final Container parent)
 	{
 
 		// see if insets/border has changed.  If so, recompute
@@ -328,7 +328,7 @@ public class VerticalFlowLayout
 
 			//D.out("Parent container insets: "+insets.toString());
 			// Go through all of the components and add things up
-			Enumeration<AlignedComponent> e = m_components.elements();
+			final Enumeration<AlignedComponent> e = m_components.elements();
 
 			if (e != null)
 			{
@@ -336,11 +336,11 @@ public class VerticalFlowLayout
 				{
 
 					// Get component/alignment pair
-					AlignedComponent alcomp = e.nextElement();
+					final AlignedComponent alcomp = e.nextElement();
 
 					// Pull just the component out
-					Dimension compSize = alcomp.getComponent().getPreferredSize();
-					int width = compSize.width;
+					final Dimension compSize = alcomp.getComponent().getPreferredSize();
+					final int width = compSize.width;
 
 					if (width > m_widestWidth)
 					{
@@ -383,10 +383,9 @@ public class VerticalFlowLayout
 	 * @param parent the container that is being layed out
 	 * @see Container
 	 */
-	public void layoutContainer(Container parent)
+	public void layoutContainer(final Container parent)
 	{
 		int yPos = m_externalPadTop;
-		int yBot = m_externalPadBottom;
 		int xPos = m_externalPadLeft;
 		int xRight = m_externalPadRight;
 		int compWidth = 0;
@@ -404,7 +403,7 @@ public class VerticalFlowLayout
 		}
 
 		// get parent container's minimum size
-		Dimension d = parent.getMinimumSize();
+		final Dimension d = parent.getMinimumSize();
 
 		if (d != null)
 		{
@@ -415,27 +414,26 @@ public class VerticalFlowLayout
 		if (m_insets != null)
 		{
 			yPos += m_insets.top;
-			yBot += m_insets.bottom;
 			xPos += m_insets.left;
 			xRight += m_insets.right;
 		}
 
 		// Go through all of the components and place them vertically.
-		Enumeration<AlignedComponent> e = m_components.elements();
+		final Enumeration<AlignedComponent> e = m_components.elements();
 
 		if (e != null)
 		{
 			while (e.hasMoreElements())
 			{
-				AlignedComponent alcomp = e.nextElement();
-				Component comp = alcomp.getComponent();
-				String alignment = alcomp.getAlignment();
+				final AlignedComponent alcomp = e.nextElement();
+				final Component comp = alcomp.getComponent();
+				final String alignment = alcomp.getAlignment();
 
 				if (comp.isVisible())
 				{
 
 					// compute height for this component = preferred height + 2*internal pady
-					int height = comp.getPreferredSize().height + (m_internalPadY * 2);
+					final int height = comp.getPreferredSize().height + (m_internalPadY * 2);
 
 					// compute width for this component + 2*m_internalPadX
 					if (m_bUniformWidths == true)
@@ -467,7 +465,7 @@ public class VerticalFlowLayout
 					{
 
 						// centered between margins
-						int centerPos = xPos + (parentWidth - xPos - xRight) / 2;
+						final int centerPos = xPos + (parentWidth - xPos - xRight) / 2;
 
 						comp.setLocation(centerPos - (compWidth / 2), yPos);
 					}
@@ -488,7 +486,7 @@ public class VerticalFlowLayout
 	 * @param comp the component to be added
 	 * @param constraints  where/how the component is added to the layout.
 	 */
-	public void addLayoutComponent(Component comp, Object constraints)
+	public void addLayoutComponent(final Component comp, final Object constraints)
 	{
 		if ((constraints == null) || (constraints instanceof String))
 		{
@@ -506,7 +504,7 @@ public class VerticalFlowLayout
 	 * @see java.awt.Component#getPreferredSize()
 	 * @see LayoutManager
 	 */
-	public Dimension maximumLayoutSize(Container target)
+	public Dimension maximumLayoutSize(final Container target)
 	{
 		return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
@@ -518,7 +516,7 @@ public class VerticalFlowLayout
 	 * where 0 represents alignment along the origin, 1 is aligned
 	 * the furthest away from the origin, 0.5 is centered, etc.
 	 */
-	public float getLayoutAlignmentX(Container target)
+	public float getLayoutAlignmentX(final Container target)
 	{
 		return 0.5f;
 	}
@@ -530,7 +528,7 @@ public class VerticalFlowLayout
 	 * where 0 represents alignment along the origin, 1 is aligned
 	 * the furthest away from the origin, 0.5 is centered, etc.
 	 */
-	public float getLayoutAlignmentY(Container target)
+	public float getLayoutAlignmentY(final Container target)
 	{
 		return 0.5f;
 	}
@@ -539,7 +537,7 @@ public class VerticalFlowLayout
 	 * Invalidates the layout, indicating that if the layout manager
 	 * has cached information it should be discarded.
 	 */
-	public void invalidateLayout(Container target) {}
+	public void invalidateLayout(final Container target) {}
 
 	//************************************************************************
 	// Accessor methods
@@ -644,7 +642,7 @@ public class VerticalFlowLayout
 	 * <LI>true  = make all the widths uniform (sizing to match the widest) </LI>
 	 * <LI>false = let all components take their various preferred widths </UL>
 	 */
-	public void setUniformWidths(boolean uniformWidths)
+	public void setUniformWidths(final boolean uniformWidths)
 	{
 		m_bUniformWidths = uniformWidths;
 	}
@@ -654,7 +652,7 @@ public class VerticalFlowLayout
 	 *
 	 * @param vGap vertical gap
 	 */
-	public void setVerticalGap(int vGap)
+	public void setVerticalGap(final int vGap)
 	{
 		m_vGap = vGap;
 	}
@@ -665,7 +663,7 @@ public class VerticalFlowLayout
 	 *
 	 * @param padding Left external horizontal padding.
 	 */
-	public void setExternalPadLeft(int padding)
+	public void setExternalPadLeft(final int padding)
 	{
 		m_externalPadLeft = padding;
 	}
@@ -676,7 +674,7 @@ public class VerticalFlowLayout
 	 *
 	 * @param padding Right external horizontal padding.
 	 */
-	public void setExternalPadRight(int padding)
+	public void setExternalPadRight(final int padding)
 	{
 		m_externalPadRight = padding;
 	}
@@ -687,7 +685,7 @@ public class VerticalFlowLayout
 	 *
 	 * @param padding Top external vertical padding.
 	 */
-	public void setExternalPadTop(int padding)
+	public void setExternalPadTop(final int padding)
 	{
 		m_externalPadTop = padding;
 	}
@@ -698,7 +696,7 @@ public class VerticalFlowLayout
 	 *
 	 * @param padding Bottom external vertical padding.
 	 */
-	public void setExternalPadBottom(int padding)
+	public void setExternalPadBottom(final int padding)
 	{
 		m_externalPadBottom = padding;
 	}
@@ -711,7 +709,7 @@ public class VerticalFlowLayout
 	 *
 	 * @param padding internal horizontal padding
 	 */
-	public void setInternalPadX(int padding)
+	public void setInternalPadX(final int padding)
 	{
 		m_internalPadX = padding;
 	}
@@ -724,7 +722,7 @@ public class VerticalFlowLayout
 	 *
 	 * @param padding internal vertical padding
 	*/
-	public void setInternalPadY(int padding)
+	public void setInternalPadY(final int padding)
 	{
 		m_internalPadY = padding;
 	}

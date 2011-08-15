@@ -390,10 +390,6 @@ public class EventJTree
     private final JLabel mAutomatonNameLabel;
     private final JLabel mAutomatonIconLabel;
     private final JLabel mAutomatonStatusLabel;
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 6788022446662090661L;
   }
 
 

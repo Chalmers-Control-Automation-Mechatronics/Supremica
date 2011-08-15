@@ -75,8 +75,6 @@ import org.supremica.automata.Automaton;
  */
 public class ModularForbidderInput
 {
-    private static final long serialVersionUID = 1L;
-
     private static Logger logger = LoggerFactory.createLogger(ModularForbidderInput.class);
 
     private final ArrayList<SubState> subStates;

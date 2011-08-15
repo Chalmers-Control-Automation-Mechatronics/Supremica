@@ -37,7 +37,6 @@ class GreedyVariableOrdering
     final Collection<AutomatonProxy> automata = des.getAutomata();
     mNumPlants = 0;
     mNumSpecs = 0;
-    mNumBits = 0;
     for (final AutomatonProxy aut : automata) {
       switch (translator.getComponentKind(aut)) {
       case PLANT:
@@ -56,7 +55,6 @@ class GreedyVariableOrdering
       case PLANT:
       case SPEC:
         mAutomata.add(aut);
-        mNumBits += AutomatonBDD.getNumberOfBits(aut);
         break;
       default:
         break;
@@ -226,7 +224,6 @@ class GreedyVariableOrdering
   private final List<AutomatonProxy> mAutomata;
   private int mNumPlants;
   private int mNumSpecs;
-  private int mNumBits;
   private final int mNumEvents;
   private final KindTranslator mKindTranslator;
 

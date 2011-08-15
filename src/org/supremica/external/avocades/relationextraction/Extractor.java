@@ -90,7 +90,6 @@ public ArrayList<Document> extractRestrictions(final Document sup, final ArrayLi
 	/* Key is operation name who gives the operation id */
 	final Hashtable<String, String> opMatch = new Hashtable<String, String>();
 
-	int i = 0;
 	for(final Iterator<Element> eventIter = eventList.iterator(); eventIter.hasNext(); )
 	{
 		final Element event = eventIter.next();
@@ -111,8 +110,6 @@ public ArrayList<Document> extractRestrictions(final Document sup, final ArrayLi
 				} else {
 					opMatch.put(opName, eventId);
 				}
-
-				i++;
 			}
 			else if( !eventLabel.substring(0,OPERATION_STOP_PREFIX.length()).
 					equals(OPERATION_STOP_PREFIX) )
@@ -369,7 +366,6 @@ public ArrayList<Restriction> simplify(final ArrayList<Restriction> operationLis
 	do {
 		simpleRestrOld = copyRestrictions(simpleRestr);
 
-		int i0=0;
 		do {
 			simpleRestrOld2 = copyRestrictions(simpleRestr);
 
@@ -377,13 +373,11 @@ public ArrayList<Restriction> simplify(final ArrayList<Restriction> operationLis
 			simpleRestr = findReplaceIEC(simpleRestr);
 			simpleRestr = removeEqualAlternatives(simpleRestr);
 			simpleRestr = removeDontCareOperations(simpleRestr);
-			i0++;
 		} while( compareRestrictions(simpleRestrOld2, simpleRestr) == -1);
 
 		/* Step 5: If Oi -> Oj -> Ok, Ok[Oi_comp AND Oj_comp] is reduced to Ok[Oj_comp] */
 		simpleRestr = removeCompSequences(simpleRestr, predSucc);
 
-		int i1=0;
 		do {
 			simpleRestrOld3 = copyRestrictions(simpleRestr);
 
@@ -391,45 +385,36 @@ public ArrayList<Restriction> simplify(final ArrayList<Restriction> operationLis
 			simpleRestr = findReplaceIEC(simpleRestr);
 			simpleRestr = removeEqualAlternatives(simpleRestr);
 			simpleRestr = removeDontCareOperations(simpleRestr);
-			i1++;
 		} while( compareRestrictions(simpleRestrOld3, simpleRestr) == -1);
 		/* Step 6: If Oi -> Oj, Ok[Oi_comp AND Oj_exec] is reduced to Ok[Oj_exec] */
 		simpleRestr = removeCompExecSequences(simpleRestr, predSucc);
 
 		/* This removal is important to not get lots of unnecessary iec-structures... */
-		int i2=0;
 		do {
 			simpleRestrOld3 = copyRestrictions(simpleRestr);
 			simpleRestr = findReplaceIEC(simpleRestr);
 			simpleRestr = removeEqualAlternatives(simpleRestr);
 			simpleRestr = removeDontCareOperations(simpleRestr);
-			i2++;
 		} while( compareRestrictions(simpleRestrOld3, simpleRestr) == -1);
 
 		/* Step 7: If Oi -> Oj, Ok[Oi_init AND Oj_init] is reduced to Ok[Oi_init] */
 		simpleRestr = removeInitInitSequences(simpleRestr, predSucc);
 
-		int i3=0;
 		do {
 			simpleRestrOld3 = copyRestrictions(simpleRestr);
 			simpleRestr = findReplaceIEC(simpleRestr);
 			simpleRestr = removeEqualAlternatives(simpleRestr);
 			simpleRestr = removeDontCareOperations(simpleRestr);
-			i3++;
 		} while( compareRestrictions(simpleRestrOld3, simpleRestr) == -1);
 
 		/* Step 8: If Oi -> Oj, Ok[Oi_exec AND Oj_init] is reduced to Ok[Oi_exec] */
 		simpleRestr = removeExecInitSequences(simpleRestr, predSucc);
-
-		int i4=0;
 		do {
 			simpleRestrOld3 = copyRestrictions(simpleRestr);
 			simpleRestr = findReplaceIEC(simpleRestr);
 			simpleRestr = removeEqualAlternatives(simpleRestr);
 			simpleRestr = removeDontCareOperations(simpleRestr);
-			i4++;
 		} while( compareRestrictions(simpleRestrOld3, simpleRestr) == -1);
-
 
 		/* Step 9: Remove alternative restrictions that are equal */
 		simpleRestr = removeEqualAlternatives(simpleRestr);
@@ -835,7 +820,7 @@ public Restriction replaceIEC(final Restriction restr)
 				final HashSet<String> second = new HashSet<String>();
 				final HashSet<String> third = new HashSet<String>();
 
-				/* Build a set containing all other operation´s states */
+				/* Build a set containing all other operationï¿½s states */
 				for(final Iterator<?> oIter = other.iterator(); oIter.hasNext(); )
 				{
 					final String n = (String) oIter.next();
@@ -1062,8 +1047,8 @@ public ArrayList<?> replaceState(final ArrayList<?> l, final String op, final St
 *
 * If Oi -> Oj, Ok[Oi_comp AND Oj_comp] is reduced to Ok[Oj_comp]
 *
-* Vet inte varför jag tänkte så här först... Ej längre impl. så. Troligen fick jag
-* problem då jag inte hade psIEC-checken.
+* Vet inte varfï¿½r jag tï¿½nkte sï¿½ hï¿½r fï¿½rst... Ej lï¿½ngre impl. sï¿½. Troligen fick jag
+* problem dï¿½ jag inte hade psIEC-checken.
 * (BUT, remove only if Oi_comp is not a predecessor to Ok, or if Oj is a predecessor.)
 *
 ******************************************************/
@@ -1827,7 +1812,6 @@ public ArrayList<?> getRestriction(final String opName, final ArrayList<Restrict
 ******************************************************/
 public String getMachine(final String opName, final ArrayList<ArrayList<String>> opsMachs)
 {
-	int i = 0;
 	for( final Iterator<ArrayList<String>> opIter = opsMachs.iterator(); opIter.hasNext(); )
 	{
 		final ArrayList<?> omList = opIter.next();
@@ -1836,7 +1820,6 @@ public String getMachine(final String opName, final ArrayList<ArrayList<String>>
 			final String mach = (String) omList.get(0);
 			return mach;
 		}
-		i++;
 	}
 	System.out.println("Cannot find a machine that matches " + opName);
 	return new String();
@@ -2032,12 +2015,10 @@ public void buildCOPDocs(final ArrayList<Restriction> restr, final ArrayList<Doc
 	public void printStringList(final List<?> v)
 	{
 		System.out.println();
-		int i=1;
 		for(final Iterator<?> e = v.iterator(); e.hasNext(); )
 		{
 			//System.out.println("Rad " + i);
 			System.out.println(e.next());
-			i++;
 		}
 		System.out.println();
 	}

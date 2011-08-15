@@ -162,6 +162,7 @@ public class Milp
     private double[][] deltaTimes = null;
 
     /** The constraints represented by external specifications, in string form. */
+    @SuppressWarnings("unused")
     private String externalConstraints = "";
 
     /**
@@ -2781,7 +2782,6 @@ public class Milp
                     // If there are several successors, add one alternative-path variable for each successor
                     else
                     {
-                        int currAlternative = 0;
                         String sumConstraint = "";
 
                         //new 080529
@@ -2809,8 +2809,6 @@ public class Milp
                                     altPathsConstraintsBody));
 
                             pathCutTable.put(nextState, "(1 - " + currAltPathsVariable + ")");
-
-                            currAlternative++;
                         }
 
                         //new 080529

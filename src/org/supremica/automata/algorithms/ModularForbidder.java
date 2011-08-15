@@ -75,7 +75,6 @@ import org.supremica.automata.LabeledEvent;
  */
 public class ModularForbidder
 {
-    private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(ModularForbidder.class);
 
     private Project project;
@@ -90,7 +89,7 @@ public class ModularForbidder
     private final String extensionPrefix = "@_"; //Prefix used in names/labels for new events and automata
 
     /**
-     * 
+     *
      * @param input This class is based on data according to this structure
      * @param project
      */
@@ -230,7 +229,7 @@ public class ModularForbidder
      * Creates a new specification with one state and one event in alphabet
      * The event is blocked from occurring
      * @param event
-     */    
+     */
     private void createSpecification(final LabeledEvent event)
     {
         final Automaton spec = createSingleStateAutomatonWithOneEvent(AutomatonType.SPECIFICATION,"q0",event);
@@ -257,7 +256,7 @@ public class ModularForbidder
      * @param event The automaton will get this name
      * @return The created automaton
      */
-    private Automaton createSingleStateAutomatonWithOneEvent(AutomatonType type,String stateName,LabeledEvent event)
+    private Automaton createSingleStateAutomatonWithOneEvent(final AutomatonType type,final String stateName,final LabeledEvent event)
     {
         final Automaton a = new Automaton(event.getLabel()); // same name as the event-label
         a.setType(type);

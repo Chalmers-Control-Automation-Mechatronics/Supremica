@@ -596,12 +596,10 @@ public class ProjectingSafetyVerifier
           minAutomaton = mProjector.getComputedAutomaton();
           if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
             final TransitionRelation tr = new TransitionRelation(minAutomaton, null);
-            int states = tr.getAutomaton(getFactory()).getStates().size();
             tr.setMarkingToStatesWithOutgoing(forbiddenEvents);
             // BUG? This sometimes produces automata without states
             // final CertainDeath con = new CertainDeath(tr); con.run();
             minAutomaton = tr.getAutomaton(getFactory());
-            states -= tr.getAutomaton(getFactory()).getStates().size();
           }
           mStates += minAutomaton.getStates().size();
           mMinAutMap.put(ah, minAutomaton);

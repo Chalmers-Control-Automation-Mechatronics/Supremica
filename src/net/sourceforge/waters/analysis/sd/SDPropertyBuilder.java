@@ -78,7 +78,6 @@ public ProductDESProxy createSingularModel(final EventProxy hib)
 
   final Collection <EventProxy> tEvents = new ArrayList<EventProxy>();
   final Collection<EventProxy> allEvents = mModel.getEvents();
-  pCounta = 0;
   getDefaultEvents();
   createEnevent(hib);
 
@@ -91,8 +90,6 @@ public ProductDESProxy createSingularModel(final EventProxy hib)
 
     if (oldAut.getKind()== ComponentKind.PLANT)
     {
-      pCounta++;
-
       newAut = modifyAut(oldAut, hib);
 
             }
@@ -248,12 +245,8 @@ public ProductDESProxy createModelSDFour()
 
   final AutomatonProxy testAut = createT_SDfour();
   newAutomata.add(testAut);                                      //add test automata in new
-
-  pCountw = 0;
-
   for (final AutomatonProxy oldAut : oldAutomata) {
      final AutomatonProxy newAut;
-      pCountw++;
       newAut = modiAut(oldAut);
       newAutomata.add(newAut);
     }
@@ -651,5 +644,4 @@ private EventProxy mMarking;
 private EventProxy tick;
 private EventProxy Omega;
 private EventProxy que;
-private int pCounta=0, pCountw=0;     // a Count for naming the modified Plant Automata
 }

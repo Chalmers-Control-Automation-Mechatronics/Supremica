@@ -506,10 +506,6 @@ public class NDProjectingControllabilityChecker
       minSize = Integer.MAX_VALUE / 4;
       for (final Tuple tup : possible) {
         try {
-          long maxsize = 1;
-          for (final AutomatonProxy a : tup.mSet) {
-            maxsize *= a.getStates().size();
-          }
           //System.out.println("forb2:" + forbiddenEvents);
           final ProjectionList t =
             new ProjectionList(p, automata, tup.mSet, forbiddenEvents);
@@ -685,11 +681,8 @@ public class NDProjectingControllabilityChecker
           final RemoveAllTau rat = new RemoveAllTau(tr, tau); rat.run();
           if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
             System.out.println("con");
-            int states = tr.getAutomaton(getFactory()).getStates().size();
             tr.setMarkingToStatesWithOutgoing(forbiddenEvents);
             final CertainDeath con = new CertainDeath(tr); con.run();
-            states -= tr.getAutomaton(getFactory()).getStates().size();
-            //System.out.println(states);
           }
           tr.removeAllUnreachable();
           final BiSimulatorLanguage tbs = new BiSimulatorLanguage(tr); tbs.run();

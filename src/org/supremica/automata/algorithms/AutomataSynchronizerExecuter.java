@@ -415,12 +415,9 @@ public final class AutomataSynchronizerExecuter
                 return;
             }
 
-            int automatonTableIndex = 0;
             for (int i = 0; i < nbrOfSelectedAutomata; i++)
             {
                 currAutIndex = automataIndices[i];
-
-                automatonTableIndex++;
 
                 // This is the index of the "next" event in the current automaton
                 currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];

@@ -77,7 +77,6 @@ public class ComposeOrder
       }
     }
     UpperComp uc = null;
-    int aggregate = 0;
     //TObjectIntHashMap<Composition> compint = new TObjectIntHashMap<Composition>();
     while (compositions.size() != 1) {
       final Composition comp1 = compositions.remove(rand.nextInt(compositions.size()));
@@ -86,7 +85,6 @@ public class ComposeOrder
       uppercomps.add(uc);
       //compint.put(uc, uppercomps.size());
       compositions.add(uc);
-      aggregate += uc.numNonLocal();
     }
     while (temperature != 0) {
       //System.out.println("temperature: " + temperature);

@@ -63,12 +63,7 @@ public class TraceJTree
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-    totalEventWidth = 0;
     mPopupFactory = new SimulatorPopupFactory(sim);
-    for (final Integer intVal : eventColumnWidth)
-    {
-      totalEventWidth += intVal;
-    }
     this.addMouseListener(new MouseAdapter(){
       public void mouseClicked(final MouseEvent event)
       {
@@ -365,10 +360,6 @@ public class TraceJTree
     private final JLabel mAutomataNameLabel;
     private final JLabel mAutomataIconLabel;
     private final JLabel mAutomataStatusLabel;
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 6788022446662090661L;
   }
 
 
@@ -383,8 +374,6 @@ public class TraceJTree
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
-  private static final int[] eventColumnWidth = {20, 180};
-  private static int totalEventWidth;
   private static final int noduleWidth = 30;
   private static final int rowHeight = 20;
 

@@ -2335,7 +2335,6 @@ public class AutomatonMinimizer
             // So, at least one outgoing and if "state" is marked, there must be a marked decessor
             if ((state.outgoingArcsIterator().hasNext()) && (!isMarked || hasMarkedDecessor))
             {
-                int arcCount = 0;
                 for (final Iterator<Arc> outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
                 {
                     final Arc outArc = outIt.next();
@@ -2346,9 +2345,7 @@ public class AutomatonMinimizer
                         final State fromState = inArc.getFromState();
                         final State toState = outArc.getToState();
                         final Arc newArc = new Arc(fromState, toState, inArc.getEvent());
-
                         aut.addArc(newArc);
-                        arcCount++;
                     }
 
                     // BUG! There is a problem here, since when using the State.setName method, all

@@ -45,8 +45,8 @@ public class Extractor
 *
 * att fixa
 *
-* Kanske inte behöver ha operationens namn och id först i varje entry i
-* restrictions. Då måste vi ändra i getStates, removeStates och remove-listan
+* Kanske inte behï¿½ver ha operationens namn och id fï¿½rst i varje entry i
+* restrictions. Dï¿½ mï¿½ste vi ï¿½ndra i getStates, removeStates och remove-listan
 * i simplifyOneOp.
 *
 ******************************************************/
@@ -716,12 +716,9 @@ public void buildRelationsDoc(final String eventName, final List<?> unsafeStates
 	public void printStringList(final List<ArrayList<String>> v)
 	{
 		System.out.println();
-		int i=1;
 		for(final Iterator<ArrayList<String>> e = v.iterator(); e.hasNext(); )
 		{
-			//System.out.println("Rad " + i);
 			System.out.println(e.next());
-			i++;
 		}
 		System.out.println();
 	}

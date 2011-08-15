@@ -25,20 +25,19 @@ import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 
 public class Forbidder
 {
-    private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(Forbidder.class);
 
     private static final String FORBIDDEN_EVENT_PREFIX = "x:";	// prefix for forbidden events
     private static final String FORBIDDEN_AUTOMATA_PREFIX = "X:";   // prefix added to name of plant automata with forbidden event selfloops
 
     private Automaton[] the_automata;
-    private int[] selected_indices;
-    private SearchStates search_states;
-    private VisualProject the_project;
-    private Automaton[] the_specs;
+    private final int[] selected_indices;
+    private final SearchStates search_states;
+    private final VisualProject the_project;
+    private final Automaton[] the_specs;
     private int num_automata;
-    
-    public Forbidder(Automata automata, int[] selects, SearchStates ss, VisualProject project)
+
+    public Forbidder(final Automata automata, final int[] selects, final SearchStates ss, final VisualProject project)
     {
         // this.the_automata = new Automata(automata); // makes a deep copy, hopefully order-preserving
         //** We are not guaranteed that this copy constructor will preserve order,
@@ -48,20 +47,20 @@ public class Forbidder
         this.search_states = ss;
         this.the_project = project;
         this.the_specs = new Automaton[selected_indices.length];
-        
+
         // for each automaton, make it a plant if not already, then rename
         fiddleAutomata();
-        
+
         // for each global state, create a forbidden event, selfloop it at each corresponding local state
         for(int i = 0; i < selected_indices.length; ++i)
         {
-            int index = selected_indices[i];	// get index for global state
-            
+            final int index = selected_indices[i];	// get index for global state
+
             // make project-global unique forbidden event,
-            ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel(FORBIDDEN_EVENT_PREFIX + i));
+            final ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel(FORBIDDEN_EVENT_PREFIX + i));
             x_event.setControllable(false);
             logger.debug(x_event.getLabel());
-            
+
             // for each automaton, find the local state, self-loop the x_event
             for(int a = 0; a < num_automata; ++a)
             {
@@ -84,20 +83,20 @@ public class Forbidder
                  **/
                 addForbiddenEvent(a, index, x_event);
             }
-            
+
             // make a spec that forbids only this event
             the_specs[i] = makeSpec(x_event);
         }
-        
+
         // add the result to the project
         addResult();
     }
-    
+
     /**
      * This one has no selection, this is taken to mean the cross-product between the found states
      * This is true for fixed-form searches, but not necessarily for free-from(?)
      **/
-    public Forbidder(Automata automata, SearchStates ss, VisualProject project)
+    public Forbidder(final Automata automata, final SearchStates ss, final VisualProject project)
     {
         // this.the_automata = new Automata(automata); // makes a deep copy, hopefully order-preserving
         //** We are not guaranteed that this copy constructor will preserve order,
@@ -107,15 +106,15 @@ public class Forbidder
         this.search_states = ss;
         this.the_project = project;
         this.the_specs = new Automaton[1];
-        
+
         // for each automaton, make it a plantif not already, then rename
         fiddleAutomata();
-        
+
         // Now we have a single project-global unique forbidden event,
-        ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel(FORBIDDEN_EVENT_PREFIX));
+        final ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel(FORBIDDEN_EVENT_PREFIX));
         x_event.setControllable(false);
         logger.debug(x_event.getLabel());
-        
+
         // for each automaton, self-loop the x_event at all found local states
         for(int a = 0; a < num_automata; ++a)
         {
@@ -125,7 +124,7 @@ public class Forbidder
              * // Add the event
              * automaton.getAlphabet().addEvent(x_event);
              **/
-            
+
             // for each local state
             for(int index = 0; index < search_states.numberFound(); ++index)
             {
@@ -148,28 +147,28 @@ public class Forbidder
                 addForbiddenEvent(a, index, x_event);
             }
         }
-        
+
         // Add spec with only this event, initial state and no transitions
         the_specs[0] = makeSpec(x_event);
         // add the result to the project
         addResult();
     }
-    
+
     /**
      * Guaranteeing order-preserving copy
      * Would a class be useful for others?
      **/
-    private void copyAutomata(Automata automata)
+    private void copyAutomata(final Automata automata)
     {
         this.num_automata = automata.nbrOfAutomata();
         this.the_automata = new Automaton[num_automata];
-        
+
         for(int i = 0; i < num_automata; ++i)
         {
             the_automata[i] = new Automaton(automata.getAutomatonAt(i));
         }
     }
-    
+
     /**
      * Plantify specs
      * Rename all copies
@@ -179,9 +178,9 @@ public class Forbidder
         // for each automaton, make it a plant if not already
         for(int i = 0; i < num_automata; ++i)
         {
-            Automaton automaton = the_automata[i];
+            final Automaton automaton = the_automata[i];
 
-            String old_name = automaton.getName();
+            final String old_name = automaton.getName();
 
 	    if(automaton.isSpecification() || automaton.isSupervisor())
 	    {
@@ -191,23 +190,23 @@ public class Forbidder
             automaton.setName(the_project.getUniqueAutomatonName(FORBIDDEN_AUTOMATA_PREFIX + old_name));
         }
     }
-    
+
     /**
      * Add forbidden event, with some sanity checks
      ***/
-    private void addForbiddenEvent(int a, int index, ForbiddenEvent x_event)
+    private void addForbiddenEvent(final int a, final int index, final ForbiddenEvent x_event)
     {
         // Get automaton
-        Automaton automaton = the_automata[a];
+        final Automaton automaton = the_automata[a];
         // Add the event - beware, adding an existig event throws exception
         if(automaton.getAlphabet().contains(x_event) == false)
         {
             automaton.getAlphabet().addEvent(x_event);
         }
         // get the local state
-        State state = search_states.getState(a, index);
+        final State state = search_states.getState(a, index);
         // This should have a corresponding state in automaton
-        State curr_state = automaton.getStateWithName(state.getName());
+        final State curr_state = automaton.getStateWithName(state.getName());
         if(curr_state == null) // if not found, somethig is _seriously_ wrong
         {
             logger.debug("Cannot find state " + state.getName() + " in automaton " + automaton.getName());
@@ -219,22 +218,22 @@ public class Forbidder
             logger.debug("Selflooping " + automaton.getName() + ": " + curr_state.getName());
         }
     }
-    
+
     /**
      * Make a spec with a single marked state, and only this forbidden event in its alphabet
      **/
-    private Automaton makeSpec(ForbiddenEvent x_event)
+    private Automaton makeSpec(final ForbiddenEvent x_event)
     {
-        Automaton spec = new Automaton(x_event.getLabel()); // same name as the event-label
+        final Automaton spec = new Automaton(x_event.getLabel()); // same name as the event-label
         spec.setType(AutomatonType.SPECIFICATION);
         spec.getAlphabet().addEvent(x_event);
-        State init_state = new State("q0");
+        final State init_state = new State("q0");
         init_state.setInitial(true);
         init_state.setAccepting(true);
         spec.addState(init_state);
         return spec;
     }
-    
+
     /**
      * Add result to the project
      **/

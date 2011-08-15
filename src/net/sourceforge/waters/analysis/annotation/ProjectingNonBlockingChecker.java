@@ -725,11 +725,9 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       final Set<AutomatonProxy> set = getFromReader(automata, reader);
       if (set == null) {break;}
       boolean stop = true;
-      int overflows = 0;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
       //System.out.println("possible: " + possible.size());
-      int num = 0;
       //for (Tuple tup : possible) {
       //for (Set<AutomatonProxy> set : possible) {
         //if (num > 3) {break;}
@@ -745,16 +743,16 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
           System.out.println(imaxsize);*/
           final ProjectionList t =
             new ProjectionList(p, automata, set);
-          num++;
           if (minSize >= t.getNew().getStates().size()) {
             minlist = t;
             minSize = t.getNew().getStates().size();
             //break;
           }
         } catch (final AnalysisException exception) {
+          // TODO This can't be right ~~~Robi
           //exception.printStackTrace();
           //System.out.println("over");
-          overflows++;
+          //overflows++;
         }
       //}
       if (minlist != null) {
