@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tbed_valid" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment>Model of a train testbed described in R. J. Leduc, PLC Implementation of a DES Supervisor for a Manufacturing Testbed: An Implementation Perspective, Masters Thesis, Department of Electrical Engineering, University of Toronto, 1996.
-This is not the original model. This model was created according to the original specifications using VALID and later converted to Waters. The model is controllable and nonblocking.</ns2:Comment>
+This is not the original model. This model was created according to the original specifications using VALID and later converted to Waters. The model is controllable and nonblocking. It has 3011315995104 reachable states and a diameter of 538.</ns2:Comment>
 <ConstantAliasList>
 <ConstantAlias Name="CRANES">
 <ConstantAliasExpression>

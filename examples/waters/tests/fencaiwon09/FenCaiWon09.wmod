@@ -2,7 +2,7 @@
 <Module Name="FenCaiWon09" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Model of a production cell as documented in {Lei Feng, Kai Cai, W.M. Wonham, A structural approach to the non-blocking supervisory control of discrete-event systems, Int. J. Adv. Manuf. Technol. 41:1152-1168, 2009}.
 This is the version that achieves least restrictive nonblocking supervision according to the paper. The supervisors A1PC and A2PS have not been obtained using SUPREDUCE but manually, and they are different from those used by the original authors.
-Specifications in the original model are marked as properties in this model, so language inclusion check can be used to confirm that they are satisfied. Supervisors are included as specs. The plants in this version are the original (non-abstracted) automata. The system is controllable and nonblocking, and satisfies all properties. The number of reachable states exceeds 100,000,000.</ns2:Comment>
+Specifications in the original model are marked as properties in this model, so language inclusion check can be used to confirm that they are satisfied. Supervisors are included as specs. The plants in this version are the original (non-abstracted) automata. The system is controllable and nonblocking, and satisfies all properties. The number of reachable states is 102790252.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="blank_add"/>
         <EventDecl Kind="CONTROLLABLE" Name="Cr_mOn"/>

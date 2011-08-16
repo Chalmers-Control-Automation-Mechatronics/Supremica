@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tbed_ctct" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Model of a train testbed described in R. J. Leduc, PLC Implementation of a DES Supervisor for a Manufacturing Testbed: An Implementation Perspective, Masters Thesis, Department of Electrical Engineering, University of Toronto, 1996.
+This is the original model by Ryan Leduc, converted from CTCT to VALID, and then imported into Waters. The model is controllable and blocking. It has 39357319936640 reachable states and a diameter of 759.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="e10"/>
         <EventDecl Kind="CONTROLLABLE" Name="e11"/>
@@ -120,8 +122,7 @@
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_1_0"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_1_0">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -666,8 +667,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_11_13"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_11_13">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -942,8 +942,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_12_14"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_12_14">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -1270,8 +1269,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_15_16"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_15_16">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -1504,8 +1502,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_19_20"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_19_20">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -2060,8 +2057,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_2_4"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_2_4">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -2346,8 +2342,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_21_22"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_21_22">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -2580,8 +2575,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_23_24"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_23_24">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -2814,8 +2808,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_25_26"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_25_26">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -3048,8 +3041,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_3_5_fix1"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_3_5_fix1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -3376,8 +3368,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_6_7"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_6_7">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -3917,8 +3908,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_9_10"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_9_10">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -4458,8 +4448,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_rs27"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_rs27">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -4692,8 +4681,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctcp_rs8"/>
+        <SimpleComponent Kind="SPEC" Name="ctctcp_rs8">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -4926,8 +4914,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctcrane1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctcrane1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e15"/>
@@ -4955,8 +4942,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctcrane2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctcrane2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e25"/>
@@ -4984,8 +4970,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctcrane3"/>
+        <SimpleComponent Kind="PLANT" Name="ctctcrane3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e35"/>
@@ -5013,8 +4998,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw3t1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw3t1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e12"/>
@@ -5202,8 +5186,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw3t2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw3t2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e14"/>
@@ -5391,8 +5374,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw4t1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw4t1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e47"/>
@@ -5580,8 +5562,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw4t2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw4t2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e47"/>
@@ -5769,8 +5750,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw5t1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw5t1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e57"/>
@@ -5929,8 +5909,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw5t2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw5t2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e57"/>
@@ -6089,8 +6068,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw6t1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw6t1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e67"/>
@@ -6205,8 +6183,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw6t2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw6t2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e67"/>
@@ -6321,8 +6298,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw7t1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw7t1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e77"/>
@@ -6510,8 +6486,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw7t2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw7t2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e77"/>
@@ -6699,8 +6674,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw8t1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw8t1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e112"/>
@@ -6881,8 +6855,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctms_sw8t2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctms_sw8t2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e114"/>
@@ -7063,8 +7036,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctreq_sw3"/>
+        <SimpleComponent Kind="PLANT" Name="ctctreq_sw3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e31"/>
@@ -7125,8 +7097,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctreq_sw4"/>
+        <SimpleComponent Kind="PLANT" Name="ctctreq_sw4">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e41"/>
@@ -7187,8 +7158,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctreq_sw5"/>
+        <SimpleComponent Kind="PLANT" Name="ctctreq_sw5">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e51"/>
@@ -7249,8 +7219,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctreq_sw6"/>
+        <SimpleComponent Kind="PLANT" Name="ctctreq_sw6">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e61"/>
@@ -7311,8 +7280,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctreq_sw7"/>
+        <SimpleComponent Kind="PLANT" Name="ctctreq_sw7">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e71"/>
@@ -7373,8 +7341,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctreq_sw8"/>
+        <SimpleComponent Kind="PLANT" Name="ctctreq_sw8">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e81"/>
@@ -7435,8 +7402,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs0"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs0">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e2"/>
@@ -7475,8 +7441,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e12"/>
@@ -7515,8 +7480,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs10"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs10">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e102"/>
@@ -7555,8 +7519,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs11"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs11">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e112"/>
@@ -7595,8 +7558,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs12"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs12">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e122"/>
@@ -7635,8 +7597,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs13"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs13">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e132"/>
@@ -7675,8 +7636,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs14"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs14">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e142"/>
@@ -7715,8 +7675,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs15"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs15">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e152"/>
@@ -7755,8 +7714,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs16"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs16">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e162"/>
@@ -7795,8 +7753,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs19"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs19">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e192"/>
@@ -7835,8 +7792,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e22"/>
@@ -7875,8 +7831,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs20"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs20">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e202"/>
@@ -7915,8 +7870,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs21"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs21">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e212"/>
@@ -7955,8 +7909,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs22"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs22">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e222"/>
@@ -7995,8 +7948,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs23"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs23">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e232"/>
@@ -8035,8 +7987,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs24"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs24">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e242"/>
@@ -8075,8 +8026,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs25"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs25">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e252"/>
@@ -8115,8 +8065,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs26"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs26">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e262"/>
@@ -8155,8 +8104,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs27"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs27">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e272"/>
@@ -8195,8 +8143,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs3"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e32"/>
@@ -8235,8 +8182,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs4"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs4">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e42"/>
@@ -8275,8 +8221,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs5"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs5">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e52"/>
@@ -8315,8 +8260,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs6"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs6">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e62"/>
@@ -8355,8 +8299,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs7"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs7">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e72"/>
@@ -8395,8 +8338,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs8"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs8">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e82"/>
@@ -8435,8 +8377,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctrs9"/>
+        <SimpleComponent Kind="PLANT" Name="ctctrs9">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e92"/>
@@ -8475,8 +8416,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctcts_crane1"/>
+        <SimpleComponent Kind="SPEC" Name="ctcts_crane1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -8574,8 +8514,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctcts_crane2"/>
+        <SimpleComponent Kind="SPEC" Name="ctcts_crane2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -8673,8 +8612,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctcts_crane3"/>
+        <SimpleComponent Kind="SPEC" Name="ctcts_crane3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -8772,8 +8710,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctsens_it1"/>
+        <SimpleComponent Kind="PLANT" Name="ctctsens_it1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e2"/>
@@ -8966,8 +8903,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctsens_it2"/>
+        <SimpleComponent Kind="PLANT" Name="ctctsens_it2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e4"/>
@@ -9160,8 +9096,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt1_sw3"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt1_sw3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -9368,8 +9303,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt1_sw4"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt1_sw4">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -9449,8 +9383,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt1_sw5"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt1_sw5">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -9536,8 +9469,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt1_sw6"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt1_sw6">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -9617,8 +9549,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt1_sw7"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt1_sw7">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -9698,8 +9629,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt1_sw8"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt1_sw8">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -9937,8 +9867,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt2_sw3"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt2_sw3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -10145,8 +10074,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt2_sw4"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt2_sw4">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -10226,8 +10154,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt2_sw5"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt2_sw5">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -10403,8 +10330,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt2_sw6"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt2_sw6">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -10484,8 +10410,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt2_sw7"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt2_sw7">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -10693,8 +10618,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="ctctsrt2_sw8_fix1"/>
+        <SimpleComponent Kind="SPEC" Name="ctctsrt2_sw8_fix1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -10876,8 +10800,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctsw3"/>
+        <SimpleComponent Kind="PLANT" Name="ctctsw3">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e307"/>
@@ -10918,8 +10841,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctsw8"/>
+        <SimpleComponent Kind="PLANT" Name="ctctsw8">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e807"/>
@@ -10960,8 +10882,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctt1_sen"/>
+        <SimpleComponent Kind="PLANT" Name="ctctt1_sen">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -11151,8 +11072,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctctt2_sen"/>
+        <SimpleComponent Kind="PLANT" Name="ctctt2_sen">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -11342,8 +11262,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctcttrain1"/>
+        <SimpleComponent Kind="PLANT" Name="ctcttrain1">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e11"/>
@@ -11371,8 +11290,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="ctcttrain2"/>
+        <SimpleComponent Kind="PLANT" Name="ctcttrain2">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="e21"/>
@@ -11402,4 +11320,3 @@
         </SimpleComponent>
     </ComponentList>
 </Module>
-
