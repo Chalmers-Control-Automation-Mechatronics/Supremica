@@ -75,10 +75,6 @@ public class Milp
     /** Decides if the schedule should be built */
     protected boolean buildSchedule;
 
-    /** The output string */
-    @SuppressWarnings("unused")
-	private final String outputStr = "";
-
     /**
      * Contains the info about the nearest path splits above a given state. The
      * indices of the IntArrayTreeSet (this storage format is chosen to avoid
@@ -148,7 +144,6 @@ public class Milp
      * which makes it possible to create unique headers for this constraint in the
      * language specific to some MILP-solver.
      */
-//    private ArrayList<Constraint> mutexConstraints = null;
     private ArrayList<int[]> mutexConstraints = null;
 
     private ArrayList<ArrayList<int[]>> xorConstraints = null;
@@ -161,8 +156,12 @@ public class Milp
      */
     private double[][] deltaTimes = null;
 
-    /** The constraints represented by external specifications, in string form. */
-    @SuppressWarnings("unused")
+    /**
+     * The constraints represented by external specifications, in string form.
+     * TODO Eclipse (Indigo) reports this member as unused an it seems that
+     * it is never read, although large parts of this code are only there to
+     * produce it?
+     */
     private String externalConstraints = "";
 
     /**
@@ -1912,6 +1911,11 @@ public class Milp
                 }
             }
         }
+
+        // To suppress unused warning for externalConstraints in Eclipse
+        // Galileo-Indigo without deleting lots of code. ~~~Robi
+        @SuppressWarnings("unused")
+        final String dummy = externalConstraints;
     }
 
     /**
