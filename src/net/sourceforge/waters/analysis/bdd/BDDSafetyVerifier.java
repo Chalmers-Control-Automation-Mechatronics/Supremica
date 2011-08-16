@@ -218,7 +218,7 @@ public class BDDSafetyVerifier
         }
         final BDDFactory bddFactory = getBDDFactory();
         final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
-        final double limit = getPartitioningGrowthLimit();
+        final int limit = getPartitioningSizeLimit();
         final Collection<ConditionPartitionBDD> conditions =
           condPartitioning.mergePartitions(automatonBDDs, bddFactory, limit);
         mConditionBDDs = new ArrayList<ConditionPartitionBDD>(conditions);

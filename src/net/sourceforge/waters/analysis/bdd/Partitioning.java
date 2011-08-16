@@ -59,11 +59,11 @@ class Partitioning<P extends PartitionBDD>
   //# Algorithm
   SortedSet<P> mergePartitions(final AutomatonBDD[] automatonBDDs,
                                final BDDFactory factory,
-                               final double partitioningGrowthLimit)
+                               final int partitioningSizeLimit)
   {
     if (mPartitions.isEmpty()) {
       // nothing ...
-    } else if (partitioningGrowthLimit == Double.POSITIVE_INFINITY) {
+    } else if (partitioningSizeLimit == Integer.MAX_VALUE) {
       PartitionBDD composition = null;
       for (final P part : mPartitions) {
         if (composition == null) {
@@ -78,7 +78,7 @@ class Partitioning<P extends PartitionBDD>
       mPartitions.clear();
       final P result = mClass.cast(composition);
       mPartitions.add(result);
-    } else if (partitioningGrowthLimit > 0.0) {
+    } else if (partitioningSizeLimit > 0) {
       final int count = mPartitions.size();
       final Collection<P> completed = new ArrayList<P>(count);
       while (!mPartitions.isEmpty()) {
@@ -86,7 +86,7 @@ class Partitioning<P extends PartitionBDD>
         final P part = iter.next();
         iter.remove();
         final P merged =
-          merge(part, automatonBDDs, factory, partitioningGrowthLimit);
+          merge(part, automatonBDDs, factory, partitioningSizeLimit);
         if (merged == null) {
           completed.add(part);
         }
@@ -103,10 +103,9 @@ class Partitioning<P extends PartitionBDD>
   private P merge(final P part,
                   final AutomatonBDD[] automatonBDDs,
                   final BDDFactory factory,
-                  final double partitioningGrowthLimit)
+                  final int partitioningSizeLimit)
   {
     final BitSet automata0 = part.getAutomata();
-    final int size0 = part.getNodeCount();
     PartitionBDD bestcomposition = null;
     P bestcandidate = null;
     int bestsize = Integer.MAX_VALUE;
@@ -115,12 +114,10 @@ class Partitioning<P extends PartitionBDD>
       if (!automata0.intersects(automata1)) {
         continue;
       }
-      final int size1 = candidate.getNodeCount();
       final PartitionBDD composition =
         part.compose(candidate, automatonBDDs, factory);
       final int size = composition.getNodeCount();
-      if (size >= bestsize ||
-          size > partitioningGrowthLimit * (size0 + size1)) {
+      if (size >= bestsize || size > partitioningSizeLimit) {
         composition.dispose();
         continue;
       }

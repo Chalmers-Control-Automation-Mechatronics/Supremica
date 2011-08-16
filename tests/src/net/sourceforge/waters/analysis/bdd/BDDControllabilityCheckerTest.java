@@ -18,16 +18,19 @@ import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
+/**
+ * @author Robi Malik
+ */
+
 public class BDDControllabilityCheckerTest
   extends AbstractControllabilityCheckerTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
-  public static Test suite() {
-    TestSuite testSuite =
-      new TestSuite(BDDControllabilityCheckerTest.class);
-    return testSuite;
+  public static Test suite()
+  {
+    return new TestSuite(BDDControllabilityCheckerTest.class);
   }
 
   public static void main(final String[] args)
@@ -39,6 +42,7 @@ public class BDDControllabilityCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ControllabilityChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {

@@ -12,9 +12,9 @@ package net.sourceforge.waters.analysis.bdd;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentDouble;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -59,7 +59,7 @@ public class BDDModelVerifierFactory
     addArgument(new CommandLineArgumentPack());
     addArgument(new CommandLineArgumentOrder());
     addArgument(new CommandLineArgumentDynamic());
-    addArgument(new CommandLineArgumentGrowthLimit());
+    addArgument(new CommandLineArgumentParitioningSizeLimit());
   }
 
 
@@ -164,15 +164,15 @@ public class BDDModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class CommandLineArgumentOrder
-  private static class CommandLineArgumentGrowthLimit
-    extends CommandLineArgumentDouble
+  //# Inner Class CommandLineArgumentParitioningSizeLimit
+  private static class CommandLineArgumentParitioningSizeLimit
+    extends CommandLineArgumentInteger
   {
     //#######################################################################
     //# Constructor
-    private CommandLineArgumentGrowthLimit()
+    private CommandLineArgumentParitioningSizeLimit()
     {
-      super("-part", "Maximum growth factor when merging partitioned BDDs");
+      super("-part", "Maximum BDD size when merging partitioned BDDs");
     }
 
     //#######################################################################
@@ -182,10 +182,9 @@ public class BDDModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
-      final double limit = getValue();
-      bddVerifier.setPartitioningGrowthLimit(limit);
+      final int limit = getValue();
+      bddVerifier.setPartitioningSizeLimit(limit);
     }
   }
-
 
 }

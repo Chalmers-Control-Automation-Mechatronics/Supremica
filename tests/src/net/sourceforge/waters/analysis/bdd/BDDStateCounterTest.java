@@ -52,6 +52,7 @@ public class BDDStateCounterTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mMonolithicChecker = new NativeControllabilityChecker(factory);
     mBDDChecker = new BDDControllabilityChecker(factory);
+    mBDDChecker.setReorderingEnabled(true);
   }
 
   @Override
@@ -590,6 +591,6 @@ public class BDDStateCounterTest
   //#########################################################################
   //# Data Members
   private ControllabilityChecker mMonolithicChecker;
-  private ControllabilityChecker mBDDChecker;
+  private BDDControllabilityChecker mBDDChecker;
 
 }

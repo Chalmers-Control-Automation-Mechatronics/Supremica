@@ -247,20 +247,28 @@ public class BDDConflictChecker
       setFailedResult(counterexample);
       return eventBDDs;
     }
-    final BDD nondeadlock = mMarkingBDD.id();
-    final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
-    final BDDFactory factory = getBDDFactory();
-    final List<TransitionPartitionBDD> partition = getTransitionBDDs();
-    for (final TransitionPartitionBDD part : partition) {
-      final BDD nondeadlockPart = part.getNonDeadlockBDD(automatonBDDs, factory);
-      nondeadlock.orWith(nondeadlockPart);
-    }
-    final BDD deadlock = nondeadlock.not();
-    if (mPreconditionBDD != null) {
-      deadlock.andWith(mPreconditionBDD.id());
-    }
-    if (!deadlock.isZero()) {
-      mDeadlockBDD = deadlock;
+    final int limit = getPartitioningSizeLimit();
+    if (limit > 0) {
+      final BDD nondeadlock = mMarkingBDD.id();
+      final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
+      final BDDFactory factory = getBDDFactory();
+      final List<TransitionPartitionBDD> partition = getTransitionBDDs();
+      for (final TransitionPartitionBDD part : partition) {
+        final BDD nondeadlockPart =
+          part.getNonDeadlockBDD(automatonBDDs, factory);
+        nondeadlock.orWith(nondeadlockPart);
+        if (nondeadlock.nodeCount() > limit) {
+          nondeadlock.free();
+          return eventBDDs;
+        }
+      }
+      final BDD deadlock = nondeadlock.not();
+      if (mPreconditionBDD != null) {
+        deadlock.andWith(mPreconditionBDD.id());
+      }
+      if (!deadlock.isZero()) {
+        mDeadlockBDD = deadlock;
+      }
     }
     return eventBDDs;
   }
@@ -345,6 +353,7 @@ public class BDDConflictChecker
     return desfactory.createConflictTraceProxy
       (name, null, null, des, automata, trace, kind);
   }
+
 
   //#########################################################################
   //# Data Members

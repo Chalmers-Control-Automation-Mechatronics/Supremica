@@ -116,7 +116,7 @@ public abstract class BDDModelVerifier
     mBDDPackage = bddpackage;
     mVariableOrdering = VariableOrdering.FORCE;
     mIsReorderingEnabled = true;
-    mPartitioningGrowthLimit = Double.POSITIVE_INFINITY;
+    mPartitioningSizeLimit = Integer.MAX_VALUE;
   }
 
 
@@ -152,14 +152,14 @@ public abstract class BDDModelVerifier
     mIsReorderingEnabled = enable;
   }
 
-  public double getPartitioningGrowthLimit()
+  public int getPartitioningSizeLimit()
   {
-    return mPartitioningGrowthLimit;
+    return mPartitioningSizeLimit;
   }
 
-  public void setPartitioningGrowthLimit(final double limit)
+  public void setPartitioningSizeLimit(final int limit)
   {
-    mPartitioningGrowthLimit = limit < 0 ? Double.POSITIVE_INFINITY : limit;
+    mPartitioningSizeLimit = limit < 0 ? Integer.MAX_VALUE : limit;
   }
 
 
@@ -374,7 +374,7 @@ public abstract class BDDModelVerifier
     }
     final Collection<TransitionPartitionBDD> transitions =
       transPartitioning.mergePartitions(mAutomatonBDDs, mBDDFactory,
-                                        mPartitioningGrowthLimit);
+                                        mPartitioningSizeLimit);
     mTransitionBDDs = new ArrayList<TransitionPartitionBDD>(transitions);
     final int transcount1 = mTransitionBDDs.size();
     final Logger logger = getLogger();
@@ -832,7 +832,7 @@ public abstract class BDDModelVerifier
   private BDDPackage mBDDPackage;
   private VariableOrdering mVariableOrdering;
   private boolean mIsReorderingEnabled;
-  private double mPartitioningGrowthLimit;
+  private int mPartitioningSizeLimit;
 
   private int mNumAutomata;
   private BDDFactory mBDDFactory;
