@@ -413,7 +413,6 @@ public class TestAutomatonMinimizer
 		final int size = alphabet.size();
 		final Set<EventProxy> result = new HashSet<EventProxy>(size);
 		for (final EventProxy supevent : alphabet) {
-		  if (supevent.isObservable()) {
 			final String name = supevent.getName();
 			final EventProxy event = findEvent(des, name);
 			final boolean added = result.add(event);
@@ -422,7 +421,6 @@ public class TestAutomatonMinimizer
 					("Duplicate event name '" + name +
 					 "' in Supremica alphabet!");
 			}
-		  }
 		}
 		return result;
 	}

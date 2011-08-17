@@ -73,6 +73,8 @@ public class TestSynthesisAbstractionMinimizer
     mAutomatonBuilder = new ProjectBuildFromWaters(docman);
     mMinimizationOptions = MinimizationOptions.getDefaultMinimizationOptions();
     mMinimizationOptions.setAlsoTransitions(true);
+    mMinimizationOptions.setCompositionalMinimization(false);
+    mMinimizationOptions.setKeepOriginal(true);
     mMinimizationOptions.setMinimizationType
       (EquivalenceRelation.SYNTHESISABSTRACTION);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
