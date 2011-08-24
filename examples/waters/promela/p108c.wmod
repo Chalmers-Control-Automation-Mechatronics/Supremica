@@ -51,26 +51,26 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="A_0">
                                 <PointGeometry>
-                                    <Point Y="64" X="80"/>
+                                    <Point X="80" Y="64"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-7" X="9"/>
+                                    <Point X="9" Y="-7"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="A_1">
                                 <PointGeometry>
-                                    <Point Y="144" X="80"/>
+                                    <Point X="80" Y="144"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-6" X="9"/>
+                                    <Point X="9" Y="-6"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="A_2">
                                 <PointGeometry>
-                                    <Point Y="224" X="80"/>
+                                    <Point X="80" Y="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-5" X="7"/>
+                                    <Point X="7" Y="-5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="A_3">
@@ -78,25 +78,25 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="304" X="80"/>
+                                    <Point X="80" Y="304"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-5" X="7"/>
+                                    <Point X="7" Y="-5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="A_1" Source="A_0">
+                            <Edge Source="A_0" Target="A_1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="run_A">
                                         <SimpleIdentifier Name="procid"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-8" X="5"/>
+                                        <Point X="5" Y="-8"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="A_2" Source="A_1">
+                            <Edge Source="A_1" Target="A_2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="procid"/>
@@ -109,11 +109,11 @@
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-20" X="4"/>
+                                        <Point X="4" Y="-20"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="A_3" Source="A_2">
+                            <Edge Source="A_2" Target="A_3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="procid"/>
@@ -126,7 +126,7 @@
                                         <SimpleIdentifier Name="FALSE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-18" X="4"/>
+                                        <Point X="4" Y="-18"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -149,26 +149,26 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="B_0">
                                 <PointGeometry>
-                                    <Point Y="64" X="80"/>
+                                    <Point X="80" Y="64"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-6" X="-32"/>
+                                    <Point X="-32" Y="-6"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_1">
                                 <PointGeometry>
-                                    <Point Y="144" X="80"/>
+                                    <Point X="80" Y="144"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-5" X="-29"/>
+                                    <Point X="-29" Y="-5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_2">
                                 <PointGeometry>
-                                    <Point Y="224" X="80"/>
+                                    <Point X="80" Y="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-10" X="-32"/>
+                                    <Point X="-32" Y="-10"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_3">
@@ -176,25 +176,25 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="304" X="80"/>
+                                    <Point X="80" Y="304"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-7" X="-32"/>
+                                    <Point X="-32" Y="-7"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="B_1" Source="B_0">
+                            <Edge Source="B_0" Target="B_1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="run_B">
                                         <SimpleIdentifier Name="procid"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-13" X="6"/>
+                                        <Point X="6" Y="-13"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="B_2" Source="B_1">
+                            <Edge Source="B_1" Target="B_2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="A_0"/>
@@ -217,11 +217,11 @@
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-33" X="3"/>
+                                        <Point X="3" Y="-33"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="B_3" Source="B_2">
+                            <Edge Source="B_2" Target="B_3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="A_0"/>
@@ -244,7 +244,7 @@
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-34" X="4"/>
+                                        <Point X="4" Y="-34"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -258,34 +258,34 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="init_0">
                         <PointGeometry>
-                            <Point Y="48" X="80"/>
+                            <Point X="80" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="10"/>
+                            <Point X="10" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_1">
                         <PointGeometry>
-                            <Point Y="112" X="80"/>
+                            <Point X="80" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="8"/>
+                            <Point X="8" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_2">
                         <PointGeometry>
-                            <Point Y="176" X="80"/>
+                            <Point X="80" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="8"/>
+                            <Point X="8" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_3">
                         <PointGeometry>
-                            <Point Y="240" X="80"/>
+                            <Point X="80" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="8"/>
+                            <Point X="8" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_4">
@@ -293,46 +293,46 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="304" X="80"/>
+                            <Point X="80" Y="304"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="init_1" Source="init_0">
+                    <Edge Source="init_0" Target="init_1">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_A"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="6"/>
+                                <Point X="6" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="init_2" Source="init_1">
+                    <Edge Source="init_1" Target="init_2">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_A"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="3"/>
+                                <Point X="3" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="init_3" Source="init_2">
+                    <Edge Source="init_2" Target="init_3">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="4"/>
+                                <Point X="4" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="176" X="80"/>
+                            <Point X="80" Y="176"/>
                         </StartPointGeometry>
                     </Edge>
-                    <Edge Target="init_4" Source="init_3">
+                    <Edge Source="init_3" Target="init_4">
                         <LabelBlock>
                             <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="4"/>
+                                <Point X="4" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
