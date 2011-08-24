@@ -19,9 +19,9 @@ proctype A()
 
 proctype B()
 {
-  mtype data;
+  mtype date;
   byte value;
-  ch?data(value);
+  ch?date(value);
 }
 
 init
