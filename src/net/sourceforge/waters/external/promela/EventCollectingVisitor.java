@@ -552,6 +552,7 @@ public class EventCollectingVisitor implements PromelaVisitor
         }
 
       }
+      System.out.println("123");
     }
 
 
@@ -566,64 +567,18 @@ public class EventCollectingVisitor implements PromelaVisitor
     final List<SimpleExpressionProxy> rangeValues = table.get(argIndex);
     final int numValues = rangeValues.size();
     final List<SimpleIdentifierProxy> enumValues = new ArrayList<SimpleIdentifierProxy>(numValues); ;
-//   final List<SimpleExpressionProxy> enumBinary = null;
 
-  /*  final boolean isMtype = typeList.get(argIndex).equals("mtype");
-    if(isMtype){
-      enumValues = new ArrayList<SimpleIdentifierProxy>(numValues);
-    }else{
-      enumBinary = new ArrayList<SimpleExpressionProxy>(numValues);
-    }
-  */
     for (int i=0;i<rangeValues.size();i++) {
- //     final List<SimpleExpressionProxy> temp = new ArrayList<SimpleExpressionProxy>();
- //     final BinaryOperator op = optable.getRangeOperator();
- //     if(isMtype){
         final SimpleIdentifierProxy cloned =
             (SimpleIdentifierProxy) cloner.getClone(rangeValues.get(i));
         enumValues.add(cloned);
- //     }else{
-       // final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(rangeValues.get(i).toString()));
-       // enumBinary.add(c);
- //       }
      }
 
-   /* for(int i=0;i<rangeValues.size();i++){
-      if(typeList.get(i).equals("mtype")){
-        final SimpleIdentifierProxy cloned =
-            (SimpleIdentifierProxy) cloner.getClone(rangeValues.get(i));
-          enumValues.add(cloned);
-      }else{
-        final IntConstantProxy zero =
-            mFactory.createIntConstantProxy(Integer.parseInt(rangeValues.get(i).toString()));
-        enumValues.add(zero);
-      }
-    }
-    */
-   /* for (final SimpleExpressionProxy value : rangeValues) {
-      final SimpleIdentifierProxy cloned =
-        (SimpleIdentifierProxy) cloner.getClone(value);
-      enumValues.add(cloned);
-    }
-  */
- //   final Comparator<SimpleExpressionProxy> comparator =
- //       new ExpressionComparator(optable);
-   // Collections.sort(enumValues);
-    //if(isMtype){
     final EnumSetExpressionProxy en =
       mFactory.createEnumSetExpressionProxy(enumValues);
       return en;
-   // }else{
-   //   final BinaryOperator op = optable.getRangeOperator();
-   //   final BinaryExpressionProxy bi = mFactory.createBinaryExpressionProxy(op, enumBinary.get(0), enumBinary.get(enumBinary.size()-1));
-   //   return bi;
-   // }
-
   }
 
- // public List<Message> getMsg(){
- //   return mOutput;
- // }
   //########################################################################
   //# Interface net.sourceforge.waters.external.promela.PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)
@@ -660,8 +615,6 @@ public class EventCollectingVisitor implements PromelaVisitor
     for(int i=0;i<t.getChildCount();i++){
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
-  //  final PromelaTree tr1 = (PromelaTree) t.getChild(1);
- //   tr1.acceptVisitor(this);
     return null;
   }
 
@@ -682,27 +635,6 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
 
     chan.put(name,new ChanInfo(name, chanLength, datalength,type));
-/*
-    //final String chanName = t.getParent().getChild(0).getText();
-    lowerEnd = new ArrayList<String>();
-    upperEnd = new ArrayList<String>();
-    @SuppressWarnings("unused")
-    final ArrayList<String> rangeData = new ArrayList<String>();
-    for(int i =1;i<t.getChildCount();i++){
-      ((PromelaTree) t.getChild(i)).acceptVisitor(this);
-    }
-
-    final int size = t.getChildCount()-1;
-    final Collection<SimpleExpressionProxy> ranges = new ArrayList<SimpleExpressionProxy>(size);
-    for(int i=0;i<size;i++){
-      final IntConstantProxy zero = mFactory.createIntConstantProxy(Integer.parseInt(lowerEnd.get(i)));
-      final IntConstantProxy c255 = mFactory.createIntConstantProxy(Integer.parseInt(upperEnd.get(i)));
-      final BinaryOperator op = optable.getRangeOperator();
-      final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, zero, c255);
-      ranges.add(range);
-    }
-  //  mRanges = new ArrayList<SimpleExpressionProxy>(ranges);
-*/
     return null;
   }
 
@@ -827,29 +759,31 @@ public class EventCollectingVisitor implements PromelaVisitor
         }else{
           indexes.add(null);
         }
-
-     }else if(ch.getType().get(y).equals("mtype")){
+     }
+     else if(ch.getType().get(y).equals("mtype")){
        //if(mGlobalVar.get(labels.get(y+1)).equals("mtype")){
        if(proctypeVar.containsKey(labels.get(y+1))){
          if(proctypeVar.get(labels.get(y+1)).equals("mtype")){
+           final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy("mtype");
+          // indexes.add(id);
            for(final Map.Entry<String,String> s: mGlobalVar.entrySet()){
-             //indexes = new ArrayList<SimpleExpressionProxy>();
+             final List<SimpleExpressionProxy> tempindex = new ArrayList<SimpleExpressionProxy>();
              if(s.getValue().equals("mtype")){
                final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(s.getKey());
-               indexes.add(c);
+               tempindex.add(c);
                final Message msg = new Message(indexes);
                msg.addRecipient(n);
                ch.addMessages(msg);
-               indexes.remove(c);
+               tempindex.remove(c);
              }
            }
-           return null;
+           //return null;
          }else{
            indexes.add(null);
            final Message msg = new Message(indexes);
            msg.addRecipient(n);
            ch.addMessages(msg);
-           return null;
+           //return null;
          }
        }
 

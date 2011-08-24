@@ -649,6 +649,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
             break;
           }
         }
+        if(ch.getType().size()>1){
+          if(ch.getType().contains("mtype")) isSame = true;
+        }
+
         if(isSame){
             if(!m.hasSenders()) break loop1;
             loop2:
@@ -692,7 +696,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
                   }
               }
               Collection<SimpleExpressionProxy> data = new ArrayList<SimpleExpressionProxy>();
-              if(msg.getMsg().contains(null)){
+              if(m.getMsg().contains(null)){
                 if(indexes.size()==1){
                   data = cloner.getClonedList(m2.getMsg());
                 }else if(indexes.size()>1){
@@ -717,8 +721,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
                 if(temp.isEmpty()){
                 data=cloner.getClonedList(indexes);
                 }else{
-                  data=cloner.getClonedList(temp.get(msg));
-                }
+                 if(ch.getType().size()>1 && ch.getType().contains("mtype")){
+                    data=cloner.getClonedList(m.getMsg());
+                  }else{
+                    data=cloner.getClonedList(temp.get(msg));
+                  }
+                 }
               }
               if(data.size()==0){
                 continue loop2;
