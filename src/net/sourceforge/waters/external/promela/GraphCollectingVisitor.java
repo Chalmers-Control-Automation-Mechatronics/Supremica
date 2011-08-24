@@ -721,11 +721,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
                 if(temp.isEmpty()){
                 data=cloner.getClonedList(indexes);
                 }else{
-                 if(ch.getType().size()>1 && ch.getType().contains("mtype")){
+                //if(ch.getType().size()>1 && ch.getType().contains("mtype")){
                     data=cloner.getClonedList(m.getMsg());
-                  }else{
-                    data=cloner.getClonedList(temp.get(msg));
-                  }
+                 // }else{
+                   // data=cloner.getClonedList(temp.get(msg));
+                 // }
                  }
               }
               if(data.size()==0){
