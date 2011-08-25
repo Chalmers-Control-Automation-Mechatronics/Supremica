@@ -641,11 +641,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
       loop1:
       for(final Message m: ch.getOutput()){
         boolean isSame = false;
-        Message msg = null;
         for(final Message allmsg: msgList){
           if(allmsg.equals(m)){
             isSame = true;
-            msg = allmsg;
             break;
           }
         }

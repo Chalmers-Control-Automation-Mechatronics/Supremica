@@ -764,8 +764,8 @@ public class EventCollectingVisitor implements PromelaVisitor
        //if(mGlobalVar.get(labels.get(y+1)).equals("mtype")){
        if(proctypeVar.containsKey(labels.get(y+1))){
          if(proctypeVar.get(labels.get(y+1)).equals("mtype")){
-           final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy("mtype");
-          // indexes.add(id);
+           // final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy("mtype");
+           // indexes.add(id);
            for(final Map.Entry<String,String> s: mGlobalVar.entrySet()){
              final List<SimpleExpressionProxy> tempindex = new ArrayList<SimpleExpressionProxy>();
              if(s.getValue().equals("mtype")){

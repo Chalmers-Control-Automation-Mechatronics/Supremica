@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.io.PrintStream;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -27,7 +27,7 @@ import java.util.Iterator;
  */
 
 public abstract class CommandLineArgumentEnum<E extends Enum<E>>
-  extends CommandLineArgument
+  extends CommandLineArgumentExtensibleEnum<E>
 {
 
   //#########################################################################
@@ -44,8 +44,7 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
                                     final String description,
                                     final Class<E> eclass)
   {
-    super(name, description);
-    mEnumerationClass = eclass;
+    super(name, description, new JavaEnumFactory<E>(eclass));
   }
 
   /**
@@ -65,89 +64,33 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
                                     final Class<E> eclass,
                                     final boolean required)
   {
-    super(name, description, required);
-    mEnumerationClass = eclass;
-  }
-
-
-  //#######################################################################
-  //# Simple Access
-  protected String getArgumentTemplate()
-  {
-    return "<value>";
-  }
-
-  protected E getValue()
-  {
-    return mValue;
-  }
-
-
-  //#######################################################################
-  //# Parsing
-  protected void parse(final Iterator<String> iter)
-  {
-    if (iter.hasNext()) {
-      final String name = iter.next();
-      for (final E value : mEnumerationClass.getEnumConstants()) {
-        if (value.toString().equalsIgnoreCase(name)) {
-          mValue = value;
-          return;
-        }
-      }
-      System.err.println("Bad value for " + getName() + " option!");
-      dumpEnumeration(System.err, 0);
-      System.exit(1);
-    } else {
-      failMissingValue();
-    }
+    super(name, description, new JavaEnumFactory<E>(eclass), required);
   }
 
 
   //#########################################################################
-  //# Printing
-  protected void dump(final PrintStream stream)
+  //# Inner Class JavaEnumFactory
+  private static class JavaEnumFactory<E extends Enum<E>>
+    implements EnumFactory<E>
   {
-    super.dump(stream);
-    dumpEnumeration(stream, INDENT);
-  }
-
-  protected void dumpEnumeration(final PrintStream stream, final int indent)
-  {
-    doIndent(stream, indent);
-    stream.println("Possible values are:");
-    int column = 0;
-    boolean first = true;
-    for (final E item : mEnumerationClass.getEnumConstants()) {
-      final String label = item.toString();
-      final int len = label.length();
-      if (first) {
-        first = false;
-      } else {
-        stream.print(',');
-        column++;
-        if (column + 1 + len > 75) {
-          stream.println();
-          column = 0;
-        } else {
-          stream.print(' ');
-          column++;
-        }
-      }
-      if (column == 0) {
-        doIndent(stream, indent);
-        column = indent;
-      }
-      stream.print(label);
-      column += len;
+    //#######################################################################
+    //# Constructors
+    private JavaEnumFactory(final Class<E> clazz)
+    {
+      mEnumerationClass = clazz;
     }
-    stream.println();
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.ExtensibleEnumFactory
+    public List<? extends E> getEnumConstants()
+    {
+      final E[] array = mEnumerationClass.getEnumConstants();
+      return Arrays.asList(array);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Class<E> mEnumerationClass;
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private final Class<E> mEnumerationClass;
-  private E mValue;
 
 }
