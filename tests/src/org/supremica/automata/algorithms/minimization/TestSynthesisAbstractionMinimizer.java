@@ -72,7 +72,7 @@ public class TestSynthesisAbstractionMinimizer
     final DocumentManager docman = getDocumentManager();
     mAutomatonBuilder = new ProjectBuildFromWaters(docman);
     mMinimizationOptions = MinimizationOptions.getDefaultMinimizationOptions();
-    mMinimizationOptions.setAlsoTransitions(true);
+    mMinimizationOptions.setAlsoTransitions(false);
     mMinimizationOptions.setCompositionalMinimization(false);
     mMinimizationOptions.setKeepOriginal(true);
     mMinimizationOptions.setMinimizationType

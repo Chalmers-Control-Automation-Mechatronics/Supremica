@@ -414,12 +414,14 @@ public class TestAutomatonMinimizer
 		final Set<EventProxy> result = new HashSet<EventProxy>(size);
 		for (final EventProxy supevent : alphabet) {
 			final String name = supevent.getName();
-			final EventProxy event = findEvent(des, name);
+			final EventProxy event = getEvent(des, name);
+			if (event != null) {
 			final boolean added = result.add(event);
-			if (!added) {
+			  if (!added) {
 				throw new DuplicateNameException
 					("Duplicate event name '" + name +
 					 "' in Supremica alphabet!");
+			  }
 			}
 		}
 		return result;
