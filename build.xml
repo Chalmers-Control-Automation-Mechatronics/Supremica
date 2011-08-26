@@ -294,9 +294,7 @@
                destdir="${build}"
                verbose="false"
                nowarn="true"
-               excludes="${supremica_basedir}/external/robotCoordination/**,
-                 ${supremica_basedir}/external/operationframeworkto61131/**,
-                 ${supremica_basedir}/net/sourceforge/waters/external/promela/parser/**"
+               excludes="${supremica_basedir}/net/sourceforge/waters/external/promela/parser/**"
                source="1.5"
                fork="true"
                includeantruntime="false"
@@ -317,7 +315,6 @@
                deprecation="false"
                verbose="false"
                nowarn="true"
-               excludes="${supremica_basedir}/external/robotCoordination/**"
                source="1.5"
                fork="true"
                includeantruntime="false"
@@ -985,7 +982,6 @@ Class-Path: ${manifest.pathlist}</echo>
                 <exclude name="org/supremica/functionblocks/xsd/*/impl/**"/>
                 <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
                 <exclude name="org/supremica/softplc/**"/>
-                <exclude name="org/supremica/external/robotCoordination/**"/>
             </packageset>       
             <link href="${java14.api.url}"
                   offline="true" packagelistLoc="${docsrc}/offline/j2sdk1.4.2"/>
