@@ -8,8 +8,6 @@ package org.supremica.automata.BDD.EFA;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 
 import java.util.HashSet;
 import java.util.Iterator;

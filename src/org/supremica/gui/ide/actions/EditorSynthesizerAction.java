@@ -111,8 +111,8 @@ public class EditorSynthesizerAction
             }
         }
 
-
-        Vector<String> eventNamesForBox = (Vector<String>)eventNames.clone();
+        final Vector<String> eventNamesForBox =
+          new Vector<String>(eventNames);
         eventNamesForBox.add(0,"Generate guards for ALL controllable events");
 
         final EditorSynthesizerDialog synthesizerDialog = new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options, eventNamesForBox);

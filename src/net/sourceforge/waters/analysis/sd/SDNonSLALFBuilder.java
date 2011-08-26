@@ -1,4 +1,8 @@
-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters SD Analysis
+//# PACKAGE: net.sourceforge.waters.model.analysis
+//# CLASS:   SDNonSLALFBuilder
 //###########################################################################
 
 
@@ -50,19 +54,16 @@ public boolean run() throws AnalysisException
     final int numaut = oldAutomata.size();
     final List<AutomatonProxy> newAutomata =
       new ArrayList<AutomatonProxy>(numaut);
-    for (final AutomatonProxy oldAut : oldAutomata)
-    {
-      final Collection <EventProxy> autEvents = oldAut.getEvents();
-      for(final EventProxy ev: autEvents )
-      {
-        if(ev.getName().equals("tick"))
-          {tick = ev;
-          conTick = true;}
-      }
-      if(!conTick)
-        {
-        return false;
+    for (final AutomatonProxy oldAut : oldAutomata) {
+      final Collection<EventProxy> autEvents = oldAut.getEvents();
+      for (final EventProxy ev : autEvents) {
+        if (ev.getName().equals("tick")) {
+          conTick = true;
         }
+      }
+      if (!conTick) {
+        return false;
+      }
     }
     ProductDESProxy newModel = null;
     SDActivityLoopChecker checker = new SDActivityLoopChecker(newModel, getFactory());;
@@ -146,10 +147,5 @@ return getFactory().createAutomatonProxy(aut.getName() , aut.getKind(),
 
 //#########################################################################
 //# Data Members
-
-/**
- * The tick event used for the test automaton for SD Singular property.
- */
-private EventProxy tick;
 
 }

@@ -268,16 +268,17 @@ public class MonolithicNerodeEChecker
    */
   private boolean isMarked(final StateTuple tuple)
   {
-     final int[] temp = new int[mNumAutomata];
-     decode(tuple.getCodes(), temp);
-     boolean marked = true;
+    final int[] temp = new int[mNumAutomata];
+    decode(tuple.getCodes(), temp);
+    boolean marked = true;
 
-     for( int i=0; i < mNumAutomata; i++)
-       if(mMarkedStates[i][temp[i]]!=1)
-       { ErrorAut = i;
-         marked = false; }
-      return marked;
+    for (int i = 0; i < mNumAutomata; i++)
+      if (mMarkedStates[i][temp[i]] != 1) {
+        marked = false;
+      }
+    return marked;
   }
+
   private boolean ReCheckNerodeCells()
   {
     final List<StateTuplePair> Visited= new ArrayList<StateTuplePair>();
@@ -614,8 +615,6 @@ public class MonolithicNerodeEChecker
       i++;
     }
 
-    // set a buffer for storing current state tuple
-    mCurrTuple = new int[mNumAutomata];
     // set a buffer for storing next state tuple
     mNextTuple = new int[mNumAutomata];
     // set the initial state tuple
@@ -906,17 +905,13 @@ public class MonolithicNerodeEChecker
   private static int[][][] mMap;
   private static int[][] mMarkedStates;
 
-  /** a global integer array to store current decoded integer state tuple */
-  private int mCurrTuple[];
-
-  /** a global state tup le for storing next state tuple */
+  /** a global state tuple for storing next state tuple */
   private int mNextTuple[];
 
   /** for CounterExample */
   private int[] mSystemState;
   private int mErrorEvent;
   private int mErrorAutomaton;
-  private int ErrorAut;
   private StateTuplePair errorPair;
   private boolean errorMark;
   private SafetyTraceProxy tCounterExample;

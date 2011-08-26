@@ -2,40 +2,27 @@
 //###########################################################################
 //# PROJECT: Supremica/Waters IDE
 //# PACKAGE: org.supremica.gui.ide.actions
-//# CLASS:   AnalyzerSynthesizerAction
+//# CLASS:   EditorReachabilityGraphAction
 //###########################################################################
-//# $Id: AnalyzerSynthesizerAction.java 4750 2009-09-01 00:33:54Z robi $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 
-import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomata;
-import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.EFAMonlithicReachability;
-import org.supremica.automata.algorithms.EditorSynthesizerOptions;
-import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
-import org.supremica.gui.EditorSynthesizerDialog;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import org.supremica.properties.Config;
 
 
 public class EditorReachabilityGraphAction
@@ -94,8 +81,8 @@ public class EditorReachabilityGraphAction
     //        ReduceBDDvars rBDDv = new ReduceBDDvars(exAutomata.getExtendedAutomataList().get(0));
     //        rBDDv.computeOptimalPaths();
 
-            ExtendedAutomaton efa = exAutomata.iterator().next();
-            EFAMonlithicReachability efaMR = new EFAMonlithicReachability(efa.getComponent(), exAutomata.getVars(),efa.getAlphabet());
+            final ExtendedAutomaton efa = exAutomata.iterator().next();
+            final EFAMonlithicReachability efaMR = new EFAMonlithicReachability(efa.getComponent(), exAutomata.getVars(),efa.getAlphabet());
             exAutomata.addAutomaton(new ExtendedAutomaton(exAutomata, efaMR.createEFA()));
 
             logger.info("Reachability graph computed.");

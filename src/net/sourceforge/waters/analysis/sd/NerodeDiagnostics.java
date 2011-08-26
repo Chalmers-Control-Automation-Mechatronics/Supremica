@@ -1,9 +1,9 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters SD Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   
-//###########################
+//# CLASS:   NerodeDiagnostics
+//###########################################################################
 
 package net.sourceforge.waters.analysis.sd;
 
@@ -74,7 +74,7 @@ public class NerodeDiagnostics
       {buffer.append(aut.getName());
        buffer.append("' contains concurrent Strings which do not lead to Nerode equivalent States");
       }
-       
+
     return buffer.toString();
   }
 
