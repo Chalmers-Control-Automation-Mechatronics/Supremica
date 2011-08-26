@@ -2,10 +2,6 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   ControllabilityKindTranslator
-//###########################################################################
-//# $Id: ControllabilityKindTranslator.java 5206 2010-02-04 00:45:23Z robi $
-//###########################################################################
 
 package net.sourceforge.waters.analysis.sd;
 
@@ -19,12 +15,12 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>A kind translator used for controllability checking.
+ * <P>A kind translator used for Nerode Equivalence checking.
  * This translator relabels supervisors as specifications and otherwise
  * returns all component and event types as they are in the original
  * model.</P>
  *
- * @author Robi Malik
+ * @author Mahvash Baloch
  */
 
 public class NerodeKindTranslator

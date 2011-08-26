@@ -12,8 +12,7 @@ import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import java.util.Collection;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
 /**
@@ -54,14 +53,6 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
     try {
       final ProductDESProxy model = getModel();
 
-      final Collection<AutomatonProxy> oldAutomata = model.getAutomata();
-
-      final int numaut = oldAutomata.size();
-
-      if (numaut == 0) {
-        return setSatisfiedResult();
-      }
-
       final SDPropertyBuilder builder =
         new SDPropertyBuilder(model, getFactory());
 
@@ -85,7 +76,8 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
         if(result.isSatisfied())
         return(true);
         else
-        { return (false);
+        { final SafetyTraceProxy counterexample = checker.getCounterExample();
+          return setFailedResult(counterexample);
         }
     } finally {
       tearDown();

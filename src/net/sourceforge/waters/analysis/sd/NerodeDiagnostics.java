@@ -2,10 +2,8 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   ControllabilityKindTranslator
-//###########################################################################
-//# $Id: LanguageInclusionDiagnostics.java 5927 2010-09-24 04:54:47Z robi $
-//###########################################################################
+//# CLASS:   
+//###########################
 
 package net.sourceforge.waters.analysis.sd;
 
@@ -20,9 +18,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>A diagnostics generator used for language inclusion checking.</P>
+ * <P>A diagnostics generator used for Nerode Equivalence checking.</P>
  *
- * @author Robi Malik
+ * @author Mahvash Baloch
  */
 
 public class NerodeDiagnostics
@@ -76,11 +74,7 @@ public class NerodeDiagnostics
       {buffer.append(aut.getName());
        buffer.append("' contains concurrent Strings which do not lead to Nerode equivalent States");
       }
-       //buffer.append(" : event ");
-    //buffer.append(event.getName());
-    //buffer.append(" takes to state");
-    //buffer.append(state.getName());
-    //buffer.append(", but the other string does not");
+       
     return buffer.toString();
   }
 

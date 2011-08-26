@@ -8,7 +8,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 /**
  * A result record returned by a {@link MonolithicNerodeEChecker} A verification
  * result contains the information on whether the property checked is true or
- * false, and in the latter case, it also contains a counterexample.
+ * false, and in the latter case, it also contains two counterexamples.
  *
  * @author Mahvash Baloch
  */

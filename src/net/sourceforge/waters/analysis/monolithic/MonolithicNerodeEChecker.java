@@ -2,10 +2,8 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:
-//###########################################################################
-//# $Id: MonolithicControlLoopChecker.java 6050 2011-04-17 20:41:36Z robi $
-//###########################################################################
+//# CLASS: MonoLithicNerodeEChecker
+//####################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
 

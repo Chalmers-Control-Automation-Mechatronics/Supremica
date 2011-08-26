@@ -2,10 +2,8 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   TransitionProperty
-//###########################################################################
-//# $Id: TransitionProperty.java 4526 2008-11-17 01:35:52Z robi $
-//###########################################################################
+//# CLASS:   
+//##################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
 
