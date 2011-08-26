@@ -17,7 +17,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -27,15 +26,7 @@ import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
-import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_apropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_bpropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDNSLActivityLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
@@ -85,6 +76,16 @@ import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
 
+import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_apropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_bpropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
 
 /**
  * <P>
@@ -350,6 +351,9 @@ public class IDEMenuBar extends JMenuBar
            final Action activityLoop =
            actions.getAction(AnalyzeSDActivityLoopAction.class);
             mVerifyMenu.add(activityLoop);
+            final Action nslactivityLoop =
+                actions.getAction(AnalyzeSDNSLActivityLoopAction.class);
+                 mVerifyMenu.add(nslactivityLoop);
             final Action SSingular =
               actions.getAction(AnalyzeSDSingularPropertyAction.class);
             mVerifyMenu.add(SSingular);
@@ -365,6 +369,9 @@ public class IDEMenuBar extends JMenuBar
             final Action Sdthree1b =
               actions.getAction(AnalyzeSDCThreep1_bpropertyAction.class);
             mVerifyMenu.add(Sdthree1b);
+            final Action SDthree2 =
+                actions.getAction(AnalyzeNerodeEquivalentAction.class);
+              mVerifyMenu.add(SDthree2);
             final Action Sdfour =
               actions.getAction(AnalyzeSDCFourPropertyAction.class);
             mVerifyMenu.add(Sdfour);
@@ -494,7 +501,6 @@ public class IDEMenuBar extends JMenuBar
           }
         }
       }
-      mExamplesMenu.add(mIDE.getActions().editorReadFTAction.getMenuItem());
     }
 
     // Modules
