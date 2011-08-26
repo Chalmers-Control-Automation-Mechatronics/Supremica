@@ -95,7 +95,7 @@ public class CompositionalConflictChecker
    *          Factory used for trace construction.
    */
   public CompositionalConflictChecker(final AbstractionMethod method,
-                                    final ProductDESProxyFactory factory)
+                                      final ProductDESProxyFactory factory)
   {
     this(null, method, factory);
   }
@@ -111,8 +111,8 @@ public class CompositionalConflictChecker
    *          Factory used for trace construction.
    */
   public CompositionalConflictChecker(final ProductDESProxy model,
-                                    final AbstractionMethod method,
-                                    final ProductDESProxyFactory factory)
+                                      final AbstractionMethod method,
+                                      final ProductDESProxyFactory factory)
   {
     this(model, null, method, factory);
   }
@@ -134,9 +134,9 @@ public class CompositionalConflictChecker
    *          Factory used for trace construction.
    */
   public CompositionalConflictChecker(final ProductDESProxy model,
-                                    final EventProxy marking,
-                                    final AbstractionMethod method,
-                                    final ProductDESProxyFactory factory)
+                                      final EventProxy marking,
+                                      final AbstractionMethod method,
+                                      final ProductDESProxyFactory factory)
   {
     super(model,
           null,
@@ -144,9 +144,8 @@ public class CompositionalConflictChecker
           ConflictKindTranslator.getInstance(),
           new PreselectingMethodFactory(),
           new SelectingMethodFactory());
-    final AbstractionProcedure proc = method.createAbstractionRule(this);
-    setAbstractionProcedure(proc);
     mDefaultMarking = marking;
+    mAbstractionMethod = method;
   }
 
 
@@ -155,7 +154,7 @@ public class CompositionalConflictChecker
   public void setMarkingProposition(final EventProxy marking)
   {
     mDefaultMarking = marking;
-    mCurrentDefaultMarking = null;
+    mUsedDefaultMarking = null;
   }
 
   public EventProxy getMarkingProposition()
@@ -227,7 +226,7 @@ public class CompositionalConflictChecker
       } else {
         current = configured;
       }
-      current.setMarkingProposition(mCurrentDefaultMarking);
+      current.setMarkingProposition(mUsedDefaultMarking);
       current.setPreconditionMarking(mPreconditionMarking);
       setCurrentMonolithicVerifier(current);
       super.setupMonolithicVerifier();
@@ -266,6 +265,14 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  public boolean supportsNondeterminism()
+  {
+    return mAbstractionMethod.supportsNondeterminism();
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
@@ -286,29 +293,34 @@ public class CompositionalConflictChecker
   protected void setUp()
     throws AnalysisException
   {
-    super.setUp();
     if (mDefaultMarking == null) {
       final ProductDESProxy model = getModel();
-      mCurrentDefaultMarking =
+      mUsedDefaultMarking =
         AbstractConflictChecker.getMarkingProposition(model);
+    } else {
+      mUsedDefaultMarking = mDefaultMarking;
     }
     final Collection<EventProxy> props;
     if (mPreconditionMarking == null) {
-      props = Collections.singletonList(mCurrentDefaultMarking);
+      props = Collections.singletonList(mUsedDefaultMarking);
     } else {
       final EventProxy[] markings = new EventProxy[2];
-      markings[0] = mCurrentDefaultMarking;
+      markings[0] = mUsedDefaultMarking;
       markings[1] = mPreconditionMarking;
       props = Arrays.asList(markings);
     }
     setPropositions(props);
+    final AbstractionProcedure proc =
+      mAbstractionMethod.createAbstractionRule(this);
+    setAbstractionProcedure(proc);
+    super.setUp();
     setupSafetyVerifiers();
   }
 
   protected void tearDown()
   {
     super.tearDown();
-    mCurrentDefaultMarking = null;
+    mUsedDefaultMarking = null;
     mCurrentCompositionalSafetyVerifier = null;
     mCurrentMonolithicSafetyVerifier = null;
     mAutomatonInfoMap = null;
@@ -378,7 +390,7 @@ public class CompositionalConflictChecker
     final KindTranslator translator = getKindTranslator();
     TraceChecker.checkConflictCounterExample(steps, automata,
                                              mPreconditionMarking,
-                                             mCurrentDefaultMarking,
+                                             mUsedDefaultMarking,
                                              true, translator);
   }
 
@@ -553,6 +565,7 @@ public class CompositionalConflictChecker
     for (final AutomatonProxy aut : victims) {
       mAutomatonInfoMap.remove(aut);
     }
+    super.removeEventsToAutomata(victims);
   }
 
 
@@ -1191,7 +1204,7 @@ public class CompositionalConflictChecker
     private void countPropositions()
     {
       final EventProxy alpha = mPreconditionMarking;
-      final EventProxy omega = mCurrentDefaultMarking;
+      final EventProxy omega = mUsedDefaultMarking;
       boolean usesAlpha = false;
       boolean usesOmega = false;
       for (final EventProxy event : mAutomaton.getEvents()) {
@@ -1424,14 +1437,6 @@ public class CompositionalConflictChecker
     }
 
     //#######################################################################
-    //# Overrides for AbstractionProcedure
-    @Override
-    protected boolean supportsNondeterminism()
-    {
-      return true;
-    }
-
-    //#######################################################################
     //# Overrides for TRSimplifierAbstractionProcedure
     @Override
     protected EventEncoding createEventEncoding(final AutomatonProxy aut,
@@ -1440,7 +1445,7 @@ public class CompositionalConflictChecker
       final EventEncoding eventEnc =
         super.createEventEncoding(aut, tau);
       final TransitionRelationSimplifier simplifier = getSimplifier();
-      final int omega = eventEnc.getEventCode(mCurrentDefaultMarking);
+      final int omega = eventEnc.getEventCode(mUsedDefaultMarking);
       simplifier.setDefaultMarkingID(omega);
       return eventEnc;
     }
@@ -1525,11 +1530,11 @@ public class CompositionalConflictChecker
                                                 final EventProxy tau)
     {
       final EventEncoding eventEnc = super.createEventEncoding(aut, tau);
-      int markingID = eventEnc.getEventCode(mCurrentDefaultMarking);
+      int markingID = eventEnc.getEventCode(mUsedDefaultMarking);
       if (markingID < 0) {
         final KindTranslator translator = getKindTranslator();
         markingID =
-          eventEnc.addEvent(mCurrentDefaultMarking, translator, true);
+          eventEnc.addEvent(mUsedDefaultMarking, translator, true);
         final TransitionRelationSimplifier simplifier = getSimplifier();
         simplifier.setDefaultMarkingID(markingID);
       }
@@ -1592,7 +1597,7 @@ public class CompositionalConflictChecker
       super(simplifier);
       mRecoveryIndex = recoveryIndex;
       final EventProxy[] props = new EventProxy[2];
-      mUsedDefaultMarking = props[0] = mCurrentDefaultMarking;
+      props[0] = mUsedDefaultMarking;
       if (mPreconditionMarking == null) {
         final ProductDESProxyFactory factory = getFactory();
         mUsedPreconditionMarking = props[1] =
@@ -1713,7 +1718,6 @@ public class CompositionalConflictChecker
     private final int mRecoveryIndex;
     private final List<EventProxy> mPropositions;
     private EventProxy mUsedPreconditionMarking;
-    private final EventProxy mUsedDefaultMarking;
     private int mPreconditionMarkingID;
     private int mDefaultMarkingID;
   }
@@ -1773,14 +1777,6 @@ public class CompositionalConflictChecker
       final Collection<EventProxy> props = getPropositions();
       mSimplifier.setPropositions(props);
       mStatistics = new TRSimplifierStatistics(mSimplifier, true, true);
-    }
-
-    //#######################################################################
-    //# Overrides for AbstractionProcedure
-    @Override
-    protected boolean supportsNondeterminism()
-    {
-      return false;
     }
 
     //#######################################################################
@@ -2752,7 +2748,7 @@ public class CompositionalConflictChecker
                                     final ListBufferTransitionRelation rel,
                                     final EventEncoding enc)
     {
-      final int markingID = enc.getEventCode(mCurrentDefaultMarking);
+      final int markingID = enc.getEventCode(mUsedDefaultMarking);
       assert markingID >= 0;
       final int traceEnd = steps.size() - 1;
       final SearchRecord step = steps.get(traceEnd);
@@ -2984,10 +2980,10 @@ public class CompositionalConflictChecker
 
   //#########################################################################
   //# Data Members
-  private EventProxy mDefaultMarking;
-  private EventProxy mCurrentDefaultMarking;
-  private EventProxy mPreconditionMarking;
   private AbstractionMethod mAbstractionMethod;
+  private EventProxy mDefaultMarking;
+  private EventProxy mUsedDefaultMarking;
+  private EventProxy mPreconditionMarking;
   private SafetyVerifier mCompositionalSafetyVerifier;
   private SafetyVerifier mMonolithicSafetyVerifier;
 

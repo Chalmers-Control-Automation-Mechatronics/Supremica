@@ -42,8 +42,9 @@ public class ObservationEquivalenceGeneralisedConflictCheckerTest extends
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final OPConflictChecker checker = new OPConflictChecker(factory);
-    checker.setAbstractionMethod(OPConflictChecker.AbstractionMethod.OEQ);
+    final CompositionalConflictChecker checker =
+      new CompositionalConflictChecker
+        (CompositionalConflictChecker.AbstractionMethod.OEQ, factory);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

@@ -556,14 +556,6 @@ public abstract class AbstractCompositionalModelVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
-  public boolean supportsNondeterminism()
-  {
-    return mAbstractionProcedure.supportsNondeterminism();
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
@@ -1561,8 +1553,6 @@ public abstract class AbstractCompositionalModelVerifier
                                            final EventProxy tau)
       throws AnalysisException;
 
-    protected abstract boolean supportsNondeterminism();
-
     protected abstract void storeStatistics();
 
     protected abstract void resetStatistics();
@@ -2471,6 +2461,25 @@ public abstract class AbstractCompositionalModelVerifier
         mAutomataMap.put(newAut, code);
         return true;
       }
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      final StringBuffer buffer = new StringBuffer("[");
+      boolean first = true;
+      for (final AutomatonProxy aut : getAutomataList()) {
+        if (first) {
+          first = false;
+        } else {
+          buffer.append(',');
+        }
+        buffer.append(aut.getName());
+      }
+      buffer.append(']');
+      return buffer.toString();
     }
 
     //#######################################################################

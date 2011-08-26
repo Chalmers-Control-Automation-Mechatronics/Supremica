@@ -41,8 +41,9 @@ public class OPConflictCheckerTest extends
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final OPConflictChecker checker = new OPConflictChecker(factory);
-    checker.setAbstractionMethod(OPConflictChecker.AbstractionMethod.OP);
+    final CompositionalConflictChecker checker =
+      new CompositionalConflictChecker
+        (CompositionalConflictChecker.AbstractionMethod.OP, factory);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

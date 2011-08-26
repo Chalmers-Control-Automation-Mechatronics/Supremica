@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.hisc;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.abstraction.OPConflictChecker;
+import net.sourceforge.waters.analysis.abstraction.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -43,8 +43,9 @@ public class GNBAbstractionSICProperty5VerifierTest
   protected ModelVerifier createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final OPConflictChecker checker = new OPConflictChecker(factory);
-    checker.setAbstractionMethod(OPConflictChecker.AbstractionMethod.GNB);
+    final CompositionalConflictChecker checker =
+      new CompositionalConflictChecker
+        (CompositionalConflictChecker.AbstractionMethod.GNB, factory);
     checker.setInternalStateLimit(5000);
     checker.setInternalTransitionLimit(100000);
     return new SICProperty5Verifier(checker, factory);

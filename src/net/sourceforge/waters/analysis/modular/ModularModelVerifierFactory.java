@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.OPConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
@@ -63,12 +62,6 @@ public class ModularModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new ModularControlLoopChecker(factory);
-  }
-
-  public OPConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new OPConflictChecker(null, factory);
   }
 
   public ModularLanguageInclusionChecker createLanguageInclusionChecker
