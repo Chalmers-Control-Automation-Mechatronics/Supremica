@@ -102,7 +102,6 @@ public class EditorSynthesizerAction
         final EditorSynthesizerOptions options = new EditorSynthesizerOptions();
 
         final Vector<String> eventNames = new Vector<String>();
-        eventNames.add("Generate guards for ALL controllable events");
 
         for(final EventDeclSubject sigmaS:  module.getEventDeclListModifiable())
         {
@@ -112,7 +111,11 @@ public class EditorSynthesizerAction
             }
         }
 
-        final EditorSynthesizerDialog synthesizerDialog = new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options, eventNames);
+
+        Vector<String> eventNamesForBox = (Vector<String>)eventNames.clone();
+        eventNamesForBox.add(0,"Generate guards for ALL controllable events");
+
+        final EditorSynthesizerDialog synthesizerDialog = new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options, eventNamesForBox);
         synthesizerDialog.show();
 
         if (!options.getDialogOK())

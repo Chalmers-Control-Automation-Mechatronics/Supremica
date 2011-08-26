@@ -817,7 +817,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             //nbrOfReachableStates = nbrOfStatesBDD(reachableStatesBDD);
             final IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
             nbrOfReachableStates = nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).longValue();
-//            nbrOfReachableStates = 1;
+//            nbrOfReachableStates = -1;
 
 
 //            logger.info("Number of reachable states in the closed-loop system: "+nbrOfReachableStates);
@@ -972,6 +972,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
     public IDD generateIDD(final BDD bdd, final BDD validStatesBDD)
     {
+        System.err.println("generating IDD...");
         final HashMap<Integer, IDD> visitedNodes = new HashMap<Integer, IDD>();
         visitedNodes.put(1, new IDD(new IDDNode("1", "1")));
         IDD idd = null;
@@ -998,6 +999,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
     public void BDD2IDD(final BDD bdd, final BDD autStatesBDD, final IDD idd, final HashMap<Integer, IDD> visitedNodes, final BDD validStatesBDD)
     {
+//        System.err.println("BDD2IDD()");
         if(!bdd.isZero())
         {
             if(bdd.isOne() || !getAutVarName(bdd.var()).equals(idd.getRoot().getName()))
@@ -1044,6 +1046,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
     ArrayList<String> bdd2automatonStates(final BDD autStatesBDD, final BDD validStatesBDD)
     {
+//        System.err.println("bdd2automatonStates()");
         final ArrayList<String> output = new ArrayList<String>();
         final int var = autStatesBDD.var();
 

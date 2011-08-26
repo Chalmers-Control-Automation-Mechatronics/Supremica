@@ -29,6 +29,16 @@ public class EFAState {
     public Map<String, Integer> getVar2val() {
         return var2val;
     }
+
+    public String getName()
+    {
+        String output = location.getName()+"[";
+        for(String s:var2val.keySet())
+            output += (s+"="+var2val.get(s)+",");
+        output = output.substring(0,output.length()-1);
+        output+= "]";
+        return output;
+    }
     
     @Override
     public int hashCode(){
@@ -48,10 +58,10 @@ public class EFAState {
                 return false;
             } else {
                 for(String var: var2val.keySet()){
-                    if(var2val.get(var) != es.getVar2val().get(var))
+                    if(!var2val.get(var).equals(es.getVar2val().get(var)))
                         return false;
                 }
-               
+
                 return true;
             }
         } else {

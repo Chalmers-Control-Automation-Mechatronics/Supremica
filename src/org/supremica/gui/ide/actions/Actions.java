@@ -120,6 +120,7 @@ public class Actions extends WatersActionManager
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(mIDEActions);
     public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
     public IDEAction editorSynthesizerAction = new EditorSynthesizerAction(mIDEActions);
+    public IDEAction editorReachabilityGraphAction = new EditorReachabilityGraphAction(mIDEActions);
     public IDEAction editorReadSpecAction = new EditorReadSpecAction(mIDEActions);
     public IDEAction editorReadFTAction = new EditorReadFisherThompsonAction(mIDEActions);
    

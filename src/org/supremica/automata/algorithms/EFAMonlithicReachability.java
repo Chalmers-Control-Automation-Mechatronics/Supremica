@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
@@ -51,6 +52,7 @@ public class EFAMonlithicReachability {
     List<EventDeclProxy> alphabet;
     NodeProxy initLocation = null;
     Map<String,Integer> var2initialVal;
+    Set<EFAState> reachableStates;
 
     public EFAMonlithicReachability(SimpleComponentProxy efa, List<VariableComponentProxy> vars, List<EventDeclProxy> alphabet){
         this.efa = efa;
@@ -111,7 +113,7 @@ for3:       for(String var:es.getVar2val().keySet())
             if(isMarked)
                 props = (PlainEventListProxy)es.getLocation().getPropositions().clone();
 
-            SimpleNodeSubject newState = new SimpleNodeSubject (createStateName(es),props,isInitial,null,null,null);
+            SimpleNodeSubject newState = new SimpleNodeSubject(createStateName(es),props,isInitial,null,null,null);
             state2node.put(es, newState);
             newStates.add(newState);
         }
@@ -125,7 +127,8 @@ for3:       for(String var:es.getVar2val().keySet())
                 {
                     List<SimpleIdentifierSubject> events = new ArrayList<SimpleIdentifierSubject>();
                     events.add(new SimpleIdentifierSubject(currEvent.getName()));
-                    newEdges.add(new EdgeSubject(state2node.get(es), state2node.get(currState), new LabelBlockSubject(events, null), null, null, null, null));
+                    EdgeSubject edge = new EdgeSubject(state2node.get(es), state2node.get(currState), new LabelBlockSubject(events, null), new GuardActionBlockSubject(), null, null, null);
+                    newEdges.add(edge);
                 }
             }
         }
@@ -136,6 +139,7 @@ for3:       for(String var:es.getVar2val().keySet())
 
     public Set<EFAState> computeReachableStates()
     {
+        reachableStates = new HashSet<EFAState>();
         Map<String,Integer> var2val = new HashMap<String,Integer>();
         for(VariableComponentProxy var:vars)
         {
@@ -183,6 +187,7 @@ for3:       for(String var:es.getVar2val().keySet())
 
     public List<EFAState> next(EFAState aState, String aEvent) {
 
+        reachableStates.add(aState);
         LocationEvent le = new LocationEvent(aState.getLocation(), aEvent);
         List<EFAState> result = new ArrayList<EFAState>();        
         if (le2gals.containsKey(le)) {
@@ -192,12 +197,26 @@ for3:       for(String var:es.getVar2val().keySet())
                 var2val = aState.getVar2val();                
                 if (evaluateGuard(gal.getGuard()))
                 {
-                    result.add(new EFAState(gal.getLocation(), evaluateActions(gal.getActions())));
+                    EFAState eState = new EFAState(gal.getLocation(), evaluateActions(gal.getActions()));
+                    EFAState efaState = extractState(eState);
+                    reachableStates.add(efaState);
+                    result.add(efaState);
                 }
             }
         }
  
         return result;
+    }
+
+    public EFAState extractState(EFAState state)
+    {
+        for(EFAState st:reachableStates)
+        {
+            if(state.equals(st))
+                return st;
+        }
+
+        return state;
     }
 
     public Map<LocationEvent, List<GuardActionLoc>> getLe2gal() {
@@ -363,5 +382,6 @@ for3:       for(String var:es.getVar2val().keySet())
 
         throw new IllegalArgumentException("Type of expression not known!");
     }
+
 
 }

@@ -8,6 +8,8 @@ package org.supremica.automata.BDD.EFA;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -574,9 +576,9 @@ public class BDDExtendedManager
 
         BDD Qkn = bddExAutomata.getInitialState().and(forbidden.not());
         BDD Qk = null;
-/*
 
-        FileWriter fstream = null;
+
+ /*       FileWriter fstream = null;
         try
         {
             fstream = new FileWriter("C:/Users/sajed/Documents/My Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RF.txt");
@@ -585,7 +587,7 @@ public class BDDExtendedManager
         BufferedWriter out = new BufferedWriter(fstream);
 
         int iteration = 1;
- */
+*/
         do
         {
 //            System.err.println("RForward "+iteration + "\t" + Qkn.nodeCount());

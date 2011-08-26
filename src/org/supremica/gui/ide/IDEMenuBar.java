@@ -382,13 +382,14 @@ public class IDEMenuBar extends JMenuBar
 		}
       }
 
-      // Analyze (Seamless Synthesis)
+      // Analyze
       if (mEdAnalyzeMenu == null &&
           Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.isTrue() &&
           panel instanceof EditorPanel) {
         mEdAnalyzeMenu = new JMenu("Analyze");
         mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
+        mEdAnalyzeMenu.add(actions.editorReachabilityGraphAction.getMenuItem());
       }
 
       // Simulate
