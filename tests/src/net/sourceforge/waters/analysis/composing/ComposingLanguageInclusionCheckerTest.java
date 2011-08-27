@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.composing;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.gnonblocking.ComposingModelVerifierFactory;
+import net.sourceforge.waters.analysis.gnonblocking.GNBModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -40,8 +40,8 @@ public class ComposingLanguageInclusionCheckerTest
   protected ComposingLanguageInclusionChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final ComposingModelVerifierFactory checkerfactory =
-      ComposingModelVerifierFactory.getInstance();
+    final GNBModelVerifierFactory checkerfactory =
+      GNBModelVerifierFactory.getInstance();
     return checkerfactory.createLanguageInclusionChecker(factory);
   }
 

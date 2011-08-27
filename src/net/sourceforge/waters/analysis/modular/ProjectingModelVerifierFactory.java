@@ -11,11 +11,8 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.OPConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -62,14 +59,8 @@ public class ProjectingModelVerifierFactory
     super(arglist);
     addArgument(new MonolithicStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
-    addArgument(new LowerInternalStateLimitArgument());
-    addArgument(new UpperInternalStateLimitArgument());
     addArgument(new MonolithicTransitionLimitArgument());
     addArgument(new InternalTransitionLimitArgument());
-    addArgument(new AbstractionMethodArgument());
-    addArgument(new PreselectingMethodArgument());
-    addArgument(new SelectingMethodArgument());
-    addArgument(new SubsumptionArgument());
     addArgument(ModularHeuristicFactory.getMethodArgument());
     addArgument(ModularHeuristicFactory.getPreferenceArgument());
   }
@@ -83,12 +74,6 @@ public class ProjectingModelVerifierFactory
     final SafetyProjectionBuilder projector = new Projection2(factory);
     return new ProjectingControllabilityChecker
       (factory, new NativeControllabilityChecker(factory), projector);
-  }
-
-  public OPConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new OPConflictChecker(null, factory);
   }
 
   public LanguageInclusionChecker createLanguageInclusionChecker
@@ -122,12 +107,7 @@ public class ProjectingModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setMonolithicStateLimit(limit);
-      } else {
-        verifier.setNodeLimit(limit);
-      }
+      verifier.setNodeLimit(limit);
     }
 
   }
@@ -153,74 +133,7 @@ public class ProjectingModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setInternalStateLimit(limit);
-      } else {
-        verifier.setNodeLimit(limit);
-      }
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class LowerInternalStateLimitArgument
-  private static class LowerInternalStateLimitArgument extends
-      CommandLineArgumentInteger
-  {
-
-    //#######################################################################
-    //# Constructors
-    private LowerInternalStateLimitArgument()
-    {
-      super("-lslimit",
-            "Initial maximum number of states for abstraction attempts");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
-    {
-      final int limit = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setLowerInternalStateLimit(limit);
-      } else {
-        verifier.setNodeLimit(limit);
-      }
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class UpperInternalStateLimitArgument
-  private static class UpperInternalStateLimitArgument extends
-      CommandLineArgumentInteger
-  {
-
-    //#######################################################################
-    //# Constructors
-    private UpperInternalStateLimitArgument()
-    {
-      super("-uslimit",
-            "Final maximum number of states for abstraction attempts");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
-    {
-      final int limit = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setUpperInternalStateLimit(limit);
-      } else {
-        verifier.setNodeLimit(limit);
-      }
+      verifier.setNodeLimit(limit);
     }
 
   }
@@ -246,12 +159,7 @@ public class ProjectingModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setMonolithicTransitionLimit(limit);
-      } else {
-        verifier.setTransitionLimit(limit);
-      }
+      verifier.setTransitionLimit(limit);
     }
 
   }
@@ -277,135 +185,8 @@ public class ProjectingModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setInternalTransitionLimit(limit);
-      } else {
-        verifier.setTransitionLimit(limit);
-      }
+      verifier.setTransitionLimit(limit);
     }
 
   }
-
-
-  //#########################################################################
-  //# Inner Class AbstractionMethodArgument
-  private static class AbstractionMethodArgument
-    extends CommandLineArgumentEnum<OPConflictChecker.AbstractionMethod>
-  {
-
-    //#######################################################################
-    //# Constructors
-    private AbstractionMethodArgument()
-    {
-      super("-method", "Abstraction method used for conflict check",
-            OPConflictChecker.AbstractionMethod.class);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
-    {
-      final OPConflictChecker.AbstractionMethod method = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setAbstractionMethod(method);
-      } else {
-        fail(getName() + " option only supported for conflict check!");
-      }
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class PreselectingMethodArgument
-  private static class PreselectingMethodArgument
-    extends CommandLineArgumentEnum<OPConflictChecker.PreselectingMethod>
-  {
-
-    //#######################################################################
-    //# Constructors
-    private PreselectingMethodArgument()
-    {
-      super("-presel", "Preselecting heuristic for candidate selection",
-            OPConflictChecker.PreselectingMethod.class);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
-    {
-      final OPConflictChecker.PreselectingMethod method = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setPreselectingMethod(method);
-      } else {
-        fail(getName() + " option only supported for conflict check!");
-      }
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectingMethodArgument
-  private static class SelectingMethodArgument
-    extends CommandLineArgumentEnum<OPConflictChecker.SelectingMethod>
-  {
-
-    //#######################################################################
-    //# Constructors
-    private SelectingMethodArgument()
-    {
-      super("-sel", "Selecting heuristic for candidate selection",
-            OPConflictChecker.SelectingMethod.class);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
-    {
-      final OPConflictChecker.SelectingMethod method = getValue();
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setSelectingMethod(method);
-      } else {
-        fail(getName() + " option only supported for conflict check!");
-      }
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class SubsumptionArgument
-  private static class SubsumptionArgument extends CommandLineArgumentFlag
-  {
-
-    //#######################################################################
-    //# Constructors
-    private SubsumptionArgument()
-    {
-      super("-sub", "Check for subsumption in selecting heuristics");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
-    {
-      if (verifier instanceof OPConflictChecker) {
-        final OPConflictChecker composer = (OPConflictChecker) verifier;
-        composer.setSubumptionEnabled(true);
-      } else {
-        fail(getName() + " option only supported for conflict check!");
-      }
-    }
-
-  }
-
 }

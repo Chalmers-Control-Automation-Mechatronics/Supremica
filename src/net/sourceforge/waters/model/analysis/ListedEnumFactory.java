@@ -21,7 +21,7 @@ import java.util.List;
  * @author Robi Malik
  */
 
-public class ListedEnumFactory<E> implements EnumFactory<E>
+public class ListedEnumFactory<E> extends EnumFactory<E>
 {
 
   //#########################################################################

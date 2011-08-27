@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -214,8 +216,7 @@ public abstract class AbstractModelVerifierFactory
     //# Constructors
     private HelpArgument()
     {
-      super("-help",
-            "Print this message");
+      super("-help", "Print this message");
     }
 
     //#######################################################################
@@ -223,23 +224,21 @@ public abstract class AbstractModelVerifierFactory
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void parse(final Iterator<String> iter)
     {
-      final Class<?> clazz = AbstractModelVerifierFactory.this.getClass();
-      final String fullname = clazz.getName();
-      final int dotpos = fullname.lastIndexOf('.');
-      final String name = fullname.substring(dotpos + 1);
+    }
+
+    protected void configure(final ModelVerifier verifier)
+    {
+      final String name =
+        ProxyTools.getShortClassName(AbstractModelVerifierFactory.this);
       System.err.println
         (name + " supports the following command line options:");
       final List<CommandLineArgument> args =
         new ArrayList<CommandLineArgument>(mArgumentMap.values());
       Collections.sort(args);
       for (final CommandLineArgument arg : args) {
-        arg.dump(System.err);
+        arg.dump(System.err, verifier);
       }
       System.exit(0);
-    }
-
-    protected void configure(final ModelVerifier verifier)
-    {
     }
   }
 
@@ -438,6 +437,17 @@ public abstract class AbstractModelVerifierFactory
       } else {
         fail("Command line option " + getName() +
              " is only supported for language inclusion!");
+      }
+    }
+
+    //#######################################################################
+    //# Printing
+    @Override
+    protected void dump(final PrintStream stream,
+                        final ModelVerifier verifier)
+    {
+      if (verifier instanceof LanguageInclusionChecker) {
+        super.dump(stream, verifier);
       }
     }
   }

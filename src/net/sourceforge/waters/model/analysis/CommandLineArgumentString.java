@@ -60,6 +60,7 @@ public abstract class CommandLineArgumentString
 
   //#######################################################################
   //# Simple Access
+  @Override
   protected String getArgumentTemplate()
   {
     return "<name>";

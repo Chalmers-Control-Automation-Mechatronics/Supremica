@@ -12,36 +12,39 @@ ARGS=
 
 for F in "$@"; do
     case $F in
-	-bdd)
-	    FACTORY="$WPACK.analysis.bdd.BDDModelVerifierFactory"
-	    ;;
-	-native)
-	    FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
-	    ;;
-	-comp)
-	    FACTORY="$WPACK.analysis.gnonblocking.ComposingModelVerifierFactory"
-	    ;;
-	-mod|-modular)
-	    FACTORY="$WPACK.analysis.modular.ModularModelVerifierFactory"
-	    ;;
-	-mono)
-	    FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
-	    ;;
-	-dist)
-	    FACTORY="$WPACK.analysis.distributed.DistributedModelVerifierFactory"
-	    ;;
-	-proj)
-	    FACTORY="$WPACK.analysis.modular.ProjectingModelVerifierFactory"
-	    ;;
-	-conf)
-	    CHECK="Conflict"
-	    ;;
-	-cont)
-	    CHECK="Controllability"
-	    ;;
-	-lang)
-	    CHECK="LanguageInclusion"
-	    ;;
+    -bdd)
+        FACTORY="$WPACK.analysis.bdd.BDDModelVerifierFactory"
+        ;;
+    -comp)
+        FACTORY="$WPACK.analysis.abstraction.CompositionalModelVerifierFactory"
+        ;;
+    -dist)
+        FACTORY="$WPACK.analysis.distributed.DistributedModelVerifierFactory"
+        ;;
+    -gnb|-composing)
+        FACTORY="$WPACK.analysis.gnonblocking.GNBModelVerifierFactory"
+        ;;
+    -mod|-modular)
+        FACTORY="$WPACK.analysis.modular.ModularModelVerifierFactory"
+        ;;
+    -mono)
+        FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
+        ;;
+    -native)
+        FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
+        ;;
+    -proj)
+        FACTORY="$WPACK.analysis.modular.ProjectingModelVerifierFactory"
+        ;;
+    -conf)
+        CHECK="Conflict"
+        ;;
+    -cont)
+        CHECK="Controllability"
+        ;;
+    -lang)
+        CHECK="LanguageInclusion"
+        ;;
     -loop)
         CHECK="ControlLoop"
         ;;
@@ -52,9 +55,9 @@ for F in "$@"; do
     -Xmx*)
         MEM="$F"
         ;;
-	*)
-	    ARGS="$ARGS \"$F\""
-	    ;;
+    *)
+        ARGS="$ARGS \"$F\""
+        ;;
     esac
 done
 

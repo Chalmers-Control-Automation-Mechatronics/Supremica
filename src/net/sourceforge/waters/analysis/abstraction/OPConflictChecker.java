@@ -90,6 +90,7 @@ import org.apache.log4j.Logger;
  * @author Robi Malik, Rachel Francis
  */
 
+@Deprecated
 public class OPConflictChecker
   extends AbstractConflictChecker
 {

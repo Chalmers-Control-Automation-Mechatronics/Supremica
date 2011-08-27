@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.composing
-//# CLASS:   ComposeModelVerifierFactory
+//# CLASS:   GNBModelVerifierFactory
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -23,39 +23,44 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
  * A factory that produces compositional model verifiers.
+ * This provides access to experimental compositional model verifiers
+ * written by Jinjian Shi and Rachel Francis.
  *
- * @author Jinjian Shi, Robi Malik
+ * @see ComposingSafetyVerifier
+ * @see CompositionalGeneralisedConflictChecker
+ *
+ * @author Jinjian Shi, Rachel Francis, Robi Malik
  */
 
-public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
+public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
 {
 
   //#########################################################################
   //# Singleton Pattern
-  public static ComposingModelVerifierFactory getInstance()
+  public static GNBModelVerifierFactory getInstance()
   {
     return SingletonHolder.INSTANCE;
   }
 
-  public static ComposingModelVerifierFactory getInstance
+  public static GNBModelVerifierFactory getInstance
     (final List<String> cmdline)
   {
-    return new ComposingModelVerifierFactory(cmdline);
+    return new GNBModelVerifierFactory(cmdline);
   }
 
   private static class SingletonHolder {
-    private static final ComposingModelVerifierFactory INSTANCE =
-      new ComposingModelVerifierFactory();
+    private static final GNBModelVerifierFactory INSTANCE =
+      new GNBModelVerifierFactory();
   }
 
 
   //#########################################################################
   //# Constructors
-  private ComposingModelVerifierFactory()
+  private GNBModelVerifierFactory()
   {
   }
 
-  private ComposingModelVerifierFactory(final List<String> arglist)
+  private GNBModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
     addArgument(new FinalStateLimitArgument());

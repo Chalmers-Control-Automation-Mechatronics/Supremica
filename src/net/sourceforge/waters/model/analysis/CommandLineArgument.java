@@ -116,7 +116,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Printing
-  protected void dump(final PrintStream stream)
+  protected void dump(final PrintStream stream, final ModelVerifier verifier)
   {
     final String name = getName();
     final String template = getArgumentTemplate();
@@ -146,7 +146,7 @@ public abstract class CommandLineArgument
   }
 
 
-  protected void doIndent(final PrintStream stream, final int spaces)
+  protected static void doIndent(final PrintStream stream, final int spaces)
   {
     for (int i = 0; i < spaces; i++) {
       stream.print(' ');
