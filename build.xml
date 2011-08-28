@@ -823,7 +823,7 @@ Class-Path: ${manifest.pathlist}</echo>
     </target>
     
     <target name="-run_test_minimization" depends="-jar_supremica,-jar_supremica_tests">
-        <mkdir dir="${logs.results}"/>
+        <mkdir dir="${logs.results}/algorithms/minimization"/>
         <delete>
             <fileset dir="${logs.results}/algorithms/minimization" includes="**/log4j.log"/>
         </delete>
