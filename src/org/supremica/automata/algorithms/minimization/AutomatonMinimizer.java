@@ -470,7 +470,7 @@ public class AutomatonMinimizer
 
         else
         {
-            throw new Exception("Unknown equivalence relation");
+            throw new Exception("Unknown equivalence relation (" + equivalenceRelation.toString() + ")");
         }
 
         if (stopRequested)
