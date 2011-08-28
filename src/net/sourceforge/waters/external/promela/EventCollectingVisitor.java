@@ -518,13 +518,37 @@ public class EventCollectingVisitor implements PromelaVisitor
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("exch_"+chanName);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, ranges, null, null);
         mEventDecls.add(event);
-    }else{
+    }else if(lengthOfChan==1){
         final IdentifierProxy ident1 = mFactory.createSimpleIdentifierProxy("send_"+chanName);
         final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("recv_"+chanName);
         final EventDeclProxy event1 = mFactory.createEventDeclProxy(ident1, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, specialSend, null, null);
         final EventDeclProxy event2 = mFactory.createEventDeclProxy(ident2, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, specialRec, null, null);
         mEventDecls.add(event1);
         mEventDecls.add(event2);
+    }else{
+      final IdentifierProxy ident1 = mFactory.createSimpleIdentifierProxy("send_"+chanName);
+      final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("recv_"+chanName);
+      final IdentifierProxy ident0 = mFactory.createSimpleIdentifierProxy("rppl_"+chanName);
+      final IntConstantProxy c3 = mFactory.createIntConstantProxy(lengthOfChan-1);
+      final IntConstantProxy c2 = mFactory.createIntConstantProxy(lengthOfChan-2);
+      final IntConstantProxy c0 = mFactory.createIntConstantProxy(0);
+      final BinaryOperator op = optable.getRangeOperator();
+      final BinaryExpressionProxy b1 = mFactory.createBinaryExpressionProxy(op, c0, c2);
+      final BinaryExpressionProxy b2 = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy)cloner.getClone(c0), c3);
+      final Collection<SimpleExpressionProxy> copyOfSend = new ArrayList<SimpleExpressionProxy>();
+      copyOfSend.addAll(cloner.getClonedList(specialSend));
+      copyOfSend.add(b2);
+      final Collection<SimpleExpressionProxy> copyOfRec = new ArrayList<SimpleExpressionProxy>();
+      copyOfRec.addAll(cloner.getClonedList(specialRec));
+      if(lengthOfChan>2){
+        copyOfRec.add(b1);
+      }
+      final EventDeclProxy event0 = mFactory.createEventDeclProxy(ident0,EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, copyOfRec, null, null);
+      final EventDeclProxy event1 = mFactory.createEventDeclProxy(ident1, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, copyOfSend, null, null);
+      final EventDeclProxy event2 = mFactory.createEventDeclProxy(ident2, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, specialRec, null, null);
+      mEventDecls.add(event1);
+      mEventDecls.add(event2);
+      mEventDecls.add(event0);
     }
   }
 
@@ -764,8 +788,7 @@ public class EventCollectingVisitor implements PromelaVisitor
        //if(mGlobalVar.get(labels.get(y+1)).equals("mtype")){
        if(proctypeVar.containsKey(labels.get(y+1))){
          if(proctypeVar.get(labels.get(y+1)).equals("mtype")){
-           // final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy("mtype");
-           // indexes.add(id);
+
            for(final Map.Entry<String,String> s: mGlobalVar.entrySet()){
              final List<SimpleExpressionProxy> tempindex = new ArrayList<SimpleExpressionProxy>();
              if(s.getValue().equals("mtype")){
