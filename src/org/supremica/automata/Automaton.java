@@ -1781,13 +1781,15 @@ public class Automaton
                         
                     }
                     else{
-                        // if the event is already hiden find the corresponding tau event and replace the event.
+                        // if the event is already hidden find the corresponding tau event and replace the event.
                         arc.setEvent(tauEventMap.get(arcE));
                         
                         
                     }
                 }
             }
+        // Now, hide the ones that were replaced by tau's
+        // If we get an exception in teh above code, at least these still remain...
         getAlphabet().minus(hideThese);
 
     }
