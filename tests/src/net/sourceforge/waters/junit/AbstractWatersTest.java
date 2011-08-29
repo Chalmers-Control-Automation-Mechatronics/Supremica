@@ -43,10 +43,8 @@ public abstract class AbstractWatersTest
     super(name);
     final String inputprop = System.getProperty("waters.test.inputdir");
     final String outputprop = System.getProperty("waters.test.outputdir");
-    System.err.println(outputprop);
     mInputRoot = new File(inputprop);
     mOutputRoot = new File(outputprop);
-    System.err.println(mOutputRoot);
   }
 
 
