@@ -125,9 +125,8 @@ public class TestAutomatonMinimizer
     //#######################################################################
     //# Supremica Test Cases
     public void testLanguageEquivalenceMinimization()
+      throws Exception
     {
-        try
-        {
             final ProjectBuildFromXML builder = new ProjectBuildFromXML();
             final Project theProject = builder.build(TestFiles.getFile(TestFiles.MachineBufferMachine));
             final SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
@@ -152,12 +151,6 @@ public class TestAutomatonMinimizer
             final Automaton languageMin = minimizer.getMinimizedAutomaton(options);
             assertTrue(languageMin.nbrOfStates() == 8);
             assertTrue(languageMin.nbrOfTransitions() == 18);
-        }
-        catch (final Exception ex)
-        {
-            ex.printStackTrace();
-            assertTrue(false);
-        }
     }
 
     public void testObservationEquivalenceMinimization()

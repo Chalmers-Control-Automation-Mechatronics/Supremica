@@ -60,7 +60,7 @@ import java.io.*;
 public class TestFiles
 {
     private static List<TestFiles> collection = new LinkedList<TestFiles>();
-    
+
     // Sorted alphabetically (for convenience), please comply.  :o)
     public static final TestFiles AGV = new TestFiles("agv.xml");
     public static final TestFiles AutomaticCarParkGate = new TestFiles("AutomaticCarParkGate.xml");
@@ -90,34 +90,34 @@ public class TestFiles
     public static final TestFiles Split = new TestFiles("split.xml");
     public static final TestFiles UMDES_1 = new TestFiles("umdes_test1.fsm");
     public static final TestFiles UMDES_2 = new TestFiles("umdes_test2.fsm");
-    
-    private static final String testFilePrefix = "./tests/testfiles/";
-    
-    private String filename;
-    
-    private TestFiles(String filename)
+
+    private final String filename;
+
+    private TestFiles(final String filename)
     {
         collection.add(this);
         this.filename = filename;
     }
-    
+
     public static Iterator<TestFiles> iterator()
     {
         return collection.iterator();
     }
-    
+
+    @Override
     public String toString()
     {
         return filename;
     }
-    
+
     public static Object[] toArray()
     {
         return collection.toArray();
     }
-    
-    public static File getFile(TestFiles theTestFile)
+
+    public static File getFile(final TestFiles theTestFile)
     {
-        return new File(testFilePrefix + theTestFile);
+        final String dir = System.getProperty("supremica.test.inputdir");
+        return new File(dir, theTestFile.filename);
     }
 }
