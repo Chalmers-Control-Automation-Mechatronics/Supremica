@@ -576,7 +576,7 @@ public class EventCollectingVisitor implements PromelaVisitor
         }
 
       }
-      System.out.println("123");
+
     }
 
 
@@ -706,7 +706,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       if(mSendersMsg.containsKey(n)){
         final List<Message> l = mSendersMsg.get(n);
         l.add(msg);
-        //System.out.println("123");
+
         mSendersMsg.put(n, l);
       }else{
         final List<Message> l = new ArrayList<Message>();

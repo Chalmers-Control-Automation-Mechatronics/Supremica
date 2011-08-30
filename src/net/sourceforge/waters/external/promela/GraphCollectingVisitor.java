@@ -417,7 +417,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
               }
 
           }
-          System.out.println("123");
+
           final LabelBlockProxy label =
               mFactory.createLabelBlockProxy(labelBlock, null);
           final LabelBlockProxy label3 =
