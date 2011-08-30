@@ -138,7 +138,6 @@
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/junit-4.4.jar" dest="${lib}/${unjared}"/>    
         <unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>
@@ -551,6 +550,8 @@ Class-Path: ${manifest.pathlist}</echo>
                         prefix="net/sourceforge/waters/model/marshaller/examples"/>
         </jar>
     </target>
+    
+    <target name="nb_tests" depends="-jar_supremica_tests"/>
     
     <target name="-jar_supremica_standalone">
         <jar jarfile="${dist}/SupremicaStandalone.jar"> 
@@ -1044,8 +1045,8 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement location="examples" />
                 <pathelement path="${java.class.path}" />
             </classpath>            
-            <jvmarg value="-Xms1024M"/>
-            <jvmarg value="-Xmx2048M" />
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx1024M" />
         </java>
     </target>
     

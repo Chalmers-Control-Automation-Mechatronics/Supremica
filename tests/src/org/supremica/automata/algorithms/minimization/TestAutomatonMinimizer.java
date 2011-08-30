@@ -114,6 +114,7 @@ public class TestAutomatonMinimizer
         junit.textui.TestRunner.run(suite());
     }
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

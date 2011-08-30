@@ -28,7 +28,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
 /**
- * XXX
+ * Main entry point to distributed safety verifier implementation.
  *
  * @author Sam Douglas
  */
