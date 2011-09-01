@@ -307,7 +307,7 @@ public class ExtDiningPhilosophers{
     {
         Alphabet alpha = a.getAlphabet();
         LabeledEvent ev_old = alpha.getEvent(label);
-        LabeledEvent ev_new = new LabeledEvent(ev_old);
+        LabeledEvent ev_new = new LabeledEvent(ev_old); // Should use clone?
         ev_new.setControllable(new_control);
         a.replaceEvent(ev_old, ev_new);
     }

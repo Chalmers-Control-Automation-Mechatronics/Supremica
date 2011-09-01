@@ -154,11 +154,14 @@ public class AutomataSynchronizer
             comment.append(syncOptions.getAutomatonNameSeparator());
         }
         comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
-        try {
-			synchHelper.addState(initialState);
-		} catch (final SupremicaException e1) {
-			throw new RuntimeException(e1);
-		}
+        try
+	{
+	    synchHelper.addState(initialState);
+	}
+	catch (final SupremicaException e1)
+	{
+	    throw new RuntimeException(e1);
+	}
         synchHelper.addComment(comment.toString());
 
         // Start all the synchronization executers and wait for completetion
@@ -168,26 +171,32 @@ public class AutomataSynchronizer
         }
 
         // Wait for completion
-
-        try {
-			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
-			 	synchExecuter.join();
-			}
-		} catch (final InterruptedException e) {
-			// Current thread has been interrupted, perhaps
-			// due to an exception in one of the executers.
-			// Stop all tasks and throw the original exception
-			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
-	            synchExecuter.requestStop();
-	        }
-			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
-			 	final Throwable cause = synchExecuter.getCauseOfInterrupt();
-			 	if (cause != null) {
-			 		if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-			 		else throw new RuntimeException(cause);
-			 	}
-			}
-		}
+        try
+	{
+	    for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+	    {
+		    synchExecuter.join();
+	    }
+	} 
+	catch (final InterruptedException e)
+	{
+	    // Current thread has been interrupted, perhaps
+	    // due to an exception in one of the executers.
+	    // Stop all tasks and throw the original exception
+	    for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+	    {
+		synchExecuter.requestStop();
+	    }
+	    for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+	    {
+		    final Throwable cause = synchExecuter.getCauseOfInterrupt();
+		    if (cause != null)
+		    {
+			    if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+			    else throw new RuntimeException(cause);
+		    }
+	    }
+	}
     }
 
     public void displayInfo()

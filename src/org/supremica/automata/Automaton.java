@@ -1622,20 +1622,20 @@ public class Automaton
         getAlphabet().minus(hideThese);
 
         // Do we care about controllability?
-        if (!preserveControllability)
+        if (!preserveControllability)	// no care about controllability, only a single tau event (which will by default be controllable!)
         {
             // Get/create silent event tau
             final String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
-            LabeledEvent tau = getAlphabet().getEvent(silentName);
+            LabeledEvent tau = getAlphabet().getEvent(silentName);  // Check to see if this already exists
             if (tau == null)
             {
                 tau = new LabeledEvent(silentName);
                 tau.setUnobservable(true);
                 getAlphabet().addEvent(tau);
             }
-            else
+            else    // already exists...
             {
-                if (tau.isObservable())
+                if (tau.isObservable())	// ... and is observable. No good.
                 {
                     logger.error("The event name " + silentName +
                         " is reserved and must be unobservable!");
@@ -1666,7 +1666,7 @@ public class Automaton
                 removeArc(arc);
             }
         }
-        else
+        else	// yes care about controllability, distinguish between tau_c and tau_u
         {
             // Get/create silent events tau_c and tau_u
             // tau_c

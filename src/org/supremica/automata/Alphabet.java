@@ -90,7 +90,7 @@ public class Alphabet
             
             if (keepUnobservable || orgEvent.isObservable())
             {
-                LabeledEvent newEvent = new LabeledEvent(orgEvent);
+                LabeledEvent newEvent = orgEvent.clone(); // was: new LabeledEvent(orgEvent); not polite!
                 theEvents.put(newEvent.getLabel(), newEvent);
             }
         }

@@ -657,7 +657,7 @@ public final class AutomataIndexForm
 
             controllableEventsTable[i] = currEvent.isControllable();
             immediateEventsTable[i] = currEvent.isImmediate();
-            epsilonEventsTable[i] = !currEvent.isObservable();
+            epsilonEventsTable[i] = !currEvent.isObservable();	// An event is epsilon if (and only if) it is unobservable
         }
     }
 

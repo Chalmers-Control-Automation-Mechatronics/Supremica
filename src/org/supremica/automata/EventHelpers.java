@@ -175,7 +175,7 @@ public class EventHelpers
 
 		// The new event should be a copy, except for the prioritized status, that we may change!
 		// The above construction was bound to give problems when something new was introduced!
-		LabeledEvent theEvent = new LabeledEvent(firstEvent);
+		LabeledEvent theEvent = firstEvent.clone(); // was: new LabeledEvent(firstEvent); not polite
 		theEvent.setIndex(-1);
 		theEvent.setPrioritized(prioritized);
 

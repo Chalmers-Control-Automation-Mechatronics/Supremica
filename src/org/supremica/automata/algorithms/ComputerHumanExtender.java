@@ -125,7 +125,7 @@ public class ComputerHumanExtender
                 throw new IllegalStateException("All events must be observable and non immediate");
             }
             
-            LabeledEvent newEvent = new LabeledEvent(currEvent);
+            LabeledEvent newEvent = currEvent.clone(); // was: new LabeledEvent(currEvent); not polite!
             
             if (currEvent.isOperatorReset())
             {
