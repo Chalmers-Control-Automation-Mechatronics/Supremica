@@ -693,8 +693,9 @@ public class ListBufferTransitionRelation
    * outgoing transitions.
    * The iterator returned is not initialised, so one of the methods
    * {@link TransitionIterator#resetState(int)} or
-   * {@link TransitionIterator#reset(int, int)} before it can be used.
-   * Being a read-only iterator, it does not implement the
+   * {@link TransitionIterator#reset(int, int)} must be called
+   * before it can be used. Being a read-only iterator, the iterator
+   * return by this method does not implement the
    * {@link TransitionIterator#remove()} method.
    */
   public TransitionIterator createSuccessorsReadOnlyIterator()

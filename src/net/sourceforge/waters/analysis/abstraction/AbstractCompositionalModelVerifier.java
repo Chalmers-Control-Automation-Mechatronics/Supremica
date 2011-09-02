@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.HashFunctions;
 import gnu.trove.THashSet;
 import gnu.trove.TObjectByteHashMap;
 import gnu.trove.TObjectByteIterator;
@@ -85,26 +86,21 @@ public abstract class AbstractCompositionalModelVerifier
   //# Constructors
   /**
    * Creates an abstracting model verifier without a model.
-   * @param proc
-   *          The abstraction procedure used to simplify automata.
    * @param factory
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
    */
   protected AbstractCompositionalModelVerifier
-    (final AbstractionProcedure proc,
-     final ProductDESProxyFactory factory,
+    (final ProductDESProxyFactory factory,
      final KindTranslator translator)
   {
-    this(proc, factory, translator,
+    this(factory, translator,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
   /**
    * Creates an abstracting model verifier without a model.
-   * @param proc
-   *          The abstraction procedure used to simplify automata.
    * @param factory
    *          Factory used for trace construction.
    * @param translator
@@ -117,13 +113,12 @@ public abstract class AbstractCompositionalModelVerifier
    *          selection methods.
    */
   protected AbstractCompositionalModelVerifier
-    (final AbstractionProcedure proc,
-     final ProductDESProxyFactory factory,
+    (final ProductDESProxyFactory factory,
      final KindTranslator translator,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    this(null, proc, factory, translator,
+    this(null, factory, translator,
          preselectingMethodFactory, selectingMethodFactory);
   }
 
@@ -140,11 +135,10 @@ public abstract class AbstractCompositionalModelVerifier
    */
   protected AbstractCompositionalModelVerifier
     (final ProductDESProxy model,
-     final AbstractionProcedure proc,
      final ProductDESProxyFactory factory,
      final KindTranslator translator)
   {
-    this(model, proc, factory, translator,
+    this(model, factory, translator,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
@@ -152,8 +146,6 @@ public abstract class AbstractCompositionalModelVerifier
    * Creates an abstracting model verifier to check the given model.
    * @param model
    *          The model to be checked by this model verifier.
-   * @param proc
-   *          The abstraction procedure used to simplify automata.
    * @param factory
    *          Factory used for trace construction.
    * @param translator
@@ -167,14 +159,12 @@ public abstract class AbstractCompositionalModelVerifier
    */
   protected AbstractCompositionalModelVerifier
     (final ProductDESProxy model,
-     final AbstractionProcedure proc,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
     super(model, factory, translator);
-    mAbstractionProcedure = proc;
     mPreselectingMethodFactory = preselectingMethodFactory;
     mPreselectingMethod = MustL;
     mSelectingMethodFactory = selectingMethodFactory;
@@ -580,10 +570,7 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
-  /**
-   * Initialises required variables to default values if the user has not
-   * configured them.
-   */
+  @Override
   protected void setUp()
     throws AnalysisException
   {
@@ -599,21 +586,9 @@ public abstract class AbstractCompositionalModelVerifier
     mModifyingSteps = new ArrayList<AbstractionStep>();
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
     mCurrentInternalStateLimit = mLowerInternalStateLimit;
-    /*
-    mAbstractionProcedure = mAbstractionMethod.createAbstractionRule(this);
-    mCurrentDefaultMarking = getUsedMarkingProposition();
-    if (mPreconditionMarking == null) {
-      mPropositions = Collections.singletonList(mCurrentDefaultMarking);
-    } else {
-      final EventProxy[] markings = new EventProxy[2];
-      markings[0] = mCurrentDefaultMarking;
-      markings[1] = mPreconditionMarking;
-      mPropositions = Arrays.asList(markings);
-    }
-    setupSafetyVerifiers();
-    */
   }
 
+  @Override
   protected void tearDown()
   {
     super.tearDown();
@@ -650,7 +625,7 @@ public abstract class AbstractCompositionalModelVerifier
   //#########################################################################
   //# Hooks
   /**
-   * Creates a product DES consisting for an abstraction step. This hook is
+   * Creates a product DES for an abstraction step. This hook is
    * invoked before composing the automata of a selected candidate or before
    * running a final monolithic check. It may be overridden by specialised
    * property verifiers that modify the set of automata prior to composition.
@@ -671,7 +646,8 @@ public abstract class AbstractCompositionalModelVerifier
     final String name = Candidate.getCompositionName(automata);
     final String comment =
       "Automatically generated by " + ProxyTools.getShortClassName(this);
-    return factory.createProductDESProxy(name, comment, null, events, automata);
+    return factory.createProductDESProxy(name, comment, null,
+                                         events, automata);
   }
 
   /**
@@ -751,7 +727,7 @@ public abstract class AbstractCompositionalModelVerifier
     mEventInfoMap = new HashMap<EventProxy,EventInfo>(numEvents);
     mDirtyAutomata = new LinkedList<AutomatonProxy>();
     for (final AutomatonProxy aut : automata) {
-      if (translator.getComponentKind(aut) != ComponentKind.PROPERTY) {
+      if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
         mCurrentAutomata.add(aut);
         addEventsToAutomata(aut);
         mDirtyAutomata.add(aut);
@@ -787,6 +763,16 @@ public abstract class AbstractCompositionalModelVerifier
     removeEventsToAutomata(autToRemove);
   }
 
+  /**
+   * Returns whether the given event can be hidden in abstraction steps.
+   * This is used by safety verifiers. e.g., to exclude events used in
+   * properties from abstraction.
+   */
+  protected boolean canBeHidden(final EventProxy event)
+  {
+    return true;
+  }
+
   protected void addEventsToAutomata(final AutomatonProxy aut)
   {
     final Collection<EventProxy> events = aut.getEvents();
@@ -795,7 +781,9 @@ public abstract class AbstractCompositionalModelVerifier
       new TObjectByteHashMap<EventProxy>(numEvents);
     for (final TransitionProxy trans : aut.getTransitions()) {
       final EventProxy event = trans.getEvent();
-      if (trans.getSource() != trans.getTarget()) {
+      if (!canBeHidden(event)) {
+        statusMap.put(event, NOT_ONLY_SELFLOOP);
+      } else if (trans.getSource() != trans.getTarget()) {
         statusMap.put(event, NOT_ONLY_SELFLOOP);
       } else if (!statusMap.containsKey(event)) {
         statusMap.put(event, ONLY_SELFLOOP);
@@ -803,7 +791,8 @@ public abstract class AbstractCompositionalModelVerifier
     }
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : events) {
-      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
+      if (translator.getEventKind(event) != EventKind.PROPOSITION &&
+          canBeHidden(event)) {
         EventInfo info = mEventInfoMap.get(event);
         if (info == null) {
           info = new EventInfo();
@@ -856,9 +845,9 @@ public abstract class AbstractCompositionalModelVerifier
   {
     final Set<EventProxy> localEvents = new THashSet<EventProxy>();
     for (final Map.Entry<EventProxy,EventInfo> entry : mEventInfoMap.entrySet()) {
+      final EventProxy event = entry.getKey();
       final EventInfo info = entry.getValue();
-      if (info.containedIn(candidate)) {
-        final EventProxy event = entry.getKey();
+      if (canBeHidden(event) && info.containedIn(candidate)) {
         localEvents.add(event);
       }
     }
@@ -974,7 +963,7 @@ public abstract class AbstractCompositionalModelVerifier
     final Collection<AutomatonProxy> remainingAutomata =
       new THashSet<AutomatonProxy>(mCurrentAutomata);
     final List<EventProxy> remainingEvents =
-      new LinkedList<EventProxy>(mEventInfoMap.keySet());
+      new LinkedList<EventProxy>(getCurrentEvents());
     Collections.sort(remainingEvents);
     final List<SubSystem> tasks = new LinkedList<SubSystem>();
     while (!remainingEvents.isEmpty()) {
@@ -1300,7 +1289,7 @@ public abstract class AbstractCompositionalModelVerifier
       if (local.contains(event)) {
         eventEnc.addSilentEvent(event);
       } else if (translator.getEventKind(event) != EventKind.PROPOSITION ||
-                 mPropositions.contains(event)) {
+                 (mPropositions != null && mPropositions.contains(event))) {
         eventEnc.addEvent(event, translator, false);
       }
     }
@@ -1648,7 +1637,13 @@ public abstract class AbstractCompositionalModelVerifier
                                                 final EventProxy tau)
     {
       final KindTranslator translator = getKindTranslator();
-      return new EventEncoding(aut, translator, tau, mPropositions,
+      final Collection<EventProxy> filter;
+      if (mPropositions == null) {
+        filter = Collections.emptyList();
+      } else {
+        filter = mPropositions;
+      }
+      return new EventEncoding(aut, translator, tau, filter,
                                EventEncoding.FILTER_PROPOSITIONS);
     }
 
@@ -2047,6 +2042,208 @@ public abstract class AbstractCompositionalModelVerifier
 
 
   //#########################################################################
+  //# Inner Class TRAbstractionStep
+  /**
+   * An abstraction step that uses a {@link ListBufferTransitionRelation}
+   * for trace expansion
+   */
+  protected abstract class TRAbstractionStep extends AbstractionStep
+  {
+    //#######################################################################
+    //# Constructor
+    /**
+     * Creates a new abstraction step record.
+     * @param  resultAut         The automaton resulting from abstraction.
+     * @param  originalAut       The automaton before abstraction.
+     * @param  tau               The event represent silent transitions,
+     *                           or <CODE>null</CODE>.
+     * @param  originalStateEnc  State encoding of input automaton, or
+     *                           <CODE>null</CODE> to use a temporary
+     *                           encoding.
+     */
+    protected TRAbstractionStep(final AutomatonProxy resultAut,
+                                final AutomatonProxy originalAut,
+                                final EventProxy tau,
+                                final StateEncoding originalStateEnc)
+    {
+      super(resultAut, originalAut);
+      mTau = tau;
+      mOriginalStateEncodingIsTemporary = (originalStateEnc == null);
+      mOriginalStateEncoding = originalStateEnc;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    protected EventProxy getTau()
+    {
+      return mTau;
+    }
+
+    protected ListBufferTransitionRelation getTransitionRelation()
+    {
+      return mTransitionRelation;
+    }
+
+    protected EventEncoding getEventEncoding()
+    {
+      return mEventEncoding;
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    protected void setupTraceConversion()
+      throws AnalysisException
+    {
+      final AutomatonProxy originalAutomaton = getOriginalAutomaton();
+      final KindTranslator translator = getKindTranslator();
+      final Collection<EventProxy> props = getPropositions();
+      final Collection<EventProxy> filter;
+      if (props != null) {
+        filter = props;
+      } else {
+        filter = Collections.emptyList();
+      }
+      mEventEncoding =
+        new EventEncoding(originalAutomaton, translator, mTau, filter,
+                          EventEncoding.FILTER_PROPOSITIONS);
+      if (mOriginalStateEncodingIsTemporary) {
+        mOriginalStateEncoding = new StateEncoding(originalAutomaton);
+      }
+      mTransitionRelation = new ListBufferTransitionRelation
+        (originalAutomaton, mEventEncoding, mOriginalStateEncoding,
+         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    }
+
+    protected void setupTraceConversion
+      (final EventEncoding enc,
+       final ListBufferTransitionRelation rel)
+    {
+      mEventEncoding = enc;
+      mTransitionRelation = rel;
+      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    }
+
+    protected void tearDownTraceConversion()
+    {
+      if (mOriginalStateEncodingIsTemporary) {
+        mOriginalStateEncoding = null;
+      }
+      mEventEncoding = null;
+      mTransitionRelation = null;
+    }
+
+    protected void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
+                                   final List<SearchRecord> convertedSteps)
+    {
+      final int tau = EventEncoding.TAU;
+      final ProductDESProxyFactory factory = getFactory();
+      final AutomatonProxy resultAutomaton = getResultAutomaton();
+      final AutomatonProxy originalAutomaton = getOriginalAutomaton();
+      final ListIterator<TraceStepProxy> stepIter = traceSteps.listIterator();
+      final TraceStepProxy initStep = stepIter.next();
+      final Iterator<SearchRecord> convertedIter = convertedSteps.iterator();
+      final SearchRecord initRecord = convertedIter.next();
+      final Map<AutomatonProxy,StateProxy> map =
+        new HashMap<AutomatonProxy,StateProxy>(initStep.getStateMap());
+      map.remove(resultAutomaton);
+      final int initID = initRecord.getState();
+      final StateProxy initState = mOriginalStateEncoding.getState(initID);
+      map.put(originalAutomaton, initState);
+      final TraceStepProxy newInitStep =
+        factory.createTraceStepProxy(null, map);
+      stepIter.set(newInitStep);
+      TraceStepProxy step = stepIter.hasNext() ? stepIter.next() : null;
+      SearchRecord record =
+        convertedIter.hasNext() ? convertedIter.next() : null;
+      while (step != null || record != null) {
+        if (step != null) {
+          final EventProxy event = step.getEvent();
+          final int eventID = mEventEncoding.getEventCode(event);
+          if (eventID == tau) {
+            // Skip tau in master trace, will insert later from converted.
+            stepIter.remove();
+            step = stepIter.hasNext() ? stepIter.next() : null;
+            continue;
+          } else if (eventID < 0) {
+            // Step of another automaton only.
+            final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+            map.putAll(stepMap);
+            map.remove(resultAutomaton);
+            final TraceStepProxy newStep =
+              factory.createTraceStepProxy(event, map);
+            stepIter.set(newStep);
+            step = stepIter.hasNext() ? stepIter.next() : null;
+            continue;
+          }
+        }
+        if (record != null) {
+          final int eventID = record.getEvent();
+          if (eventID == tau) {
+            // Step by local tau only.
+            final int stateID = record.getState();
+            final StateProxy state = mOriginalStateEncoding.getState(stateID);
+            map.put(originalAutomaton, state);
+            final TraceStepProxy newStep =
+              factory.createTraceStepProxy(mTau, map);
+            if (step == null) {
+              stepIter.add(newStep);
+            } else {
+              stepIter.previous();
+              stepIter.add(newStep);
+              stepIter.next();
+            }
+            record = convertedIter.hasNext() ? convertedIter.next() : null;
+            continue;
+          }
+        }
+        // Step by shared event
+        assert step != null;
+        assert record != null;
+        final EventProxy event = step.getEvent();
+        final int stateID = record.getState();
+        final StateProxy state = mOriginalStateEncoding.getState(stateID);
+        map.put(originalAutomaton, state);
+        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+        map.putAll(stepMap);
+        map.remove(resultAutomaton);
+        final TraceStepProxy newStep = factory.createTraceStepProxy(event, map);
+        stepIter.set(newStep);
+        step = stepIter.hasNext() ? stepIter.next() : null;
+        record = convertedIter.hasNext() ? convertedIter.next() : null;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    /**
+     * The event that was hidden from the original automaton,
+     * or <CODE>null</CODE>.
+     */
+    private final EventProxy mTau;
+    /**
+     * A flag, indicating that the state encoding is only used temporarily
+     * during trace expansion.
+     */
+    private final boolean mOriginalStateEncodingIsTemporary;
+    /**
+     * State encoding of original automaton. Maps state codes in the input
+     * transition relation to state objects in the input automaton.
+     */
+    private StateEncoding mOriginalStateEncoding;
+    /**
+     * Transition relation that was simplified.
+     * Only used when expanding trace.
+     */
+    private ListBufferTransitionRelation mTransitionRelation;
+    /**
+     * Event encoding for {@link #mTransitionRelation}.
+     * Only used when expanding trace.
+     */
+    private EventEncoding mEventEncoding;
+  }
+
+
+  //#########################################################################
   //# Inner Class EventRemovalStep
   /**
    * An abstraction step that consists of removing some events from the
@@ -2340,12 +2537,19 @@ public abstract class AbstractCompositionalModelVerifier
    * it occurs in, plus information in which automata the event only appears
    * as selfloops.
    */
-  private static class EventInfo
+  protected static class EventInfo
   {
 
     //#######################################################################
     //# Constructor
-    private EventInfo()
+    /**
+     * Creates a new EventInfo record.
+     * @param  canBeHidden  Whether this event can be hidden in abstraction
+     *                      steps. This is used by safety verifiers. e.g.,
+     *                      to exclude events used in properties from
+     *                      abstraction.
+     */
+    protected EventInfo()
     {
       mAutomataMap = new TObjectByteHashMap<AutomatonProxy>();
       mNumNonSelfloopAutomata = 0;
@@ -2628,9 +2832,12 @@ public abstract class AbstractCompositionalModelVerifier
       final int size = mEventInfoMap.size();
       final Collection<List<AutomatonProxy>> found =
         new THashSet<List<AutomatonProxy>>(size);
-      for (final EventInfo info : mEventInfoMap.values()) {
+      for (final Map.Entry<EventProxy,EventInfo> entry :
+           mEventInfoMap.entrySet()) {
+        final EventProxy event = entry.getKey();
+        final EventInfo info = entry.getValue();
         assert info.getNumberOfAutomata() > 0;
-        if (info.getNumberOfAutomata() > 1) {
+        if (canBeHidden(event) && info.getNumberOfAutomata() > 1) {
           final List<AutomatonProxy> list = info.getAutomataList();
           Collections.sort(list);
           if (isPermissibleCandidate(list) && found.add(list)) {
@@ -2897,6 +3104,108 @@ public abstract class AbstractCompositionalModelVerifier
     //# Data Members
     private final AutomatonProxy mOriginalAutomaton;
     private final Map<StateProxy,StateProxy> mStateMap;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SearchRecord
+  /**
+   * A record to store information about a visited state while searching
+   * to expand counterexamples.
+   */
+  protected static class SearchRecord
+  {
+
+    //#######################################################################
+    //# Constructors
+    protected SearchRecord(final int state)
+    {
+      this(state, -1);
+    }
+
+    protected SearchRecord(final int state, final int event)
+    {
+      this(state, 0, event, null);
+    }
+
+    protected SearchRecord(final int state,
+                           final int depth,
+                           final int event,
+                           final SearchRecord pred)
+    {
+      mState = state;
+      mDepth = depth;
+      mEvent = event;
+      mPredecessor = pred;
+    }
+
+    //#######################################################################
+    //# Getters
+    protected int getState()
+    {
+      return mState;
+    }
+
+    protected int getDepth()
+    {
+      return mDepth;
+    }
+
+    protected SearchRecord getPredecessor()
+    {
+      return mPredecessor;
+    }
+
+    protected int getEvent()
+    {
+      return mEvent;
+    }
+
+    //#######################################################################
+    //# Trace Construction
+    protected List<SearchRecord> getTrace()
+    {
+      final List<SearchRecord> trace = new LinkedList<SearchRecord>();
+      for (SearchRecord record = this;
+           record != null;
+           record = record.getPredecessor()) {
+        trace.add(0, record);
+      }
+      return trace;
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public String toString()
+    {
+      return
+        "{state=" + mState + "; event=" + mEvent + "; depth=" + mDepth + "}";
+    }
+
+    @Override
+    public boolean equals(final Object other)
+    {
+      if (other.getClass() == getClass()) {
+        final SearchRecord record = (SearchRecord) other;
+        return mState == record.mState && mDepth == record.mDepth;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public int hashCode()
+    {
+      return HashFunctions.hash(mState) + 5 * HashFunctions.hash(mDepth);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mState;
+    private final int mDepth;
+    private final int mEvent;
+    private final SearchRecord mPredecessor;
   }
 
 

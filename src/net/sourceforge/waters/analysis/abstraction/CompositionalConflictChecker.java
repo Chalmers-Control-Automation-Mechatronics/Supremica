@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.HashFunctions;
 import gnu.trove.THashSet;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
@@ -67,15 +66,15 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
 /**
- * A compositional conflict checker that can be configured to use different
- * abstraction sequences for its simplification steps.
+ * <P>A compositional conflict checker that can be configured to use different
+ * abstraction sequences for its simplification steps.</P>
  *
- * <I>References:</I><BR>
+ * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
  * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
  * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
  * Nonblocking, Proc. 7th International Conference on Control and Automation,
- * ICCA'09, 448-453, Christchurch, New Zealand, 2009.<BR>
+ * ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
  *
  * @author Robi Malik, Rachel Francis
  */
@@ -139,7 +138,6 @@ public class CompositionalConflictChecker
                                       final ProductDESProxyFactory factory)
   {
     super(model,
-          null,
           factory,
           ConflictKindTranslator.getInstance(),
           new PreselectingMethodFactory(),
@@ -290,6 +288,7 @@ public class CompositionalConflictChecker
    * Initialises required variables to default values if the user has not
    * configured them.
    */
+  @Override
   protected void setUp()
     throws AnalysisException
   {
@@ -317,6 +316,7 @@ public class CompositionalConflictChecker
     setupSafetyVerifiers();
   }
 
+  @Override
   protected void tearDown()
   {
     super.tearDown();
@@ -1867,9 +1867,8 @@ public class CompositionalConflictChecker
    * An abstraction step in which the result automaton is obtained by
    * merging states of the original automaton (automaton quotient).
    */
-  private abstract class MergeStep extends AbstractionStep
+  private abstract class MergeStep extends TRAbstractionStep
   {
-
     //#######################################################################
     //# Constructor
     /**
@@ -1897,31 +1896,18 @@ public class CompositionalConflictChecker
               final boolean reduced,
               final StateEncoding resultStateEnc)
     {
-      super(resultAut, originalAut);
-      mTau = tau;
-      mOriginalStateEncoding = originalStateEnc;
+      super(resultAut, originalAut, tau, originalStateEnc);
       mPartition = partition;
       mHasReducedPreconditionMarking = reduced;
       mReverseOutputStateMap = resultStateEnc.getStateCodeMap();
     }
 
     //#######################################################################
-    //# Simple Access
-    ListBufferTransitionRelation getTransitionRelation()
-    {
-      return mTransitionRelation;
-    }
-
-    EventEncoding getEventEncoding()
-    {
-      return mEventEncoding;
-    }
-
-    //#######################################################################
     //# Trace Computation
+    @Override
     protected List<TraceStepProxy> convertTraceSteps
       (final List<TraceStepProxy> traceSteps)
-    throws AnalysisException
+      throws AnalysisException
     {
       setupTraceConversion();
       final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
@@ -1932,27 +1918,20 @@ public class CompositionalConflictChecker
       return traceSteps;
     }
 
-    void setupTraceConversion()
-    throws AnalysisException
+    @Override
+    protected void setupTraceConversion()
+      throws AnalysisException
     {
-      final AutomatonProxy originalAutomaton = getOriginalAutomaton();
-      final KindTranslator translator = getKindTranslator();
-      final Collection<EventProxy> props = getPropositions();
-      mEventEncoding =
-        new EventEncoding(originalAutomaton, translator, mTau, props,
-                          EventEncoding.FILTER_PROPOSITIONS);
+      super.setupTraceConversion();
       recoverPreconditionMarking();
-      mTransitionRelation = new ListBufferTransitionRelation
-        (originalAutomaton, mEventEncoding, mOriginalStateEncoding,
-         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     }
 
-    void setupTraceConversion(final EventEncoding enc,
-                              final ListBufferTransitionRelation rel)
+    @Override
+    protected void setupTraceConversion
+      (final EventEncoding enc,
+       final ListBufferTransitionRelation rel)
     {
-      mEventEncoding = enc;
-      mTransitionRelation = rel;
-      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      super.setupTraceConversion(enc, rel);
       final AbstractionProcedure proc = getAbstractionProcedure();
       if (proc instanceof ConflictCheckerAbstractionProcedure) {
         final ConflictCheckerAbstractionProcedure cproc =
@@ -1962,16 +1941,17 @@ public class CompositionalConflictChecker
       }
     }
 
-    void tearDownTraceConversion()
+    @Override
+    protected void tearDownTraceConversion()
     {
+      super.tearDownTraceConversion();
       mTargetSet = null;
       mRecoveredPreconditionMarking = null;
-      mEventEncoding = null;
-      mTransitionRelation = null;
     }
 
     List<SearchRecord> getCrucialSteps(final List<TraceStepProxy> traceSteps)
     {
+      final EventEncoding enc = getEventEncoding();
       final AutomatonProxy resultAutomaton = getResultAutomaton();
       final int tau = EventEncoding.TAU;
       final int len = traceSteps.size() + 1;
@@ -1985,7 +1965,7 @@ public class CompositionalConflictChecker
       while (iter.hasNext()) {
         step = iter.next();
         final EventProxy event = step.getEvent();
-        final int eventID = mEventEncoding.getEventCode(event);
+        final int eventID = enc.getEventCode(event);
         if (eventID < 0) {
           // Step of another automaton only --- skip.
         } else if (eventID == tau) {
@@ -2051,88 +2031,8 @@ public class CompositionalConflictChecker
       } else if (mRecoveredPreconditionMarking != null) {
         return mRecoveredPreconditionMarking.get(state);
       } else {
-        return mTransitionRelation.isMarked(state, mPreconditionMarkingID);
-      }
-    }
-
-    void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
-                         final List<SearchRecord> convertedSteps)
-    {
-      final int tau = EventEncoding.TAU;
-      final ProductDESProxyFactory factory = getFactory();
-      final AutomatonProxy resultAutomaton = getResultAutomaton();
-      final AutomatonProxy originalAutomaton = getOriginalAutomaton();
-      final ListIterator<TraceStepProxy> stepIter = traceSteps.listIterator();
-      final TraceStepProxy initStep = stepIter.next();
-      final Iterator<SearchRecord> convertedIter = convertedSteps.iterator();
-      final SearchRecord initRecord = convertedIter.next();
-      final Map<AutomatonProxy,StateProxy> map =
-        new HashMap<AutomatonProxy,StateProxy>(initStep.getStateMap());
-      map.remove(resultAutomaton);
-      final int initID = initRecord.getState();
-      final StateProxy initState = mOriginalStateEncoding.getState(initID);
-      map.put(originalAutomaton, initState);
-      final TraceStepProxy newInitStep =
-        factory.createTraceStepProxy(null, map);
-      stepIter.set(newInitStep);
-      TraceStepProxy step = stepIter.hasNext() ? stepIter.next() : null;
-      SearchRecord record =
-        convertedIter.hasNext() ? convertedIter.next() : null;
-      while (step != null || record != null) {
-        if (step != null) {
-          final EventProxy event = step.getEvent();
-          final int eventID = mEventEncoding.getEventCode(event);
-          if (eventID == tau) {
-            // Skip tau in master trace, will insert later from converted.
-            stepIter.remove();
-            step = stepIter.hasNext() ? stepIter.next() : null;
-            continue;
-          } else if (eventID < 0) {
-            // Step of another automaton only.
-            final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
-            map.putAll(stepMap);
-            map.remove(resultAutomaton);
-            final TraceStepProxy newStep =
-              factory.createTraceStepProxy(event, map);
-            stepIter.set(newStep);
-            step = stepIter.hasNext() ? stepIter.next() : null;
-            continue;
-          }
-        }
-        if (record != null) {
-          final int eventID = record.getEvent();
-          if (eventID == tau) {
-            // Step by local tau only.
-            final int stateID = record.getState();
-            final StateProxy state = mOriginalStateEncoding.getState(stateID);
-            map.put(originalAutomaton, state);
-            final TraceStepProxy newStep =
-              factory.createTraceStepProxy(mTau, map);
-            if (step == null) {
-              stepIter.add(newStep);
-            } else {
-              stepIter.previous();
-              stepIter.add(newStep);
-              stepIter.next();
-            }
-            record = convertedIter.hasNext() ? convertedIter.next() : null;
-            continue;
-          }
-        }
-        // Step by shared event
-        assert step != null;
-        assert record != null;
-        final EventProxy event = step.getEvent();
-        final int stateID = record.getState();
-        final StateProxy state = mOriginalStateEncoding.getState(stateID);
-        map.put(originalAutomaton, state);
-        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
-        map.putAll(stepMap);
-        map.remove(resultAutomaton);
-        final TraceStepProxy newStep = factory.createTraceStepProxy(event, map);
-        stepIter.set(newStep);
-        step = stepIter.hasNext() ? stepIter.next() : null;
-        record = convertedIter.hasNext() ? convertedIter.next() : null;
+        final ListBufferTransitionRelation rel = getTransitionRelation();
+        return rel.isMarked(state, mPreconditionMarkingID);
       }
     }
 
@@ -2143,17 +2043,18 @@ public class CompositionalConflictChecker
     {
       final AbstractionProcedure proc = getAbstractionProcedure();
       if (proc instanceof ConflictCheckerAbstractionProcedure) {
+        final EventEncoding enc = getEventEncoding();
         final ConflictCheckerAbstractionProcedure cproc =
           (ConflictCheckerAbstractionProcedure) proc;
         final EventProxy alpha = cproc.getUsedPreconditionMarking();
-        mPreconditionMarkingID = mEventEncoding.getEventCode(alpha);
+        mPreconditionMarkingID = enc.getEventCode(alpha);
         if (mHasReducedPreconditionMarking) {
           final AutomatonProxy aut = getOriginalAutomaton();
-          mRecoveredPreconditionMarking = cproc.recoverMarkings(aut, mTau);
+          final EventProxy tau = getTau();
+          mRecoveredPreconditionMarking = cproc.recoverMarkings(aut, tau);
           if (mPreconditionMarkingID < 0) {
             final KindTranslator translator = getKindTranslator();
-            mPreconditionMarkingID =
-              mEventEncoding.addEvent(alpha, translator, true);
+            mPreconditionMarkingID = enc.addEvent(alpha, translator, true);
           }
         }
       } else {
@@ -2163,16 +2064,6 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Data Members
-    /**
-     * The event that was hidden from the original automaton,
-     * or <CODE>null</CODE>.
-     */
-    private final EventProxy mTau;
-    /**
-     * State encoding of original automaton. Maps state codes in the input
-     * transition relation to state objects in the input automaton.
-     */
-    private final StateEncoding mOriginalStateEncoding;
     /**
      * Partition applied to original automaton.
      * Each entry lists states of the input encoding that have been merged.
@@ -2190,16 +2081,6 @@ public class CompositionalConflictChecker
     private final TObjectIntHashMap<StateProxy> mReverseOutputStateMap;
 
     /**
-     * Transition relation that was simplified.
-     * Only used when expanding trace.
-     */
-    private ListBufferTransitionRelation mTransitionRelation;
-    /**
-     * Event encoding for {@link #mTransitionRelation}.
-     * Only used when expanding trace.
-     */
-    private EventEncoding mEventEncoding;
-    /**
      * Code of precondition marking in {@link #mEventEncoding}.
      */
     private int mPreconditionMarkingID;
@@ -2213,7 +2094,6 @@ public class CompositionalConflictChecker
      * @see #mHasReducedPreconditionMarking
      */
     private BitSet mRecoveredPreconditionMarking;
-
   }
 
 
@@ -2236,7 +2116,7 @@ public class CompositionalConflictChecker
      * precondition markings.
      * @param  resultAut         The automaton resulting from abstraction.
      * @param  originalAut       The automaton before abstraction.
-     * @param  tau               The event represent silent transitions,
+     * @param  tau               The event representing silent transitions,
      *                           or <CODE>null</CODE>.
      * @param  originalStateEnc  State encoding that relates states in the
      *                           original automaton to state numbers used in
@@ -2262,15 +2142,15 @@ public class CompositionalConflictChecker
      * Creates a new observation equivalence step record.
      * @param  resultAut         The automaton resulting from abstraction.
      * @param  originalAut       The automaton before abstraction.
-     * @param  tau               The event represent silent transitions,
+     * @param  tau               The event representing silent transitions,
      *                           or <CODE>null</CODE>.
      * @param  originalStateEnc  State encoding that relates states in the
      *                           original automaton to state numbers used in
      *                           the partition.
      * @param  partition         Partition that identifies classes of states
      *                           merged during abstraction.
-     * @param  reduced           Whether or not the set of precondition markings
-     *                           was reduced during abstraction.
+     * @param  reduced           Whether or not the set of precondition
+     *                           markings was reduced during abstraction.
      * @param  resultStateEnc    State encoding that relates states in the
      *                           original automaton to state numbers used in
      *                           the partition.
@@ -2434,7 +2314,7 @@ public class CompositionalConflictChecker
      * Creates a new conflict equivalence step record.
      * @param  resultAut         The automaton resulting from abstraction.
      * @param  originalAut       The automaton before abstraction.
-     * @param  tau               The event represent silent transitions,
+     * @param  tau               The event representing silent transitions,
      *                           or <CODE>null</CODE>.
      * @param  originalStateEnc  State encoding that relates states in the
      *                           original automaton to state numbers used in
@@ -2578,7 +2458,7 @@ public class CompositionalConflictChecker
      * Creates a new abstraction step record.
      * @param  resultAut         The automaton resulting from abstraction.
      * @param  originalAut       The automaton before abstraction.
-     * @param  tau               The event represent silent transitions,
+     * @param  tau               The event representing silent transitions,
      *                           or <CODE>null</CODE>.
      * @param  originalStateEnc  State encoding that relates states in the
      *                           original automaton to state numbers used in
@@ -2888,93 +2768,6 @@ public class CompositionalConflictChecker
      */
     private final boolean mIsObservationEquivalentAfter;
 
-  }
-
-
-  //#########################################################################
-  //# Inner Class SearchRecord
-  /**
-   * A record to store information about a visited state while searching
-   * to expand counterexamples.
-   */
-  private static class SearchRecord
-  {
-
-    //#######################################################################
-    //# Constructors
-    SearchRecord(final int state)
-    {
-      this(state, -1);
-    }
-
-    SearchRecord(final int state, final int event)
-    {
-      this(state, 0, event, null);
-    }
-
-    SearchRecord(final int state, final int depth, final int event,
-                 final SearchRecord pred)
-    {
-      mState = state;
-      mDepth = depth;
-      mEvent = event;
-      mPredecessor = pred;
-    }
-
-    //#######################################################################
-    //# Getters
-    int getState()
-    {
-      return mState;
-    }
-
-    int getDepth()
-    {
-      return mDepth;
-    }
-
-    SearchRecord getPredecessor()
-    {
-      return mPredecessor;
-    }
-
-    int getEvent()
-    {
-      return mEvent;
-    }
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
-    @Override
-    public String toString()
-    {
-      return
-        "{state=" + mState + "; event=" + mEvent + "; depth=" + mDepth + "}";
-    }
-
-    @Override
-    public boolean equals(final Object other)
-    {
-      if (other.getClass() == getClass()) {
-        final SearchRecord record = (SearchRecord) other;
-        return mState == record.mState && mDepth == record.mDepth;
-      } else {
-        return false;
-      }
-    }
-
-    @Override
-    public int hashCode()
-    {
-      return HashFunctions.hash(mState) + 5 * HashFunctions.hash(mDepth);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final int mState;
-    private final int mDepth;
-    private final int mEvent;
-    private final SearchRecord mPredecessor;
   }
 
 

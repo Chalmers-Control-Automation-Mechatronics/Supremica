@@ -530,20 +530,20 @@ public class EventEncoding
    * Filter mode defining that the filter list should only be used to
    * restrict proper events, i.e., non-proposition events. All proposition
    * events in the input event list will be copied to the encoding.
-   * Proper events will only be included if the appear in the filter.
+   * Proper events will only be included if they appear in the filter.
    */
   public static final int FILTER_PROPER_EVENTS = 0x01;
   /**
    * Filter mode defining that the filter list should only be used to
    * restrict proposition events. All proper, i.e., non-proposition
    * events in the input event list will be copied to the encoding.
-   * Proposition events will only be included if the appear in the filter.
+   * Proposition events will only be included if they appear in the filter.
    */
   public static final int FILTER_PROPOSITIONS = 0x02;
   /**
    * Filter mode defining that the filter list should be applied to all
    * events. Events in the input event list will only be copied to the
-   * encoding if the appear in the filter.
+   * encoding if they appear in the filter.
    */
   public static final int FILTER_ALL =
     FILTER_PROPER_EVENTS | FILTER_PROPOSITIONS;
