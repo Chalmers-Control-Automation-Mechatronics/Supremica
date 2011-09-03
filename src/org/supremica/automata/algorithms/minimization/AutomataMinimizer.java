@@ -66,7 +66,7 @@ public class AutomataMinimizer
 
     /** The automata being minimized (may be a copy of the original). */
     private Automata theAutomata;
-
+    private  Automata setOfHalf ;
     /** The supplied options. */
     private MinimizationOptions options;
 
@@ -102,7 +102,8 @@ public class AutomataMinimizer
     private final Automata neighbours = new Automata();
     private final Automata selection = new Automata();
     private final Automata taskExtra = new Automata();
-
+    public static boolean synthesiss = false;
+    
 
     /**
      * Basic constructor.
@@ -111,6 +112,7 @@ public class AutomataMinimizer
     {
         initialNbrOfAutomata = theAutomata.nbrOfAutomata();
         this.theAutomata = theAutomata;
+        this.setOfHalf = theAutomata.getSpecificationAndSupervisorAutomata();
     }
 
     /**
@@ -121,6 +123,15 @@ public class AutomataMinimizer
     {
         this.executionDialog = executionDialog;
     }
+    public Automata getCompositionalMinimization(final MinimizationOptions options, boolean synthesis)
+    throws Exception
+    {
+
+        synthesiss = synthesis;
+        
+        return getCompositionalMinimization(options);
+
+    }
 
     /**
      * Returns minimized automaton, minimized with respect to the supplied options.
@@ -128,6 +139,7 @@ public class AutomataMinimizer
     public Automata getCompositionalMinimization(final MinimizationOptions options)
     throws Exception
     {
+        
         this.options = options;
 
         // Are the options valid?
@@ -182,7 +194,7 @@ public class AutomataMinimizer
         // Initialize statistics count
         AutomatonMinimizer.resetStatistics();
 
-         
+
 
         // Special pre-minimization stuff
         if ((options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)||
@@ -221,7 +233,7 @@ public class AutomataMinimizer
         // select some automata to compose and minimize!
         while (theAutomata.size() >= 2)
         {
-               
+
             /*
 			  // Don't always give the same result
 			  MinimizationTask newTask = getNextMinimizationTask(true);
@@ -252,9 +264,10 @@ public class AutomataMinimizer
             {
                 // Could not find a task? Select everything!
                 selection = new Automata(theAutomata, true);
+
                 hideThese = selection.getUnionAlphabet();
                 hideThese.minus(options.getTargetAlphabet());
-            }            
+            }
             taskSelectionTimer.stop();
             if (stopRequested)
             {
@@ -263,11 +276,12 @@ public class AutomataMinimizer
             // Perform the minimization, unless of course this is the last step
             // and it should be skipped...
             Automaton min;
+
             if (options.getSkipLast() && (theAutomata.size() == selection.size()))
             {
                 // Just synch and hide
-//                
-                min = AutomataSynchronizer.synchronizeAutomata(selection);     
+//
+                min = AutomataSynchronizer.synchronizeAutomata(selection);
                 min.hide(hideThese, preserveControllability);
                 // Examine for largest sizes (this is a special case, this is otherwise done in minolithicMinimization())
                 if (min.nbrOfStates() > mostStates)
@@ -280,12 +294,28 @@ public class AutomataMinimizer
                 }
                 totalStates += min.nbrOfStates();
                 totalTransitions += min.nbrOfTransitions();
+                
             }
+
             else
             {
                 // Compose and minimize!
-                
-                min = monolithicMinimization(selection, hideThese);
+                 if(AutomataSynthesizer.renameBack()){
+                     String name= "HalfWaySynthesisResult("+selection.getFirstAutomaton().getName()+")";
+                      Automaton aut=new Automaton(name );
+//                     
+                        // Synch
+                        final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+                        synchOptions.setUseShortStateNames(useShortStateNames);
+                        aut = AutomataSynchronizer.synchronizeAutomata(selection, synchOptions);
+                        aut.setName(name);
+                        aut.hide(hideThese, preserveControllability);
+                        AutomatonMinimizer.halfWaySynthesis(aut);
+                        AutomatonMinimizer.renameBackToOriginalEvents(aut);
+                        setOfHalf.addAutomaton(aut);
+               }
+
+                 min = monolithicMinimization(selection, hideThese);
             }
             if (stopRequested)
             {
@@ -359,6 +389,7 @@ public class AutomataMinimizer
 
             // Adjust the automata
             theAutomata.removeAutomata(selection);
+
             theAutomata.addAutomaton(min);
 
             // Update execution dialog
@@ -391,7 +422,13 @@ public class AutomataMinimizer
         //logger.info("Timer time: " + taskSelectionTimer);
         //logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
         // Return the result of the minimization!
-       
+
+
+
+        if(theAutomata.size()<2){
+            theAutomata.addAutomata(setOfHalf);
+
+        }
         return theAutomata;
     }
 
@@ -834,11 +871,12 @@ public class AutomataMinimizer
     private Automaton monolithicMinimization(final Automata automata, final Alphabet hideThese)
     throws Exception
     {
+         
 //        logger.info("hide these in monolithic"+hideThese);
         //System.err.println("Minimizing " + automata + ", hiding: " + hideThese);
 
         // Synchronize, or if there's just one automaton, just find it
-        
+
         Automaton aut;
 
         if (automata.size() > 1)
@@ -869,16 +907,11 @@ public class AutomataMinimizer
         return monolithicMinimization(aut, hideThese);
     }
 
-    /**
-     * Composes automata and minimizes the result with hideThese considered as epsilon
-     * events.
-     */
+    
     private Automaton monolithicMinimization(Automaton aut, final Alphabet hideThese)
     throws Exception
     {
-//        logger.info("before monolithic minimization "+aut);
-//        logger.info("the number of statesaut "+ aut.nbrOfStates());
-//        logger.info(hideThese);
+
         /*
         // If supervision equivalence, make the result a kripke automaton!
         if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
@@ -961,6 +994,7 @@ public class AutomataMinimizer
             aut.setComment("" + nameIndex++);
         }
 		*/
+
 
         return aut;
     }

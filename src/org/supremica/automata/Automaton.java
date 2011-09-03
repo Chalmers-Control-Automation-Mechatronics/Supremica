@@ -1622,20 +1622,20 @@ public class Automaton
         getAlphabet().minus(hideThese);
 
         // Do we care about controllability?
-        if (!preserveControllability)	// no care about controllability, only a single tau event (which will by default be controllable!)
+        if (!preserveControllability)
         {
             // Get/create silent event tau
             final String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
-            LabeledEvent tau = getAlphabet().getEvent(silentName);  // Check to see if this already exists
+            LabeledEvent tau = getAlphabet().getEvent(silentName);
             if (tau == null)
             {
                 tau = new LabeledEvent(silentName);
                 tau.setUnobservable(true);
                 getAlphabet().addEvent(tau);
             }
-            else    // already exists...
+            else
             {
-                if (tau.isObservable())	// ... and is observable. No good.
+                if (tau.isObservable())
                 {
                     logger.error("The event name " + silentName +
                         " is reserved and must be unobservable!");
@@ -1666,7 +1666,7 @@ public class Automaton
                 removeArc(arc);
             }
         }
-        else	// yes care about controllability, distinguish between tau_c and tau_u
+        else
         {
             // Get/create silent events tau_c and tau_u
             // tau_c
@@ -1752,7 +1752,6 @@ public class Automaton
      */
     public void hide(final Alphabet hideThese, final boolean preserveControllability )
     {
-//        logger.info(hideThese);
         hideThese.minus(hideThese.getUnobservableEvents());
         // new hiding method by using TauEvent class. The old version is oldHides now.
         // Don't hide nothing!
@@ -1760,14 +1759,14 @@ public class Automaton
         {
             return;
         }
-        
+
             // Modify arcs
 //            final LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
             for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
             {
                 final Arc arc = arcIt.next();
                 LabeledEvent arcE=arc.getEvent();
-                
+
                 // Hide this one?
                 if (hideThese.contains(arcE))
                 {
@@ -1778,18 +1777,16 @@ public class Automaton
                         getAlphabet().addEvent(tau);
                         tauEventMap.put(arcE, tau);
                         arc.setEvent(tau);
-                        
+
                     }
                     else{
-                        // if the event is already hidden find the corresponding tau event and replace the event.
+                        // if the event is already hiden find the corresponding tau event and replace the event.
                         arc.setEvent(tauEventMap.get(arcE));
-                        
-                        
+
+
                     }
                 }
             }
-        // Now, hide the ones that were replaced by tau's
-        // If we get an exception in teh above code, at least these still remain...
         getAlphabet().minus(hideThese);
 
     }

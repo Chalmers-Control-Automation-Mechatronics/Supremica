@@ -79,14 +79,14 @@ public class AutomataSynthesizer
     // For the stopping
     private boolean stopRequested = false;
     private Stoppable threadToStop = null;
-    
+
     private ActionTimer timer = new ActionTimer();
     // Statistics
     AutomataSynchronizerHelperStatistics helperStatistics = new AutomataSynchronizerHelperStatistics();
-    
+
     private long numberOfStatesBDD;
     private long numberOfNodesBDD;
-
+    public static boolean synthesis=false;
     public AutomataSynthesizer(Automata theAutomata, SynchronizationOptions synchronizationOptions,
         SynthesizerOptions synthesizerOptions)
         throws IllegalArgumentException
@@ -117,7 +117,7 @@ public class AutomataSynthesizer
     {
         timer = new ActionTimer();
         timer.start();
-        
+
         Automata result = new Automata();
 
         if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHIC)
@@ -174,7 +174,7 @@ public class AutomataSynthesizer
             }
             else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
             {
-                
+
                 // NONBLOCKING and controllable. Plantify the specifications and supervisors!
             	// if no plants in model, just set everything to type 'plant'
                 if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
@@ -185,17 +185,17 @@ public class AutomataSynthesizer
                 	}
                 }
             }
-            
+
             // Do the stuff!
             AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
             minimizer.setExecutionDialog(executionDialog);
-            
+
             MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
 
             Automata min = minimizer.getCompositionalMinimization(options);
             for (Automaton sup: min)
             {
-                
+
                 sup.setComment("sup(" + min.getName() + ")");
                 sup.setName(null);
             }
@@ -215,16 +215,16 @@ public class AutomataSynthesizer
 
          else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.SYNTHESISA)
         {
-             
+
             // Use synthesis Abstraction minimization!
 
             // Prepare for synthesis
             // Make a copy
-             
+
             theAutomata = new Automata(theAutomata);
             // Make preparations based on synthesis type
             SynthesisType type = synthesizerOptions.getSynthesisType();
-            
+
             if (type == SynthesisType.NONBLOCKING)
             {
                 // Only nonblocking? Then everything should be considered controllable!
@@ -238,7 +238,7 @@ public class AutomataSynthesizer
             }
             else if (type == SynthesisType.CONTROLLABLE)
             {
-                
+
                 // Only controllable? Then everything should be considered marked...
                 // and AFTER that, the specs must be plantified!
                 for (Automaton automaton : theAutomata)
@@ -252,7 +252,7 @@ public class AutomataSynthesizer
             else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
             {
 
-                
+
                 // NONBLOCKING and controllable. Plantify the specifications and supervisors!
             	// if no plants in model, just set everything to type 'plant'
                 if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
@@ -267,59 +267,64 @@ public class AutomataSynthesizer
             // Do the stuff!
             AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
             minimizer.setExecutionDialog(executionDialog);
-
+            synthesis=true;
+            
             MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptionsSynthesisA();
-           
+
 //          //Abstract the automata by using synthesis Abstraction
-            Automata min = minimizer.getCompositionalMinimization(options);
-            // Replace all the tau event by the original event.
-            //First the blocked events and
-            if( min.getFirstAutomaton().getBlockedEvents().size()>0){
-
-                Alphabet alphabet = min.getFirstAutomaton().getBlockedEvents();
-                for(Iterator<LabeledEvent> itr = alphabet.getUnobservableEvents().iterator(); itr.hasNext();){
-                    TauEvent tauEvent = new TauEvent(itr.next());
-                    LabeledEvent labeledevent = tauEvent.getOriginalEvent();
-                    if(!alphabet.contains(labeledevent)){
-                        alphabet.addEvent(labeledevent);
-                    }
-                    if(alphabet.contains(tauEvent)){
-                    alphabet.removeEvent(tauEvent);}
-                }
-
-            }
-            if( min.getFirstAutomaton().getBlockedEvents().size()>0){
-//
-                Alphabet alphabet = min.getFirstAutomaton().getBlockedEvents();
-                for(Iterator<LabeledEvent> itr = alphabet.getUnobservableEvents().iterator(); itr.hasNext();){
-                    TauEvent tauEvent = new TauEvent(itr.next());
-                    if(alphabet.contains(tauEvent)){
-                    alphabet.removeEvent(tauEvent);}
-                    
-                }
-            }
-            //then events of transitions.
-            for (final Iterator<Arc> arcIt = min.getFirstAutomaton().arcIterator(); arcIt.hasNext(); )
-            {
-                final Arc arc = arcIt.next();
-                if (arc.getEvent().isUnobservable())
-                {
-                   LabeledEvent orig = ((TauEvent)arc.getEvent()).getOriginalEvent();
-                   arc.setEvent(orig);
-                   if(!min.getFirstAutomaton().getAlphabet().contains(orig)){
-                   min.getFirstAutomaton().getAlphabet().addEvent(orig);}
-                   
+            Automata min = minimizer.getCompositionalMinimization(options, synthesis);
+            
+            // get the halfwaysynthesis automata.
+            Automata halfwaySynthesisResult = new Automata();
+            for(Automaton aut:min){
+                if(aut.getName().contains("HalfWaySynthesisResult")){
+                    halfwaySynthesisResult.addAutomaton(aut);
                 }
             }
             
+            if(halfwaySynthesisResult.size()>0){
+                min.removeAutomata(halfwaySynthesisResult);
+            }
+             
+            Automaton cloneAutomaton=min.getFirstAutomaton();
+//           
+           
+            Alphabet tauToBeRemoved = new Alphabet();
+            for (final Iterator<Arc> arcIt = cloneAutomaton.arcIterator(); arcIt.hasNext(); )
+            {
+                
+                final Arc arc = arcIt.next();
+                if (arc.getEvent().isUnobservable())
+                {
+                    if(cloneAutomaton.getAlphabet().contains(arc.getEvent())&&!tauToBeRemoved.contains(arc.getEvent())){
+                       tauToBeRemoved.add(arc.getEvent());
+                   }
+                   LabeledEvent orig = ((TauEvent)arc.getEvent()).getOriginalEvent();
+                   arc.setEvent(orig);
+
+
+                   if(!cloneAutomaton.getAlphabet().contains(orig)){
+                       cloneAutomaton.getAlphabet().addEvent(orig);
+                   }
+
+                }
+            }
+            cloneAutomaton.getAlphabet().minus(tauToBeRemoved);
+            min.addAutomaton(cloneAutomaton);
+            
+//
             // Applying synthesis on the abstract automaton.
             MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
             threadToStop = synthesizer;
             MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
             min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
-            if (stopRequested) return new Automata();
+            if (stopRequested)
+                return new Automata();
 
             result.addAutomaton(retval.automaton);
+            if(halfwaySynthesisResult.size()>0){
+                result.addAutomata(halfwaySynthesisResult);
+            }
             for (Automaton sup: min)
             {
                 if(!sup.isDeterministic()){
@@ -327,6 +332,7 @@ public class AutomataSynthesizer
                 }
                 sup.setComment("sup(" + min.getName() + ")");
                 sup.setName(null);
+                synthesis=false;
             }
 
             // Present result
@@ -336,8 +342,9 @@ public class AutomataSynthesizer
                 logger.info("The following states are allowed by the maximally permissive, "
                     + "controllable and nonblocking supervisor: " +  min.getFirstAutomaton().getStateSet() + ".");
             }
-            
+
 //            result.addAutomata(min);
+
         }
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -358,23 +365,23 @@ public class AutomataSynthesizer
 				BDDAutomata bdda = bddSynthesizer.getBDDAutomata();
             	@SuppressWarnings("unused")
 				int safeStates = bddSynthesizer.computeSafeStates();
-            
-/*            
+
+/*
             int coreach_int = bddSynthesizer.coReachStates();
             int dead_int = bddSynthesizer.deadStates();
 
             int reach_int = bddSynthesizer.reachStates();
             int uc_int = bddSynthesizer.UCStates();
-            
+
             System.err.println("number of reachable states: "+bdda.count_states(reach_int));
             System.err.println("number of uncontrollable states: "+bdda.count_states(uc_int));
-*/            
+*/
  //           	System.err.println("Computing number of states and nodes...");
-/*            
+/*
             bdda.show_states(reach_int);
             bdda.show_states(coreach_int);
             bdda.show_states(dead_int);
-*/            
+*/
 
 //            numberOfStatesBDD = bdda.count_states(bdd_int);
 //            bddSynthesizer.extractOnlineSupervisor();
@@ -382,9 +389,9 @@ public class AutomataSynthesizer
 //            	numberOfStatesBDD = bdda.count_states(safeStates);
 
 //            bdda.show_states(bdd_int);
- 
+
 //            numberOfNodesBDD = bdda.nodeCount(bdd_int);
-            
+
 //            System.err.println("number of nodes (BDD): "+numberOfNodesBDD);
 
 //            	System.err.println("number of states (BDD): "+numberOfStatesBDD);
@@ -421,16 +428,16 @@ public class AutomataSynthesizer
         {
             logger.error("Unknown synthesis algorithm");
         }
-        
+
         timer.stop();
         return result;
     }
-    
+
     public String getTime()
     {
         return timer.toString();
     }
-    
+
     public BigDecimal getTimeSeconds()
     {
         String[] result = (getTime()).split("\\s");
@@ -446,7 +453,7 @@ public class AutomataSynthesizer
                 f1 = new Float(result[0])*60;
             else if(result[1].equals("hours"))
                 f1 = new Float(result[0])*60*60;
-            
+
             if(result[3].equals("milliseconds"))
                 f2 = new Float(result[2])/ 1000;
             else if(result[3].equals("seconds"))
@@ -456,22 +463,30 @@ public class AutomataSynthesizer
 
             out = (f1+f2);
         }
-        
+
         BigDecimal bd = new BigDecimal(out);
         bd = bd.setScale(3,BigDecimal.ROUND_DOWN);
-        
+
         return bd;
-        
+
     }
-    
+
     public long getNbrOfStatesBDD()
     {
         return numberOfStatesBDD;
     }
-    
+
     public long getNbrOfNodesBDD()
     {
         return numberOfNodesBDD;
+    }
+     /**
+     * A method for automaton abstraction to figure out if the tauevent should be
+     * renamed back to to the original events. In the case of synthesis it returns
+     * true otherwise false.
+     */
+    public static boolean renameBack(){
+        return synthesis;
     }
 
     /**
@@ -593,7 +608,7 @@ public class AutomataSynthesizer
 			MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					automata, synthesizerOptions, synchronizationOptions,
 					executionDialog, helperStatistics, false);
- 
+
             if (stopRequested)
             {
                 return new Automata();
