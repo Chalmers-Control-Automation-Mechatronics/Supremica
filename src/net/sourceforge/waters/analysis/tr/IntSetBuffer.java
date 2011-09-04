@@ -13,6 +13,8 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntProcedure;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +88,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
     int offset = mNextFreeOffset & BLOCK_MASK;
     long current = count;
     int shift = mSizeShift;
-    for (final int value : data) {
+    for (final long value : data) {
       current |= (value << shift);
       shift += mDataShift;
       if (shift >= 32) {
@@ -301,6 +303,35 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
 
   //#########################################################################
+  //# Debugging
+  public String toString(final int set)
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter printer = new PrintWriter(writer);
+    dump(printer, set);
+    printer.close();
+    return writer.toString();
+  }
+
+  public void dump(final PrintWriter printer, final int set)
+  {
+    final IntSetIterator iter = iterator(set);
+    printer.print('{');
+    boolean first = true;
+    while (iter.advance()) {
+      if (first) {
+        first = false;
+      } else {
+        printer.print(", ");
+      }
+      final int state = iter.getCurrentData();
+      printer.print(state);
+    }
+    printer.print('}');
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private int getNumberOfWords(final int count)
   {
@@ -424,7 +455,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       final int data = block[offset];
       mRemainingCount = data & mSizeMask;
       mCurrentShift = mSizeShift - mDataShift;
-      mCurrentData = data >>> mCurrentShift;
+      mCurrentData = (data & 0xffffffffL) >>> mCurrentShift;
     }
 
     public boolean advance()
@@ -446,13 +477,14 @@ public class IntSetBuffer implements WatersIntHashingStrategy
         mCurrentShift &= 0x1f;
         final int[] block = mBlocks.get(mCurrentOffset >> BLOCK_SHIFT);
         final int offset = mCurrentOffset & BLOCK_MASK;
-        mCurrentData = block[offset] >>> mCurrentShift;
+        final long data = block[offset] & 0xffffffffL;
+        mCurrentData = data >>> mCurrentShift;
       }
       if (mCurrentShift + mDataShift > 32) {
         mCurrentOffset++;
         final int[] block = mBlocks.get(mCurrentOffset >> BLOCK_SHIFT);
         final int offset = mCurrentOffset & BLOCK_MASK;
-        final long data = (long) block[offset] & 0xffffffffL;
+        final long data = block[offset] & 0xffffffffL;
         mCurrentData |= data << (32 - mCurrentShift);
         mCurrentShift -= 32;
       }

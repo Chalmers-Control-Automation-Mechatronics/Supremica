@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters BDD
 //# PACKAGE: net.sourceforge.waters.analysis.bdd
 //# CLASS:   BDDModelVerifierFactory
 //###########################################################################
@@ -36,7 +36,8 @@ public class BDDModelVerifierFactory
     return SingletonHolder.theInstance;
   }
 
-  public static BDDModelVerifierFactory getInstance(final List<String> cmdline)
+  public static BDDModelVerifierFactory getInstance
+    (final List<String> cmdline)
   {
     return new BDDModelVerifierFactory(cmdline);
   }
@@ -58,8 +59,9 @@ public class BDDModelVerifierFactory
     super(arglist);
     addArgument(new CommandLineArgumentPack());
     addArgument(new CommandLineArgumentOrder());
-    addArgument(new CommandLineArgumentDynamic());
+    addArgument(new CommandLineArgumentInitialSize());
     addArgument(new CommandLineArgumentParitioningSizeLimit());
+    addArgument(new CommandLineArgumentDynamic());
   }
 
 
@@ -162,6 +164,30 @@ public class BDDModelVerifierFactory
     }
   }
 
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentInitialSize
+  private static class CommandLineArgumentInitialSize
+    extends CommandLineArgumentInteger
+  {
+    //#######################################################################
+    //# Constructor
+    private CommandLineArgumentInitialSize()
+    {
+      super("-size", "Initial size of BDD node table");
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModelVerifier verifier)
+    {
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final int size = getValue();
+      bddVerifier.setInitialSize(size);
+    }
+  }
 
   //#########################################################################
   //# Inner Class CommandLineArgumentParitioningSizeLimit

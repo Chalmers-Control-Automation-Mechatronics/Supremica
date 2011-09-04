@@ -327,6 +327,12 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "GlobalAndLocalVariables");
   }
 
+  public void testCompile_io1()
+  throws IOException, WatersException
+  {
+    compile("handwritten", "io1");
+  }
+
   public void testCompile_machines_buffer_efa()
     throws IOException, WatersException
   {

@@ -137,11 +137,17 @@ public class SubsetConstructionTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface net.sourceforge.waters.analysis.abstraction.
+  //# TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+  }
+
+  public boolean isPartitioning()
+  {
+    return false;
   }
 
   @Override

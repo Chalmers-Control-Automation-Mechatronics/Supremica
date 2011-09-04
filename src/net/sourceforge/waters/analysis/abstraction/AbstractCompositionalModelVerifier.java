@@ -1081,15 +1081,6 @@ public abstract class AbstractCompositionalModelVerifier
   private void runMonolithicCheck()
     throws AnalysisException
   {
-    final Logger logger = getLogger();
-    if (logger.isDebugEnabled()) {
-      double estimate = 1.0;
-      for (final AutomatonProxy aut : mCurrentAutomata) {
-        estimate *= aut.getStates().size();
-      }
-      logger.debug("Monolithically composing " + mCurrentAutomata.size() +
-                   " automata, estimated " + estimate + " states.");
-    }
     final int numEvents = mEventInfoMap.size() +
       (mPropositions != null ? mPropositions.size() : 0);
     final List<EventProxy> events = new ArrayList<EventProxy>(numEvents);
@@ -1100,6 +1091,16 @@ public abstract class AbstractCompositionalModelVerifier
     Collections.sort(events);
     final ProductDESProxy des =
       createProductDESProxy(events, mCurrentAutomata, false);
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final Collection<AutomatonProxy> automata = des.getAutomata();
+      double estimate = 1.0;
+      for (final AutomatonProxy aut : automata) {
+        estimate *= aut.getStates().size();
+      }
+      logger.debug("Monolithically composing " + automata.size() +
+                   " automata, estimated " + estimate + " states.");
+    }
     mCurrentMonolithicVerifier.setModel(des);
     mCurrentMonolithicVerifier.run();
     // Do not clean up before run, keep data just in case of overflow ...

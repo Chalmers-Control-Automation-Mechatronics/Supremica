@@ -40,7 +40,13 @@ public class TauLoopRemovalTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface net.sourceforge.waters.analysis.abstraction.
+  //# TransitionRelationSimplifier
+  public boolean isPartitioning()
+  {
+    return true;
+  }
+
   @Override
   public boolean isObservationEquivalentAbstraction()
   {

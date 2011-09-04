@@ -39,6 +39,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -176,7 +177,11 @@ public abstract class CompositionalSafetyVerifier
     for (final AutomatonProxy aut : automata) {
       if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
         mProperties.add(aut);
-        mPropertyEvents.addAll(aut.getEvents());
+        for (final EventProxy event : aut.getEvents()) {
+          if (translator.getEventKind(event) != EventKind.PROPOSITION) {
+            mPropertyEvents.addAll(aut.getEvents());
+          }
+        }
       }
     }
     super.initialiseEventsToAutomata();
@@ -186,6 +191,20 @@ public abstract class CompositionalSafetyVerifier
   protected boolean canBeHidden(final EventProxy event)
   {
     return !mPropertyEvents.contains(event);
+  }
+
+  @Override
+  protected boolean isSubsystemTrivial
+    (final Collection<AutomatonProxy> automata)
+  {
+    for (final AutomatonProxy aut : automata) {
+      for (final EventProxy event : aut.getEvents()) {
+        if (mPropertyEvents.contains(event)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   @Override

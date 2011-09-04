@@ -120,11 +120,17 @@ public class ObserverProjectionTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface net.sourceforge.waters.analysis.abstraction.
+  //# TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
+  }
+
+  public boolean isPartitioning()
+  {
+    return true;
   }
 
   @Override

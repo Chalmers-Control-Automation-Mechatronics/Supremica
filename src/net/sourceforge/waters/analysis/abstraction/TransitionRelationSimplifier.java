@@ -109,12 +109,23 @@ public interface TransitionRelationSimplifier
   public boolean run() throws AnalysisException;
 
   /**
+   * Returns whether this transition relation simplifier can produce
+   * a result partition to relate states in the input automaton to states
+   * in the output automaton. Many standard simplifiers, such as bisimulation,
+   * provide a partition, but some simplifiers, such as subset construction,
+   * do not.
+   * @see #getResultPartition()
+   */
+  public boolean isPartitioning();
+
+  /**
    * Gets the partition produced by the last {@link #run()}.
    * @return The calculated partitioning. Each array in the collection
    *         defines the state codes comprising an equivalence class
    *         to be merged into a single state. A partition that does not
    *         change the automaton is indicated by a return value of
    *         <CODE>null</CODE>.
+   * @see #isPartitioning()
    */
   public List<int[]> getResultPartition();
 

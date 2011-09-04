@@ -78,7 +78,13 @@ public abstract class AbstractMarkingTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface net.sourceforge.waters.analysis.abstraction.
+  //# TransitionRelationSimplifier
+  public boolean isPartitioning()
+  {
+    return true;
+  }
+
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =

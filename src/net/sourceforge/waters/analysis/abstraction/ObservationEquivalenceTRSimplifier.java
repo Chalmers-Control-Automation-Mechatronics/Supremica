@@ -217,7 +217,8 @@ public class ObservationEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface net.sourceforge.waters.analysis.abstraction.
+  //# TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -232,6 +233,11 @@ public class ObservationEquivalenceTRSimplifier
     mNumReachableStates = rel.getNumberOfReachableStates();
     mNumEvents = rel.getNumberOfProperEvents();
     mStateShift = AutomatonTools.log2(mNumEvents);
+  }
+
+  public boolean isPartitioning()
+  {
+    return true;
   }
 
   @Override
@@ -252,6 +258,7 @@ public class ObservationEquivalenceTRSimplifier
   {
     super.reset();
     mTauClosure = null;
+    mTauIterator = mEventIterator = null;
   }
 
 

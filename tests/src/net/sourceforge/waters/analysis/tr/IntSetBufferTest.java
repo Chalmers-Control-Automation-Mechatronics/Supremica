@@ -116,19 +116,58 @@ public class IntSetBufferTest extends AbstractWatersTest
     }
   }
 
-  public void testSmallIterator()
+  public void testSmallArray1()
   {
     final IntSetBuffer buffer = new IntSetBuffer(4);
     final int[] data = {1, 2, 3};
-    final int offset = buffer.add(data);
-    final WatersIntIterator iter = buffer.iterator(offset);
-    assertTrue("Premature end of iteration!", iter.advance());
-    assertEquals("Unexpected data in iteration!", 1, iter.getCurrentData());
-    assertTrue("Premature end of iteration!", iter.advance());
-    assertEquals("Unexpected data in iteration!", 2, iter.getCurrentData());
-    assertTrue("Premature end of iteration!", iter.advance());
-    assertEquals("Unexpected data in iteration!", 3, iter.getCurrentData());
-    assertFalse("Expected end of iteration not signalled!", iter.advance());
+    addArray(buffer, data);
+  }
+
+  public void testSmallArrayList1()
+  {
+    final IntSetBuffer buffer = new IntSetBuffer(4);
+    final int[] data = {1, 2, 3};
+    addArrayList(buffer, data);
+  }
+
+  public void testSmallArray2()
+  {
+    final IntSetBuffer buffer = new IntSetBuffer(18);
+    final int[] data = {0, 1, 2, 4, 9, 14, 15};
+    addArray(buffer, data);
+  }
+
+  public void testSmallArrayList2()
+  {
+    final IntSetBuffer buffer = new IntSetBuffer(18);
+    final int[] data = {0, 1, 2, 4, 9, 14, 15};
+    addArrayList(buffer, data);
+  }
+
+  public void testSmallArray3()
+  {
+    final IntSetBuffer buffer = new IntSetBuffer(1513);
+    final int[] data =
+      {1, 3, 5, 6, 140, 142, 144, 145, 147, 149, 151, 153, 155, 157, 158,
+       159, 161, 163, 165, 167, 169, 171, 172, 173, 175, 177, 179, 181, 183,
+       185, 186, 187, 189, 191, 193, 195, 197, 199, 200, 201, 203, 205, 207,
+       209, 211, 213, 214, 215, 217, 219, 221, 223, 225, 227, 228, 229, 231,
+       233, 235, 237, 239, 241, 242, 244, 246, 248, 250, 252, 254, 256, 257,
+       259, 261, 263, 265, 267, 269, 270, 271, 273, 275, 277, 279, 281, 283,
+       284, 285, 287, 289, 291, 293, 295, 297, 298, 299, 301, 303, 305, 307,
+       309, 311, 313, 314, 316, 318, 320, 322, 324, 326, 327, 328, 330, 332,
+       334, 336, 338, 340, 341, 342, 344, 346, 348, 350, 352, 354, 355, 356,
+       358, 360, 362, 364, 366, 374, 470, 472, 474, 476, 477, 478, 479, 480,
+       481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494,
+       495, 496, 497, 498, 499, 500, 501, 502, 503, 504, 505, 506, 507, 508,
+       509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522,
+       523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536,
+       537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550,
+       551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564,
+       565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578,
+       579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592,
+       593, 594, 595, 596, 597, 598, 599};
+    addArray(buffer, data);
   }
 
   public void testBigIterator()
@@ -145,11 +184,43 @@ public class IntSetBufferTest extends AbstractWatersTest
       iter.reset(offset);
       for (int i = 1; i <= count; i++) {
         assertTrue("Premature end of iteration!", iter.advance());
-        assertEquals("Unexpected data in iteration!", i, iter.getCurrentData());
+        assertEquals("Unexpected data in iteration!",
+                     i, iter.getCurrentData());
       }
       assertFalse("Expected end of iteration not signalled!", iter.advance());
       assertEquals("Unexpected set size!", count, buffer.size(offset));
     }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Method
+  private void addArray(final IntSetBuffer buffer, final int[] data)
+  {
+    final int offset = buffer.add(data);
+    final WatersIntIterator iter = buffer.iterator(offset);
+    for (int i = 0; i < data.length; i++) {
+      assertTrue("Premature end of iteration!", iter.advance());
+      final int value = iter.getCurrentData();
+      assertEquals("Unexpected data in iteration!", data[i], value);
+    }
+    assertFalse("Expected end of iteration not signalled!", iter.advance());
+  }
+
+  private void addArrayList(final IntSetBuffer buffer, final int[] data)
+  {
+    final TIntArrayList list = new TIntArrayList(data.length);
+    for (final int d : data) {
+      list.add(d);
+    }
+    final int offset = buffer.add(list);
+    final WatersIntIterator iter = buffer.iterator(offset);
+    for (int i = 0; i < data.length; i++) {
+      assertTrue("Premature end of iteration!", iter.advance());
+      final int value = iter.getCurrentData();
+      assertEquals("Unexpected data in iteration!", data[i], value);
+    }
+    assertFalse("Expected end of iteration not signalled!", iter.advance());
   }
 
 }

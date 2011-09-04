@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters BDD
 //# PACKAGE: net.sourceforge.waters.analysis.bdd
-//# CLASS:   BDDVerifier
+//# CLASS:   BDDModelVerifier
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -115,8 +115,9 @@ public abstract class BDDModelVerifier
     super(model, desfactory, translator);
     mBDDPackage = bddpackage;
     mVariableOrdering = VariableOrdering.FORCE;
-    mIsReorderingEnabled = true;
+    mInitialSize = 50000;
     mPartitioningSizeLimit = Integer.MAX_VALUE;
+    mIsReorderingEnabled = true;
   }
 
 
@@ -132,24 +133,29 @@ public abstract class BDDModelVerifier
     return mBDDPackage;
   }
 
-  public VariableOrdering getVariableOrdering()
-  {
-    return mVariableOrdering;
-  }
-
   public void setVariableOrdering(final VariableOrdering ordering)
   {
     mVariableOrdering = ordering;
   }
 
-  public boolean isReorderingEnabled()
+  public VariableOrdering getVariableOrdering()
   {
-    return mIsReorderingEnabled;
+    return mVariableOrdering;
   }
 
-  public void setReorderingEnabled(final boolean enable)
+  public void setInitialSize(final int size)
   {
-    mIsReorderingEnabled = enable;
+    mInitialSize = size;
+  }
+
+  public int getInitialSize()
+  {
+    return mInitialSize;
+  }
+
+  public void setPartitioningSizeLimit(final int limit)
+  {
+    mPartitioningSizeLimit = limit < 0 ? Integer.MAX_VALUE : limit;
   }
 
   public int getPartitioningSizeLimit()
@@ -157,9 +163,14 @@ public abstract class BDDModelVerifier
     return mPartitioningSizeLimit;
   }
 
-  public void setPartitioningSizeLimit(final int limit)
+  public void setReorderingEnabled(final boolean enable)
   {
-    mPartitioningSizeLimit = limit < 0 ? Integer.MAX_VALUE : limit;
+    mIsReorderingEnabled = enable;
+  }
+
+  public boolean isReorderingEnabled()
+  {
+    return mIsReorderingEnabled;
   }
 
 
@@ -187,9 +198,10 @@ public abstract class BDDModelVerifier
   public void setUp() throws AnalysisException
   {
     super.setUp();
-    final int initnodes = 10000; // breaks BuDDy at 57600 ???
+    final int initnodes = mInitialSize;
     final String name = mBDDPackage.getBDDPackageName();
-    mBDDFactory = BDDFactory.init(name, initnodes, initnodes >> 1);
+    mBDDFactory = BDDFactory.init(name, initnodes, CACHE_RATIO * initnodes);
+    mBDDFactory.setCacheRatio(CACHE_RATIO);
     try {
       final Class<?>[] parameterTypes =
         new Class<?>[] {Object.class, Object.class};
@@ -831,8 +843,9 @@ public abstract class BDDModelVerifier
   //# Data Members
   private BDDPackage mBDDPackage;
   private VariableOrdering mVariableOrdering;
-  private boolean mIsReorderingEnabled;
+  private int mInitialSize;
   private int mPartitioningSizeLimit;
+  private boolean mIsReorderingEnabled;
 
   private int mNumAutomata;
   private BDDFactory mBDDFactory;
@@ -850,6 +863,7 @@ public abstract class BDDModelVerifier
   //#########################################################################
   //# Class Constants
   private static final BDDPackage BDD_PACKAGE = BDDPackage.CUDD;
+  private static final int CACHE_RATIO = 10;
   private static final int START_REORDER_INDEX = 8;
 
 }

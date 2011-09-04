@@ -31,19 +31,28 @@ public class ChainTRSimplifier
   //# Constructors
   public ChainTRSimplifier()
   {
+    mIsPartitioning = true;
     mSteps = new LinkedList<TransitionRelationSimplifier>();
   }
 
   public ChainTRSimplifier(final List<TransitionRelationSimplifier> steps)
   {
-    mSteps = steps;
+    mIsPartitioning = true;
+    mSteps = new LinkedList<TransitionRelationSimplifier>();
+    for (final TransitionRelationSimplifier step : steps) {
+      add(step);
+    }
   }
 
   public ChainTRSimplifier(final List<TransitionRelationSimplifier> steps,
                            final ListBufferTransitionRelation rel)
   {
     super(rel);
-    mSteps = steps;
+    mIsPartitioning = true;
+    mSteps = new LinkedList<TransitionRelationSimplifier>();
+    for (final TransitionRelationSimplifier step : steps) {
+      add(step);
+    }
   }
 
 
@@ -65,12 +74,14 @@ public class ChainTRSimplifier
     final int config = step.getPreferredInputConfiguration();
     setPreferredOutputConfiguration(config);
     mSteps.add(step);
+    mIsPartitioning &= step.isPartitioning();
     return index;
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface net.sourceforge.waters.analysis.abstraction.
+  //# TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -100,6 +111,11 @@ public class ChainTRSimplifier
     for (final TransitionRelationSimplifier step : mSteps) {
       step.setPropositions(preconditionID, defaultID);
     }
+  }
+
+  public boolean isPartitioning()
+  {
+    return mIsPartitioning;
   }
 
   public boolean run()
@@ -208,8 +224,10 @@ public class ChainTRSimplifier
           for (int prop = 0; prop < numProps; prop++) {
             mReducedMarkings[prop] |= step.isReducedMarking(prop);
           }
-          final List<int[]> partition = step.getResultPartition();
-          mergePartitions(partition);
+          if (isPartitioning()) {
+            final List<int[]> partition = step.getResultPartition();
+            mergePartitions(partition);
+          }
         }
       } finally {
         step.reset();
@@ -252,6 +270,7 @@ public class ChainTRSimplifier
   //# Data Members
   private final List<TransitionRelationSimplifier> mSteps;
   private int mStopIndex;
+  private boolean mIsPartitioning;
   private boolean mIsObservationEquivalentAbstraction;
   private boolean[] mReducedMarkings;
 
