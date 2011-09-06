@@ -543,12 +543,9 @@ public class CompositionalConflictChecker
 
   //#########################################################################
   //# Events+Automata Maps
-  /**
-   * Maps the events in the model to a set of the automata that contain the
-   * event in their alphabet.
-   */
   @Override
   protected void initialiseEventsToAutomata()
+    throws OverflowException
   {
     super.initialiseEventsToAutomata();
     final ProductDESProxy model = getModel();

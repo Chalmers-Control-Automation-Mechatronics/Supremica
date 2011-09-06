@@ -15,9 +15,11 @@ import gnu.trove.TIntArrayList;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -30,6 +32,7 @@ import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.TraceChecker;
@@ -38,6 +41,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -169,6 +173,7 @@ public abstract class CompositionalSafetyVerifier
 
   @Override
   protected void initialiseEventsToAutomata()
+    throws OverflowException
   {
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
@@ -179,7 +184,8 @@ public abstract class CompositionalSafetyVerifier
     final int numEvents = events.size();
     mPropertyEventsMap = new HashMap<EventProxy,HidingMode>(numEvents);
     for (final AutomatonProxy aut : automata) {
-      if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
+      if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
+          !isTrivialProperty(aut)) {
         mProperties.add(aut);
         final Collection<EventProxy> local = aut.getEvents();
         final int numLocal = local.size();
@@ -208,6 +214,75 @@ public abstract class CompositionalSafetyVerifier
     return mode == null ? HidingMode.TAU : mode;
   }
 
+
+  @Override
+  protected boolean isSubsystemTrivial
+    (final Collection<AutomatonProxy> automata)
+  {
+    if (mProperties.isEmpty()) {
+      return setSatisfiedResult();
+    } else {
+      for (final AutomatonProxy aut : automata) {
+        for (final EventProxy event : aut.getEvents()) {
+          if (mPropertyEventsMap.containsKey(event)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+  }
+
+  @Override
+  protected AbstractionStep removeEvents(final Collection<EventProxy> removed)
+    throws OverflowException
+  {
+    final AbstractionStep step = super.removeEvents(removed);
+    if (step != null) {
+      final ProductDESProxyFactory factory = getFactory();
+      final Set<EventProxy> removedSet = new THashSet<EventProxy>(removed);
+      final ListIterator<AutomatonProxy> iter = mProperties.listIterator();
+      while (iter.hasNext()) {
+        final AutomatonProxy aut = iter.next();
+        final Collection<EventProxy> events = aut.getEvents();
+        boolean found = false;
+        for (final EventProxy event : events) {
+          if (removedSet.contains(event)) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          continue;
+        }
+        final int numEvents = events.size();
+        final Collection<EventProxy> newEvents =
+          new ArrayList<EventProxy>(numEvents - 1);
+        for (final EventProxy event : events) {
+          if (!removedSet.contains(event)) {
+            newEvents.add(event);
+          }
+        }
+        final String name = aut.getName();
+        final ComponentKind kind = aut.getKind();
+        final Collection<StateProxy> states = aut.getStates();
+        final Collection<TransitionProxy> transitions = aut.getTransitions();
+        final AutomatonProxy newAut = factory.createAutomatonProxy
+          (name, kind, newEvents, states, transitions);
+        if (isTrivialProperty(newAut)) {
+          iter.remove();
+        } else {
+          step.addAutomatonPair(newAut, aut);
+          iter.set(newAut);
+        }
+      }
+      for (final EventProxy event : removed) {
+        mPropertyEventsMap.remove(event);
+      }
+    }
+    return step;
+  }
+
   @Override
   protected boolean checkPropertyMonolithically
     (final List<AutomatonProxy> automata)
@@ -232,20 +307,6 @@ public abstract class CompositionalSafetyVerifier
       }
       return result;
     }
-  }
-
-  @Override
-  protected boolean isSubsystemTrivial
-    (final Collection<AutomatonProxy> automata)
-  {
-    for (final AutomatonProxy aut : automata) {
-      for (final EventProxy event : aut.getEvents()) {
-        if (mPropertyEventsMap.containsKey(event)) {
-          return false;
-        }
-      }
-    }
-    return true;
   }
 
   @Override
@@ -295,6 +356,35 @@ public abstract class CompositionalSafetyVerifier
   {
     // TODO
     TraceChecker.checkCounterExample(steps, automata, true);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private boolean isTrivialProperty(final AutomatonProxy aut)
+    throws OverflowException
+  {
+    final KindTranslator translator = getKindTranslator();
+    final Collection<EventProxy> filter = Collections.emptyList();
+    final EventEncoding enc =
+      new EventEncoding(aut, translator,
+                        filter, EventEncoding.FILTER_PROPOSITIONS);
+    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+      (aut, enc, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    rel.checkReachability();
+    final int numStates = rel.getNumberOfStates();
+    final int numEvents = rel.getNumberOfProperEvents();
+    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+    for (int s = 0; s < numStates; s++) {
+      if (rel.isReachable(s)) {
+        for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+          if (!iter.advance()) {
+            return false;
+          }
+        }
+      }
+    }
+    return false;
   }
 
 

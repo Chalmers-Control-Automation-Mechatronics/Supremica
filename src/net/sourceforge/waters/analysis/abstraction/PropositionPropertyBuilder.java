@@ -157,7 +157,9 @@ public class PropositionPropertyBuilder
     final Collection<EventProxy> outputEvents =
       new ArrayList<EventProxy>(numEvents);
     outputEvents.addAll(inputEvents);
-    outputEvents.add(mProposition);
+    if (!outputEvents.contains(mProposition)) {
+      outputEvents.add(mProposition);
+    }
     final Collection<AutomatonProxy> inputAutomata = mInputModel.getAutomata();
     final int numAutomata = inputAutomata.size();
     final Collection<String> autnames = new THashSet<String>(numAutomata);

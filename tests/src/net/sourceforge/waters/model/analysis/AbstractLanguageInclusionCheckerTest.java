@@ -201,21 +201,6 @@ public abstract class AbstractLanguageInclusionCheckerTest
     }
   }
 
-  public void testProfisafeI4SlaveEFA__neversend_PV0010()
-    throws Exception
-  {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_islave_efa.wmod";
-    final int maxseqno = 4;
-    final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
-    final List<ParameterBindingProxy> bindings =
-      Collections.singletonList(binding);
-    final String propname = "never_send[PV][0][0][1][0]";
-    final boolean cansend = false;
-    runModelVerifier(group, dir, name, bindings, !cansend, propname);
-  }
-
   public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_crc_fault_2()
     throws Exception
   {
