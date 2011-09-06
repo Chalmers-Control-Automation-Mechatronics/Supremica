@@ -889,13 +889,12 @@ public abstract class AbstractCompositionalModelVerifier
   }
 
   /**
-   * Returns to which extent the given event can be hidden in abstraction
-   * steps. This is used by safety verifiers. e.g., to exclude events used in
-   * properties from abstraction.
+   * Creates an event information record for the given event.
+   * @see EventInfo
    */
-  protected HidingMode getHidingMode(final EventProxy event)
+  protected EventInfo createEventInfo(final EventProxy event)
   {
-    return HidingMode.TAU;
+    return new EventInfo(event);
   }
 
   protected void addEventsToAutomata(final AutomatonProxy aut)
@@ -906,9 +905,7 @@ public abstract class AbstractCompositionalModelVerifier
       new TObjectByteHashMap<EventProxy>(numEvents);
     for (final TransitionProxy trans : aut.getTransitions()) {
       final EventProxy event = trans.getEvent();
-      if (!getHidingMode(event).isLocal()) {
-        statusMap.put(event, NOT_ONLY_SELFLOOP);
-      } else if (trans.getSource() != trans.getTarget()) {
+      if (trans.getSource() != trans.getTarget()) {
         statusMap.put(event, NOT_ONLY_SELFLOOP);
       } else if (!statusMap.containsKey(event)) {
         statusMap.put(event, ONLY_SELFLOOP);
@@ -916,12 +913,13 @@ public abstract class AbstractCompositionalModelVerifier
     }
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : events) {
-      if (translator.getEventKind(event) != EventKind.PROPOSITION &&
-          getHidingMode(event).isLocal()) {
+      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
         EventInfo info = mEventInfoMap.get(event);
         if (info == null) {
-          final HidingMode mode = getHidingMode(event);
-          info = new EventInfo(mode);
+          info = createEventInfo(event);
+          if (!info.isLocal()) {
+            continue;
+          }
           mEventInfoMap.put(event, info);
         }
         final byte lookup = statusMap.get(event);
@@ -970,10 +968,11 @@ public abstract class AbstractCompositionalModelVerifier
     (final Collection<AutomatonProxy> candidate)
   {
     final Set<EventProxy> localEvents = new THashSet<EventProxy>();
-    for (final Map.Entry<EventProxy,EventInfo> entry : mEventInfoMap.entrySet()) {
-      final EventProxy event = entry.getKey();
+    for (final Map.Entry<EventProxy,EventInfo> entry :
+         mEventInfoMap.entrySet()) {
       final EventInfo info = entry.getValue();
-      if (getHidingMode(event).isLocal() && info.containedIn(candidate)) {
+      if (info.isLocal() && info.containedIn(candidate)) {
+        final EventProxy event = entry.getKey();
         localEvents.add(event);
       }
     }
@@ -1250,8 +1249,8 @@ public abstract class AbstractCompositionalModelVerifier
     final int numLocal = local.size();
     final Collection<EventProxy> notHidden = new ArrayList<EventProxy>(numLocal);
     for (final EventProxy event : local) {
-      final HidingMode mode = getHidingMode(event);
-      if (mode.isLocal() && !mode.isTau()) {
+      final EventInfo info = mEventInfoMap.get(event);
+      if (info.isLocal() && !info.isTau()) {
         notHidden.add(event);
       }
     }
@@ -1305,7 +1304,8 @@ public abstract class AbstractCompositionalModelVerifier
     final int numLocal = local.size();
     final Collection<EventProxy> hidden = new ArrayList<EventProxy>(numLocal);
     for (final EventProxy event : local) {
-      if (getHidingMode(event).isTau()) {
+      final EventInfo info = mEventInfoMap.get(event);
+      if (info.isTau()) {
         hidden.add(event);
       }
     }
@@ -1570,128 +1570,6 @@ public abstract class AbstractCompositionalModelVerifier
   {
     final CompositionalVerificationResult global = getAnalysisResult();
     global.addMonolithicVerificationResult(result);
-  }
-
-
-  //#########################################################################
-  //# Inner Enumeration HidingMode
-  /**
-   * The hiding modes supported by compositional model verifier.
-   * Different compositional approaches can hide events in different ways.
-   * The standard approach is to replace all local events by the silent
-   * event {@link EventEncoding#TAU TAU}, but some algorithms may prefer
-   * to retain events although they are local.
-   */
-  protected enum HidingMode
-  {
-    /**
-     * A hiding mode to indicate that an event is local and should be
-     * replaced by {@link EventEncoding#TAU TAU} during abstraction.
-     */
-    TAU {
-      @Override
-      protected boolean isTau()
-      {
-        return true;
-      }
-      @Override
-      protected boolean isLocal()
-      {
-        return true;
-      }
-      @Override
-      protected boolean isSubjectToSelfloopRemoval()
-      {
-        return true;
-      }
-    },
-    /**
-     * A hiding mode to indicate that an event can be considered as local,
-     * but should not be replaced by {@link EventEncoding#TAU TAU} during
-     * abstraction, but may be subject to selfloop removal.
-     */
-    LOCAL_SELFLOOP {
-      @Override
-      protected boolean isTau()
-      {
-        return false;
-      }
-      @Override
-      protected boolean isLocal()
-      {
-        return true;
-      }
-      @Override
-      protected boolean isSubjectToSelfloopRemoval()
-      {
-        return true;
-      }
-    },
-    /**
-     * A hiding mode to indicate that an event can be considered as local,
-     * but should not be replaced by {@link EventEncoding#TAU TAU} during
-     * abstraction, and should never be subject to selfloop removal.
-     */
-    LOCAL_NONSELFLOOP {
-      @Override
-      protected boolean isTau()
-      {
-        return false;
-      }
-      @Override
-      protected boolean isLocal()
-      {
-        return true;
-      }
-      @Override
-      protected boolean isSubjectToSelfloopRemoval()
-      {
-        return false;
-      }
-    },
-    /**
-     * A hiding mode to indicate that an event should not be considered
-     * as local during abstraction.
-     */
-    SHARED {
-      @Override
-      protected boolean isTau()
-      {
-        return false;
-      }
-      @Override
-      protected boolean isLocal()
-      {
-        return false;
-      }
-      @Override
-      protected boolean isSubjectToSelfloopRemoval()
-      {
-        return false;
-      }
-    };
-
-    /**
-     * Returns whether an event should be treated as
-     * {@link EventEncoding#TAU TAU}. Events treated as TAU are removed
-     * during synchronous composition.
-     */
-    protected abstract boolean isTau();
-
-    /**
-     * Returns whether an event can be considered as local events. Local
-     * events are passed that have not been replaced by TAU during synchronous
-     * compositions are passed to the abstraction procedure for special
-     * treatment.
-     */
-    protected abstract boolean isLocal();
-
-    /**
-     * Returns whether an event can be subject to selfloop removal.
-     * Events subject to selfloop removal are removed from the model
-     * when it is found that they appear only as selfloop events.
-     */
-    protected abstract boolean isSubjectToSelfloopRemoval();
   }
 
 
@@ -2719,14 +2597,54 @@ public abstract class AbstractCompositionalModelVerifier
     //# Constructor
     /**
      * Creates a new EventInfo record.
-     * @param  mode   The event's hiding mode.
      */
-    protected EventInfo(final HidingMode mode)
+    protected EventInfo(final EventProxy event)
     {
-      mHidingMode = mode;
+      mEvent = event;
       mAutomataMap = new TObjectByteHashMap<AutomatonProxy>();
       mNumNonSelfloopAutomata = 0;
       mIsBlocked = false;
+    }
+
+    //#######################################################################
+    //# Event Status
+    /**
+     * Gets the event associated with this event information record.
+     */
+    protected EventProxy getEvent()
+    {
+      return mEvent;
+    }
+
+    /**
+     * Returns whether this event should be treated as
+     * {@link EventEncoding#TAU TAU}. Events treated as TAU are removed
+     * during synchronous composition.
+     */
+    protected boolean isTau()
+    {
+      return true;
+    }
+
+    /**
+     * Returns whether this event can be considered as local event. Local
+     * events that have not been replaced by TAU during synchronous
+     * compositions are passed to the abstraction procedure for special
+     * treatment.
+     */
+    protected boolean isLocal()
+    {
+      return true;
+    }
+
+    /**
+     * Returns whether this event can be subject to selfloop removal.
+     * Events subject to selfloop removal are removed from the model
+     * when it is found that they appear only as selfloop events.
+     */
+    protected boolean isSubjectToSelfloopRemoval()
+    {
+      return isTau();
     }
 
     //#######################################################################
@@ -2817,7 +2735,7 @@ public abstract class AbstractCompositionalModelVerifier
       if (mIsBlocked) {
         return true;
       } else if (mNumNonSelfloopAutomata == 0) {
-        return mHidingMode.isSubjectToSelfloopRemoval();
+        return isSubjectToSelfloopRemoval();
       } else {
         return false;
       }
@@ -2867,7 +2785,7 @@ public abstract class AbstractCompositionalModelVerifier
 
     //#######################################################################
     //# Data Members
-    private final HidingMode mHidingMode;
+    private final EventProxy mEvent;
     private final TObjectByteHashMap<AutomatonProxy> mAutomataMap;
     private int mNumNonSelfloopAutomata;
     private boolean mIsBlocked;
@@ -3012,13 +2930,9 @@ public abstract class AbstractCompositionalModelVerifier
       final int size = mEventInfoMap.size();
       final Collection<List<AutomatonProxy>> found =
         new THashSet<List<AutomatonProxy>>(size);
-      for (final Map.Entry<EventProxy,EventInfo> entry :
-           mEventInfoMap.entrySet()) {
-        final EventProxy event = entry.getKey();
-        final EventInfo info = entry.getValue();
+      for (final EventInfo info : mEventInfoMap.values()) {
         assert info.getNumberOfAutomata() > 0;
-        if (getHidingMode(event).isLocal() &&
-            info.getNumberOfAutomata() > 1) {
+        if (info.isLocal() && info.getNumberOfAutomata() > 1) {
           final List<AutomatonProxy> list = info.getAutomataList();
           Collections.sort(list);
           if (isPermissibleCandidate(list) && found.add(list)) {

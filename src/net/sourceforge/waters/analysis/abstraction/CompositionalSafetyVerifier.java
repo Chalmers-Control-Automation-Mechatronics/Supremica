@@ -11,16 +11,15 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectByteHashMap;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -71,11 +70,12 @@ public abstract class CompositionalSafetyVerifier
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new conflict checker without a model or marking proposition.
-   * @param method
-   *          Abstraction procedure used for simplification.
+   * Creates a new safety verifier without a model.
    * @param factory
    *          Factory used for trace construction.
+   * @param translator
+   *          Kind translator that defines event controllability status
+   *          and automata types.
    * @param diag
    *          Diagnostics object to produce commented counterexamples.
    */
@@ -87,14 +87,14 @@ public abstract class CompositionalSafetyVerifier
   }
 
   /**
-   * Creates a new conflict checker to check whether the given model is
-   * nonblocking with respect to its default marking.
+   * Creates a new safety verifier to check the given model.
    * @param model
-   *          The model to be checked by this conflict checker.
-   * @param method
-   *          Abstraction procedure used for simplification.
+   *          The model to be checked by this safety verifier.
    * @param factory
    *          Factory used for trace construction.
+   * @param translator
+   *          Kind translator that defines event controllability status
+   *          and automata types.
    * @param diag
    *          Diagnostics object to produce commented counterexamples.
    */
@@ -182,7 +182,7 @@ public abstract class CompositionalSafetyVerifier
     mProperties = new ArrayList<AutomatonProxy>(numAutomata);
     final Collection<EventProxy> events = model.getEvents();
     final int numEvents = events.size();
-    mPropertyEventsMap = new HashMap<EventProxy,HidingMode>(numEvents);
+    mPropertyEventsMap = new TObjectByteHashMap<EventProxy>(numEvents);
     for (final AutomatonProxy aut : automata) {
       if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
           !isTrivialProperty(aut)) {
@@ -196,8 +196,7 @@ public abstract class CompositionalSafetyVerifier
         }
         for (final EventProxy event : local) {
           if (translator.getEventKind(event) != EventKind.PROPOSITION) {
-            final HidingMode mode =
-              used.contains(event) ? HidingMode.SHARED : HidingMode.LOCAL_NONSELFLOOP;
+            final byte mode = used.contains(event) ? REGULAR : FORBIDDEN;
             mPropertyEventsMap.put(event, mode);
           }
         }
@@ -208,10 +207,9 @@ public abstract class CompositionalSafetyVerifier
   }
 
   @Override
-  protected HidingMode getHidingMode(final EventProxy event)
+  protected EventInfo createEventInfo(final EventProxy event)
   {
-    final HidingMode mode = mPropertyEventsMap.get(event);
-    return mode == null ? HidingMode.TAU : mode;
+    return new SafetyEventInfo(event);
   }
 
 
@@ -389,6 +387,37 @@ public abstract class CompositionalSafetyVerifier
 
 
   //#########################################################################
+  //# Inner Class SafetyEventInfo
+  private class SafetyEventInfo
+    extends EventInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private SafetyEventInfo(final EventProxy event)
+    {
+      super(event);
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.abstraction.
+    //# AbstractCompositionalModelVerifier.EventInfo
+    @Override
+    protected boolean isTau()
+    {
+      final EventProxy event = getEvent();
+      return !mPropertyEventsMap.containsKey(event);
+    }
+
+    @Override
+    protected boolean isLocal()
+    {
+      final EventProxy event = getEvent();
+      return mPropertyEventsMap.get(event) != REGULAR;
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class ProjectionAbstractionProcedure
   private class ProjectionAbstractionProcedure
     extends TRSimplifierAbstractionProcedure
@@ -426,7 +455,7 @@ public abstract class CompositionalSafetyVerifier
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);
         for (final EventProxy event : local) {
-          if (mPropertyEventsMap.get(event) == HidingMode.LOCAL_NONSELFLOOP) {
+          if (mPropertyEventsMap.get(event) == FORBIDDEN) {
             final int e = eventEnc.getEventCode(event);
             mSubsetConstructionTRSimplifier.setForbiddenEvent(e, true);
           }
@@ -591,26 +620,40 @@ public abstract class CompositionalSafetyVerifier
   private List<AutomatonProxy> mProperties;
 
   /**
-   * Hiding modes of events used in properties. Events used in properties
-   * cannot be hidden during compositional minimisation, but <I>forbidden</I>
-   * events can be treated specially. An event is considered as forbidden if
-   * it is disabled in all states of some property automaton. These events
-   * cannot be replaced by {@link EventEncoding#TAU TAU}, but they be treated
-   * specially in subset construction, because successor states reached after
-   * these events do not need to be explored. Therefore, forbidden events are
-   * assigned the hiding mode {@link HidingMode#LOCAL_NONSELFLOOP LOCAL}, while other
-   * property events are assigned the hiding mode {@link HidingMode#SHARED
-   * SHARED}.
+   * Status information for events used in properties. Events used in
+   * properties cannot be hidden during compositional minimisation, but
+   * <I>forbidden</I> events can be treated specially. An event is considered
+   * as forbidden if it is disabled in all states of some property automaton.
+   * These events cannot be replaced by {@link EventEncoding#TAU TAU}, but
+   * they are treated specially in subset construction, because successor
+   * states reached after these events do not need to be explored. Therefore,
+   * forbidden events are assigned the status {@link #FORBIDDEN}, while other
+   * property events are assigned the status {@link #REGULAR}.
    */
-  private Map<EventProxy,HidingMode> mPropertyEventsMap;
+  private TObjectByteHashMap<EventProxy> mPropertyEventsMap;
 
   /**
    * List of plants still to be checked.
    * Event-disjoint subsystems that share events with the properties cannot
-   * be checked independently. Therefore, automata from event-disjoint are
-   * collected in this list. When the last monolithic check is requested,
-   * all plants are combined and checked together against the properties.
+   * be checked independently. Therefore, automata from event-disjoint
+   * subsystems are collected in this list. When the last monolithic check is
+   * requested, all plants are combined and checked together against the
+   * properties.
    */
   private List<AutomatonProxy> mCollectedPlants;
+
+
+  //#########################################################################
+  //# Class Constants
+  /**
+   * Status of non-forbidden property events.
+   * @see #mPropertyEventsMap
+   */
+  private static final byte REGULAR = 1;
+  /**
+   * Status of forbidden property events.
+   * @see #mPropertyEventsMap
+   */
+  private static final byte FORBIDDEN = 2;
 
 }
