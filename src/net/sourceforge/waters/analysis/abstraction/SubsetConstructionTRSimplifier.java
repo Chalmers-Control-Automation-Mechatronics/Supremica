@@ -154,6 +154,7 @@ public class SubsetConstructionTRSimplifier
   public void reset()
   {
     super.reset();
+    mForbiddenEvents = null;
     mSetOffsets = null;
     mStateSetBuffer = null;
     mTransitionBuffer = null;
@@ -181,7 +182,7 @@ public class SubsetConstructionTRSimplifier
         rel.createSuccessorsTauClosure(mTransitionLimit);
       mTauIterator = closure.createIterator();
       mEventIterator = closure.createPostEventClosureIterator(-1);
-    } else if (!rel.isDeterministic()) {
+    } else if (!rel.isDeterministic() || mForbiddenEvents != null) {
       mIsDeterministic = false;
       mTauIterator = null;
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
@@ -349,7 +350,26 @@ public class SubsetConstructionTRSimplifier
       rel.removeEvent(EventEncoding.TAU);
       mTransitionBuffer.addOutgoingTransitions(rel);
       mTransitionBuffer = null;
-      rel.removeProperSelfLoopEvents();
+      if (mForbiddenEvents == null) {
+        rel.removeProperSelfLoopEvents();
+      } else {
+        final TIntArrayList forbiddenVictims =
+          new TIntArrayList(mForbiddenEventIndexes.length);
+        final int numEvents = rel.getNumberOfProperEvents();
+        for (int event = 0; event < numEvents; event++) {
+          if (isSelfloopEventExceptInForbiddenStates(event)) {
+            if (mForbiddenEvents.get(event)) {
+              forbiddenVictims.add(event);
+            } else {
+              rel.removeEvent(event);
+            }
+          }
+        }
+        for (int e = 0; e < forbiddenVictims.size(); e++) {
+          final int event = forbiddenVictims.get(e);
+          rel.removeEvent(event);
+        }
+      }
     }
   }
 
@@ -358,6 +378,44 @@ public class SubsetConstructionTRSimplifier
   {
     mForbiddenEventIndexes = mNormalEventIndexes = null;
     mTauIterator = mForbiddenEventIterator = mEventIterator = null;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private boolean isSelfloopEventExceptInForbiddenStates(final int event)
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (rel.isUsedEvent(event)) {
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      final int numStates = rel.getNumberOfStates();
+      states:
+      for (int state = 0; state < numStates; state++) {
+        if (rel.isReachable(state)) {
+          boolean selfloop = false;
+          iter.reset(state, event);
+          while (iter.advance()) {
+            if (iter.getCurrentTargetState() != state) {
+              return false;
+            } else {
+              selfloop = true;
+            }
+          }
+          if (!selfloop) {
+            for (final int e : mForbiddenEventIndexes) {
+              iter.reset(state, e);
+              if (iter.advance()) {
+                continue states;
+              }
+            }
+            return false;
+          }
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
 

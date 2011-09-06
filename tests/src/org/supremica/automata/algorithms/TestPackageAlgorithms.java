@@ -52,25 +52,27 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.supremica.automata.algorithms.minimization.TestAutomatonMinimizer;
+import org.supremica.automata.algorithms.minimization.TestSynthesisAbstractionMinimizer;
 
 public class TestPackageAlgorithms
     extends TestCase
 {
-    
-    public TestPackageAlgorithms(String name)
+
+    public TestPackageAlgorithms(final String name)
     {
         super(name);
     }
-    
+
     /**
      * Assembles and returns a test suite
      * containing all known tests.
      */
     public static Test suite()
     {
-        TestSuite suite = new TestSuite();
+        final TestSuite suite = new TestSuite();
         // suite.addTest(TestProjectBuildFromXml.suite());
         suite.addTest(TestAutomatonMinimizer.suite());
+        suite.addTest(TestSynthesisAbstractionMinimizer.suite());
         suite.addTest(TestAutomataSynchronizer.suite());
         suite.addTest(TestAutomatonSynthesizer.suite());
         suite.addTest(TestAutomataSynthesizer.suite());

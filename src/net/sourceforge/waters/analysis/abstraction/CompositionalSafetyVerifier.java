@@ -15,10 +15,12 @@ import gnu.trove.TIntArrayList;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -38,6 +40,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -150,7 +153,7 @@ public abstract class CompositionalSafetyVerifier
     bisimulator.setTransitionLimit(tlimit);
     chain.add(bisimulator);
     final AbstractionProcedure proc =
-      new ProjectionAbstractionProcedure(chain);
+      new ProjectionAbstractionProcedure(chain, subset);
     setAbstractionProcedure(proc);
     super.setUp();
   }
@@ -160,7 +163,8 @@ public abstract class CompositionalSafetyVerifier
   {
     super.tearDown();
     mProperties = null;
-    mPropertyEvents = null;
+    mPropertyEventsMap = null;
+    mCollectedPlants = null;
   }
 
   @Override
@@ -173,24 +177,61 @@ public abstract class CompositionalSafetyVerifier
     mProperties = new ArrayList<AutomatonProxy>(numAutomata);
     final Collection<EventProxy> events = model.getEvents();
     final int numEvents = events.size();
-    mPropertyEvents = new THashSet<EventProxy>(numEvents);
+    mPropertyEventsMap = new HashMap<EventProxy,HidingMode>(numEvents);
     for (final AutomatonProxy aut : automata) {
       if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
         mProperties.add(aut);
-        for (final EventProxy event : aut.getEvents()) {
+        final Collection<EventProxy> local = aut.getEvents();
+        final int numLocal = local.size();
+        final Collection<EventProxy> used =
+          new THashSet<EventProxy>(numLocal);
+        for (final TransitionProxy trans : aut.getTransitions()) {
+          used.add(trans.getEvent());
+        }
+        for (final EventProxy event : local) {
           if (translator.getEventKind(event) != EventKind.PROPOSITION) {
-            mPropertyEvents.addAll(aut.getEvents());
+            final HidingMode mode =
+              used.contains(event) ? HidingMode.SHARED : HidingMode.LOCAL_NONSELFLOOP;
+            mPropertyEventsMap.put(event, mode);
           }
         }
       }
     }
+    mCollectedPlants = new ArrayList<AutomatonProxy>(numAutomata);
     super.initialiseEventsToAutomata();
   }
 
   @Override
-  protected boolean canBeHidden(final EventProxy event)
+  protected HidingMode getHidingMode(final EventProxy event)
   {
-    return !mPropertyEvents.contains(event);
+    final HidingMode mode = mPropertyEventsMap.get(event);
+    return mode == null ? HidingMode.TAU : mode;
+  }
+
+  @Override
+  protected boolean checkPropertyMonolithically
+    (final List<AutomatonProxy> automata)
+  throws AnalysisException
+  {
+    if (!getPostponedSubsystems().isEmpty()) {
+      mCollectedPlants.addAll(automata);
+      return true;
+    } else {
+      final int numAutomata =
+        mCollectedPlants.size() + automata.size() + mProperties.size();
+      final List<AutomatonProxy> plantsAndSpecs =
+        new ArrayList<AutomatonProxy>(numAutomata);
+      plantsAndSpecs.addAll(mCollectedPlants);
+      plantsAndSpecs.addAll(automata);
+      plantsAndSpecs.addAll(mProperties);
+      final boolean result =
+        super.checkPropertyMonolithically(plantsAndSpecs);
+      mCollectedPlants.clear();
+      if (result) {
+        setSatisfiedResult();
+      }
+      return result;
+    }
   }
 
   @Override
@@ -199,48 +240,12 @@ public abstract class CompositionalSafetyVerifier
   {
     for (final AutomatonProxy aut : automata) {
       for (final EventProxy event : aut.getEvents()) {
-        if (mPropertyEvents.contains(event)) {
+        if (mPropertyEventsMap.containsKey(event)) {
           return false;
         }
       }
     }
     return true;
-  }
-
-  @Override
-  protected ProductDESProxy createProductDESProxy
-    (final List<EventProxy> events,
-     final List<AutomatonProxy> automata,
-     final boolean intermediate)
-  {
-    if (intermediate) {
-      return super.createProductDESProxy(events, automata, true);
-    } else {
-      final int numAutomata = automata.size() + mProperties.size();
-      final List<AutomatonProxy> plantsAndSpecs =
-        new ArrayList<AutomatonProxy>(numAutomata);
-      plantsAndSpecs.addAll(automata);
-      plantsAndSpecs.addAll(mProperties);
-      final Collection<EventProxy> eventSet = new THashSet<EventProxy>(events);
-      final Collection<EventProxy> extraEvents = new LinkedList<EventProxy>();
-      for (final AutomatonProxy aut : mProperties) {
-        for (final EventProxy event : aut.getEvents()) {
-          if (eventSet.add(event)) {
-            extraEvents.add(event);
-          }
-        }
-      }
-      if (extraEvents.isEmpty()) {
-        return super.createProductDESProxy(events, plantsAndSpecs, false);
-      } else {
-        final int numEvents = events.size() + extraEvents.size();
-        final List<EventProxy> allEvents =
-          new ArrayList<EventProxy>(numEvents);
-        allEvents.addAll(events);
-        allEvents.addAll(extraEvents);
-        return super.createProductDESProxy(allEvents, plantsAndSpecs, false);
-      }
-    }
   }
 
   @Override
@@ -301,13 +306,54 @@ public abstract class CompositionalSafetyVerifier
     //#######################################################################
     //# Constructor
     ProjectionAbstractionProcedure
-      (final TransitionRelationSimplifier simplifier)
+      (final TransitionRelationSimplifier simplifier,
+       final SubsetConstructionTRSimplifier subset)
     {
       super(simplifier);
+      mSubsetConstructionTRSimplifier = subset;
     }
 
     //#######################################################################
     //# Overrides for TRSimplifierAbstractionProcedure
+    @Override
+    protected AbstractionStep run(final AutomatonProxy aut,
+                                  final Collection<EventProxy> local)
+      throws AnalysisException
+    {
+      final TransitionRelationSimplifier simplifier = getSimplifier();
+      try {
+        EventProxy tau = null;
+        for (final EventProxy event : local) {
+          if (!mPropertyEventsMap.containsKey(event)) {
+            tau = event;
+            break;
+          }
+        }
+        final EventEncoding eventEnc = createEventEncoding(aut, tau);
+        final StateEncoding inputStateEnc = new StateEncoding(aut);
+        final int config = simplifier.getPreferredInputConfiguration();
+        final ListBufferTransitionRelation rel =
+          new ListBufferTransitionRelation(aut, eventEnc,
+                                           inputStateEnc, config);
+        for (final EventProxy event : local) {
+          if (mPropertyEventsMap.get(event) == HidingMode.LOCAL_NONSELFLOOP) {
+            final int e = eventEnc.getEventCode(event);
+            mSubsetConstructionTRSimplifier.setForbiddenEvent(e, true);
+          }
+        }
+        simplifier.setTransitionRelation(rel);
+        simplifier.run();
+        final ProductDESProxyFactory factory = getFactory();
+        final StateEncoding outputStateEnc = new StateEncoding();
+        final AutomatonProxy convertedAut =
+          rel.createAutomaton(factory, eventEnc, outputStateEnc);
+        return createStep
+          (aut, inputStateEnc, convertedAut, outputStateEnc, tau);
+      } finally {
+        simplifier.reset();
+      }
+    }
+
     @Override
     protected ProjectionStep createStep(final AutomatonProxy input,
                                         final StateEncoding inputStateEnc,
@@ -317,6 +363,11 @@ public abstract class CompositionalSafetyVerifier
     {
       return new ProjectionStep(output, input, tau);
     }
+
+    //#######################################################################
+    //# Data Members
+    private final SubsetConstructionTRSimplifier
+      mSubsetConstructionTRSimplifier;
   }
 
 
@@ -386,6 +437,7 @@ public abstract class CompositionalSafetyVerifier
       // 1. Collect initial states
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final Set<SearchRecord> visited = new THashSet<SearchRecord>();
       final int numStates = rel.getNumberOfStates();
       for (int state = 0; state < numStates; state++) {
         if (rel.isInitial(state)) {
@@ -393,6 +445,7 @@ public abstract class CompositionalSafetyVerifier
           if (eventSteps.isEmpty()) {
             return record;
           }
+          visited.add(record);
           open.add(record);
         }
       }
@@ -410,18 +463,21 @@ public abstract class CompositionalSafetyVerifier
         while (iter.advance()) {
           final int target = iter.getCurrentTargetState();
           final SearchRecord next =
-            new SearchRecord(target, event, nextdepth, current);
+            new SearchRecord(target, nextdepth, event, current);
           if (nextdepth == eventSteps.size()) {
             return next;
+          } else if (visited.add(next)) {
+            open.add(next);
           }
-          open.add(next);
         }
         iter.reset(state, tau);
         while (iter.advance()) {
           final int target = iter.getCurrentTargetState();
           final SearchRecord next =
-            new SearchRecord(target, tau, depth, current);
-          open.add(next);
+            new SearchRecord(target, depth, tau, current);
+          if (visited.add(next)) {
+            open.add(next);
+          }
         }
       }
     }
@@ -445,9 +501,26 @@ public abstract class CompositionalSafetyVerifier
   private List<AutomatonProxy> mProperties;
 
   /**
-   * Collection of events used in properties. These events cannot be hidden
-   * during compositional minimisation.
+   * Hiding modes of events used in properties. Events used in properties
+   * cannot be hidden during compositional minimisation, but <I>forbidden</I>
+   * events can be treated specially. An event is considered as forbidden if
+   * it is disabled in all states of some property automaton. These events
+   * cannot be replaced by {@link EventEncoding#TAU TAU}, but they be treated
+   * specially in subset construction, because successor states reached after
+   * these events do not need to be explored. Therefore, forbidden events are
+   * assigned the hiding mode {@link HidingMode#LOCAL_NONSELFLOOP LOCAL}, while other
+   * property events are assigned the hiding mode {@link HidingMode#SHARED
+   * SHARED}.
    */
-  private Collection<EventProxy> mPropertyEvents;
+  private Map<EventProxy,HidingMode> mPropertyEventsMap;
+
+  /**
+   * List of plants still to be checked.
+   * Event-disjoint subsystems that share events with the properties cannot
+   * be checked independently. Therefore, automata from event-disjoint are
+   * collected in this list. When the last monolithic check is requested,
+   * all plants are combined and checked together against the properties.
+   */
+  private List<AutomatonProxy> mCollectedPlants;
 
 }

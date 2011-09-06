@@ -633,8 +633,7 @@ public class CompositionalConflictChecker
         traces.add(conflict);
       }
       if (includeCurrent) {
-        if (!isAlphaReachable(builder, getCurrentEvents(),
-                              getCurrentAutomata(), traces)) {
+        if (!isAlphaReachable(builder, getCurrentAutomata(), traces)) {
           result.setSatisfied(true);
           return false;
         }
@@ -662,21 +661,16 @@ public class CompositionalConflictChecker
                                    final List<ConflictTraceProxy> traces)
     throws AnalysisException
   {
-    final Collection<EventProxy> events = subsys.getEvents();
     final List<AutomatonProxy> automata = subsys.getAutomata();
-    return isAlphaReachable(builder, events, automata, traces);
+    return isAlphaReachable(builder, automata, traces);
   }
 
   private boolean isAlphaReachable(final PropositionPropertyBuilder builder,
-                                   final Collection<EventProxy> events,
                                    final List<AutomatonProxy> automata,
                                    final List<ConflictTraceProxy> traces)
     throws AnalysisException
   {
-    final List<EventProxy> eventList = new ArrayList<EventProxy>(events);
-    Collections.sort(eventList);
-    final ProductDESProxy des =
-      createProductDESProxy(eventList, automata, false);
+    final ProductDESProxy des = createProductDESProxy(automata);
     builder.setInputModel(des);
     builder.run();
     final ProductDESProxy languageInclusionModel = builder.getOutputModel();
@@ -1331,10 +1325,8 @@ public class CompositionalConflictChecker
         Collections.singletonList(mPreconditionMarking);
       builder.setPropositions(props);
       for (final Candidate candidate : list) {
-        final List<EventProxy> events = candidate.getAllEvents();
         final List<AutomatonProxy> automata = candidate.getAutomata();
-        final ProductDESProxy des =
-          createProductDESProxy(events, automata, true);
+        final ProductDESProxy des = createProductDESProxy(automata);
         builder.setModel(des);
         try {
           mCount = 0;
@@ -1781,20 +1773,22 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Rule Application
-    protected ObservationEquivalenceStep run(final AutomatonProxy aut,
-                                             final EventProxy tau)
-    throws AnalysisException
+    @Override
+    protected ObservationEquivalenceStep run
+      (final AutomatonProxy aut, final Collection<EventProxy> local)
+      throws AnalysisException
     {
       final long start = System.currentTimeMillis();
+      assert local.size() <= 1 : "Only one tau event supported!";
       try {
         mStatistics.recordStart(aut);
-        if (tau == null) {
+        if (local.isEmpty()) {
           mStatistics.recordFinish(aut, false);
           return null;
         }
-        final Collection<EventProxy> hidden = Collections.singletonList(tau);
+        final EventProxy tau = local.iterator().next();
         mSimplifier.setModel(aut);
-        mSimplifier.setHiddenEvents(hidden);
+        mSimplifier.setHiddenEvents(local);
         mSimplifier.setOutputHiddenEvent(tau);
         final int limit = getCurrentInternalStateLimit();
         mSimplifier.setNodeLimit(limit);

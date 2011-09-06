@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="hisc8nd" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A test to check whether a language inclusion checker can produce a correct counterexample when presented a nondeterministic model.
-This model is an abstraction computed when checking SIC property 5 of model hisc8_low2 in the despor/testHISC series with respect to answer event a2:2. It fails a language inclusion check with counterexample r1 :alpha, which should end in state S:1 in the nondeterministic plant Test:Aut.</ns2:Comment>
+This model is an abstraction computed when checking SIC property 5 of model hisc8_low2 in the despot/testHISC series with respect to answer event a2:2. It fails a language inclusion check with counterexample r1 :alpha, which should end in state S:1 in the nondeterministic plant Test:Aut.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a1"/>
         <EventDecl Kind="CONTROLLABLE" Name="r1"/>

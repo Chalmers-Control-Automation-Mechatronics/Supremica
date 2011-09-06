@@ -832,6 +832,7 @@ Class-Path: ${manifest.pathlist}</echo>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
                     <include name="org/supremica/automata/algorithms/minimization/*.java"/>
+                    <include name="org/supremica/automata/algorithms/TestAutomataVerifier.java"/>
                 </fileset>
             </batchtest>
             <classpath>
