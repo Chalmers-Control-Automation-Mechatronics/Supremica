@@ -236,6 +236,7 @@ public class AutomatonMinimizer
             }
 
             // Partition using native methods
+
             BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, true);
 
             theAutomaton.setComment("min(" + theAutomaton.getName() + ")");
@@ -364,7 +365,7 @@ public class AutomatonMinimizer
             if (BisimulationEquivalenceMinimizer.libraryLoaded())
             {
                 // Partition using native methods
-                BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames,false);
+                BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames,true);
 
             }
             // Applying synthesis abstraction
@@ -518,15 +519,22 @@ public class AutomatonMinimizer
         // Do the partitioning!
         final int statesBefore = theAutomaton.nbrOfStates();
 //       logger.info("nbr of states before"+statesBefore);
-        if (BisimulationEquivalenceMinimizer.libraryLoaded())
+        if (BisimulationEquivalenceMinimizer.libraryLoaded()&& equivalenceRelation != EquivalenceRelation.SYNTHESISABSTRACTION)
         {
             // Partition using native methods
             BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, false);
 
         }
+//        if (BisimulationEquivalenceMinimizer.libraryLoaded()&& equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION)
+//        {
+//            // Partition using native methods
+//            BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, true);
+//
+//        }
 
         else
         {
+            
             // Partition using naive methods (pun intended)
             EquivalenceClasses equivClasses = new EquivalenceClasses();
 
