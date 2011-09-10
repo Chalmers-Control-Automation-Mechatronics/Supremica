@@ -70,10 +70,17 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.plain.module.IntConstantElement;
+import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
+import net.sourceforge.waters.plain.module.VariableComponentElement;
+import net.sourceforge.waters.plain.module.VariableMarkingElement;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.IntConstantSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
@@ -132,7 +139,7 @@ public class VariableEditorDialog
   private void createComponents()
   {
     final VariableComponentSubject template =
-      mVariable == null ? VARIABLE_TEMPLATE : mVariable;
+      mVariable == null ? getVariableTemplate() : mVariable;
     final ModuleContext context = mRoot.getModuleContext();
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
@@ -501,7 +508,8 @@ public class VariableEditorDialog
       final int column;
       final List<VariableMarkingSubject> markings = mMarkingsModel.getList();
       if (markings.isEmpty()) {
-        row = mMarkingsModel.createEditedItemAtEnd(MARKING_TEMPLATE);
+        final VariableMarkingSubject template = getMarkingTemplate();
+        row = mMarkingsModel.createEditedItemAtEnd(template);
         column = 2;
       } else {
         row = mMarkingsModel.createEditedItemAtEnd();
@@ -723,6 +731,23 @@ public class VariableEditorDialog
     } else {
       return pred;
     }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Static Methods
+  private static VariableComponentSubject getVariableTemplate()
+  {
+    final ModuleProxyCloner cloner =
+      ModuleSubjectFactory.getCloningInstance();
+    return (VariableComponentSubject) cloner.getClone(VARIABLE_TEMPLATE);
+  }
+
+  private static VariableMarkingSubject getMarkingTemplate()
+  {
+    final ModuleProxyCloner cloner =
+      ModuleSubjectFactory.getCloningInstance();
+    return (VariableMarkingSubject) cloner.getClone(MARKING_TEMPLATE);
   }
 
 
@@ -1155,7 +1180,7 @@ public class VariableEditorDialog
    *
    * <P>This is a reference to the actual object that is being edited.  If
    * a new variable is being created, it is <CODE>null</CODE>
-   * until the dialog is commited and the actually created subject is
+   * until the dialog is committed and the actually created subject is
    * assigned.</P>
    *
    * <P>The edited state is stored only in the dialog. Changes are only
@@ -1168,14 +1193,14 @@ public class VariableEditorDialog
   //# Class Constants
   private static final long serialVersionUID = 1L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final VariableComponentSubject VARIABLE_TEMPLATE =
-    new VariableComponentSubject(new SimpleIdentifierSubject(""),
-                                 new SimpleIdentifierSubject(""),
+  private static final VariableComponentProxy VARIABLE_TEMPLATE =
+    new VariableComponentElement(new SimpleIdentifierElement(""),
+                                 new SimpleIdentifierElement(""),
                                  true,
-                                 new SimpleIdentifierSubject(""));
-  private static final VariableMarkingSubject MARKING_TEMPLATE =
-    new VariableMarkingSubject
-      (new SimpleIdentifierSubject(EventDeclProxy.DEFAULT_MARKING_NAME),
-       new IntConstantSubject(1));
+                                 new SimpleIdentifierElement(""));
+  private static final VariableMarkingProxy MARKING_TEMPLATE =
+    new VariableMarkingElement
+      (new SimpleIdentifierElement(EventDeclProxy.DEFAULT_MARKING_NAME),
+       new IntConstantElement(1));
 
 }
