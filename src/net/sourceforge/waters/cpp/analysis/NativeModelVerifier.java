@@ -40,23 +40,8 @@ public abstract class NativeModelVerifier
                              final ProductDESProxyFactory factory,
                              final KindTranslator translator)
   {
-    super(model, factory);
-    mKindTranslator = translator;
+    super(model, factory, translator);
     mExplorerMode = ExplorerMode.BEST_GUESS;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
-  public void setKindTranslator(final KindTranslator translator)
-  {
-    mKindTranslator = translator;
-    clearAnalysisResult();
-  }
-
-  public KindTranslator getKindTranslator()
-  {
-    return mKindTranslator;
   }
 
 
@@ -147,7 +132,6 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Data Members
-  private KindTranslator mKindTranslator;
   private ExplorerMode mExplorerMode;
 
 }

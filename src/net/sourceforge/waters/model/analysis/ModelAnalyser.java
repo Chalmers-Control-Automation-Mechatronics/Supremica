@@ -74,6 +74,20 @@ public interface ModelAnalyser
    */
   public void setModel(AutomatonProxy aut);
 
+  /**
+   * Sets a kind translator to be used by this model analyser.
+   */
+  public void setKindTranslator(KindTranslator translator);
+
+  /**
+   * Gets the kind translator used by this model analyser.
+   * The kind translator is used to remap component and event kinds
+   * for the sake of a single algorithm, and thus implement different
+   * checks using the same code.
+   */
+  public KindTranslator getKindTranslator();
+
+
 
   //#########################################################################
   //# Parameters

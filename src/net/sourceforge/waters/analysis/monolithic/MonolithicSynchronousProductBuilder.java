@@ -20,6 +20,7 @@ import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AutomatonResult;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
@@ -66,6 +67,14 @@ public class MonolithicSynchronousProductBuilder
      final ProductDESProxyFactory factory)
   {
     super(model, factory);
+  }
+
+  public MonolithicSynchronousProductBuilder
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory,
+     final KindTranslator translator)
+  {
+    super(model, factory, translator);
   }
 
 
@@ -244,8 +253,9 @@ public class MonolithicSynchronousProductBuilder
     }
     int nextForbidden = 0;
     int nextNormal = forbidden.size();
+    final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : events) {
-      if (event.getKind() == EventKind.PROPOSITION) {
+      if (translator.getEventKind(event) == EventKind.PROPOSITION) {
         if (mUsedPropositions == null) {
           mCurrentPropositions.add(event);
         }
@@ -357,7 +367,7 @@ public class MonolithicSynchronousProductBuilder
         list.add(target);
       }
       for (final EventProxy event : localEvents) {
-        if (event.getKind() != EventKind.PROPOSITION) {
+        if (translator.getEventKind(event) != EventKind.PROPOSITION) {
           final int e = eventToIndex.get(event);
           mTransitions[a][e] = new int[numStates][];
           for (int source = 0; source < numStates; source++) {

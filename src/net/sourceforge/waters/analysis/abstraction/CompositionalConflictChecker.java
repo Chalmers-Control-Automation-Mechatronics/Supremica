@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -47,8 +46,10 @@ import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
+import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -208,6 +209,120 @@ public class CompositionalConflictChecker
   }
 
 
+  @Override
+  public void setPreselectingMethod(final PreselectingMethod method)
+  {
+    super.setPreselectingMethod(method);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      final AbstractCompositionalModelVerifier.PreselectingMethodFactory
+        factory = safetyVerifier.getPreselectingMethodFactory();
+      final PreselectingMethod safetyMethod = factory.getEnumValue(method);
+      if (safetyMethod != null) {
+        safetyVerifier.setPreselectingMethod(safetyMethod);
+      }
+    }
+  }
+
+  @Override
+  public void setSelectingMethod(final SelectingMethod method)
+  {
+    super.setSelectingMethod(method);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      final AbstractCompositionalModelVerifier.SelectingMethodFactory
+        factory = safetyVerifier.getSelectingMethodFactory();
+      final SelectingMethod safetyMethod = factory.getEnumValue(method);
+      if (safetyMethod != null) {
+        safetyVerifier.setSelectingMethod(safetyMethod);
+      }
+    }
+  }
+
+  @Override
+  public void setSubumptionEnabled(final boolean enable)
+  {
+    super.setSubumptionEnabled(enable);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      safetyVerifier.setSubumptionEnabled(enable);
+    }
+  }
+
+  @Override
+  public void setInternalStateLimit(final int limit)
+  {
+    super.setInternalStateLimit(limit);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      safetyVerifier.setInternalStateLimit(limit);
+    }
+  }
+
+  @Override
+  public void setLowerInternalStateLimit(final int limit)
+  {
+    super.setLowerInternalStateLimit(limit);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      safetyVerifier.setLowerInternalStateLimit(limit);
+    }
+  }
+
+  @Override
+  public void setUpperInternalStateLimit(final int limit)
+  {
+    super.setUpperInternalStateLimit(limit);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      safetyVerifier.setUpperInternalStateLimit(limit);
+    }
+  }
+
+  @Override
+  public void setMonolithicStateLimit(final int limit)
+  {
+    super.setMonolithicStateLimit(limit);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      safetyVerifier.setMonolithicStateLimit(limit);
+    } else if (mMonolithicSafetyVerifier != null) {
+      mMonolithicSafetyVerifier.setNodeLimit(limit);
+    }
+  }
+
+  @Override
+  public void setMonolithicTransitionLimit(final int limit)
+  {
+    super.setMonolithicTransitionLimit(limit);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      safetyVerifier.setMonolithicTransitionLimit(limit);
+    } else if (mMonolithicSafetyVerifier != null) {
+      mMonolithicSafetyVerifier.setTransitionLimit(limit);
+    }
+  }
+
+  @Override
+  public void setInternalTransitionLimit(final int limit)
+  {
+    super.setInternalTransitionLimit(limit);
+    if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
+      final CompositionalSafetyVerifier safetyVerifier =
+        (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
+      safetyVerifier.setInternalTransitionLimit(limit);
+    }
+  }
+
+
   //#########################################################################
   //# Specific Access
   @Override
@@ -248,13 +363,37 @@ public class CompositionalConflictChecker
     }
     if (mCurrentCompositionalSafetyVerifier == null) {
       if (mCompositionalSafetyVerifier == null) {
-        mCurrentCompositionalSafetyVerifier =
-          new ModularControllabilityChecker
-            (factory, mCurrentMonolithicSafetyVerifier);
-        final int nlimit = getMonolithicStateLimit();
-        mCurrentMonolithicSafetyVerifier.setNodeLimit(nlimit);
-        final int tlimit = getMonolithicTransitionLimit();
-        mCurrentMonolithicSafetyVerifier.setTransitionLimit(tlimit);
+        final SafetyDiagnostics diag =
+          LanguageInclusionDiagnostics.getInstance();
+        final CompositionalSafetyVerifier safetyVerifier =
+          new CompositionalSafetyVerifier(factory, null, diag);
+        final AbstractCompositionalModelVerifier.PreselectingMethodFactory
+          pfactory = safetyVerifier.getPreselectingMethodFactory();
+        final PreselectingMethod pmethod = getPreselectingMethod();
+        final PreselectingMethod ppmethod = pfactory.getEnumValue(pmethod);
+        if (ppmethod != null) {
+          safetyVerifier.setPreselectingMethod(ppmethod);
+        }
+        final AbstractCompositionalModelVerifier.SelectingMethodFactory
+          sfactory = safetyVerifier.getSelectingMethodFactory();
+        final SelectingMethod smethod = getSelectingMethod();
+        final SelectingMethod ssmethod = sfactory.getEnumValue(smethod);
+        if (ssmethod != null) {
+          safetyVerifier.setSelectingMethod(ssmethod);
+        }
+        final boolean enable = isSubsumptionEnabled();
+        safetyVerifier.setSubumptionEnabled(enable);
+        final int lslimit = getLowerInternalStateLimit();
+        safetyVerifier.setLowerInternalStateLimit(lslimit);
+        final int uslimit = getUpperInternalStateLimit();
+        safetyVerifier.setUpperInternalStateLimit(uslimit);
+        final int mslimit = getMonolithicStateLimit();
+        safetyVerifier.setMonolithicStateLimit(mslimit);
+        final int itlimit = getInternalTransitionLimit();
+        safetyVerifier.setInternalTransitionLimit(itlimit);
+        final int mtlimit = getMonolithicTransitionLimit();
+        safetyVerifier.setMonolithicTransitionLimit(mtlimit);
+        mCurrentCompositionalSafetyVerifier  = safetyVerifier;
       } else {
         mCurrentCompositionalSafetyVerifier = mCompositionalSafetyVerifier;
       }
@@ -1024,6 +1163,11 @@ public class CompositionalConflictChecker
           (CompositionalConflictChecker) verifier;
       return checker.new HeuristicMinTAlpha();
     }
+    @Override
+    protected PreselectingMethod getCommonMethod()
+    {
+      return MinT;
+    }
   };
 
 
@@ -1052,6 +1196,11 @@ public class CompositionalConflictChecker
   public static final SelectingMethod MinSa =
       new SelectingMethod("MinSa")
   {
+    @Override
+    protected SelectingMethod getCommonMethod()
+    {
+      return MinS;
+    }
     @Override
     Comparator<Candidate> createComparator
       (final AbstractCompositionalModelVerifier verifier)
@@ -1085,6 +1234,11 @@ public class CompositionalConflictChecker
   public static final SelectingMethod MinSyncA =
       new SelectingMethod("MinSyncA")
   {
+    @Override
+    protected SelectingMethod getCommonMethod()
+    {
+      return MinSync;
+    }
     @Override
     SelectingHeuristic createHeuristic
       (final AbstractCompositionalModelVerifier verifier)

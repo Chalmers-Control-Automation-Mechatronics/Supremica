@@ -62,7 +62,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik
  */
 
-public abstract class CompositionalSafetyVerifier
+public class CompositionalSafetyVerifier
   extends AbstractCompositionalModelVerifier
   implements SafetyVerifier
 {

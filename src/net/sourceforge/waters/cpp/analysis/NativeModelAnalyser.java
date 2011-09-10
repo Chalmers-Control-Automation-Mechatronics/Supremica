@@ -12,6 +12,7 @@ package net.sourceforge.waters.cpp.analysis;
 import java.nio.ByteBuffer;
 
 import net.sourceforge.waters.model.analysis.AbstractModelAnalyser;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -35,15 +36,17 @@ public abstract class NativeModelAnalyser
 
   //#########################################################################
   //# Constructors
-  public NativeModelAnalyser(final ProductDESProxyFactory factory)
+  public NativeModelAnalyser(final ProductDESProxyFactory factory,
+                             final KindTranslator translator)
   {
-    this(null, factory);
+    this(null, factory, translator);
   }
 
   public NativeModelAnalyser(final ProductDESProxy model,
-                             final ProductDESProxyFactory factory)
+                             final ProductDESProxyFactory factory,
+                             final KindTranslator translator)
   {
-    super(model, factory);
+    super(model, factory, translator);
     mNativeModelAnalyzer = null;
   }
 

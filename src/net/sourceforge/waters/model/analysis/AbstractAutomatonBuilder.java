@@ -36,19 +36,33 @@ public abstract class AbstractAutomatonBuilder
   //# Constructors
   public AbstractAutomatonBuilder(final ProductDESProxyFactory factory)
   {
-    super(factory);
+    super(factory, IdenticalKindTranslator.getInstance());
   }
 
   public AbstractAutomatonBuilder(final ProductDESProxy model,
                                   final ProductDESProxyFactory factory)
   {
-    super(model, factory);
+    super(model, factory, IdenticalKindTranslator.getInstance());
+  }
+
+  public AbstractAutomatonBuilder(final ProductDESProxy model,
+                                  final ProductDESProxyFactory factory,
+                                  final KindTranslator translator)
+  {
+    super(model, factory, translator);
   }
 
   public AbstractAutomatonBuilder(final AutomatonProxy aut,
                                   final ProductDESProxyFactory factory)
   {
-    super(aut, factory);
+    super(aut, factory, IdenticalKindTranslator.getInstance());
+  }
+
+  public AbstractAutomatonBuilder(final AutomatonProxy aut,
+                                  final ProductDESProxyFactory factory,
+                                  final KindTranslator translator)
+  {
+    super(aut, factory, translator);
   }
 
 

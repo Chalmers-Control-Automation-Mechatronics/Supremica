@@ -41,26 +41,12 @@ public abstract class AbstractModelVerifier
                                final ProductDESProxyFactory factory,
                                final KindTranslator translator)
   {
-    super(model, factory);
-    mKindTranslator = translator;
+    super(model, factory, translator);
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
-  public void setKindTranslator(final KindTranslator translator)
-  {
-    if (mKindTranslator != translator) {
-      mKindTranslator = translator;
-      clearAnalysisResult();
-    }
-  }
-
-  public KindTranslator getKindTranslator()
-  {
-    return mKindTranslator;
-  }
-
   public boolean isSatisfied()
   {
     final VerificationResult result = getAnalysisResult();
@@ -119,10 +105,5 @@ public abstract class AbstractModelVerifier
     result.setCounterExample(counterexample);
     return setBooleanResult(false);
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private KindTranslator mKindTranslator;
 
 }

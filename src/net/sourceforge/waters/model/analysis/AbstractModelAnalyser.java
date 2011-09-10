@@ -32,15 +32,18 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
 
   //#########################################################################
   //# Constructors
-  public AbstractModelAnalyser(final ProductDESProxyFactory factory)
+  public AbstractModelAnalyser(final ProductDESProxyFactory factory,
+                               final KindTranslator translator)
   {
-    this((ProductDESProxy) null, factory);
+    this((ProductDESProxy) null, factory, translator);
   }
 
   public AbstractModelAnalyser(final ProductDESProxy model,
-                               final ProductDESProxyFactory factory)
+                               final ProductDESProxyFactory factory,
+                               final KindTranslator translator)
   {
     mFactory = factory;
+    mKindTranslator = translator;
     mModel = model;
     mNodeLimit = Integer.MAX_VALUE;
     mTransitionLimit = Integer.MAX_VALUE;
@@ -48,9 +51,11 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   }
 
   public AbstractModelAnalyser(final AutomatonProxy aut,
-                               final ProductDESProxyFactory factory)
+                               final ProductDESProxyFactory factory,
+                               final KindTranslator translator)
   {
-    this(AutomatonTools.createProductDESProxy(aut, factory), factory);
+    this(AutomatonTools.createProductDESProxy(aut, factory),
+         factory, translator);
   }
 
 
@@ -77,6 +82,19 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     final ProductDESProxy des =
       AutomatonTools.createProductDESProxy(aut, mFactory);
     setModel(des);
+  }
+
+  public void setKindTranslator(final KindTranslator translator)
+  {
+    if (mKindTranslator != translator) {
+      mKindTranslator = translator;
+      clearAnalysisResult();
+    }
+  }
+
+  public KindTranslator getKindTranslator()
+  {
+    return mKindTranslator;
   }
 
   public void setNodeLimit(final int limit)
@@ -266,6 +284,8 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   private final ProductDESProxyFactory mFactory;
   private ProductDESProxy mModel;
   private AnalysisResult mAnalysisResult;
+  private KindTranslator mKindTranslator;
+
   private int mNodeLimit;
   private int mTransitionLimit;
   private long mStartTime;
