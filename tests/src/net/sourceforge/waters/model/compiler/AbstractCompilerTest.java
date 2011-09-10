@@ -321,6 +321,12 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "enumvar");
   }
 
+  public void testCompile_forbidden()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "forbidden");
+  }
+
   public void testCompile_GlobalAndLocalVariables()
     throws IOException, WatersException
   {

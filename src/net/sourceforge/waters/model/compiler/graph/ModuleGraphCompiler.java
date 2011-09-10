@@ -404,6 +404,12 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     if (!mLocalEventsMap.containsKey(event)) {
       final SelfloopInfo info = new SelfloopInfo();
       mLocalEventsMap.put(event, info);
+      // Special treatment of :forbidden proposition ---
+      // exclude this from compiler optimisation.
+      final String name = event.getName();
+      if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+        info.addTransition(false);
+      }
     }
   }
 

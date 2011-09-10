@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="forbidden" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>A test to check whether the special event :forbidden is handled correctly by the compiler. The :forbidden event cannot be subject to compiler optimisation like other propositions: an automaton with all states forbidden must be retained in the compiler output.</Comment>
+<ns2:EventList>
+<ns2:Event Kind="PROPOSITION" Name=":forbidden"/>
+<ns2:Event Kind="CONTROLLABLE" Name="e"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="SPEC" Name="forbid_all">
+<ns2:EventRefList>
+<ns2:EventRef Name=":forbidden"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":forbidden"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="forbid_some">
+<ns2:EventRefList>
+<ns2:EventRef Name=":forbidden"/>
+<ns2:EventRef Name="e"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0"/>
+<ns2:State Name="S1">
+<ns2:EventRefList>
+<ns2:EventRef Name=":forbidden"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="S1" Source="S0" Event="e"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>
