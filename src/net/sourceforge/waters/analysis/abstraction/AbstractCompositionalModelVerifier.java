@@ -381,9 +381,10 @@ public abstract class AbstractCompositionalModelVerifier
     return mCurrentMonolithicVerifier;
   }
 
-  protected MonolithicSynchronousProductBuilder getSynchronousProductBuilder()
+  protected MonolithicSynchronousProductBuilder
+    getCurrentSynchronousProductBuilder()
   {
-    return mSynchronousProductBuilder;
+    return mCurrentSynchronousProductBuilder;
   }
 
   protected void setPropositions(final Collection<EventProxy> props)

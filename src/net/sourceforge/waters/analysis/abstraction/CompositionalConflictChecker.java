@@ -1465,7 +1465,7 @@ public class CompositionalConflictChecker
       final Comparator<Candidate> comparator = getComparator();
       Collections.sort(list, comparator);
       final MonolithicSynchronousProductBuilder builder =
-        getSynchronousProductBuilder();
+        getCurrentSynchronousProductBuilder();
       final int limit = getCurrentInternalStateLimit();
       builder.setNodeLimit(limit);
       builder.setConstructsAutomaton(false);
@@ -1508,7 +1508,7 @@ public class CompositionalConflictChecker
       throws OverflowException
     {
       final MonolithicSynchronousProductBuilder builder =
-        getSynchronousProductBuilder();
+        getCurrentSynchronousProductBuilder();
       boolean alpha = true;
       for (int a = 0; a < tuple.length; a++) {
         final List<EventProxy> props =

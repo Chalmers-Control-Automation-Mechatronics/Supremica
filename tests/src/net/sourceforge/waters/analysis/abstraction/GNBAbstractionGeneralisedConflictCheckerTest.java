@@ -46,6 +46,7 @@ public class GNBAbstractionGeneralisedConflictCheckerTest extends
     final CompositionalConflictChecker checker =
       new CompositionalConflictChecker
         (CompositionalConflictChecker.AbstractionMethod.GNB, factory);
+    checker.setSelectingMethod(CompositionalConflictChecker.MinSyncA);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
