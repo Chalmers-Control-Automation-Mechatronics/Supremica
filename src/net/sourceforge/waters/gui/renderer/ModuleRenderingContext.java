@@ -21,7 +21,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * An implementation of the {@link RenderingContext} interface based on
- * a module context. This implementation obtain event fonts and proposition
+ * a module context. This implementation obtains event fonts and proposition
  * colours using the best guess of a module context, while suppressing all
  * highlighting.
  *
