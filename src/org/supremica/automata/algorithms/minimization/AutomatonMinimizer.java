@@ -93,6 +93,7 @@ public class AutomatonMinimizer
 
     // Use short names (state names are either integers or based on their parent states)
     private boolean useShortNames = false;
+    private HashMap<EquivalenceClass,Boolean> moreThanOneSilenceOutgoing = new HashMap<EquivalenceClass,Boolean>();
 
     /**
      * Basic constructor.
@@ -164,7 +165,7 @@ public class AutomatonMinimizer
 
         theAutomaton.hide(hideThese, preserveControllability);
         // Message
-
+        
         final int before = theAutomaton.nbrOfStates();
         final int epsilons = theAutomaton.nbrOfEpsilonTransitions();
         final int total = theAutomaton.nbrOfTransitions();
@@ -281,6 +282,96 @@ public class AutomatonMinimizer
           theAutomaton.endTransaction();
           return theAutomaton;
         }
+
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        //Abstraction base on synthesis abstraction(DCDS2011).
+        else if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION){
+
+
+             
+            // Merge the states that only have one local outgoing transition.
+//            theAutomaton.endTransaction();
+            if (theAutomaton.getAlphabet().size() > 1)
+            {
+
+                mergeTriviallyObservationEquivalentStatesSynthesis(theAutomaton);
+//                logger.info("mergetrivially the name "+ theAutomaton.getName()+"nbrofStates "+theAutomaton.nbrOfStates());
+            }
+//            mergeEpsilonLoopsSynthesis(theAutomaton);
+            
+            
+
+           //Applying halfway synthesis.
+            //!!! if we apply halfway synthesis before
+            // mergetrivially it takes a long time to calculate the abstracted automaton!!!!
+
+            halfWaySynthesis(theAutomaton);
+
+            if (BisimulationEquivalenceMinimizer.libraryLoaded())
+            {
+                // Partition using native methods
+                BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames,true);
+
+            }
+//            // Applying synthesis abstraction
+
+            EquivalenceClasses equivClasses = new EquivalenceClasses();
+            try
+            {
+                // Find initial partitioning (based on marking, basically)
+                equivClasses = findInitialPartitioning(theAutomaton);
+                // Partition
+                findCoarsestPartitioning(equivClasses, equivalenceRelation);
+            } catch (final Exception ex) {
+                requestStop();
+                throw ex;
+            }
+
+            if (stopRequested)
+            {
+                return null;
+            }
+             theAutomaton.beginTransaction();
+           Iterator<?> equivClassIt = equivClasses.iterator();
+
+            while (equivClassIt.hasNext())
+            {
+                State blob = null;
+                EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
+                // Merge states in partitions (the partitions are separated by -1)!
+                while(currEquivClass.size()>0){
+                    //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
+                    if (blob == null)
+                    {
+                        blob = currEquivClass.remove();
+                    }
+                    else
+                    {
+                        //logger.info("Merging " + blob + " and " + states[part[i]]);
+                        blob = MinimizationHelper.mergeStates(theAutomaton, blob, currEquivClass.remove(), useShortNames);
+                    }
+                }
+
+            }
+
+            // Build the minimized automaton based on the partitioning in equivClasses
+//            theAutomaton = buildAutomaton(equivClasses);
+//            halfWaySynthesis(theAutomaton);
+//            
+//                removeUnusedEpsilonEvents(theAutomaton);
+//            
+            if(!AutomataSynthesizer.renameBack()){
+                   renameBackToOriginalEvents(theAutomaton);
+         }
+            return theAutomaton;
+
+
+             
+        }
+        ////////////////////////////////////////////////////////////////////////////
+
         else if (equivalenceRelation == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
         {
             //Coreachability is strange, forbidden and MAX_COST
@@ -332,74 +423,7 @@ public class AutomatonMinimizer
             // Finished!
             return theAutomaton;
         }
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-        //Abstraction base on synthesis abstraction(DCDS2011).
-        else if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION){
-
-            if (Config.VERBOSE_MODE.isTrue())
-            {
-                final int after = theAutomaton.nbrOfStates();
-                logger.info("There were " + before + " states before and " +
-                        after +
-                    " states after the minimization. Reduction: " +
-                    Math.round(100*(((double) (before-after))*100/before))/100.0
-                    + "%.");
-            }
-
-            // Merge the states that only have one local outgoing transition.
-//            theAutomaton.endTransaction();
-            if (theAutomaton.getAlphabet().size() > 1)
-            {
-
-                mergeTriviallyObservationEquivalentStatesSynthesis(theAutomaton);
-//                logger.info("mergetrivially the name "+ theAutomaton.getName()+"nbrofStates "+theAutomaton.nbrOfStates());
-            }
-
-           //Applying halfway synthesis.
-            //!!! if we apply halfway synthesis before
-            // mergetrivially it takes a long time to calculate the abstracted automaton!!!!
-
-                halfWaySynthesis(theAutomaton);
-
-            if (BisimulationEquivalenceMinimizer.libraryLoaded())
-            {
-                // Partition using native methods
-                BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames,true);
-
-            }
-            // Applying synthesis abstraction
-            EquivalenceClasses equivClasses = new EquivalenceClasses();
-            try
-            {
-                // Find initial partitioning (based on marking, basically)
-                equivClasses = findInitialPartitioning(theAutomaton);
-//                logger.info("equivClasses after initial partitioning "+equivClasses);
-                // Partition
-                findCoarsestPartitioning(equivClasses, equivalenceRelation);
-            } catch (final Exception ex) {
-                requestStop();
-                throw ex;
-            }
-
-            if (stopRequested)
-            {
-                return null;
-            }
-               if(!AutomataSynthesizer.renameBack()){
-                   renameBackToOriginalEvents(theAutomaton);
-         }
-
-//            return theAutomaton;
-
-
-            //then events of transitions.
-
-
-//            logger.info("observation the name "+ theAutomaton.getName()+"nbrofStates "+theAutomaton.nbrOfStates());
-//            return theAutomaton;
-
-        }
+        
         //######################################################################
 
 
@@ -626,6 +650,8 @@ public class AutomatonMinimizer
 //
 //                }
 //            }
+        
+
 
         // Return the result of the minimization!
         return theAutomaton;
@@ -671,26 +697,32 @@ public class AutomatonMinimizer
         }
     }
      */
-
-    public static void renameBackToOriginalEvents(final Automaton aut){
-        for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
-            {
-                final Arc arc = arcIt.next();
-                final LabeledEvent event = arc.getEvent();
-                if (event.isUnobservable())
+     public static void renameBackToOriginalEvents(final Automaton aut){
+          for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
-                   final LabeledEvent orig = TauEvent.getOriginalEvent(event.getName());
-                   arc.setEvent(orig);
-                   if(!aut.getAlphabet().contains(orig)&& !orig.equals(null)){
-                       aut.getAlphabet().addEvent(orig);}
-                       if(aut.getAlphabet().contains(event)){
-                          aut.getAlphabet().removeEvent(event);
-                       }
+                    final Arc arc = arcIt.next();
+                    final LabeledEvent event = arc.getEvent();
+                    if (event.isUnobservable())
+                    {
+                       final LabeledEvent orig = TauEvent.getOriginalEvent(event.getName());
+                       arc.setEvent(orig);
+                       if(!aut.getAlphabet().contains(orig)&& !orig.equals(null)){
+                           aut.getAlphabet().addEvent(orig);}
+                           if(aut.getAlphabet().contains(event)){
+                              aut.getAlphabet().removeEvent(event);
+                           }
 
+                    }
                 }
-            }
-    }
+        }
 
+
+
+    public static void renameBackToOriginalEvents(final Automata auto){
+        for(Automaton aut:auto){
+           renameBackToOriginalEvents(aut);
+        }
+    }
     /**
      * Find the initial partitioning of this automaton, based on the marking and forbidden
      * states (marking can be ignored using the minimization option ignoreMarking.
@@ -737,10 +769,10 @@ public class AutomatonMinimizer
         final StateSet ordStates = new StateSet();
         for (final Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
         {
-
+            
             final State currState = stateIt.next();
 
-            if (currState.isAccepting())
+            if (currState.isAccepting(true))
             {
                 currState.setStateSet(acceptingStates);
                 acceptingStates.add(currState);
@@ -762,24 +794,24 @@ public class AutomatonMinimizer
 
 
         // Adjust the marking!
-        while (markedStates.size()>0)
-        {
-            final StateSet closure = markedStates.remove().backwardsEpsilonClosure();
-
-            for (final Iterator<State> closureIt = closure.iterator(); closureIt.hasNext(); )
-            {
-                final State state = closureIt.next();
-                if (!acceptingStates.contains(state))
-                {   acceptingStates.add(state);
-                    state.setStateSet(acceptingStates);
-                    if(ordinaryStates.contains(state)){
-                        ordinaryStates.remove(state);
-                    }
-                }
-
-
-            }
-        }
+//        while (markedStates.size()>0)
+//        {
+//            final StateSet closure = markedStates.remove().backwardsEpsilonClosure();
+//
+//            for (final Iterator<State> closureIt = closure.iterator(); closureIt.hasNext(); )
+//            {
+//                final State state = closureIt.next();
+//                if (!acceptingStates.contains(state))
+//                {   acceptingStates.add(state);
+//                    state.setStateSet(acceptingStates);
+//                    if(ordinaryStates.contains(state)){
+//                        ordinaryStates.remove(state);
+//                    }
+//                }
+//
+//
+//            }
+//        }
 
         // Put these new classes into a single object
         // Only if there are any states in the class...
@@ -908,42 +940,42 @@ public class AutomatonMinimizer
 
                 final Arc newArc = new Arc(fromState, toState, currEvent);
                 // check if the tau event only apears in selfloops( Tau loop removal).
-                if (currEvent.isUnobservable()){
-                    if(newArc.isSelfLoop()){
-                        //if the event has been checked before...
-                            if(checkEvent.containsKey(currEvent)){
-                                // and it was in selfloop only...
-                                if(checkEvent.get(currEvent)){
-                                    // add the arc to the removed arc set.
-                                    checkToBeRemoved.put(newArc, currEvent);
-                                    toBeRemoved.add(newArc);
-                                }
-                            }
-                        // but if the event has been checked before and now it is in selfloop
-                            //the arc should be added in the remove arc set.
-                        else{
-                            checkEvent.put(currEvent, true);
-                            checkToBeRemoved.put(newArc, currEvent);
-                            toBeRemoved.add(newArc);
-                        }
-                    }
-                    // if the arc is not selfloop, then the corresponding event will
-                    // have a false value. If these event had been apeared in selfloop
-                    // and the removed arc set contains arc that has this event,
-                    //these arc should be removed.
-                    else{
-
-                        checkEvent.put(currEvent, false);
-
-//                        logger.info(newArc);
-//                        logger.info(checkToBeRemoved.containsKey(newArc));
-                        if(checkToBeRemoved.containsValue(currEvent)){
-
-                            toBeRemoved.removeAll(checkToBeRemoved.keySet());
-                        }
-                    }
-
-                }
+//                if (currEvent.isUnobservable()){
+//                    if(newArc.isSelfLoop()){
+//                        //if the event has been checked before...
+//                            if(checkEvent.containsKey(currEvent)){
+//                                // and it was in selfloop only...
+//                                if(checkEvent.get(currEvent)){
+//                                    // add the arc to the removed arc set.
+//                                    checkToBeRemoved.put(newArc, currEvent);
+//                                    toBeRemoved.add(newArc);
+//                                }
+//                            }
+//                        // but if the event has been checked before and now it is in selfloop
+//                            //the arc should be added in the remove arc set.
+//                        else{
+//                            checkEvent.put(currEvent, true);
+//                            checkToBeRemoved.put(newArc, currEvent);
+//                            toBeRemoved.add(newArc);
+//                        }
+//                    }
+//                    // if the arc is not selfloop, then the corresponding event will
+//                    // have a false value. If these event had been apeared in selfloop
+//                    // and the removed arc set contains arc that has this event,
+//                    //these arc should be removed.
+//                    else{
+//
+//                        checkEvent.put(currEvent, false);
+//
+////                        logger.info(newArc);
+////                        logger.info(checkToBeRemoved.containsKey(newArc));
+//                        if(checkToBeRemoved.containsValue(currEvent)){
+//
+//                            toBeRemoved.removeAll(checkToBeRemoved.keySet());
+//                        }
+//                    }
+//
+//                }
 
                 // If we should minimize the number of transitions, make sure a transition is never
                 // present more than once (this is performed in an ugly way below)
@@ -964,15 +996,15 @@ public class AutomatonMinimizer
 
 
         // selfloop removel.
-        while(toBeRemoved.size()>0){
-            final Arc remove = toBeRemoved.getFirst();
-            final State stateFrom = remove.getFromState();
-            final State stateTo = remove.getToState();
-
-            if( stateFrom.containsOutgoingArc(remove)&& stateTo.containsIncomingArc(remove)){
-                newAutomaton.removeArc(toBeRemoved.removeFirst());
-            }
-        }
+//        while(toBeRemoved.size()>0){
+//            final Arc remove = toBeRemoved.getFirst();
+//            final State stateFrom = remove.getFromState();
+//            final State stateTo = remove.getToState();
+//
+//            if( stateFrom.containsOutgoingArc(remove)&& stateTo.containsIncomingArc(remove)){
+//                newAutomaton.removeArc(toBeRemoved.removeFirst());
+//            }
+//        }
 
 
         newAutomaton.endTransaction();
@@ -1039,6 +1071,7 @@ public class AutomatonMinimizer
     {
         boolean refined = false;
      //logger.info("eqq"+equivClasses);
+//        logger.info(theAutomaton.getAlphabet());
         for (final Iterator<?> eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext(); )
         {
             if (stopRequested)
@@ -1066,33 +1099,46 @@ public class AutomatonMinimizer
      * Partitions equivClass by the event e.
      * @return true if a partitioning was made, false otherwise.
      */
+     // "Split" class on event 'e', i.e. based on where the 'e'-transitions lead
     private boolean partition(final EquivalenceClasses equivClasses,
         final EquivalenceClass equivClass, final LabeledEvent e, final EquivalenceRelation equivalenceRelation)
     {
-
-            // "Split" class on event 'e', i.e. based on where the 'e'-transitions lead
+        boolean extraCheck = false;
        final EquivalenceClass equivClass2= (EquivalenceClass)equivClass.clone();
        EquivalenceClassHolder newEquivClassHolder = new EquivalenceClassHolder();
        loop:if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION){
             if(e.isControllable()&&e.isUnobservable()){
+                for(State st:equivClass2){
+                    if(st.nbrOfOutgoingUnobservableArcs()>1){
+                        extraCheck = true;
+                        break;
+                    }
+                }
+                if(extraCheck){
+                    while(equivClass2.size()>0){
+                     final State currState=equivClass2.remove();
 
-                while(equivClass2.size()>0){
-                 final State currState=equivClass2.remove();
-                 StateSet nextcurr=new StateSet();
-                 nextcurr = currState.epsilonClosureOnlyFirst(false,true,false,true);
-                 while(nextcurr.size()>0){
-                     final State next=nextcurr.remove();
-                     newEquivClassHolder = splitSynthesisACUo(equivClass, currState, next ,e);
-                     if(newEquivClassHolder.size()>1){
-                         break loop;
-                     }
+                         StateSet nextcurr=new StateSet();
+                         nextcurr = currState.epsilonClosureOnlyFirst(false,true,false,true);
+                         while(nextcurr.size()>0){
+                             final State next=nextcurr.remove();
+                             newEquivClassHolder = splitSynthesisACUo(equivClass, currState, next ,e);
+                             if(newEquivClassHolder.size()>1){
+                                 break loop;
+                             }
+                        }
+
+                    }
+               }
+                else{
+                    newEquivClassHolder = splitSynthesisA(equivClass, e);
                 }
-                }
-            }
+         }
             else{
 
                  newEquivClassHolder = splitSynthesisA(equivClass, e);
             }
+           
        }
        else{
            newEquivClassHolder = oeSplit(equivClass, e);
@@ -1235,7 +1281,7 @@ public class AutomatonMinimizer
             }
 
             final State currState = stateIt.next();
-//            logger.info("currState"+currState);
+//           
             StateSet nextStates=new StateSet();
             if(currstate.equalState(currState)){
                 nextStates.add(next);
@@ -1246,7 +1292,9 @@ public class AutomatonMinimizer
              else{
 
                 nextStates = currState.epsilonClosure(false,true,true,true);
-                if(nextStates.contains(currState)){nextStates.remove(currState);}
+                if(nextStates.contains(currState)){
+                    nextStates.remove(currState);
+                }
 //
                 extraCheck=true;
              }
@@ -1314,11 +1362,19 @@ public class AutomatonMinimizer
 
             final State currState = stateIt.next();
             StateSet nextStates1;
+//            logger.info("currstate "+currState);
             if (e.isControllable())
             {
-                nextStates1 = currState.nextStates(e, false, true);
+                if(e.isObservable()){
+                    nextStates1 = currState.nextStates(e, false, true);
+                }
+                else{
+                    nextStates1 = currState.epsilonClosure(true,true,true,false);
+                }
 
             }
+
+
             //if the event is uncontrollable then the local events should be uncontrollable.
             else{
                 if (e.isUnobservable())
@@ -1333,7 +1389,7 @@ public class AutomatonMinimizer
                 }
 
             }
-//            logger.info("nextStates1 "+nextStates1);
+//            logger.info("nextState1"+ nextStates1);
             final EquivalenceClass nextClass = new EquivalenceClass();
 
             for (final Iterator<State> nextIt = nextStates1.iterator(); nextIt.hasNext(); )
@@ -1529,14 +1585,14 @@ public class AutomatonMinimizer
 //                boolean ok2= !arcIt.hasNext();
                 final boolean arcOK = (!arcIt.hasNext() && arc.getEvent().isUnobservable()&& !arc.getEvent().isControllable() &&  !arc.isSelfLoop())||
                         (!arcIt.hasNext() && arc.getEvent().isUnobservable()&& arc.getEvent().isControllable() &&  !arc.isSelfLoop()&&!containsUncontrollble(two));
-                final boolean markingOK = options.getIgnoreMarking() || !(one.isAccepting()&&!two.isAccepting());
+                final boolean markingOK = options.getIgnoreMarking() || (one.isAccepting(true) && two.isAccepting(true));
                 arcIt = null;
 //                logger.info("the event"+arc.getEvent());
 //                logger.info("one"+one);
 //                logger.info("two"+two);
 //                logger.info("markOk"+markingOK);
-//                logger.info("arcOk1" + arcOK);
-//                logger.info((one.isAccepting()&&!two.isAccepting()));
+//                logger.info("arcOk1" + one.isAccepting(true));
+//                logger.info((two.isAccepting()));
 
 
                 if (arcOK && markingOK)
@@ -1637,6 +1693,50 @@ public class AutomatonMinimizer
 
         return count;
     }
+
+     public int mergeEpsilonLoopsSynthesis(final Automaton aut)
+    {
+        final StateSet statesToExamine = new StateSet(aut.getStateSet());
+
+        // Count the removed states
+        int count = 0;
+
+        // Do the merging
+        while (statesToExamine.size() != 0)
+        {
+            if (stopRequested)
+            {
+                return -1;
+            }
+
+            // Get and remove arbitrary state
+            State one = statesToExamine.remove();
+
+            // Merge loops in which this state is involved
+
+            // Find forwards and backwards closures
+            final StateSet forwardsClosure = one.epsilonClosureWithActiveEventCheck(false);
+            final StateSet backwardsClosure = one.backwardsEpsilonClosureActiveEventCheck();
+
+            // Merge all states in the intersection!
+            forwardsClosure.remove(one); // Skip self
+            while (forwardsClosure.size() != 0)
+            {
+                final State two = forwardsClosure.remove();
+
+                if (backwardsClosure.contains(two))
+                {
+                    // Merge!
+                    count++;
+                    statesToExamine.remove(two);
+                    one = MinimizationHelper.mergeStates(aut, one, two, useShortNames);
+                }
+            }
+        }
+
+        return count;
+    }
+
 
     private static boolean hasEpsilonLoops(final Automaton aut)
     {

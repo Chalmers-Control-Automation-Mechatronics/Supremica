@@ -630,6 +630,21 @@ public class State
         return count;
     }
 
+    public int nbrOfOutgoingUnobservableArcs()
+    {
+        int count = 0;
+
+        for (final Iterator<Arc> it = outgoingArcsIterator(); it.hasNext(); )
+        {
+            if (!it.next().getEvent().isObservable())
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     public int nbrOfOutgoingArcs()
     {
         return outgoingArcs.size();
@@ -1018,6 +1033,45 @@ public class State
         
     }
 
+
+
+     public StateSet epsilonClosureWithActiveEventCheck(final boolean includeSelf)
+    {
+
+        final StateSet result = new StateSet();
+
+        // Include self?
+        if (includeSelf)
+        {
+            result.add(this);
+        }
+
+        // Examine states
+        final LinkedList<State> statesToExamine = new LinkedList<State>();
+        statesToExamine.add(this);
+        while (statesToExamine.size() != 0)
+        {
+            final State currState = statesToExamine.removeFirst();
+
+            for (final Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+            {
+                final Arc currArc = arcIt.next();
+                final State state = currArc.getToState();
+
+                // Is this an epsilon event that we care about?
+                if (!currArc.getEvent().isObservable() && !currArc.isSelfLoop() && !result.contains(state))
+                {
+                    statesToExamine.add(state);
+                    if(!currArc.getEvent().isControllable()|| state.activeEvents(true).getUncontrollableAlphabet().size()<1){
+                        result.add(state);
+                    }
+                }
+            }
+        }
+        return result;
+
+    }
+
     public StateSet epsilonClosureOnlyFirst(final boolean includeSelf, final boolean includeControllable, final boolean includeUncontrollable, boolean select)
     {
         if(!select){
@@ -1077,6 +1131,40 @@ public class State
                 {
                     statesToExamine.add(state);
                     result.add(state);
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    public StateSet backwardsEpsilonClosureActiveEventCheck()
+    {
+        final StateSet result = new StateSet();
+
+        result.add(this);
+
+        final LinkedList<State> statesToExamine = new LinkedList<State>();
+
+        statesToExamine.add(this);
+
+        while (statesToExamine.size() != 0)
+        {
+            final State currState = statesToExamine.removeFirst();
+
+            for (final Iterator<Arc> arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
+            {
+                final Arc currArc = arcIt.next();
+                final State state = currArc.getFromState();
+
+                if (!currArc.getEvent().isObservable() &&!currArc.isSelfLoop() &&!result.contains(state) && !currArc.getEvent().isControllable())
+                {
+                    statesToExamine.add(state);
+                    if(!currArc.getEvent().isControllable()|| state.activeEvents(true).getUncontrollableAlphabet().size()<1){
+                        result.add(state);
+                    }
+                    
                 }
             }
         }

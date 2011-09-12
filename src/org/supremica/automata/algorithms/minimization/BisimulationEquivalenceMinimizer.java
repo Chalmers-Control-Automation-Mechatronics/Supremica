@@ -261,9 +261,9 @@ public class BisimulationEquivalenceMinimizer
         
         // Do the partitioning
         partition();
-        
         // Merge partitions based on the partitioning done in the native environment
         int[] part = getPartitioning();
+        
         State blob = null;
         for (int i=0; i<part.length; i++)
         {
@@ -313,5 +313,185 @@ public class BisimulationEquivalenceMinimizer
     public static boolean libraryLoaded()
     {
         return libraryLoaded;
+    }
+    public static int minimizeSynthesisAbstraction(Automaton aut, boolean useShortNames, boolean strong)
+    throws UnsatisfiedLinkError
+    {
+        int before = aut.nbrOfStates();
+
+        // Set the indices in the automaton.
+        aut.setIndices();
+
+        // States...
+        State[] states = new State[aut.nbrOfStates()];
+
+        // Initialize
+        {
+            // The initial partitioning in an array, separated by -1 elements.
+            // Normally, there should be two partitions, the set of  marked and
+            // the set of nonmarked states
+            int nbrOfPartitions;
+            if (aut.hasAcceptingState() && aut.hasNonacceptingState())
+            {
+                nbrOfPartitions = 2;
+            }
+            else
+            {
+                nbrOfPartitions = 1;
+            }
+            int[] initialPartitioning = new int[aut.nbrOfStates()-1+nbrOfPartitions];
+            int forwIndex = 0;
+            int backIndex = initialPartitioning.length-1;
+            for (Iterator<State> stIt = aut.stateIterator(); stIt.hasNext(); )
+            {
+                State state = stIt.next();
+                int index = state.getIndex();
+                assert((index >= 0) && (index < aut.nbrOfStates()));
+                assert(states[index] == null);
+                states[index] = state;
+                // Put accepting states at the front of the list and all other at the back...
+                if (!state.isAccepting(!strong))
+                {
+                    initialPartitioning[forwIndex++] = index;
+                }
+                else
+                {
+                    initialPartitioning[backIndex--] = index;
+                }
+                // When they meet, put a -1
+                if (forwIndex == backIndex)
+                {
+                    initialPartitioning[forwIndex] = -1;
+                }
+            }
+            // This is an array of int, every third int is the index of a
+            // from-state, event or to-state respectively...
+            int[] transitions;
+            int transitionCount = 0;
+            if (strong)
+            {
+                // Strong bisimulation equivalence
+                transitions = new int[aut.nbrOfTransitions()*3];
+                int index = 0;
+                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+                {
+                    Arc arc = arcIt.next();
+                    //logger.info("From: " + arc.getFromState() + " ev: " + arc.getEvent() + " (" + arc.getEvent().getIndex() + ") to: " + arc.getToState());
+                    transitions[index++] = arc.getFromState().getIndex();
+                    transitions[index++] = arc.getEvent().getIndex();
+                    transitions[index++] = arc.getToState().getIndex();
+                }
+
+                transitionCount = aut.nbrOfTransitions();
+            }
+            else
+            {
+                // Weak bisimulation equivalence
+                // Find out how many transitions there are (after saturation)
+                for (Iterator<State> fromIt = aut.stateIterator(); fromIt.hasNext(); )
+                {
+                    State from = fromIt.next();
+                    for (Iterator<LabeledEvent> evIt = aut.eventIterator(); evIt.hasNext(); )
+                    {
+                        LabeledEvent event = evIt.next();
+                        StateSet nextStates;
+
+                        if (event.isUnobservable())
+                        {
+                            if(!event.isControllable()){
+                                nextStates = from.epsilonClosureWithNoCon(true);
+                            }
+                            else{
+                                nextStates = from.epsilonClosure(true,true,true,true);
+                            }
+                        }
+                        else
+                        {
+                            if(!event.isControllable()){
+                               nextStates = from.nextStatesWithUncoClosure(event, true);
+                            }
+                            else{
+                                nextStates = from.nextStates(event, false, true);
+                            }
+                        }
+                                                /*
+                        for (Iterator<State> toIt = nextStates.iterator(); toIt.hasNext(); )
+                        {
+                            State to = toIt.next();
+                            transitionCount++;
+                        }
+                                                 */
+                        transitionCount += nextStates.size();
+                    }
+                }
+                // Now, do the same thing again, and put the info in the array
+                transitions = new int[transitionCount*3];
+                int index = 0;
+                for (Iterator<State> fromIt = aut.stateIterator(); fromIt.hasNext(); )
+                {
+                    State from = fromIt.next();
+                    for (Iterator<LabeledEvent> evIt = aut.eventIterator(); evIt.hasNext(); )
+                    {
+                        LabeledEvent event = evIt.next();
+                        StateSet nextStates;
+                        if (!event.isObservable())
+                        {
+                            nextStates = from.epsilonClosure(true);
+                        }
+                        else
+                        {
+                            nextStates = from.nextStates(event, true);
+                        }
+                        for (Iterator<State> toIt = nextStates.iterator(); toIt.hasNext(); )
+                        {
+                            State to = toIt.next();
+                            //logger.info("From: " + from + " ev: " + event + " (" + event.getIndex() + ") to: " + to);
+                            transitions[index++] = from.getIndex();
+                            transitions[index++] = event.getIndex();
+                            transitions[index++] = to.getIndex();
+                        }
+                    }
+                }
+            }
+
+            // Initialize
+            //logger.info("States: " + aut.nbrOfStates() + " events: " + aut.nbrOfEvents() + " transitions: " + transitionCount);
+            initialize(aut.nbrOfStates(), aut.nbrOfEvents(), transitionCount,
+                initialPartitioning, transitions);
+            initialPartitioning = null;
+            transitions = null;
+        }
+
+        // Do the partitioning
+        partition();
+        // Merge partitions based on the partitioning done in the native environment
+        int[] part = getPartitioning();
+
+        State blob = null;
+        for (int i=0; i<part.length; i++)
+        {
+            // Merge states in partitions (the partitions are separated by -1)!
+            if (part[i] != -1)
+            {
+                //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
+                if (blob == null)
+                {
+                    blob = states[part[i]];
+                }
+                else
+                {
+                    //logger.info("Merging " + blob + " and " + states[part[i]]);
+                    blob = MinimizationHelper.mergeStates(aut, blob, states[part[i]], useShortNames);
+                }
+            }
+            else
+            {
+                // Prepare for new blob
+                blob = null;
+            }
+        }
+        part = null;
+
+        return before - aut.nbrOfStates();
     }
 }

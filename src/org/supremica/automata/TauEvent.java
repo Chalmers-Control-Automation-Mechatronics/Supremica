@@ -47,7 +47,9 @@ public class TauEvent extends LabeledEvent
       this.orig_event=event;
       this.controllable = event.controllable;	// always preserve controllability
       this.prioritized = false;		// always non-prioritize
-      this.observable = false;		// always un-observable
+      this.observable = false;
+      this.tauEvent= true;
+     // always un-observable
     }
 
     private TauEvent(final TauEvent tevent)
@@ -63,5 +65,9 @@ public class TauEvent extends LabeledEvent
     public  LabeledEvent getOriginalEvent()
     {
       return orig_event;
+    }
+    public  boolean isTauEvent()
+    {
+      return tauEvent;
     }
 }

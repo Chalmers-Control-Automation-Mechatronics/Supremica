@@ -70,10 +70,12 @@ public class LabeledEvent
     protected boolean controllable = true;
     protected boolean prioritized = true;
     protected boolean observable = true;
+    protected boolean tauEvent =false;
     private boolean operatorIncrease = false;
     private boolean operatorReset = false;
     private boolean immediate = false;
     private boolean proposition = false;
+    
     private int expansionPriority = -1;
     private int index = -1;
 
@@ -301,7 +303,10 @@ public class LabeledEvent
     {
         return false;
     }
-
+    public  boolean isTauEvent()
+    {
+      return tauEvent;
+    }
 
     //#########################################################################
     //# Interface net.sourceforge.waters.model.base.Proxy

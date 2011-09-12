@@ -281,69 +281,35 @@ public class AutomataSynthesizer
                     halfwaySynthesisResult.addAutomaton(aut);
                 }
             }
-            
+            // remove the halfway synthesis result from min.
             if(halfwaySynthesisResult.size()>0){
                 min.removeAutomata(halfwaySynthesisResult);
             }
              
-            Automaton cloneAutomaton=min.getFirstAutomaton();
-//           
+//            Automaton cloneAutomaton=min.getFirstAutomaton();
+//
+            //rename back the tau events to the original events.
+
+            AutomatonMinimizer.renameBackToOriginalEvents(min);
            
-            Alphabet tauToBeRemoved = new Alphabet();
-            for (final Iterator<Arc> arcIt = cloneAutomaton.arcIterator(); arcIt.hasNext(); )
-            {
-                
-                final Arc arc = arcIt.next();
-                if (arc.getEvent().isUnobservable())
-                {
-                    if(cloneAutomaton.getAlphabet().contains(arc.getEvent())&&!tauToBeRemoved.contains(arc.getEvent())){
-                       tauToBeRemoved.add(arc.getEvent());
-                   }
-                   LabeledEvent orig = ((TauEvent)arc.getEvent()).getOriginalEvent();
-                   arc.setEvent(orig);
-
-
-                   if(!cloneAutomaton.getAlphabet().contains(orig)){
-                       cloneAutomaton.getAlphabet().addEvent(orig);
-                   }
-
-                }
-            }
-            cloneAutomaton.getAlphabet().minus(tauToBeRemoved);
-            min.addAutomaton(cloneAutomaton);
+//            min.addAutomaton(cloneAutomaton);
             
 //
-            // Applying synthesis on the abstract automaton.
+            // Applying monolithic synthesis on the abstract automaton.
             MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
             threadToStop = synthesizer;
-            MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
-            min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
+            MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
+
             if (stopRequested)
                 return new Automata();
-
+            retval.automaton.setName("sup(Untitled)");
             result.addAutomaton(retval.automaton);
+
+            // add the result of halfway synthesis to the final synthesis result.
             if(halfwaySynthesisResult.size()>0){
                 result.addAutomata(halfwaySynthesisResult);
             }
-            for (Automaton sup: min)
-            {
-                if(!sup.isDeterministic()){
-                    logger.warn("The calculated supervisor is nondeterminstic which currently is not supported.");
-                }
-                sup.setComment("sup(" + min.getName() + ")");
-                sup.setName(null);
-                synthesis=false;
-            }
-
-            // Present result
-            if (Config.VERBOSE_MODE.isTrue() && (min.size() == 1) && (min.getFirstAutomaton().nbrOfStates() < 100))
-            {
-                // This may not be true if more advanced simplification rules have been used!
-                logger.info("The following states are allowed by the maximally permissive, "
-                    + "controllable and nonblocking supervisor: " +  min.getFirstAutomaton().getStateSet() + ".");
-            }
-
-//            result.addAutomata(min);
+//         
 
         }
 

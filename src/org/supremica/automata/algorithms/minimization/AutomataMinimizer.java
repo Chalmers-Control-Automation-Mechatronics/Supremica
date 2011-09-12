@@ -197,8 +197,9 @@ public class AutomataMinimizer
 
 
         // Special pre-minimization stuff
-        if ((options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)||
-                (options.getMinimizationType() ==   EquivalenceRelation.SYNTHESISABSTRACTION))
+        if ((options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE))
+//                ||
+//                (options.getMinimizationType() ==   EquivalenceRelation.SYNTHESISABSTRACTION))
         {
             MinimizationHelper.plantify(theAutomata);
         }
@@ -253,21 +254,31 @@ public class AutomataMinimizer
             final MinimizationTask task = getNextMinimizationTask(true); // new implementation
             //MinimizationTask task = getNextMinimizationTask(heuristicList.getFirst() != MinimizationHeuristic.MostLocal); // decide based on heuristic
             Automata selection;
+            
             Alphabet hideThese;
             if (task != null)
             {
                 // Get task
                 selection = task.getAutomata();
+                if ((options.getMinimizationType() ==   EquivalenceRelation.SYNTHESISABSTRACTION))
+                {
+                    MinimizationHelper.plantify(selection);
+                }
                 hideThese = task.getEventsToHide();
             }
             else
             {
                 // Could not find a task? Select everything!
                 selection = new Automata(theAutomata, true);
+                if ((options.getMinimizationType() ==   EquivalenceRelation.SYNTHESISABSTRACTION))
+                {
+                    MinimizationHelper.plantify(selection);
+                }
 
                 hideThese = selection.getUnionAlphabet();
                 hideThese.minus(options.getTargetAlphabet());
             }
+           
             taskSelectionTimer.stop();
             if (stopRequested)
             {
@@ -276,11 +287,21 @@ public class AutomataMinimizer
             // Perform the minimization, unless of course this is the last step
             // and it should be skipped...
             Automaton min;
-
+            
             if (options.getSkipLast() && (theAutomata.size() == selection.size()))
             {
                 // Just synch and hide
 //
+                if(options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION){
+//                    if(hideThese.size()>0){
+//                        for(Automaton aut:theAutomata){
+//                            aut=monolithicMinimization(aut, hideThese);
+//                        }
+//                    }
+                    theAutomata.addAutomata(setOfHalf);
+                    return theAutomata;
+                }
+                 
                 min = AutomataSynchronizer.synchronizeAutomata(selection);
                 min.hide(hideThese, preserveControllability);
                 // Examine for largest sizes (this is a special case, this is otherwise done in minolithicMinimization())
@@ -299,22 +320,26 @@ public class AutomataMinimizer
 
             else
             {
+//               
+                
                 // Compose and minimize!
                  if(AutomataSynthesizer.renameBack()){
+                     Automata selectClone=selection.clone();
                      String name= "HalfWaySynthesisResult("+selection.getFirstAutomaton().getName()+")";
                       Automaton aut=new Automaton(name );
-//                     
+//                        logger.info(selection);
                         // Synch
                         final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
                         synchOptions.setUseShortStateNames(useShortStateNames);
-                        aut = AutomataSynchronizer.synchronizeAutomata(selection, synchOptions);
+                        aut = AutomataSynchronizer.synchronizeAutomata(selectClone, synchOptions);
                         aut.setName(name);
                         aut.hide(hideThese, preserveControllability);
                         AutomatonMinimizer.halfWaySynthesis(aut);
                         AutomatonMinimizer.renameBackToOriginalEvents(aut);
+                        aut.setType(AutomatonType.SUPERVISOR);
                         setOfHalf.addAutomaton(aut);
                }
-
+                 
                  min = monolithicMinimization(selection, hideThese);
             }
             if (stopRequested)
@@ -425,10 +450,10 @@ public class AutomataMinimizer
 
 
 
-        if(theAutomata.size()<2){
-            theAutomata.addAutomata(setOfHalf);
-
-        }
+//        if(theAutomata.size()<2){
+//            theAutomata.addAutomata(setOfHalf);
+//
+//        }
         return theAutomata;
     }
 
@@ -871,6 +896,7 @@ public class AutomataMinimizer
     private Automaton monolithicMinimization(final Automata automata, final Alphabet hideThese)
     throws Exception
     {
+        
          
 //        logger.info("hide these in monolithic"+hideThese);
         //System.err.println("Minimizing " + automata + ", hiding: " + hideThese);
