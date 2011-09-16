@@ -33,14 +33,18 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 
 
 /**
- * <P>A bisimulation and observation equivalence partitioning algorithm.</P>
+ * <P>
+ * A bisimulation and observation equivalence partitioning algorithm.
+ * </P>
  *
- * <P>This transition relation simplifier can simplify a given deterministic or
+ * <P>
+ * This transition relation simplifier can simplify a given deterministic or
  * nondeterministic automaton according to common equivalences such as
- * bisimulation and observation equivalence. The implementation is based on the
- * bisimulation algorithm by Jean-Claude Fernandez. When computing observation
- * equivalence, it can additionally be configured to remove redundant
- * transitions before and after partitioning.</P>
+ * bisimulation and observation equivalence. The implementation is based on
+ * the bisimulation algorithm by Jean-Claude Fernandez. When computing
+ * observation equivalence, it can additionally be configured to remove
+ * redundant transitions before and after partitioning.
+ * </P>
  *
  * <P>
  * <I>References.</I><BR>
@@ -57,8 +61,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  * @author Robi Malik, Simon Ware, Rachel Francis
  */
 
-public class SynthesisAbstractionTRSimplifier
-  extends AbstractTRSimplifier
+public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
 {
 
   //#########################################################################
@@ -73,25 +76,24 @@ public class SynthesisAbstractionTRSimplifier
   /**
    * Creates a new bisimulation simplifier for the given transition relation.
    */
-  public SynthesisAbstractionTRSimplifier
-    (final ListBufferTransitionRelation rel)
+  public SynthesisAbstractionTRSimplifier(final ListBufferTransitionRelation rel)
   {
     if (rel != null) {
       setTransitionRelation(rel);
     }
   }
 
-
   //#########################################################################
   //# Configuration
   /**
-   * Determines the propositions used when partitioning.
-   * The propositions mask is only used to distinguish states when setting up
-   * an initial partition. When merging states, all propositions present in
-   * the transition relation are merged.
-   * @param  mask   The bit mask of the significant propositions,
-   *                or <CODE>-1</CODE> to indicate that all propositions
-   *                are significant.
+   * Determines the propositions used when partitioning. The propositions mask
+   * is only used to distinguish states when setting up an initial partition.
+   * When merging states, all propositions present in the transition relation
+   * are merged.
+   *
+   * @param mask
+   *          The bit mask of the significant propositions, or <CODE>-1</CODE>
+   *          to indicate that all propositions are significant.
    * @see #setUpInitialPartitionBasedOnMarkings()
    */
   public void setPropositionMask(final long mask)
@@ -101,6 +103,7 @@ public class SynthesisAbstractionTRSimplifier
 
   /**
    * Gets the mask of significant propositions.
+   *
    * @see #setPropositionMask(long) setPropositionMask()
    */
   public long getPropositionMask()
@@ -112,9 +115,10 @@ public class SynthesisAbstractionTRSimplifier
    * Sets the transition limit. The transition limit specifies the maximum
    * number of transitions (including stored silent transitions of the
    * transitive closure) that will be stored.
+   *
    * @param limit
-   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
-   *          unlimited number of transitions.
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
    */
   public void setTransitionLimit(final int limit)
   {
@@ -123,20 +127,21 @@ public class SynthesisAbstractionTRSimplifier
 
   /**
    * Gets the transition limit.
+   *
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
   public int getTransitionLimit()
   {
     return mTransitionLimit;
   }
+
   /**
-   * Sets the code of the last local uncontrollable event.
-   * Events are encoded such that all local events appear before all shared
-   * events, and all uncontrollable local events appear before controllable
-   * local events. The tau event code ({@link EventEncoding#TAU} is not used.
-   * Therefore, the range of uncontrollable local events is from
-   * {@link EventEncoding#NONTAU} to {@link
-   * #getLastUncontrollableLocalEvent()} inclusive.
+   * Sets the code of the last local uncontrollable event. Events are encoded
+   * such that all local events appear before all shared events, and all
+   * uncontrollable local events appear before controllable local events. The
+   * tau event code ({@link EventEncoding#TAU} is not used. Therefore, the
+   * range of uncontrollable local events is from {@link EventEncoding#NONTAU}
+   * to {@link #getLastUncontrollableLocalEvent()} inclusive.
    */
   public void setLastUncontrollableLocalEvent(final int event)
   {
@@ -145,19 +150,44 @@ public class SynthesisAbstractionTRSimplifier
 
   /**
    * Gets the code of the last local uncontrollable event.
+   *
    * @see #getLastUncontrollableLocalEvent()
    */
-  public int getLastUncontrollableLocalEvent(){
-      return mLastUncontrollableLocalEvent;
+  public int getLastUncontrollableLocalEvent()
+  {
+    return mLastUncontrollableLocalEvent;
   }
 
   /**
-   * Sets the code of the last local controllable event.
-   * Events are encoded such that all local events appear before all shared
-   * events, and all uncontrollable local events appear before controllable
-   * local events. Therefore, the range of controllable local events is from
-   * {@link #getLastUncontrollableLocalEvent()}+1 to {@link
-   * #getLastControllableLocalEvent()} inclusive.
+   * Sets the code of the last shared uncontrollable event. Events are encoded
+   * such that all local events appear before all shared events, and all
+   * uncontrollable local events appear before controllable events.
+   * Therefore, the range of uncontrollable shared events is from
+   * {@link #getLastControllableLocalEvent()}+1 to
+   * {@link #getLastUncontrollableSharedEvent()} inclusive.
+   */
+  public void setLastUncontrollableSharedEvent(final int event)
+  {
+    mLastUncontrollableSharedEvent = event;
+  }
+
+  /**
+   * Gets the code of the last shared uncontrollable event.
+   *
+   * @see #getLastUncontrollableSharedEvent()
+   */
+  public int getLastUncontrollableSharedEvent()
+  {
+    return mLastUncontrollableSharedEvent;
+  }
+
+  /**
+   * Sets the code of the last local controllable event. Events are encoded
+   * such that all local events appear before all shared events, and all
+   * uncontrollable local events appear before controllable local events.
+   * Therefore, the range of controllable local events is from
+   * {@link #getLastUncontrollableLocalEvent()}+1 to
+   * {@link #getLastControllableLocalEvent()} inclusive.
    */
   public void setLastControllableLocalEvent(final int event)
   {
@@ -166,13 +196,13 @@ public class SynthesisAbstractionTRSimplifier
 
   /**
    * Gets the code of the last local controllable event.
+   *
    * @see #getLastControllableLocalEvent()
    */
-  public int getLastControllableLocalEvent(){
-      return mLastControllableLocalEvent;
+  public int getLastControllableLocalEvent()
+  {
+    return mLastControllableLocalEvent;
   }
-
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.
@@ -208,41 +238,45 @@ public class SynthesisAbstractionTRSimplifier
   public void reset()
   {
     super.reset();
-    mTauClosure = null;
-    mTauIterator = mEventIterator = null;
+    mUncontrollableTauClosure = null;
+    mAllEventsTauClosure = null;
+    mUncontrollableTauIterator = null;
+    mAllTauIterator = null;
+    mUncontrollableEventIterator = null;
+    mControllableEventIterator = null;
   }
-
 
   //#########################################################################
   //# Initial Partition
   /**
-   * Sets up an initial partition for the bisimulation algorithm based on
-   * the markings of states in the transition relation.
-   * States with equal sets of markings are placed in the same class.
-   * This method replaces any previously set initial partition.
-   * This method is called by default during each {@link #run()} unless
-   * the user provides an alternative initial partition.
+   * Sets up an initial partition for the bisimulation algorithm based on the
+   * markings of states in the transition relation. States with equal sets of
+   * markings are placed in the same class. This method replaces any
+   * previously set initial partition. This method is called by default during
+   * each {@link #run()} unless the user provides an alternative initial
+   * partition.
    */
-  public void setUpInitialPartitionBasedOnMarkings()
-  throws OverflowException
+  public void setUpInitialPartitionBasedOnMarkings() throws OverflowException
   {
     final long mask = getPropositionMask();
     setUpInitialPartitionBasedOnMarkings(mask);
   }
 
   /**
-   * Sets up an initial partition for the bisimulation algorithm based on
-   * the markings of states in the transition relation.
-   * States with equal sets of markings are placed in the same class.
-   * This method replaces any previously set initial partition.
-   * This method is called by default during each {@link #run()} unless
-   * the user provides an alternative initial partition.
-   * @param  mask   Marking pattern identifying the markings to be considered.
-   *                Only markings in this pattern will be taken into account
-   *                for the partition.
+   * Sets up an initial partition for the bisimulation algorithm based on the
+   * markings of states in the transition relation. States with equal sets of
+   * markings are placed in the same class. This method replaces any
+   * previously set initial partition. This method is called by default during
+   * each {@link #run()} unless the user provides an alternative initial
+   * partition.
+   *
+   * @param mask
+   *          Marking pattern identifying the markings to be considered. Only
+   *          markings in this pattern will be taken into account for the
+   *          partition.
    */
   public void setUpInitialPartitionBasedOnMarkings(final long mask)
-  throws OverflowException
+    throws OverflowException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -250,7 +284,7 @@ public class SynthesisAbstractionTRSimplifier
 
     mHasModifications = false;
     setUpTauClosure();
-    final TransitionIterator iter = mTauClosure.createIterator();
+    final TransitionIterator iter = mAllTauIterator;
     for (int state = 0; state < numStates; state++) {
       if (rel.isReachable(state)) {
         final long marking = rel.getAllMarkings(state) & mask;
@@ -292,13 +326,10 @@ public class SynthesisAbstractionTRSimplifier
     }
   }
 
-
-
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
-  protected void setUp()
-  throws AnalysisException
+  protected void setUp() throws AnalysisException
   {
     super.setUp();
     if (mSplitters == null) {
@@ -323,12 +354,11 @@ public class SynthesisAbstractionTRSimplifier
   }
 
   @Override
-  protected boolean runSimplifier()
-  throws AnalysisException
+  protected boolean runSimplifier() throws AnalysisException
   {
-    for (Splitter splitter = mSplitters.poll();
-         splitter != null && mNumClasses < mNumReachableStates;
-         splitter = mSplitters.poll()) {
+    for (Splitter splitter = mSplitters.poll(); splitter != null
+                                                && mNumClasses < mNumReachableStates; splitter =
+      mSplitters.poll()) {
       splitter.splitOn();
     }
     buildResultPartition();
@@ -354,15 +384,20 @@ public class SynthesisAbstractionTRSimplifier
    * transition relation. This method merges any states found to be equivalent
    * during the last call to {@link #run()}, and depending on configuration,
    * performs a second pass to remove redundant transitions.
+   *
    * @see TransitionRemoval
    */
   @Override
-  protected void applyResultPartition()
-  throws AnalysisException
+  protected void applyResultPartition() throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (getResultPartition() != null) {
-      mTauClosure = null;
+      mUncontrollableTauClosure = null;
+      mAllEventsTauClosure = null;
+      mUncontrollableTauIterator = null;
+      mAllTauIterator = null;
+      mUncontrollableEventIterator = null;
+      mControllableEventIterator = null;
       super.applyResultPartition();
 
       rel.removeTauSelfLoops();
@@ -374,7 +409,6 @@ public class SynthesisAbstractionTRSimplifier
       }
     }
   }
-
 
   //#########################################################################
   //# Algorithm
@@ -393,34 +427,25 @@ public class SynthesisAbstractionTRSimplifier
 
   private void setUpTauClosure() throws OverflowException
   {
-   // we have to do tauclosure here diffrently.
-      if (mTauClosure == null) {
-        final ListBufferTransitionRelation rel = getTransitionRelation();
-        final int limit = getTransitionLimit();
-        final int config = rel.getConfiguration();
-        if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
-          mTauClosure = rel.createPredecessorsTauClosure(limit);
-        } else {
-          mTauClosure = rel.createSuccessorsTauClosure(limit);
-        }
-        mTauIterator = mTauClosure.createIterator();
-        if (mInitialInfoSize < 0) {
-          mTauIterator = new OneEventCachingTransitionIterator
-                               (mTauIterator, EventEncoding.TAU);
-        }
-        mEventIterator = mTauClosure.createFullEventClosureIterator(-1);
-      }
-
-  }
-
-  private TransitionIterator getPredecessorIterator(final int event)
-  {
-    if (event == EventEncoding.TAU) {
-      mTauIterator.reset();
-      return mTauIterator;
-    } else {
-      mEventIterator.resetEvent(event);
-      return mEventIterator;
+    if (mUncontrollableTauClosure == null) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int limit = getTransitionLimit();
+      mUncontrollableTauClosure =
+        rel.createPredecessorsTauClosure(limit, EventEncoding.NONTAU,
+                                         mLastUncontrollableLocalEvent);
+      mAllEventsTauClosure =
+        rel.createPredecessorsTauClosure(limit, EventEncoding.NONTAU,
+                                         mLastControllableLocalEvent);
+      mUncontrollableTauIterator =
+        new OneEventCachingTransitionIterator
+          (mUncontrollableTauClosure.createIterator(), EventEncoding.TAU);
+      mAllTauIterator =
+        new OneEventCachingTransitionIterator
+          (mAllEventsTauClosure.createIterator(), EventEncoding.TAU);
+      mControllableEventIterator =
+        mAllEventsTauClosure.createPreEventClosureIterator(-1);
+      mUncontrollableEventIterator =
+        mUncontrollableTauClosure.createFullEventClosureIterator(-1);
     }
   }
 
@@ -450,7 +475,6 @@ public class SynthesisAbstractionTRSimplifier
       setResultPartitionList(null);
     }
   }
-
 
   //#########################################################################
   //# Debugging
@@ -504,8 +528,7 @@ public class SynthesisAbstractionTRSimplifier
 
   //#########################################################################
   //# Inner Class EquivalenceClass
-  private class EquivalenceClass
-    implements Splitter
+  private class EquivalenceClass implements Splitter
   {
 
     //#######################################################################
@@ -520,8 +543,7 @@ public class SynthesisAbstractionTRSimplifier
       mIsOpenSplitter = false;
     }
 
-    private EquivalenceClass(final int list,
-                             final int size,
+    private EquivalenceClass(final int list, final int size,
                              final boolean preds)
     {
       mSize = size;
@@ -541,7 +563,7 @@ public class SynthesisAbstractionTRSimplifier
       mNumClasses++;
     }
 
-   //#######################################################################
+    //#######################################################################
     //# Initialisation
     void setSize(final int size)
     {
@@ -610,38 +632,57 @@ public class SynthesisAbstractionTRSimplifier
         states.add(state);
       }
     }
-    public void splitOn()
-    {
-      mIsOpenSplitter = false;
-      final ListBufferTransitionRelation rel = getTransitionRelation();
+
+    /**
+     * Splits all the classes connected to this base on the given transition
+     * iterator.
+     */
+    private void splitOn(final TransitionIterator transIter){
       final Collection<EquivalenceClass> splitClasses =
         new THashSet<EquivalenceClass>();
-      collect(mTempClass);
       final int size = getSize();
-      // get the first event in the encoding.
-      final int first = EventEncoding.NONTAU;
-      for (int event = first; event < mNumEvents; event++) {
-        if (rel.isUsedEvent(event)) {
-          final TransitionIterator transIter =
-            getPredecessorIterator(event);
-          for (int i = 0; i < size; i++) {
-            final int state = mTempClass.get(i);
-            transIter.resume(state);
-            while (transIter.advance()) {
-              final int pred = transIter.getCurrentSourceState();
-              final EquivalenceClass splitClass = mStateToClass[pred];
-              if (splitClass != null) {
-                splitClass.moveToOverflowList(pred);
-                splitClasses.add(splitClass);
-              }
-            }
+      for (int i = 0; i < size; i++) {
+        final int state = mTempClass.get(i);
+        transIter.resume(state);
+        while (transIter.advance()) {
+          final int pred = transIter.getCurrentSourceState();
+          final EquivalenceClass splitClass = mStateToClass[pred];
+          if (splitClass != null) {
+            splitClass.moveToOverflowList(pred);
+            splitClasses.add(splitClass);
           }
-          for (final EquivalenceClass splitClass : splitClasses) {
-            splitClass.splitUsingOverflowList();
-          }
-          splitClasses.clear();
         }
       }
+      for (final EquivalenceClass splitClass : splitClasses) {
+        splitClass.splitUsingOverflowList();
+      }
+    }
+
+    public void splitOn()
+    {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mIsOpenSplitter = false;
+      collect(mTempClass);
+      for (int event = mLastControllableLocalEvent + 1;
+           event < mLastUncontrollableSharedEvent;
+           event++) {
+        if (rel.isUsedEvent(event)) {
+          final TransitionIterator transIter = mUncontrollableEventIterator;
+          transIter.resetEvent(event);
+          splitOn(transIter);
+        }
+      }
+      for (int event = mLastUncontrollableSharedEvent + 1;
+           event < mNumEvents; event++) {
+        if (rel.isUsedEvent(event)) {
+          final TransitionIterator transIter = mControllableEventIterator;
+          transIter.resetEvent(event);
+          splitOn(transIter);
+        }
+      }
+      final TransitionIterator transIter = mUncontrollableTauIterator;
+      transIter.reset();
+      splitOn(transIter);
       mTempClass.clear();
     }
 
@@ -655,15 +696,15 @@ public class SynthesisAbstractionTRSimplifier
 
     //#######################################################################
     //# Overrides for EquivalenceClass
-    void doSimpleSplit(final int overflowList,
-                       final int overflowSize,
+    void doSimpleSplit(final int overflowList, final int overflowSize,
                        final boolean preds)
     {
       final int size = getSize();
       final int newSize = size - overflowSize;
       final EquivalenceClass overflowClass;
       if (newSize >= overflowSize) {
-        overflowClass = new EquivalenceClass(overflowList, overflowSize, preds);
+        overflowClass =
+          new EquivalenceClass(overflowList, overflowSize, preds);
         setSize(newSize);
       } else {
         final int list = getList();
@@ -740,9 +781,8 @@ public class SynthesisAbstractionTRSimplifier
     private void setUpPredecessors()
     {
       int pred = IntListBuffer.NULL;
-      for (int list = mClassLists.getHead(mList);
-           list != IntListBuffer.NULL;
-           list = mClassLists.getNext(list)) {
+      for (int list = mClassLists.getHead(mList); list != IntListBuffer.NULL; list =
+        mClassLists.getNext(list)) {
         final int state = mClassLists.getData(list);
         mPredecessors[state] = pred;
         pred = list;
@@ -775,23 +815,26 @@ public class SynthesisAbstractionTRSimplifier
     private boolean mIsOpenSplitter;
   }
 
-
   //#########################################################################
   //# Data Members
   private long mPropositionMask = ~0;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mInitialInfoSize = -1;
-  private int mLastControllableLocalEvent;
   private int mLastUncontrollableLocalEvent;
+  private int mLastControllableLocalEvent;
+  private int mLastUncontrollableSharedEvent;
 
   private int mNumReachableStates;
   private int mNumEvents;
   private int mNumClasses;
   private boolean mHasModifications;
 
-  private TauClosure mTauClosure;
-  private TransitionIterator mTauIterator;
-  private TransitionIterator mEventIterator;
+  private TauClosure mUncontrollableTauClosure;
+  private TauClosure mAllEventsTauClosure;
+  private TransitionIterator mUncontrollableTauIterator;
+  private TransitionIterator mAllTauIterator;
+  private TransitionIterator mUncontrollableEventIterator;
+  private TransitionIterator mControllableEventIterator;
   private IntListBuffer mClassLists;
   private IntListBuffer.ReadOnlyIterator mClassReadIterator;
   private IntListBuffer.ModifyingIterator mClassWriteIterator;

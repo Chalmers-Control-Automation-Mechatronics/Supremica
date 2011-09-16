@@ -228,6 +228,14 @@ public class TestSynthesisAbstractionMinimizer
     runAutomatonMinimizer(group, subdir, name);
   }
 
+  public void test_synthesisAbstraction_5() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_5.wmod";
+    runAutomatonMinimizer(group, subdir, name);
+  }
+
 
   //#########################################################################
   //# Instantiating and Checking Modules

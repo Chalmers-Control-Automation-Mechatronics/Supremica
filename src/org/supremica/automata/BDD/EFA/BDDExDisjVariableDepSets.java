@@ -11,38 +11,40 @@ import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 /**
- * Variable-based disjunctive partitioning 
- * 
+ * Variable-based disjunctive partitioning
+ *
  * @author zhennan
  * @version 1.0
- * 
+ *
  */
 public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
 
     /** A map from names of variables to their indices. */
-    private TObjectIntHashMap<String> variableNameToIndex;
-    
-    /** A map from variable indices to variable names. */
-    private TIntObjectHashMap<String> variableIndexToName;
-    
-    /** A map from variable indices to their partitioned BDD expressions. */
-    private TIntObjectHashMap<BDD> variableToBDD;
-    
-    /** A map from variable indices to a map where the key is the influenced component index while 
-     *   the value is the influenced value. 
-     */
-    private TIntObjectHashMap<TIntIntHashMap> variableToForwardInfluencedVariables;
+    private final TObjectIntHashMap<String> variableNameToIndex;
 
-    private TIntObjectHashMap<TIntIntHashMap> variableToBackwardInfluencedVariables;
-    
-    /** A variable can appear in several arcs where events are enabled. 
+    /** A map from variable indices to variable names. */
+    private final TIntObjectHashMap<String> variableIndexToName;
+
+    /** A map from variable indices to their partitioned BDD expressions. */
+    private final TIntObjectHashMap<BDD> variableToBDD;
+
+    /** A map from variable indices to a map where the key is the influenced component index while
+     *   the value is the influenced value.
+     */
+    @SuppressWarnings("unused")
+    private final TIntObjectHashMap<TIntIntHashMap> variableToForwardInfluencedVariables;
+
+    @SuppressWarnings("unused")
+    private final TIntObjectHashMap<TIntIntHashMap> variableToBackwardInfluencedVariables;
+
+    /** A variable can appear in several arcs where events are enabled.
      *   After filling this field, the BDDs corresponding to all the events for one variable will be used to construct the BDD
      *   expression of a variable partition.
      */
-    private TIntObjectHashMap<TIntHashSet> variableToEvents;
-    
+    private final TIntObjectHashMap<TIntHashSet> variableToEvents;
 
-    public BDDExDisjVariableDepSets(BDDExtendedAutomata bddExtendAutomata, BDDExDisjEventDepSets eventDepSets) {
+
+    public BDDExDisjVariableDepSets(final BDDExtendedAutomata bddExtendAutomata, final BDDExDisjEventDepSets eventDepSets) {
         super(bddExtendAutomata, eventDepSets);
         this.size = orgAutomata.getVars().size();
         this.variableNameToIndex = new TObjectIntHashMap<String>(size);
@@ -51,34 +53,34 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
         this.variableToForwardInfluencedVariables = new TIntObjectHashMap<TIntIntHashMap>(size);
         this.variableToBackwardInfluencedVariables = new TIntObjectHashMap<TIntIntHashMap>(size);
         this.variableToEvents = new TIntObjectHashMap<TIntHashSet>(size);
-        
+
         initialize();
     }
 
     @Override
     protected final void initialize() {
 
-        for (VariableComponentProxy variable : orgAutomata.getVars()) {/*Fill these fields*/
-            String variableName = variable.getName();
-            int variableIndex = theIndexMap.getVariableIndex(variable);
+        for (final VariableComponentProxy variable : orgAutomata.getVars()) {/*Fill these fields*/
+            final String variableName = variable.getName();
+            final int variableIndex = theIndexMap.getVariableIndex(variable);
             variableNameToIndex.put(variableName, variableIndex);
             variableIndexToName.put(variableIndex, variableName);
             variableToEvents.put(variableIndex, new TIntHashSet());
             variableToBDD.put(variableIndex, manager.getZeroBDD());
         }
-        
-        TIntObjectHashMap<HashSet<String>> eventIndex2GuardVariables = eventParDepSets.getEventIndex2GuardVariables();
-        
+
+        final TIntObjectHashMap<HashSet<String>> eventIndex2GuardVariables = eventParDepSets.getEventIndex2GuardVariables();
+
         eventIndex2GuardVariables.forEachEntry(new TIntObjectProcedure<HashSet<String>>() {
 
             @Override
-            public boolean execute(int eventIndex, HashSet<String> guardVariables) {
+            public boolean execute(final int eventIndex, final HashSet<String> guardVariables) {
                 if(!guardVariables.isEmpty()){
-                    for(String aguardVariable: guardVariables){
+                    for(final String aguardVariable: guardVariables){
                         variableToEvents.get(variableNameToIndex.get(aguardVariable)).add(eventIndex);
                     }
                 }else{
-                    int[] autIndicesAsKeys = variableToEvents.keys();
+                    final int[] autIndicesAsKeys = variableToEvents.keys();
                     for(int i = 0; i < autIndicesAsKeys.length; i++){
                         variableToEvents.get(autIndicesAsKeys[i]).add(eventIndex);
                     }
@@ -86,7 +88,7 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
                 return true;
             }
         });
-          
+
         buildVariableToBDD();
     }
 
@@ -94,7 +96,7 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
     public TIntObjectHashMap<BDD> getComponentToComponentTransMap() {
          return variableToBDD;
     }
-    
+
     // Get a map which is the form of [variableIndex [influencedVariableIndex influencedValue]]
     @Override
     protected TIntObjectHashMap<TIntIntHashMap> getForwardComponentToInfluencedComponentMap() {
@@ -148,16 +150,16 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
 //        return variableToBackwardInfluencedVariables;
         return eventParDepSets.getBackwardComponentToInfluencedComponentMap();
     }
-    /** Based on the events associated with each variable, build the BDD expression of it. */ 
+    /** Based on the events associated with each variable, build the BDD expression of it. */
     private void buildVariableToBDD() {
-        int[] variableIndicesAsKeys = variableToEvents.keys();
+        final int[] variableIndicesAsKeys = variableToEvents.keys();
         for(int i = 0; i < variableIndicesAsKeys.length; i++){
                 BDD variableTransitions = manager.getZeroBDD();
-                TIntHashSet includedEvents = variableToEvents.get(variableIndicesAsKeys[i]);
-                for(TIntIterator itr = includedEvents.iterator(); itr.hasNext();){
+                final TIntHashSet includedEvents = variableToEvents.get(variableIndicesAsKeys[i]);
+                for(final TIntIterator itr = includedEvents.iterator(); itr.hasNext();){
                     variableTransitions = variableTransitions.or(eventParDepSets.getComponentToComponentTransMap().get(itr.next()));
                 }
-                variableToBDD.get(variableIndicesAsKeys[i]).orWith(variableTransitions);          
+                variableToBDD.get(variableIndicesAsKeys[i]).orWith(variableTransitions);
         }
     }
 
@@ -180,14 +182,14 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
     protected BDD getUncontrollableTransitionRelationBDD() {
         return eventParDepSets.getUncontrollableTransitionRelationBDD();
     }
-    
+
     /* Another idea: disjunctive (event trans BDD without actions)+ selective conjunctive (variable update)*/
 //    @Override
 //    public BDD forwardWorkSetAlgorithm(BDD initialStates) {
-//        
+//
 //        System.err.println("Start variable based c/d partitioning forward reachability search: ");
 //        workset.reset();
-//        
+//
 //        BDD[] compensateBDDArray = new BDD[orgAutomata.getVars().size()];
 //        for (VariableComponentProxy var : orgAutomata.getVars()) {
 //            int varIndex = theIndexMap.getVariableIndex(var);
@@ -196,35 +198,35 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
 //
 //       BDD currentReachableStatesBDD = initialStates;
 //       BDD previousReachablestatesBDD = null;
-//       
+//
 //       /* Use the intuitive way to test */
 //        do {
-//            
+//
 //            int[] eventIndexAsKeys = eventParDepSets.eventToTransitionBDDwithoutActions.keys();
-//            
+//
 //            previousReachablestatesBDD = currentReachableStatesBDD.id();
-//            
+//
 //            for (int i = 0; i < eventIndexAsKeys.length; i++) {
 //
 //                int currEventIndex = eventIndexAsKeys[i];
 //
 //                BDD currentTransition = eventParDepSets.getEventToTransitionBDDwithoutActions().get(currEventIndex);
-//                
+//
 //                BDD caredTransition = currentReachableStatesBDD.and(currentTransition);
-//                
+//
 //                BDD nextStatesWithCaredValues = manager.getOneBDD();
-//                
+//
 //                HashSet<String> updatedVariablesNames = eventParDepSets.eventIndex2UpdatedVariables.get(currEventIndex);
-//                
+//
 //                for (String updatedVariableName : updatedVariablesNames) {
 //                    int varIndex = theIndexMap.getVariableIndexByName(updatedVariableName);
-//                    
+//
 //                    BDD t = caredTransition.and(eventParDepSets.getVariableUpdateBDD()[varIndex])
 //                            .exist(bddExAutomata.getEventVarSet()).exist(bddExAutomata.sourceStateVariables);
-//                    
+//
 //                    nextStatesWithCaredValues.andWith(t);
 //                }
-//                
+//
 //                nextStatesWithCaredValues.replaceWith(bddExAutomata.destToSourceLocationPairing)
 //                        .replaceWith(bddExAutomata.destToSourceVariablePairing);
 //
@@ -235,28 +237,28 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
 //                        compensate = compensate.and(compensateBDDArray[j]);
 //                    }
 //                }
-//                
+//
 //                BDD dontCaredValues = caredTransition.and(compensate).exist(bddExAutomata.getEventVarSet())
 //                        .exist(bddExAutomata.sourceVariablesVarSet)
 //                        .exist(bddExAutomata.destLocationVariables)
 //                        .replaceWith(bddExAutomata.destToSourceVariablePairing);
-//                        
+//
 //                currentReachableStatesBDD.orWith(nextStatesWithCaredValues.and(dontCaredValues));
 //            }
 //        } while (!currentReachableStatesBDD.equals(previousReachablestatesBDD));
 //
 //
 ////        boolean forward = true;
-////        
+////
 ////        while (!workset.empty()) {
-////            
+////
 ////            previousReachablestatesBDD = currentReachableStatesBDD.id();
 ////            int choice = workset.pickOne(forward);
-////            
+////
 ////            BDD currentTransition = eventParDepSets.getEventToTransitionBDDwithoutActions().get(choice);
-////                                    
+////
 ////            BDD caredTransition = currentReachableStatesBDD.and(currentTransition);
-////            
+////
 ////            BDD updatedVariablesBDD = manager.getOneBDD();
 ////            HashSet<String> updatedVariablesNames = eventParDepSets.eventIndex2UpdatedVariables.get(choice);
 ////            for(String updatedVariableName: updatedVariablesNames){
@@ -266,21 +268,21 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
 ////                        .exist(bddExAutomata.sourceStateVariables);
 ////                updatedVariablesBDD.andWith(t);
 ////            }
-////            
+////
 ////            //Add compensate (v:=v)
 ////            BDD compensate = manager.getOneBDD();
 ////            for(int i = 0; i < compensateBDDArray.length; i++){
 ////                if(!updatedVariablesNames.contains(theIndexMap.getVariableAt(i).getName()))
 ////                    compensate = compensate.and(compensateBDDArray[i]);
 ////            }
-////            
+////
 ////            compensate = currentReachableStatesBDD.exist(bddExAutomata.sourceLocationVariables).and(compensate).exist(bddExAutomata.sourceVariablesVarSet);
-////            
+////
 ////             currentReachableStatesBDD.orWith(updatedVariablesBDD.and(compensate).replaceWith(bddExAutomata.destToSourceLocationPairing).replaceWith(bddExAutomata.destToSourceVariablePairing));
-////            
+////
 ////            workset.advance(choice, !previousReachablestatesBDD.equals(currentReachableStatesBDD));
 ////        }
-//        
+//
 //        return currentReachableStatesBDD;
 //    }
 
@@ -293,5 +295,5 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
     protected TIntObjectHashMap<BDD> getComponentToComponentActionMap() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
 }

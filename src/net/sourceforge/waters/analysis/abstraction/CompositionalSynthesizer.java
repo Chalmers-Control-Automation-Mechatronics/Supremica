@@ -595,12 +595,12 @@ public abstract class CompositionalSynthesizer
       (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
     chain.add(bisimulator);
 
-    final SynthesisAbstractionTRSimplifier synthesisAbstraction= new 
+    final SynthesisAbstractionTRSimplifier synthesisAbstraction= new
             SynthesisAbstractionTRSimplifier();
     final int limit = getInternalTransitionLimit();
     synthesisAbstraction.setTransitionLimit(limit);
     chain.add(synthesisAbstraction);
-    mAbstractionProcedure = new SynthesisAbstractionProcedure(chain, 
+    mAbstractionProcedure = new SynthesisAbstractionProcedure(chain,
            synthesisAbstraction);
 
     mAbstractionProcedure.storeStatistics();
@@ -1783,8 +1783,9 @@ public abstract class CompositionalSynthesizer
 
     //#######################################################################
     //# Auxiliary Methods
-    private EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                              final Collection<EventProxy> local)
+    private EventEncoding createEventEncoding
+      (final AutomatonProxy aut,
+       final Collection<EventProxy> local)
     {
       final KindTranslator translator = getKindTranslator();
       final Collection<EventProxy> filter;
@@ -1795,36 +1796,47 @@ public abstract class CompositionalSynthesizer
       }
       final Collection<EventProxy> autAlphabet = aut.getEvents();
       final Collection<EventProxy> localUncontrollableEvents =
-              new ArrayList<EventProxy>(local.size());
+        new ArrayList<EventProxy>(local.size());
+      final Collection<EventProxy> sharedUncontrollableEvents =
+        new ArrayList<EventProxy>(autAlphabet.size() - local.size());
       final Collection<EventProxy> localControllableEvents =
-              new ArrayList<EventProxy>(local.size());
-      final Collection<EventProxy> sharedEvents =
-              new ArrayList<EventProxy>(autAlphabet.size() - local.size());
+        new ArrayList<EventProxy>(local.size());
+      final Collection<EventProxy> sharedControllableEvents =
+        new ArrayList<EventProxy>(autAlphabet.size() - local.size());
       final Collection<EventProxy> encodedEvents =
-              new ArrayList<EventProxy>(autAlphabet.size());
-      for(EventProxy event:autAlphabet){
-          if(local.contains(event) && translator.getEventKind(event) ==
-                  EventKind.CONTROLLABLE)
-              localControllableEvents.add(event);
-          else if(local.contains(event) && translator.getEventKind(event) ==
-                  EventKind.UNCONTROLLABLE)
-              localUncontrollableEvents.add(event);
-          else
-              sharedEvents.add(event);
+        new ArrayList<EventProxy>(autAlphabet.size());
+      for (final EventProxy event : autAlphabet) {
+        if (local.contains(event) &&
+            translator.getEventKind(event) == EventKind.CONTROLLABLE)
+          localControllableEvents.add(event);
+        else if (local.contains(event) &&
+                 translator.getEventKind(event) == EventKind.UNCONTROLLABLE)
+          localUncontrollableEvents.add(event);
+        else if (translator.getEventKind(event) == EventKind.CONTROLLABLE)
+          sharedControllableEvents.add(event);
+        else
+          sharedUncontrollableEvents.add(event);
+
       }
-      int lastUncontrollableEvent = localUncontrollableEvents.size();
-      int lastControllableEvent = localControllableEvents.size() +
-              lastUncontrollableEvent;
-      mSynthesisAbstraction.setLastControllableLocalEvent(lastControllableEvent);
-      mSynthesisAbstraction.setLastUncontrollableLocalEvent
-              (lastUncontrollableEvent);
+      final int lastUncontrollableLocalEvent = localUncontrollableEvents.size();
+      final int lastControllableLocalEvent =
+        localControllableEvents.size() + lastUncontrollableLocalEvent;
+      final int lastUncontrollableSharedEvent =
+        local.size() + sharedUncontrollableEvents.size();
+      mSynthesisAbstraction
+        .setLastControllableLocalEvent(lastControllableLocalEvent);
+      mSynthesisAbstraction
+        .setLastUncontrollableLocalEvent(lastUncontrollableLocalEvent);
+      mSynthesisAbstraction
+      .setLastUncontrollableSharedEvent(lastUncontrollableSharedEvent);
       encodedEvents.addAll(localUncontrollableEvents);
       encodedEvents.addAll(localControllableEvents);
-      encodedEvents.addAll(sharedEvents);
+      encodedEvents.addAll(sharedUncontrollableEvents);
+      encodedEvents.addAll(sharedControllableEvents);
       return new EventEncoding(encodedEvents, translator, filter,
                                EventEncoding.FILTER_PROPOSITIONS);
     }
-    
+
     protected AbstractionStep createStep
       (final AutomatonProxy input,
        final StateEncoding inputStateEnc,
@@ -1839,8 +1851,8 @@ public abstract class CompositionalSynthesizer
     //# Data Members
     private final SynthesisAbstractionTRSimplifier mSynthesisAbstraction;
   }
-  
-  
+
+
   //#########################################################################
   //# Inner Class PreselectingMethod
   /**
