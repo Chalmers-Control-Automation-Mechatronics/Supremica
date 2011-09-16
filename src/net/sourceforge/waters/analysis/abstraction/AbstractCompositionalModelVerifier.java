@@ -1695,6 +1695,7 @@ public abstract class AbstractCompositionalModelVerifier
                                EventEncoding.FILTER_PROPOSITIONS);
     }
 
+    @SuppressWarnings("unused")
     private EventEncoding createEventEncoding(final AutomatonProxy aut,
                                               final Collection<EventProxy> local)
     {
@@ -1714,7 +1715,7 @@ public abstract class AbstractCompositionalModelVerifier
               new ArrayList<EventProxy>(autAlphabet.size() - local.size());
       final Collection<EventProxy> encodedEvents =
               new ArrayList<EventProxy>(autAlphabet.size());
-      for(EventProxy event:autAlphabet){
+      for(final EventProxy event:autAlphabet){
           if(local.contains(event) && translator.getEventKind(event) ==
                   EventKind.CONTROLLABLE)
               localControllableEvents.add(event);

@@ -64,6 +64,14 @@ public class PropositionIcon implements Icon
     return MARKED_ICON;
   }
 
+  public static ColorInfo getNeutralColors()
+  {
+    if (NEUTRAL_COLORS == null) {
+      NEUTRAL_COLORS = new ColorInfo(null, false);
+    }
+    return NEUTRAL_COLORS;
+  }
+
   public static ColorInfo getUnmarkedColors()
   {
     if (UNMARKED_COLORS == null) {
@@ -177,6 +185,8 @@ public class PropositionIcon implements Icon
     {
       if (mForbidden) {
         return new PropositionIcon(this);
+      } else if (mList == null) {
+        return null;
       } else if (mList.isEmpty()) {
         return getUnmarkedIcon();
       } else if (mList.size() == 1 &&
@@ -207,6 +217,7 @@ public class PropositionIcon implements Icon
   private static final int DIAMETER = SIZE - OFFSET - OFFSET;
 
   private static ColorInfo MARKED_COLORS;
+  private static ColorInfo NEUTRAL_COLORS;
   private static ColorInfo UNMARKED_COLORS;
 
   private static PropositionIcon MARKED_ICON;

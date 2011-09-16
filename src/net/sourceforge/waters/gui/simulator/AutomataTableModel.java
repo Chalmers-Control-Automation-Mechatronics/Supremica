@@ -166,7 +166,7 @@ class AutomataTableModel
         row.add(getSimulation().getAutomatonActivityIcon(aut));
         final StateProxy state = getSimulation().getCurrentState(aut);
         if (state != null) {
-          row.add(getSimulation().getMarkingIcon(state, aut, false));
+          row.add(getSimulation().getMarkingIcon(state, aut));
           row.add(state.getName());
         } else {
           row.add(null);

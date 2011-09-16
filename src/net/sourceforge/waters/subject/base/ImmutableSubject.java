@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.Collection;
 import net.sourceforge.waters.model.base.Proxy;
 
 
@@ -19,7 +20,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * <P>This is the abstract base class of all immutable Waters elements
  * in the <I>subject</I> implementation. It provides the basic functionality
  * of an immutable object.</P>
- * 
+ *
  * @author Robi Malik
  */
 
@@ -54,6 +55,11 @@ public abstract class ImmutableSubject
 
   public void removeModelObserver(final ModelObserver observer)
   {
+  }
+
+  public Collection<ModelObserver> getModelObservers()
+  {
+    return null;
   }
 
   public void fireModelChanged(final ModelChangeEvent event)

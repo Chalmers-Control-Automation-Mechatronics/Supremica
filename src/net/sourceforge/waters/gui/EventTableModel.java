@@ -420,6 +420,11 @@ public class EventTableModel
       }
     }
 
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.RENDERING_PRIORITY;
+    }
+
   }
 
 
@@ -509,6 +514,11 @@ public class EventTableModel
         fireTableDataChanged();
         break;
       }
+    }
+
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.RENDERING_PRIORITY;
     }
 
   }

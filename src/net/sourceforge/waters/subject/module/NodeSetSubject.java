@@ -33,6 +33,7 @@ import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 
 
 /**
@@ -339,16 +340,14 @@ class NodeSetSubject
     }
   }
 
+  public Collection<ModelObserver> getModelObservers()
+  {
+    return mObservers;
+  }
+
   public void fireModelChanged(final ModelChangeEvent event)
   {
-    if (mObservers != null) {
-      for (final ModelObserver observer : mObservers) {
-        observer.modelChanged(event);
-      }
-    }
-    if (mParent != null) {
-      mParent.fireModelChanged(event);
-    }
+    SubjectTools.fireModelChanged(this, event);
   }
 
 

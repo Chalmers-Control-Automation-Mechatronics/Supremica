@@ -202,6 +202,11 @@ class ComponentsTreeModel
     }
   }
 
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.DEFAULT_PRIORITY;
+  }
+
 
   //#########################################################################
   //# Computing Paths

@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.Collection;
+
 /**
  * <P>The common interface for all Waters elements.</P>
  *
@@ -67,6 +69,8 @@ public interface Subject {
   public void addModelObserver(ModelObserver observer);
 
   public void removeModelObserver(ModelObserver observer);
+
+  public Collection<ModelObserver> getModelObservers();
 
   public void fireModelChanged(ModelChangeEvent event);
 

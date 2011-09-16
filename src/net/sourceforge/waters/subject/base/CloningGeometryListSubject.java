@@ -183,20 +183,14 @@ public class CloningGeometryListSubject<E extends Cloneable>
     }
   }
 
+  public Collection<ModelObserver> getModelObservers()
+  {
+    return mObservers;
+  }
+
   public void fireModelChanged(final ModelChangeEvent event)
   {
-    if (mObservers != null) {
-      // Just in case they try to register or deregister observers
-      // in response to the update ...
-      final List<ModelObserver> copy =
-        new ArrayList<ModelObserver>(mObservers);
-      for (final ModelObserver observer : copy) {
-        observer.modelChanged(event);
-      }
-    }
-    if (mParent != null) {
-      mParent.fireModelChanged(event);
-    }
+    SubjectTools.fireModelChanged(this, event);
   }
 
 

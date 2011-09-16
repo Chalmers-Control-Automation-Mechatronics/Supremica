@@ -11,15 +11,12 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
 import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -33,7 +30,6 @@ import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.des.AutomatonTools;
 
 
 /**
@@ -296,7 +292,7 @@ public class SynthesisAbstractionTRSimplifier
     }
   }
 
- 
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
@@ -307,11 +303,11 @@ public class SynthesisAbstractionTRSimplifier
     super.setUp();
     if (mSplitters == null) {
       mHasModifications = false;
-      
+
       final boolean modified = mHasModifications;
       setUpInitialPartitionBasedOnMarkings();
       mHasModifications |= modified;
-    } 
+    }
     setUpTauClosure();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (mInitialInfoSize >= 0) {
@@ -414,7 +410,7 @@ public class SynthesisAbstractionTRSimplifier
         }
         mEventIterator = mTauClosure.createFullEventClosureIterator(-1);
       }
-    
+
   }
 
   private TransitionIterator getPredecessorIterator(final int event)
@@ -578,11 +574,6 @@ public class SynthesisAbstractionTRSimplifier
           mStateToClass[state] = this;
         }
       }
-    }
-
-    void setPredecessorsInvalid()
-    {
-      mOverflowSize = -1;
     }
 
     //#######################################################################

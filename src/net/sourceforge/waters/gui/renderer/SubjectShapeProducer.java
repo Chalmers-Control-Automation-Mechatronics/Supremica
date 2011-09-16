@@ -42,7 +42,7 @@ public class SubjectShapeProducer
   implements ModelObserver
 {
 
-  //##########################################################################
+  //#########################################################################
   //# Constructors
   public SubjectShapeProducer(final GraphSubject graph,
                               final ModuleSubject module,
@@ -86,7 +86,7 @@ public class SubjectShapeProducer
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Clean up
   public void close()
   {
@@ -98,7 +98,7 @@ public class SubjectShapeProducer
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Cleaning the Cache
   private void removeMapping(final Subject subject)
   {
@@ -112,10 +112,20 @@ public class SubjectShapeProducer
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
   public void modelChanged(final ModelChangeEvent event)
   {
+    final RenderingContext context = getRenderingContext();
+    final GraphProxy graph = getGraph();
+    if (context.causesPropositionStatusChange(event, graph)) {
+      for (final NodeProxy node : graph.getNodes()) {
+        if (node instanceof SimpleNodeProxy) {
+          removeMapping(node);
+        }
+      }
+    }
+
     final Subject esource = event.getSource();
     switch (event.getKind()) {
     case ModelChangeEvent.ITEM_REMOVED:
@@ -143,7 +153,8 @@ public class SubjectShapeProducer
       }
       break;
     case ModelChangeEvent.STATE_CHANGED:
-      if (esource instanceof EdgeProxy || esource instanceof SimpleNodeProxy) {
+      if (esource instanceof EdgeProxy ||
+          esource instanceof SimpleNodeProxy) {
         removeMapping(esource);
       } else if (esource == getGraph() &&
                  getGraph().getBlockedEvents() == null &&
@@ -176,8 +187,13 @@ public class SubjectShapeProducer
     }
   }
 
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.CLEANUP_PRIORITY_0;
+  }
 
-  //##########################################################################
+
+  //#########################################################################
   //# Smarter Lookup Using Parents
   public GuardActionBlockProxyShape visitGuardActionBlockProxy
     (final GuardActionBlockProxy block)
@@ -226,13 +242,13 @@ public class SubjectShapeProducer
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Inner Class RemoveMappingVisitor
   private class RemoveMappingVisitor
     extends AbstractModuleProxyVisitor
   {
 
-    //########################################################################
+    //#######################################################################
     //# Invocation
     private void removeMapping(final Proxy proxy)
     {
@@ -243,7 +259,7 @@ public class SubjectShapeProducer
       }
     }
 
-    //########################################################################
+    //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     public Object visitProxy(final Proxy proxy)
     {
@@ -251,7 +267,7 @@ public class SubjectShapeProducer
       return null;
     }
 
-    //########################################################################
+    //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
@@ -298,7 +314,7 @@ public class SubjectShapeProducer
 
   }
 
-  //##########################################################################
+  //#########################################################################
   //# Data Members
   private final Subject mSubject;
   private final ModuleSubject mModule;

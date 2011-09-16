@@ -14,8 +14,10 @@ import java.awt.Font;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.PropositionIcon.ColorInfo;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -42,11 +44,14 @@ public class ModuleRenderingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
-  public ColorInfo getColorInfo(final SimpleNodeProxy node)
+  @Override
+  public ColorInfo getColorInfo(final GraphProxy graph,
+                                final SimpleNodeProxy node)
   {
-    return mModuleContext.guessPropositionColors(node);
+    return mModuleContext.guessPropositionColors(graph, node);
   }
 
+  @Override
   public Font getFont(final IdentifierProxy ident)
   {
     if (mModuleContext.guessEventKind(ident) == EventKind.UNCONTROLLABLE) {
@@ -54,6 +59,13 @@ public class ModuleRenderingContext
     } else {
       return EditorColor.DEFAULT_FONT;
     }
+  }
+
+  @Override
+  public boolean causesPropositionStatusChange(final ModelChangeEvent event,
+                                               final GraphProxy graph)
+  {
+    return mModuleContext.causesPropositionStatusChange(event, graph);
   }
 
 

@@ -58,7 +58,8 @@ public class TraceJTree
     mExpandedIndexes = new TIntHashSet();
     final TraceMutableTreeNode root = new TraceMutableTreeNode(sim, this);
     this.setModel(new DefaultTreeModel(root, false));
-    this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    this.getSelectionModel().setSelectionMode
+      (TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
     setShowsRootHandles(true);
     setAutoscrolls(true);
@@ -320,7 +321,7 @@ public class TraceJTree
         }
         final StateProxy state = node.getOverloadedState();
         mAutomataStatusLabel.setText(state.getName());
-        mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(state, aut, false));
+        mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(state, aut));
         final int width = mPane.getWidth();
         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
         final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));

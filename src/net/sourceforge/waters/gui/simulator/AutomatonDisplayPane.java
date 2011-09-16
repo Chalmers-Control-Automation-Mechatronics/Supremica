@@ -561,20 +561,23 @@ public class AutomatonDisplayPane
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
-    public PropositionIcon.ColorInfo getColorInfo(final SimpleNodeProxy node)
+    @Override
+    public PropositionIcon.ColorInfo getColorInfo(final GraphProxy graph,
+                                                  final SimpleNodeProxy node)
     {
       // The spring embedder modifies a copy of our graph. When it is running,
       // the items being displayed are not in our compiled graph ...
       final Proxy orig = getOriginal(node);
       final StateProxy state = mStateMap.get(orig);
       if (state != null) {
-        return mSim.getMarkingColorInfo(state, mAutomaton, true);
+        return mSim.getMarkingColorInfo(state, mAutomaton);
       } else {
         // This state was a victim of compiler optimisation ..,
         return PropositionIcon.getUnmarkedColors();
       }
     }
 
+    @Override
     public RenderingInformation getRenderingInformation(final Proxy proxy)
     {
       // The spring embedder modifies a copy of our graph. When it is running,

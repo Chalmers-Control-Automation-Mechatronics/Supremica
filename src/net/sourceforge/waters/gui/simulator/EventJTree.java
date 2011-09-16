@@ -53,7 +53,8 @@ public class EventJTree
     mSortingMethods = new ArrayList<Pair<Boolean, Integer>>();
     expandedNodes = new ArrayList<String>();
     setModel(new EventTreeModel(mSim, mSortingMethods));
-    getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    getSelectionModel().setSelectionMode
+      (TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
     setShowsRootHandles(true);
     setAutoscrolls(true);
@@ -63,7 +64,9 @@ public class EventJTree
       public void mouseClicked(final MouseEvent e)
       {
         if (e.getClickCount() == 2) {
-          final TreePath path = getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
+          final TreePath path =
+            getClosestPathForLocation((int) e.getPoint().getX(),
+                                      (int) e.getPoint().getY());
           final Object node = path.getLastPathComponent();
           if (node == null)
             return; // Nothing is selected
@@ -341,7 +344,8 @@ public class EventJTree
           mAutomatonIconLabel.setIcon(statusIcon);
           final StateProxy currentState = mSim.getCurrentState(aut);
           mAutomatonStatusLabel.setText(currentState.getName());
-          mAutomatonStatusLabel.setIcon(mSim.getMarkingIcon(currentState, aut, false));
+          mAutomatonStatusLabel.setIcon
+            (mSim.getMarkingIcon(currentState, aut));
         }
         final int width = mPane.getWidth();
         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));

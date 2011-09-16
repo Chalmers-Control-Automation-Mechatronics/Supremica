@@ -24,6 +24,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.SetSubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 
 
 /**
@@ -167,7 +168,7 @@ class ChildNodeSetSubject
     return mProxySet.size();
   }
 
-           
+
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
   public void assignFrom(final Set<? extends NodeSubject> set)
@@ -176,7 +177,7 @@ class ChildNodeSetSubject
       ("Child node set assignment not yet implemented!");
   }
 
-  
+
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()
@@ -227,16 +228,14 @@ class ChildNodeSetSubject
     }
   }
 
+  public Collection<ModelObserver> getModelObservers()
+  {
+    return mObservers;
+  }
+
   public void fireModelChanged(final ModelChangeEvent event)
   {
-    if (mObservers != null) {
-      for (final ModelObserver observer : mObservers) {
-        observer.modelChanged(event);
-      }
-    }
-    if (mParent != null) {
-      mParent.fireModelChanged(event);
-    }
+    SubjectTools.fireModelChanged(this, event);
   }
 
 

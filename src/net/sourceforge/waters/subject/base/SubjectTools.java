@@ -9,6 +9,11 @@
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 import net.sourceforge.waters.model.base.Proxy;
 
 
@@ -95,5 +100,53 @@ public class SubjectTools
     } while (subject != null);
     return null;
   }
+
+  /**
+   * Sends the given {@link ModelChangeEvent} to all observers registered
+   * on the given subject or its parents. This method first collects all
+   * registered observers in a queue, in order to call them in the order
+   * defined by their priority.
+   * @see ModelObserver
+   */
+  public static void fireModelChanged(final Subject subject,
+                                      final ModelChangeEvent event)
+  {
+    final Queue<ModelObserver> recipients =
+      new PriorityQueue<ModelObserver>(7, ModelObserverComparator.INSTANCE);
+    for (Subject current = subject;
+         current != null;
+         current = current.getParent()) {
+      final Collection<ModelObserver> list = current.getModelObservers();
+      if (list != null) {
+        for (final ModelObserver observer : current.getModelObservers()) {
+          recipients.add(observer);
+        }
+      }
+    }
+    while (!recipients.isEmpty()) {
+      final ModelObserver observer = recipients.remove();
+      observer.modelChanged(event);
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class ModelObserverComparator
+  private static class ModelObserverComparator
+    implements Comparator<ModelObserver>
+  {
+    //#######################################################################
+    //# Interface java.util.Comparator
+    public int compare(final ModelObserver obs1, final ModelObserver obs2)
+    {
+      return obs1.getModelObserverPriority() - obs2.getModelObserverPriority();
+    }
+
+    //#######################################################################
+    //# Singleton Pattern
+    private static final ModelObserverComparator INSTANCE =
+      new ModelObserverComparator();
+  }
+
+
 
 }

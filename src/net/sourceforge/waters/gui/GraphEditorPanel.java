@@ -1611,6 +1611,11 @@ public class GraphEditorPanel
       }
     }
 
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.RENDERING_PRIORITY;
+    }
+
   }
 
 

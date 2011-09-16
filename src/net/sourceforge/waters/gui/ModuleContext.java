@@ -30,14 +30,19 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -47,9 +52,12 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -81,6 +89,9 @@ public class ModuleContext
     mIdentifierNameVisitor = new IdentifierNameVisitor();
     mIconGetterVisitor = new IconGetterVisitor();
     mToolTipGetterVisitor = new ToolTipGetterVisitor();
+    mPropositionFinderVisitor = new PropositionFinderVisitor();
+    mPropositionColorCollectorVisitor =
+      new PropositionColorCollectorVisitor();
     if (module instanceof ModuleSubject) {
       final ModuleSubject subject = (ModuleSubject) module;
       mEventDeclListWrapper =
@@ -93,8 +104,7 @@ public class ModuleContext
       mComponentListWrapper =
         new ListSubjectWrapper(module.getComponentList());
     }
-    mPropositionColorCollectorVisitor =
-      new PropositionColorCollectorVisitor();
+    mGraphStatusMap = new HashMap<GraphProxy,GraphStatus>();
   }
 
 
@@ -201,9 +211,9 @@ public class ModuleContext
    *         the presence of the 'forbidden' marking.
    */
   public PropositionIcon.ColorInfo guessPropositionColors
-    (final SimpleNodeProxy node)
+    (final GraphProxy graph, final SimpleNodeProxy node)
   {
-    return mPropositionColorCollectorVisitor.getPropositionColors(node);
+    return mPropositionColorCollectorVisitor.getPropositionColors(graph, node);
   }
 
   /**
@@ -242,6 +252,27 @@ public class ModuleContext
   public boolean canDropOnEdge(final Collection<? extends Proxy> idents)
   {
     return mCanDropVisitor.canDrop(idents, EDGE_DROP_LIST);
+  }
+
+
+  //#########################################################################
+  //# Event Handling Support
+  /**
+   * Returns whether given event may cause the proposition status of
+   * the given graph to change. The proposition status of a graph
+   * indicates whether the graph uses any propositions, i.e., whether
+   * states without propositions are rendered with a filled or a
+   * transparent background.
+   */
+  public boolean causesPropositionStatusChange(final ModelChangeEvent event,
+                                               final GraphProxy graph)
+  {
+    final GraphStatus status = mGraphStatusMap.get(graph);
+    if (status == null) {
+      return false;
+    } else {
+      return status.causesChange(event);
+    }
   }
 
 
@@ -486,6 +517,18 @@ public class ModuleContext
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private boolean hasPropositions(final GraphProxy graph)
+  {
+    GraphStatus status = mGraphStatusMap.get(graph);
+    if (status == null) {
+      status = new GraphStatus(graph);
+    }
+    return status.hasPropositions();
+  }
+
+
+  //#########################################################################
   //# Auxiliary Static Methods
   private static String getPastedName(final String name,
                                       final NameChecker checker)
@@ -525,7 +568,7 @@ public class ModuleContext
 
 
   //#########################################################################
-  //# Private Interface Class NameChecker
+  //# Private Interface NameChecker
   private interface NameChecker
   {
 
@@ -637,11 +680,155 @@ public class ModuleContext
       }
     }
 
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.CLEANUP_PRIORITY_1;
+    }
+
     //#######################################################################
     //# Data Members
     private final List<? extends Proxy> mList;
     private final ListSubject<? extends ProxySubject> mListSubject;
     private Map<String,IdentifiedProxy> mMap;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class GraphStatus
+  private class GraphStatus
+    implements ModelObserver
+  {
+
+    //#######################################################################
+    //# Invocation
+    private GraphStatus(final GraphProxy graph)
+    {
+      mGraph = graph;
+      mHasPropositions = mPropositionFinderVisitor.hasPropositions(graph);
+      mGraphStatusMap.put(graph, this);
+      if (graph instanceof GraphSubject) {
+        final GraphSubject subject = (GraphSubject) graph;
+        subject.addModelObserver(this);
+      }
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private boolean hasPropositions()
+    {
+      return mHasPropositions;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      if (causesChange(event)) {
+        toggleStatus();
+      }
+    }
+
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.CLEANUP_PRIORITY_1;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private boolean causesChange(final ModelChangeEvent event)
+    {
+      final Subject source = event.getSource();
+      final int ekind = event.getKind();
+      final Object value = event.getValue();
+      if (mHasPropositions) {
+        switch (ekind) {
+        case ModelChangeEvent.ITEM_REMOVED:
+          if (value instanceof SimpleNodeProxy) {
+            final SimpleNodeProxy node = (SimpleNodeProxy) value;
+            final PlainEventListProxy props = node.getPropositions();
+            if (!props.getEventList().isEmpty()) {
+              return true;
+            }
+          } else {
+            final Proxy proxy = (Proxy) value;
+            final Boolean found =
+              mPropositionFinderVisitor.hasPropositions(proxy);
+            if (found == null &&
+                SubjectTools.getAncestor(source,
+                                         SimpleNodeSubject.class) != null) {
+              return true;
+            } else if (found) {
+              return true;
+            }
+          }
+          break;
+        case ModelChangeEvent.STATE_CHANGED:
+          if (source == mGraph && mGraph.getBlockedEvents() == null) {
+            return true;
+          }
+          break;
+        default:
+          break;
+        }
+      } else {
+        switch (ekind) {
+        case ModelChangeEvent.ITEM_ADDED:
+          if (value instanceof SimpleNodeProxy) {
+            final SimpleNodeProxy node = (SimpleNodeProxy) value;
+            final PlainEventListProxy props = node.getPropositions();
+            if (!props.getEventList().isEmpty()) {
+              return true;
+            }
+          } else {
+            final Proxy proxy = (Proxy) value;
+            final Boolean found =
+              mPropositionFinderVisitor.hasPropositions(proxy);
+            if (found == null &&
+                SubjectTools.getAncestor(source,
+                                         SimpleNodeSubject.class) != null) {
+              return true;
+            } else if (found) {
+              return true;
+            }
+          }
+          break;
+        case ModelChangeEvent.STATE_CHANGED:
+          if (source == mGraph) {
+            final LabelBlockProxy blocked = mGraph.getBlockedEvents();
+            if (blocked != null) {
+              final Boolean found =
+                 mPropositionFinderVisitor.hasPropositions(blocked);
+              if (found != null && found) {
+                return true;
+              }
+            }
+          }
+          break;
+        default:
+          break;
+        }
+      }
+      return false;
+    }
+
+    private void toggleStatus()
+    {
+      if (mHasPropositions) {
+        mGraphStatusMap.remove(mGraph);
+        if (mGraph instanceof GraphSubject) {
+          final GraphSubject subject = (GraphSubject) mGraph;
+          subject.removeModelObserver(this);
+        }
+      } else {
+        mHasPropositions = true;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final GraphProxy mGraph;
+    private boolean mHasPropositions;
 
   }
 
@@ -667,12 +854,12 @@ public class ModuleContext
         }
         return true;
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public Boolean visitForeachEventProxy(final ForeachEventProxy foreach)
       throws VisitorException
     {
@@ -724,19 +911,19 @@ public class ModuleContext
           return (String) ident.acceptVisitor(this);
         }
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     public Icon visitProxy(final Proxy proxy)
     {
       return null;
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public String visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
     {
@@ -763,21 +950,21 @@ public class ModuleContext
     private Icon getIcon(final Proxy proxy)
     {
       try {
-	return (Icon) proxy.acceptVisitor(this);
+        return (Icon) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     public Icon visitProxy(final Proxy proxy)
     {
       return null;
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public Icon visitEventDeclProxy(final EventDeclProxy decl)
     {
       final EventKind kind = decl.getKind();
@@ -845,21 +1032,21 @@ public class ModuleContext
     private String getToolTipText(final Proxy proxy)
     {
       try {
-    return (String) proxy.acceptVisitor(this);
+        return (String) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-    throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     public String visitProxy(final Proxy proxy)
     {
       return null;
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public String visitEventDeclProxy(final EventDeclProxy decl)
     {
       final EventKind kind = decl.getKind();
@@ -901,11 +1088,13 @@ public class ModuleContext
     //#######################################################################
     //# Invocation
     private PropositionIcon.ColorInfo getPropositionColors
-      (final SimpleNodeProxy node)
+      (final GraphProxy graph, final SimpleNodeProxy node)
     {
       try {
-        mColorList = new LinkedList<Color>();
-        mColorSet = new HashSet<Color>();
+        if (hasPropositions(graph)) {
+          mColorList = new LinkedList<Color>();
+          mColorSet = new HashSet<Color>();
+        }
         mForbidden = false;
         final List<Proxy> props = node.getPropositions().getEventList();
         visitCollection(props);
@@ -920,14 +1109,14 @@ public class ModuleContext
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     public Object visitProxy(final Proxy proxy)
     {
       return null;
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public Object visitForeachEventProxy(final ForeachEventProxy foreach)
       throws VisitorException
     {
@@ -945,12 +1134,13 @@ public class ModuleContext
           final String name = decl.getName();
           if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
             mForbidden = true;
-          } else if (mColorSet.add(EditorColor.DEFAULTMARKINGCOLOR)) {
+          } else if (mColorSet != null &&
+                     mColorSet.add(EditorColor.DEFAULTMARKINGCOLOR)) {
             mColorList.add(EditorColor.DEFAULTMARKINGCOLOR);
           }
         } else {
           for (final Color colour : geo.getColorSet()) {
-            if (mColorSet.add(colour)) {
+            if (mColorSet != null && mColorSet.add(colour)) {
               mColorList.add(colour);
             }
           }
@@ -964,7 +1154,123 @@ public class ModuleContext
     private List<Color> mColorList;
     private Set<Color> mColorSet;
     private boolean mForbidden;
- }
+  }
+
+
+  //#########################################################################
+  //# Inner Class PropositionFinderVisitor
+  private class PropositionFinderVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private Boolean hasPropositions(final Proxy proxy)
+    {
+      try {
+        return (Boolean) proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    private boolean hasPropositions(final GraphProxy graph)
+    {
+      try {
+        for (final NodeProxy node : graph.getNodes()) {
+          final boolean found = (Boolean) node.acceptVisitor(this);
+          if (found) {
+            return true;
+          }
+        }
+        final LabelBlockProxy blocked = graph.getBlockedEvents();
+        if (blocked == null) {
+          return false;
+        } else {
+          final Boolean found = visitEventListExpressionProxy(blocked);
+          return found != null && found;
+        }
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
+    public Boolean visitProxy(final Proxy proxy)
+    {
+      return false;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Boolean visitEventListExpressionProxy
+      (final EventListExpressionProxy elist)
+      throws VisitorException
+    {
+      final List<Proxy> list = elist.getEventList();
+      return visitIdentifiers(list);
+    }
+
+    @Override
+    public Boolean visitForeachEventProxy(final ForeachEventProxy foreach)
+      throws VisitorException
+    {
+      final List<Proxy> body = foreach.getBody();
+      return visitIdentifiers(body);
+    }
+
+    @Override
+    public Boolean visitSimpleIdentifierProxy
+      (final SimpleIdentifierProxy ident)
+    {
+      final String name = ident.getName();
+      if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+        return false;
+      } else {
+        return visitIdentifierProxy(ident);
+      }
+    }
+
+    @Override
+    public Boolean visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      final EventKind kind = guessEventKind(ident);
+      if (kind == null) {
+        return null;
+      } else {
+        return kind == EventKind.PROPOSITION;
+      }
+    }
+
+    @Override
+    public Boolean visitSimpleNodeProxy(final SimpleNodeProxy node)
+      throws VisitorException
+    {
+      final PlainEventListProxy props = node.getPropositions();
+      final Boolean found = visitEventListExpressionProxy(props);
+      return found == null || found;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private Boolean visitIdentifiers(final List<? extends Proxy> list)
+      throws VisitorException
+    {
+      Boolean result = false;
+      for (final Proxy proxy : list) {
+        final Boolean found = (Boolean) proxy.acceptVisitor(this);
+        if (found == null) {
+          result = null;
+        } else if (found) {
+          return true;
+        }
+      }
+      return result;
+    }
+  }
 
 
   //#########################################################################
@@ -974,11 +1280,13 @@ public class ModuleContext
   private final IdentifierNameVisitor mIdentifierNameVisitor;
   private final IconGetterVisitor mIconGetterVisitor;
   private final ToolTipGetterVisitor mToolTipGetterVisitor;
+  private final PropositionFinderVisitor mPropositionFinderVisitor;
   private final PropositionColorCollectorVisitor
     mPropositionColorCollectorVisitor;
 
   private final ListSubjectWrapper mEventDeclListWrapper;
   private final ListSubjectWrapper mComponentListWrapper;
+  private final Map<GraphProxy,GraphStatus> mGraphStatusMap;
 
 
   //#########################################################################

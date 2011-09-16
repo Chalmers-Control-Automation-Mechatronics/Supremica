@@ -383,18 +383,13 @@ public class Simulation implements ModelObserver, Observer
    *          The state to be drawn
    * @param automaton
    *          The automaton the state belongs to
-   * @param drawAsEditor
-   *          <STRONG>true</STRONG> if a state inside an automaton with no
-   *          accepting states should be drawn with a white inner,
-   *          <STRONG>false</STRONG> if it should be drawn with a grey (IE.
-   *          Accepting) inner
    * @return The icon of a state, taking into account propositions
    */
   Icon getMarkingIcon(final StateProxy state,
-                      final AutomatonProxy automaton,
-                      final boolean drawAsEditor)
+                      final AutomatonProxy automaton)
   {
-    final PropositionIcon.ColorInfo info = getMarkingColorInfo(state, automaton, drawAsEditor);
+    final PropositionIcon.ColorInfo info =
+      getMarkingColorInfo(state, automaton);
     return info.getIcon();
   }
 
@@ -403,50 +398,51 @@ public class Simulation implements ModelObserver, Observer
    *          The state to be drawn
    * @param automaton
    *          The automaton the state belongs to
-   * @param drawAsEditor
-   *          <STRONG>true</STRONG> if a state inside an automaton with no
-   *          accepting states should be drawn with a white inner,
-   *          <STRONG>false</STRONG> if it should be drawn with a grey (IE.
-   *          Accepting) inner
    * @return The colour of a state, taking into account propositions.
    */
   PropositionIcon.ColorInfo getMarkingColorInfo
-    (final StateProxy state, final AutomatonProxy automaton,
-     final boolean drawAsEditor)
+    (final StateProxy state, final AutomatonProxy automaton)
   {
-    if (!hasPropositions(automaton) && drawAsEditor) {
-      return PropositionIcon.getUnmarkedColors();
-    }
-    else if (!hasPropositions(automaton) && !drawAsEditor)
-    {
-      return PropositionIcon.getDefaultMarkedColors();
-    }
     final Collection<EventProxy> props = state.getPropositions();
-    if (props.isEmpty() && drawAsEditor) {
-      return PropositionIcon.getUnmarkedColors();
-    }
-    else {
-      final Map<Proxy,SourceInfo> infomap = mModuleContainer.getSourceInfoMap();
-      if (infomap == null)
-        return new PropositionIcon.ColorInfo(new ArrayList<Color>(), false);
+    if (props.isEmpty()) {
+      if (hasNonForbiddenPropositions(automaton)) {
+        return PropositionIcon.getUnmarkedColors();
+      } else {
+        return PropositionIcon.getNeutralColors();
+      }
+    } else {
+      final Map<Proxy,SourceInfo> infomap =
+        mModuleContainer.getSourceInfoMap();
+      if (infomap == null) {
+        return PropositionIcon.getNeutralColors();
+      }
       final int size = props.size();
-      final Set<Color> colorset = new HashSet<Color>(size);
-      final List<Color> colorlist = new ArrayList<Color>(size);
+      final Set<Color> colorset;
+      final List<Color> colorlist;
+      if (hasNonForbiddenPropositions(automaton)) {
+        colorset = new HashSet<Color>(size);
+        colorlist = new ArrayList<Color>(size);
+      } else {
+        colorset = null;
+        colorlist = null;
+      }
       boolean forbidden = false;
       for (final EventProxy prop : props) {
         final SourceInfo info = infomap.get(prop);
         final EventDeclProxy decl = (EventDeclProxy) info.getSourceObject();
         final ColorGeometryProxy geo = decl.getColorGeometry();
         if (geo != null) {
-          for (final Color color : geo.getColorSet()) {
-            if (colorset.add(color)) {
-              colorlist.add(color);
+          if (colorset != null) {
+            for (final Color color : geo.getColorSet()) {
+              if (colorset.add(color)) {
+                colorlist.add(color);
+              }
             }
           }
         } else if (decl.getName().equals
-            (EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+                     (EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
           forbidden = true;
-        } else {
+        } else if (colorset != null) {
           if (colorset.add(EditorColor.DEFAULTMARKINGCOLOR)) {
             colorlist.add(EditorColor.DEFAULTMARKINGCOLOR);
           }
@@ -540,11 +536,11 @@ public class Simulation implements ModelObserver, Observer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
-  // This event is received when the user has made changes to the
-  // model in the editor. The handler invalidates the current
-  // compiled DES; it will be recompiled later when the simulator
-  // tab is activated.
+  //# Interface net.sourceforge.subject.base.Observer
+  /**
+   * Invalidates the current compiled DES; it will be recompiled later when
+   * the simulator tab is activated.
+   */
   public void modelChanged(final ModelChangeEvent event)
   {
     final int kind = event.getKind();
@@ -561,6 +557,11 @@ public class Simulation implements ModelObserver, Observer
       setCompiledDES(null);;
       break;
     }
+  }
+
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.RENDERING_PRIORITY;
   }
 
 
@@ -963,11 +964,15 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Auxiliary Static Methods
-  private static boolean hasPropositions(final AutomatonProxy automaton)
+  private static boolean hasNonForbiddenPropositions
+    (final AutomatonProxy automaton)
   {
     for (final EventProxy event : automaton.getEvents()) {
       if (event.getKind() == EventKind.PROPOSITION) {
-        return true;
+        final String name = event.getName();
+        if (!name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+          return true;
+        }
       }
     }
     return false;

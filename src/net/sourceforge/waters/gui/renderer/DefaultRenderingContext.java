@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -29,6 +30,7 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 
 
 /**
@@ -54,17 +56,6 @@ public class DefaultRenderingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
-  public ColorInfo getColorInfo(final SimpleNodeProxy node)
-  {
-    final PlainEventListProxy props = node.getPropositions();
-    final List<Proxy> elist = props.getEventList();
-    if (elist.isEmpty()) {
-      return PropositionIcon.getUnmarkedColors();
-    } else {
-      return PropositionIcon.getDefaultMarkedColors();
-    }
-  }
-
   public Font getFont(final IdentifierProxy ident)
   {
     return EditorColor.DEFAULT_FONT;
@@ -79,6 +70,24 @@ public class DefaultRenderingContext
        EditorColor.getShadowColor
          (proxy, GraphPanel.DragOverStatus.NOTDRAG, false, false, true),
        getPriority(proxy));
+  }
+
+  public ColorInfo getColorInfo(final GraphProxy graph,
+                                final SimpleNodeProxy node)
+  {
+    final PlainEventListProxy props = node.getPropositions();
+    final List<Proxy> elist = props.getEventList();
+    if (elist.isEmpty()) {
+      return PropositionIcon.getUnmarkedColors();
+    } else {
+      return PropositionIcon.getDefaultMarkedColors();
+    }
+  }
+
+  public boolean causesPropositionStatusChange(final ModelChangeEvent event,
+                                               final GraphProxy graph)
+  {
+    return false;
   }
 
 

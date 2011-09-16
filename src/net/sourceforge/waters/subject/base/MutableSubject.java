@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.subject.base;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -101,19 +100,16 @@ public abstract class MutableSubject
     }
   }
 
-  public void fireModelChanged(final ModelChangeEvent event)
+  public Collection<ModelObserver> getModelObservers()
   {
-    if (mObservers != null) {
-      // ARGH! People may add or remove observers while we iterate!
-      final Collection<ModelObserver> copy =
-        new ArrayList<ModelObserver>(mObservers);
-      for (final ModelObserver observer : copy) {
-        observer.modelChanged(event);
-      }
-    }
-    super.fireModelChanged(event);
+    return mObservers;
   }
 
+  @Override
+  public void fireModelChanged(final ModelChangeEvent event)
+  {
+    SubjectTools.fireModelChanged(this, event);
+  }
 
   //#########################################################################
   //# Convenience Methods

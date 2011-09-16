@@ -22,7 +22,6 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.GraphSubject;
-
 import org.supremica.gui.ide.IDE;
 
 
@@ -102,6 +101,11 @@ public class GraphLayoutAction
     }
   }
 
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.DEFAULT_PRIORITY;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -125,7 +129,7 @@ public class GraphLayoutAction
         setEnabled(false);
         return;
       }
-    }        
+    }
     setEnabled(true);
   }
 

@@ -24,7 +24,9 @@ import net.sourceforge.waters.subject.module.GraphSubject;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AutomatonInternalFrame extends JInternalFrame implements ModelObserver
+public class AutomatonInternalFrame
+  extends JInternalFrame
+  implements ModelObserver
 {
 
   //##########################################################################
@@ -138,9 +140,9 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
     }
   }
 
-  // ###########################################################################
-  // # Access methods for event handling
 
+  //#########################################################################
+  //# Access Methods for Event Handling
   public void execute(final Proxy proxyToFire)
   {
     mDisplayPane.execute(proxyToFire);
@@ -162,24 +164,29 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
             && Math.abs(mDisplayPane.getSize().getWidth() - mDisplayPane.getPreferredSize().getWidth()) > 10);
   }
 
-  // ###########################################################################
-  // # Interface ModelObserver
 
+  //#########################################################################
+  //# Interface ModelObserver
   public void modelChanged(final ModelChangeEvent event)
   {
-    if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED)
-    {
+    if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED) {
       this.adjustSize(false);
       this.repaint();
     }
   }
 
-  //##########################################################################
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.RENDERING_PRIORITY;
+  }
+
+
+  //#########################################################################
   //# Inner class InternalFrameMouseAdapter
   private class InternalFrameMouseAdapter extends MouseAdapter
   {
 
-    //########################################################################
+    //#######################################################################
     //# Interface java.awt.event.MouseListener
     /**
      * Listener for mouse-release events.
@@ -197,12 +204,12 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Inner Class PreserveAspectComponentListener
   private class PreserveAspectComponentListener extends ComponentAdapter
   {
 
-    //########################################################################
+    //#######################################################################
     //# Interface java.awt.event.MouseListener
     /**
      * Listener for component-moved events.
@@ -238,7 +245,7 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Data Members
   private final AutomatonDisplayPane mDisplayPane;
   private final AutomatonDesktopPane mParent;
@@ -263,7 +270,7 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
   private int mBorderHeight = 0;
 
 
-  //##########################################################################
+  //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
 

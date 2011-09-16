@@ -114,8 +114,36 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     return checker;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  public void modelChanged(final ModelChangeEvent event)
+  {
+    switch (event.getKind()) {
+    case ModelChangeEvent.STATE_CHANGED:
+      if (event.getSource() instanceof SimpleComponentSubject)
+        updateEnabledStatus();
+      break;
+    case ModelChangeEvent.ITEM_ADDED:
+    case ModelChangeEvent.ITEM_REMOVED:
+      if (event.getValue() instanceof SimpleComponentSubject) {
+        updateEnabledStatus();
+      }
+      break;
+    default:
+      break;
+    }
+  }
+
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.DEFAULT_PRIORITY;
+  }
+
+
   //#########################################################################
   //# Enablement
+  @Override
   public void update(final EditorChangedEvent event)
   {
     final ModuleContainer mContainer = ((ModuleContainer)getIDE().getActiveDocumentContainer());
@@ -136,24 +164,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     }
   }
 
-  public void modelChanged(final ModelChangeEvent event)
-  {
-    switch (event.getKind()) {
-    case ModelChangeEvent.STATE_CHANGED:
-      if (event.getSource() instanceof SimpleComponentSubject)
-        updateEnabledStatus();
-      break;
-    case ModelChangeEvent.ITEM_ADDED:
-    case ModelChangeEvent.ITEM_REMOVED:
-      if (event.getValue() instanceof SimpleComponentSubject) {
-        updateEnabledStatus();
-      }
-      break;
-    default:
-      break;
-    }
-  }
-
+  @Override
   public void updateEnabledStatus()
   {
     super.updateEnabledStatus();

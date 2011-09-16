@@ -186,6 +186,11 @@ public class IndexedListModel<E extends IdentifiedSubject>
     }
   }
 
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.RENDERING_PRIORITY;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods

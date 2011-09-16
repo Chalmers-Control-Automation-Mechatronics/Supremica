@@ -11,7 +11,7 @@ package net.sourceforge.waters.subject.base;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -183,19 +183,14 @@ public final class AttributeMapSubject
     }
   }
 
+  public Collection<ModelObserver> getModelObservers()
+  {
+    return mObservers;
+  }
+
   public void fireModelChanged(final ModelChangeEvent event)
   {
-    if (mObservers != null) {
-      // Just in case they try to register or unregister observers
-      // in response to the update ...
-      final List<ModelObserver> copy = new ArrayList<ModelObserver>(mObservers);
-      for (final ModelObserver observer : copy) {
-        observer.modelChanged(event);
-      }
-    }
-    if (mParent != null) {
-      mParent.fireModelChanged(event);
-    }
+    SubjectTools.fireModelChanged(this, event);
   }
 
 

@@ -260,7 +260,7 @@ public class IDE
   {
     return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
   }
-  
+
 
   public Project getActiveProject()
   {
@@ -395,6 +395,11 @@ public class IDE
           event.getKind() == ModelChangeEvent.NAME_CHANGED) {
         updateWindowTitle();
       }
+    }
+
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.RENDERING_PRIORITY;
     }
 
     //#######################################################################

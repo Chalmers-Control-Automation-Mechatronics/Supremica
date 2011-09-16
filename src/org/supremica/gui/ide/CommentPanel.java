@@ -229,6 +229,11 @@ class CommentPanel extends JPanel
       }
     }
 
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.RENDERING_PRIORITY;
+    }
+
   }
 
 

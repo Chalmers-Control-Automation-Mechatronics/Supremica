@@ -643,7 +643,7 @@ class EditorGraph
   //#########################################################################
   //# Inner Class CopiedModelListener
   /**
-   * This listener receives all change event associated with this
+   * This listener receives all change events associated with this
    * editor graph.
    */
   private class CopiedModelListener
@@ -742,6 +742,11 @@ class EditorGraph
         break;
       }
     }
+
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.RENDERING_PRIORITY;
+    }
   }
 
 
@@ -750,12 +755,35 @@ class EditorGraph
   private abstract class EditorNode
     implements ModelObserver
   {
+
+    //#######################################################################
+    //# Constructor
     protected EditorNode(final NodeSubject node)
     {
       mNode = node;
       mEdges = new HashMap<EdgeSubject, Boolean>();
     }
 
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      if (event.getSource() instanceof EdgeSubject) {
+        final EdgeSubject e = (EdgeSubject) event.getSource();
+        if (e.getSource() != getNodeSubject() &&
+            e.getTarget() != getNodeSubject()) {
+          removeEdge(e);
+        }
+      }
+    }
+
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.CLEANUP_PRIORITY_1;
+    }
+
+    //#######################################################################
+    //# Simple Access
     public void removeEdge(final EdgeSubject edge)
     {
       if (mEdges.remove(edge) != null) {
@@ -773,17 +801,6 @@ class EditorGraph
     public Set<EdgeSubject> getEdges()
     {
       return Collections.unmodifiableSet(mEdges.keySet());
-    }
-
-    public void modelChanged(final ModelChangeEvent event)
-    {
-      if (event.getSource() instanceof EdgeSubject) {
-        final EdgeSubject e = (EdgeSubject) event.getSource();
-        if (e.getSource() != getNodeSubject() &&
-            e.getTarget() != getNodeSubject()) {
-          removeEdge(e);
-        }
-      }
     }
 
     public abstract void update();

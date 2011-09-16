@@ -70,8 +70,8 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class ModuleContainer
-    extends DocumentContainer
-    implements UndoInterface, Subject, ChangeListener, ModelObserver
+  extends DocumentContainer
+  implements UndoInterface, Subject, ChangeListener, ModelObserver
 {
 
   //#########################################################################
@@ -241,6 +241,11 @@ public class ModuleContainer
       mCompiledDES = null;
       break;
     }
+  }
+
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.CLEANUP_PRIORITY_0;
   }
 
 

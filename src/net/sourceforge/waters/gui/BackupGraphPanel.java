@@ -44,9 +44,9 @@ import org.supremica.properties.Config;
  * <P>
  * The backup graph panel can manage two copies of a graph ({@link GraphProxy})
  * to be displayed and edited. The <I>primary graph</I> is monitored subject
- * ({@link GraphSubject}) that can be edited in a controlled way. The
- * <I>secondary graph</I> is copy created from the primary graph when a major
- * modification is initiated, such as running the spring embedder
+ * ({@link GraphSubject}) that can be edited in a controlled way. The backup
+ * graph panel creates a <I>secondary graph</I> as a copy the primary graph
+ * when a major modification is initiated, such as running the spring embedder
  * ({@link SpringEmbedder}) or a drag operation. During such operations, the
  * secondary graph can be updated frequently; but only when the operation
  * completes, the changes are committed to the primary graph using a single
@@ -54,9 +54,9 @@ import org.supremica.properties.Config;
  * </P>
  *
  * <P>
- * In addition, the backup graph panel provides support to detect graphs
- * with insufficient geometry information, and invoke the spring embedder
- * and animate its progress for such graphs.
+ * In addition, the backup graph panel provides support to detect graphs with
+ * insufficient geometry information, and to invoke the spring embedder and
+ * animate its progress for such graphs.
  * </P>
  *
  * @author Robi Malik
@@ -276,6 +276,11 @@ public class BackupGraphPanel
     public void modelChanged(final ModelChangeEvent event)
     {
       graphChanged(event);
+    }
+
+    public int getModelObserverPriority()
+    {
+      return ModelObserver.RENDERING_PRIORITY;
     }
 
   }

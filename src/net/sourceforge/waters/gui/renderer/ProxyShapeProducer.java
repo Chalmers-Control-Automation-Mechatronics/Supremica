@@ -242,7 +242,7 @@ public class ProxyShapeProducer
     SimpleNodeProxyShape shape = (SimpleNodeProxyShape) lookup(simple);
     if (shape == null) {
       final PropositionIcon.ColorInfo colorinfo =
-        mRenderingContext.getColorInfo(simple);
+        mRenderingContext.getColorInfo(mGraph, simple);
       shape = new SimpleNodeProxyShape(simple, colorinfo);
       mMap.put(simple, shape);
     }

@@ -148,7 +148,7 @@ public class ObservationEquivalenceTRSimplifier
    * an initial partition. When merging states, all propositions present in
    * the transition relation are merged.
    * @param  mask   The bit mask of the significant propositions,
-   *                or <CODE>-1</CODE> to indicate that all propositions
+   *                or&nbsp;<CODE>-1</CODE> to indicate that all propositions
    *                are significant.
    * @see #setUpInitialPartitionBasedOnMarkings()
    */
@@ -391,7 +391,7 @@ public class ObservationEquivalenceTRSimplifier
     while (mapIter.hasNext()) {
       mapIter.advance();
       final EquivalenceClass sec = mapIter.value();
-      sec.setUpStateToClass(false);
+      sec.setUpStateToClass();
       sec.enqueue(true);
     }
   }
@@ -871,15 +871,13 @@ public class ObservationEquivalenceTRSimplifier
       mSize++;
     }
 
-    void setUpStateToClass(final boolean force)
+    void setUpStateToClass()
     {
       if (mSize == 1) {
-        if (force) {
-          reset(mClassReadIterator);
-          mClassReadIterator.advance();
-          final int state = mClassReadIterator.getCurrentData();
-          mStateToClass[state] = null;
-        }
+        reset(mClassReadIterator);
+        mClassReadIterator.advance();
+        final int state = mClassReadIterator.getCurrentData();
+        mStateToClass[state] = null;
       } else {
         reset(mClassReadIterator);
         while (mClassReadIterator.advance()) {
@@ -1117,9 +1115,9 @@ public class ObservationEquivalenceTRSimplifier
         setList(overflowList, overflowSize);
       }
       if (getSize() == 1) {
-        setUpStateToClass(true);
+        setUpStateToClass();
       }
-      overflowClass.setUpStateToClass(true);
+      overflowClass.setUpStateToClass();
       overflowClass.enqueue(false);
       mEquivalence.enqueueBigBrother(this);
     }
@@ -1261,9 +1259,9 @@ public class ObservationEquivalenceTRSimplifier
         setList(overflowList, overflowSize);
       }
       if (getSize() == 1) {
-        setUpStateToClass(true);
+        setUpStateToClass();
       }
-      overflowClass.setUpStateToClass(true);
+      overflowClass.setUpStateToClass();
       final ComplexEquivalenceClass parent = getParent();
       if (parent != null) {
         final ComplexEquivalenceClass complex =
@@ -1337,16 +1335,16 @@ public class ObservationEquivalenceTRSimplifier
         setSize(newSize);
       }
       if (getSize() == 1) {
-        setUpStateToClass(true);
+        setUpStateToClass();
       }
 
       // Create and enqueue complex splitters ...
       final LeafEquivalenceClass class1 =
         new LeafEquivalenceClass(overflow1, size1, false);
-      class1.setUpStateToClass(true);
+      class1.setUpStateToClass();
       final LeafEquivalenceClass class2 =
         new LeafEquivalenceClass(overflow2, size2, false);
-      class2.setUpStateToClass(true);
+      class2.setUpStateToClass();
       final ComplexEquivalenceClass parent = getParent();
       if (parent != null || mInfo != null) {
         final ComplexEquivalenceClass complex2 =

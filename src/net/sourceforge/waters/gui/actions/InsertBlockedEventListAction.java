@@ -110,6 +110,11 @@ public class InsertBlockedEventListAction
     }
   }
 
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.DEFAULT_PRIORITY;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -144,7 +149,7 @@ public class InsertBlockedEventListAction
   //#########################################################################
   //# Data Members
   private GraphSubject mObservedGraph;
-  private Point mPoint;
+  private final Point mPoint;
 
 
   //#########################################################################
