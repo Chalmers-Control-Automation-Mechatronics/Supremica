@@ -401,7 +401,7 @@ public final class MinimizationOptions
         MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
         options.setMinimizationType(EquivalenceRelation.SYNTHESISABSTRACTION);
         options.setMinimizationStrategy(MinimizationStrategy.FewestStatesFirst);
-        options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
+        options.setMinimizationHeuristic(MinimizationHeuristic.LeastExtension);
         options.setAlsoTransitions(false);
         options.setKeepOriginal(false);
         options.setCompositionalMinimization(true);

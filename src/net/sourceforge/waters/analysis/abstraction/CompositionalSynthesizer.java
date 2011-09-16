@@ -39,6 +39,7 @@ import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.AutomatonResult;
+import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
@@ -77,7 +78,7 @@ import org.apache.log4j.Logger;
  * @author Robi Malik
  */
 
-public abstract class AbstractCompositionalModelVerifier
+public abstract class CompositionalSynthesizer
   extends AbstractModelVerifier
 {
 
@@ -90,7 +91,7 @@ public abstract class AbstractCompositionalModelVerifier
    * @param translator
    *          Kind translator used to determine event and component kinds.
    */
-  protected AbstractCompositionalModelVerifier
+  protected CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator)
   {
@@ -111,7 +112,7 @@ public abstract class AbstractCompositionalModelVerifier
    *          Enumeration factory that determines possible candidate
    *          selection methods.
    */
-  protected AbstractCompositionalModelVerifier
+  protected CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
      final PreselectingMethodFactory preselectingMethodFactory,
@@ -132,7 +133,7 @@ public abstract class AbstractCompositionalModelVerifier
    * @param translator
    *          Kind translator used to determine event and component kinds.
    */
-  protected AbstractCompositionalModelVerifier
+  protected CompositionalSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator)
@@ -156,7 +157,7 @@ public abstract class AbstractCompositionalModelVerifier
    *          Enumeration factory that determines possible candidate
    *          selection methods.
    */
-  protected AbstractCompositionalModelVerifier
+  protected CompositionalSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
@@ -182,7 +183,7 @@ public abstract class AbstractCompositionalModelVerifier
    * methods.
    * @see PreselectingMethod
    */
-  public PreselectingMethodFactory getPreselectingMethodFactory()
+  public EnumFactory<PreselectingMethod> getPreselectingMethodFactory()
   {
     return mPreselectingMethodFactory;
   }
@@ -210,7 +211,7 @@ public abstract class AbstractCompositionalModelVerifier
    * methods.
    * @see SelectingMethod
    */
-  public SelectingMethodFactory getSelectingMethodFactory()
+  public EnumFactory<SelectingMethod> getSelectingMethodFactory()
   {
     return mSelectingMethodFactory;
   }
@@ -381,10 +382,9 @@ public abstract class AbstractCompositionalModelVerifier
     return mCurrentMonolithicVerifier;
   }
 
-  protected MonolithicSynchronousProductBuilder
-    getCurrentSynchronousProductBuilder()
+  protected MonolithicSynchronousProductBuilder getSynchronousProductBuilder()
   {
-    return mCurrentSynchronousProductBuilder;
+    return mSynchronousProductBuilder;
   }
 
   protected void setPropositions(final Collection<EventProxy> props)
@@ -434,8 +434,6 @@ public abstract class AbstractCompositionalModelVerifier
         mCurrentSynchronousProductBuilder = mSynchronousProductBuilder;
       }
       mCurrentSynchronousProductBuilder.setPropositions(mPropositions);
-      final KindTranslator translator = getKindTranslator();
-      mCurrentSynchronousProductBuilder.setKindTranslator(translator);
       final int tlimit = getInternalTransitionLimit();
       mCurrentSynchronousProductBuilder.setTransitionLimit(tlimit);
     }
@@ -584,6 +582,27 @@ public abstract class AbstractCompositionalModelVerifier
     final CompositionalVerificationResult result = getAnalysisResult();
     result.setNumberOfStates(0.0);
     result.setNumberOfTransitions(0.0);
+
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    /*
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+     */
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+    chain.add(bisimulator);
+
+    final SynthesisAbstractionTRSimplifier synthesisAbstraction= new 
+            SynthesisAbstractionTRSimplifier();
+    final int limit = getInternalTransitionLimit();
+    synthesisAbstraction.setTransitionLimit(limit);
+    chain.add(synthesisAbstraction);
+    mAbstractionProcedure = new SynthesisAbstractionProcedure(chain, 
+           synthesisAbstraction);
+
     mAbstractionProcedure.storeStatistics();
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
     mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
@@ -1695,6 +1714,78 @@ public abstract class AbstractCompositionalModelVerifier
                                EventEncoding.FILTER_PROPOSITIONS);
     }
 
+    protected abstract AbstractionStep createStep
+      (final AutomatonProxy input,
+       final StateEncoding inputStateEnc,
+       final AutomatonProxy output,
+       final StateEncoding outputStateEnc,
+       final EventProxy tau);
+
+    //#######################################################################
+    //# Data Members
+    private final TransitionRelationSimplifier mSimplifier;
+  }
+
+  //#########################################################################
+  //# Inner Class SynthesisAbstractionProcedure
+  protected class SynthesisAbstractionProcedure
+    extends TRSimplifierAbstractionProcedure
+  {
+    //#######################################################################
+    //# Constructor
+    protected SynthesisAbstractionProcedure
+      (final TransitionRelationSimplifier simplifier,
+       final SynthesisAbstractionTRSimplifier synthesisAbstraction)
+    {
+      super(simplifier);
+      mSynthesisAbstraction = synthesisAbstraction;
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractionProcedure
+    @Override
+    protected AbstractionStep run(final AutomatonProxy aut,
+                                  final Collection<EventProxy> local)
+      throws AnalysisException
+    {
+      final TransitionRelationSimplifier simplifier = getSimplifier();
+      try {
+        assert local.size() <= 1 : "At most one tau event supported!";
+        final Iterator<EventProxy> iter = local.iterator();
+        final EventProxy tau = iter.hasNext() ? iter.next() : null;
+        final EventEncoding eventEnc = createEventEncoding(aut, tau);
+        final StateEncoding inputStateEnc = new StateEncoding(aut);
+        final int config = simplifier.getPreferredInputConfiguration();
+        final ListBufferTransitionRelation rel =
+          new ListBufferTransitionRelation(aut, eventEnc,
+                                           inputStateEnc, config);
+        final int numStates = rel.getNumberOfStates();
+        final int numTrans = rel.getNumberOfTransitions();
+        final int numMarkings = rel.getNumberOfMarkings();
+        simplifier.setTransitionRelation(rel);
+        if (simplifier.run()) {
+          if (rel.getNumberOfReachableStates() == numStates &&
+              rel.getNumberOfTransitions() == numTrans &&
+              rel.getNumberOfMarkings() == numMarkings) {
+            return null;
+          }
+          rel.removeRedundantPropositions();
+          final ProductDESProxyFactory factory = getFactory();
+          final StateEncoding outputStateEnc = new StateEncoding();
+          final AutomatonProxy convertedAut =
+            rel.createAutomaton(factory, eventEnc, outputStateEnc);
+          return createStep
+            (aut, inputStateEnc, convertedAut, outputStateEnc, tau);
+        } else {
+          return null;
+        }
+      } finally {
+        simplifier.reset();
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
     private EventEncoding createEventEncoding(final AutomatonProxy aut,
                                               final Collection<EventProxy> local)
     {
@@ -1730,20 +1821,23 @@ public abstract class AbstractCompositionalModelVerifier
       return new EventEncoding(encodedEvents, translator, filter,
                                EventEncoding.FILTER_PROPOSITIONS);
     }
-
-    protected abstract AbstractionStep createStep
+    
+    protected AbstractionStep createStep
       (final AutomatonProxy input,
        final StateEncoding inputStateEnc,
        final AutomatonProxy output,
        final StateEncoding outputStateEnc,
-       final EventProxy tau);
+       final EventProxy tau)
+    {
+        return null;
+    }
 
     //#######################################################################
     //# Data Members
-    private final TransitionRelationSimplifier mSimplifier;
+    private final SynthesisAbstractionTRSimplifier mSynthesisAbstraction;
   }
-
-
+  
+  
   //#########################################################################
   //# Inner Class PreselectingMethod
   /**
@@ -1776,23 +1870,11 @@ public abstract class AbstractCompositionalModelVerifier
     //#######################################################################
     //# Heuristics
     /**
-     * Gets the common method associated with this method.
-     * Not all compositional model verifiers support all preselecting
-     * methods. By calling {@link #getCommonMethod()}, it should be
-     * possible to obtain an alternative that is supported by all
-     * compositional model verifiers.
-     */
-    protected PreselectingMethod getCommonMethod()
-    {
-      return this;
-    }
-
-    /**
      * Creates the actual heuristics object implementing this preselecting
      * method.
      */
     abstract PreselectingHeuristic createHeuristic
-      (AbstractCompositionalModelVerifier verifier);
+      (CompositionalSynthesizer verifier);
 
     //#######################################################################
     //# Data Members
@@ -1813,15 +1895,6 @@ public abstract class AbstractCompositionalModelVerifier
       register(MaxS);
       register(MinT);
     }
-
-    //#######################################################################
-    //# Migration
-    protected PreselectingMethod getEnumValue(final PreselectingMethod method)
-    {
-      final PreselectingMethod common = method.getCommonMethod();
-      final String name = common.toString();
-      return getEnumValue(name);
-    }
   }
 
 
@@ -1836,7 +1909,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     @Override
     PreselectingHeuristic createHeuristic
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       return verifier.new HeuristicMustL();
     }
@@ -1851,7 +1924,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     @Override
     PreselectingHeuristic createHeuristic
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       return verifier.new HeuristicMaxS();
     }
@@ -1867,7 +1940,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     @Override
     PreselectingHeuristic createHeuristic
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       return verifier.new HeuristicMinT();
     }
@@ -1910,18 +1983,6 @@ public abstract class AbstractCompositionalModelVerifier
     //#######################################################################
     //# Heuristics
     /**
-     * Gets the common method associated with this method.
-     * Not all compositional model verifiers support all selecting
-     * methods. By calling {@link #getCommonMethod()}, it should be
-     * possible to obtain an alternative that is supported by all
-     * compositional model verifiers.
-     */
-    protected SelectingMethod getCommonMethod()
-    {
-      return this;
-    }
-
-    /**
      * Creates a comparator to implement this selecting heuristic.
      * This returns an implementation of only one heuristic, which
      * may consider two candidates as equal.
@@ -1931,7 +1992,7 @@ public abstract class AbstractCompositionalModelVerifier
      *         is not implemented by a comparator.
      */
     Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       return null;
     }
@@ -1948,7 +2009,7 @@ public abstract class AbstractCompositionalModelVerifier
      *                 heuristic.
      */
     SelectingHeuristic createHeuristic
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       final SelectingMethodFactory factory = verifier.mSelectingMethodFactory;
       final Comparator<Candidate> chain =
@@ -1978,15 +2039,6 @@ public abstract class AbstractCompositionalModelVerifier
     }
 
     //#######################################################################
-    //# Migration
-    protected SelectingMethod getEnumValue(final SelectingMethod method)
-    {
-      final SelectingMethod common = method.getCommonMethod();
-      final String name = common.toString();
-      return getEnumValue(name);
-    }
-
-    //#######################################################################
     //# Chain Construction
     /**
      * Creates a comparator to implement the given selecting heuristic. The
@@ -2000,7 +2052,7 @@ public abstract class AbstractCompositionalModelVerifier
      *          Primary selection method to be used first.
      */
     Comparator<Candidate> createComparatorChain
-      (final AbstractCompositionalModelVerifier verifier,
+      (final CompositionalSynthesizer verifier,
        final SelectingMethod method)
     {
       final List<Comparator<Candidate>> list =
@@ -2030,7 +2082,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     @Override
     Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       return verifier.new ComparatorMaxL();
     }
@@ -2046,7 +2098,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     @Override
     Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       return verifier.new ComparatorMaxC();
     }
@@ -2060,7 +2112,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     @Override
     Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       return verifier.new ComparatorMinS();
     }
@@ -2075,7 +2127,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     @Override
     SelectingHeuristic createHeuristic
-      (final AbstractCompositionalModelVerifier verifier)
+      (final CompositionalSynthesizer verifier)
     {
       final SelectingMethodFactory factory = verifier.mSelectingMethodFactory;
       final Comparator<Candidate> alt =
@@ -3404,7 +3456,7 @@ public abstract class AbstractCompositionalModelVerifier
    * @see #mPostponedSubsystems
    */
   private List<AutomatonProxy> mCurrentAutomata;
-
+  //private Map<AutomatonProxy,AutomatonInfo> mAutomatonInfoMap;
   private Map<EventProxy,EventInfo> mEventInfoMap =
       new HashMap<EventProxy,EventInfo>();
   /**

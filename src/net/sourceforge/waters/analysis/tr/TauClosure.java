@@ -59,12 +59,31 @@ public class TauClosure
    */
   public TauClosure(final TransitionListBuffer buffer, int limit)
   {
+     this(buffer, limit, EventEncoding.TAU, EventEncoding.TAU);
+  }
+
+/**
+   * Creates a tau-closure for the given transition list buffer,
+   * which may or may not be precomputed. If precomputed, the tau-closure
+   * does not update automatically when the transition relation changes.
+   * @param  buffer   The transition list buffer containing the transitions
+   *                  for which tau-closure is computed.
+   * @param  limit    The maximum number of transitions that can be stored
+   *                  in the tau-closure. If the number of computed
+   *                  tau-transitions exceeds the limit, precomputation is
+   *                  aborted and transitions will be produced on the fly by
+   *                  iterators. A limit of&nbsp;0 forces the tau closure
+   *                  always to be computed on the fly.
+   */
+  public TauClosure(final TransitionListBuffer buffer, int limit,
+                    final int firstLocal, final int lastLocal)
+  {
     mTransitionBuffer = buffer;
     if (limit > 0) {
       final int numStates = mTransitionBuffer.getNumberOfStates();
       final int[][] trans = new int[numStates][];
       final TransitionIterator iter =
-        new OnTheFlyTauClosureIterator(mTransitionBuffer);
+        new OnTheFlyTauClosureIterator(mTransitionBuffer, firstLocal, lastLocal);
       final TIntArrayList list = new TIntArrayList();
       for (int state = 0; state < numStates; state++) {
         iter.resetState(state);
@@ -89,7 +108,6 @@ public class TauClosure
       mStoredTransitions = null;
     }
   }
-
 
   //#########################################################################
   //# Iterator Access
@@ -379,6 +397,26 @@ public class TauClosure
       mStack = new TIntStack();
       mInner = mTransitionBuffer.createReadOnlyIterator();
       mInner.resetEvent(EventEncoding.TAU);
+      mVisited = new TIntHashSet();
+      mCurrentState = -1;
+    }
+
+    private OnTheFlyTauClosureIterator(final TransitionListBuffer buffer,
+                                       final int firstLocal,
+                                       final int lastLocal)
+    {
+      this(buffer, -1, firstLocal, lastLocal);
+    }
+
+    private OnTheFlyTauClosureIterator(final TransitionListBuffer buffer,
+                                       final int from, final int firstLocal,
+                                       final int lastLocal)
+    {
+      super(from);
+      mTransitionBuffer = buffer;
+      mStack = new TIntStack();
+      mInner = mTransitionBuffer.createReadOnlyIterator();
+      mInner.resetEvents(firstLocal, lastLocal);
       mVisited = new TIntHashSet();
       mCurrentState = -1;
     }

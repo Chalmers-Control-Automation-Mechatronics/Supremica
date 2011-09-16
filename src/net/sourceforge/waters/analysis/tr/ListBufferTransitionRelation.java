@@ -1030,6 +1030,28 @@ public class ListBufferTransitionRelation
    *         a {@link TransitionIterator} over the tau-closure of the
    *         predecessor transition relation.
    */
+  public TauClosure createPredecessorsTauClosure(final int limit,
+          final int firstLocal, final int lastLocal)
+  {
+    if (mPredecessorBuffer != null) {
+      return new TauClosure(mPredecessorBuffer, limit, firstLocal, lastLocal);
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
+    }
+  }
+/**
+   * Obtains the tau-closure of the successors of this transition relation.
+   * @param  limit    The maximum number of transitions that can be stored.
+   *                  If the number of transitions already in the transition
+   *                  relation plus the number of computed tau transitions
+   *                  exceeds the limit, precomputation is aborted and
+   *                  transitions will be produced on the fly by iterators.
+   *                  It limit of&nbsp;0 forces the tau closure always to
+   *                  be computed on the fly.
+   * @return A {@link TauClosure} object, which can be used to obtain
+   *         a {@link TransitionIterator} over the tau-closure of the
+   *         predecessor transition relation.
+   */
   public TauClosure createPredecessorsTauClosure(final int limit)
   {
     if (mPredecessorBuffer != null) {
