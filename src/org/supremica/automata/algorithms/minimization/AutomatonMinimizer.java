@@ -320,7 +320,7 @@ public class AutomatonMinimizer
 //            // Applying synthesis abstraction
 
             EquivalenceClasses equivClasses = new EquivalenceClasses();
-            if(hideThese.size()>0){
+            
                 try
                 {
                     // Find initial partitioning (based on marking, basically)
@@ -367,7 +367,7 @@ public class AutomatonMinimizer
     //
     //                removeUnusedEpsilonEvents(theAutomaton);
 //
-            }
+            
 
             if(!AutomataSynthesizer.renameBack()){
                    renameBackToOriginalEvents(theAutomaton);
@@ -712,13 +712,15 @@ public class AutomatonMinimizer
                     if (event.isUnobservable())
                     {
                        final LabeledEvent orig = TauEvent.getOriginalEvent(event.getName());
-                       arc.setEvent(orig);
-                       if(!aut.getAlphabet().contains(orig)&& !orig.equals(null)){
-                           aut.getAlphabet().addEvent(orig);}
-                           if(aut.getAlphabet().contains(event)){
-                              aut.getAlphabet().removeEvent(event);
+                       if(orig != null){
+                           arc.setEvent(orig);
+                           if( !aut.getAlphabet().contains(orig) ){
+                               aut.getAlphabet().addEvent(orig);
+                               if(aut.getAlphabet().contains(event)){
+                                  aut.getAlphabet().removeEvent(event);
+                               }
                            }
-
+                        }
                     }
                 }
         }
