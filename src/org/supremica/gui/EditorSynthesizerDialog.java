@@ -342,7 +342,9 @@ class EditorSynthesizerDialogStandardPanel
         if (typeSelector.getType() == SynthesisType.CONTROLLABLE)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
 /*            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
             algorithmSelector.addItem(SynthesisAlgorithm.MODULAR);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
@@ -352,7 +354,10 @@ class EditorSynthesizerDialogStandardPanel
         else if (typeSelector.getType() == SynthesisType.NONBLOCKING)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
+
 /*
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
@@ -363,7 +368,9 @@ class EditorSynthesizerDialogStandardPanel
         else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
 /*
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);

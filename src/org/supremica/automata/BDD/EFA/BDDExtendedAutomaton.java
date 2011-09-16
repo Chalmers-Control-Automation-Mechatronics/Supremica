@@ -119,7 +119,7 @@ public class BDDExtendedAutomaton {
         int nbrOfEdges = 0;
         int nbrOfGuards = 0;
         for (final NodeProxy currLocation : theExAutomaton.getNodes()) {
-            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+            if (!bddExAutomata.synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
                 // Add the node proxy in the map
                 for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
                     final EdgeSubject currEdge = edgeIt.next();
@@ -176,7 +176,7 @@ public class BDDExtendedAutomaton {
         bddExAutomata.addForbiddenLocations(forbiddenLocations);
         bddExAutomata.addPlantifiedBlockedLocations(plantifiedBlockedLocation);
 
-        if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+        if (!bddExAutomata.synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
             bddExAutomata.automaton2nbrEdges.put(theExAutomaton, nbrOfEdges);
             bddExAutomata.automaton2nbrGuards.put(theExAutomaton, nbrOfGuards);
         }

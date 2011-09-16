@@ -27,7 +27,8 @@ public abstract class BDDExDisjunctiveAbstractWorkSet {
         this.workset = new int[size];
         this.selectedAutomata = new int[size];
         this.worksetCount = size;
-        this.rl = new ReinforcementLearningPlusTabuSearch(size);
+        this.rl = ReinforcementLearningPlusTabuSearch.getInstance();
+        rl.setSize(size);
     }
 
     public abstract void initialize();
