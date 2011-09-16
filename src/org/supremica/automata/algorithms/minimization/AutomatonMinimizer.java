@@ -301,7 +301,7 @@ public class AutomatonMinimizer
                 mergeTriviallyObservationEquivalentStatesSynthesis(theAutomaton);
 //                logger.info("mergetrivially the name "+ theAutomaton.getName()+"nbrofStates "+theAutomaton.nbrOfStates());
             }
-//            mergeEpsilonLoopsSynthesis(theAutomaton);
+            mergeEpsilonLoopsSynthesis(theAutomaton);
 
 
 
@@ -320,16 +320,18 @@ public class AutomatonMinimizer
 //            // Applying synthesis abstraction
 
             EquivalenceClasses equivClasses = new EquivalenceClasses();
-            try
-            {
-                // Find initial partitioning (based on marking, basically)
-                equivClasses = findInitialPartitioning(theAutomaton);
-                // Partition
-                findCoarsestPartitioning(equivClasses, equivalenceRelation);
-            } catch (final Exception ex) {
-                requestStop();
-                throw ex;
-            }
+            if(hideThese.size()>0){
+                try
+                {
+                    // Find initial partitioning (based on marking, basically)
+                    equivClasses = findInitialPartitioning(theAutomaton);
+                    // Partition
+                    findCoarsestPartitioning(equivClasses, equivalenceRelation);
+                } catch (final Exception ex) {
+                    requestStop();
+                    throw ex;
+                }
+
 
             if (stopRequested)
             {
@@ -338,32 +340,35 @@ public class AutomatonMinimizer
              theAutomaton.beginTransaction();
            final Iterator<?> equivClassIt = equivClasses.iterator();
 
-            while (equivClassIt.hasNext())
-            {
-                State blob = null;
-                final EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
-                // Merge states in partitions (the partitions are separated by -1)!
-                while(currEquivClass.size()>0){
-                    //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
-                    if (blob == null)
-                    {
-                        blob = currEquivClass.remove();
+                while (equivClassIt.hasNext())
+                {
+                    State blob = null;
+                    EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
+                    // Merge states in partitions (the partitions are separated by -1)!
+                    while(currEquivClass.size()>0){
+                        //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
+                        if (blob == null)
+                        {
+                            blob = currEquivClass.remove();
+                        }
+                        else
+                        {
+                            //logger.info("Merging " + blob + " and " + states[part[i]]);
+                            blob = MinimizationHelper.mergeStates(theAutomaton, blob, currEquivClass.remove(), useShortNames);
+                        }
+
                     }
-                    else
-                    {
-                        //logger.info("Merging " + blob + " and " + states[part[i]]);
-                        blob = MinimizationHelper.mergeStates(theAutomaton, blob, currEquivClass.remove(), useShortNames);
-                    }
+
                 }
 
+                // Build the minimized automaton based on the partitioning in equivClasses
+    //            theAutomaton = buildAutomaton(equivClasses);
+    //            halfWaySynthesis(theAutomaton);
+    //
+    //                removeUnusedEpsilonEvents(theAutomaton);
+//
             }
 
-            // Build the minimized automaton based on the partitioning in equivClasses
-//            theAutomaton = buildAutomaton(equivClasses);
-//            halfWaySynthesis(theAutomaton);
-//
-//                removeUnusedEpsilonEvents(theAutomaton);
-//
             if(!AutomataSynthesizer.renameBack()){
                    renameBackToOriginalEvents(theAutomaton);
          }

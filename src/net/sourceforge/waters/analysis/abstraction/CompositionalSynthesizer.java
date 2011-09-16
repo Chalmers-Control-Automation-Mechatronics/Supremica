@@ -1750,10 +1750,7 @@ public abstract class CompositionalSynthesizer
     {
       final TransitionRelationSimplifier simplifier = getSimplifier();
       try {
-        assert local.size() <= 1 : "At most one tau event supported!";
-        final Iterator<EventProxy> iter = local.iterator();
-        final EventProxy tau = iter.hasNext() ? iter.next() : null;
-        final EventEncoding eventEnc = createEventEncoding(aut, tau);
+        final EventEncoding eventEnc = createEventEncoding(aut, local);
         final StateEncoding inputStateEnc = new StateEncoding(aut);
         final int config = simplifier.getPreferredInputConfiguration();
         final ListBufferTransitionRelation rel =
@@ -1775,7 +1772,7 @@ public abstract class CompositionalSynthesizer
           final AutomatonProxy convertedAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
           return createStep
-            (aut, inputStateEnc, convertedAut, outputStateEnc, tau);
+            (aut, inputStateEnc, convertedAut, outputStateEnc, null);
         } else {
           return null;
         }
@@ -1815,6 +1812,12 @@ public abstract class CompositionalSynthesizer
           else
               sharedEvents.add(event);
       }
+      int lastUncontrollableEvent = localUncontrollableEvents.size();
+      int lastControllableEvent = localControllableEvents.size() +
+              lastUncontrollableEvent;
+      mSynthesisAbstraction.setLastControllableLocalEvent(lastControllableEvent);
+      mSynthesisAbstraction.setLastUncontrollableLocalEvent
+              (lastUncontrollableEvent);
       encodedEvents.addAll(localUncontrollableEvents);
       encodedEvents.addAll(localControllableEvents);
       encodedEvents.addAll(sharedEvents);
