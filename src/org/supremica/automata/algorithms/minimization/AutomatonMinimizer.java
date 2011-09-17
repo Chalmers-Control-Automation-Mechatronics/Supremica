@@ -320,7 +320,7 @@ public class AutomatonMinimizer
 //            // Applying synthesis abstraction
 
             EquivalenceClasses equivClasses = new EquivalenceClasses();
-            
+
                 try
                 {
                     // Find initial partitioning (based on marking, basically)
@@ -343,7 +343,7 @@ public class AutomatonMinimizer
                 while (equivClassIt.hasNext())
                 {
                     State blob = null;
-                    EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
+                    final EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
                     // Merge states in partitions (the partitions are separated by -1)!
                     while(currEquivClass.size()>0){
                         //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
@@ -367,7 +367,7 @@ public class AutomatonMinimizer
     //
     //                removeUnusedEpsilonEvents(theAutomaton);
 //
-            
+
 
             if(!AutomataSynthesizer.renameBack()){
                    renameBackToOriginalEvents(theAutomaton);
@@ -631,7 +631,8 @@ public class AutomatonMinimizer
         }
 
         // Remove from alphabet epsilon events that are never used
-        if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION){
+        if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION)
+        {
             removeUnusedEpsilonEvents(theAutomaton);
         }
         // Message
@@ -640,7 +641,8 @@ public class AutomatonMinimizer
             final int after = theAutomaton.nbrOfStates();
             logger.info("There were " + before + " states before and " + after +
                 " states after the minimization. Reduction: " +
-                Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");}
+                Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
+        }
 
         // Start listening again
 
@@ -704,26 +706,31 @@ public class AutomatonMinimizer
         }
     }
      */
-     public static void renameBackToOriginalEvents(final Automaton aut){
+     public static void renameBackToOriginalEvents(final Automaton aut)
+     {
           for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
-                {
-                    final Arc arc = arcIt.next();
-                    final LabeledEvent event = arc.getEvent();
-                    if (event.isUnobservable())
-                    {
-                       final LabeledEvent orig = TauEvent.getOriginalEvent(event.getName());
-                       if(orig != null){
-                           arc.setEvent(orig);
-                           if( !aut.getAlphabet().contains(orig) ){
-                               aut.getAlphabet().addEvent(orig);
-                               if(aut.getAlphabet().contains(event)){
-                                  aut.getAlphabet().removeEvent(event);
-                               }
-                           }
-                        }
-                    }
-                }
-        }
+          {
+              final Arc arc = arcIt.next();
+              final LabeledEvent event = arc.getEvent();
+              if (event.isUnobservable())   // this is where isTau() did not work, right? (What if we have other non-tau un-observable events?)
+              {
+                 final LabeledEvent orig = TauEvent.getOriginalEvent(event);    // MF: changed event.getName() to just event (see TauEvent)
+                 if(orig != null)   // what if we get null here? Then we leave an un-obs/tau event in the alphabet and on the arc...
+                 {
+                     arc.setEvent(orig);
+                     if( !aut.getAlphabet().contains(orig) )
+                     {
+                         aut.getAlphabet().addEvent(orig);
+
+                         if(aut.getAlphabet().contains(event))
+                         {
+                            aut.getAlphabet().removeEvent(event);
+                         }
+                     }
+                  }
+              }
+          }
+     }
 
 
 

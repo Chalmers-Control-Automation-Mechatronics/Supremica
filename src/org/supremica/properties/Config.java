@@ -273,6 +273,8 @@ public final class Config
     public static final ObjectProperty MINIMIZATION_SILENT_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentEventName", "tau", "Silent event name");
     public static final ObjectProperty MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
     public static final ObjectProperty MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
+    // MF: This one below is purely experimental, remove in production code
+    public static final BooleanProperty MINIMIZATION_USE_TAUEVENT_MAP = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationUseTaueventMap", true, "Use TauEvent map");
 
     // ALGORITHMS_BDD2
     // New BDD implementation using JavaBDD library

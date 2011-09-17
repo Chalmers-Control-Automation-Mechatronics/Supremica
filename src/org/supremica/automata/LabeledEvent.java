@@ -75,7 +75,7 @@ public class LabeledEvent
     private boolean operatorReset = false;
     private boolean immediate = false;
     private boolean proposition = false;
-    
+
     private int expansionPriority = -1;
     private int index = -1;
 
@@ -93,7 +93,7 @@ public class LabeledEvent
         this.proposition = isProposition;
     }
 
-    public LabeledEvent(final LabeledEvent e)
+    private LabeledEvent(final LabeledEvent e)   // Should really use clone() instead...
     {
         label = e.label;
         controllable = e.controllable;
@@ -303,6 +303,11 @@ public class LabeledEvent
     {
         return false;
     }
+    /**
+     * and similar but not exactly the same for TauEvents.
+     * LabeledEvent can (but should not really) be tau-events
+     * but TauEvents are of course always tau-events
+     */
     public  boolean isTauEvent()
     {
       return tauEvent;
