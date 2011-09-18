@@ -282,9 +282,8 @@ public class CompositionalSafetyVerifier
   }
 
   @Override
-  protected boolean checkPropertyMonolithically
-    (final List<AutomatonProxy> automata)
-  throws AnalysisException
+  protected boolean doMonolithicAnalysis(final List<AutomatonProxy> automata)
+    throws AnalysisException
   {
     if (!getPostponedSubsystems().isEmpty()) {
       mCollectedPlants.addAll(automata);
@@ -297,8 +296,7 @@ public class CompositionalSafetyVerifier
       plantsAndSpecs.addAll(mCollectedPlants);
       plantsAndSpecs.addAll(automata);
       plantsAndSpecs.addAll(mProperties);
-      final boolean result =
-        super.checkPropertyMonolithically(plantsAndSpecs);
+      final boolean result = super.doMonolithicAnalysis(plantsAndSpecs);
       mCollectedPlants.clear();
       if (result) {
         setSatisfiedResult();

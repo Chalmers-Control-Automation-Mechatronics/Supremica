@@ -1134,7 +1134,7 @@ public class CompositionalConflictChecker
   //#########################################################################
   //# Inner Class PreselectingMethodFactory
   protected static class PreselectingMethodFactory
-    extends AbstractCompositionalModelVerifier.PreselectingMethodFactory
+    extends AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
   {
     //#######################################################################
     //# Constructors
@@ -1157,10 +1157,10 @@ public class CompositionalConflictChecker
   {
     @Override
     PreselectingHeuristic createHeuristic
-      (final AbstractCompositionalModelVerifier verifier)
+      (final AbstractCompositionalModelAnalyzer analyzer)
     {
       final CompositionalConflictChecker checker =
-          (CompositionalConflictChecker) verifier;
+          (CompositionalConflictChecker) analyzer;
       return checker.new HeuristicMinTAlpha();
     }
     @Override
@@ -1203,10 +1203,10 @@ public class CompositionalConflictChecker
     }
     @Override
     Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelVerifier verifier)
+      (final AbstractCompositionalModelAnalyzer analyzer)
     {
       final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) verifier;
+        (CompositionalConflictChecker) analyzer;
       if (checker.mPreconditionMarking == null) {
         return null;
       } else {
@@ -1215,10 +1215,10 @@ public class CompositionalConflictChecker
     }
     @Override
     SelectingHeuristic createHeuristic
-      (final AbstractCompositionalModelVerifier verifier)
+      (final AbstractCompositionalModelAnalyzer analyzer)
     {
       final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) verifier;
+        (CompositionalConflictChecker) analyzer;
       if (checker.mPreconditionMarking == null) {
         return MinS.createHeuristic(checker);
       } else {
@@ -1241,17 +1241,17 @@ public class CompositionalConflictChecker
     }
     @Override
     SelectingHeuristic createHeuristic
-      (final AbstractCompositionalModelVerifier verifier)
+      (final AbstractCompositionalModelAnalyzer analyzer)
     {
       final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) verifier;
+        (CompositionalConflictChecker) analyzer;
       if (checker.mPreconditionMarking == null) {
         return MinSync.createHeuristic(checker);
       } else {
         final SelectingMethodFactory factory =
-          (SelectingMethodFactory) verifier.getSelectingMethodFactory();
+          (SelectingMethodFactory) analyzer.getSelectingMethodFactory();
         final Comparator<Candidate> alt =
-          factory.createComparatorChain(verifier, MinSa);
+          factory.createComparatorChain(analyzer, MinSa);
         return checker.new HeuristicMinSyncAlpha(1, 0, alt);
       }
     }
