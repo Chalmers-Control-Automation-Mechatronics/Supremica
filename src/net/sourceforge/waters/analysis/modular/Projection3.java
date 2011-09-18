@@ -37,8 +37,8 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class Projection3
-extends AbstractAutomatonBuilder
-implements SafetyProjectionBuilder
+  extends AbstractAutomatonBuilder<AutomatonProxy>
+  implements SafetyProjectionBuilder
 {
 
   public Projection3(final ProductDESProxyFactory factory)

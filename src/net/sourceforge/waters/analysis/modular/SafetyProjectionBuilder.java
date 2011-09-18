@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.modular;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AutomatonBuilder;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -25,7 +26,8 @@ import net.sourceforge.waters.model.des.EventProxy;
  *
  * @author Robi Malik
  */
-public interface SafetyProjectionBuilder extends AutomatonBuilder
+public interface SafetyProjectionBuilder
+  extends AutomatonBuilder<AutomatonProxy>
 {
 
   //#########################################################################

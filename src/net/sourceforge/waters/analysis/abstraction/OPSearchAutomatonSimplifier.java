@@ -38,7 +38,6 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AutomatonResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -63,7 +62,7 @@ import org.apache.log4j.Logger;
  */
 
 public class OPSearchAutomatonSimplifier
-  extends AbstractAutomatonBuilder
+  extends AbstractAutomatonBuilder<AutomatonProxy>
 {
 
   //#########################################################################
@@ -213,9 +212,9 @@ public class OPSearchAutomatonSimplifier
       tearDown();
       if (logger.isDebugEnabled()) {
         String msg = "EXIT " + ProxyTools.getShortClassName(this) + ".run()";
-        final AutomatonResult result = getAnalysisResult();
+        final PartitionedAutomatonResult result = getAnalysisResult();
         final AutomatonProxy aut =
-          result == null ? null : result.getAutomaton();
+          result == null ? null : result.getComputedProxy();
         if (aut != null) {
           msg += ": " + aut.getStates().size() + " states and " +
                  aut.getTransitions().size() + " transitions";

@@ -760,7 +760,7 @@ public class CompositionalGeneralisedConflictChecker
 
     composer.run();
 
-    final AutomatonProxy syncProduct = composer.getComputedAutomaton();
+    final AutomatonProxy syncProduct = composer.getComputedProxy();
 
     // records statistics
     final double numberOfStates = syncProduct.getStates().size();

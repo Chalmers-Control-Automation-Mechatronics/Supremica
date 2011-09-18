@@ -50,7 +50,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class MonolithicSynchronousProductBuilder
-  extends AbstractAutomatonBuilder
+  extends AbstractAutomatonBuilder<AutomatonProxy>
   implements SynchronousProductBuilder
 {
 
@@ -194,7 +194,7 @@ public class MonolithicSynchronousProductBuilder
         final int[] tuple = mUnvisited.remove();
         explore(tuple);
       }
-      if (getConstructsAutomaton()) {
+      if (getConstructsResult()) {
         final AutomatonProxy aut = createAutomaton();
         return setAutomatonResult(aut);
       } else {
@@ -414,7 +414,7 @@ public class MonolithicSynchronousProductBuilder
   protected void addStatistics()
   {
     super.addStatistics();
-    final AutomatonResult result = getAnalysisResult();
+    final AutomatonResult<AutomatonProxy> result = getAnalysisResult();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(mNumStates);
     if (mTransitionBuffer != null) {
@@ -676,7 +676,7 @@ public class MonolithicSynchronousProductBuilder
      *                  information recorded by the synchronous product
      *                  builder.
      */
-    public void recordStatistics(AutomatonResult result);
+    public void recordStatistics(AutomatonResult<AutomatonProxy> result);
 
   }
 

@@ -1384,21 +1384,21 @@ public abstract class AbstractCompositionalModelVerifier
       mCurrentSynchronousProductBuilder.addMask(hidden, tau);
       expectedNumberOfEvents++;
     }
-    mCurrentSynchronousProductBuilder.setConstructsAutomaton(true);
+    mCurrentSynchronousProductBuilder.setConstructsResult(true);
     mCurrentSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
     mCurrentSynchronousProductBuilder.setStateCallback(null);
     mCurrentSynchronousProductBuilder.setPropositions(null);
     try {
       mCurrentSynchronousProductBuilder.run();
       final AutomatonProxy sync =
-        mCurrentSynchronousProductBuilder.getComputedAutomaton();
+        mCurrentSynchronousProductBuilder.getComputedProxy();
       mEventHasDisappeared |= sync.getEvents().size() < expectedNumberOfEvents;
       final SynchronousProductStateMap stateMap =
         mCurrentSynchronousProductBuilder.getStateMap();
       return new HidingStep(sync, hidden, tau, stateMap);
     } finally {
       final CompositionalVerificationResult stats = getAnalysisResult();
-      final AutomatonResult result =
+      final AutomatonResult<AutomatonProxy> result =
         mCurrentSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
       mCurrentSynchronousProductBuilder.clearMask();
@@ -3108,7 +3108,7 @@ public abstract class AbstractCompositionalModelVerifier
       Collections.sort(list, comparator);
       int limit = mCurrentInternalStateLimit;
       mCurrentSynchronousProductBuilder.setNodeLimit(limit);
-      mCurrentSynchronousProductBuilder.setConstructsAutomaton(false);
+      mCurrentSynchronousProductBuilder.setConstructsResult(false);
       mCurrentSynchronousProductBuilder.setStateCallback(null);
       Candidate best = null;
       final List<EventProxy> empty = Collections.emptyList();
@@ -3135,7 +3135,7 @@ public abstract class AbstractCompositionalModelVerifier
           // skip this one ...
         } finally {
           final CompositionalVerificationResult stats = getAnalysisResult();
-          final AutomatonResult result =
+          final AutomatonResult<AutomatonProxy> result =
             mCurrentSynchronousProductBuilder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }

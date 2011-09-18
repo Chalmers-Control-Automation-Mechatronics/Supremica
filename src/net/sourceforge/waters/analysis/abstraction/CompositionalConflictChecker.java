@@ -1468,7 +1468,7 @@ public class CompositionalConflictChecker
         getCurrentSynchronousProductBuilder();
       final int limit = getCurrentInternalStateLimit();
       builder.setNodeLimit(limit);
-      builder.setConstructsAutomaton(false);
+      builder.setConstructsResult(false);
       builder.setStateCallback(this);
       mCurrentMinimum = Integer.MAX_VALUE;
       Candidate best = null;
@@ -1493,7 +1493,7 @@ public class CompositionalConflictChecker
           // skip this one ...
         } finally {
           final CompositionalVerificationResult stats = getAnalysisResult();
-          final AutomatonResult result =
+          final AutomatonResult<AutomatonProxy> result =
             builder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }
@@ -1528,7 +1528,7 @@ public class CompositionalConflictChecker
       }
     }
 
-    public void recordStatistics(final AutomatonResult result)
+    public void recordStatistics(final AutomatonResult<AutomatonProxy> result)
     {
       result.setPeakNumberOfNodes(mCount);
     }
@@ -1946,7 +1946,7 @@ public class CompositionalConflictChecker
         mSimplifier.run();
         final PartitionedAutomatonResult result =
           mSimplifier.getAnalysisResult();
-        final AutomatonProxy convertedAut = result.getAutomaton();
+        final AutomatonProxy convertedAut = result.getComputedProxy();
         if (aut == convertedAut) {
           mStatistics.recordFinish(aut, false);
           return null;

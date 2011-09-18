@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -22,14 +23,14 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * builders. In addition to the model and factory members inherited from
  * {@link AbstractModelAnalyser}, this class provides access to a automaton
  * result member, and uses this to implement access to the computed
- * automaton.
+ * result.
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractAutomatonBuilder
+public abstract class AbstractAutomatonBuilder<P extends Proxy>
   extends AbstractModelAnalyser
-  implements AutomatonBuilder
+  implements AutomatonBuilder<P>
 {
 
   //#########################################################################
@@ -88,37 +89,38 @@ public abstract class AbstractAutomatonBuilder
     return mOutputKind;
   }
 
-  public void setConstructsAutomaton(final boolean construct)
+  public void setConstructsResult(final boolean construct)
   {
-    mConstructsAutomaton = construct;
+    mConstructsResult = construct;
   }
 
-  public boolean getConstructsAutomaton()
+  public boolean getConstructsResult()
   {
-    return mConstructsAutomaton;
+    return mConstructsResult;
   }
 
-  public AutomatonProxy getComputedAutomaton()
+  public P getComputedProxy()
   {
-    final AutomatonResult result = getAnalysisResult();
+    final AutomatonResult<P> result = getAnalysisResult();
     if (result != null) {
-      return result.getAutomaton();
+      return result.getComputedProxy();
     } else {
       throw new IllegalStateException("Call run() first!");
     }
   }
 
-  public AutomatonResult getAnalysisResult()
+  @SuppressWarnings("unchecked")
+  public AutomatonResult<P> getAnalysisResult()
   {
-    return (AutomatonResult) super.getAnalysisResult();
+    return (AutomatonResult<P>) super.getAnalysisResult();
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
-  protected AutomatonResult createAnalysisResult()
+  protected AutomatonResult<P> createAnalysisResult()
   {
-    return new AutomatonResult();
+    return new AutomatonResult<P>();
   }
 
 
@@ -128,20 +130,20 @@ public abstract class AbstractAutomatonBuilder
    * Stores an automaton result indicating successful computation.
    * Setting the automaton also marks the analysis run as completed and
    * sets the Boolean result.
-   * @param  aut    The computed automaton, or <CODE>null</CODE> to
+   * @param  proxy    The computed automaton, or <CODE>null</CODE> to
    *                indicate an unsuccessful computation. The Boolean analysis
    *                result is set to <CODE>false</CODE> if and only if this
    *                parameter is <CODE>null</CODE>.
    */
-  protected boolean setAutomatonResult(final AutomatonProxy aut)
+  protected boolean setAutomatonResult(final P proxy)
   {
-    final AutomatonResult result = getAnalysisResult();
-    result.setAutomaton(aut);
+    final AutomatonResult<P> result = getAnalysisResult();
+    result.setComputedProxy(proxy);
     return result.isSatisfied();
   }
 
   /**
-   * Computes a name for the output automaton.
+   * Computes a name for the output object.
    * @return The name set by the user, if present, or a default name computed
    *         from the names of the automata in the input model.
    * @see #setOutputName(String) setOutputName()
@@ -169,7 +171,7 @@ public abstract class AbstractAutomatonBuilder
   }
 
   /**
-   * Computes a component for the output automaton.
+   * Computes a component kind for the output automaton (or automata).
    * @return The component kind set by the user, if present, or a default kind
    *         determined from the automata in the input model.
    * @see #setOutputKind(ComponentKind) setOutputKind()
@@ -201,7 +203,7 @@ public abstract class AbstractAutomatonBuilder
   //# Data Members
   private String mOuptutName;
   private ComponentKind mOutputKind;
-  private boolean mConstructsAutomaton = true;
+  private boolean mConstructsResult = true;
 
 }
 

@@ -272,7 +272,7 @@ public class AutomatonMinimizer
           final KindTranslator translator = IdenticalKindTranslator.getInstance();
          final OPSearchAutomatonSimplifier simp =
             new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
-          final AutomatonProxy result = simp.getComputedAutomaton();
+          final AutomatonProxy result = simp.getComputedProxy();
           if (result != aut) {
             final ProjectBuildFromWaters exporter =
               new ProjectBuildFromWaters(null);

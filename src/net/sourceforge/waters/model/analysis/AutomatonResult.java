@@ -9,19 +9,22 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.base.Proxy;
 
 
 /**
  * A result record returned by an {@link AutomatonBuilder}. An automaton
- * result consists of a single automaton representing the result of an
- * analysis algorithm such as projection or automaton minimisation. In
- * addition, it may contain some statistics about the analysis run.
+ * result consists of a structured object, typically an automaton
+ * ({@link net.sourceforge.waters.model.des.AutomatonProxy AutomatonProxy})
+ * or a product DES ({@link net.sourceforge.waters.model.des.ProductDESProxy
+ * ProductDESProxy}) representing the result of an analysis algorithm such
+ * as projection, minimisation, or synthesis. In addition, it may contain
+ * some statistics about the analysis run.
  *
  * @author Robi Malik
  */
 
-public class AutomatonResult extends AnalysisResult
+public class AutomatonResult<P extends Proxy> extends AnalysisResult
 {
 
   //#########################################################################
@@ -37,27 +40,28 @@ public class AutomatonResult extends AnalysisResult
   //#########################################################################
   //# Simple Access Methods
   /**
-   * Gets the automaton computed by the model checker,
+   * Gets the object computed by the model analyser,
    * or <CODE>null</CODE> if the computation was unsuccessful.
    */
-  public AutomatonProxy getAutomaton()
+  public P getComputedProxy()
   {
-    return mAutomaton;
+    return mComputedProxy;
   }
 
   /**
-   * Sets the computed automaton for this result.
-   * Setting the automaton also marks the analysis run as completed and
-   * sets the Boolean result.
-   * @param  aut    The computed automaton, or <CODE>null</CODE> to
+   * Sets the computed object (e.g.,
+   * {@link net.sourceforge.waters.model.des.AutomatonProxy AutomatonProxy})
+   * for this result. Setting the computed object also marks the analysis run
+   * as completed and sets the Boolean result.
+   * @param  proxy  The computed object, or <CODE>null</CODE> to
    *                indicate an unsuccessful computation. The Boolean analysis
    *                result is set to <CODE>false</CODE> if and only if this
    *                parameter is <CODE>null</CODE>.
    */
-  public void setAutomaton(final AutomatonProxy aut)
+  public void setComputedProxy(final P proxy)
   {
-    setSatisfied(aut != null);
-    mAutomaton = aut;
+    setSatisfied(proxy != null);
+    mComputedProxy = proxy;
   }
 
 
@@ -67,12 +71,12 @@ public class AutomatonResult extends AnalysisResult
   public void merge(final AnalysisResult other)
   {
     super.merge(other);
-    mAutomaton = null;
+    mComputedProxy = null;
   }
 
 
   //#########################################################################
   //# Data Members
-  private AutomatonProxy mAutomaton;
+  private P mComputedProxy;
 
 }

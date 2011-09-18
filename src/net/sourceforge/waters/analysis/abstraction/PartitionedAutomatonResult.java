@@ -28,7 +28,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
  * @author Robi Malik
  */
 
-public class PartitionedAutomatonResult extends AutomatonResult
+public class PartitionedAutomatonResult
+  extends AutomatonResult<AutomatonProxy>
 {
   //#########################################################################
   //# Constructor
@@ -89,7 +90,7 @@ public class PartitionedAutomatonResult extends AutomatonResult
                            final StateEncoding outputEnc,
                            final List<int[]> partition)
   {
-    super.setAutomaton(aut);
+    super.setComputedProxy(aut);
     mInputEncoding = inputEnc;
     mOutputEncoding = outputEnc;
     mPartition = partition;

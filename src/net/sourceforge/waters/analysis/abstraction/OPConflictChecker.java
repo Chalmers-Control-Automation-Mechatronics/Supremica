@@ -1660,21 +1660,21 @@ public class OPConflictChecker
       mCurrentSynchronousProductBuilder.addMask(local, tau);
       expectedNumberOfEvents++;
     }
-    mCurrentSynchronousProductBuilder.setConstructsAutomaton(true);
+    mCurrentSynchronousProductBuilder.setConstructsResult(true);
     mCurrentSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
     mCurrentSynchronousProductBuilder.setStateCallback(null);
     mCurrentSynchronousProductBuilder.setPropositions(null);
     try {
       mCurrentSynchronousProductBuilder.run();
       final AutomatonProxy sync =
-        mCurrentSynchronousProductBuilder.getComputedAutomaton();
+        mCurrentSynchronousProductBuilder.getComputedProxy();
       mEventHasDisappeared |= sync.getEvents().size() < expectedNumberOfEvents;
       final SynchronousProductStateMap stateMap =
         mCurrentSynchronousProductBuilder.getStateMap();
       return new HidingStep(sync, local, tau, stateMap);
     } finally {
       final CompositionalVerificationResult stats = getAnalysisResult();
-      final AutomatonResult result =
+      final AutomatonResult<AutomatonProxy> result =
         mCurrentSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
       mCurrentSynchronousProductBuilder.clearMask();
@@ -2861,7 +2861,7 @@ public class OPConflictChecker
       Collections.sort(list, comparator);
       int limit = mCurrentInternalStateLimit;
       mCurrentSynchronousProductBuilder.setNodeLimit(limit);
-      mCurrentSynchronousProductBuilder.setConstructsAutomaton(false);
+      mCurrentSynchronousProductBuilder.setConstructsResult(false);
       mCurrentSynchronousProductBuilder.setStateCallback(null);
       Candidate best = null;
       final List<EventProxy> empty = Collections.emptyList();
@@ -2890,7 +2890,7 @@ public class OPConflictChecker
           // skip this one ...
         } finally {
           final CompositionalVerificationResult stats = getAnalysisResult();
-          final AutomatonResult result =
+          final AutomatonResult<AutomatonProxy> result =
             mCurrentSynchronousProductBuilder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }
@@ -2929,7 +2929,7 @@ public class OPConflictChecker
       Collections.sort(list, comparator);
       mCurrentSynchronousProductBuilder.setNodeLimit
         (mCurrentInternalStateLimit);
-      mCurrentSynchronousProductBuilder.setConstructsAutomaton(false);
+      mCurrentSynchronousProductBuilder.setConstructsResult(false);
       mCurrentSynchronousProductBuilder.setStateCallback(this);
       mCurrentMinimum = Integer.MAX_VALUE;
       Candidate best = null;
@@ -2956,7 +2956,7 @@ public class OPConflictChecker
           // skip this one ...
         } finally {
           final CompositionalVerificationResult stats = getAnalysisResult();
-          final AutomatonResult result =
+          final AutomatonResult<AutomatonProxy> result =
             mCurrentSynchronousProductBuilder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }
@@ -2989,7 +2989,7 @@ public class OPConflictChecker
       }
     }
 
-    public void recordStatistics(final AutomatonResult result)
+    public void recordStatistics(final AutomatonResult<AutomatonProxy> result)
     {
       result.setPeakNumberOfNodes(mCount);
     }
@@ -3641,7 +3641,7 @@ public class OPConflictChecker
         mSimplifier.run();
         final PartitionedAutomatonResult result =
           mSimplifier.getAnalysisResult();
-        final AutomatonProxy convertedAut = result.getAutomaton();
+        final AutomatonProxy convertedAut = result.getComputedProxy();
         if (aut == convertedAut) {
           mStatistics.recordFinish(aut, false);
           return null;
