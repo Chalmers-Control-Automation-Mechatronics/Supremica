@@ -30,7 +30,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  * language inclusion checker
  *
  * @see SDPropertyBuilder
- * @see Modular Language Inclusion Checker
+ * @see ModularLanguageInclusionChecker
  *
  * @author Mahvash Baloch , Robi Malik
  */

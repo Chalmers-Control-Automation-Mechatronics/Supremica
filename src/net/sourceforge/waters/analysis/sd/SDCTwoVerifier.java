@@ -27,7 +27,7 @@ import java.util.Collection;
  * language inclusion checker
  *
  * @see SDPropertyBuilder
- * @see Modular Language Inclusion Checker
+ * @see ModularLanguageInclusionChecker
  *
  * @author Mahvash Baloch , Robi Malik
  */

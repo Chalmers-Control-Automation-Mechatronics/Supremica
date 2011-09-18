@@ -37,7 +37,7 @@ public interface Abortable
    * request abort at a later time. It may take some time for the model
    * analyser to check this flag and react, or the request may not be
    * obeyed at all. If a model analyser aborts, it will throw an
-   * {@link AbortException} from its {@link #run()} method.
+   * {@link AbortException} from its {@link ModelAnalyser#run() run()} method.
    */
   public void requestAbort();
 

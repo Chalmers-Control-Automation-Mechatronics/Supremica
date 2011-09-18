@@ -487,7 +487,7 @@ public class IntListBuffer
 
     /**
      * Resets iteration to the start of the given list.
-     * The next call to {@link #advance() will set the iterator to the
+     * The next call to {@link #advance()} will set the iterator to the
      * first list element.
      */
     public void reset(int list);

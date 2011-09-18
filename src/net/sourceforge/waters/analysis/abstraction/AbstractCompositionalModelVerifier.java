@@ -125,8 +125,6 @@ public abstract class AbstractCompositionalModelVerifier
    * Creates an abstracting model verifier to check the given model.
    * @param model
    *          The model to be checked by this model verifier.
-   * @param proc
-   *          The abstraction procedure used to simplify automata.
    * @param factory
    *          Factory used for trace construction.
    * @param translator
@@ -932,13 +930,12 @@ public abstract class AbstractCompositionalModelVerifier
   }
 
   /**
-   * Removes the given automata from the current subsystem data structures. This
-   * method is called after a candidate has been composed and simplified. It
-   * removes entries from the automata and event information maps
-   * ({@link #mAutomatonInfoMap} and {@link #mEventInfoMap}), and tests for
-   * events that become redundant. Events are redundant if they are known to be
-   * globally disabled, or if they only ever appear as selfloops. Such events
-   * are added to the list {@link #mRedundantEvents}.
+   * Removes the given automata from the current subsystem data structures.
+   * This method is called after a candidate has been composed and simplified.
+   * It removes entries from the event information map {@link #mEventInfoMap}),
+   * and tests for events that become redundant. Events are redundant if
+   * they are known to be globally disabled, or if they only ever appear as
+   * selfloops. Such events are added to the list {@link #mRedundantEvents}.
    * @param victims
    *          Collection of automata to be removed.
    * @see #removeRedundantEvents()

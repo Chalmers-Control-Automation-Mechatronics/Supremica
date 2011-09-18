@@ -62,9 +62,6 @@ public class StandardExtensionFileFilter
    *                     file type selection box.
    * @param  ext         The filename extension accepted by the filter,
    *                     with preceding dot.
-   * @param  dirs        A flag, indicating that the filter accepts all
-   *                     directories in addition to files with the given
-   *                     extension.
    */
   public StandardExtensionFileFilter(final String description,
                                      final String ext)

@@ -384,8 +384,6 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
    * transition relation. This method merges any states found to be equivalent
    * during the last call to {@link #run()}, and depending on configuration,
    * performs a second pass to remove redundant transitions.
-   *
-   * @see TransitionRemoval
    */
   @Override
   protected void applyResultPartition() throws AnalysisException
