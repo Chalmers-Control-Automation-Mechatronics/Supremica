@@ -24,7 +24,8 @@ import net.sourceforge.waters.model.base.Proxy;
  * @author Robi Malik
  */
 
-public class AutomatonResult<P extends Proxy> extends AnalysisResult
+public class AutomatonResult<P extends Proxy>
+  extends DefaultAnalysisResult
 {
 
   //#########################################################################

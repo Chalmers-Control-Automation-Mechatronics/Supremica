@@ -15,7 +15,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
 /**
  * <P>A model verifier takes a finite-state machine model as input and
  * performs a particular kind of verification on it. In contrast to a
- * general {@link ModelAnalyser}, a verifier always produces a Boolean
+ * general {@link ModelAnalyzer}, a verifier always produces a Boolean
  * result that states whether a particular property checked is satisfied or
  * not. Furthermore, if the property is found not to be satisfied, the
  * model verifier provides a counterexample in the form of a sequence of
@@ -59,7 +59,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * @author Robi Malik
  */
 
-public interface ModelVerifier extends ModelAnalyser
+public interface ModelVerifier extends ModelAnalyzer
 {
 
   //#########################################################################
@@ -70,7 +70,7 @@ public interface ModelVerifier extends ModelAnalyser
    *         <CODE>false</CODE> otherwise.
    * @throws IllegalStateException if this method is called before
    *         model checking has completed, i.e., before
-   *         {@link ModelAnalyser#run() run()} has been called.
+   *         {@link ModelAnalyzer#run() run()} has been called.
    */
   public boolean isSatisfied();
 
@@ -81,7 +81,7 @@ public interface ModelVerifier extends ModelAnalyser
    *         It shares events and automata with the input model.
    * @throws IllegalStateException if this method is called before
    *         model checking has completed, i.e., before {@link
-   *         ModelAnalyser#run() run()} has been called, or model checking has
+   *         ModelAnalyzer#run() run()} has been called, or model checking has
    *         found that the property is satisfied and there is no
    *         counterexample.
    */

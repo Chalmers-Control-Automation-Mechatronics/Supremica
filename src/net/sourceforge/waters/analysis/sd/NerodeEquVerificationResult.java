@@ -1,7 +1,7 @@
 package net.sourceforge.waters.analysis.sd;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
-import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
@@ -12,7 +12,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  *
  * @author Mahvash Baloch
  */
-public class NerodeEquVerificationResult extends VerificationResult
+public class NerodeEquVerificationResult extends DefaultVerificationResult
 {
   // #########################################################################
   // # Constructors

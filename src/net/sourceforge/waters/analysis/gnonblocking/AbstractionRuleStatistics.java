@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.PrintWriter;
 
-import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 
@@ -264,18 +264,22 @@ public class AbstractionRuleStatistics
     if (mRuleClass == stats.mRuleClass) {
       mAppliedCount += stats.mAppliedCount;
       mReductionCount += stats.mReductionCount;
-      mInputStates = AnalysisResult.mergeAdd(mInputStates, stats.mInputStates);
+      mInputStates =
+        DefaultAnalysisResult.mergeAdd(mInputStates, stats.mInputStates);
       mOutputStates =
-        AnalysisResult.mergeAdd(mOutputStates, stats.mOutputStates);
+        DefaultAnalysisResult.mergeAdd(mOutputStates, stats.mOutputStates);
       mUnchangedStates =
-        AnalysisResult.mergeAdd(mUnchangedStates, stats.mUnchangedStates);
+        DefaultAnalysisResult.mergeAdd(mUnchangedStates,
+                                       stats.mUnchangedStates);
       mInputTransitions =
-        AnalysisResult.mergeAdd(mInputTransitions, stats.mInputTransitions);
+        DefaultAnalysisResult.mergeAdd(mInputTransitions,
+                                       stats.mInputTransitions);
       mOutputTransitions =
-        AnalysisResult.mergeAdd(mOutputTransitions, stats.mOutputTransitions);
+        DefaultAnalysisResult.mergeAdd(mOutputTransitions,
+                                       stats.mOutputTransitions);
       mUnchangedTransitions =
-        AnalysisResult.mergeAdd(mUnchangedTransitions,
-                                stats.mUnchangedTransitions);
+        DefaultAnalysisResult.mergeAdd(mUnchangedTransitions,
+                                       stats.mUnchangedTransitions);
       mRunTime += stats.mRunTime;
     } else {
       throw new ClassCastException

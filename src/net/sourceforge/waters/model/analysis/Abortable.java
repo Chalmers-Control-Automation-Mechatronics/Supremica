@@ -18,7 +18,7 @@ package net.sourceforge.waters.model.analysis;
  * can request the operation to be aborted. When such a request is
  * made, it is up to the operation to stop at the next convenient time.</P>
  *
- * <P>Every {@link ModelAnalyser} should support abort requests, but
+ * <P>Every {@link ModelAnalyzer} should support abort requests, but
  * this interface is kept separate to facilitate its implementation by
  * subroutines that are not model analysers.</P>
  *
@@ -37,7 +37,7 @@ public interface Abortable
    * request abort at a later time. It may take some time for the model
    * analyser to check this flag and react, or the request may not be
    * obeyed at all. If a model analyser aborts, it will throw an
-   * {@link AbortException} from its {@link ModelAnalyser#run() run()} method.
+   * {@link AbortException} from its {@link ModelAnalyzer#run() run()} method.
    */
   public void requestAbort();
 

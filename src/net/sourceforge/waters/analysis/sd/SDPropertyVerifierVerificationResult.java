@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 
 
@@ -16,7 +17,8 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
  *
  * @author Rachel Francis, Mahvash Baloch
  */
-public class SDPropertyVerifierVerificationResult extends VerificationResult
+public class SDPropertyVerifierVerificationResult
+  extends DefaultVerificationResult
 {
   // #########################################################################
   // # Constructors

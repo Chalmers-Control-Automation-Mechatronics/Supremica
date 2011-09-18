@@ -27,18 +27,18 @@ import org.apache.log4j.Logger;
  * @author Robi Malik
  */
 
-public abstract class AbstractModelAnalyser implements ModelAnalyser
+public abstract class AbstractModelAnalyzer implements ModelAnalyzer
 {
 
   //#########################################################################
   //# Constructors
-  public AbstractModelAnalyser(final ProductDESProxyFactory factory,
+  public AbstractModelAnalyzer(final ProductDESProxyFactory factory,
                                final KindTranslator translator)
   {
     this((ProductDESProxy) null, factory, translator);
   }
 
-  public AbstractModelAnalyser(final ProductDESProxy model,
+  public AbstractModelAnalyzer(final ProductDESProxy model,
                                final ProductDESProxyFactory factory,
                                final KindTranslator translator)
   {
@@ -50,7 +50,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     mIsAborting = false;
   }
 
-  public AbstractModelAnalyser(final AutomatonProxy aut,
+  public AbstractModelAnalyzer(final AutomatonProxy aut,
                                final ProductDESProxyFactory factory,
                                final KindTranslator translator)
   {
@@ -146,7 +146,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   /**
    * Initialises the model analyser for a new run.
    * This method should be called by all subclasses at the beginning of
-   * each {@link ModelAnalyser#run() run()}. If overridden, the overriding
+   * each {@link ModelAnalyzer#run() run()}. If overridden, the overriding
    * method should call the superclass methods first.
    * @throws AnalysisException
    */
@@ -161,7 +161,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   /**
    * Resets the model analyser at the end of a run.
    * This method should be called by all subclasses upon completion of
-   * each {@link ModelAnalyser#run() run()}, even if an exception is
+   * each {@link ModelAnalyzer#run() run()}, even if an exception is
    * thrown. If overridden, the overriding method should call the superclass
    * methods last.
    */
@@ -218,7 +218,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
    */
   protected AnalysisResult createAnalysisResult()
   {
-    return new AnalysisResult();
+    return new DefaultAnalysisResult();
   }
 
   /**

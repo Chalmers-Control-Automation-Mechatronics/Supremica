@@ -29,7 +29,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public interface ModelAnalyser
+public interface ModelAnalyzer
   extends Abortable
 {
 

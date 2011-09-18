@@ -1,10 +1,20 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# CLASS:   LoopResult
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.modular;
 
 import java.io.PrintWriter;
 
-import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 
-public class LoopResult extends VerificationResult
+
+public class LoopResult extends DefaultVerificationResult
 {
 
   LoopResult()

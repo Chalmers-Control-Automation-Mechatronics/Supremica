@@ -683,7 +683,7 @@ public:
 
   ~ProductExplorerFinalizer()
   {
-    mNativeModelVerifier.setNativeModelAnalyser(0);
+    mNativeModelVerifier.setNativeModelAnalyzer(0);
     delete mProductExplorer;
   }
 
@@ -717,7 +717,7 @@ public:
     JNIEnv* env = cache.getEnvironment();
     jobject bbuffer =
       env->NewDirectByteBuffer(mProductExplorer, sizeof(*mProductExplorer));
-    mNativeModelVerifier.setNativeModelAnalyser(bbuffer);
+    mNativeModelVerifier.setNativeModelAnalyzer(bbuffer);
     return mProductExplorer;
   }
 
@@ -750,7 +750,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
     waters::ProductExplorer* checker =
       finalizer.createProductExplorer(translator, nomarking, nomarking, cache);
     bool result = checker->runSafetyCheck();
-    jni::VerificationResultGlue vresult(&cache);
+    jni::VerificationResultGlue vresult =
+      gchecker.createAnalysisResultGlue(&cache);
     if (result) {
       vresult.setSatisfied(true);
       checker->addStatistics(vresult);
@@ -790,7 +791,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
     waters::ProductExplorer* checker =
       finalizer.createProductExplorer(translator, premarking, marking, cache);
     bool result = checker->runNonblockingCheck();
-    jni::VerificationResultGlue vresult(&cache);
+    jni::VerificationResultGlue vresult =
+      gchecker.createAnalysisResultGlue(&cache);
     if (result) {
       vresult.setSatisfied(true);
       checker->addStatistics(vresult);
@@ -817,12 +819,12 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
 
 
 JNIEXPORT void JNICALL
-Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyser_requestAbort
+Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_requestAbort
   (JNIEnv *env, jobject jchecker)
 {
   jni::ClassCache cache(env);
-  jni::NativeModelAnalyserGlue gchecker(jchecker, &cache);
-  jobject bbuffer = gchecker.getNativeModelAnalyser();
+  jni::NativeModelAnalyzerGlue gchecker(jchecker, &cache);
+  jobject bbuffer = gchecker.getNativeModelAnalyzer();
   if (bbuffer != 0) {
     waters::ProductExplorer* explorer =
       (waters::ProductExplorer*) env->GetDirectBufferAddress(bbuffer);

@@ -11,6 +11,7 @@ package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -24,7 +25,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  */
 
 public abstract class NativeModelVerifier
-  extends NativeModelAnalyser
+  extends NativeModelAnalyzer
   implements ModelVerifier
 {
 
@@ -48,9 +49,9 @@ public abstract class NativeModelVerifier
   //#########################################################################
   //# Overrides net.sourceforge.waters.model.analysis.AbstractModelVerifier
   @Override
-  protected VerificationResult createAnalysisResult()
+  public VerificationResult createAnalysisResult()
   {
-    return new VerificationResult();
+    return new DefaultVerificationResult();
   }
 
 

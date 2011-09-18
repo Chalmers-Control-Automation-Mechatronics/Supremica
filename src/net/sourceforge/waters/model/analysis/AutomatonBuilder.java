@@ -36,7 +36,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Robi Malik
  */
 
-public interface AutomatonBuilder<P extends Proxy> extends ModelAnalyser
+public interface AutomatonBuilder<P extends Proxy> extends ModelAnalyzer
 {
 
   //#########################################################################
@@ -92,7 +92,7 @@ public interface AutomatonBuilder<P extends Proxy> extends ModelAnalyser
    * computed by this algorithm.
    * @throws IllegalStateException if this method is called before
    *         model checking has completed, i.e., before {@link
-   *         ModelAnalyser#run() run()} has been called, or model checking
+   *         ModelAnalyzer#run() run()} has been called, or model checking
    *         has found that no proper result can be computed for the
    *         input model.
    */

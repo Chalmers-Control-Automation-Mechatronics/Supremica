@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 
 
 /**
@@ -29,8 +29,8 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
  * @author Rachel Francis
  */
 
-public class CompositionalGeneralisedConflictCheckerVerificationResult extends
-    VerificationResult
+public class CompositionalGeneralisedConflictCheckerVerificationResult
+  extends DefaultVerificationResult
 {
 
   //#########################################################################

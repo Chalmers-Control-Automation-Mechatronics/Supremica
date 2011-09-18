@@ -21,7 +21,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 /**
  * An abstract base class to facilitate the implementation of automaton
  * builders. In addition to the model and factory members inherited from
- * {@link AbstractModelAnalyser}, this class provides access to a automaton
+ * {@link AbstractModelAnalyzer}, this class provides access to a automaton
  * result member, and uses this to implement access to the computed
  * result.
  *
@@ -29,7 +29,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  */
 
 public abstract class AbstractAutomatonBuilder<P extends Proxy>
-  extends AbstractModelAnalyser
+  extends AbstractModelAnalyzer
   implements AutomatonBuilder<P>
 {
 

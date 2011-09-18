@@ -783,10 +783,12 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement location="${dist}/SupremicaTest.jar"/>
                 <pathelement path="${java.class.path}"/>
             </classpath>
+            <sysproperty key="supremica.test.inputdir" value="${basedir}/tests/testfiles"/>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
             <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
+            <jvmarg value="-enableassertions"/>
         </junit>
     </target>
     

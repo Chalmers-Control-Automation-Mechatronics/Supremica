@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
 /**
  * An abstract base class that can be used for all model verifier
  * implementations. In addition to the model and factory members inherited
- * from {@link AbstractModelAnalyser}, this class provides access to a
+ * from {@link AbstractModelAnalyzer}, this class provides access to a
  * verification result member, and uses this to implement access to the
  * Boolean result value and the counterexample.
  *
@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  */
 
 public abstract class AbstractModelVerifier
-  extends AbstractModelAnalyser
+  extends AbstractModelAnalyzer
   implements ModelVerifier
 {
 
@@ -67,6 +67,7 @@ public abstract class AbstractModelVerifier
     }
   }
 
+  @Override
   public VerificationResult getAnalysisResult()
   {
     return (VerificationResult) super.getAnalysisResult();
@@ -75,9 +76,10 @@ public abstract class AbstractModelVerifier
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  @Override
   protected VerificationResult createAnalysisResult()
   {
-    return new VerificationResult();
+    return new DefaultVerificationResult();
   }
 
 

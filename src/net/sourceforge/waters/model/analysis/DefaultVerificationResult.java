@@ -1,38 +1,36 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   CompositionalVerificationResult
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.model.analysis
+//# CLASS:   DefaultVerificationResult
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.abstraction;
+package net.sourceforge.waters.model.analysis;
 
-import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
- * A result record that can be returned by a compositional verification
- * algorithms such as {@link CompositionalConflictChecker}.
+ * The standard implementation of the {@link VerificationResult} interface.
+ * The default analysis provides read/write access to all the data provided
+ * by the interface.
  *
- * @author Rachel Francis, Robi Malik
+ * @author Robi Malik
  */
 
-public class CompositionalVerificationResult
-  extends CompositionalAnalysisResult
+public class DefaultVerificationResult
+  extends DefaultAnalysisResult
   implements VerificationResult
 {
-
 
   //#########################################################################
   //# Constructors
   /**
    * Creates a new verification result representing an incomplete run.
    */
-  public CompositionalVerificationResult()
+  public DefaultVerificationResult()
   {
   }
 
@@ -48,7 +46,7 @@ public class CompositionalVerificationResult
     }
   }
 
-
+  
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.VerificationResult
   public TraceProxy getCounterExample()

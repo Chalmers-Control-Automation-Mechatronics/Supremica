@@ -15,11 +15,14 @@ package net.sourceforge.waters.model.analysis;
  * This model verifier checks whether the spec components in its input
  * model is controllable with respect to the plant components in the input
  * model.
- * 
+ *
  * @author Robi Malik
  */
 
 public interface ControllabilityChecker extends SafetyVerifier
 {
+
+  // Not really necessary to redeclare, but removes Eclipse compiler error.
+  public VerificationResult getAnalysisResult();
 
 }

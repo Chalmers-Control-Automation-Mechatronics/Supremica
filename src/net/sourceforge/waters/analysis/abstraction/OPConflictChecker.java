@@ -1871,7 +1871,7 @@ public class OPConflictChecker
   private void recordStatistics(final VerificationResult result)
   {
     final CompositionalVerificationResult global = getAnalysisResult();
-    global.addMonolithicVerificationResult(result);
+    global.addMonolithicAnalysisResult(result);
   }
 
 
