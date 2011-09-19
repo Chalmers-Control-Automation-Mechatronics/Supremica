@@ -1034,7 +1034,7 @@ public class ListBufferTransitionRelation
           final int firstLocal, final int lastLocal)
   {
     if (mPredecessorBuffer != null) {
-      return new TauClosure(mPredecessorBuffer, limit, firstLocal, lastLocal);
+      return new TauClosure(mPredecessorBuffer, firstLocal, lastLocal, limit);
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }

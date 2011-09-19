@@ -22,7 +22,9 @@ import net.sourceforge.waters.model.base.ProxyTools;
  * A utility class to iterate over transitions in the tau-closure of
  * a transition relation. This class can be configured to compute the
  * tau closure on the fly for each iteration, or to compute it once and
- * use it for subsequent requests.
+ * use it for subsequent requests. By default, the tau-closure only
+ * operates using the default tau event {@link EventEncoding#TAU}, but
+ * it can be configured to use an arbitrary range of events.
  *
  * @author Robi Malik
  */
@@ -32,12 +34,13 @@ public class TauClosure
   //#########################################################################
   //# Constructor
   /**
-   * Computes the tau-closure for the given transition list buffer.
-   * All transitions in the tau closure are precomputed and stored by
+   * Computes the tau-closure over the standard tau
+   * ({@link EventEncoding#TAU}) transitions in the given transition list
+   * buffer. All transitions in the tau closure are precomputed and stored by
    * this constructor. The precomputed tau-closure does not update
    * automatically when the transition relation changes.
-   * @param  buffer   The transition list buffer containing the transitions
-   *                  for which tau-closure is computed.
+   * @param  buffer     The transition list buffer containing the transitions
+   *                    for which tau-closure is computed.
    */
   public TauClosure(final TransitionListBuffer buffer)
   {
@@ -45,45 +48,56 @@ public class TauClosure
   }
 
   /**
-   * Creates a tau-closure for the given transition list buffer,
-   * which may or may not be precomputed. If precomputed, the tau-closure
-   * does not update automatically when the transition relation changes.
-   * @param  buffer   The transition list buffer containing the transitions
-   *                  for which tau-closure is computed.
-   * @param  limit    The maximum number of transitions that can be stored
-   *                  in the tau-closure. If the number of computed
-   *                  tau-transitions exceeds the limit, precomputation is
-   *                  aborted and transitions will be produced on the fly by
-   *                  iterators. A limit of&nbsp;0 forces the tau closure
-   *                  always to be computed on the fly.
+   * Computes the tau-closure over the standard tau
+   * ({@link EventEncoding#TAU}) transitions in the given transition list
+   * buffer, which may or may not be precomputed. If precomputed, the
+   * tau-closure does not update automatically when the transition relation
+   * changes.
+   * @param  buffer     The transition list buffer containing the transitions
+   *                    for which tau-closure is computed.
+   * @param  limit      The maximum number of transitions that can be stored
+   *                    in the tau-closure. If the number of computed
+   *                    tau-transitions exceeds the limit, precomputation is
+   *                    aborted and transitions will be produced on the fly by
+   *                    iterators. A limit of&nbsp;0 forces the tau closure
+   *                    always to be computed on the fly.
    */
   public TauClosure(final TransitionListBuffer buffer, final int limit)
   {
-     this(buffer, limit, EventEncoding.TAU, EventEncoding.TAU);
+     this(buffer, EventEncoding.TAU, EventEncoding.TAU, limit);
   }
 
 /**
    * Creates a tau-closure for the given transition list buffer,
    * which may or may not be precomputed. If precomputed, the tau-closure
    * does not update automatically when the transition relation changes.
-   * @param  buffer   The transition list buffer containing the transitions
-   *                  for which tau-closure is computed.
-   * @param  limit    The maximum number of transitions that can be stored
-   *                  in the tau-closure. If the number of computed
-   *                  tau-transitions exceeds the limit, precomputation is
-   *                  aborted and transitions will be produced on the fly by
-   *                  iterators. A limit of&nbsp;0 forces the tau closure
-   *                  always to be computed on the fly.
+   * @param  buffer     The transition list buffer containing the transitions
+   *                    for which tau-closure is computed.
+   * @param  firstLocal The code of the first event considered as local
+   *                    (i.e., tau) by this tau-closure.
+   * @param  lastLocal  The code of the last event considered as local
+   *                    (i.e., tau) by this tau-closure.
+   * @param  limit      The maximum number of transitions that can be stored
+   *                    in the tau-closure. If the number of computed
+   *                    tau-transitions exceeds the limit, precomputation is
+   *                    aborted and transitions will be produced on the fly by
+   *                    iterators. A limit of&nbsp;0 forces the tau closure
+   *                    always to be computed on the fly.
    */
-  public TauClosure(final TransitionListBuffer buffer, int limit,
-                    final int firstLocal, final int lastLocal)
+  public TauClosure(final TransitionListBuffer buffer,
+                    final int firstLocal,
+                    final int lastLocal,
+                    int limit)
   {
     mTransitionBuffer = buffer;
+    mFirstLocal = firstLocal;
+    mLastLocal = lastLocal;
     if (limit > 0) {
       final int numStates = mTransitionBuffer.getNumberOfStates();
       final int[][] trans = new int[numStates][];
       final TransitionIterator iter =
-        new OnTheFlyTauClosureIterator(mTransitionBuffer, firstLocal, lastLocal);
+        new OnTheFlyTauClosureIterator(mTransitionBuffer,
+                                       firstLocal, lastLocal);
       final TIntArrayList list = new TIntArrayList();
       for (int state = 0; state < numStates; state++) {
         iter.resetState(state);
@@ -124,7 +138,8 @@ public class TauClosure
   public TransitionIterator createIterator()
   {
     if (mStoredTransitions == null) {
-      return new OnTheFlyTauClosureIterator(mTransitionBuffer);
+      return new OnTheFlyTauClosureIterator(mTransitionBuffer,
+                                            mFirstLocal, mLastLocal);
     } else {
       return new StoredTauClosureIterator();
     }
@@ -142,7 +157,8 @@ public class TauClosure
   public TransitionIterator createIterator(final int from)
   {
     if (mStoredTransitions == null) {
-      return new OnTheFlyTauClosureIterator(mTransitionBuffer, from);
+      return new OnTheFlyTauClosureIterator(mTransitionBuffer, from,
+                                            mFirstLocal, mLastLocal);
     } else {
       return new StoredTauClosureIterator(from);
     }
@@ -384,23 +400,6 @@ public class TauClosure
 
     //#######################################################################
     //# Constructor
-    private OnTheFlyTauClosureIterator(final TransitionListBuffer buffer)
-    {
-      this(buffer, -1);
-    }
-
-    private OnTheFlyTauClosureIterator(final TransitionListBuffer buffer,
-                                       final int from)
-    {
-      super(from);
-      mTransitionBuffer = buffer;
-      mStack = new TIntStack();
-      mInner = mTransitionBuffer.createReadOnlyIterator();
-      mInner.resetEvent(EventEncoding.TAU);
-      mVisited = new TIntHashSet();
-      mCurrentState = -1;
-    }
-
     private OnTheFlyTauClosureIterator(final TransitionListBuffer buffer,
                                        final int firstLocal,
                                        final int lastLocal)
@@ -409,7 +408,8 @@ public class TauClosure
     }
 
     private OnTheFlyTauClosureIterator(final TransitionListBuffer buffer,
-                                       final int from, final int firstLocal,
+                                       final int from,
+                                       final int firstLocal,
                                        final int lastLocal)
     {
       super(from);
@@ -949,6 +949,16 @@ public class TauClosure
    * The transition list buffer this tau-closure refers to.
    */
   private final TransitionListBuffer mTransitionBuffer;
+  /**
+   * The code of the first event to be considered as local (i.e., tau) by this
+   * closure.
+   */
+  private int mFirstLocal;
+  /**
+   * The code of the last event to be considered as local (i.e., tau) by this
+   * closure.
+   */
+  private int mLastLocal;
   /**
    * Arrays of stored tau-successors for each state.
    * The state itself is never explicitly stored, although it is returned
