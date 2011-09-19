@@ -16,11 +16,13 @@ import gnu.trove.TLongObjectIterator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -350,15 +352,28 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       }
     }
     final int numStates = rel.getNumberOfStates();
+    mHasUncontrollable = new boolean[numStates];
+    final TransitionIterator itr = rel.createAllTransitionsReadOnlyIterator();
+    itr.resetEvents(EventEncoding.NONTAU, mLastUncontrollableLocalEvent);
+    while(itr.advance()){
+      final int source = itr.getCurrentSourceState();
+      mHasUncontrollable[source] = true;
+    }
+    itr.resetEvents(mLastControllableLocalEvent+1,
+                    mLastUncontrollableSharedEvent);
+    while(itr.advance()){
+      final int source = itr.getCurrentSourceState();
+      mHasUncontrollable[source] = true;
+    }
     mTempClass = new TIntArrayList(numStates);
   }
 
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-    for (Splitter splitter = mSplitters.poll(); splitter != null
-                                                && mNumClasses < mNumReachableStates; splitter =
-      mSplitters.poll()) {
+    for (Splitter splitter = mSplitters.poll();
+         splitter != null && mNumClasses < mNumReachableStates;
+         splitter = mSplitters.poll()) {
       splitter.splitOn();
     }
     buildResultPartition();
@@ -377,6 +392,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     mPredecessors = null;
     mSplitters = null;
     mTempClass = null;
+    mHasUncontrollable = null;
   }
 
   /**
@@ -434,6 +450,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       mAllEventsTauClosure =
         rel.createPredecessorsTauClosure(limit, EventEncoding.NONTAU,
                                          mLastControllableLocalEvent);
+      mPredecessorIterator = rel.createPredecessorsReadOnlyIterator();
       mUncontrollableTauIterator =
         new OneEventCachingTransitionIterator
           (mUncontrollableTauClosure.createIterator(), EventEncoding.TAU);
@@ -456,15 +473,9 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
           final EquivalenceClass sec = mStateToClass[state];
-          if (sec == null) {
-            final int[] clazz = new int[1];
-            clazz[0] = state;
+          final int[] clazz = sec.putResult(state);
+          if (clazz != null) {
             partition.add(clazz);
-          } else {
-            final int[] clazz = sec.putResult(state);
-            if (clazz != null) {
-              partition.add(clazz);
-            }
           }
         }
       }
@@ -479,23 +490,13 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
   @Override
   public String toString()
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
     final StringWriter writer = new StringWriter();
     final PrintWriter printer = new PrintWriter(writer);
     final Collection<EquivalenceClass> printed =
       new THashSet<EquivalenceClass>(mNumClasses);
     for (int s = 0; s < mStateToClass.length; s++) {
       final EquivalenceClass clazz = mStateToClass[s];
-      if (clazz == null) {
-        if (rel.isReachable(s)) {
-          if (s > 0) {
-            printer.println();
-          }
-          printer.print('[');
-          printer.print(s);
-          printer.print(']');
-        }
-      } else if (printed.add(clazz)) {
+      if (printed.add(clazz)) {
         if (s > 0) {
           printer.println();
         }
@@ -537,6 +538,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       mList = mClassLists.createList();
       mOverflowList = IntListBuffer.NULL;
       mOverflowSize = -1;
+      mSmallestState = Integer.MAX_VALUE;
       mNumClasses++;
       mIsOpenSplitter = false;
     }
@@ -550,6 +552,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       mOverflowSize = preds ? 0 : -1;
       mNumClasses++;
       mIsOpenSplitter = false;
+      setUpSmallestState();
     }
 
     private EquivalenceClass(final int[] states)
@@ -559,6 +562,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       mOverflowList = IntListBuffer.NULL;
       mOverflowSize = -1;
       mNumClasses++;
+      setUpSmallestState();
     }
 
     //#######################################################################
@@ -578,26 +582,26 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     {
       mClassLists.append(mList, state);
       mSize++;
+      if(state < mSmallestState){
+        mSmallestState = state;
+      }
     }
 
     void setUpStateToClass()
     {
-      if (mSize == 1) {
-        reset(mClassReadIterator);
-        mClassReadIterator.advance();
+      reset(mClassReadIterator);
+      while (mClassReadIterator.advance()) {
         final int state = mClassReadIterator.getCurrentData();
-        mStateToClass[state] = null;
-      } else {
-        reset(mClassReadIterator);
-        while (mClassReadIterator.advance()) {
-          final int state = mClassReadIterator.getCurrentData();
-          mStateToClass[state] = this;
-        }
+        mStateToClass[state] = this;
       }
     }
 
     //#######################################################################
     //# Simple Access
+    int getSmallestState(){
+      return mSmallestState;
+    }
+
     int getList()
     {
       return mList;
@@ -645,7 +649,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
         while (transIter.advance()) {
           final int pred = transIter.getCurrentSourceState();
           final EquivalenceClass splitClass = mStateToClass[pred];
-          if (splitClass != null) {
+          if (splitClass.getSize() > 1) {
             splitClass.moveToOverflowList(pred);
             splitClasses.add(splitClass);
           }
@@ -661,6 +665,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       mIsOpenSplitter = false;
       collect(mTempClass);
+      // Uncontrollable shared events
       for (int event = mLastControllableLocalEvent + 1;
            event < mLastUncontrollableSharedEvent;
            event++) {
@@ -670,6 +675,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
           splitOn(transIter);
         }
       }
+      // TODO Controllable shared events
       for (int event = mLastUncontrollableSharedEvent + 1;
            event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
@@ -678,10 +684,42 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
           splitOn(transIter);
         }
       }
+      // Uncontrollable local events
       final TransitionIterator transIter = mUncontrollableTauIterator;
       transIter.reset();
       splitOn(transIter);
       mTempClass.clear();
+    }
+
+    @SuppressWarnings("unused")
+    private void explore(final int endState, final int event)
+    {
+      final EquivalenceClass endClass = mStateToClass[endState];
+      final SearchRecord initial =
+        new SearchRecord(endState, null, event <= mLastControllableLocalEvent);
+      final Set <SearchRecord> visited = new THashSet<SearchRecord>();
+      final Queue<SearchRecord> opened = new ArrayDeque<SearchRecord>();
+      visited.add(initial);
+      opened.add(initial);
+      while(!opened.isEmpty()){
+        final SearchRecord record = opened.remove();
+        mPredecessorIterator.resetState(record.getState());
+        if(record.getHasEvent()){
+
+        } else {
+          mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
+                                           mLastControllableLocalEvent);
+          while(mPredecessorIterator.advance()){
+            final int source = mPredecessorIterator.getCurrentSourceState();
+            if(mHasUncontrollable [source]){
+              final EquivalenceClass sourceClass = mStateToClass[source];
+              if(sourceClass == endClass){
+                // nothing
+              }
+            }
+          }
+        }
+      }
     }
 
     public void enqueue()
@@ -709,9 +747,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
         overflowClass = new EquivalenceClass(list, newSize, preds);
         setList(overflowList, overflowSize);
       }
-      if (getSize() == 1) {
-        setUpStateToClass();
-      }
+      setUpSmallestState();
       overflowClass.setUpStateToClass();
       overflowClass.enqueue();
       enqueue();
@@ -779,12 +815,27 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     private void setUpPredecessors()
     {
       int pred = IntListBuffer.NULL;
-      for (int list = mClassLists.getHead(mList); list != IntListBuffer.NULL; list =
-        mClassLists.getNext(list)) {
+      for (int list = mClassLists.getHead(mList);
+           list != IntListBuffer.NULL;
+           list = mClassLists.getNext(list)) {
         final int state = mClassLists.getData(list);
         mPredecessors[state] = pred;
         pred = list;
       }
+    }
+
+    private void setUpSmallestState()
+    {
+      int smallest = Integer.MAX_VALUE;
+      for (int list = mClassLists.getHead(mList);
+           list != IntListBuffer.NULL;
+           list = mClassLists.getNext(list)) {
+        final int state = mClassLists.getData(list);
+        if(state < smallest){
+          smallest = state;
+        }
+      }
+      mSmallestState = smallest;
     }
 
     //#######################################################################
@@ -809,9 +860,91 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     private int mList;
     private int mOverflowList;
     private int mOverflowSize;
+    private int mSmallestState;
     private int[] mArray;
     private boolean mIsOpenSplitter;
   }
+
+
+  //#########################################################################
+  //# Inner Class SearchRecord
+  private class SearchRecord
+  {
+
+    //#######################################################################
+    //# Constructors
+    private SearchRecord(final int state,
+                         final EquivalenceClass startingClass,
+                         final boolean hasEvent)
+    {
+      mState = state;
+      mStartingClass = startingClass;
+      mHasEvent = hasEvent;
+    }
+
+    //#######################################################################
+    //# simple Access
+    private int getState()
+    {
+      return mState;
+    }
+
+    @SuppressWarnings("unused")
+    private EquivalenceClass getStartingClass()
+    {
+      return mStartingClass;
+    }
+
+    private boolean getHasEvent()
+    {
+      return mHasEvent;
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public int hashCode()
+    {
+      int result = mState * 31;
+      if (mStartingClass != null) {
+        result = result + mStartingClass.getSmallestState();
+      }
+      if (mHasEvent){
+        result = result + 0xabababab;
+      }
+      return result;
+    }
+
+    @Override
+    public boolean equals(final Object other)
+    {
+      if (other != null && other.getClass() == getClass()) {
+        final SearchRecord record = (SearchRecord) other;
+        if (record.mState == mState
+            && record.mStartingClass == mStartingClass
+            && record.mHasEvent == mHasEvent) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public String toString()
+    {
+      return "{" + mState + "," + mStartingClass + "," + mHasEvent + "}";
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mState;
+    private final EquivalenceClass mStartingClass;
+    private final boolean mHasEvent;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -829,10 +962,12 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
 
   private TauClosure mUncontrollableTauClosure;
   private TauClosure mAllEventsTauClosure;
+  private TransitionIterator mPredecessorIterator;
   private TransitionIterator mUncontrollableTauIterator;
   private TransitionIterator mAllTauIterator;
   private TransitionIterator mUncontrollableEventIterator;
   private TransitionIterator mControllableEventIterator;
+  private boolean [] mHasUncontrollable;
   private IntListBuffer mClassLists;
   private IntListBuffer.ReadOnlyIterator mClassReadIterator;
   private IntListBuffer.ModifyingIterator mClassWriteIterator;
