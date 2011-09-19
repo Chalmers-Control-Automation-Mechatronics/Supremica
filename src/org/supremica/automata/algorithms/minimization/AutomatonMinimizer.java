@@ -314,10 +314,11 @@ public class AutomatonMinimizer
             if (BisimulationEquivalenceMinimizer.libraryLoaded())
             {
                 // Partition using native methods
-                BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames,true);
+                BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames,false);
 
             }
 //            // Applying synthesis abstraction
+
 
             EquivalenceClasses equivClasses = new EquivalenceClasses();
 
@@ -361,12 +362,7 @@ public class AutomatonMinimizer
 
                 }
 
-                // Build the minimized automaton based on the partitioning in equivClasses
-    //            theAutomaton = buildAutomaton(equivClasses);
-    //            halfWaySynthesis(theAutomaton);
-    //
-    //                removeUnusedEpsilonEvents(theAutomaton);
-//
+                     removeUnusedEpsilonEvents(theAutomaton);
 
 
             if(!AutomataSynthesizer.renameBack()){
