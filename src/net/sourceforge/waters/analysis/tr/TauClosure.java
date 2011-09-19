@@ -57,7 +57,7 @@ public class TauClosure
    *                  iterators. A limit of&nbsp;0 forces the tau closure
    *                  always to be computed on the fly.
    */
-  public TauClosure(final TransitionListBuffer buffer, int limit)
+  public TauClosure(final TransitionListBuffer buffer, final int limit)
   {
      this(buffer, limit, EventEncoding.TAU, EventEncoding.TAU);
   }
@@ -602,9 +602,13 @@ public class TauClosure
 
     public void resetEvent(final int event)
     {
-      mTauIterator.resetState(mFromState);
-      mTauIterator.advance();
-      mEventIterator.reset(mFromState, event);
+      if (mFromState >= 0) {
+        mTauIterator.resetState(mFromState);
+        mTauIterator.advance();
+        mEventIterator.reset(mFromState, event);
+      } else {
+        mEventIterator.resetEvent(event);
+      }
     }
 
     public void resetEvents(final int first, final int last)

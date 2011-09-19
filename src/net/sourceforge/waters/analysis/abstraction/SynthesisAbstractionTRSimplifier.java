@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   ObservationEquivalenceTRSimplifier
+//# CLASS:   SynthesisAbstractionTRSimplifier
 //###########################################################################
-//# $Id: ObservationEquivalenceTRSimplifier.java 6451 2011-09-04 07:13:54Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.abstraction;
@@ -35,32 +35,27 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 
 
 /**
- * <P>
- * A bisimulation and observation equivalence partitioning algorithm.
- * </P>
+ * <P>The synthesis abstraction algorithm.</P>
  *
  * <P>
- * This transition relation simplifier can simplify a given deterministic or
- * nondeterministic automaton according to common equivalences such as
- * bisimulation and observation equivalence. The implementation is based on
- * the bisimulation algorithm by Jean-Claude Fernandez. When computing
- * observation equivalence, it can additionally be configured to remove
- * redundant transitions before and after partitioning.
+ * This transition relation simplifier can simplify a given deterministic (or
+ * nondeterministic) automaton according synthesis equivalence. The algorithm
+ * is based on the partitioning algorithms for bisimulation by Jean-Claude
+ * Fernandez, modified for synthesis abstraction.
  * </P>
  *
  * <P>
  * <I>References.</I><BR>
+ * Sahar Mohajerani, Robi Malik, Simon Ware, Martin Fabian.
+ * On the Use of Observation Equivalence in Synthesis Abstraction.
+ * Proc. 3rd IFAC Workshop on Dependable Control of Discrete Systems,
+ * DCDS&nbsp;2011, Saarbr&uuml;cken, Germany, 2011.<BR>
  * Jean-Claude Fernandez. An Implementation of an Efficient Algorithm for
  * Bisimulation Equivalence. Science of Computer Programming,
  * <STRONG>13</STRONG>, 219-236, 1990.<BR>
- * J. E. Hopcroft. An <I>n</I>&nbsp;log&nbsp;<I>n</I> Algorithm for Minimizing
- * States in a Finite Automaton. In: Z. Kohavi and A. Paz, eds., Theory of
- * Machines and Computations, Academic Press, New York, 397-419, 1971.<BR>
- * Jaana Eloranta. Minimizing the Number of Transitions with Respect to
- * Observation Equivalence. BIT, <STRONG>31</STRONG>(4), 397-419, 1991.
  * </P>
  *
- * @author Robi Malik, Simon Ware, Rachel Francis
+ * @author Sahar Mohajerani, Robi Malik
  */
 
 public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
@@ -78,7 +73,8 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
   /**
    * Creates a new bisimulation simplifier for the given transition relation.
    */
-  public SynthesisAbstractionTRSimplifier(final ListBufferTransitionRelation rel)
+  public SynthesisAbstractionTRSimplifier
+    (final ListBufferTransitionRelation rel)
   {
     if (rel != null) {
       setTransitionRelation(rel);
@@ -143,44 +139,21 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
    * uncontrollable local events appear before controllable local events. The
    * tau event code ({@link EventEncoding#TAU} is not used. Therefore, the
    * range of uncontrollable local events is from {@link EventEncoding#NONTAU}
-   * to {@link #getLastUncontrollableLocalEvent()} inclusive.
+   * to {@link #getLastLocalUncontrollableEvent()} inclusive.
    */
-  public void setLastUncontrollableLocalEvent(final int event)
+  public void setLastLocalUncontrollableEvent(final int event)
   {
-    mLastUncontrollableLocalEvent = event;
+    mLastLocalUncontrollableEvent = event;
   }
 
   /**
    * Gets the code of the last local uncontrollable event.
    *
-   * @see #getLastUncontrollableLocalEvent()
+   * @see #setLastLocalUncontrollableEvent(int) setLastLocalUncontrollableEvent()
    */
-  public int getLastUncontrollableLocalEvent()
+  public int getLastLocalUncontrollableEvent()
   {
-    return mLastUncontrollableLocalEvent;
-  }
-
-  /**
-   * Sets the code of the last shared uncontrollable event. Events are encoded
-   * such that all local events appear before all shared events, and all
-   * uncontrollable local events appear before controllable events.
-   * Therefore, the range of uncontrollable shared events is from
-   * {@link #getLastControllableLocalEvent()}+1 to
-   * {@link #getLastUncontrollableSharedEvent()} inclusive.
-   */
-  public void setLastUncontrollableSharedEvent(final int event)
-  {
-    mLastUncontrollableSharedEvent = event;
-  }
-
-  /**
-   * Gets the code of the last shared uncontrollable event.
-   *
-   * @see #getLastUncontrollableSharedEvent()
-   */
-  public int getLastUncontrollableSharedEvent()
-  {
-    return mLastUncontrollableSharedEvent;
+    return mLastLocalUncontrollableEvent;
   }
 
   /**
@@ -188,23 +161,47 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
    * such that all local events appear before all shared events, and all
    * uncontrollable local events appear before controllable local events.
    * Therefore, the range of controllable local events is from
-   * {@link #getLastUncontrollableLocalEvent()}+1 to
-   * {@link #getLastControllableLocalEvent()} inclusive.
+   * {@link #getLastLocalUncontrollableEvent()}+1 to
+   * {@link #getLastLocalControllableEvent()} inclusive.
    */
-  public void setLastControllableLocalEvent(final int event)
+  public void setLastLocalControllableEvent(final int event)
   {
-    mLastControllableLocalEvent = event;
+    mLastLocalControllableEvent = event;
   }
 
   /**
    * Gets the code of the last local controllable event.
    *
-   * @see #getLastControllableLocalEvent()
+   * @see #setLastLocalControllableEvent(int) setLastLocalControllableEvent()
    */
-  public int getLastControllableLocalEvent()
+  public int getLastLocalControllableEvent()
   {
-    return mLastControllableLocalEvent;
+    return mLastLocalControllableEvent;
   }
+
+  /**
+   * Sets the code of the last shared uncontrollable event. Events are encoded
+   * such that all local events appear before all shared events, and all
+   * uncontrollable local events appear before controllable events.
+   * Therefore, the range of uncontrollable shared events is from
+   * {@link #getLastLocalControllableEvent()}+1 to
+   * {@link #getLastSharedUncontrollableEvent()} inclusive.
+   */
+  public void setLastSharedUncontrollableEvent(final int event)
+  {
+    mLastSharedUncontrollableEvent = event;
+  }
+
+  /**
+   * Gets the code of the last shared uncontrollable event.
+   *
+   * @see #setLastSharedUncontrollableEvent(int) setLastSharedUncontrollableEvent()
+   */
+  public int getLastSharedUncontrollableEvent()
+  {
+    return mLastSharedUncontrollableEvent;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.
@@ -242,11 +239,13 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     super.reset();
     mUncontrollableTauClosure = null;
     mAllEventsTauClosure = null;
+    mPredecessorIterator = null;
     mUncontrollableTauIterator = null;
     mAllTauIterator = null;
     mUncontrollableEventIterator = null;
     mControllableEventIterator = null;
   }
+
 
   //#########################################################################
   //# Initial Partition
@@ -328,6 +327,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     }
   }
 
+
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
@@ -336,31 +336,22 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     super.setUp();
     if (mSplitters == null) {
       mHasModifications = false;
-
       final boolean modified = mHasModifications;
       setUpInitialPartitionBasedOnMarkings();
       mHasModifications |= modified;
     }
     setUpTauClosure();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (mInitialInfoSize >= 0) {
-      final int numTrans = rel.getNumberOfTransitions();
-      if (mNumReachableStates > 0) {
-        mInitialInfoSize = numTrans / mNumReachableStates;
-      } else {
-        mInitialInfoSize = 0;
-      }
-    }
     final int numStates = rel.getNumberOfStates();
     mHasUncontrollable = new boolean[numStates];
     final TransitionIterator itr = rel.createAllTransitionsReadOnlyIterator();
-    itr.resetEvents(EventEncoding.NONTAU, mLastUncontrollableLocalEvent);
+    itr.resetEvents(EventEncoding.NONTAU, mLastLocalUncontrollableEvent);
     while(itr.advance()){
       final int source = itr.getCurrentSourceState();
       mHasUncontrollable[source] = true;
     }
-    itr.resetEvents(mLastControllableLocalEvent+1,
-                    mLastUncontrollableSharedEvent);
+    itr.resetEvents(mLastLocalControllableEvent+1,
+                    mLastSharedUncontrollableEvent);
     while(itr.advance()){
       final int source = itr.getCurrentSourceState();
       mHasUncontrollable[source] = true;
@@ -424,6 +415,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     }
   }
 
+
   //#########################################################################
   //# Algorithm
   private void setUpPartition(final int numSplitters)
@@ -446,10 +438,10 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       final int limit = getTransitionLimit();
       mUncontrollableTauClosure =
         rel.createPredecessorsTauClosure(limit, EventEncoding.NONTAU,
-                                         mLastUncontrollableLocalEvent);
+                                         mLastLocalUncontrollableEvent);
       mAllEventsTauClosure =
         rel.createPredecessorsTauClosure(limit, EventEncoding.NONTAU,
-                                         mLastControllableLocalEvent);
+                                         mLastLocalControllableEvent);
       mPredecessorIterator = rel.createPredecessorsReadOnlyIterator();
       mUncontrollableTauIterator =
         new OneEventCachingTransitionIterator
@@ -484,6 +476,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       setResultPartitionList(null);
     }
   }
+
 
   //#########################################################################
   //# Debugging
@@ -666,8 +659,8 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       mIsOpenSplitter = false;
       collect(mTempClass);
       // Uncontrollable shared events
-      for (int event = mLastControllableLocalEvent + 1;
-           event < mLastUncontrollableSharedEvent;
+      for (int event = mLastLocalControllableEvent + 1;
+           event < mLastSharedUncontrollableEvent;
            event++) {
         if (rel.isUsedEvent(event)) {
           final TransitionIterator transIter = mUncontrollableEventIterator;
@@ -676,7 +669,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
         }
       }
       // TODO Controllable shared events
-      for (int event = mLastUncontrollableSharedEvent + 1;
+      for (int event = mLastSharedUncontrollableEvent + 1;
            event < mNumEvents; event++) {
         if (rel.isUsedEvent(event)) {
           final TransitionIterator transIter = mControllableEventIterator;
@@ -696,7 +689,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     {
       final EquivalenceClass endClass = mStateToClass[endState];
       final SearchRecord initial =
-        new SearchRecord(endState, null, event <= mLastControllableLocalEvent);
+        new SearchRecord(endState, null, event <= mLastLocalControllableEvent);
       final Set <SearchRecord> visited = new THashSet<SearchRecord>();
       final Queue<SearchRecord> opened = new ArrayDeque<SearchRecord>();
       visited.add(initial);
@@ -704,16 +697,16 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       while(!opened.isEmpty()){
         final SearchRecord record = opened.remove();
         mPredecessorIterator.resetState(record.getState());
-        if(record.getHasEvent()){
-
+        if (record.getHasEvent()) {
+          // TODO
         } else {
           mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
-                                           mLastControllableLocalEvent);
-          while(mPredecessorIterator.advance()){
+                                           mLastLocalControllableEvent);
+          while (mPredecessorIterator.advance()) {
             final int source = mPredecessorIterator.getCurrentSourceState();
-            if(mHasUncontrollable [source]){
+            if (mHasUncontrollable[source]) {
               final EquivalenceClass sourceClass = mStateToClass[source];
-              if(sourceClass == endClass){
+              if (sourceClass == endClass) {
                 // nothing
               }
             }
@@ -909,7 +902,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       if (mStartingClass != null) {
         result = result + mStartingClass.getSmallestState();
       }
-      if (mHasEvent){
+      if (mHasEvent) {
         result = result + 0xabababab;
       }
       return result;
@@ -950,10 +943,9 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
   //# Data Members
   private long mPropositionMask = ~0;
   private int mTransitionLimit = Integer.MAX_VALUE;
-  private int mInitialInfoSize = -1;
-  private int mLastUncontrollableLocalEvent;
-  private int mLastControllableLocalEvent;
-  private int mLastUncontrollableSharedEvent;
+  private int mLastLocalUncontrollableEvent;
+  private int mLastLocalControllableEvent;
+  private int mLastSharedUncontrollableEvent;
 
   private int mNumReachableStates;
   private int mNumEvents;
@@ -967,7 +959,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
   private TransitionIterator mAllTauIterator;
   private TransitionIterator mUncontrollableEventIterator;
   private TransitionIterator mControllableEventIterator;
-  private boolean [] mHasUncontrollable;
+  private boolean[] mHasUncontrollable;
   private IntListBuffer mClassLists;
   private IntListBuffer.ReadOnlyIterator mClassReadIterator;
   private IntListBuffer.ModifyingIterator mClassWriteIterator;

@@ -376,11 +376,11 @@ public abstract class CompositionalSynthesizer
         localControllableEvents.size() + lastUncontrollableLocalEvent;
       final int lastUncontrollableSharedEvent =
         local.size() + sharedUncontrollableEvents.size();
-      mSynthesisAbstraction.setLastControllableLocalEvent
+      mSynthesisAbstraction.setLastLocalControllableEvent
         (lastControllableLocalEvent);
-      mSynthesisAbstraction.setLastUncontrollableLocalEvent
+      mSynthesisAbstraction.setLastLocalUncontrollableEvent
         (lastUncontrollableLocalEvent);
-      mSynthesisAbstraction.setLastUncontrollableSharedEvent
+      mSynthesisAbstraction.setLastSharedUncontrollableEvent
         (lastUncontrollableSharedEvent);
       encodedEvents.addAll(localUncontrollableEvents);
       encodedEvents.addAll(localControllableEvents);
