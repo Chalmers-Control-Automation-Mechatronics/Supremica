@@ -179,7 +179,12 @@ public class TauClosure
    */
   public TransitionIterator createPreEventClosureIterator()
   {
-    final TransitionIterator inner = new PreEventClosureTransitionIterator();
+    final TransitionIterator inner;
+    if (mTransitionBuffer instanceof OutgoingTransitionListBuffer) {
+      inner = new PreEventClosureTransitionIterator();
+    } else {
+      inner = new PostEventClosureTransitionIterator();
+    }
     return new CachingTransitionIterator(mTransitionBuffer, inner);
   }
 
@@ -206,8 +211,12 @@ public class TauClosure
     if (event == EventEncoding.TAU) {
       return createIterator();
     } else {
-      final TransitionIterator inner =
-        new PreEventClosureTransitionIterator(event);
+      final TransitionIterator inner;
+      if (mTransitionBuffer instanceof OutgoingTransitionListBuffer) {
+        inner = new PreEventClosureTransitionIterator(event);
+      } else {
+        inner = new PostEventClosureTransitionIterator(event);
+      }
       return new OneEventCachingTransitionIterator(inner, event);
     }
   }
@@ -226,7 +235,12 @@ public class TauClosure
    */
   public TransitionIterator createPostEventClosureIterator()
   {
-    final TransitionIterator inner = new PostEventClosureTransitionIterator();
+    final TransitionIterator inner;
+    if (mTransitionBuffer instanceof OutgoingTransitionListBuffer) {
+      inner = new PostEventClosureTransitionIterator();
+    } else {
+      inner = new PreEventClosureTransitionIterator();
+    }
     return new CachingTransitionIterator(mTransitionBuffer, inner);
   }
 
@@ -253,8 +267,12 @@ public class TauClosure
     if (event == EventEncoding.TAU) {
       return createIterator();
     } else {
-      final TransitionIterator inner =
-        new PostEventClosureTransitionIterator(event);
+      final TransitionIterator inner;
+      if (mTransitionBuffer instanceof OutgoingTransitionListBuffer) {
+        inner = new PostEventClosureTransitionIterator(event);
+      } else {
+        inner = new PreEventClosureTransitionIterator(event);
+      }
       return new OneEventCachingTransitionIterator(inner, event);
     }
   }

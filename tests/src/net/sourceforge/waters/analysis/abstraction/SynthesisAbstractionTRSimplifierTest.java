@@ -172,6 +172,33 @@ public class SynthesisAbstractionTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_synthesisAbstraction_6()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_6.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_7()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_7.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_8()
+    throws Exception
+    {
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "synthesisAbstraction_8.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
@@ -186,7 +213,7 @@ public class SynthesisAbstractionTRSimplifierTest
     test_synthesisAbstraction_3();
     test_synthesisAbstraction_4();
     test_synthesisAbstraction_5();
-    // test_synthesisAbstraction_6();
+    test_synthesisAbstraction_6();
     test_synthesisAbstraction_5();
     test_synthesisAbstraction_4();
     test_synthesisAbstraction_3();
