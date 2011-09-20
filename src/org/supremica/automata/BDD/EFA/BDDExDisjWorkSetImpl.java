@@ -13,6 +13,7 @@ import java.util.Arrays;
  * @author zhennan
  * @version  1.0
  */
+
 public class BDDExDisjWorkSetImpl extends BDDExDisjAbstractWorkSet {
 
     public BDDExDisjWorkSetImpl(BDDExDisjDepSets depSets, int size) {

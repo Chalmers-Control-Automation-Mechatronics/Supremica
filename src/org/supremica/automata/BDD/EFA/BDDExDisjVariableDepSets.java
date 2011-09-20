@@ -286,14 +286,4 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
 //        return currentReachableStatesBDD;
 //    }
 
-    @Override
-    protected TIntObjectHashMap<BDD> getComponentToComponentOnlyTransMap() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    protected TIntObjectHashMap<BDD> getComponentToComponentActionMap() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
 }

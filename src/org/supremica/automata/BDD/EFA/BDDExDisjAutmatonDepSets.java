@@ -180,17 +180,7 @@ public class BDDExDisjAutmatonDepSets extends BDDExDisjDepSetsDecorator {
     protected BDD getUncontrollableTransitionRelationBDD() {
         return eventParDepSets.getUncontrollableTransitionRelationBDD();
     }
-
-    @Override
-    protected TIntObjectHashMap<BDD> getComponentToComponentOnlyTransMap() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    protected TIntObjectHashMap<BDD> getComponentToComponentActionMap() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    
     /* For each automaton, initiate an instance of AutomatonDisjParDepSet. */
     class AutomatonDisjParDepSet {
 

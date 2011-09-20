@@ -24,7 +24,7 @@ public abstract class BDDExDisjAbstractWorkSet {
     protected int size;
     
     /** 
-     * If workset [i] == true, it means that the component of which the index is equal to i is in the work set. 
+     * If work set [i] == true, it means that the component of which the index is equal to i is in the work set. 
      * Otherwise, it isn't.
      */
     protected boolean[] workset;

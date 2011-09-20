@@ -32,7 +32,7 @@ public class ReinforcementLearningPlusTabuSearch {
         return rl;
     }
 
-    // This method must be called to set up some fields after the call of getInstance()
+    /* This method must be called to set up some fields after the call of getInstance() */
     public void setSize(final int size) {
         max_activity = size;
         punish_inactive = true;

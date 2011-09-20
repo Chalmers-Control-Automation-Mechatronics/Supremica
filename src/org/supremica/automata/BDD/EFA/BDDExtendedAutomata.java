@@ -7,7 +7,6 @@ package org.supremica.automata.BDD.EFA;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TObjectIntHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -36,7 +35,6 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomataIndexMap;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDAutomata;
-import org.supremica.automata.BDD.EFA.EventDisParDepSets.EventDisParDepSet;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
@@ -139,19 +137,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
     List<ExtendedAutomaton> plants;
     List<ExtendedAutomaton> specs;
-
-    TIntObjectHashMap<BDDExDisjunctiveDependentSet> autIndex2DependentSet;
-
-    TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> event2AutomatonsEdges;
-    TIntObjectHashMap<EventDisParDepSet> events2EventDisParDepSet;
-
-    Map<BDD, Integer> eventBDD2eventIndices;
-
-    TObjectIntHashMap<ExtendedAutomaton>automaton2nbrEdges;
-    TObjectIntHashMap<ExtendedAutomaton> automaton2nbrGuards;
-
+    
     TIntArrayList plantUncontrollableEventIndexList;
     TIntArrayList specUncontrollableEventIndexList;
+    
+    TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> event2AutomatonsEdges;
 
     String pathRoot = "C:/Users/sajed/Desktop/MDD_files/";
 
@@ -212,9 +202,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         unionAlphabet = orgExAutomata.getUnionAlphabet();
         if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
             event2AutomatonsEdges = new TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>>(unionAlphabet.size());
-            automaton2nbrEdges = new  TObjectIntHashMap<ExtendedAutomaton>(orgExAutomata.size());
-            automaton2nbrGuards = new TObjectIntHashMap<ExtendedAutomaton>(orgExAutomata.size());
-            eventBDD2eventIndices = new HashMap<BDD, Integer>(unionAlphabet.size());
         }
 
         sourceStateVariables = manager.createEmptyVarSet();
@@ -1361,25 +1348,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     public BDDExtendedAutomaton getBDDExAutomatonAt(final int i)
     {
         return automatonToBDDAutomatonMap.get(theIndexMap.getExAutomatonAt(i));
-    }
-
-    public TIntObjectHashMap<BDDExDisjunctiveDependentSet> getAutIndex2DependentSet() {
-        if (autIndex2DependentSet == null) {
-            autIndex2DependentSet = new TIntObjectHashMap<BDDExDisjunctiveDependentSet>();
-            for(final ExtendedAutomaton automaton:theExAutomata) {
-                final int autoIndex = theIndexMap.getExAutomatonIndex(automaton.getName());
-                autIndex2DependentSet.put(autoIndex, automatonToBDDAutomatonMap.get(automaton).getDependentSet());
-            }
-        }
-        return autIndex2DependentSet;
-    }
-
-    public TIntObjectHashMap<EventDisParDepSet> getEvents2EventDisParDepSet() {
-        if (events2EventDisParDepSet == null) {
-            final EventDisParDepSets eventDisParDepSets = new EventDisParDepSets(this);
-            events2EventDisParDepSet = eventDisParDepSets.getEvents2EventDisParDepSet();
-        }
-        return events2EventDisParDepSet;
     }
 
     public SynthesisAlgorithm getSynthAlg() {

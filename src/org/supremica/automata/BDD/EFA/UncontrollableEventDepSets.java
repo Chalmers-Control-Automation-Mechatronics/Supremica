@@ -19,7 +19,8 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
 /**
- * The class is used to compute the uncontrollable states. The class is similar to the event based partitioning.
+ * The class is used to compute the uncontrollable states. The class is similar to the event based partitioning. 
+ * But the variable updating information is disregarded.  
  * 
  * @author zhennan
  * @version 1.0

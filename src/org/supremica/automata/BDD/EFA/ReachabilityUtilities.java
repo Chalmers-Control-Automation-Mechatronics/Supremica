@@ -9,9 +9,9 @@ import net.sf.javabdd.BDD;
  * @version  1.0
  * 
  * Note: all the transition BDDs fed into each utility are forward. For preImage and  restrictedPreImage,
- * exchange of BDD domains should be performed. The returned values from *image methods are "source states", 
- * while the return values from *preImage methods are "target states".
- *
+ * exchange of BDD domains should be performed. The returned values from image and restrictedImage 
+ * methods are "source states", while the return values from preImage and restrictedPreImage methods 
+ * are "target states".
  */
 public class ReachabilityUtilities {
 

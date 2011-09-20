@@ -10,7 +10,6 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,15 +22,10 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-
-import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDLibraryType;
-import org.supremica.automata.BDD.EFA.EventDisParDepSets.EventDisParDepSet;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.PSupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.ResultOverflows;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
@@ -638,66 +632,6 @@ public class BDDExtendedManager
         nextStates.replaceWith(bddExAutomata.getDest2SourceVariablePairing());
 
         return nextStates;
-    }
-
-    BDD action2BDDDisjunctiveVersion(final EventDisParDepSet eventDepSet, final List<BinaryExpressionProxy> anAction) {
-        final HashSet<String> updatedVars = new HashSet<String>();
-        final BDD actionBDD = factory.one();
-        for (final Iterator<BinaryExpressionProxy> statementItrator = anAction.iterator(); statementItrator.hasNext();) {
-            final BinaryExpressionProxy aStatement = statementItrator.next();
-            final String varName = aStatement.getLeft().toString();
-            updatedVars.add(varName);
-            BDD aStatementBDD = action2BDD(aStatement);
-            // Restrict the value of the variable to the domain
-            aStatementBDD = aStatementBDD
-             .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
-             .and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
-             .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)))
-             .and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
-
-            actionBDD.andWith(aStatementBDD);
-        }
-        // Detect the automaton which contains this updated variables in its guard collection -- for heurictics
-        for (final Iterator<ExtendedAutomaton> autInterator = bddExAutomata.theExAutomata.iterator(); autInterator.hasNext();) {
-            int nbrOfSharedVariablesInGuards = 0;
-            final ExtendedAutomaton anAutomaton = autInterator.next();
-            for (final NodeProxy currLocation : anAutomaton.getNodes()) {
-                for (final Iterator<EdgeSubject> edgeIt = anAutomaton.getLocationToOutgoingEdgesMap()
-                                                    .get(currLocation).iterator(); edgeIt.hasNext();) {
-                    final EdgeSubject currEdge = edgeIt.next();
-                    if (currEdge.getGuardActionBlock() != null) {
-                        final List<SimpleExpressionProxy> guards = currEdge.getGuardActionBlock().getGuards();
-                        if (guards != null && guards.size() > 0) {
-                            final String guardString = guards.get(0).toString();
-                            for (final String varName : updatedVars) {
-                                if (guardString.contains(varName)) {
-                                    nbrOfSharedVariablesInGuards++;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            eventDepSet.getAutomaton2nbrOfInfluencedVariables().put(anAutomaton, nbrOfSharedVariablesInGuards);
-        }
-        // find the variables which have not been uodated and constrcut the statement v := v in BDD.
-        for (final Iterator<String> varIterator = bddExAutomata.BDDBitVecTargetVarsMap.keySet().iterator();
-                                                                                        varIterator.hasNext();) {
-            final String varName = varIterator.next();
-            if (!updatedVars.contains(varName)) {
-                final SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varName);
-                final SupremicaBDDBitVector rightSide = bddExAutomata.getBDDBitVecSource(varName);
-                BDD compensateBDD = leftSide.equ(rightSide);
-                // Restrict the value of the compensate variable to the domain
-                compensateBDD = compensateBDD
-             .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
-             .and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)))
-             .and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)))
-             .and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
-                actionBDD.andWith(compensateBDD);
-            }
-        }
-        return actionBDD;
     }
 
      /** Return a set of initial uncontrollable states. */

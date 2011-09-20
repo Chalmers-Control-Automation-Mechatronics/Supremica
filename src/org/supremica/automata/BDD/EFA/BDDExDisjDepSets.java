@@ -45,11 +45,6 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
     /** Return a map where the key is the component index while the value is the component complete transition */
     public abstract TIntObjectHashMap<BDD> getComponentToComponentTransMap();
     
-    protected abstract TIntObjectHashMap<BDD> getComponentToComponentOnlyTransMap();
-    
-    /** Return a map where the key is the component index while the value is the component actions */
-    protected abstract TIntObjectHashMap<BDD> getComponentToComponentActionMap(); 
-    
     /** For the forward reachability, the method returns a map where the key is the component index while the value is another map 
      *   representing forward influenced components and their values. */
     protected abstract TIntObjectHashMap<TIntIntHashMap> getForwardComponentToInfluencedComponentMap();

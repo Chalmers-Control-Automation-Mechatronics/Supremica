@@ -57,7 +57,6 @@ public class BDDExtendedAutomaton {
 
     BDD selfLoopsBDD;
     TIntArrayList caredEventsIndex;
-    BDDExDisjunctiveDependentSet dependentSet;
 
     String OR = " | ";
     String AND = " & ";
@@ -98,7 +97,6 @@ public class BDDExtendedAutomaton {
 
         selfLoopsBDD = manager.getZeroBDD();
         caredEventsIndex = new TIntArrayList();
-        dependentSet = null;
     }
 
     public void initialize()
@@ -116,19 +114,12 @@ public class BDDExtendedAutomaton {
 
         boolean anyMarkedLocation = false;
 
-        int nbrOfEdges = 0;
-        int nbrOfGuards = 0;
         for (final NodeProxy currLocation : theExAutomaton.getNodes()) {
             if (!bddExAutomata.synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
                 // Add the node proxy in the map
                 for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
                     final EdgeSubject currEdge = edgeIt.next();
-                        if (currEdge.getGuardActionBlock() != null && currEdge.getGuardActionBlock().getGuards() != null
-                        && currEdge.getGuardActionBlock().getGuards().size() > 0) {
-                            nbrOfGuards++;
-                        }
                     addNodeProxy(currEdge);
-                    nbrOfEdges++;
                 }
                 // Construct "keep BDD"
                 addKeep(currLocation);
@@ -175,11 +166,6 @@ public class BDDExtendedAutomaton {
         bddExAutomata.addMarkedLocations(markedLocations);
         bddExAutomata.addForbiddenLocations(forbiddenLocations);
         bddExAutomata.addPlantifiedBlockedLocations(plantifiedBlockedLocation);
-
-        if (!bddExAutomata.synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
-            bddExAutomata.automaton2nbrEdges.put(theExAutomaton, nbrOfEdges);
-            bddExAutomata.automaton2nbrGuards.put(theExAutomaton, nbrOfGuards);
-        }
     }
 
     public ExtendedAutomaton getExAutomaton()
@@ -320,13 +306,6 @@ public class BDDExtendedAutomaton {
 
     public BDD getSelfLoopsBDD() {
         return selfLoopsBDD;
-    }
-
-    public BDDExDisjunctiveDependentSet getDependentSet() {
-        if (dependentSet == null) {
-            dependentSet = new BDDExDisjunctiveDependentSet(manager, this);
-        }
-        return dependentSet;
     }
 
     public BDD getForbiddenStateSet()

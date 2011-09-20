@@ -7,6 +7,7 @@ package org.supremica.automata.BDD.EFA;
  * @author zhennan
  * @version 1.0
  */
+
 public abstract class BDDExDisjDepSetsDecorator extends BDDExDisjDepSets{
 
     BDDExDisjEventDepSets eventParDepSets;

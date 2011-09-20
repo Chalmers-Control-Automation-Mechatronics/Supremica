@@ -3,7 +3,7 @@ package org.supremica.automata.BDD.EFA;
 import net.sf.javabdd.BDD;
 
 /**
- * A set of algorithms used to realize the verification and synthesis for the disjunctive partitioning technique.
+ * The interface for the set of algorithms used to realize the verification and synthesis for the disjunctive partitioning technique.
  *   
  * @author Zhennan
  * @version  1.0

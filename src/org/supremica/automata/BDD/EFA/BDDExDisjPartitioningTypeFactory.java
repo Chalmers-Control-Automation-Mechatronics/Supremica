@@ -20,12 +20,12 @@ public class BDDExDisjPartitioningTypeFactory {
         BDDExDisjAbstractWorkSet workset = null;
 
         if (synType == SynthesisAlgorithm.PARTITIONBDD_Event) {
-            logger.info("Choose the event based paritioning algorithm");
+            logger.info("Choose the event based paritioning algorithm ...");
             depSets = new BDDExDisjEventDepSets(bddExAutomata);
             workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
             depSets.setWorkSet(workset);
         } else if (synType == SynthesisAlgorithm.PARTITIONBDD_Automaton) {
-            logger.info("Choose the automaton based partitioning algorithm");
+            logger.info("Choose the automaton based partitioning algorithm ...");
             BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);
             depSets = new BDDExDisjAutmatonDepSets(bddExAutomata, eventDepSets);
             workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
