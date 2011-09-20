@@ -55,7 +55,7 @@ public enum SynthesisAlgorithm
     MONOLITHICBDD("Monolithic (symbolic)", false),
     PARTITIONBDD_Event("Partitioning (event_based)", false),
     PARTITIONBDD_Automaton("Partitioning (automaton_based)", false),
-    //PARTITIONBDD_Variable("Partitioning (variable_based)", false), // Under the development
+    PARTITIONBDD_Variable("Partitioning (variable_based)", false), // Under the development
     
     MODULAR("Modular"),
     COMPOSITIONAL("Compositional"),

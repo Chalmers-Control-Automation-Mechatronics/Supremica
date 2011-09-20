@@ -828,10 +828,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         {
             if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
             {
-                //coreachableStatesBDD = getDepSets().reachableBackwardWorkSetAlgorithm(getMarkedStates(), getReachableStates()); 
-                coreachableStatesBDD = getDepSets().backwardWorkSetAlgorithm(getMarkedStates());
-                //coreachableStatesBDD = BDDExDisjunctiveHeuristicReachabilityAlgorithms.backWorkSetAlgorithm(this, getMarkedStates(), getReachableStates(), manager.getZeroBDD());
-                //coreachableStatesBDD = BDDExDisjunctiveReachabilityAlgorithms.restrictedBackwardWorkSetAlgorithm(this, getMarkedStates(), manager.getZeroBDD(), getReachableStates());
+                coreachableStatesBDD = getDepSets().reachableBackwardWorkSetAlgorithm(getMarkedStates(), getReachableStates()); 
+                //coreachableStatesBDD = getDepSets().backwardWorkSetAlgorithm(getMarkedStates());
             }
             else
             {

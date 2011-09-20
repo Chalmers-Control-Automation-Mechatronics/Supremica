@@ -31,21 +31,20 @@ public class BDDExDisjPartitioningTypeFactory {
             workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
             depSets.setWorkSet(workset);
         } 
-//        else if (synType == SynthesisAlgorithm.PARTITIONBDD_Variable) {
-//            BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);;
-//            if (bddExAutomata.orgExAutomata.getVars() == null) {
-//                logger.info("Not an EFA model. Choose the automaton based partitioning algorithm (default for DFA)");
-//                depSets = new BDDExDisjAutmatonDepSets(bddExAutomata, eventDepSets);
-//                workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
-//                depSets.setWorkSet(workset);
-//            } else {
-//                logger.info("Choose the variable based paritioning algorithm");
-//                depSets = new BDDExDisjVariableDepSets(bddExAutomata, eventDepSets);
-//                //workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
-//                workset = new BDDExDisjWorkSetImpl(depSets, bddExAutomata.orgExAutomata.getUnionAlphabet().size());
-//                depSets.setWorkSet(workset);
-//            }
-//        }
+        else if (synType == SynthesisAlgorithm.PARTITIONBDD_Variable) {
+            BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);;
+            if (bddExAutomata.orgExAutomata.getVars() == null) {
+                logger.info("Not an EFA model. Choose the automaton based partitioning algorithm (default for DFA)");
+                depSets = new BDDExDisjAutmatonDepSets(bddExAutomata, eventDepSets);
+                workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
+                depSets.setWorkSet(workset);
+            } else {
+                logger.info("Choose the variable based paritioning algorithm");
+                depSets = new BDDExDisjVariableDepSets(bddExAutomata, eventDepSets);
+                workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
+                depSets.setWorkSet(workset);
+            }
+        }
         return depSets;
     }
 }

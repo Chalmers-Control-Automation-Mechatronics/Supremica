@@ -26,6 +26,7 @@ import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.EFA.BDDEdges;
 import org.supremica.automata.BDD.EFA.BDDExDisjAutmatonDepSets;
+import org.supremica.automata.BDD.EFA.BDDExDisjVariableDepSets;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedManager;
@@ -837,6 +838,9 @@ public class BDDExtendedGuardGenerator {
         }else if(options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD_Automaton)){
             eventTransBDD = ((BDDExDisjAutmatonDepSets)automataBDD.getDepSets())
                     .getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+        }else if(options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD_Variable)){
+            eventTransBDD = ((BDDExDisjVariableDepSets)automataBDD.getDepSets())
+                    .getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
         }
 
         tmp = safeStatesWithEvent.and(eventTransBDD).exist(automataBDD.getDestStatesVarSet())
@@ -861,6 +865,9 @@ public class BDDExtendedGuardGenerator {
             eventTransBDD = automataBDD.getDepSets().getComponentToComponentTransMap().get(eventIndex);
         }else if(options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD_Automaton)){
             eventTransBDD = ((BDDExDisjAutmatonDepSets)automataBDD.getDepSets())
+                    .getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+        }else if(options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD_Variable)){
+            eventTransBDD = ((BDDExDisjVariableDepSets)automataBDD.getDepSets())
                     .getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
         }
 
