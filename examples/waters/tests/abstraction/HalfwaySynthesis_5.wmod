@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="HalfwaySynthesis_5" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="c"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="u"/>
+        <EventDecl Kind="CONTROLLABLE" Name="d"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="64" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="-26"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point Y="128" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="-25"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-4" X="15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3">
+                        <PointGeometry>
+                            <Point Y="64" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-4" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S1" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S1" Source="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="4" X="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S1" Source="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="u"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S3" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S2" Source="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-4" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph>
+                <LabelBlock>
+                    <SimpleIdentifier Name="c"/>
+                    <SimpleIdentifier Name="d"/>
+                    <SimpleIdentifier Name="u"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="47" X="101"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="80" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

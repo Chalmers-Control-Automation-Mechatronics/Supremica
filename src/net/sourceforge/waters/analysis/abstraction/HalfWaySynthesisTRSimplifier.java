@@ -132,6 +132,10 @@ public class HalfWaySynthesisTRSimplifier
   protected boolean runSimplifier()
   throws AnalysisException
   {
+    final int defaultID = getDefaultMarkingID();
+    if (defaultID < 0){
+      return false;
+    }
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     boolean hasAdded;
@@ -145,12 +149,13 @@ public class HalfWaySynthesisTRSimplifier
     } while (hasAdded);
 
     final int dumpState = badStates.nextSetBit(0);
-    if(dumpState < 0){
+    if (dumpState < 0) {
       return false;
     }
 
     final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
     boolean dumpStateUsed = false;
+    boolean changed = false;
     for (int state = badStates.nextSetBit(0); state >= 0;
          state = badStates.nextSetBit(state+1)) {
       iter.resetState(state);
@@ -159,22 +164,32 @@ public class HalfWaySynthesisTRSimplifier
         final int event = iter.getCurrentEvent();
         if(!badStates.get(source) && mLastLocalControllableEvent < event &&
           event<= mLastSharedUncontrollableEvent){
-          if(state != dumpState){
+          if (state != dumpState) {
             iter.remove();
-            rel.addTransition(state, event, dumpState);
+            rel.addTransition(source, event, dumpState);
+            changed = true;
           }
           dumpStateUsed = true;
-        } else iter.remove();
+        } else {
+          iter.remove();
+          changed = true;
+        }
       }
-      if(state != dumpState){
+      if (state != dumpState) {
         rel.setReachable(state, false);
+        changed = true;
       }
     }
 
-    if (!dumpStateUsed){
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    if (dumpStateUsed) {
+      changed |= rel.removeOutgoingTransitions(dumpState);
+    } else {
       rel.setReachable(dumpState, false);
+      changed = true;
     }
-    return true;
+    changed |= rel.checkReachability();
+    return changed;
   }
 
   @Override

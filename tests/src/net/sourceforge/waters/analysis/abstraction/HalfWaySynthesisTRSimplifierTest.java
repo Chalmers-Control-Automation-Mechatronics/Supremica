@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   SynthesisAbstractionTRSimplifierTest
+//# CLASS:   HalfWaySynthesisTRSimplifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,24 +12,19 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
-/**
- * A test for the synthesis abstraction algorithm
- * ({@link SynthesisAbstractionTRSimplifier}).
- *
- * @author Robi Malik
- */
-
-public class SynthesisAbstractionTRSimplifierTest
+public class HalfWaySynthesisTRSimplifierTest
   extends AbstractTRSimplifierTest
 {
 
@@ -38,7 +33,7 @@ public class SynthesisAbstractionTRSimplifierTest
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(SynthesisAbstractionTRSimplifierTest.class);
+        new TestSuite(HalfWaySynthesisTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -52,10 +47,16 @@ public class SynthesisAbstractionTRSimplifierTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
   @Override
-  protected SynthesisAbstractionTRSimplifier
-    createTransitionRelationSimplifier()
+  protected HalfWaySynthesisTRSimplifier createTransitionRelationSimplifier()
   {
-    return new SynthesisAbstractionTRSimplifier();
+    return new HalfWaySynthesisTRSimplifier();
+  }
+
+  @Override
+  protected HalfWaySynthesisTRSimplifier getTransitionRelationSimplifier()
+  {
+    return (HalfWaySynthesisTRSimplifier)
+      super.getTransitionRelationSimplifier();
   }
 
   @Override
@@ -72,6 +73,7 @@ public class SynthesisAbstractionTRSimplifierTest
       new ArrayList<EventProxy>(numEvents);
     final Collection<EventProxy> sharedControllable =
       new ArrayList<EventProxy>(numEvents);
+    EventProxy marking = null;
     for (final EventProxy event : events) {
       switch (event.getKind()) {
       case UNCONTROLLABLE:
@@ -90,6 +92,9 @@ public class SynthesisAbstractionTRSimplifierTest
         break;
       case PROPOSITION:
         sharedControllable.add(event);
+        if (event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+          marking = event;
+        }
         break;
       default:
         break;
@@ -103,129 +108,142 @@ public class SynthesisAbstractionTRSimplifierTest
     mLastSharedUncontrollable = all.size();
     all.addAll(sharedControllable);
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    return new EventEncoding(all, translator);
+    final EventEncoding encoding = new EventEncoding(all, translator);
+    mDefaultMarkingID = encoding.getEventCode(marking);
+    return encoding;
   }
 
   @Override
   protected void configureTransitionRelationSimplifier()
   {
     super.configureTransitionRelationSimplifier();
-    final SynthesisAbstractionTRSimplifier simplifier =
+    final HalfWaySynthesisTRSimplifier simplifier =
       getTransitionRelationSimplifier();
+    simplifier.setDefaultMarkingID(mDefaultMarkingID);
     simplifier.setLastLocalUncontrollableEvent(mLastLocalUncontrollable);
     simplifier.setLastLocalControllableEvent(mLastLocalControllable);
     simplifier.setLastSharedUncontrollableEvent(mLastSharedUncontrollable);
   }
 
-  @Override
-  protected SynthesisAbstractionTRSimplifier getTransitionRelationSimplifier()
-  {
-    return (SynthesisAbstractionTRSimplifier)
-      super.getTransitionRelationSimplifier();
-  }
-
 
   //#########################################################################
   //# Test Cases
-  public void test_synthesisAbstraction_1()
-  throws Exception
+  /**
+   * <P>
+   * Tests the model in file {supremica}/examples/waters/tests/abstraction/
+   * HalfwaySynthesis_1.wmod.
+   * </P>
+   *
+   * <P>
+   * All test modules contain up to two automata, named "before" and "after".
+   * The automaton named "before" is required to be present, and defines the
+   * input automaton for the abstraction rule. The automaton "after" defines the
+   * expected result of abstraction. It may be missing, in which case the
+   * abstraction should have no effect and return the unchanged input automaton
+   * (the test expects the same object, not an identical copy).
+   * </P>
+   *
+   * <P>
+   * Unobservable events are considered as local.
+   * </P>
+   *
+   * <P>
+   * After running the test, any automaton created by the rule is saved in
+   * {supremica }/logs/results/analysis/op/HalfWaySynthesisTRSimplifierTest as
+   * a .des file (for text viewing) and as a .wmod file (to load into the IDE).
+   * </P>
+   */
+  public void test_HalfwaySynthesis_1() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_1.wmod";
+    final String name = "HalfwaySynthesis_1.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_synthesisAbstraction_2()
-  throws Exception
+  public void test_HalfwaySynthesis_2() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_2.wmod";
+    final String name = "HalfwaySynthesis_2.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_synthesisAbstraction_3()
-  throws Exception
+  public void test_HalfwaySynthesis_3() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_3.wmod";
+    final String name = "HalfwaySynthesis_3.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_synthesisAbstraction_4()
-  throws Exception
+  public void test_HalfwaySynthesis_4() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_4.wmod";
+    final String name = "HalfwaySynthesis_4.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_synthesisAbstraction_5()
-  throws Exception
+  public void test_HalfwaySynthesis_5() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_5.wmod";
+    final String name = "HalfwaySynthesis_5.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_synthesisAbstraction_6()
-  throws Exception
+  public void test_HalfwaySynthesis_6() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_6.wmod";
+    final String name = "HalfwaySynthesis_6.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_synthesisAbstraction_7()
-  throws Exception
+  public void test_HalfwaySynthesis_7() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_7.wmod";
+    final String name = "HalfwaySynthesis_7.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
-
-  public void test_synthesisAbstraction_8()
-    throws Exception
-    {
-      final String group = "tests";
-      final String subdir = "abstraction";
-      final String name = "synthesisAbstraction_8.wmod";
-      runTransitionRelationSimplifier(group, subdir, name);
-    }
-  public void test_synthesisAbstraction_9()
-    throws Exception
-    {
-      final String group = "tests";
-      final String subdir = "abstraction";
-      final String name = "synthesisAbstraction_9.wmod";
-      runTransitionRelationSimplifier(group, subdir, name);
-    }
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
-   */
   public void testReentrant() throws Exception
   {
-    test_synthesisAbstraction_4();
-    test_synthesisAbstraction_3();
-    test_synthesisAbstraction_2();
-    test_synthesisAbstraction_1();
-    test_synthesisAbstraction_2();
-    test_synthesisAbstraction_3();
-    test_synthesisAbstraction_4();
-    test_synthesisAbstraction_5();
-    test_synthesisAbstraction_6();
-    test_synthesisAbstraction_5();
-    test_synthesisAbstraction_4();
-    test_synthesisAbstraction_3();
-    test_synthesisAbstraction_2();
-    test_synthesisAbstraction_1();
+    test_noncoreachableStatesRemoval_1();
+    test_reachableLoop();
+    test_noncoreachableStatesRemoval_3();
+    test_selfLoops();
+    test_reachableBeforeNotAfter();
+    test_multipleIncomingTransitions();
+    test_multipleOutgoingTransitions();
+    test_noncoreachableStatesRemoval_2();
+    test_noTransitions();
+    test_unreachableLoop();
+    test_noncoreachableStatesRemoval_1();
+    test_selfLoops();
+    test_reachableBeforeNotAfter();
+    test_noncoreachableStatesRemoval_2();
+    test_stateWithReachableAndNonreachablePath();
+    test_noTransitions();
+    test_unreachableLoop();
+    test_noncoreachableStatesRemoval_3();
+    test_multipleOutgoingTransitions();
+    test_stateWithReachableAndNonreachablePath();
+    test_reachableLoop();
+  }
+  */
+
+  @Override
+  public void test_basic_7() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "HalfwaySynthesisBasic_7.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
   }
 
 
@@ -234,5 +252,5 @@ public class SynthesisAbstractionTRSimplifierTest
   private int mLastLocalUncontrollable;
   private int mLastLocalControllable;
   private int mLastSharedUncontrollable;
-
+  private int mDefaultMarkingID;
 }

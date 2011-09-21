@@ -724,7 +724,7 @@ public class ModuleContext
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
     public void modelChanged(final ModelChangeEvent event)
     {
-      if (causesChange(event)) {
+     if (causesChange(event)) {
         toggleStatus();
       }
     }
@@ -766,6 +766,15 @@ public class ModuleContext
         case ModelChangeEvent.STATE_CHANGED:
           if (source == mGraph && mGraph.getBlockedEvents() == null) {
             return true;
+          } else if (source instanceof EventDeclProxy) {
+            final EventDeclProxy edecl = (EventDeclProxy) source;
+            return edecl.getKind() != EventKind.PROPOSITION;
+          }
+          break;
+        case ModelChangeEvent.NAME_CHANGED:
+          if (source instanceof EventDeclProxy) {
+            final EventDeclProxy edecl = (EventDeclProxy) source;
+            return edecl.getKind() == EventKind.PROPOSITION;
           }
           break;
         default:
@@ -803,6 +812,15 @@ public class ModuleContext
                 return true;
               }
             }
+          } else if (source instanceof EventDeclProxy) {
+            final EventDeclProxy edecl = (EventDeclProxy) source;
+            return edecl.getKind() == EventKind.PROPOSITION;
+          }
+          break;
+        case ModelChangeEvent.NAME_CHANGED:
+          if (source instanceof EventDeclProxy) {
+            final EventDeclProxy edecl = (EventDeclProxy) source;
+            return edecl.getKind() == EventKind.PROPOSITION;
           }
           break;
         default:
