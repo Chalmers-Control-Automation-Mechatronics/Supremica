@@ -14,9 +14,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -43,7 +45,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 
-public abstract class CompositionalSynthesizer
+public class CompositionalSynthesizer
   extends AbstractCompositionalModelAnalyzer
 {
 
@@ -56,7 +58,7 @@ public abstract class CompositionalSynthesizer
    * @param translator
    *          Kind translator used to determine event and component kinds.
    */
-  protected CompositionalSynthesizer
+  public CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator)
   {
@@ -76,7 +78,7 @@ public abstract class CompositionalSynthesizer
    *          Enumeration factory that determines possible candidate
    *          selection methods.
    */
-  protected CompositionalSynthesizer
+  public CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
      final PreselectingMethodFactory preselectingMethodFactory,
@@ -96,7 +98,7 @@ public abstract class CompositionalSynthesizer
    * @param translator
    *          Kind translator used to determine event and component kinds.
    */
-  protected CompositionalSynthesizer
+  public CompositionalSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator)
@@ -120,7 +122,7 @@ public abstract class CompositionalSynthesizer
    *          Enumeration factory that determines possible candidate
    *          selection methods.
    */
-  protected CompositionalSynthesizer
+  public CompositionalSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
@@ -133,6 +135,20 @@ public abstract class CompositionalSynthesizer
 
 
   //#########################################################################
+  //# Configuration
+  public void setMarkingProposition(final EventProxy marking)
+  {
+    mDefaultMarking = marking;
+    mUsedDefaultMarking = null;
+  }
+
+  public EventProxy getMarkingProposition()
+  {
+    return mDefaultMarking;
+  }
+
+
+  //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException
   {
@@ -140,6 +156,9 @@ public abstract class CompositionalSynthesizer
       setUp();
       runCompositionalMinimisation();
       final CompositionalSynthesisResult result = getAnalysisResult();
+      if (!result.isFinished()) {
+        result.setSatisfied(true);
+      }
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -169,42 +188,49 @@ public abstract class CompositionalSynthesizer
   protected void setUp()
     throws AnalysisException
   {
-    // TODO Add other abstractions ...
+    if (mDefaultMarking == null) {
+      final ProductDESProxy model = getModel();
+      mUsedDefaultMarking =
+        AbstractConflictChecker.getMarkingProposition(model);
+    } else {
+      mUsedDefaultMarking = mDefaultMarking;
+    }
+    final Collection<EventProxy> props =
+      Collections.singletonList(mUsedDefaultMarking);
+    setPropositions(props);
+
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     /*
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
      */
+    final HalfWaySynthesisTRSimplifier halfWay =
+      new HalfWaySynthesisTRSimplifier();
+    chain.add(halfWay);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
     chain.add(bisimulator);
-
     final SynthesisAbstractionTRSimplifier synthesisAbstraction= new
             SynthesisAbstractionTRSimplifier();
     final int limit = getInternalTransitionLimit();
     synthesisAbstraction.setTransitionLimit(limit);
     chain.add(synthesisAbstraction);
     final AbstractionProcedure proc =
-      new SynthesisAbstractionProcedure(chain, synthesisAbstraction);
+      new SynthesisAbstractionProcedure(chain, synthesisAbstraction, halfWay);
     setAbstractionProcedure(proc);
-    proc.storeStatistics();
-
-    // TODO More initialisation ?
-    /*
-    setupMonolithicVerifier();
-    */
 
     super.setUp();
+    proc.storeStatistics();
   }
 
   @Override
   protected void tearDown()
   {
     super.tearDown();
-    // TODO Clean up ...
+    mUsedDefaultMarking = null;
   }
 
   @Override
@@ -217,6 +243,12 @@ public abstract class CompositionalSynthesizer
   public CompositionalSynthesisResult getAnalysisResult()
   {
     return (CompositionalSynthesisResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return false;
   }
 
 
@@ -239,8 +271,36 @@ public abstract class CompositionalSynthesizer
     (final List<AutomatonProxy> automata)
     throws AnalysisException
   {
-    // TODO Invoke monolithic synthesis and store result ...
-    return false;
+    final AutomatonProxy automaton;
+    switch (automata.size()) {
+    case 0:
+      return true;
+    case 1:
+      automaton = automata.get(0);
+      break;
+    default:
+      final MonolithicSynchronousProductBuilder syncBuilder =
+        getCurrentSynchronousProductBuilder();
+      final ProductDESProxy des = createProductDESProxy(automata);
+      syncBuilder.setModel(des);
+      final int limit = getMonolithicStateLimit();
+      syncBuilder.setNodeLimit(limit);
+      syncBuilder.run();
+      automaton = syncBuilder.getComputedProxy();
+      break;
+    }
+
+    final AutomatonProxy supervisor =
+      HalfWaySynthesisTRSimplifier.synthesise(automaton, mUsedDefaultMarking,
+                                              getFactory(), getKindTranslator());
+    final CompositionalSynthesisResult result = getAnalysisResult();
+    if (supervisor.getStates().isEmpty()){
+      result.setSatisfied(false);
+      return false;
+    } else {
+      result.addSupervisor(supervisor);
+      return true;
+    }
   }
 
 
@@ -253,10 +313,12 @@ public abstract class CompositionalSynthesizer
     //# Constructor
     protected SynthesisAbstractionProcedure
       (final TransitionRelationSimplifier simplifier,
-       final SynthesisAbstractionTRSimplifier synthesisAbstraction)
+       final SynthesisAbstractionTRSimplifier synthesisAbstraction,
+       final HalfWaySynthesisTRSimplifier halfWaySynthesisSimplifier)
     {
       mSimplifier = simplifier;
       mSynthesisAbstraction = synthesisAbstraction;
+      mHalfWaySynthesisSimplifier = halfWaySynthesisSimplifier;
     }
 
     //#######################################################################
@@ -289,7 +351,7 @@ public abstract class CompositionalSynthesizer
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy convertedAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          return new SynthesisAbstractionStep(aut, convertedAut);
+          return new SynthesisAbstractionStep(convertedAut, aut);
         } else {
           return null;
         }
@@ -382,18 +444,29 @@ public abstract class CompositionalSynthesizer
         (lastUncontrollableLocalEvent);
       mSynthesisAbstraction.setLastSharedUncontrollableEvent
         (lastUncontrollableSharedEvent);
+      mHalfWaySynthesisSimplifier.setLastLocalUncontrollableEvent
+      (lastUncontrollableLocalEvent);
+      mHalfWaySynthesisSimplifier.setLastLocalControllableEvent
+      (lastControllableLocalEvent);
+      mHalfWaySynthesisSimplifier.setLastSharedUncontrollableEvent
+      (lastUncontrollableSharedEvent);
       encodedEvents.addAll(localUncontrollableEvents);
       encodedEvents.addAll(localControllableEvents);
       encodedEvents.addAll(sharedUncontrollableEvents);
       encodedEvents.addAll(sharedControllableEvents);
-      return new EventEncoding(encodedEvents, translator, filter,
-                               EventEncoding.FILTER_PROPOSITIONS);
+      final EventEncoding encoding = new EventEncoding(encodedEvents, translator,
+                                                 filter,
+                        EventEncoding.FILTER_PROPOSITIONS);
+      mHalfWaySynthesisSimplifier.
+      setDefaultMarkingID(encoding.getEventCode(mUsedDefaultMarking));
+      return encoding;
     }
 
     //#######################################################################
     //# Data Members
     private final TransitionRelationSimplifier mSimplifier;
     private final SynthesisAbstractionTRSimplifier mSynthesisAbstraction;
+    private final HalfWaySynthesisTRSimplifier mHalfWaySynthesisSimplifier;
   }
 
   //#########################################################################
@@ -449,5 +522,7 @@ public abstract class CompositionalSynthesizer
 
   //#########################################################################
   //# Data Members
+  private EventProxy mDefaultMarking;
+  private EventProxy mUsedDefaultMarking;
 
 }

@@ -51,12 +51,27 @@ package org.supremica.automata.algorithms;
 
 import java.math.BigDecimal;
 import java.util.*;
+
+import net.sourceforge.waters.analysis.abstraction.CompositionalSynthesisResult;
+import net.sourceforge.waters.analysis.abstraction.CompositionalSynthesizer;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.properties.Config;
 import org.supremica.automata.BDD.BDDSynthesizer;
+import org.supremica.automata.IO.AutomataToWaters;
+import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.util.ActionTimer;
 import org.supremica.util.BDD.OnlineBDDSupervisor;
 import org.supremica.util.BDD.BDDAutomata;
@@ -70,9 +85,9 @@ public class AutomataSynthesizer
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
     private Automata theAutomata;
-    private Map<LabeledEvent,Automata> ucEventToPlantMap;
-    private SynchronizationOptions synchronizationOptions;
-    private SynthesizerOptions synthesizerOptions;
+    private final Map<LabeledEvent,Automata> ucEventToPlantMap;
+    private final SynchronizationOptions synchronizationOptions;
+    private final SynthesizerOptions synthesizerOptions;
 
     private ExecutionDialog executionDialog = null;
 
@@ -87,8 +102,8 @@ public class AutomataSynthesizer
     private long numberOfStatesBDD;
     private long numberOfNodesBDD;
     public static boolean synthesis=false;
-    public AutomataSynthesizer(Automata theAutomata, SynchronizationOptions synchronizationOptions,
-        SynthesizerOptions synthesizerOptions)
+    public AutomataSynthesizer(final Automata theAutomata, final SynchronizationOptions synchronizationOptions,
+        final SynthesizerOptions synthesizerOptions)
         throws IllegalArgumentException
     {
         // initialization stuff that need no computation
@@ -118,14 +133,14 @@ public class AutomataSynthesizer
         timer = new ActionTimer();
         timer.start();
 
-        Automata result = new Automata();
+        final Automata result = new Automata();
 
         if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHIC)
         {
             // MONOLITHIC synthesis, just whack the entire stuff into the monolithic algo
-            MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
+            final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
 			threadToStop = synthesizer;
-			MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
+			final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					theAutomata, synthesizerOptions, synchronizationOptions,
 					executionDialog, helperStatistics, false);
 			if (stopRequested) return new Automata();
@@ -135,7 +150,7 @@ public class AutomataSynthesizer
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR)
         {
             // MODULAR (controllability) synthesis
-            Automata newSupervisors = doModular(theAutomata);
+            final Automata newSupervisors = doModular(theAutomata);
 
             if (stopRequested || newSupervisors == null) return new Automata();
             logger.info(helperStatistics);
@@ -149,13 +164,13 @@ public class AutomataSynthesizer
             // Make a copy
             theAutomata = new Automata(theAutomata);
             // Make preparations based on synthesis type
-            SynthesisType type = synthesizerOptions.getSynthesisType();
+            final SynthesisType type = synthesizerOptions.getSynthesisType();
             if (type == SynthesisType.NONBLOCKING)
             {
                 // Only nonblocking? Then everything should be considered controllable!
-                for (Automaton automaton : theAutomata)
+                for (final Automaton automaton : theAutomata)
                 {
-                    for (LabeledEvent event : automaton.getAlphabet())
+                    for (final LabeledEvent event : automaton.getAlphabet())
                     {
                         event.setControllable(true);
                     }
@@ -165,7 +180,7 @@ public class AutomataSynthesizer
             {
                 // Only controllable? Then everything should be considered marked...
                 // and AFTER that, the specs must be plantified!
-                for (Automaton automaton : theAutomata)
+                for (final Automaton automaton : theAutomata)
                 {
                     automaton.setAllStatesAccepting();
                 }
@@ -179,7 +194,7 @@ public class AutomataSynthesizer
             	// if no plants in model, just set everything to type 'plant'
                 if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
                 else {
-                	for (Automaton a : theAutomata) {
+                	for (final Automaton a : theAutomata) {
                 		a.setComment("plant(" + a.getName() + ")");
                         a.setType(AutomatonType.PLANT);
                 	}
@@ -187,13 +202,13 @@ public class AutomataSynthesizer
             }
 
             // Do the stuff!
-            AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
+            final AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
             minimizer.setExecutionDialog(executionDialog);
 
-            MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
+            final MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
 
-            Automata min = minimizer.getCompositionalMinimization(options);
-            for (Automaton sup: min)
+            final Automata min = minimizer.getCompositionalMinimization(options);
+            for (final Automaton sup: min)
             {
 
                 sup.setComment("sup(" + min.getName() + ")");
@@ -211,7 +226,7 @@ public class AutomataSynthesizer
         }
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-        // Compositional synthesis by using synthesis abstractio(DCDS 2011).
+        // Compositional synthesis by using synthesis abstraction (DCDS 2011).
 
          else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.SYNTHESISA)
         {
@@ -223,14 +238,14 @@ public class AutomataSynthesizer
 
             theAutomata = new Automata(theAutomata);
             // Make preparations based on synthesis type
-            SynthesisType type = synthesizerOptions.getSynthesisType();
+            final SynthesisType type = synthesizerOptions.getSynthesisType();
 
             if (type == SynthesisType.NONBLOCKING)
             {
                 // Only nonblocking? Then everything should be considered controllable!
-                for (Automaton automaton : theAutomata)
+                for (final Automaton automaton : theAutomata)
                 {
-                    for (LabeledEvent event : automaton.getAlphabet())
+                    for (final LabeledEvent event : automaton.getAlphabet())
                     {
                         event.setControllable(true);
                     }
@@ -241,7 +256,7 @@ public class AutomataSynthesizer
 
                 // Only controllable? Then everything should be considered marked...
                 // and AFTER that, the specs must be plantified!
-                for (Automaton automaton : theAutomata)
+                for (final Automaton automaton : theAutomata)
                 {
                     automaton.setAllStatesAccepting();
                 }
@@ -257,7 +272,7 @@ public class AutomataSynthesizer
             	// if no plants in model, just set everything to type 'plant'
                 if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
                 else {
-                	for (Automaton a : theAutomata) {
+                	for (final Automaton a : theAutomata) {
                 		a.setComment("plant(" + a.getName() + ")");
                         a.setType(AutomatonType.PLANT);
                 	}
@@ -265,18 +280,18 @@ public class AutomataSynthesizer
             }
 
             // Do the stuff!
-            AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
+            final AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
             minimizer.setExecutionDialog(executionDialog);
             synthesis=true;
-            
-            MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptionsSynthesisA();
+
+            final MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptionsSynthesisA();
 
 //          //Abstract the automata by using synthesis Abstraction
-            Automata min = minimizer.getCompositionalMinimization(options, synthesis);
-            
+            final Automata min = minimizer.getCompositionalMinimization(options, synthesis);
+
             // get the halfwaysynthesis automata.
-            Automata halfwaySynthesisResult = new Automata();
-            for(Automaton aut:min){
+            final Automata halfwaySynthesisResult = new Automata();
+            for(final Automaton aut:min){
                 if(aut.getName().contains("HalfWaySynthesisResult")){
                     halfwaySynthesisResult.addAutomaton(aut);
                 }
@@ -285,20 +300,20 @@ public class AutomataSynthesizer
             if(halfwaySynthesisResult.size()>0){
                 min.removeAutomata(halfwaySynthesisResult);
             }
-             
+
 //            Automaton cloneAutomaton=min.getFirstAutomaton();
 //
             //rename back the tau events to the original events.
 
             AutomatonMinimizer.renameBackToOriginalEvents(min);
-           
+
 //            min.addAutomaton(cloneAutomaton);
-            
+
 //
             // Applying monolithic synthesis on the abstract automaton.
-            MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
+            final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
             threadToStop = synthesizer;
-            MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
+            final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
 
             if (stopRequested)
                 return new Automata();
@@ -309,7 +324,66 @@ public class AutomataSynthesizer
             if(halfwaySynthesisResult.size()>0){
                 result.addAutomata(halfwaySynthesisResult);
             }
-//         
+//
+
+        }
+
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+        else if (synthesizerOptions.getSynthesisAlgorithm() ==
+                 SynthesisAlgorithm.COMPOSITIONAL_WATERS)
+        {
+
+          final ProductDESProxyFactory factory =
+            ProductDESElementFactory.getInstance();
+          final KindTranslator translator;
+          final EventProxy marking;
+          switch (synthesizerOptions.getSynthesisType()) {
+          case NONBLOCKING:
+            translator = ConflictKindTranslator.getInstance();
+            marking = null;
+            break;
+          case CONTROLLABLE:
+            theAutomata = new Automata(theAutomata);
+            MinimizationHelper.plantify(theAutomata);
+            translator = IdenticalKindTranslator.getInstance();
+            marking =
+              factory.createEventProxy(":none", EventKind.PROPOSITION);
+            break;
+          case NONBLOCKINGCONTROLLABLE:
+            theAutomata = new Automata(theAutomata);
+            MinimizationHelper.plantify(theAutomata);
+            translator = IdenticalKindTranslator.getInstance();
+            marking = null;
+            break;
+          default:
+            throw new IllegalStateException
+              ("Unknown synthesis type " +
+               synthesizerOptions.getSynthesisType() + "!");
+          }
+
+          final AutomataToWaters exporter = new AutomataToWaters(factory);
+          final ProductDESProxy des = exporter.convertAutomata(theAutomata);
+
+          final CompositionalSynthesizer synthesizer =
+            new CompositionalSynthesizer(des, factory, translator);
+          synthesizer.setMarkingProposition(marking);
+          synthesizer.setInternalStateLimit(10000);
+          synthesizer.run();
+          final CompositionalSynthesisResult watersResult =
+            synthesizer.getAnalysisResult();
+          final ProjectBuildFromWaters importer =
+            new ProjectBuildFromWaters(null);
+          if (watersResult.isSatisfied()) {
+            for (final AutomatonProxy proxy : watersResult.getSupervisors()) {
+              final Automaton aut = importer.build(proxy);
+              result.addAutomaton(aut);
+            }
+          } else {
+            final Automaton aut = new Automaton("sup(Untitled)");
+            aut.setType(AutomatonType.SUPERVISOR);
+            result.addAutomaton(aut);
+          }
 
         }
 
@@ -319,17 +393,19 @@ public class AutomataSynthesizer
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
         {
             // BDD synthesis
-            SynthesisType type = synthesizerOptions.getSynthesisType();
-            boolean doControllabilitySynth = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.CONTROLLABLE);
-            boolean doNonblockingSynth = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.NONBLOCKING);
+            final SynthesisType type = synthesizerOptions.getSynthesisType();
+            final boolean doControllabilitySynth = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.CONTROLLABLE);
+            final boolean doNonblockingSynth = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.NONBLOCKING);
 
-            Automata newAutomata = new Automata(theAutomata);
-            AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata,
+            final Automata newAutomata = new Automata(theAutomata);
+            final AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata,
                		doNonblockingSynth, doControllabilitySynth);
             try {
             	@SuppressWarnings("unused")
+              final
 				BDDAutomata bdda = bddSynthesizer.getBDDAutomata();
             	@SuppressWarnings("unused")
+              final
 				int safeStates = bddSynthesizer.computeSafeStates();
 
 /*
@@ -366,11 +442,11 @@ public class AutomataSynthesizer
             	{
             		//Perform BDD synthesis
 
-            		OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
+            		final OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
                     //result.addAutomaton(sup);
                 	try
                     {
-                	Automaton supAutomaton = supervisor.createAutomaton();
+                	final Automaton supAutomaton = supervisor.createAutomaton();
                         result.addAutomaton(supAutomaton);
                     }
                     finally
@@ -385,7 +461,7 @@ public class AutomataSynthesizer
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHICBDD)
         {
-            BDDSynthesizer bddSynthesizer = new BDDSynthesizer(theAutomata);
+            final BDDSynthesizer bddSynthesizer = new BDDSynthesizer(theAutomata);
             bddSynthesizer.computeSupervisor();
             bddSynthesizer.getSupervisor();
             bddSynthesizer.done();
@@ -406,7 +482,7 @@ public class AutomataSynthesizer
 
     public BigDecimal getTimeSeconds()
     {
-        String[] result = (getTime()).split("\\s");
+        final String[] result = (getTime()).split("\\s");
         Float out = (float)-1;
         if(result.length==2)
             out = (new Float(result[0]))/1000;
@@ -459,35 +535,35 @@ public class AutomataSynthesizer
      * Removes from disabledUncontrollableEvents those events that are "insignificant"
      * Returns the result, which is an altered disabledUncontrollableEvents
      */
-    private Alphabet checkMaximallyPermissive(Automata automata, Alphabet disabledUncontrollableEvents)
+    private Alphabet checkMaximallyPermissive(final Automata automata, final Alphabet disabledUncontrollableEvents)
     {
         if (disabledUncontrollableEvents != null)
         {
-            for (Automaton currAutomaton : automata)
+            for (final Automaton currAutomaton : automata)
             {
                 // disregard the uc-events of this spec/supervisor
                 if (currAutomaton.isSupervisor() || currAutomaton.isSpecification())
                 {
-                    Alphabet currAlphabet = currAutomaton.getAlphabet();
+                    final Alphabet currAlphabet = currAutomaton.getAlphabet();
 
                     disabledUncontrollableEvents.minus(currAlphabet);
                 }
             }
 
             // Remove those disabled events that are not included in another plant
-            LinkedList<LabeledEvent> eventsToBeRemoved = new LinkedList<LabeledEvent>();
+            final LinkedList<LabeledEvent> eventsToBeRemoved = new LinkedList<LabeledEvent>();
 
-            for (LabeledEvent currEvent : disabledUncontrollableEvents)
+            for (final LabeledEvent currEvent : disabledUncontrollableEvents)
             {
                 //Set currAutomata = (Set) ucEventToPlantMap.get(currEvent);
-                Automata currAutomata = ucEventToPlantMap.get(currEvent);
+                final Automata currAutomata = ucEventToPlantMap.get(currEvent);
                 boolean removeEvent = true;
 
                 // currAutomata contains those plant automata that contain this event.
-                for (Iterator<Automaton> autIt = currAutomata.iterator();
+                for (final Iterator<Automaton> autIt = currAutomata.iterator();
                 autIt.hasNext(); )
                 {
-                    Automaton currAutomaton = autIt.next();
+                    final Automaton currAutomaton = autIt.next();
 
                     if (currAutomaton.isPlant())
                     {
@@ -507,7 +583,7 @@ public class AutomataSynthesizer
                 }
             }
 
-            for (LabeledEvent currEvent : eventsToBeRemoved)
+            for (final LabeledEvent currEvent : eventsToBeRemoved)
             {
                 disabledUncontrollableEvents.removeEvent(currEvent);
             }
@@ -519,14 +595,14 @@ public class AutomataSynthesizer
     /**
      * Does modular synthesis...
      */
-    private Automata doModular(Automata aut)
+    private Automata doModular(final Automata aut)
     throws Exception
     {
         // Automata that collects the calculated supervisors
-        Automata supervisors = new Automata();
+        final Automata supervisors = new Automata();
 
         // Selector - always start with non-max perm
-        AutomataSelector selector = AutomataSelectorFactory.getAutomataSelector(aut, synthesizerOptions);
+        final AutomataSelector selector = AutomataSelectorFactory.getAutomataSelector(aut, synthesizerOptions);
 
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()
@@ -535,7 +611,7 @@ public class AutomataSynthesizer
             {
                 if (executionDialog != null)
                 {
-                    int nbrOfSpecAndSup = theAutomata.getSpecificationAndSupervisorAutomata().size();
+                    final int nbrOfSpecAndSup = theAutomata.getSpecificationAndSupervisorAutomata().size();
                     executionDialog.initProgressBar(0, nbrOfSpecAndSup);
                 }
             }
@@ -569,7 +645,7 @@ public class AutomataSynthesizer
             }
 
             // Do monolithic synthesis on this subsystem
-            MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
+            final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
 			threadToStop = synthesizer;
 			MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					automata, synthesizerOptions, synchronizationOptions,
@@ -710,27 +786,27 @@ public class AutomataSynthesizer
      * @param  theAutomata contains the originally given specs/sups and plants
      * @param  candidateSupervisors the Automata-object containing the new supervisors, is altered!
      */
-    private void removeUnnecessarySupervisors(Automata theAutomata, Automata candidateSupervisors)
+    private void removeUnnecessarySupervisors(final Automata theAutomata, final Automata candidateSupervisors)
     throws Exception
     {
         logger.debug("AutomataSynthesizer.optimize");
 
         // Deep copy the new automata, so we can purge without affecting the originals
-        Automata newSupervisors = new Automata(candidateSupervisors);
+        final Automata newSupervisors = new Automata(candidateSupervisors);
 
         // Make sure the automata are purged - they must be for the optimization to work...
         if (!synthesizerOptions.doPurge())
         {
             // We have not purged earlier - do that now!
-            Iterator<Automaton> autIt = newSupervisors.iterator();
+            final Iterator<Automaton> autIt = newSupervisors.iterator();
             while (autIt.hasNext())
             {
-                AutomatonPurge automatonPurge = new AutomatonPurge(autIt.next());
+                final AutomatonPurge automatonPurge = new AutomatonPurge(autIt.next());
                 automatonPurge.execute();
             }
         }
 
-        Automata currAutomata = new Automata();
+        final Automata currAutomata = new Automata();
         currAutomata.addAutomata(theAutomata);
         currAutomata.addAutomata(newSupervisors);
 
@@ -742,7 +818,7 @@ public class AutomataSynthesizer
         int progress = 0;
         for (int i = newSupervisors.size() - 1; i >= 0; i--)
         {
-            Automaton currSupervisor = newSupervisors.getAutomatonAt(i);
+            final Automaton currSupervisor = newSupervisors.getAutomatonAt(i);
             currAutomata.removeAutomaton(currSupervisor);
             progress++;
 
@@ -751,7 +827,7 @@ public class AutomataSynthesizer
             SynchronizationOptions synchronizationOptions;
             verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
             synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
-            AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions,
+            final AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions,
                 synchronizationOptions, null);
 
             if (stopRequested)
@@ -784,7 +860,7 @@ public class AutomataSynthesizer
         }
     }
 
-    public void setExecutionDialog(ExecutionDialog dialog)
+    public void setExecutionDialog(final ExecutionDialog dialog)
     {
         executionDialog = dialog;
     }
@@ -815,13 +891,13 @@ public class AutomataSynthesizer
     /**
      * Default method for SYNTHESIZING a controllable and nonblocking supervisor.
      */
-    public static Supervisor synthesizeControllableNonblocking(Automata model)
+    public static Supervisor synthesizeControllableNonblocking(final Automata model)
     throws Exception
     {
-        SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-        SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultMonolithicCNBSynthesizerOptions();
-        AutomataSynthesizer synthesizer = new AutomataSynthesizer(model, synchOptions, synthOptions);
-        Automata result = synthesizer.execute();
+        final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+        final SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultMonolithicCNBSynthesizerOptions();
+        final AutomataSynthesizer synthesizer = new AutomataSynthesizer(model, synchOptions, synthOptions);
+        final Automata result = synthesizer.execute();
 
         return new ModularSupervisor(result);
     }

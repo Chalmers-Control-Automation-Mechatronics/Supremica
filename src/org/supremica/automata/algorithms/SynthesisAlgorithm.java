@@ -56,43 +56,44 @@ public enum SynthesisAlgorithm
     PARTITIONBDD_Event("Partitioning (event_based)", false),
     PARTITIONBDD_Automaton("Partitioning (automaton_based)", false),
     PARTITIONBDD_Variable("Partitioning (variable_based)", false), // Under the development
-    
+
     MODULAR("Modular"),
     COMPOSITIONAL("Compositional"),
     SYNTHESISA("Compositional (SynthesisA)"),
+    COMPOSITIONAL_WATERS("Compositional (Waters)"),
     //IDD("IDD"),
     //MonolithicSingleFixpoint("MONOLITHIC (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
     BDD("BDD");    // works, but we cant handle the results yet
-    
+
     /** Textual description. */
     private final String description;
     /** True if this algo prefers working on modular systems. */
     private final boolean preferModular;
-    
-    private SynthesisAlgorithm(String description)
+
+    private SynthesisAlgorithm(final String description)
     {
         this(description, true);
     }
-    
-    private SynthesisAlgorithm(String description, boolean preferModular)
+
+    private SynthesisAlgorithm(final String description, final boolean preferModular)
     {
         this.description = description;
         this.preferModular = preferModular;
     }
-    
+
     public String toString()
     {
         return description;
     }
-    
+
     public boolean prefersModular()
     {
         return preferModular;
     }
-    
-    public static SynthesisAlgorithm fromDescription(String description)
+
+    public static SynthesisAlgorithm fromDescription(final String description)
     {
-        for (SynthesisAlgorithm value: values())
+        for (final SynthesisAlgorithm value: values())
         {
             if (value.description.equals(description))
             {

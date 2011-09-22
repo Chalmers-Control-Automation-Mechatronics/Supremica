@@ -198,12 +198,22 @@ public class SynthesisAbstractionTRSimplifierTest
       final String name = "synthesisAbstraction_8.wmod";
       runTransitionRelationSimplifier(group, subdir, name);
     }
+
   public void test_synthesisAbstraction_9()
     throws Exception
     {
       final String group = "tests";
       final String subdir = "abstraction";
       final String name = "synthesisAbstraction_9.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+
+  public void test_synthesisAbstraction_10()
+    throws Exception
+    {
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "synthesisAbstraction_10.wmod";
       runTransitionRelationSimplifier(group, subdir, name);
     }
   /**

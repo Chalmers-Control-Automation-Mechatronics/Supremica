@@ -208,6 +208,22 @@ public class HalfWaySynthesisTRSimplifierTest
     final String name = "HalfwaySynthesis_7.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
+  public void test_HalfwaySynthesis_8() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "HalfwaySynthesis_8.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_HalfwaySynthesis_9() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "HalfwaySynthesis_9.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.

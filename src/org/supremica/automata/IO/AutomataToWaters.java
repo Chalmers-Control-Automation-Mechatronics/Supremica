@@ -126,6 +126,8 @@ public class AutomataToWaters
     try {
       mEventList = new ArrayList<EventProxy>();
       mEventMap = new HashMap<String,EventProxy>();
+      mEventList.add(mMarkedProposition);
+      mEventMap.put(mMarkedProposition.getName(), mMarkedProposition);
       final String name = automata.getName();
       final String comment = automata.getComment();
       final int numAutomata = automata.size();

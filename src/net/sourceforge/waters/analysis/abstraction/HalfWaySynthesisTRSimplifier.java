@@ -9,7 +9,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 
 import gnu.trove.TIntStack;
 
@@ -18,6 +20,12 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -30,7 +38,53 @@ public class HalfWaySynthesisTRSimplifier
   extends AbstractMarkingTRSimplifier
 {
 
-  //#######################################################################
+  //#########################################################################
+  //# Static Invocation
+  public static AutomatonProxy synthesise(final AutomatonProxy automaton,
+                                          final EventProxy marking,
+                                          final ProductDESProxyFactory factory,
+                                          final KindTranslator translator)
+    throws AnalysisException
+  {
+    final Collection<EventProxy> events = automaton.getEvents();
+    final int numEvents = events.size();
+    final Collection<EventProxy> uncontrollable =
+      new ArrayList<EventProxy>(numEvents);
+    final Collection<EventProxy> controllable =
+      new ArrayList<EventProxy>(numEvents);
+    for (final EventProxy event : events) {
+      if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
+        uncontrollable.add(event);
+      } else {
+        controllable.add(event);
+      }
+    }
+    final Collection<EventProxy> orderedEvents =
+      new ArrayList<EventProxy>(numEvents);
+    orderedEvents.addAll(uncontrollable);
+    orderedEvents.addAll(controllable);
+    final EventEncoding encoding =
+      new EventEncoding(orderedEvents, translator);
+    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+      (automaton, encoding, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final HalfWaySynthesisTRSimplifier synthesis =
+      new HalfWaySynthesisTRSimplifier(rel);
+    synthesis.setLastLocalControllableEvent(numEvents);
+    synthesis.setLastLocalUncontrollableEvent(uncontrollable.size());
+    synthesis.setLastSharedUncontrollableEvent(numEvents);
+    final int defaultID = encoding.getEventCode(marking);
+    synthesis.setDefaultMarkingID(defaultID);
+    final boolean change = synthesis.run();
+    if (change) {
+      rel.setKind(ComponentKind.SUPERVISOR);
+      return rel.createAutomaton(factory, encoding);
+    } else {
+      return automaton;
+    }
+  }
+
+
+  //#########################################################################
   //# Constructors
   public HalfWaySynthesisTRSimplifier()
   {
@@ -159,11 +213,12 @@ public class HalfWaySynthesisTRSimplifier
     for (int state = badStates.nextSetBit(0); state >= 0;
          state = badStates.nextSetBit(state+1)) {
       iter.resetState(state);
-      while(iter.advance()){
+      while (iter.advance()) {
         final int source = iter.getCurrentSourceState();
         final int event = iter.getCurrentEvent();
-        if(!badStates.get(source) && mLastLocalControllableEvent < event &&
-          event<= mLastSharedUncontrollableEvent){
+        if (!badStates.get(source) &&
+            mLastLocalControllableEvent < event &&
+            event <= mLastSharedUncontrollableEvent) {
           if (state != dumpState) {
             iter.remove();
             rel.addTransition(source, event, dumpState);

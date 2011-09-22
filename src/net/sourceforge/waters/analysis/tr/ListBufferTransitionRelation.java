@@ -1880,6 +1880,8 @@ public class ListBufferTransitionRelation
         if (oldstatus != newstatus) {
           setReachable(s, newstatus);
           modified = true;
+        } else if (!newstatus) {
+          modified |= removeTransitions(s);
         }
       }
       return modified;

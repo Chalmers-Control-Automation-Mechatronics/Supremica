@@ -455,7 +455,9 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
 
   private void enqueueAlltheClasses(){
     for(final EquivalenceClass eq : mStateToClass){
-      eq.enqueue();
+      if(eq != null){
+        eq.enqueue();
+      }
     }
   }
 
