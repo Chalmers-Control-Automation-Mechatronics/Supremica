@@ -287,7 +287,7 @@ public abstract class AbstractTRSimplifierTest
   throws Exception
   {
     final EventEncoding eventEnc = createEventEncoding(des, aut);
-    final StateEncoding inputStateEnc = new StateEncoding(aut);
+    final StateEncoding inputStateEnc = createStateEncoding(aut);
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
@@ -344,7 +344,7 @@ public abstract class AbstractTRSimplifierTest
   /**
    * Creates an event encoding for use with the given product DES and
    * automaton. This method is called automatically and should be overridden
-   * by subclasses that need more specific implementation.
+   * by subclasses that need a more specific implementation.
    */
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
@@ -352,6 +352,16 @@ public abstract class AbstractTRSimplifierTest
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau = getEvent(aut, TAU);
     return new EventEncoding(aut, translator, tau);
+  }
+
+  /**
+   * Creates a state encoding for use with the given automaton.
+   * This method is called automatically and should be overridden
+   * by subclasses that need a more specific implementation.
+   */
+  protected StateEncoding createStateEncoding(final AutomatonProxy aut)
+  {
+    return new StateEncoding(aut);
   }
 
   /**

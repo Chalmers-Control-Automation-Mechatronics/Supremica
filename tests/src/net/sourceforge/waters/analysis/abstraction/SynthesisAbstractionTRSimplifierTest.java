@@ -11,13 +11,19 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -62,6 +68,7 @@ public class SynthesisAbstractionTRSimplifierTest
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
   {
+    EventProxy marking = null;
     final Collection<EventProxy> events = aut.getEvents();
     final int numEvents = events.size();
     final Collection<EventProxy> localUncontrollable =
@@ -90,6 +97,9 @@ public class SynthesisAbstractionTRSimplifierTest
         break;
       case PROPOSITION:
         sharedControllable.add(event);
+        if (event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+          marking = event;
+        }
         break;
       default:
         break;
@@ -103,7 +113,24 @@ public class SynthesisAbstractionTRSimplifierTest
     mLastSharedUncontrollable = all.size();
     all.addAll(sharedControllable);
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    return new EventEncoding(all, translator);
+    final EventEncoding encoding = new EventEncoding(all, translator);
+    mDefaultMarkingID = encoding.getEventCode(marking);
+    return encoding;
+  }
+
+  @Override
+  protected StateEncoding createStateEncoding(final AutomatonProxy aut)
+  {
+    final Collection <StateProxy> autStates = aut.getStates();
+    final int autSize = autStates.size();
+    final List<StateProxy> extendedStates =
+      new ArrayList<StateProxy>(autSize + 1);
+    extendedStates.addAll(autStates);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final StateProxy omega = factory.createStateProxy(":omega");
+    extendedStates.add(omega);
+    final StateEncoding coding = new StateEncoding(extendedStates);
+    return coding;
   }
 
   @Override
@@ -115,6 +142,7 @@ public class SynthesisAbstractionTRSimplifierTest
     simplifier.setLastLocalUncontrollableEvent(mLastLocalUncontrollable);
     simplifier.setLastLocalControllableEvent(mLastLocalControllable);
     simplifier.setLastSharedUncontrollableEvent(mLastSharedUncontrollable);
+    simplifier.setDefaultMarkingID(mDefaultMarkingID);
   }
 
   @Override
@@ -244,5 +272,6 @@ public class SynthesisAbstractionTRSimplifierTest
   private int mLastLocalUncontrollable;
   private int mLastLocalControllable;
   private int mLastSharedUncontrollable;
+  private int mDefaultMarkingID;
 
 }

@@ -12,9 +12,6 @@ package net.sourceforge.waters.analysis.abstraction;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TLongObjectIterator;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayDeque;
@@ -59,7 +56,8 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  * @author Sahar Mohajerani, Robi Malik
  */
 
-public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
+public class SynthesisAbstractionTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -93,7 +91,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
    * @param mask
    *          The bit mask of the significant propositions, or <CODE>-1</CODE>
    *          to indicate that all propositions are significant.
-   * @see #setUpInitialPartitionBasedOnMarkings()
+   * @see #setUpInitialPartitionBasedOnDefaultMarking()
    */
   public void setPropositionMask(final long mask)
   {
@@ -249,80 +247,55 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
   //# Initial Partition
   /**
    * Sets up an initial partition for the bisimulation algorithm based on the
-   * markings of states in the transition relation. States with equal sets of
-   * markings are placed in the same class. This method replaces any
+   * default marking. This method replaces any
    * previously set initial partition. This method is called by default during
    * each {@link #run()} unless the user provides an alternative initial
    * partition.
    */
-  public void setUpInitialPartitionBasedOnMarkings() throws OverflowException
+  public void setUpInitialPartitionBasedOnDefaultMarking()
   {
-    final long mask = getPropositionMask();
-    setUpInitialPartitionBasedOnMarkings(mask);
-  }
-
-  /**
-   * Sets up an initial partition for the bisimulation algorithm based on the
-   * markings of states in the transition relation. States with equal sets of
-   * markings are placed in the same class. This method replaces any
-   * previously set initial partition. This method is called by default during
-   * each {@link #run()} unless the user provides an alternative initial
-   * partition.
-   *
-   * @param mask
-   *          Marking pattern identifying the markings to be considered. Only
-   *          markings in this pattern will be taken into account for the
-   *          partition.
-   */
-  public void setUpInitialPartitionBasedOnMarkings(final long mask)
-    throws OverflowException
-  {
+    setUpPartition(2);
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-
-    mHasModifications = false;
-//    final long notMarked = rel.createMarkings();
-//    setUpTauClosure();
-//    final TransitionIterator iter = mAllTauIterator;
-//    for (int state = 0; state < numStates; state++) {
-//      if (rel.isReachable(state)) {
-//        final long marking = rel.getAllMarkings(state) & mask;
-//        if (marking != notMarked) {
-//          iter.resetState(state);
-//          while (iter.advance()) {
-//            final int pred = iter.getCurrentSourceState();
-//            if (rel.addMarkings(pred, marking)) {
-//              mHasModifications = true;
-//            }
-//          }
-//        }
-//      }
-//    }
-
-    final int numProps = rel.getNumberOfMarkings();
-    final int size = numProps > 8 ? 256 : 1 << numProps;
-    setUpPartition(size);
-    final TLongObjectHashMap<EquivalenceClass> prepartition =
-      new TLongObjectHashMap<EquivalenceClass>();
-    for (int state = 0; state < numStates; state++) {
-      if (rel.isReachable(state)) {
-        final long marking = rel.getAllMarkings(state) & mask;
-        EquivalenceClass clazz = prepartition.get(marking);
-        if (clazz == null) {
-          clazz = new EquivalenceClass();
-          prepartition.put(marking, clazz);
+    final int defaultMarkingID = getDefaultMarkingID();
+    final EquivalenceClass reachableClass = new EquivalenceClass();
+    if (defaultMarkingID >= 0) {
+      mOmegaState = -1;
+      for (int state = numStates - 1; state >= 0; state--) {
+        if (!rel.isReachable(state)) {
+          mOmegaState = state;
+          break;
         }
-        clazz.addState(state);
+      }
+      if (mOmegaState < 0) {
+        throw new IllegalArgumentException("Cannot create an omega state");
+      }
+      final EquivalenceClass omegaClass = new EquivalenceClass();
+      omegaClass.addState(mOmegaState);
+      for (int state = 0; state < numStates; state++) {
+        if (rel.isReachable(state)) {
+          if (rel.isMarked(state, defaultMarkingID)) {
+            rel.addTransition(state, EventEncoding.TAU, mOmegaState);
+          }
+          reachableClass.addState(state);
+        }
+      }
+      omegaClass.enqueue();
+      omegaClass.setUpStateToClass();
+      rel.setUsedEvent(EventEncoding.TAU, true);
+      rel.setReachable(mOmegaState, true);
+      mNumReachableStates++;
+    } else {
+      mOmegaState = -1;
+      for (int state = 0; state < numStates; state++) {
+        if (rel.isReachable(state)) {
+          reachableClass.addState(state);
+        }
       }
     }
-    final TLongObjectIterator<EquivalenceClass> mapIter =
-      prepartition.iterator();
-    while (mapIter.hasNext()) {
-      mapIter.advance();
-      final EquivalenceClass sec = mapIter.value();
-      sec.setUpStateToClass();
-      sec.enqueue();
-    }
+    reachableClass.enqueue();
+    reachableClass.setUpStateToClass();
+    mHasModifications = false;
   }
 
 
@@ -335,7 +308,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
     if (mSplitters == null) {
       mHasModifications = false;
       final boolean modified = mHasModifications;
-      setUpInitialPartitionBasedOnMarkings();
+      setUpInitialPartitionBasedOnDefaultMarking();
       mHasModifications |= modified;
     }
     setUpTauClosure();
@@ -375,6 +348,13 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
         prevNumClasses = mNumClasses;
         enqueueAlltheClasses();
       }
+    }
+    if(mOmegaState >= 0) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      rel.setReachable(mOmegaState, false);
+      rel.setUsedEvent(EventEncoding.TAU, false);
+      mNumClasses--;
+      mNumReachableStates--;
     }
     buildResultPartition();
     applyResultPartitionAutomatically();
@@ -681,29 +661,18 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       splitOn(transIter);
 
       // Controllable shared events
-      final int size = mTempClass.size();
       for (int event = mLastSharedUncontrollableEvent + 1;
            event < mNumEvents; event++) {
-        if (rel.isUsedEvent(event)) {
-          final Set <SearchRecord> visited = new THashSet<SearchRecord>();
-          final TIntHashSet found = new TIntHashSet();
-          final Collection<EquivalenceClass> splitClasses =
-            new THashSet<EquivalenceClass>();
-          for (int i = 0; i < size; i++) {
-            final int state = mTempClass.get(i);
-            explore(state, event, visited, found, splitClasses);
-          }
-          for (final EquivalenceClass splitClass : splitClasses) {
-            splitClass.splitUsingOverflowList();
-          }
-        }
+        splitOnSharedControllable(event);
       }
+      splitOnSharedControllable(EventEncoding.TAU);
 
       // Controllable local events
       final Set <SearchRecord> visited = new THashSet<SearchRecord>();
       final TIntHashSet found = new TIntHashSet();
       final Collection<EquivalenceClass> splitClasses =
         new THashSet<EquivalenceClass>();
+      final int size = mTempClass.size();
       for (int i = 0; i < size; i++) {
         final int state = mTempClass.get(i);
         explore(state, mLastLocalControllableEvent, visited, found,
@@ -716,6 +685,25 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       mTempClass.clear();
     }
 
+    private void splitOnSharedControllable(final int event)
+    {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int size = mTempClass.size();
+      if (rel.isUsedEvent(event)) {
+        final Set <SearchRecord> visited = new THashSet<SearchRecord>();
+        final TIntHashSet found = new TIntHashSet();
+        final Collection<EquivalenceClass> splitClasses =
+          new THashSet<EquivalenceClass>();
+        for (int i = 0; i < size; i++) {
+          final int state = mTempClass.get(i);
+          explore(state, event, visited, found, splitClasses);
+        }
+        for (final EquivalenceClass splitClass : splitClasses) {
+          splitClass.splitUsingOverflowList();
+        }
+      }
+    }
+
     private void explore(final int endState, final int event,
                          final Set <SearchRecord> visited,
                          final TIntHashSet found,
@@ -724,7 +712,9 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
       final Queue<SearchRecord> opened = new ArrayDeque<SearchRecord>();
       final EquivalenceClass endClass = mStateToClass[endState];
       final SearchRecord initial =
-        new SearchRecord(endState, null, event <= mLastLocalControllableEvent);
+        new SearchRecord(endState, null,
+                         event > EventEncoding.TAU &&
+                         event <= mLastLocalControllableEvent);
       visited.add(initial);
       opened.add(initial);
       while(!opened.isEmpty()){
@@ -1060,6 +1050,7 @@ public class SynthesisAbstractionTRSimplifier extends AbstractTRSimplifier
   private int mNumClasses;
   private boolean mHasModifications;
 
+  private int mOmegaState;
   private TauClosure mUncontrollableTauClosure;
   private TransitionIterator mPredecessorIterator;
   private TransitionIterator mUncontrollableTauIterator;

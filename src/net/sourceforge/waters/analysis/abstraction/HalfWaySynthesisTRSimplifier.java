@@ -24,6 +24,8 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -75,11 +77,18 @@ public class HalfWaySynthesisTRSimplifier
     final int defaultID = encoding.getEventCode(marking);
     synthesis.setDefaultMarkingID(defaultID);
     final boolean change = synthesis.run();
+    final String name = "sup:" + automaton.getName();
     if (change) {
+      rel.setName(name);
       rel.setKind(ComponentKind.SUPERVISOR);
       return rel.createAutomaton(factory, encoding);
     } else {
-      return automaton;
+      final Collection <StateProxy> states = automaton.getStates();
+      final Collection <TransitionProxy> transitions =
+        automaton.getTransitions();
+      return
+        factory.createAutomatonProxy(name, ComponentKind.SUPERVISOR,
+                                     events, states, transitions);
     }
   }
 
@@ -244,6 +253,7 @@ public class HalfWaySynthesisTRSimplifier
       changed = true;
     }
     changed |= rel.checkReachability();
+    changed |= rel.removeProperSelfLoopEvents();
     return changed;
   }
 

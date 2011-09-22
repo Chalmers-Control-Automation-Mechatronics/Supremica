@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
@@ -25,6 +26,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -263,7 +267,44 @@ public class CompositionalSynthesizer
   @Override
   protected void recordAbstractionStep(final AbstractionStep step)
   {
-    // TODO Add any distinguishers to analysis result ...
+    if(step instanceof EventRemovalStep){
+      final ProductDESProxyFactory factory = getFactory();
+      final CompositionalSynthesisResult result = getAnalysisResult();
+      final List<AutomatonProxy> before = step.getOriginalAutomata();
+      final List<AutomatonProxy> after = step.getResultAutomata();
+      final Iterator <AutomatonProxy> beforeIterator = before.iterator();
+      final Iterator <AutomatonProxy> afterIterator = after.iterator();
+      while (beforeIterator.hasNext()) {
+        final AutomatonProxy beforeAutomaton = beforeIterator.next();
+        final AutomatonProxy afterAutomaton = afterIterator.next();
+        final int sizeBefore = getNumControllableEvents(beforeAutomaton);
+        final int sizeAfter = getNumControllableEvents(afterAutomaton);
+        if (sizeBefore != sizeAfter) {
+          final String name = "dis:" + beforeAutomaton.getName();
+          final Collection <EventProxy> events = beforeAutomaton.getEvents();
+          final Collection <StateProxy> states = beforeAutomaton.getStates();
+          final Collection <TransitionProxy> transitions =
+            beforeAutomaton.getTransitions();
+          final AutomatonProxy distinguisher =
+            factory.createAutomatonProxy(name, ComponentKind.SUPERVISOR,
+                                         events, states, transitions);
+          result.addSupervisor(distinguisher);
+        }
+      }
+    }
+  }
+
+  private int getNumControllableEvents(final AutomatonProxy aut)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final Collection<EventProxy> alphabet = aut.getEvents();
+    int size = 0;
+    for(final EventProxy event:alphabet){
+      if(translator.getEventKind(event) == EventKind.CONTROLLABLE){
+        size++;
+      }
+    }
+   return size;
   }
 
   @Override
@@ -331,7 +372,7 @@ public class CompositionalSynthesizer
       final TransitionRelationSimplifier simplifier = getSimplifier();
       try {
         final EventEncoding eventEnc = createEventEncoding(aut, local);
-        final StateEncoding inputStateEnc = new StateEncoding(aut);
+        final StateEncoding inputStateEnc = createStateEncoding(aut);
         final int config = simplifier.getPreferredInputConfiguration();
         final ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
@@ -458,9 +499,26 @@ public class CompositionalSynthesizer
                                                  filter,
                         EventEncoding.FILTER_PROPOSITIONS);
       mHalfWaySynthesisSimplifier.
-      setDefaultMarkingID(encoding.getEventCode(mUsedDefaultMarking));
+        setDefaultMarkingID(encoding.getEventCode(mUsedDefaultMarking));
+      mSynthesisAbstraction.
+        setDefaultMarkingID(encoding.getEventCode(mUsedDefaultMarking));
       return encoding;
     }
+
+    private StateEncoding createStateEncoding(final AutomatonProxy aut)
+    {
+      final Collection <StateProxy> autStates = aut.getStates();
+      final int autSize = autStates.size();
+      final List<StateProxy> extendedStates =
+        new ArrayList<StateProxy>(autSize + 1);
+      extendedStates.addAll(autStates);
+      final ProductDESProxyFactory factory = getFactory();
+      final StateProxy omega = factory.createStateProxy(":omega");
+      extendedStates.add(omega);
+      final StateEncoding coding = new StateEncoding(extendedStates);
+      return coding;
+    }
+
 
     //#######################################################################
     //# Data Members

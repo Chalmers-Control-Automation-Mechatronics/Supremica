@@ -1965,7 +1965,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * copies that use the same state objects, so trace expansion can be
    * achieved by replacing only the automata in a trace.
    */
-  private class EventRemovalStep extends AbstractionStep
+  protected class EventRemovalStep extends AbstractionStep
   {
 
     //#######################################################################

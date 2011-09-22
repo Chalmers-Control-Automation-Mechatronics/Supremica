@@ -168,6 +168,15 @@ public class ListBufferTransitionRelation
         new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
       mPredecessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
     }
+    if (numStates > aut.getStates().size()) {
+      for (int state = 0; state<numStates; state++){
+        mStateBuffer.setReachable(state, false);
+      }
+      for(final StateProxy state: aut.getStates()){
+        final int code = stateEnc.getStateCode(state);
+        mStateBuffer.setReachable(code, true);
+      }
+    }
     mUsedEvents = new BitSet(numEvents);
     final int tau = EventEncoding.TAU;
     final int first = eventEnc.getProperEvent(tau) == null ? tau + 1 : tau;
@@ -1487,6 +1496,15 @@ public class ListBufferTransitionRelation
   public boolean isUsedEvent(final int event)
   {
     return mUsedEvents.get(event);
+  }
+
+  /**
+   * Sets whether the given event is used in this transition relation.
+   * @see #isUsedEvent(int) isUsedEvent()
+   */
+  public void setUsedEvent(final int event, final boolean used)
+  {
+    mUsedEvents.set(event, used);
   }
 
   /**
