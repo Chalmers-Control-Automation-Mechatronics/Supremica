@@ -1009,7 +1009,7 @@ public abstract class TransitionListBuffer
    *          the new merged state.
    * @see ListBufferTransitionRelation#merge(List) ListBufferTransitionRelation.merge()
    */
-  public void merge(final List<int[]> partition)
+  public void merge(final List<int[]> partition, final int extraStates)
   {
     mStateEventTransitions.clear();
     final int[] recoding = new int[mStateTransitions.length];
@@ -1024,7 +1024,7 @@ public abstract class TransitionListBuffer
         size = clazz.length;
       }
     }
-    final int numClasses = code;
+    final int numClasses = code + extraStates;
     final int[] newStateTransitions = new int[numClasses];
     final int eventShift = AutomatonTools.log2(mNumStates);
     final int stateMask = (1 << eventShift) - 1;

@@ -118,7 +118,7 @@ public class IncomingEquivalenceTRSimplifier
       rel.createPredecessorsTauClosure(mTransitionLimit);
     mPredecessorsTauClosureIterator = mPredecessorsTauClosure.createIterator();
     mPredecessorsPostEventClosureIterator =
-      mPredecessorsTauClosure.createPostEventClosureIterator();
+      mPredecessorsTauClosure.createPreEventClosureIterator();
     mPredecessorsFullEventClosureIterator =
       mPredecessorsTauClosure.createFullEventClosureIterator(-1);
     mSuccessorsTauClosure = rel.createSuccessorsTauClosure(0);

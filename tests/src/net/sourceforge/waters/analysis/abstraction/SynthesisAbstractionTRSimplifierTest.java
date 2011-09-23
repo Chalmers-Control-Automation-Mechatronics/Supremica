@@ -11,8 +11,6 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -20,8 +18,6 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 
 import junit.framework.Test;
@@ -121,16 +117,9 @@ public class SynthesisAbstractionTRSimplifierTest
   @Override
   protected StateEncoding createStateEncoding(final AutomatonProxy aut)
   {
-    final Collection <StateProxy> autStates = aut.getStates();
-    final int autSize = autStates.size();
-    final List<StateProxy> extendedStates =
-      new ArrayList<StateProxy>(autSize + 1);
-    extendedStates.addAll(autStates);
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final StateProxy omega = factory.createStateProxy(":omega");
-    extendedStates.add(omega);
-    final StateEncoding coding = new StateEncoding(extendedStates);
-    return coding;
+    final StateEncoding encoding = new StateEncoding(aut);
+    encoding.setNumberOfExtraStates(1);
+    return encoding;
   }
 
   @Override

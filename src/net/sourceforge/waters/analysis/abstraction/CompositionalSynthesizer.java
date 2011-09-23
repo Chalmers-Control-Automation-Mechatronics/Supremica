@@ -31,6 +31,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * An implementation of the compositional synthesis algorithm.
@@ -163,6 +165,8 @@ public class CompositionalSynthesizer
       if (!result.isFinished()) {
         result.setSatisfied(true);
       }
+      final Logger logger = getLogger();
+      logger.debug("CompositionalSynthesizer done.");
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -211,7 +215,7 @@ public class CompositionalSynthesizer
      */
     final HalfWaySynthesisTRSimplifier halfWay =
       new HalfWaySynthesisTRSimplifier();
-    chain.add(halfWay);
+    //chain.add(halfWay);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
@@ -320,6 +324,15 @@ public class CompositionalSynthesizer
       automaton = automata.get(0);
       break;
     default:
+      final Logger logger = getLogger();
+      if (logger.isDebugEnabled()) {
+        double estimate = 1.0;
+        for (final AutomatonProxy aut : automata) {
+          estimate *= aut.getStates().size();
+        }
+        logger.debug("Monolithically composing " + automata.size() +
+                     " automata, estimated " + estimate + " states.");
+      }
       final MonolithicSynchronousProductBuilder syncBuilder =
         getCurrentSynchronousProductBuilder();
       final ProductDESProxy des = createProductDESProxy(automata);
@@ -507,16 +520,9 @@ public class CompositionalSynthesizer
 
     private StateEncoding createStateEncoding(final AutomatonProxy aut)
     {
-      final Collection <StateProxy> autStates = aut.getStates();
-      final int autSize = autStates.size();
-      final List<StateProxy> extendedStates =
-        new ArrayList<StateProxy>(autSize + 1);
-      extendedStates.addAll(autStates);
-      final ProductDESProxyFactory factory = getFactory();
-      final StateProxy omega = factory.createStateProxy(":omega");
-      extendedStates.add(omega);
-      final StateEncoding coding = new StateEncoding(extendedStates);
-      return coding;
+      final StateEncoding encoding = new StateEncoding(aut);
+      encoding.setNumberOfExtraStates(1);
+      return encoding;
     }
 
 

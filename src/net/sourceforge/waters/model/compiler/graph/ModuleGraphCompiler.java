@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.compiler.graph;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -243,9 +245,9 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       mCurrentComponentIsDetermistic = graph.isDeterministic();
       mMaxInitialStates = mCurrentComponentIsDetermistic ? 1 : -1;
       final Collection<NodeProxy> nodes = graph.getNodes();
-      final int numnodes = nodes.size();
-      mPrecompiledNodesMap = new HashMap<NodeProxy,CompiledNode>(numnodes);
-      mLocalStateNames = new HashSet<String>(numnodes);
+      final int numNodes = nodes.size();
+      mPrecompiledNodesMap = new HashMap<NodeProxy,CompiledNode>(numNodes);
+      mLocalStateNames = new HashSet<String>(numNodes);
       mLocalTransitionsList = new LinkedList<CompiledTransition>();
       visitCollection(nodes);
       // Precompile transitions ...
@@ -263,9 +265,24 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       if (mIsOptimizationEnabled) {
         mNumReachableStates = 0;
         mNumReachableTransitions = 0;
+        final Queue<CompiledNode> queue =
+          new ArrayDeque<CompiledNode>(numNodes);
         for (final CompiledNode node : mPrecompiledNodesMap.values()) {
-          if (node.isInitial()) {
-            node.explore();
+          if (node.isInitial() && node.setReachable()) {
+            queue.add(node);
+            while (!queue.isEmpty()) {
+              final CompiledNode current = queue.remove();
+              for (final List<CompiledTransition> list :
+                   current.getOutgoingTransitions()) {
+                for (final CompiledTransition trans : list) {
+                  trans.setReachable();
+                  final CompiledNode target = trans.getTarget();
+                  if (target.setReachable()) {
+                    queue.add(target);
+                  }
+                }
+              }
+            }
           }
         }
         removeSelfloopedEvents(alphabet);
@@ -491,7 +508,9 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
     abstract boolean hasProperChildNode(CompiledNode node);
 
-    abstract void explore();
+    abstract boolean setReachable();
+
+    abstract Collection<List<CompiledTransition>> getOutgoingTransitions();
 
     abstract StateProxy createStateProxy();
 
@@ -599,7 +618,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       return false;
     }
 
-    void explore()
+    boolean setReachable()
     {
       if (!mIsReachable) {
         mIsReachable = true;
@@ -610,16 +629,15 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
             info.addSelfloop();
           }
         }
-        final Collection<List<CompiledTransition>> outgoing =
-          mOutgoingTransitions.values();
-        for (final List<CompiledTransition> list : outgoing) {
-          for (final CompiledTransition trans : list) {
-            final CompiledSimpleNode target = trans.getTarget();
-            target.explore();
-            trans.explore();
-          }
-        }
+        return true;
+      } else {
+        return false;
       }
+    }
+
+    Collection<List<CompiledTransition>> getOutgoingTransitions()
+    {
+      return mOutgoingTransitions.values();
     }
 
     //#######################################################################
@@ -727,8 +745,14 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       return false;
     }
 
-    void explore()
+    boolean setReachable()
     {
+      return false;
+    }
+
+    Collection<List<CompiledTransition>> getOutgoingTransitions()
+    {
+      return Collections.emptyList();
     }
 
     StateProxy createStateProxy()
@@ -776,7 +800,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
     //#######################################################################
     //# Algorithms
-    void explore()
+    void setReachable()
     {
       final SelfloopInfo info = getSelfloopInfo(mEvent);
       info.addTransition(mSource == mTarget);

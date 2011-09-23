@@ -33,6 +33,14 @@ public class NondeterministicDESException extends InvalidModelException {
   }
 
   /**
+   * Constructs a new exception with the given detail message.
+   */
+  public NondeterministicDESException(final String msg)
+  {
+    super(msg);
+  }
+
+  /**
    * Constructs a new exception indicating that an automaton has more than
    * one initial state.
    * @param aut      The automaton that causes the problem.

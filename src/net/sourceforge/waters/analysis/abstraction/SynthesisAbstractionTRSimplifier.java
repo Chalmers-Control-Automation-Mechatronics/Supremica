@@ -29,6 +29,7 @@ import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
 
@@ -393,6 +394,12 @@ public class SynthesisAbstractionTRSimplifier
       super.applyResultPartition();
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();
+      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      if (!rel.isDeterministic()) {
+        throw new NondeterministicDESException
+          ("Nondeterminism detected after synthesis abstraction of " +
+           rel.getName() + "!");
+      }
     } else {
       if (mHasModifications) {
         rel.removeProperSelfLoopEvents();

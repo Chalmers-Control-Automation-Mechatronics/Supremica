@@ -613,9 +613,11 @@ public class TauClosure
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     public void reset()
     {
-      mTauIterator.resetState(mFromState);
-      mTauIterator.advance();
-      mEventIterator.resetState(mFromState);
+      if (mFromState >= 0) {
+        mTauIterator.resetState(mFromState);
+        mTauIterator.advance();
+        mEventIterator.resetState(mFromState);
+      }
     }
 
     public void resetEvent(final int event)

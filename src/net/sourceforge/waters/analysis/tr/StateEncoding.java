@@ -244,10 +244,26 @@ public class StateEncoding
     return mStateCodeMap;
   }
 
+  public int getNumberOfExtraStates()
+  {
+    return mExtraStates;
+  }
+
+  public void setNumberOfExtraStates(final int extra)
+  {
+    mExtraStates = extra;
+  }
+
+  public int getNumberOfIncludingExtraStates()
+  {
+    return mStates.length + mExtraStates;
+  }
+
 
   //#########################################################################
   //# Data Members
   private StateProxy[] mStates;
   private TObjectIntHashMap<StateProxy> mStateCodeMap;
+  private int mExtraStates;
 
 }

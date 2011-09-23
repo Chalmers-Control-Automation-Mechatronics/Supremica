@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/waters"/>
+<listEntry value="/waters/tests/src/net/sourceforge/waters/analysis/abstraction/IncomingEquivalenceTRSimplifierTest.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-<listEntry value="4"/>
+<listEntry value="1"/>
 </listAttribute>
 <booleanAttribute key="org.eclipse.hyades.trace.ui.ATTR_AUTO_FILTER_CRITERIA" value="false"/>
 <booleanAttribute key="org.eclipse.hyades.trace.ui.ATTR_AUTO_MONITORING" value="true"/>

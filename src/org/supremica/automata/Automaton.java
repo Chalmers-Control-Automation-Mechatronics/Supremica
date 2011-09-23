@@ -93,7 +93,7 @@ public class Automaton
 
     private AutomatonListeners listeners = null;
     //The map between tau events and the original event.
-    private HashMap<LabeledEvent,TauEvent> tauEventMap=new HashMap<LabeledEvent,TauEvent>();
+    private final HashMap<LabeledEvent,TauEvent> tauEventMap=new HashMap<LabeledEvent,TauEvent>();
 
     /**
      * Creates an empty automaton. Always create with a name.
@@ -920,24 +920,12 @@ public class Automaton
      * Returns the state with the asked for name if it exists, otherwise null.
      */
     public State getStateWithName(final String name)
-    throws IllegalArgumentException
     {
-        if (name == null)
-        {
-            throw new IllegalArgumentException("Name must be non-null");
-        }
-
-        for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
-        {
-            final State currState = stIt.next();
-
-            if (currState.getName().equals(name))
-            {
-                return currState;
-            }
-        }
-
-        return null;
+      if (name == null) {
+        throw new IllegalArgumentException("Name must be non-null");
+      } else {
+        return theStates.getState(name);
+      }
     }
 
         /*
@@ -1765,7 +1753,7 @@ public class Automaton
             for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
             {
                 final Arc arc = arcIt.next();
-                LabeledEvent arcE=arc.getEvent();
+                final LabeledEvent arcE=arc.getEvent();
 
                 // Hide this one?
                 if (hideThese.contains(arcE))
@@ -1773,7 +1761,7 @@ public class Automaton
                     // If this event has been replaced by a new tau...
                     if(!tauEventMap.containsKey(arcE)){
                         //creat a new tau tau for the event
-                        TauEvent tau = new TauEvent(arc.getEvent());
+                        final TauEvent tau = new TauEvent(arc.getEvent());
                         getAlphabet().addEvent(tau);
                         tauEventMap.put(arcE, tau);
                         arc.setEvent(tau);
