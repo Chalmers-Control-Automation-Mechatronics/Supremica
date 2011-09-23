@@ -215,7 +215,7 @@ public class CompositionalSynthesizer
      */
     final HalfWaySynthesisTRSimplifier halfWay =
       new HalfWaySynthesisTRSimplifier();
-    //chain.add(halfWay);
+    chain.add(halfWay);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence
@@ -271,9 +271,22 @@ public class CompositionalSynthesizer
   @Override
   protected void recordAbstractionStep(final AbstractionStep step)
   {
-    if(step instanceof EventRemovalStep){
-      final ProductDESProxyFactory factory = getFactory();
-      final CompositionalSynthesisResult result = getAnalysisResult();
+    final CompositionalSynthesisResult result = getAnalysisResult();
+    final ProductDESProxyFactory factory = getFactory();
+    if(step instanceof SynthesisAbstractionStep){
+      final SynthesisAbstractionStep synStep = (SynthesisAbstractionStep) step;
+      final EventEncoding eventEnc = synStep.getEventEncoding();
+      final ListBufferTransitionRelation distinguisher =
+        synStep.getDistinguisher();
+      if(distinguisher != null){
+        final String name = "hsup:" + distinguisher.getName();
+        distinguisher.setName(name);
+        distinguisher.setKind(ComponentKind.SUPERVISOR);
+        final AutomatonProxy autDistinguisher =
+          distinguisher.createAutomaton(factory, eventEnc);
+        result.addSupervisor(autDistinguisher);
+      }
+    } else if(step instanceof EventRemovalStep){
       final List<AutomatonProxy> before = step.getOriginalAutomata();
       final List<AutomatonProxy> after = step.getResultAutomata();
       final Iterator <AutomatonProxy> beforeIterator = before.iterator();
@@ -405,7 +418,9 @@ public class CompositionalSynthesizer
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy convertedAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          return new SynthesisAbstractionStep(convertedAut, aut);
+          return new SynthesisAbstractionStep(convertedAut, aut,
+                                              mHalfWaySynthesisSimplifier.
+                                              getDistinguisher(), eventEnc);
         } else {
           return null;
         }
@@ -545,10 +560,31 @@ public class CompositionalSynthesizer
     //#######################################################################
     //# Constructor
     protected SynthesisAbstractionStep(final AutomatonProxy result,
-                                       final AutomatonProxy original)
+                                       final AutomatonProxy original,
+                                       final ListBufferTransitionRelation dis,
+                                       final EventEncoding coding)
     {
       super(result, original);
+      mDistinguisher = dis;
+      mEventEncoding = coding;
     }
+
+    //#######################################################################
+    //# Simple Access
+    ListBufferTransitionRelation getDistinguisher()
+    {
+      return mDistinguisher;
+    }
+
+    EventEncoding getEventEncoding()
+    {
+      return mEventEncoding;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ListBufferTransitionRelation mDistinguisher;
+    private final EventEncoding mEventEncoding;
   }
 
 

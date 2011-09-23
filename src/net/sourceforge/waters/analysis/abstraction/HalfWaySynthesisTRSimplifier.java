@@ -189,8 +189,19 @@ public class HalfWaySynthesisTRSimplifier
     return mLastSharedUncontrollableEvent;
   }
 
+  public ListBufferTransitionRelation getDistinguisher(){
+    return mDistinguisher;
+  }
+
+
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  @Override
+  protected void setUp() throws AnalysisException{
+    super.setUp();
+    mDistinguisher = null;
+  }
+
   @Override
   protected boolean runSimplifier()
   throws AnalysisException
@@ -219,15 +230,19 @@ public class HalfWaySynthesisTRSimplifier
     final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
     boolean dumpStateUsed = false;
     boolean changed = false;
+    boolean addDistinguisher = false;
     for (int state = badStates.nextSetBit(0); state >= 0;
          state = badStates.nextSetBit(state+1)) {
       iter.resetState(state);
       while (iter.advance()) {
         final int source = iter.getCurrentSourceState();
         final int event = iter.getCurrentEvent();
-        if (!badStates.get(source) &&
-            mLastLocalControllableEvent < event &&
-            event <= mLastSharedUncontrollableEvent) {
+        if (badStates.get(source)) {
+          iter.remove();
+          changed = true;
+        } else if (mLastLocalControllableEvent < event &&
+                   event <= mLastSharedUncontrollableEvent) {
+          // shared uncontrollable
           if (state != dumpState) {
             iter.remove();
             rel.addTransition(source, event, dumpState);
@@ -235,8 +250,11 @@ public class HalfWaySynthesisTRSimplifier
           }
           dumpStateUsed = true;
         } else {
+          // local or shared controllable
+          // (cannot be local uncontrollable, other source would be bad)
           iter.remove();
           changed = true;
+          addDistinguisher = true;
         }
       }
       if (state != dumpState) {
@@ -244,7 +262,6 @@ public class HalfWaySynthesisTRSimplifier
         changed = true;
       }
     }
-
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     if (dumpStateUsed) {
       changed |= rel.removeOutgoingTransitions(dumpState);
@@ -254,6 +271,14 @@ public class HalfWaySynthesisTRSimplifier
     }
     changed |= rel.checkReachability();
     changed |= rel.removeProperSelfLoopEvents();
+
+    if(addDistinguisher){
+      mDistinguisher = new ListBufferTransitionRelation
+          (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      if (dumpStateUsed) {
+        mDistinguisher.setReachable(dumpState, false);
+      }
+    }
     return changed;
   }
 
@@ -336,4 +361,5 @@ public class HalfWaySynthesisTRSimplifier
   private int mLastLocalControllableEvent;
   private int mLastSharedUncontrollableEvent;
 
+  private ListBufferTransitionRelation mDistinguisher;
 }
