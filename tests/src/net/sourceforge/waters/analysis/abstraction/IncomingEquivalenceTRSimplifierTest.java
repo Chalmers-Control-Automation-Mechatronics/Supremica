@@ -158,6 +158,15 @@ public class IncomingEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_activeEvents_11()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "activeEvents_11.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
 
   //#########################################################################
   //# Test Cases - Silent Continuation Rule

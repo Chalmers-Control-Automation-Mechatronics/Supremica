@@ -117,7 +117,7 @@ public class IncomingEquivalenceTRSimplifier
     mPredecessorsTauClosure =
       rel.createPredecessorsTauClosure(mTransitionLimit);
     mPredecessorsTauClosureIterator = mPredecessorsTauClosure.createIterator();
-    mPredecessorsPostEventClosureIterator =
+    mPredecessorsPreEventClosureIterator =
       mPredecessorsTauClosure.createPreEventClosureIterator();
     mPredecessorsFullEventClosureIterator =
       mPredecessorsTauClosure.createFullEventClosureIterator(-1);
@@ -214,7 +214,7 @@ public class IncomingEquivalenceTRSimplifier
     mStack1 = mStack2 = null;
     mEvents0 = mEvents1 = null;
     mPredecessorsTauClosure = mSuccessorsTauClosure = null;
-    mPredecessorsTauClosureIterator = mPredecessorsPostEventClosureIterator =
+    mPredecessorsTauClosureIterator = mPredecessorsPreEventClosureIterator =
       mPredecessorsFullEventClosureIterator =
       mSuccessorsTauIterator = mSuccessorsEventIterator1 =
       mSuccessorsEventIterator2 = null;
@@ -378,7 +378,7 @@ public class IncomingEquivalenceTRSimplifier
         boolean init = false;
         int result = 0;
         mPredecessorsTauClosureIterator.resetState(root);
-        mPredecessorsPostEventClosureIterator.resetEvents(EventEncoding.NONTAU,
+        mPredecessorsPreEventClosureIterator.resetEvents(EventEncoding.NONTAU,
                                                           Integer.MAX_VALUE);
         while (mPredecessorsTauClosureIterator.advance()) {
           final int taupred =
@@ -387,12 +387,12 @@ public class IncomingEquivalenceTRSimplifier
             init = true;
             result += INIT_HASH;
           }
-          mPredecessorsPostEventClosureIterator.resume(taupred);
-          while (mPredecessorsPostEventClosureIterator.advance()) {
+          mPredecessorsPreEventClosureIterator.resume(taupred);
+          while (mPredecessorsPreEventClosureIterator.advance()) {
             final int pred =
-              mPredecessorsPostEventClosureIterator.getCurrentSourceState();
+              mPredecessorsPreEventClosureIterator.getCurrentSourceState();
             final int event =
-              mPredecessorsPostEventClosureIterator.getCurrentEvent();
+              mPredecessorsPreEventClosureIterator.getCurrentEvent();
             final ClassInfo info = mStateClasses[pred];
             final int key = info.getFirstState() | (event << mEventShift);
             if (keys.add(key)) {
@@ -491,7 +491,7 @@ public class IncomingEquivalenceTRSimplifier
                  info1.incomingEquivalenceHashCode()) {
         return false;
       }
-      mPredecessorsPostEventClosureIterator.resetEvents(EventEncoding.NONTAU,
+      mPredecessorsPreEventClosureIterator.resetEvents(EventEncoding.NONTAU,
                                                         Integer.MAX_VALUE);
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final TIntHashSet keys0 = new TIntHashSet();
@@ -502,18 +502,18 @@ public class IncomingEquivalenceTRSimplifier
         final int taupred0 =
           mPredecessorsTauClosureIterator.getCurrentSourceState();
         init0 |= rel.isInitial(taupred0);
-        mPredecessorsPostEventClosureIterator.resume(taupred0);
-        while (mPredecessorsPostEventClosureIterator.advance()) {
+        mPredecessorsPreEventClosureIterator.resume(taupred0);
+        while (mPredecessorsPreEventClosureIterator.advance()) {
           final int pred0 =
-            mPredecessorsPostEventClosureIterator.getCurrentSourceState();
+            mPredecessorsPreEventClosureIterator.getCurrentSourceState();
           final int event0 =
-            mPredecessorsPostEventClosureIterator.getCurrentEvent();
+            mPredecessorsPreEventClosureIterator.getCurrentEvent();
           final ClassInfo info0 = mStateClasses[pred0];
           final int key0 = info0.getFirstState() | (event0 << mEventShift);
           keys0.add(key0);
         }
       }
-      mPredecessorsPostEventClosureIterator.reset();
+      mPredecessorsPreEventClosureIterator.reset();
       final int numKeys0 = keys0.size();
       final TIntHashSet keys1 = new TIntHashSet(numKeys0);
       boolean init1 = false;
@@ -528,12 +528,12 @@ public class IncomingEquivalenceTRSimplifier
             return false;
           }
         }
-        mPredecessorsPostEventClosureIterator.resume(taupred1);
-        while (mPredecessorsPostEventClosureIterator.advance()) {
+        mPredecessorsPreEventClosureIterator.resume(taupred1);
+        while (mPredecessorsPreEventClosureIterator.advance()) {
           final int pred1 =
-            mPredecessorsPostEventClosureIterator.getCurrentSourceState();
+            mPredecessorsPreEventClosureIterator.getCurrentSourceState();
           final int event1 =
-            mPredecessorsPostEventClosureIterator.getCurrentEvent();
+            mPredecessorsPreEventClosureIterator.getCurrentEvent();
           final ClassInfo predinfo1 = mStateClasses[pred1];
           final int key1 = predinfo1.getFirstState() | (event1 << mEventShift);
           if (keys1.add(key1) && !keys0.contains(key1)) {
@@ -917,7 +917,7 @@ public class IncomingEquivalenceTRSimplifier
   private TIntHashSet mEvents1;
   private TauClosure mPredecessorsTauClosure;
   private TransitionIterator mPredecessorsTauClosureIterator;
-  private TransitionIterator mPredecessorsPostEventClosureIterator;
+  private TransitionIterator mPredecessorsPreEventClosureIterator;
   private TransitionIterator mPredecessorsFullEventClosureIterator;
   private TauClosure mSuccessorsTauClosure;
   private TransitionIterator mSuccessorsTauIterator;

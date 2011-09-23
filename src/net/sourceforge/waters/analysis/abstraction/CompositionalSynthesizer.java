@@ -9,16 +9,24 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TLongObjectHashMap;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -368,6 +376,207 @@ public class CompositionalSynthesizer
       result.addSupervisor(supervisor);
       return true;
     }
+  }
+
+
+  //#########################################################################
+  //# Renaming
+  @SuppressWarnings("unused")
+  private AutomatonProxy createDeterministicAutomaton
+    (final ListBufferTransitionRelation original,
+     final ListBufferTransitionRelation simplified,
+     final Collection<int[]> partition,
+     final EventEncoding eventEnc)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final int numOfStates= original.getNumberOfStates();
+    final int[] recoding = new int[numOfStates];
+    int code = 0;
+    for (final int[] clazz : partition) {
+      for (final int state : clazz) {
+        recoding[state] = code;
+      }
+      code++;
+    }
+
+    final int numOfEvents = eventEnc.getNumberOfProperEvents();
+    final Map<EventProxy, List<EventProxy>> eventMap =
+      new HashMap<EventProxy, List<EventProxy>>(numOfEvents);
+    final TransitionIterator iter = original.createSuccessorsReadOnlyIterator();
+    for (int event = 0; event<numOfEvents; event ++){
+      if(original.isUsedEvent(event)){
+        int maxCount = 0;
+        for(final int[] clazz : partition){
+          final TIntHashSet successors = new TIntHashSet();
+          for(final int state : clazz){
+            iter.reset(state, event);
+            while (iter.advance()){
+              final int target = iter.getCurrentTargetState();
+              final int targetClass = recoding [target];
+              successors.add(targetClass);
+            }
+          }
+          final int count = successors.size();
+          if (count > maxCount){
+            maxCount = count;
+          }
+        }
+        if (maxCount > 1){
+          final List <EventProxy> replacement =
+            new ArrayList <EventProxy>(maxCount);
+          final EventProxy eventProxy = eventEnc.getProperEvent(event);
+          for (int i = 0; i < maxCount; i++){
+            final EventProxy newEvent = factory.createEventProxy
+              (eventProxy.getName() + ":" + i,
+               eventProxy.getKind(), eventProxy.isObservable());
+            replacement.add(newEvent);
+          }
+          eventMap.put(eventProxy, replacement);
+        }
+      }
+    }
+
+    // Create distinguisher and simplified automaton alphabet
+    final Collection<EventProxy> distinguisherEvents =
+      createAlphabet(original, eventEnc, eventMap);
+    final Collection<EventProxy> simplifiedEvents =
+      createAlphabet(simplified, eventEnc, eventMap);
+
+    // Create distinguisher and simplified automaton states
+    final StateProxy[] distinguisherStatesArray =
+      createStates(original, eventEnc);
+    final StateProxy[] simplifiedStatesArray =
+      createStates(simplified, eventEnc);
+    final Collection<StateProxy> distinguisherStates =
+      getNotNullStates(distinguisherStatesArray);
+    final Collection<StateProxy> simplifiedStates =
+      getNotNullStates(simplifiedStatesArray);
+
+    // Create distinguisher and simplified automaton transitions
+    final Collection <TransitionProxy> distinguisherTransitions =
+      new ArrayList <TransitionProxy> (original.getNumberOfTransitions());
+    final TransitionIterator allIter =
+      original.createAllTransitionsReadOnlyIterator();
+    for (int event = 0; event<numOfEvents; event ++){
+      if(original.isUsedEvent(event)){
+        final EventProxy eventProxy = eventEnc.getProperEvent(event);
+        if (eventMap.get(eventProxy) == null){
+          allIter.resetEvent(event);
+          while (iter.advance()) {
+            final int s = iter.getCurrentSourceState();
+            final int t = iter.getCurrentTargetState();
+            if (original.isReachable(s) && original.isReachable(t)) {
+              final StateProxy source = distinguisherStatesArray[s];
+              final int e = iter.getCurrentEvent();
+              final StateProxy target = distinguisherStatesArray[t];
+              final TransitionProxy trans =
+                factory.createTransitionProxy(source, eventProxy, target);
+              distinguisherTransitions.add(trans);
+            }
+          }
+        } else {
+          final List<EventProxy> replacement= eventMap.get(eventProxy);
+          for(final int[] clazz : partition){
+            final TIntObjectHashMap <EventProxy> successors =
+              new TIntObjectHashMap<EventProxy>(replacement.size());
+            int next = 0;
+            for(final int state : clazz){
+              iter.reset(state, event);
+              while(iter.advance()){
+                final int target = iter.getCurrentTargetState();
+                final int targetClass = recoding[target];
+                EventProxy replacementEventProxy = successors.get(targetClass);
+                if (replacementEventProxy == null) {
+                  replacementEventProxy = replacement.get(next);
+                  next++;
+                  successors.put(next, replacementEventProxy);
+                }
+                final StateProxy source = distinguisherStatesArray[state];
+                final int e = iter.getCurrentEvent();
+                final StateProxy targetState = distinguisherStatesArray[target];
+                final TransitionProxy trans =
+                  factory.createTransitionProxy(source,
+                                                replacementEventProxy,
+                                                targetState);
+                distinguisherTransitions.add(trans);
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  private Collection<EventProxy> createAlphabet
+    (final ListBufferTransitionRelation rel,
+     final EventEncoding eventEnc,
+     final Map<EventProxy,List<EventProxy>> eventMap)
+  {
+    final int numOfEvents = eventEnc.getNumberOfProperEvents();
+    final Collection<EventProxy> events =
+      new ArrayList<EventProxy>(numOfEvents);
+    for (int event = 0; event < numOfEvents; event++) {
+      if (rel.isUsedEvent(event)) {
+        final EventProxy eventProxy = eventEnc.getProperEvent(event);
+        if (eventMap.get(eventProxy) != null){
+          events.addAll(eventMap.get(eventProxy));
+        } else {
+          events.add(eventProxy);
+        }
+      }
+    }
+    for (int p = 0; p < rel.getNumberOfPropositions(); p++) {
+      if (rel.isUsedProposition(p)) {
+        final EventProxy event = eventEnc.getProposition(p);
+        events.add(event);
+      }
+    }
+    return events;
+  }
+
+  private StateProxy [] createStates(final ListBufferTransitionRelation rel,
+                                     final EventEncoding eventEnc)
+  {
+    final int numOfStates= rel.getNumberOfStates();
+    final int numProps = rel.getNumberOfPropositions();
+    final StateProxy[] states = new StateProxy[numOfStates];
+    final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
+      new TLongObjectHashMap<Collection<EventProxy>>();
+    int code = 0;
+    for (int s = 0; s < numOfStates; s++) {
+      if (rel.isReachable(s)) {
+        final StateProxy state;
+        final boolean init = rel.isInitial(s);
+        final long markings = rel.getAllMarkings(s);
+        Collection<EventProxy> props = markingsMap.get(markings);
+        if (props == null) {
+          props = new ArrayList<EventProxy>(numProps);
+          for (int p = 0; p < numProps; p++) {
+            if (rel.isMarked(s, p)) {
+              final EventProxy prop = eventEnc.getProposition(p);
+              props.add(prop);
+            }
+          }
+          markingsMap.put(markings, props);
+        }
+        state = new MemStateProxy(code++, init, props);
+        states[s] = state;
+      }
+    }
+    return states;
+  }
+
+  private Collection<StateProxy> getNotNullStates(final StateProxy[] states)
+  {
+    final List<StateProxy> reachable =
+      new ArrayList<StateProxy>(states.length);
+    for (final StateProxy state : states) {
+      if (state != null) {
+        reachable.add(state);
+      }
+    }
+    return reachable;
   }
 
 

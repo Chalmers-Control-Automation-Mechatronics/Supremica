@@ -511,6 +511,28 @@ public class ListBufferTransitionRelation
   //#########################################################################
   //# Markings Access
   /**
+   * Checks whether the given proposition is marked as used.
+   * Propositions can be marked as unused to indicate that all states are
+   * marked, so the proposition does not need to be included in the alphabet
+   * when constructing an automaton.
+   * @param  prop    ID of the marking proposition to be tested.
+   * @see #removeRedundantPropositions()
+   */
+  public boolean isUsedProposition(final int prop)
+  {
+    return mStateBuffer.isUsedProposition(prop);
+  }
+
+  /**
+   * Gets a marking pattern containing all propositions currently marked as
+   * used.
+   */
+  public long getUsedPropositions()
+  {
+    return mStateBuffer.getUsedPropositions();
+  }
+
+  /**
    * Tests whether a state is marked with a particular proposition.
    *
    * @param state
@@ -523,15 +545,6 @@ public class ListBufferTransitionRelation
   public boolean isMarked(final int state, final int prop)
   {
     return mStateBuffer.isMarked(state, prop);
-  }
-
-  /**
-   * Gets a marking pattern containing all propositions currently marked as
-   * used.
-   */
-  public long getUsedPropositions()
-  {
-    return mStateBuffer.getUsedPropositions();
   }
 
   /**
