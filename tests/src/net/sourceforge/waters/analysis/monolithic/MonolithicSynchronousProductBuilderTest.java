@@ -61,6 +61,7 @@ public class MonolithicSynchronousProductBuilderTest
   {
     super.configureAutomatonBuilder(des);
     final MonolithicSynchronousProductBuilder builder = getAutomatonBuilder();
+    builder.setPruningDeadlocks(mPruningDeadlocks);
     final Collection<EventProxy> events = des.getEvents();
     for (final EventProxy event : events) {
       final EventKind kind = event.getKind();
@@ -72,6 +73,7 @@ public class MonolithicSynchronousProductBuilderTest
     }
   }
 
+
   //#########################################################################
   //# Specific Test Cases
   public void testForbid() throws Exception
@@ -81,5 +83,23 @@ public class MonolithicSynchronousProductBuilderTest
     final String name = "forbid";
     runAutomatonBuilder(group, subdir, name);
   }
+
+  public void testDeadlockPruning() throws Exception
+  {
+    try {
+      mPruningDeadlocks = true;
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "deadlockPruning";
+      runAutomatonBuilder(group, subdir, name);
+    } finally {
+      mPruningDeadlocks = false;
+    }
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mPruningDeadlocks = false;
 
 }

@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.monolithic
+//# CLASS:   MonolithicSynchronousProductBuilder
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.THashSet;
@@ -40,7 +50,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * A simple monolithic implementation of the synchronous product algorithm.
+ * A Java implementation of the monolithic synchronous product algorithm.
  * This implementation supports nondeterministic automata and hiding.
  * States are stored in integer arrays without compression, so it is not
  * recommended to use this implementation to compose a large number of
@@ -137,6 +147,28 @@ public class MonolithicSynchronousProductBuilder
     }
     final MaskingPair pair = new MaskingPair(hidden, replacement, forbidden);
     mMaskingPairs.add(pair);
+  }
+
+  /**
+   * Sets whether deadlock states are pruned. If enabled, the synchronous
+   * product builder checks for deadlock states in the input automata, i.e.,
+   * for states that are not marked and which do not have any outgoing
+   * transitions. Synchronous product states, of which at least one state
+   * component is a deadlock state, are not expanded and instead merged into
+   * a single state.
+   */
+  public void setPruningDeadlocks(final boolean pruning)
+  {
+    mPruningDeadlocks = pruning;
+  }
+
+  /**
+   * Returns whether deadlock states are pruned.
+   * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
+   */
+  public boolean getPruningDeadlocks()
+  {
+    return mPruningDeadlocks;
   }
 
 
@@ -290,6 +322,8 @@ public class MonolithicSynchronousProductBuilder
       for (int e = 0; e < nextNormal; e++) {
         mCurrentSuccessors[e] = new TIntHashSet();
       }
+    } else if (mPruningDeadlocks) {
+      mCurrentDeadlock = new boolean[mNumInputEvents];
     }
     mNumEvents = nextNormal;
     mEvents = new EventProxy[nextNormal];
@@ -307,8 +341,12 @@ public class MonolithicSynchronousProductBuilder
     mStateMarkings = new List<?>[mNumAutomata][];
     // transitions indexed first by automaton then by event then by source state
     mTransitions = new int[mNumAutomata][mNumInputEvents][][];
+    if (mPruningDeadlocks) {
+      mDeadlock = new boolean[mNumAutomata][];
+    }
     mTargetTuple = new int[mNumAutomata];
     mNDTuple = new int[mNumAutomata][];
+    mDeadlockState = -1;
 
     int a = 0;
     for (final AutomatonProxy aut : automata) {
@@ -329,6 +367,9 @@ public class MonolithicSynchronousProductBuilder
       int snum = 0;
       mOriginalStates[a] = new StateProxy[numStates];
       mStateMarkings[a] = new List<?>[numStates];
+      if (mPruningDeadlocks) {
+        mDeadlock[a] = new boolean[numStates];
+      }
       for (final StateProxy state : states) {
         stateToIndex.put(state, snum);
         mOriginalStates[a][snum] = state;
@@ -350,6 +391,9 @@ public class MonolithicSynchronousProductBuilder
           Collections.sort(stateProps);
         }
         mStateMarkings[a][snum] = getUniqueMarking(stateProps);
+        if (mPruningDeadlocks) {
+          mDeadlock[a][snum] = stateProps.isEmpty();
+        }
         snum++;
       }
       mNDTuple[a] = initials.toNativeArray();
@@ -374,6 +418,9 @@ public class MonolithicSynchronousProductBuilder
             final TIntArrayList list = autTransitionLists[e][source];
             if (list != null) {
               mTransitions[a][e][source] = list.toNativeArray();
+              if (mPruningDeadlocks) {
+                mDeadlock[a][source] = false;
+              }
             }
           }
         }
@@ -436,6 +483,7 @@ public class MonolithicSynchronousProductBuilder
     mAllMarkings = null;
     mStateMarkings = null;
     mTransitions = null;
+    mDeadlock = null;
     mEventAutomata = null;
     mStates = null;
     mStateTuples = null;
@@ -444,6 +492,7 @@ public class MonolithicSynchronousProductBuilder
     mNDTuple = null;
     mTargetTuple = null;
     mCurrentSuccessors = null;
+    mCurrentDeadlock = null;
   }
 
 
@@ -457,6 +506,8 @@ public class MonolithicSynchronousProductBuilder
       for (int e = 0; e < mNumEvents; e++) {
         mCurrentSuccessors[e].clear();
       }
+    } else if (mCurrentDeadlock != null) {
+      Arrays.fill(mCurrentDeadlock, false);
     }
     forbidden:
     for (int e = 0; e < mNumForbiddenEvents; e++) {
@@ -516,12 +567,16 @@ public class MonolithicSynchronousProductBuilder
     final int target;
     if (mStates.containsKey(mTargetTuple)) {
       target = mStates.get(mTargetTuple);
-    } else {
-      final int limit = getNodeLimit();
-      if (mNumStates >= limit) {
-        throw new OverflowException(limit);
+    } else if (mPruningDeadlocks && isDeadlockTuple()) {
+      if (mDeadlockState < 0) {
+        mDeadlockState = getNewState();
+        final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
+        mStates.put(newTuple, mDeadlockState);
+        mStateTuples.add(newTuple);
       }
-      target = mNumStates++;
+      target = mDeadlockState;
+    } else {
+      target = getNewState();
       if (mStateCallback != null) {
         mStateCallback.countState(mTargetTuple);
       }
@@ -537,12 +592,40 @@ public class MonolithicSynchronousProductBuilder
     }
   }
 
+  private int getNewState()
+    throws OverflowException
+  {
+    final int limit = getNodeLimit();
+    if (mNumStates >= limit) {
+      throw new OverflowException(limit);
+    }
+    return mNumStates++;
+  }
+
+  private boolean isDeadlockTuple()
+  {
+    for (int a = 0; a < mNumAutomata; a++) {
+      final int state = mTargetTuple[a];
+      if (mDeadlock[a][state]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private void addTransition(final int source,
                              final int event,
                              final int target)
   throws OverflowException
   {
     if (mProjectionMask == null) {
+      if (target == mDeadlockState) {
+        if (mCurrentDeadlock[event]) {
+          return;
+        } else {
+          mCurrentDeadlock[event] = true;
+        }
+      }
       if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
         throw new OverflowException(OverflowKind.TRANSITION,
                                     getTransitionLimit());
@@ -782,7 +865,8 @@ public class MonolithicSynchronousProductBuilder
   //#########################################################################
   //# Inner Class MemStateProxy
   /**
-   * Stores states, encoding the name as an int rather than a long string value.
+   * Stores states, encoding the name as an int rather than a long string
+   * value.
    */
   private static class MemStateProxy implements StateProxy
   {
@@ -901,8 +985,9 @@ public class MonolithicSynchronousProductBuilder
   //#########################################################################
   //# Data Members
   private Collection<EventProxy> mUsedPropositions;
-  private Collection<MaskingPair> mMaskingPairs;
   private StateCallback mStateCallback;
+  private Collection<MaskingPair> mMaskingPairs;
+  private boolean mPruningDeadlocks;
 
   private int mNumAutomata;
   private int mNumForbiddenEvents;
@@ -915,6 +1000,7 @@ public class MonolithicSynchronousProductBuilder
   private Map<List<EventProxy>,List<EventProxy>> mAllMarkings;
   private List<?>[][] mStateMarkings;
   private int[][][][] mTransitions;
+  private boolean[][] mDeadlock;
   private int[][] mEventAutomata;
 
   private int mNumStates;
@@ -928,6 +1014,8 @@ public class MonolithicSynchronousProductBuilder
   private int[][] mNDTuple;
   private int[] mTargetTuple;
   private TIntHashSet[] mCurrentSuccessors;
+  private boolean[] mCurrentDeadlock;
+  private int mDeadlockState;
 
 
   //#########################################################################

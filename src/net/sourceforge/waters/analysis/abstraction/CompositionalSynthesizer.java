@@ -389,7 +389,10 @@ public class CompositionalSynthesizer
      final EventEncoding eventEnc)
   {
     final ProductDESProxyFactory factory = getFactory();
-    final int numOfStates= original.getNumberOfStates();
+    final int numOfStates = original.getNumberOfStates();
+    final int numOfEvents = eventEnc.getNumberOfProperEvents();
+
+    // Set up reverse state map of partition
     final int[] recoding = new int[numOfStates];
     int code = 0;
     for (final int[] clazz : partition) {
@@ -399,36 +402,38 @@ public class CompositionalSynthesizer
       code++;
     }
 
-    final int numOfEvents = eventEnc.getNumberOfProperEvents();
+    // Find event replacements
     final Map<EventProxy, List<EventProxy>> eventMap =
       new HashMap<EventProxy, List<EventProxy>>(numOfEvents);
-    final TransitionIterator iter = original.createSuccessorsReadOnlyIterator();
-    for (int event = 0; event<numOfEvents; event ++){
-      if(original.isUsedEvent(event)){
+    final TransitionIterator iter =
+      original.createSuccessorsReadOnlyIterator();
+    for (int event = 0; event < numOfEvents; event++) {
+      if (original.isUsedEvent(event)) {
         int maxCount = 0;
-        for(final int[] clazz : partition){
+        for (final int[] clazz : partition) {
           final TIntHashSet successors = new TIntHashSet();
-          for(final int state : clazz){
+          for (final int state : clazz) {
             iter.reset(state, event);
-            while (iter.advance()){
+            while (iter.advance()) {
               final int target = iter.getCurrentTargetState();
-              final int targetClass = recoding [target];
+              final int targetClass = recoding[target];
               successors.add(targetClass);
             }
           }
           final int count = successors.size();
-          if (count > maxCount){
+          if (count > maxCount) {
             maxCount = count;
           }
         }
-        if (maxCount > 1){
-          final List <EventProxy> replacement =
-            new ArrayList <EventProxy>(maxCount);
+        if (maxCount > 1) {
+          final List<EventProxy> replacement =
+            new ArrayList<EventProxy>(maxCount);
           final EventProxy eventProxy = eventEnc.getProperEvent(event);
-          for (int i = 0; i < maxCount; i++){
-            final EventProxy newEvent = factory.createEventProxy
-              (eventProxy.getName() + ":" + i,
-               eventProxy.getKind(), eventProxy.isObservable());
+          for (int i = 0; i < maxCount; i++) {
+            final EventProxy newEvent =
+              factory.createEventProxy(eventProxy.getName() + ":" + i,
+                                       eventProxy.getKind(),
+                                       eventProxy.isObservable());
             replacement.add(newEvent);
           }
           eventMap.put(eventProxy, replacement);
@@ -457,10 +462,10 @@ public class CompositionalSynthesizer
       new ArrayList <TransitionProxy> (original.getNumberOfTransitions());
     final TransitionIterator allIter =
       original.createAllTransitionsReadOnlyIterator();
-    for (int event = 0; event<numOfEvents; event ++){
-      if(original.isUsedEvent(event)){
+    for (int event = 0; event < numOfEvents; event++) {
+      if (original.isUsedEvent(event)) {
         final EventProxy eventProxy = eventEnc.getProperEvent(event);
-        if (eventMap.get(eventProxy) == null){
+        if (eventMap.get(eventProxy) == null) {
           allIter.resetEvent(event);
           while (iter.advance()) {
             final int s = iter.getCurrentSourceState();
@@ -475,29 +480,32 @@ public class CompositionalSynthesizer
             }
           }
         } else {
-          final List<EventProxy> replacement= eventMap.get(eventProxy);
-          for(final int[] clazz : partition){
-            final TIntObjectHashMap <EventProxy> successors =
+          final List<EventProxy> replacement = eventMap.get(eventProxy);
+          for (final int[] clazz : partition) {
+            final TIntObjectHashMap<EventProxy> successors =
               new TIntObjectHashMap<EventProxy>(replacement.size());
             int next = 0;
-            for(final int state : clazz){
-              iter.reset(state, event);
-              while(iter.advance()){
+            for (final int source : clazz) {
+              iter.reset(source, event);
+              while (iter.advance()) {
                 final int target = iter.getCurrentTargetState();
                 final int targetClass = recoding[target];
-                EventProxy replacementEventProxy = successors.get(targetClass);
+                EventProxy replacementEventProxy =
+                  successors.get(targetClass);
                 if (replacementEventProxy == null) {
                   replacementEventProxy = replacement.get(next);
                   next++;
                   successors.put(next, replacementEventProxy);
                 }
-                final StateProxy source = distinguisherStatesArray[state];
+                final StateProxy sourceProxy =
+                  distinguisherStatesArray[source];
                 final int e = iter.getCurrentEvent();
-                final StateProxy targetState = distinguisherStatesArray[target];
+                final StateProxy targetProxy =
+                  distinguisherStatesArray[target];
                 final TransitionProxy trans =
-                  factory.createTransitionProxy(source,
+                  factory.createTransitionProxy(sourceProxy,
                                                 replacementEventProxy,
-                                                targetState);
+                                                targetProxy);
                 distinguisherTransitions.add(trans);
               }
             }
@@ -535,10 +543,10 @@ public class CompositionalSynthesizer
     return events;
   }
 
-  private StateProxy [] createStates(final ListBufferTransitionRelation rel,
-                                     final EventEncoding eventEnc)
+  private StateProxy[] createStates(final ListBufferTransitionRelation rel,
+                                    final EventEncoding eventEnc)
   {
-    final int numOfStates= rel.getNumberOfStates();
+    final int numOfStates = rel.getNumberOfStates();
     final int numProps = rel.getNumberOfPropositions();
     final StateProxy[] states = new StateProxy[numOfStates];
     final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
@@ -569,14 +577,13 @@ public class CompositionalSynthesizer
 
   private Collection<StateProxy> getNotNullStates(final StateProxy[] states)
   {
-    final List<StateProxy> reachable =
-      new ArrayList<StateProxy>(states.length);
+    final List<StateProxy> notNull = new ArrayList<StateProxy>(states.length);
     for (final StateProxy state : states) {
       if (state != null) {
-        reachable.add(state);
+        notNull.add(state);
       }
     }
-    return reachable;
+    return notNull;
   }
 
 
