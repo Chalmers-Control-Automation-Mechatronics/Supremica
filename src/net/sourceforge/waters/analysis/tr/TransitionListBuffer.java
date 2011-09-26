@@ -1584,12 +1584,13 @@ public abstract class TransitionListBuffer
 
     public void resetEvent(final int event)
     {
-      mInnerIterator.resetEvent(event);
+      mInnerIterator.reset(-1, event);
       reset();
     }
 
     public void resetEvents(final int first, final int last)
     {
+      mInnerIterator.resetState(-1);
       mInnerIterator.resetEvents(first, last);
       reset();
     }

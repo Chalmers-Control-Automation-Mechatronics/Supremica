@@ -197,6 +197,12 @@ public class HalfWaySynthesisTRSimplifier
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
+  public void reset(){
+    super.reset();
+    mDistinguisher = null;
+  }
+
+  @Override
   protected void setUp() throws AnalysisException{
     super.setUp();
     mDistinguisher = null;
@@ -233,33 +239,35 @@ public class HalfWaySynthesisTRSimplifier
     boolean addDistinguisher = false;
     for (int state = badStates.nextSetBit(0); state >= 0;
          state = badStates.nextSetBit(state+1)) {
-      iter.resetState(state);
-      while (iter.advance()) {
-        final int source = iter.getCurrentSourceState();
-        final int event = iter.getCurrentEvent();
-        if (badStates.get(source)) {
-          iter.remove();
-          changed = true;
-        } else if (mLastLocalControllableEvent < event &&
-                   event <= mLastSharedUncontrollableEvent) {
-          // shared uncontrollable
-          if (state != dumpState) {
+      if(rel.isReachable(state)) {
+        iter.resetState(state);
+        while (iter.advance()) {
+          final int source = iter.getCurrentSourceState();
+          final int event = iter.getCurrentEvent();
+          if (badStates.get(source)) {
             iter.remove();
-            rel.addTransition(source, event, dumpState);
             changed = true;
+          } else if (mLastLocalControllableEvent < event &&
+            event <= mLastSharedUncontrollableEvent) {
+            // shared uncontrollable
+            if (state != dumpState) {
+              iter.remove();
+              rel.addTransition(source, event, dumpState);
+              changed = true;
+            }
+            dumpStateUsed = true;
+          } else {
+            // local or shared controllable
+            // (cannot be local uncontrollable, other source would be bad)
+            iter.remove();
+            changed = true;
+            addDistinguisher = true;
           }
-          dumpStateUsed = true;
-        } else {
-          // local or shared controllable
-          // (cannot be local uncontrollable, other source would be bad)
-          iter.remove();
-          changed = true;
-          addDistinguisher = true;
         }
-      }
-      if (state != dumpState) {
-        rel.setReachable(state, false);
-        changed = true;
+        if (state != dumpState) {
+          rel.setReachable(state, false);
+          changed = true;
+        }
       }
     }
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);

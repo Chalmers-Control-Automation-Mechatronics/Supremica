@@ -801,6 +801,11 @@ public abstract class AbstractCompositionalModelAnalyzer
     return new EventInfo(event);
   }
 
+  protected EventInfo getEventInfo(final EventProxy event)
+  {
+    return mEventInfoMap.get(event);
+  }
+
   protected void addEventsToAutomata(final AutomatonProxy aut)
   {
     final Collection<EventProxy> events = aut.getEvents();
@@ -1187,9 +1192,11 @@ public abstract class AbstractCompositionalModelAnalyzer
             break;
           }
         }
-        recordAbstractionStep(simpStep);
       }
       updateEventsToAutomata(aut, candidate.getAutomata());
+      if (simpStep != null) {
+        recordAbstractionStep(simpStep);
+      }
       return true;
     } else {
       return false;
@@ -2310,6 +2317,14 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Simple Access
+    protected List<AutomatonProxy> getAutomataList()
+    {
+      final int size = mAutomataMap.size();
+      final AutomatonProxy[] automata = new AutomatonProxy[size];
+      mAutomataMap.keys(automata);
+      return Arrays.asList(automata);
+    }
+
     private boolean addAutomataTo(final Collection<AutomatonProxy> target)
     {
       final TObjectByteIterator<AutomatonProxy> iter = mAutomataMap.iterator();
@@ -2348,14 +2363,6 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       }
       return true;
-    }
-
-    private List<AutomatonProxy> getAutomataList()
-    {
-      final int size = mAutomataMap.size();
-      final AutomatonProxy[] automata = new AutomatonProxy[size];
-      mAutomataMap.keys(automata);
-      return Arrays.asList(automata);
     }
 
     private Set<AutomatonProxy> getAutomataSet()

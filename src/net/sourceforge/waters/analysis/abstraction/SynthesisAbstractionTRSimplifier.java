@@ -29,7 +29,6 @@ import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
 
@@ -237,10 +236,19 @@ public class SynthesisAbstractionTRSimplifier
   public void reset()
   {
     super.reset();
+    mOriginalTransitionRelation = null;
     mUncontrollableTauClosure = null;
     mPredecessorIterator = null;
     mUncontrollableTauIterator = null;
     mUncontrollableEventIterator = null;
+  }
+
+
+  //#########################################################################
+  //# Simple access
+  public ListBufferTransitionRelation getOriginalTransitionRelation()
+  {
+    return mOriginalTransitionRelation;
   }
 
 
@@ -329,6 +337,7 @@ public class SynthesisAbstractionTRSimplifier
       mHasUncontrollable[source] = true;
     }
     mTempClass = new TIntArrayList(numStates);
+    mOriginalTransitionRelation = null;
   }
 
   @Override
@@ -391,14 +400,14 @@ public class SynthesisAbstractionTRSimplifier
       mUncontrollableTauClosure = null;
       mUncontrollableTauIterator = null;
       mUncontrollableEventIterator = null;
+      final ListBufferTransitionRelation copy = new ListBufferTransitionRelation
+        (rel,ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       super.applyResultPartition();
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       if (!rel.isDeterministic()) {
-        throw new NondeterministicDESException
-          ("Nondeterminism detected after synthesis abstraction of " +
-           rel.getName() + "!");
+        mOriginalTransitionRelation = copy;
       }
     } else {
       if (mHasModifications) {
@@ -1051,6 +1060,8 @@ public class SynthesisAbstractionTRSimplifier
   private int mLastLocalUncontrollableEvent;
   private int mLastLocalControllableEvent;
   private int mLastSharedUncontrollableEvent;
+
+  private ListBufferTransitionRelation mOriginalTransitionRelation;
 
   private int mNumReachableStates;
   private int mNumEvents;

@@ -203,34 +203,30 @@ public class ChainTRSimplifier
     for (int index = 0; index < mStopIndex; index++) {
       checkAbort();
       final TransitionRelationSimplifier step = iter.next();
-      try {
+      if (logger.isDebugEnabled()) {
+        logger.debug(ProxyTools.getShortClassName(step) + " ...");
+      }
+      final int config = step.getPreferredInputConfiguration();
+      if (config != 0) {
+        rel.reconfigure(config);
+      }
+      step.setTransitionRelation(rel);
+      if (step.run()) {
         if (logger.isDebugEnabled()) {
-          logger.debug(ProxyTools.getShortClassName(step) + " ...");
+          logger.debug(rel.getNumberOfReachableStates() + " states, " +
+            rel.getNumberOfTransitions() + " transitions, " +
+            rel.getNumberOfMarkings() + " markings.");
         }
-        final int config = step.getPreferredInputConfiguration();
-        if (config != 0) {
-          rel.reconfigure(config);
+        result = true;
+        mIsObservationEquivalentAbstraction &=
+          step.isObservationEquivalentAbstraction();
+        for (int prop = 0; prop < numProps; prop++) {
+          mReducedMarkings[prop] |= step.isReducedMarking(prop);
         }
-        step.setTransitionRelation(rel);
-        if (step.run()) {
-          if (logger.isDebugEnabled()) {
-            logger.debug(rel.getNumberOfReachableStates() + " states, " +
-                         rel.getNumberOfTransitions() + " transitions, " +
-                         rel.getNumberOfMarkings() + " markings.");
-          }
-          result = true;
-          mIsObservationEquivalentAbstraction &=
-            step.isObservationEquivalentAbstraction();
-          for (int prop = 0; prop < numProps; prop++) {
-            mReducedMarkings[prop] |= step.isReducedMarking(prop);
-          }
-          if (isPartitioning()) {
-            final List<int[]> partition = step.getResultPartition();
-            mergePartitions(partition);
-          }
+        if (isPartitioning()) {
+          final List<int[]> partition = step.getResultPartition();
+          mergePartitions(partition);
         }
-      } finally {
-        step.reset();
       }
     }
     return result;
