@@ -610,6 +610,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    *                      and after the step.
    */
   protected void recordAbstractionStep(final AbstractionStep step)
+    throws AnalysisException
   {
   }
 
@@ -904,7 +905,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * @see #removeEventsToAutomata(Collection) removeEventsToAutomata()
    */
   private boolean removeRedundantEvents()
-    throws OverflowException
+    throws AnalysisException
   {
     final AbstractionStep step = removeEvents(mRedundantEvents);
     if (step != null) {

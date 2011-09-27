@@ -322,9 +322,9 @@ public class EventEncoding
   //#########################################################################
   //# Simple Access
   /**
-   * Gets the total number of events in this encoding.
-   * The number of events always includes the silent (tau) event,
-   * even if none has been specified.
+   * Gets the total number of events including propositions
+   * in this encoding. The number of events always includes the silent (tau)
+   * event, even if none has been specified.
    */
   public int getNumberOfEvents()
   {

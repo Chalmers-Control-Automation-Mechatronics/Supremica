@@ -10,8 +10,11 @@
 package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.TIntArrayList;
+import gnu.trove.TLongObjectHashMap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -490,6 +493,46 @@ public class IntStateBuffer
       }
     }
     return count;
+  }
+
+  /**
+   * Creates a state encoding from this state buffer. This method creates a
+   * {@link StateEncoding} with a new {@link StateProxy} objects for all
+   * states marked as reachable in the encoding.
+   * @param eventEnc
+   *          Event encoding defining what propositions are to be used to
+   *          encode markings.
+   */
+  public StateEncoding createStateEncoding(final EventEncoding eventEnc)
+  {
+    final int numProps = eventEnc.getNumberOfPropositions();
+    final int numStates = getNumberOfStates();
+    final StateProxy[] states = new StateProxy[numStates];
+    final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
+      new TLongObjectHashMap<Collection<EventProxy>>();
+    int code = 0;
+    for (int s = 0; s < numStates; s++) {
+      if (isReachable(s)) {
+        final boolean init = isInitial(s);
+        final long markings = getAllMarkings(s);
+        Collection<EventProxy> props = markingsMap.get(markings);
+        if (props == null) {
+          props = new ArrayList<EventProxy>(numProps);
+          for (int p = 0; p < numProps; p++) {
+            if (isMarked(s, p)) {
+              final EventProxy prop = eventEnc.getProposition(p);
+              if (prop != null) {
+                props.add(prop);
+              }
+            }
+          }
+          markingsMap.put(markings, props);
+        }
+        final StateProxy state = new MemStateProxy(code++, init, props);
+        states[s] = state;
+      }
+    }
+    return new StateEncoding(states);
   }
 
 

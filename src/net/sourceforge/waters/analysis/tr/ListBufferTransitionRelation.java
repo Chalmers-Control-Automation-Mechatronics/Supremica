@@ -2010,13 +2010,26 @@ public class ListBufferTransitionRelation
   //#########################################################################
   //# Automaton Output
   /**
+   * Creates a state encoding for this transition relation. This method
+   * creates a {@link StateEncoding} with a new {@link StateProxy} objects for
+   * all states marked as reachable.
+   * @param eventEnc
+   *          Event encoding defining what propositions are to be used to
+   *          encode markings.
+   */
+  public StateEncoding createStateEncoding(final EventEncoding eventEnc)
+  {
+    return mStateBuffer.createStateEncoding(eventEnc);
+  }
+
+  /**
    * Creates an automaton from this transition relation. This method creates
    * an {@link AutomatonProxy} object that contains all events not marked as
    * unused and all reachable states of the transition relation, and links
    * them with all the transitions stored.
    *
    * @param factory
-   *          Factory used from proxy creation.
+   *          Factory used for proxy creation.
    * @param eventEnc
    *          Event encoding defining what events are to be used for the
    *          integer codes in the transition relation.
@@ -2034,7 +2047,7 @@ public class ListBufferTransitionRelation
    * them with all the transitions stored.
    *
    * @param factory
-   *          Factory used from proxy creation.
+   *          Factory used for proxy creation.
    * @param eventEnc
    *          Event encoding defining what events are to be used for the
    *          integer codes in the transition relation.

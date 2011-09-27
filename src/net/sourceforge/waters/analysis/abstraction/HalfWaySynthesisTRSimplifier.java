@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 
+import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -189,8 +190,18 @@ public class HalfWaySynthesisTRSimplifier
     return mLastSharedUncontrollableEvent;
   }
 
-  public ListBufferTransitionRelation getDistinguisher(){
-    return mDistinguisher;
+  public void setRenamedEvents(final TIntHashSet renamedEventIndexes)
+  {
+    mRenamedEvents = renamedEventIndexes;
+  }
+
+  public TIntHashSet getRenamedEvents()
+  {
+    return mRenamedEvents;
+  }
+
+  public ListBufferTransitionRelation getSupervisor(){
+    return mSupervisor;
   }
 
 
@@ -199,13 +210,13 @@ public class HalfWaySynthesisTRSimplifier
   @Override
   public void reset(){
     super.reset();
-    mDistinguisher = null;
+    mSupervisor = null;
   }
 
   @Override
   protected void setUp() throws AnalysisException{
     super.setUp();
-    mDistinguisher = null;
+    mSupervisor = null;
   }
 
   @Override
@@ -236,7 +247,7 @@ public class HalfWaySynthesisTRSimplifier
     final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
     boolean dumpStateUsed = false;
     boolean changed = false;
-    boolean addDistinguisher = false;
+    boolean addSupervisor = false;
     for (int state = badStates.nextSetBit(0); state >= 0;
          state = badStates.nextSetBit(state+1)) {
       if(rel.isReachable(state)) {
@@ -256,20 +267,62 @@ public class HalfWaySynthesisTRSimplifier
               changed = true;
             }
             dumpStateUsed = true;
+          } else if (mRenamedEvents != null &&
+                     mRenamedEvents.contains(event)) {
+            // local or shared controllable, renamed
+            if (state != dumpState) {
+              iter.remove();
+              rel.addTransition(source, event, dumpState);
+              changed = true;
+            }
+            dumpStateUsed = true;
+            addSupervisor = true;
           } else {
-            // local or shared controllable
-            // (cannot be local uncontrollable, other source would be bad)
+            // local or shared controllable, not renamed
+            // (cannot be local uncontrollable, otherwise source would be bad)
             iter.remove();
             changed = true;
-            addDistinguisher = true;
+            addSupervisor = true;
           }
         }
         if (state != dumpState) {
           rel.setReachable(state, false);
           changed = true;
         }
+        if(rel.isInitial(state)){
+          rel.setReachable(state, false);
+          changed = true;
+          addSupervisor = true;
+        }
+
       }
     }
+
+    if(addSupervisor){
+      mSupervisor = new ListBufferTransitionRelation
+          (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      if (dumpStateUsed) {
+        mSupervisor.removeOutgoingTransitions(dumpState);
+      } else {
+        mSupervisor.setReachable(dumpState, false);
+      }
+      mSupervisor.checkReachability();
+      mSupervisor.removeProperSelfLoopEvents();
+    }
+
+    dumpStateUsed = false;
+    iter.resetState(dumpState);
+    while (iter.advance()) {
+      final int event = iter.getCurrentEvent();
+      if ((event > mLastLocalUncontrollableEvent &&
+           event <= mLastLocalControllableEvent) ||
+          (event > mLastSharedUncontrollableEvent)) {
+        iter.remove();
+      } else {
+        dumpStateUsed = true;
+      }
+    }
+
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     if (dumpStateUsed) {
       changed |= rel.removeOutgoingTransitions(dumpState);
@@ -280,13 +333,6 @@ public class HalfWaySynthesisTRSimplifier
     changed |= rel.checkReachability();
     changed |= rel.removeProperSelfLoopEvents();
 
-    if(addDistinguisher){
-      mDistinguisher = new ListBufferTransitionRelation
-          (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      if (dumpStateUsed) {
-        mDistinguisher.setReachable(dumpState, false);
-      }
-    }
     return changed;
   }
 
@@ -368,6 +414,8 @@ public class HalfWaySynthesisTRSimplifier
   private int mLastLocalUncontrollableEvent;
   private int mLastLocalControllableEvent;
   private int mLastSharedUncontrollableEvent;
+  private TIntHashSet mRenamedEvents;
 
-  private ListBufferTransitionRelation mDistinguisher;
+  private ListBufferTransitionRelation mSupervisor;
+
 }
