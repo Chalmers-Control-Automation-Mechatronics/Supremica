@@ -127,6 +127,8 @@ public abstract class WatersAnalyzeAction
       return null;
     } catch (final UnsupportedOperationException exception) {
       return null;
+    } catch (final UnsatisfiedLinkError exception) {
+      return null;
     }
   }
 

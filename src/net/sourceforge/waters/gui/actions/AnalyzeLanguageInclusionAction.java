@@ -93,10 +93,12 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       return "satisfies property " + mNamedProxy.getName();
   }
 
-  protected ModelVerifier getModelVerifier(final ModelVerifierFactory vfactory,
-                                         final ProductDESProxyFactory desfactory)
+  protected ModelVerifier getModelVerifier
+    (final ModelVerifierFactory vfactory,
+     final ProductDESProxyFactory desfactory)
   {
-    final LanguageInclusionChecker checker = vfactory.createLanguageInclusionChecker(desfactory);
+    final LanguageInclusionChecker checker =
+      vfactory.createLanguageInclusionChecker(desfactory);
     if (mNamedProxy != null) {
       if (mNamedProxy instanceof AutomatonProxy) {
         final KindTranslator translator = new SingleAutomatonKindTranslator();
@@ -146,20 +148,17 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   @Override
   public void update(final EditorChangedEvent event)
   {
-    final ModuleContainer mContainer = ((ModuleContainer)getIDE().getActiveDocumentContainer());
-    if (mContainer != null)
-    {
-      final ModuleSubject newModuleSubject = ((ModuleContainer)getIDE().getActiveDocumentContainer()).getModule();
-      if (newModuleSubject != connected)
-      {
-        if (connected != null)
-          connected.removeModelObserver(this);
-        connected = newModuleSubject;
-        if (connected != null)
-        {
-          connected.addModelObserver(this);
-          updateEnabledStatus();
-        }
+    final ModuleContainer container = getActiveModuleContainer();
+    final ModuleSubject module =
+      container == null ? null : container.getModule();
+    if (module != mConnectedModule) {
+      if (mConnectedModule != null) {
+        mConnectedModule.removeModelObserver(this);
+      }
+      mConnectedModule = module;
+      if (mConnectedModule != null) {
+        mConnectedModule.addModelObserver(this);
+        updateEnabledStatus();
       }
     }
   }
@@ -179,7 +178,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Inner Class SingleAutomatonKindTranslator
   private class SingleAutomatonKindTranslator
     extends AbstractLanguageInclusionKindTranslator
@@ -199,7 +198,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     }
   }
 
-  //#######################################################################
+  //#########################################################################
   //# Inner Class SingleComponentKindTranslator
   private class SingleComponentKindTranslator
     extends AbstractLanguageInclusionKindTranslator
@@ -229,9 +228,10 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     //# Data Members
     private final Map<Proxy,SourceInfo> mSourceInfo;
   }
-  // #########################################################################
-  // # Inner Class
 
+
+  //#########################################################################
+  //# Inner Class PropertyFindVisitor
   private class PropertyFindVisitor extends AbstractModuleProxyVisitor
   {
     private boolean containsProperty(final ModuleProxy proxy)
@@ -283,7 +283,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   //#########################################################################
   //# Data Members
   private final NamedProxy mNamedProxy;
-  private ModuleSubject connected;
+  private ModuleSubject mConnectedModule;
 
 
   //#########################################################################
