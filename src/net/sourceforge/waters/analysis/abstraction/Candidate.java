@@ -319,6 +319,21 @@ public class Candidate implements Comparable<Candidate>
     return list;
   }
 
+  /**
+   * Determines the total number of events in the given automaton, not
+   * including propositions.
+   */
+  public static int countEvents(final AutomatonProxy aut)
+  {
+    int count = 0;
+    for (final EventProxy event : aut.getEvents()) {
+      if (event.getKind() != EventKind.PROPOSITION) {
+        count++;
+      }
+    }
+    return count;
+  }
+
 
   //#########################################################################
   //# Data Members

@@ -1758,6 +1758,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     {
       register(MaxL);
       register(MaxC);
+      register(MinE);
       register(MinS);
       register(MinSync);
     }
@@ -1834,6 +1835,16 @@ public abstract class AbstractCompositionalModelAnalyzer
       (final AbstractCompositionalModelAnalyzer verifier)
     {
       return verifier.new ComparatorMaxC();
+    }
+  };
+
+  public static final SelectingMethod MinE = new SelectingMethod("MinE")
+  {
+    @Override
+    Comparator<Candidate> createComparator
+      (final AbstractCompositionalModelAnalyzer verifier)
+    {
+      return verifier.new ComparatorMinE();
     }
   };
 
@@ -2761,6 +2772,29 @@ public abstract class AbstractCompositionalModelAnalyzer
     {
       return - (double) candidate.getCommonEventCount() /
                (double) candidate.getNumberOfEvents();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class ComparatorMinE
+  private class ComparatorMinE extends SelectingComparator
+  {
+
+    //#######################################################################
+    //# Overrides for SelectingComparator
+    double getHeuristicValue(final Candidate candidate)
+    {
+      final int unionAlphabetSize = candidate.getNumberOfEvents();
+      int largestAlphabetSize = 0;
+      for (final AutomatonProxy aut : candidate.getAutomata()) {
+        final int size = Candidate.countEvents(aut);
+        if (size > largestAlphabetSize) {
+          largestAlphabetSize = size;
+        }
+      }
+      return (double) unionAlphabetSize / (double) largestAlphabetSize;
     }
 
   }
