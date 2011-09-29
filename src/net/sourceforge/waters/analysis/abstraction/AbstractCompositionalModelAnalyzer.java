@@ -183,20 +183,27 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Sets the preselecting heuristics used to choose candidates.
-   * @see PreselectingMethod
-   */
-  public PreselectingMethod getPreselectingMethod()
-  {
-    return mPreselectingMethod;
-  }
-
-  /**
-   * Sets the preselecting heuristics to be used to choose candidates.
-   * @see PreselectingMethod
+   * Possible heuristics are available as static instances of the
+   * {@link AbstractCompositionalModelAnalyzer} class, or can be
+   * obtained from the verifier's {@link PreselectingMethodFactory}.
+   *
+   * @see #MustL
+   * @see #MinT
+   * @see #MaxS
+   * @see #getPreselectingMethodFactory()
    */
   public void setPreselectingMethod(final PreselectingMethod method)
   {
     mPreselectingMethod = method;
+  }
+
+  /**
+   * Gets the preselecting heuristics used to choose candidates.
+   * @see #setPreselectingMethod(PreselectingMethod) setPreselectingMethod()
+   */
+  public PreselectingMethod getPreselectingMethod()
+  {
+    return mPreselectingMethod;
   }
 
   /**
@@ -210,21 +217,31 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Sets the selecting heuristics used to choose candidates.
-   * @see SelectingMethod
-   */
-  public SelectingMethod getSelectingMethod()
-  {
-    return mSelectingMethod;
-  }
-
-  /**
    * Sets the selecting heuristics to be used to choose candidates.
+   * Possible heuristics are available as static instances of the
+   * {@link AbstractCompositionalModelAnalyzer} class, or can be
+   * obtained from the verifier's {@link SelectingMethodFactory}.
+   *
+   * @see #MaxC
+   * @see #MaxL
+   * @see #MinE
+   * @see #MinS
+   * @see #MinSync
+   * @see #getSelectingMethodFactory()
    * @see SelectingMethod
    */
   public void setSelectingMethod(final SelectingMethod method)
   {
     mSelectingMethod = method;
+  }
+
+  /**
+   * Gets the selecting heuristics used to choose candidates.
+   * @see #setSelectingMethod(SelectingMethod) setSelectingMethod()
+   */
+  public SelectingMethod getSelectingMethod()
+  {
+    return mSelectingMethod;
   }
 
   /**
@@ -1587,6 +1604,18 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   //#########################################################################
   //# Inner Class PreselectingMethodFactory
+  /**
+   * The default preselecting method factory. This class can be used to
+   * obtain a list of available preselecting heuristics, or to find
+   * a preselecting heuristic given its name.
+   *
+   * Every compositional model verifier has its preselecting method factory
+   * initialised by the constructor, but different subtypes may be initialised
+   * with different factories.
+   *
+   * @see AbstractCompositionalModelAnalyzer#getPreselectingMethodFactory()
+   * @see PreselectingMethod
+   */
   protected static class PreselectingMethodFactory
     extends ListedEnumFactory<PreselectingMethod>
   {
@@ -1601,6 +1630,11 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Migration
+    /**
+     * Returns a preselecting method from this factory with the same name
+     * as the given method.
+     * @return Preselecting method if found, otherwise <CODE>null</CODE>.
+     */
     protected PreselectingMethod getEnumValue(final PreselectingMethod method)
     {
       final PreselectingMethod common = method.getCommonMethod();
@@ -1810,20 +1844,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   //# Selection Methods
   /**
    * The selecting method that chooses the candidate with the highest
-   * proportion of local events.
-   */
-  public static final SelectingMethod MaxL = new SelectingMethod("MaxL")
-  {
-    @Override
-    Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelAnalyzer verifier)
-    {
-      return verifier.new ComparatorMaxL();
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the highest
    * proportion of common events.
    * An event is considered as common if it is used by at least two
    * automata of the candidate.
@@ -1838,6 +1858,26 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   };
 
+  /**
+   * The selecting method that chooses the candidate with the highest
+   * proportion of local events.
+   */
+  public static final SelectingMethod MaxL = new SelectingMethod("MaxL")
+  {
+    @Override
+    Comparator<Candidate> createComparator
+      (final AbstractCompositionalModelAnalyzer verifier)
+    {
+      return verifier.new ComparatorMaxL();
+    }
+  };
+
+  /**
+   * The selecting method that chooses the candidate with the smallest
+   * alphabet extension. The alphabet extension is given by the quotient
+   * of the number of events of a candidate divided by the largest number of
+   * events of a single automaton of the candidate.
+   */
   public static final SelectingMethod MinE = new SelectingMethod("MinE")
   {
     @Override

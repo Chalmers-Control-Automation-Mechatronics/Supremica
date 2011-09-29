@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="ball_part" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="arm_allocate_lower_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="arm_allocate_upper_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="arm_lower_lower_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="arm_lower_upper_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="arm_raise_lower_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="arm_raise_upper_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="arm_release_lower_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="arm_release_upper_buffer"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="button_automatic_pressed"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="button_automatic_released"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="button_manual_pressed"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="button_manual_released"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_ball_out_of_measure_station"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_elevator_allocate_station"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_elevator_release_station"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_enter_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_go_down"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_go_up"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_has_ball"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_is_down"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_is_up"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_large_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_measure_allocate_station"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_measure_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_measure_go_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_measure_go_out"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_measure_has_ball"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_measure_has_no_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_measure_release_station"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_measure_start"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_putter_allocate_station"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_putter_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_putter_go_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_putter_go_out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_putter_is_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_putter_is_out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_putter_release_station"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_putter_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_small_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_timer_before_ballcheck_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_timer_before_ballcheck_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_timer_before_put_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_timer_before_put_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_timer_before_up_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_timer_before_up_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_timer_measure_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_timer_measure_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="em_timer_putting_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="em_timer_putting_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_allocate_lower_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_allocate_upper_buffer"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_ball_lower_level"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_ball_upper_level"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_deput_ball_lower"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_deput_ball_upper"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_enter_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_go_down"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_got_ball"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_is_lower"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_is_not_down"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_is_upper"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_lower_putter_go_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_lower_putter_go_out"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_no_ball_lower_level"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_no_ball_upper_level"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_put_ball_lower"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_put_ball_upper"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_release_lower_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_release_upper_buffer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_timer_before_ballcheck_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_timer_before_ballcheck_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_timer_before_deput_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_timer_before_deput_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_timer_before_up_start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="es_timer_before_up_timeout"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_up_lower"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_up_upper"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_upper_putter_go_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="es_upper_putter_go_out"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="gk_ball_out_of_gatekeeper"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_enter_ball"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="gk_has_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_in_go_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_in_go_out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_in_is_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_in_is_out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_out_go_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_out_go_out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_out_is_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_out_is_out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="gk_release_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="is_large_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="is_small_ball"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mode_automatic"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mode_manual"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="Plant: Elevator - Measure">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="down">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="107" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="up">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="175" X="162"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="down" Source="down">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="em_go_down"/>
+                            <SimpleIdentifier Name="em_is_down"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="69" X="59"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="up" Source="down">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="em_go_up"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="148" X="121"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="down" Source="up">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="em_go_down"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="133" X="137"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="up" Source="up">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="em_go_up"/>
+                            <SimpleIdentifier Name="em_is_up"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="212" X="200"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Interaction spec: GK and EM">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q_0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="83" X="81"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q_1">
+                        <PointGeometry>
+                            <Point Y="103" X="260"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q_1_0">
+                        <PointGeometry>
+                            <Point Y="50" X="175"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q_2">
+                        <PointGeometry>
+                            <Point Y="203" X="274"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q_3">
+                        <PointGeometry>
+                            <Point Y="274" X="204"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q_4">
+                        <PointGeometry>
+                            <Point Y="262" X="104"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q_5">
+                        <PointGeometry>
+                            <Point Y="178" X="50"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q_1_0" Source="q_0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="gk_has_ball"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="59" X="125"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q_2" Source="q_1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="em_enter_ball"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="152" X="275"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q_1" Source="q_1_0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="em_is_down"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="70" X="222"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q_3" Source="q_2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="gk_release_ball"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="244" X="244"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q_4" Source="q_3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="em_has_ball"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="276" X="153"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q_5" Source="q_4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="gk_ball_out_of_gatekeeper"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="224" X="70"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q_0" Source="q_5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="em_is_up"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="128" X="58"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
