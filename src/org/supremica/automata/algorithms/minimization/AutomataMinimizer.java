@@ -212,7 +212,12 @@ public class AutomataMinimizer
             if (inadequate.size() > 0)
             {
                 //logger.fatal("Hiding inadequate events " + inadequate + " in " + aut + ".");
+                if (options.getMinimizationType() ==
+                EquivalenceRelation.SYNTHESISABSTRACTION) {
+                aut.synthesisHide(inadequate, preserveControllability);
+             } else {
                 aut.hide(inadequate, preserveControllability);
+             }
             }
         }
 
@@ -303,7 +308,12 @@ public class AutomataMinimizer
                 }
                  
                 min = AutomataSynchronizer.synchronizeAutomata(selection);
-                min.hide(hideThese, preserveControllability);
+                if (options.getMinimizationType()
+                        == EquivalenceRelation.SYNTHESISABSTRACTION) {
+                    min.synthesisHide(hideThese, preserveControllability);
+                } else {
+                    min.hide(hideThese, preserveControllability);
+                }
                 // Examine for largest sizes (this is a special case, this is otherwise done in minolithicMinimization())
                 if (min.nbrOfStates() > mostStates)
                 {
@@ -358,7 +368,15 @@ public class AutomataMinimizer
                 {
                     // Return a one state blocking automaton (min for example)
                     logger.info("Early termination--a blocking state can be reached silently!");
-                    min.hide(new Alphabet(min.getAlphabet()).minus(options.getTargetAlphabet()), false);
+                    if (options.getMinimizationType()
+                            == EquivalenceRelation.SYNTHESISABSTRACTION) {
+                        min.synthesisHide(new Alphabet(min.getAlphabet()).
+                                minus(options.getTargetAlphabet()), true);
+                    } else {
+                        min.hide(new Alphabet(min.getAlphabet()).
+                                minus(options.getTargetAlphabet()), false);
+                    }
+
                     theAutomata = new Automata(min);
                     continue;
                 }
@@ -969,8 +987,13 @@ public class AutomataMinimizer
         final Alphabet inadequate = aut.getInadequateEvents(true);
         if (inadequate.size() > 0)
         {
-            //logger.fatal("Hiding inadequate events " + inadequate + " in " + aut + ".");
-            aut.hide(inadequate, preserveControllability);
+             if (options.getMinimizationType() == 
+                EquivalenceRelation.SYNTHESISABSTRACTION) {
+                aut.synthesisHide(hideThese, preserveControllability);
+             } else {
+                aut.hide(hideThese, preserveControllability);
+             }
+           
 
             // Adjust eventToAutomataMap
             for (final LabeledEvent event: inadequate)

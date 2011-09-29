@@ -1598,14 +1598,13 @@ public class Automaton
         return null;
     }
 
-        public void oldHide(final Alphabet hideThese, final boolean preserveControllability)
+        public void hide(final Alphabet hideThese, final boolean preserveControllability)
     {
         // Don't hide nothing!
         if ((hideThese == null) || (hideThese.size() == 0))
         {
             return;
         }
-
         // Remove the hidden events from alphabet
         getAlphabet().minus(hideThese);
 
@@ -1738,7 +1737,7 @@ public class Automaton
      * Selfloops that hare hidden are removed!
      *
      */
-    public void hide(final Alphabet hideThese, final boolean preserveControllability )
+    public void synthesisHide(final Alphabet hideThese, final boolean preserveControllability )
     {
         hideThese.minus(hideThese.getUnobservableEvents());
         // new hiding method by using TauEvent class. The old version is oldHides now.

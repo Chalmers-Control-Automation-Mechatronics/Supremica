@@ -139,7 +139,7 @@ class EventHiderDialog
             }
 
             // Do the hiding (preserve controllability!)
-            newAutomaton.hide(toBeHidden, preserveControllability);
+            newAutomaton.synthesisHide(toBeHidden, preserveControllability);
 
             // Set appropriate comment
             newAutomaton.setComment(automaton.getName() + "//" +
