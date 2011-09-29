@@ -360,7 +360,7 @@ public class AutomatonMinimizer
                         else
                         {
                             //logger.info("Merging " + blob + " and " + states[part[i]]);
-                            blob = MinimizationHelper.mergeStates(theAutomaton, blob, currEquivClass.remove(), useShortNames);
+                            blob = MinimizationHelper.mergeSynthesisStates(theAutomaton, blob, currEquivClass.remove(), useShortNames);
                         }
 
                     }
@@ -1626,7 +1626,7 @@ public class AutomatonMinimizer
 //
                     statesToExamine.remove(two);
 
-                    final State state = MinimizationHelper.mergeStates(aut, one, two, useShortNames);
+                    final State state = MinimizationHelper.mergeSynthesisStates(aut, one, two, useShortNames);
 
 //                    logger.info(one);
 //                    logger.info(two);
@@ -1744,7 +1744,7 @@ public class AutomatonMinimizer
                     // Merge!
                     count++;
                     statesToExamine.remove(two);
-                    one = MinimizationHelper.mergeStates(aut, one, two, useShortNames);
+                    one = MinimizationHelper.mergeSynthesisStates(aut, one, two, useShortNames);
                 }
             }
         }
