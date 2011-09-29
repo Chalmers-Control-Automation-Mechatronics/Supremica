@@ -672,10 +672,10 @@ public class AutomataSynthesizer
                 {
                     // As long as uncontrollable events had to be "disabled" by the supervisor that
                     // instead could have been disabled by a plant (right?) repeat the below...
-                    // In this maner, we're *guaranteed* max perm
+                    // In this manner, we're *guaranteed* max perm
                     while (disabledUncontrollableEvents.size() > 0)
                     {
-                        // Note that in the nonincremental approach, this will add no new plants
+                        // Note that in the non-incremental approach, this will add no new plants
                         // since they are already added!
                         if (synthesizerOptions.addOnePlantAtATime)
                             // Add one plant
@@ -684,7 +684,7 @@ public class AutomataSynthesizer
                             // Add all plants
                             automata = selector.addPlants(disabledUncontrollableEvents);
 
-                        // Do monolithic synthesis on this subsystem
+                        // Do monolithic synthesis on this extended subsystem
                         retval = synthesizer.synthesizeSupervisor(automata,
 								synthesizerOptions, synchronizationOptions,
 								executionDialog, helperStatistics, false);
@@ -717,6 +717,12 @@ public class AutomataSynthesizer
                 }
 
                 supervisors.addAutomaton(retval.automaton);
+            }
+            else if (!synthesizerOptions.getRemoveUnecessarySupervisors())  // Added by MF
+            {   // synthesis for this particular sub-system did nothing, meaning that the spec is usable as a supervisor
+                // But we only add it if we are not to remove unnecessary supervisors, otherwise we woudl first add then remove this one
+                supervisors.addAutomaton(retval.automaton);
+                logger.info(retval.automaton.getName() + " is supervisor directly by synch.");
             }
 
             // Update execution dialog

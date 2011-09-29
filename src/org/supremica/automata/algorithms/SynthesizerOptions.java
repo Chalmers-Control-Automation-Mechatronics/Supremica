@@ -93,9 +93,9 @@ public final class SynthesizerOptions
      * modify the necessary options one by one, starting from default! Much more readable and
      * also more practical when adding new options.
      */
-    private SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm,
-    		boolean purge, boolean removeUnnecessarySupervisors, boolean maximallyPermissive,
-    		boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor)
+    private SynthesizerOptions(final SynthesisType synthesisType, final SynthesisAlgorithm synthesisAlgorithm,
+    		final boolean purge, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
+    		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors, final boolean bddExtractSupervisor)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -109,7 +109,7 @@ public final class SynthesizerOptions
 
     public boolean isValid()
     {
-        String errorMessage = validOptions();
+        final String errorMessage = validOptions();
         if (errorMessage != null)
         {
             logger.error(errorMessage);
@@ -146,7 +146,7 @@ public final class SynthesizerOptions
         return null;
     }
 
-    public void setDialogOK(boolean bool)
+    public void setDialogOK(final boolean bool)
     {
         dialogOK = bool;
     }
@@ -156,7 +156,7 @@ public final class SynthesizerOptions
         return dialogOK;
     }
 
-    public void setSynthesisType(SynthesisType type)
+    public void setSynthesisType(final SynthesisType type)
     {
         synthesisType = type;
     }
@@ -166,7 +166,7 @@ public final class SynthesizerOptions
         return synthesisType;
     }
 
-    public void setSynthesisAlgorithm(SynthesisAlgorithm algorithm)
+    public void setSynthesisAlgorithm(final SynthesisAlgorithm algorithm)
     {
         synthesisAlgorithm = algorithm;
     }
@@ -176,7 +176,7 @@ public final class SynthesizerOptions
         return synthesisAlgorithm;
     }
 
-    public void setPurge(boolean bool)
+    public void setPurge(final boolean bool)
     {
         purge = bool;
     }
@@ -186,7 +186,7 @@ public final class SynthesizerOptions
         return purge;
     }
 
-    public void setRememberDisabledUncontrollableEvents(boolean remember)
+    public void setRememberDisabledUncontrollableEvents(final boolean remember)
     {
         rememberDisabledUncontrollableEvents = remember;
     }
@@ -196,7 +196,7 @@ public final class SynthesizerOptions
         return rememberDisabledUncontrollableEvents;
     }
 
-    public void setRemoveUnecessarySupervisors(boolean bool)
+    public void setRemoveUnecessarySupervisors(final boolean bool)
     {
         removeUnnecessarySupervisors = bool;
     }
@@ -206,7 +206,7 @@ public final class SynthesizerOptions
         return removeUnnecessarySupervisors;
     }
 
-    public void setExtractSupervisor(boolean extract)
+    public void setExtractSupervisor(final boolean extract)
     {
         bddExtractSupervisor = extract;
     }
@@ -216,7 +216,7 @@ public final class SynthesizerOptions
         return bddExtractSupervisor;
     }
 
-    public void setMaximallyPermissive(boolean bool)
+    public void setMaximallyPermissive(final boolean bool)
     {
         maximallyPermissive = bool;
     }
@@ -226,7 +226,7 @@ public final class SynthesizerOptions
         return maximallyPermissive;
     }
 
-    public void setMaximallyPermissiveIncremental(boolean bool)
+    public void setMaximallyPermissiveIncremental(final boolean bool)
     {
         maximallyPermissiveIncremental = bool;
     }
@@ -236,7 +236,7 @@ public final class SynthesizerOptions
         return maximallyPermissiveIncremental;
     }
 
-    public void setReduceSupervisors(boolean bool)
+    public void setReduceSupervisors(final boolean bool)
     {
         reduceSupervisors = bool;
     }
@@ -276,7 +276,7 @@ public final class SynthesizerOptions
 
     public static SynthesizerOptions getDefaultSynthesizerOptionsS()
     {
-        
+
         return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA, true, true, true, false, false, false);
     }
     /**
@@ -284,7 +284,7 @@ public final class SynthesizerOptions
      */
     public static SynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
     {
-        SynthesizerOptions options = getDefaultSynthesizerOptions();
+        final SynthesizerOptions options = getDefaultSynthesizerOptions();
 	options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
         options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
         options.removeUnnecessarySupervisors = true;

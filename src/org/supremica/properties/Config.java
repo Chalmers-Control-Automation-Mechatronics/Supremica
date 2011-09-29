@@ -250,7 +250,7 @@ public final class Config
     // ALGORITHMS_SYNTHESIS
     public static final ObjectProperty SYNTHESIS_SYNTHESIS_TYPE = new ObjectProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.NONBLOCKINGCONTROLLABLE, "Default synthesis type", SynthesisType.values());
     public static final ObjectProperty SYNTHESIS_ALGORITHM_TYPE  = new ObjectProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", SynthesisAlgorithm.MONOLITHIC, "Default synthesis algorithm", SynthesisAlgorithm.values());
-    public static final BooleanProperty SYNTHESIS_PURGE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisPurge", false, "Remove forbidden states after synthesis");
+    public static final BooleanProperty SYNTHESIS_PURGE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisPurge", true, "Remove forbidden states after synthesis"); // MF changed to true here
     public static final BooleanProperty SYNTHESIS_OPTIMIZE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisOptimize", false, "Try to remove supervisors that are not necessary");
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissive", true, "Synthesize a maximally permissive supervisor");
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissiveIncremental", true, "Use incremental algorithm when synthesizing");
