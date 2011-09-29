@@ -629,10 +629,8 @@ public class AutomatonMinimizer
         }
 
         // Remove from alphabet epsilon events that are never used
-        if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION)
-        {
-            removeUnusedEpsilonEvents(theAutomaton);
-        }
+        
+        removeUnusedEpsilonEvents(theAutomaton);
         // Message
         if (Config.VERBOSE_MODE.isTrue())
         {
