@@ -1,0 +1,46 @@
+Supremica Bugs -- add bugs here, with date and your ID, please, and short descriptions that makes it possible to reproduce the bug.
+
+2011-09-30 MF 
+Bug state: Reported
+Example: verriegel4
+Algo: CNB, compositional
+What happens: A single state supervisor is returned, but should be 0 state. In effect, a blocking system is returned.
+What should happen: A message should pop up that the problem has no (useful) solution. And if any supervisors should be added (which is not obvious), they should have zero states.
+
+2011-09-30 MF 
+Bug state: Reported
+Example: verriegel4
+Algo: CNB, compositional
+What happens: A (single state, see above) supervisor is returned with its type set to "Plant"
+What should happen: Any supervisor returned should have its type set to "Supervisor".
+
+2011-09-30 MF 
+Bug state: Reported
+Example: verriegel4
+Algo: CNB, compositional (waters)
+What happens: Incorrect supervisors are returned, due to the properties not being considered. The problem has no (useful) solution, only the null supervisor.
+What should happen: Correct supervisors shoudl be returned, or a message displayed saying that no supervisors exist.
+
+2011-09-30 MF 
+Bug state: Reported
+What happens: In the analyzer, when an automaton graph shows and that automaton is deleted, the graph does not disappear.
+What should happen: The graph should disappear, showing a blank window space.
+
+2011-09-30 MF 
+Bug state: Reported
+Algo: BDD, compositional (waters)
+What happens: Many algorithms do not update the progress dialog
+What should happen: Progress should be updated.
+
+2011-09-30 MF 
+Bug state: Reported
+Example: 3 Users with a controllablem b, c uncontrollable
+Algo: CNB, compositional
+What happens: A supervisor with a bunch of tau-events and an un-reachable dump state is returned.
+What should happen: The tau-events should be replaced by their corresponding real events. Compare the monolithic solution. The dump state should be removed. The compositional solution has the exact same structure, excpet it has tau-events for real events.
+
+2011-09-30 MF 
+Bug state: Reported
+Algo: BDD
+What happens: The c++ dll's are 32-bit and cannot be used in 64-bit windows. This essentially make many of the algos useless on 64-bit windows.
+What should happen: c++ dll's should be available in 32- as well as 64-bits.
