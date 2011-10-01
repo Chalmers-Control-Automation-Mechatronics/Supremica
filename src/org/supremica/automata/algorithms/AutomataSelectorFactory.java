@@ -60,12 +60,12 @@ import org.supremica.automata.*;
 // uc-events with any plant in the set is also included
 class AutomataSelectorFactory
 {
-    public static AutomataSelector getAutomataSelector(Automata automata, SynthesizerOptions options)
+    public static AutomataSelector getAutomataSelector(final Automata automata, final SynthesizerOptions options)
     throws Exception
     {
         if (!options.oneEventAtATime)
         {
-            // Maybe it's just as easy to put it all in the same 
+            // Maybe it's just as easy to put it all in the same
             // class anyway... the factory was unnecessary...
             return new PerSpecificationAutomataSelector(automata, options);
         }
@@ -76,43 +76,61 @@ class AutomataSelectorFactory
 
         //return null;
     }
-        
+
+    public static AutomataSelector getAutomataSelector(final Automata automata, final SynthesizerOptions options, final boolean solitary_spec)
+    throws Exception
+    {
+        if (!options.oneEventAtATime)
+        {
+            // Maybe it's just as easy to put it all in the same
+            // class anyway... the factory was unnecessary...
+            return new PerSpecificationAutomataSelector(automata, options, solitary_spec);
+        }
+        else
+        {
+            return new PerEventAutomataSelector(automata, options);
+        }
+
+        //return null;
+    }
+
+
     static class PerEventAutomataSelector
         extends PerSpecificationAutomataSelector
     {
         /**
-         * Map keeping track of which uncontrollable events each spec 
+         * Map keeping track of which uncontrollable events each spec
          * has left that has not been taken care of.
          */
-        private Map<Automaton,Alphabet> specToEventsLeftMap;
+        private final Map<Automaton,Alphabet> specToEventsLeftMap;
 
         /**
          * The spec currently being examined.
          */
         private Automaton spec;
-        
-        public PerEventAutomataSelector(Automata automata, SynthesizerOptions options)
+
+        public PerEventAutomataSelector(final Automata automata, final SynthesizerOptions options)
         throws Exception
         {
             super(automata, options);
-            
+
             // Initiate spec to events map
             specToEventsLeftMap = new TreeMap<Automaton,Alphabet>();
-            for (Automaton spec : super.globalSet)
+            for (final Automaton spec : super.globalSet)
             {
                 System.out.println("Added " + spec + " with " + spec.getAlphabet().getUncontrollableAlphabet());
-                
-                // Add spec and its uncontrollable alphabet, assert that 
-                Alphabet alreadyThere = specToEventsLeftMap.put(spec, spec.getAlphabet().getUncontrollableAlphabet());
+
+                // Add spec and its uncontrollable alphabet, assert that
+                final Alphabet alreadyThere = specToEventsLeftMap.put(spec, spec.getAlphabet().getUncontrollableAlphabet());
                 assert(alreadyThere == null);
             }
         }
-        
+
         public Automata next()
         {
             super.partialSet.clear();
 
-            for (Map.Entry<Automaton,Alphabet> entry : specToEventsLeftMap.entrySet())
+            for (final Map.Entry<Automaton,Alphabet> entry : specToEventsLeftMap.entrySet())
             {
                 // If there are no events left, we don't need synthesis
                 if (entry.getValue().size() == 0)
@@ -120,17 +138,17 @@ class AutomataSelectorFactory
                     // Then we're done
                     continue;
                 }
-                
+
                 // This is the spec
                 spec = entry.getKey();
                 super.partialSet.addAutomaton(spec);
-                
+
                 // This is an event that has not been taken care of
-                LabeledEvent event = entry.getValue().iterator().next();
+                final LabeledEvent event = entry.getValue().iterator().next();
                 // After this we're done examining this event!
                 entry.getValue().removeEvent(event);
                 // Build alphabet
-                Alphabet ucAlpha = new Alphabet();
+                final Alphabet ucAlpha = new Alphabet();
                 ucAlpha.addEvent(event);
 
                 // Add plant
@@ -139,36 +157,36 @@ class AutomataSelectorFactory
                     addPlant(ucAlpha);
                 else
                     // Add all plants
-                    addPlants(ucAlpha);  
-    
+                    addPlants(ucAlpha);
+
                 // Did we find any plants?
                 if (super.partialSet.size() > 1)
                 {
                     // Nice! Then we're ready
                     break;
                 }
-                
-                super.partialSet.clear();                
+
+                super.partialSet.clear();
             }
-            
+
             System.out.println("The task is " + super.partialSet);
-            
+
             return super.partialSet;
         }
 
-        public Automata addPlant(Alphabet alpha)
+        public Automata addPlant(final Alphabet alpha)
         {
-            Automata result = super.addPlant(alpha);
+            final Automata result = super.addPlant(alpha);
             removeCoveredEvents();
-            
+
             System.out.println("The task is now " + super.partialSet);
 
             return result;
         }
-        
-        public Automata addPlants(Alphabet alpha)
+
+        public Automata addPlants(final Alphabet alpha)
         {
-            Automata result = super.addPlants(alpha);
+            final Automata result = super.addPlants(alpha);
             removeCoveredEvents();
 
             System.out.println("The task is now " + super.partialSet);
@@ -179,10 +197,10 @@ class AutomataSelectorFactory
         private void removeCoveredEvents()
         {
             // Remove all events that are now covered
-            Alphabet specUC = specToEventsLeftMap.get(spec);
-            for (Automaton automaton : super.partialSet.getPlantAutomata())
+            final Alphabet specUC = specToEventsLeftMap.get(spec);
+            for (final Automaton automaton : super.partialSet.getPlantAutomata())
             {
-                for (LabeledEvent event : automaton.getAlphabet().getUncontrollableAlphabet())
+                for (final LabeledEvent event : automaton.getAlphabet().getUncontrollableAlphabet())
                 {
                     if (specUC.contains(event))
                         specUC.removeEvent(event);
@@ -191,11 +209,11 @@ class AutomataSelectorFactory
             System.out.println("These events are not covered: " + specUC + " for spec " + spec);
         }
     }
-    
+
     /**
      * AutomataSelector a set of specs/sups/plants,
      * For each spec/sup it returns that automaton together with the plants with which
-     * it shares uc-events (it never returns a spec with no plants)
+     * it shares uc-events (bt default it never returns a spec with no plants)
      * If closedSet == true the returned set is closed in that all plants that share
      * uc-events with any plant in the set is also included
      */
@@ -203,50 +221,59 @@ class AutomataSelectorFactory
         implements AutomataSelector
     {
         private static Logger logger = LoggerFactory.createLogger(AutomataSelector.class);
-        private Automata globalSet;
-        private Automata partialSet = new Automata();
-        private Iterator<Automaton> specIterator;
-        private Map<LabeledEvent,Automata> ucEventToPlantMap;
+        private final Automata globalSet;
+        private final Automata partialSet = new Automata();
+        private final Iterator<Automaton> specIterator;
+        private final Map<LabeledEvent,Automata> ucEventToPlantMap;
         private int progress = 0;
-        private int progressMax;
-        private SynthesizerOptions options;
-                
+        private final int progressMax;
+        private final SynthesizerOptions options;
+        private boolean solitary_spec = false; // By default never return a a solitary spec, i.e. one that does not share any uc-events with any plant
+
         /**
-         * Selects specifications and plants depending on how uncontrollable 
+         * Selects specifications and plants depending on how uncontrollable
          * events are shared.
          */
-        public PerSpecificationAutomataSelector(Automata automata, SynthesizerOptions options)
+        public PerSpecificationAutomataSelector(final Automata automata, final SynthesizerOptions options, final boolean solitary_spec)
         throws Exception
         {
-            globalSet = automata.getSpecificationAndSupervisorAutomata();
-            specIterator = globalSet.iterator();
-            progressMax = automata.size();
-            this.options = options;
-            
-            ucEventToPlantMap = AlphabetHelpers.buildUncontrollableEventToAutomataMap(automata.getPlantAutomata());
+          globalSet = automata.getSpecificationAndSupervisorAutomata();
+          specIterator = globalSet.iterator();
+          progressMax = automata.size();
+          this.options = options;
+          this.solitary_spec = solitary_spec;
+
+          ucEventToPlantMap = AlphabetHelpers.buildUncontrollableEventToAutomataMap(automata.getPlantAutomata());
+
         }
-        
+
+        public PerSpecificationAutomataSelector(final Automata automata, final SynthesizerOptions options)
+        throws Exception
+        {
+          this(automata, options, false);   // Default is not to return any solitary specs
+        }
+
         /**
          * Returns a spec/supervisor together with the plants sharing uncontrollable events
          */
         public Automata next()
         {
             partialSet.clear();
-            
+
             // Iterate over spec/sups (not really, we check this later)
             while (specIterator.hasNext())
             {
-                Automaton spec = (Automaton) specIterator.next();
+                final Automaton spec = (Automaton) specIterator.next();
                 assert (spec.isSupervisor() || spec.isSpecification());
-                
+
                 progress++;
-                
+
                 // Examine uncontrollable events in spec and select plants accordingly
                 partialSet.addAutomaton(spec);
                 logger.debug("AutomataSelector added spec/sup " + spec.getName());
-                
+
                 // Add plants for all uncontrollable events
-                Alphabet ucAlpha = spec.getAlphabet().getUncontrollableAlphabet();
+                final Alphabet ucAlpha = spec.getAlphabet().getUncontrollableAlphabet();
                 /*
                 if (options.addOnePlantAtATime)
                     // Add one plant
@@ -255,10 +282,10 @@ class AutomataSelectorFactory
                     // Add all plants
                     addPlants(ucAlpha);
                 */
-                addPlants(ucAlpha); 
-                
-                // Did we find any plants?
-                if (partialSet.size() > 1)
+                addPlants(ucAlpha);
+
+                // Did we find any plants? Or are we supposed to return even if no plants found
+                if (partialSet.size() > 1 || solitary_spec)
                 {
                     // Nice! Then we're ready
                     break;
@@ -267,39 +294,39 @@ class AutomataSelectorFactory
                 // Have another go... get a new spec etc...
                 partialSet.clear();
             }
-            
+
             // This will be empty (cleared) only when we're done!
             return partialSet;
         }
-        
+
         /**
          * To your current selection of spec and plants, add all plants that have these events..
          */
-        public Automata addPlants(Alphabet events)
+        public Automata addPlants(final Alphabet events)
         {
-            for (LabeledEvent event : events)
+            for (final LabeledEvent event : events)
             {
                 if (ucEventToPlantMap.get(event) != null)
                 {
                     partialSet.addAutomata(ucEventToPlantMap.get(event));
                 }
             }
-            
+
             return partialSet;
         }
-        
+
         /**
-         * To your current selection of spec and plants, add one plant that has at least one 
+         * To your current selection of spec and plants, add one plant that has at least one
          * of these events and that has not been added before, if there is one...
          */
-        public Automata addPlant(Alphabet events)
+        public Automata addPlant(final Alphabet events)
         {
-            for (LabeledEvent event : events)
+            for (final LabeledEvent event : events)
             {
                 if (ucEventToPlantMap.get(event) != null)
                 {
-                    Automata sharers = ucEventToPlantMap.get(event);
-                    for (Automaton plant : sharers)
+                    final Automata sharers = ucEventToPlantMap.get(event);
+                    for (final Automaton plant : sharers)
                     {
                         if (!partialSet.containsAutomaton(plant))
                         {
@@ -309,10 +336,10 @@ class AutomataSelectorFactory
                     }
                 }
             }
-            
+
             return partialSet;
         }
-        
+
         /**
          * Return the sequential number of the last supervisor/spec considered or 0 if no
          * supervisor/spec has ever been considered.

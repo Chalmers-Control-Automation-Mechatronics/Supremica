@@ -608,7 +608,7 @@ public class AutomataSynthesizer
         final Automata supervisors = new Automata();
 
         // Selector - always start with non-max perm
-        final AutomataSelector selector = AutomataSelectorFactory.getAutomataSelector(aut, synthesizerOptions);
+        final AutomataSelector selector = AutomataSelectorFactory.getAutomataSelector(aut, synthesizerOptions, true);   // MF Change here, return solitary specs
 
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()
@@ -629,6 +629,25 @@ public class AutomataSynthesizer
             if (stopRequested)
             {
                 return new Automata();
+            }
+
+            /* This if-clause handles the case with a spec that does not have any uc-events in common with any plant
+             * Previously, such spec/supervisor were not treated at all, but here a copy gets added as supervisor, since
+             * this makes more sense from teh view that the modular approach creates one sup for each spec.
+             * If the Remove unnecessary supervisors flag is turned on, such specs/sups are not considered.
+             * A boolean parameter was added to the AutomataSelectorFactory and to PerSpecificationAutomataSelector to handle this
+             * Additional changes to the modular algorithm was done below, to handle the case of controllable specs that do share uc-evenst with some plant
+             * MF, Sept-Oct 2011
+             */
+            if(automata.size() == 1 && !synthesizerOptions.getRemoveUnecessarySupervisors())
+            {   // This spec does not have any uc-events, hence it is directly a supervisor, add it immediately and break loop // MF
+              final Automaton sol_spec = automata.getAutomatonAt(0); // The one and only
+              final Automaton sol_spec_sup = sol_spec.clone();
+              sol_spec_sup.setName("sup(" + sol_spec.getName() + ")");
+              sol_spec_sup.setType(AutomatonType.SUPERVISOR);
+              supervisors.addAutomaton(sol_spec_sup);
+              logger.info(sol_spec.getName() + " has no uc events in common with any plant, hence is directly controllable.");
+              continue; // next loop
             }
 
             // In the non incremental approach, immediately add all plants that are related
@@ -718,9 +737,9 @@ public class AutomataSynthesizer
 
                 supervisors.addAutomaton(retval.automaton);
             }
-            else if (!synthesizerOptions.getRemoveUnecessarySupervisors())  // Added by MF
+            else if (!synthesizerOptions.getRemoveUnecessarySupervisors())  // Added to handle the case of controllable specs that share uc-events with some plant // MF
             {   // synthesis for this particular sub-system did nothing, meaning that the spec is usable as a supervisor
-                // But we only add it if we are not to remove unnecessary supervisors, otherwise we woudl first add then remove this one
+                // But we only add it if we are not to remove unnecessary supervisors, otherwise we would first add then remove this one
                 supervisors.addAutomaton(retval.automaton);
                 logger.info(retval.automaton.getName() + " is supervisor directly by synch.");
             }
