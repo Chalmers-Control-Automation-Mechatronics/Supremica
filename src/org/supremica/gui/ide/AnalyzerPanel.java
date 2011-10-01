@@ -29,6 +29,7 @@ import org.supremica.automata.Project;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.ide.actions.Actions;
+import org.supremica.properties.Config;
 
 
 public class AnalyzerPanel
@@ -118,6 +119,8 @@ public class AnalyzerPanel
           mDocumentContainer.getIDE().getDocumentManager();
         final ProjectBuildFromWaters builder =
           new ProjectBuildFromWaters(manager);
+        builder.setIncludesProperties
+          (Config.GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER.isTrue());
         final Project supremicaProject = builder.build(des);
         final List<String> warnings = builder.getWarnings();
         if (!warnings.isEmpty()) {

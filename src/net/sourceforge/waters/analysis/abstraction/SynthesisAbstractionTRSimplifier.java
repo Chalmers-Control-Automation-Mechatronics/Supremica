@@ -50,7 +50,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  * DCDS&nbsp;2011, Saarbr&uuml;cken, Germany, 2011.<BR>
  * Jean-Claude Fernandez. An Implementation of an Efficient Algorithm for
  * Bisimulation Equivalence. Science of Computer Programming,
- * <STRONG>13</STRONG>, 219-236, 1990.<BR>
+ * <STRONG>13</STRONG>, 219-236, 1990.
  * </P>
  *
  * @author Sahar Mohajerani, Robi Malik

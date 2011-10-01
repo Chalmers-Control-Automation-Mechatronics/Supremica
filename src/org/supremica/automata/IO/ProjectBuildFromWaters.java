@@ -73,6 +73,7 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.log.*;
@@ -128,6 +129,22 @@ public class ProjectBuildFromWaters
 
     //#######################################################################
     //# Simple Access
+    /**
+     * Sets whether this project builder also converts property automata
+     * found in the Waters input. If <CODE>true</CODE>, properties are
+     * converted, otherwise if <CODE>false</CODE> (the default), properties
+     * are suppressed.
+     */
+    public void setIncludesProperties(final boolean include)
+    {
+      mIncludesProperties = include;
+    }
+
+    public boolean getIncludesProperties()
+    {
+      return mIncludesProperties;
+    }
+
     public List<String> getWarnings()
     {
       return Collections.unmodifiableList(mWarnings);
@@ -161,6 +178,10 @@ public class ProjectBuildFromWaters
 		compiler.setOptimizationEnabled(optimize);
 		compiler.setExpandingEFATransitions(expand);
 		compiler.setUsingEventAlphabet(ealpha);
+        if (!mIncludesProperties) {
+          final Collection<String> empty = Collections.emptyList();
+          compiler.setEnabledPropositionNames(empty);
+        }
 		final ProductDESProxy des = compiler.compile();
         return build(des);
     }
@@ -174,17 +195,18 @@ public class ProjectBuildFromWaters
      *                  by Supremica.
      */
     public Project build(final ProductDESProxy des)
-    throws EvalException
+      throws EvalException
     {
         mWarnings.clear();
         warnAboutUnsupportedPropositions(des);
         final Project currProject = mProjectFactory.getProject();
         currProject.setName(des.getName());
         currProject.setComment(des.getComment());
-        for (final AutomatonProxy aut : des.getAutomata())
-        {
+        for (final AutomatonProxy aut : des.getAutomata()) {
+          if (mIncludesProperties || aut.getKind() != ComponentKind.PROPERTY) {
             final Automaton supaut = build(aut);
             currProject.addAutomaton(supaut);
+          }
         }
         return currProject;
     }
@@ -467,6 +489,8 @@ public class ProjectBuildFromWaters
     private final ProjectFactory mProjectFactory;
     private final DocumentManager mDocumentManager;
     private final List<String> mWarnings;
+
+    private boolean mIncludesProperties;
 
     private static final Logger logger =
         LoggerFactory.createLogger(ProjectBuildFromWaters.class);

@@ -205,21 +205,31 @@ public final class Config
                          ModelVerifierFactoryLoader.Monolithic,
                          "Model verifier factory used by Editor's Verify menu",
                          ModelVerifierFactoryLoader.values());
+    public static final BooleanProperty GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS =
+      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSeamlessSynthesis",
+                          true, "Include Seamless Synthesis");
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_HISC =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeHISC", false,
                           "Include HISC property checks");
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_SD =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSD", false,
                           "Include sampled-data property checks");
-    public static final BooleanProperty GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS =
-      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSeamlessSynthesis",
-                          true, "Include Seamless Synthesis");
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_OP =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeOP", false,
                           "Include Observer Projection algorithms");
 
-    public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanProperty(PropertyType.GUI_ANALYZER, "includeBoundedUnconTools", false, "Include unbounded controllability tools");
-    public static final BooleanProperty GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE = new BooleanProperty(PropertyType.GUI_ANALYZER, "automatonViewerUseControlledSurface", false, "Use new controlled surface panel to display an automaton");
+    public static final BooleanProperty GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER =
+      new BooleanProperty(PropertyType.GUI_ANALYZER,
+                          "guiAnalyzerSendPropertiesToAnalyzer", false,
+                          "Send properties to analyzer");
+    public static final BooleanProperty GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE =
+      new BooleanProperty(PropertyType.GUI_ANALYZER,
+                          "automatonViewerUseControlledSurface", false,
+                          "Use new controlled surface panel to display an automaton");
+    public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS =
+      new BooleanProperty(PropertyType.GUI_ANALYZER,
+                          "includeBoundedUnconTools", false,
+                          "Include unbounded controllability tools");
 
     // GUI_SIMULATOR
     public static final BooleanProperty INCLUDE_WATERS_SIMULATOR =
