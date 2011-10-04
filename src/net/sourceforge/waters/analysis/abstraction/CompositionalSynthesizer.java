@@ -190,20 +190,6 @@ public class CompositionalSynthesizer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    super.requestAbort();
-    /*
-    if (mCurrentMonolithicVerifier != null) {
-      mCurrentMonolithicVerifier.requestAbort();
-    }
-    */
-  }
-
-
-  //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   @Override
   protected void setUp()
@@ -882,22 +868,28 @@ public class CompositionalSynthesizer
       return createRenamedSupervisor(rel, newEncoding, listIter);
     } else {
       final ProductDESProxyFactory factory = getFactory();
-      final AutomatonProxy oldSupervisor = rel.createAutomaton(factory, encoding);
+      final AutomatonProxy oldSupervisor =
+        rel.createAutomaton(factory, encoding);
       final List<AutomatonProxy> automata = new ArrayList <AutomatonProxy>(2);
       automata.add(oldSupervisor);
       automata.add(distinguisher);
       final ProductDESProxy model = createProductDESProxy (automata);
       final MonolithicSynchronousProductBuilder builder =
         getCurrentSynchronousProductBuilder();
-      builder.setModel(model);
-      for(final DistinguisherInfo info:renamings) {
-        final EventProxy original = info.getOriginalEvent();
-        final List<EventProxy> replacement = info.getReplacement();
-        builder.addMask(replacement, original);
+      try {
+        builder.setModel(model);
+        for(final DistinguisherInfo info:renamings) {
+          final EventProxy original = info.getOriginalEvent();
+          final List<EventProxy> replacement = info.getReplacement();
+          builder.addMask(replacement, original);
+        }
+        builder.run();
+      } finally {
+        builder.clearMask();
       }
-      builder.run();
       final AutomatonProxy newSupervisor = builder.getComputedProxy();
-      final EventEncoding newEncoding = new EventEncoding(newSupervisor, translator);
+      final EventEncoding newEncoding =
+        new EventEncoding(newSupervisor, translator);
       final ListBufferTransitionRelation newRel =
         new ListBufferTransitionRelation (newSupervisor, newEncoding,
                                           ListBufferTransitionRelation.
