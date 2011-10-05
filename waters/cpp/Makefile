@@ -66,7 +66,7 @@ ifdef JAVA_HOME
   JNI_INC       = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/$(JAVAOS)"
 endif
 
-export CFLAGS   = -O2 -g -Wall -DDEBUG $(EXTRA_CFLAGS)
+export CFLAGS   = -O2 -g -Wall -DDEBUG -D__STDC_LIMIT_MACROS $(EXTRA_CFLAGS)
 export INCDIRS	= -I$(SRCDIR) $(JNI_INC)
 export LDFLAGS	= $(EXTRA_LDFLAGS)
 

@@ -33,4 +33,17 @@ int log2(uint32 x)
   return result;
 }
 
+int log2(uint64 x)
+{
+  int result = 0;
+  if (x > 1) {
+    x--;
+    do {
+      x >>= 1;
+      result++;
+    } while (x);
+  }
+  return result;
+}
+
 }  /* namespace waters */
