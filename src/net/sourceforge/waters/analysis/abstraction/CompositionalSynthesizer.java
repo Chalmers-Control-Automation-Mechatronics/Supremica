@@ -1050,7 +1050,11 @@ public class CompositionalSynthesizer
         new ArrayList<EventProxy>(autAlphabet.size() - local.size());
       final Collection<EventProxy> encodedEvents =
         new ArrayList<EventProxy>(autAlphabet.size());
+      int propositionSize = 0;
       for (final EventProxy event : autAlphabet) {
+        if (translator.getEventKind(event) == EventKind.PROPOSITION) {
+          propositionSize++;
+        }
         if (local.contains(event)) {
           if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
             localControllableEvents.add(event);
@@ -1082,7 +1086,7 @@ public class CompositionalSynthesizer
       mHalfWaySynthesisSimplifier.setLastLocalControllableEvent
         (lastControllableLocalEvent);
       mHalfWaySynthesisSimplifier.setLastSharedUncontrollableEvent
-        (lastUncontrollableSharedEvent);
+        (lastUncontrollableSharedEvent - propositionSize);
       encodedEvents.addAll(localUncontrollableEvents);
       encodedEvents.addAll(localControllableEvents);
       encodedEvents.addAll(sharedUncontrollableEvents);
