@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ProductExplorer
 //###########################################################################
-//# $Id$
+//# $Id: ProductExplorer.h 5118 2010-01-17 06:28:22Z robi $
 //###########################################################################
 
 
@@ -27,7 +27,7 @@
 #include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
 #include "waters/base/ArrayList.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/ExplorerMode.h"
 #include "waters/analysis/ReverseTransitionStore.h"
@@ -107,10 +107,10 @@ public:
 
   //##########################################################################
   //# Parameters
-  inline uint32 getStateLimit() const {return mStateLimit;}
-  inline void setStateLimit(uint32 limit) {mStateLimit = limit;}
-  inline uint32 getTransitionLimit() const {return mTransitionLimit;}
-  inline void setTransitionLimit(uint32 limit) {mTransitionLimit = limit;}
+  inline uint32_t getStateLimit() const {return mStateLimit;}
+  inline void setStateLimit(uint32_t limit) {mStateLimit = limit;}
+  inline uint32_t getTransitionLimit() const {return mTransitionLimit;}
+  inline void setTransitionLimit(uint32_t limit) {mTransitionLimit = limit;}
 
   //##########################################################################
   //# Simple Access
@@ -132,27 +132,27 @@ protected:
   virtual bool doSafetySearch();
   virtual bool doNonblockingReachabilitySearch();
   virtual bool doNonblockingCoreachabilitySearch();
-  virtual void computeCounterExample(const jni::ListGlue& list, uint32 level);
+  virtual void computeCounterExample(const jni::ListGlue& list, uint32_t level);
   virtual void storeInitialStates(bool initzero, bool donondet = true);
   virtual bool expandSafetyState
-    (const uint32* sourcetuple, const uint32* sourcepacked) = 0;
+    (const uint32_t* sourcetuple, const uint32_t* sourcepacked) = 0;
   virtual bool expandNonblockingReachabilityState
-    (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked) = 0;
+    (uint32_t source, const uint32_t* sourcetuple, const uint32_t* sourcepacked) = 0;
   virtual void expandNonblockingCoreachabilityState
-    (const uint32* targettuple, const uint32* targetpacked) = 0;
+    (const uint32_t* targettuple, const uint32_t* targetpacked) = 0;
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState
-    (const uint32* targettuple, const uint32* targetpacked) = 0;
+    (const uint32_t* targettuple, const uint32_t* targetpacked) = 0;
   virtual void storeNondeterministicTargets
-    (const uint32* sourcetuple, const uint32* targettuple,
+    (const uint32_t* sourcetuple, const uint32_t* targettuple,
      const jni::MapGlue& map) = 0;
   
-  void exploreNonblockingCoreachabilityStateDFS(uint32 target);
+  void exploreNonblockingCoreachabilityStateDFS(uint32_t target);
   void exploreNonblockingCoreachabilityStateDFS
-    (uint32* targettuple, uint32* targetpacked);
+    (uint32_t* targettuple, uint32_t* targetpacked);
   void checkCoreachabilityState();
   void checkTraceState();
-  uint32 getDepth(uint32 state) const;
+  uint32_t getDepth(uint32_t state) const;
 
   inline void checkAbort() const {if (mIsAbortRequested) doAbort();}
   void doAbort() const;
@@ -168,19 +168,19 @@ protected:
   inline bool isTrivial() const {return mIsTrivial;}
   inline void setTrivial() {mIsTrivial = true;}
   inline int getNumberOfAutomata() const {return mNumAutomata;}
-  inline uint32 getNumberOfStates() const {return mNumStates;}
-  inline uint32 incNumberOfStates() {return mNumStates++;}
-  inline uint32 incNumberOfTransitions() {return mNumTransitions++;}
-  inline void addCoreachabilityTransition(uint32 source, uint32 target)
+  inline uint32_t getNumberOfStates() const {return mNumStates;}
+  inline uint32_t incNumberOfStates() {return mNumStates++;}
+  inline uint32_t incNumberOfTransitions() {return mNumTransitions++;}
+  inline void addCoreachabilityTransition(uint32_t source, uint32_t target)
     {mReverseTransitionStore->addTransition(source, target);}
-  inline void setTraceState(uint32 state) {mTraceState = state;}
+  inline void setTraceState(uint32_t state) {mTraceState = state;}
   inline jni::ConflictKind getConflictKind() const {return mConflictKind;}
   inline void setConflictKind(jni::ConflictKind kind) {mConflictKind = kind;}
 
   //##########################################################################
   //# Class Constants
-  static const uint32 TAG_COREACHABLE;
-  static const uint32 DFS_STACK_SIZE = 0x00100000;
+  static const uint32_t TAG_COREACHABLE;
+  static const uint32_t DFS_STACK_SIZE = 0x00100000;
 
 private:
   //##########################################################################
@@ -191,27 +191,27 @@ private:
   jni::KindTranslatorGlue mKindTranslator;
   jni::EventGlue mPreMarking;
   jni::EventGlue mMarking;
-  uint32 mStateLimit;
-  uint32 mTransitionLimit;
+  uint32_t mStateLimit;
+  uint32_t mTransitionLimit;
   ExplorerMode mMode;
   bool mIsAbortRequested;
   AutomatonEncoding* mEncoding;
   StateSpace* mStateSpace;
-  ArrayList<uint32>* mDepthMap;
+  ArrayList<uint32_t>* mDepthMap;
   ReverseTransitionStore* mReverseTransitionStore;
   bool mIsTrivial;
   int mNumAutomata;
-  uint32 mNumStates;
-  uint32 mNumCoreachableStates;
-  uint32 mNumTransitions;
-  uint32* mDFSStack;
-  uint32 mDFSStackSize;
-  uint32 mDFSStackPos;
+  uint32_t mNumStates;
+  uint32_t mNumCoreachableStates;
+  uint32_t mNumTransitions;
+  uint32_t* mDFSStack;
+  uint32_t mDFSStackSize;
+  uint32_t mDFSStackPos;
   jni::ListGlue* mTraceList;
   const EventRecord* mTraceEvent;
   const AutomatonRecord* mTraceAutomaton;
-  uint32 mTraceState;
-  uint32 mTraceLimit;
+  uint32_t mTraceState;
+  uint32_t mTraceLimit;
   jni::EventGlue mJavaTraceEvent;
   jni::AutomatonGlue mJavaTraceAutomaton;
   jni::StateGlue mJavaTraceState;

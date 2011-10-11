@@ -20,7 +20,7 @@
 #endif
 
 #include "jni/cache/MethodInfo.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace jni {
@@ -34,31 +34,31 @@ class ClassInfo {
 public:
   //#########################################################################
   //# Constructors
-  explicit ClassInfo(waters::uint32 code,
+  explicit ClassInfo(uint32_t code,
                      const char* name, 
                      const ClassInfo* baseclass,
-                     waters::uint32 nummethods,
-                     waters::uint32 numfields,
+                     uint32_t nummethods,
+                     uint32_t numfields,
                      const MethodInfo* methods);
 
   //#########################################################################
   //# Simple Access
-  const waters::uint32 getClassCode() const {return mCode;};
+  const uint32_t getClassCode() const {return mCode;};
   const char* getName() const {return mName;};
-  waters::uint32 getFirstCode() const;
-  waters::uint32 getNumMethods() const {return mNumMethods;};
-  const MethodInfo* getMethodInfo(waters::uint32 methodcode) const;
-  const waters::uint32 getNumFields() const {return mNumFields;};
-  const MethodInfo* getFieldInfo(waters::uint32 fieldcode) const;
+  uint32_t getFirstCode() const;
+  uint32_t getNumMethods() const {return mNumMethods;};
+  const MethodInfo* getMethodInfo(uint32_t methodcode) const;
+  const uint32_t getNumFields() const {return mNumFields;};
+  const MethodInfo* getFieldInfo(uint32_t fieldcode) const;
 
 private:
   //#########################################################################
   //# Data Members
-  waters::uint32 mCode;
+  uint32_t mCode;
   const char* mName;
   const ClassInfo* mBaseClass;
-  waters::uint32 mNumMethods;
-  waters::uint32 mNumFields;
+  uint32_t mNumMethods;
+  uint32_t mNumFields;
   const MethodInfo* mMethodInfo;
 };
 

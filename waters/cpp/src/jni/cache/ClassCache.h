@@ -50,10 +50,10 @@ public:
 
   //##########################################################################
   //# Hash Methods
-  virtual waters::uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const
-    {return ((ClassGlue*) value)->getClassKey();};
+  virtual uint64_t hash(intptr_t key) const;
+  virtual bool equals(intptr_t key1, intptr_t key2) const;
+  virtual intptr_t getKey(intptr_t value) const
+    {return (intptr_t) ((ClassGlue*) value)->getClassKey();};
 
 private:
   //##########################################################################
@@ -78,14 +78,14 @@ public:
   //##########################################################################
   //# Access
   JNIEnv* getEnvironment() const {return mEnvironment;};
-  ClassGlue* getClass(waters::uint32 classcode);
-  ClassGlue* getClass(jclass javaclass, waters::uint32 classcode);
+  ClassGlue* getClass(uint32_t classcode);
+  ClassGlue* getClass(jclass javaclass, uint32_t classcode);
   ClassGlue* getClass(jclass javaclass, const ClassInfo* info);
   bool isSameObject(jobject obj1, jobject obj2) const;
 
   //##########################################################################
   //# Exceptions
-  jint throwJavaException(waters::uint32 classcode, const char* msg);
+  jint throwJavaException(uint32_t classcode, const char* msg);
   jint throwJavaException(const ExceptionGlue& glue);
   
 private:
@@ -93,7 +93,7 @@ private:
   //# Data Members
   JNIEnv* mEnvironment;
   ClassCacheHashAccessor mAccessor;
-  waters::HashTable<ClassKey*,ClassGlue*> mClassMap;
+  waters::PtrHashTable<ClassKey*,ClassGlue*> mClassMap;
   ClassGlue** mCodeMap;
 
 };

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   ProductDES
 //###########################################################################
-//# $Id$
+//# $Id: ProductDES.h 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 
@@ -35,12 +35,12 @@ class ProductDES
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ProductDES(uint32 numprops, uint32 numuncont, uint32 numcont);
+  explicit ProductDES(uint32_t numprops, uint32_t numuncont, uint32_t numcont);
   ~ProductDES();
 
   //##########################################################################
   //# Initialisation
-  void initEventName(uint32 code, jstring name);
+  void initEventName(uint32_t code, jstring name);
 
   //##########################################################################
   //# Simple Access

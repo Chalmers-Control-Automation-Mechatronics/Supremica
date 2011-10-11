@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class header file
 //###########################################################################
-//# $Id$
+//# $Id: PlainGlue.h 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 $+
@@ -149,9 +149,9 @@ $IF-HASSUBCLASSES
 protected:
   //##########################################################################
   //# Protected Constructors
-  explicit $CPPCLASSNAME(waters::uint32 classcode, ClassCache* cache);
+  explicit $CPPCLASSNAME(uint32_t classcode, ClassCache* cache);
   explicit $CPPCLASSNAME(jobject javaobject,
-           $CSPC       $ waters::uint32 classcode,
+           $CSPC       $ uint32_t classcode,
            $CSPC       $ ClassCache* cache,
            $CSPC       $ bool global = false);
 $ENDIF

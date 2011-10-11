@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class implementation file
 //###########################################################################
-//# $Id$
+//# $Id: PlainGlue.cpp 4718 2009-05-29 03:41:46Z robi $
 //###########################################################################
 
 $+
@@ -56,7 +56,7 @@ toEnum(jobject javaobject, ClassCache* cache)
   ClassGlue* cls = cache->getClass(CLASS_$CLASSNAME);
   JNIEnv* env = cls->getEnvironment();
   jmethodID mid = cls->getMethodID(METHOD_Object_equals_0);
-  for (waters::uint32 fieldcode = 0; fieldcode < $NUMFIELDS; fieldcode++) {
+  for (uint32_t fieldcode = 0; fieldcode < $NUMFIELDS; fieldcode++) {
     jobject item = cls->getStaticFinalField(fieldcode);
     jboolean eq = env->CallBooleanMethod(javaobject, mid, item);
     if (eq != JNI_FALSE) {
@@ -72,7 +72,7 @@ toEnum(jobject javaobject, ClassCache* cache)
 jobject $CPPCLASSNAME::
 toJavaObject($CLASSNAME$ item, ClassCache* cache)
 {
-  waters::uint32 fieldcode = (waters::uint32) item;
+  uint32_t fieldcode = (uint32_t) item;
   ClassGlue* cls = cache->getClass(CLASS_$CLASSNAME);
   return cls->getStaticFinalField(fieldcode);
 }
@@ -84,7 +84,7 @@ $ENDIF
 
 $IF-HASSUBCLASSES
 $CPPCLASSNAME::
-$CPPCLASSNAME(waters::uint32 classcode, ClassCache* cache)
+$CPPCLASSNAME(uint32_t classcode, ClassCache* cache)
   : $IF-HASBASECLASS $CPPBASECLASSNAME $ELSE ObjectBase$ENDIF$=
       (classcode, cache)
 {
@@ -93,7 +93,7 @@ $CPPCLASSNAME(waters::uint32 classcode, ClassCache* cache)
 
 $CPPCLASSNAME::
 $CPPCLASSNAME(jobject javaobject,
-$CSPC       $ waters::uint32 classcode,
+$CSPC       $ uint32_t classcode,
 $CSPC       $ ClassCache* cache,
 $CSPC       $ bool global)
   : $IF-HASBASECLASS $CPPBASECLASSNAME $ELSE ObjectBase$ENDIF$=
@@ -124,7 +124,7 @@ $CPPCLASSNAME($CLASSNAME$ item, ClassCache* cache)
   : $IF-HASBASECLASS $CPPBASECLASSNAME $ELSE ObjectBase$ENDIF$=
       (CLASS_$CLASSNAME, cache)
 {
-  waters::uint32 fieldcode = (waters::uint32) item;
+  uint32_t fieldcode = (uint32_t) item;
   ClassGlue* cls = getClass();
   jobject javaobject = cls->getStaticFinalField(fieldcode);
   initJavaObject(javaobject);

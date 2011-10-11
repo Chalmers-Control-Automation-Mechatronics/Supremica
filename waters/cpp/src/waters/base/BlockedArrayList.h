@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   BlockedArrayList
 //############################################################################
-//# $Id$
+//# $Id: BlockedArrayList.h 5810 2010-07-02 03:55:52Z robi $
 //############################################################################
 
 
@@ -19,7 +19,9 @@
 #pragma once
 #endif
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
+
+#include "waters/base/HashAccessor.h"
 
 
 namespace waters {
@@ -35,8 +37,8 @@ class BlockedArrayList
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit BlockedArrayList(uint32 blocksize = 256,
-			    uint32 headsize = 16)
+  explicit BlockedArrayList(uint32_t blocksize = 256,
+			    uint32_t headsize = 16)
   {
     mBlockShift = log2(blocksize - 1);
     mBlockSize = 1 << mBlockShift;
@@ -54,33 +56,33 @@ public:
 
   //##########################################################################
   //# Access
-  uint32 size()
+  uint32_t size()
     const
   {
     return mNumElements;
   }
 
-  Value get(uint32 index)
+  Value get(uint32_t index)
     const
   {
-    uint32 blockno = index >> mBlockShift;
-    uint32 bindex = index & mBlockMask;
+    uint32_t blockno = index >> mBlockShift;
+    uint32_t bindex = index & mBlockMask;
     return mBlocks[blockno][bindex];
   }
 
-  Value& getref(uint32 index)
+  Value& getref(uint32_t index)
     const
   {
-    uint32 blockno = index >> mBlockShift;
-    uint32 bindex = index & mBlockMask;
+    uint32_t blockno = index >> mBlockShift;
+    uint32_t bindex = index & mBlockMask;
     return mBlocks[blockno][bindex];
   }
 
   void add()
   {
-    uint32 bindex = mNumElements & mBlockMask;
+    uint32_t bindex = mNumElements & mBlockMask;
     if (bindex == 0) {
-      uint32 blockno = mNumElements >> mBlockShift;
+      uint32_t blockno = mNumElements >> mBlockShift;
       if (blockno >= mHeadArraySize) {
 	growHeadArray();
       }
@@ -91,8 +93,8 @@ public:
 
   void add(const Value value)
   {
-    uint32 blockno = mNumElements >> mBlockShift;
-    uint32 bindex = mNumElements & mBlockMask;
+    uint32_t blockno = mNumElements >> mBlockShift;
+    uint32_t bindex = mNumElements & mBlockMask;
     if (bindex == 0) {
       if (blockno >= mHeadArraySize) {
 	growHeadArray();
@@ -114,9 +116,9 @@ private:
   //# Auxiliary Methods
   void growHeadArray()
   {
-    uint32 newsize = mHeadArraySize << 1;
+    uint32_t newsize = mHeadArraySize << 1;
     Value** newblocks = new Value*[newsize];
-    for (uint32 i = 0; i < newsize; i++) {
+    for (uint32_t i = 0; i < newsize; i++) {
       newblocks[i] = mBlocks[i];
     }
     delete [] mBlocks;
@@ -127,7 +129,7 @@ private:
   void deleteBlocks()
   {
     if (mNumElements > 0) {
-      for (uint32 bindex = (mNumElements - 1) >> mBlockShift;
+      for (uint32_t bindex = (mNumElements - 1) >> mBlockShift;
 	   bindex >=0; bindex--) {
 	delete [] mBlocks[bindex];
       }
@@ -136,12 +138,12 @@ private:
 
   //##########################################################################
   //# Data Members
-  uint32 mBlockSize;
-  uint32 mBlockMask;
-  uint32 mBlockShift;
-  uint32 mHeadArraySize;
+  uint32_t mBlockSize;
+  uint32_t mBlockMask;
+  uint32_t mBlockShift;
+  uint32_t mHeadArraySize;
   Value** mBlocks;
-  uint32 mNumElements;
+  uint32_t mNumElements;
 
 };
 

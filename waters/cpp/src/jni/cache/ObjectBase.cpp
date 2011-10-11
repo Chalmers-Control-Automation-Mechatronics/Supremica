@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id$
+//# $Id: ObjectBase.cpp 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -31,14 +31,14 @@ namespace jni {
 //# ObjectBase: Constructors, Destructors & Co.
 
 ObjectBase::
-ObjectBase(waters::uint32 classcode, ClassCache* cache)
+ObjectBase(uint32_t classcode, ClassCache* cache)
 {
   mObjectReference = new ObjectReference(classcode, cache);
 }
 
 ObjectBase::
 ObjectBase(jobject javaobject,
-           waters::uint32 classcode,
+           uint32_t classcode,
            ClassCache* cache,
            bool global)
 {

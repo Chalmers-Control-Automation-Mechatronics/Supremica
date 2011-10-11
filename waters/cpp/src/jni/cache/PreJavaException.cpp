@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   PreJavaException
 //###########################################################################
-//# $Id$
+//# $Id: PreJavaException.cpp 6231 2011-06-22 09:37:15Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -28,14 +28,14 @@ namespace jni {
 //# PreJavaException: Constructors, Destructors & Co.
 
 PreJavaException::
-PreJavaException(waters::uint32 classcode)
+PreJavaException(uint32_t classcode)
   : mClassCode(classcode)
 {
   initMessage(0,true);
 }
 
 PreJavaException::
-PreJavaException(waters::uint32 classcode,
+PreJavaException(uint32_t classcode,
                  const char* msg,
                  bool staticString)
   : mClassCode(classcode)

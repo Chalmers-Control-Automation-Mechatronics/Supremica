@@ -4,12 +4,14 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassCache
 //###########################################################################
-//# $Id$
+//# $Id: ClassCache.cpp 6231 2011-06-22 09:37:15Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
 #pragma implementation
 #endif
+
+#include <iostream>
 
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ClassInfo.h"
@@ -42,30 +44,29 @@ ClassCacheHashAccessor(JNIEnv* env)
 //############################################################################
 //# ClassCacheHashAccessor: Hash Methods
 
-waters::uint32 ClassCacheHashAccessor::
-hash(const void* key)
+uint64_t ClassCacheHashAccessor::
+hash(intptr_t key)
   const
 {
   jmethodID mid = mClassGlue->getMethodID(METHOD_Object_hashCode);
   const ClassKey* ckey = (const ClassKey*) key;
-  waters::uint32 lkey[2];
   jobject javaobject = ckey->getJavaClass();
-  lkey[0] = (waters::uint32) mEnvironment->CallIntMethod(javaobject, mid);
+  uint64_t lkey = mEnvironment->CallIntMethod(javaobject, mid);
   if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
     throw exception;
   }
   const ClassInfo* info = ckey->getClassInfo();
-  lkey[1] = info->getClassCode();
-  return waters::hashIntArray(lkey, 2);
+  lkey = (lkey << 32) || info->getClassCode();
+  return waters::hashInt(lkey);
 }
 
 
 bool ClassCacheHashAccessor::
-equals(const void* key1, const void* key2)
+equals(intptr_t val1, intptr_t val2)
   const
 {
-  const ClassKey* ckey1 = (const ClassKey*) key1;
-  const ClassKey* ckey2 = (const ClassKey*) key2;
+  const ClassKey* ckey1 = (const ClassKey*) val1;
+  const ClassKey* ckey2 = (const ClassKey*) val2;
   if (ckey1->getClassInfo() != ckey2->getClassInfo()) {
     return false;
   }
@@ -90,7 +91,7 @@ ClassCache(JNIEnv* env)
     mClassMap(&mAccessor)
 {
   mCodeMap = new ClassGlue* [CLASS_COUNT];
-  for (waters::uint32 i = 0; i < CLASS_COUNT; i++) {
+  for (uint32_t i = 0; i < CLASS_COUNT; i++) {
     mCodeMap[i] = 0;
   }
   ClassGlue* classglue1 = mAccessor.getClassGlue();
@@ -115,7 +116,7 @@ ClassCache::
 //# ClassCache: Access
 
 ClassGlue* ClassCache::
-getClass(waters::uint32 classcode)
+getClass(uint32_t classcode)
 {
   ClassGlue* result = mCodeMap[classcode];
   if (result == 0) {
@@ -132,7 +133,7 @@ getClass(waters::uint32 classcode)
 }
 
 ClassGlue* ClassCache::
-getClass(jclass javaclass, waters::uint32 classcode)
+getClass(jclass javaclass, uint32_t classcode)
 {
   const ClassInfo* info = &CLASSINFO[classcode];
   return getClass(javaclass, info);
@@ -164,7 +165,7 @@ isSameObject(jobject obj1, jobject obj2)
 //# ClassCache: Exceptions
 
 jint ClassCache::
-throwJavaException(waters::uint32 classcode, const char* msg)
+throwJavaException(uint32_t classcode, const char* msg)
 {
   const ClassGlue* cls = getClass(classcode);
   const jclass javaclass = cls->getJavaClass();

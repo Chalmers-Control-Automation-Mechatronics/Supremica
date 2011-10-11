@@ -21,7 +21,7 @@
 
 #include <jni.h>
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace jni {
@@ -53,9 +53,9 @@ public:
 protected:
   //##########################################################################
   //# Constructors, Destructors & Co.
-  explicit ObjectBase(waters::uint32 classcode, ClassCache* cache);
+  explicit ObjectBase(uint32_t classcode, ClassCache* cache);
   explicit ObjectBase(jobject javaobject,
-                      waters::uint32 classcode,
+                      uint32_t classcode,
                       ClassCache* cache,
 		      bool global = false);
   ObjectBase(const ObjectBase& partner);

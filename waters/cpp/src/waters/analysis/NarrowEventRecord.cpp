@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   NarrowEventRecord
 //###########################################################################
-//# $Id$
+//# $Id: NarrowEventRecord.cpp 4786 2009-10-26 18:57:14Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -24,7 +24,7 @@ namespace waters {
 //# NarrowEventRecord: Constructors & Destructors
 
 NarrowEventRecord::
-NarrowEventRecord(jni::EventGlue event, bool controllable, uint32 code)
+NarrowEventRecord(jni::EventGlue event, bool controllable, uint32_t code)
   : EventRecord(event, controllable),
     mEventCode(code),
     mNumAutomata(0),
@@ -109,7 +109,7 @@ countLocalTransition(bool selfloop)
 }
 
 void NarrowEventRecord::
-mergeLocalToGlobal(bool isplant, uint32 numstates)
+mergeLocalToGlobal(bool isplant, uint32_t numstates)
 {
   mIsOnlySelfloops &= mIsOnlyLocalSelfloops;
   if (mIsOnlySelfloops && !isplant) {
@@ -127,7 +127,7 @@ mergeLocalToGlobal(bool isplant, uint32 numstates)
 }
 
 bool NarrowEventRecord::
-isLocallySelflooped(uint32 numstates)
+isLocallySelflooped(uint32_t numstates)
   const
 {
   return mIsOnlyLocalSelfloops && mNumLocalTransitions == numstates;

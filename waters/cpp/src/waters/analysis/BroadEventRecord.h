@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   BroadEventRecord
 //###########################################################################
-//# $Id$
+//# $Id: BroadEventRecord.h 5804 2010-07-01 22:24:50Z robi $
 //###########################################################################
 
 
@@ -31,7 +31,6 @@ namespace jni {
 namespace waters {
 
 class AutomatonRecord;
-class HashAccessor;
 class TransitionRecord;
 class TransitionUpdateRecord;
 
@@ -76,25 +75,25 @@ public:
   //##########################################################################
   //# Set up
   bool addDeterministicTransition(const AutomatonRecord* aut,
-				  uint32 source, uint32 target);
+				  uint32_t source, uint32_t target);
   void setupNondeterministicBuffers(const AutomatonRecord* aut);
   void addNondeterministicTransition(const AutomatonRecord* aut,
-				     uint32 source, uint32 target);
+				     uint32_t source, uint32_t target);
   void normalize(const AutomatonRecord* aut);
   TransitionUpdateRecord* createUpdateRecord(int wordindex);
   void optimizeTransitionRecordsForSearch(ExplorerMode mode);
   void setupNotTakenSearchRecords();
-  void markTransitionsTaken(const uint32* tuple);
+  void markTransitionsTaken(const uint32_t* tuple);
   int removeTransitionsNotTaken();
   bool reverse();
 
-  inline void markTransitionsTakenFast(const uint32* tuple)
+  inline void markTransitionsTakenFast(const uint32_t* tuple)
     {if (mNotTakenSearchRecords) markTransitionsTaken(tuple);}
 
   //##########################################################################
   //# Trace Computation
-  void storeNondeterministicTargets(const uint32* sourcetuple,
-				    const uint32* targettuple,
+  void storeNondeterministicTargets(const uint32_t* sourcetuple,
+				    const uint32_t* targettuple,
 				    const jni::MapGlue& map) const;
 
   //##########################################################################
@@ -111,8 +110,8 @@ private:
   void enqueueSearchRecord(TransitionRecord* trans);
   void clearSearchAndUpdateRecords();
   void storeNondeterministicTargets(TransitionRecord* trans,
-				    const uint32* sourcetuple,
-				    const uint32* targettuple,
+				    const uint32_t* sourcetuple,
+				    const uint32_t* targettuple,
 				    const jni::MapGlue& map) const;
 
   //##########################################################################

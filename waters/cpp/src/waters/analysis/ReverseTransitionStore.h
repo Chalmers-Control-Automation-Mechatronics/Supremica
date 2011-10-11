@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ReverseTransitionStore
 //###########################################################################
-//# $Id$
+//# $Id: ReverseTransitionStore.h 4713 2009-05-24 04:19:42Z robi $
 //###########################################################################
 
 
@@ -20,7 +20,7 @@
 #endif
 
 #include "waters/base/ArrayList.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace waters {
@@ -35,49 +35,49 @@ class ReverseTransitionStore
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ReverseTransitionStore(uint32 limit);
+  explicit ReverseTransitionStore(uint32_t limit);
   virtual ~ReverseTransitionStore();
 
   //##########################################################################
   //# Simple Access
-  inline uint32 getNumberOfTransitions() const {return mNumTransitions;}
-  inline uint32 getTransitionLimit() const {return mTransitionLimit;}
+  inline uint32_t getNumberOfTransitions() const {return mNumTransitions;}
+  inline uint32_t getTransitionLimit() const {return mTransitionLimit;}
 
   //##########################################################################
   //# Access
-  void addTransition(uint32 source, uint32 target);
-  uint32 iterator(uint32 target) const;
-  uint32 hasNext(uint32 iterator) const;
-  uint32 next(uint32& iterator) const;
+  void addTransition(uint32_t source, uint32_t target);
+  uint32_t iterator(uint32_t target) const;
+  uint32_t hasNext(uint32_t iterator) const;
+  uint32_t next(uint32_t& iterator) const;
 
   //##########################################################################
   //# Debug Output
 #ifdef DEBUG
-  void dump(uint32 numstates) const;
+  void dump(uint32_t numstates) const;
 #endif /* DEBUG */
 
 private:
   //##########################################################################
   //# Data Members
-  uint32 mTransitionLimit;
-  uint32 mNumTransitions;
-  uint32 mNextLocalIndex;
-  uint32 mNextGlobalIndex;
-  uint32* mCurrentNodeBlock;
-  ArrayList<uint32*> mHeadBlocks;
-  ArrayList<uint32*> mNodeBlocks;
+  uint32_t mTransitionLimit;
+  uint32_t mNumTransitions;
+  uint32_t mNextLocalIndex;
+  uint32_t mNextGlobalIndex;
+  uint32_t* mCurrentNodeBlock;
+  ArrayList<uint32_t*> mHeadBlocks;
+  ArrayList<uint32_t*> mNodeBlocks;
 
   //##########################################################################
   //# Class Constants
-  static const uint32 INIT_BLOCKS = 256;
-  static const uint32 BLOCK_SHIFT = 10;
-  static const uint32 BLOCK_SIZE = 1 << BLOCK_SHIFT;
-  static const uint32 BLOCK_MASK = BLOCK_SIZE - 1;
+  static const uint32_t INIT_BLOCKS = 256;
+  static const uint32_t BLOCK_SHIFT = 10;
+  static const uint32_t BLOCK_SIZE = 1 << BLOCK_SHIFT;
+  static const uint32_t BLOCK_MASK = BLOCK_SIZE - 1;
 
-  static const uint32 NODE_SIZE = 4;
-  static const uint32 NODE_MASK = NODE_SIZE - 1;
+  static const uint32_t NODE_SIZE = 4;
+  static const uint32_t NODE_MASK = NODE_SIZE - 1;
 
-  static const uint32 TAG_DATA = 0x80000000;
+  static const uint32_t TAG_DATA = 0x80000000;
 };
 
 

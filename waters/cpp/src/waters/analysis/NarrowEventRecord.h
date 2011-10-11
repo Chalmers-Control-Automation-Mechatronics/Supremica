@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   NarrowEventRecord
 //###########################################################################
-//# $Id$
+//# $Id: NarrowEventRecord.h 4784 2009-10-25 08:57:52Z robi $
 //###########################################################################
 
 
@@ -21,7 +21,7 @@
 
 #include "jni/glue/EventGlue.h"
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 #include "waters/analysis/EventRecord.h"
 
@@ -40,14 +40,14 @@ public:
   //# Constructors & Destructors
   explicit NarrowEventRecord(jni::EventGlue event,
 			     bool controllable,
-			     uint32 code = UNDEF_UINT32);
+			     uint32_t code = UINT32_MAX);
 
   //##########################################################################
   //# Simple Access
-  inline uint32 getEventCode() const {return mEventCode;}
-  inline void setEventCode(uint32 code) {mEventCode = code;}
-  inline uint32 getNumberOfAutomata() const {return mNumAutomata;}
-  inline uint32 getNumberOfPlants() const {return mNumPlants;}
+  inline uint32_t getEventCode() const {return mEventCode;}
+  inline void setEventCode(uint32_t code) {mEventCode = code;}
+  inline uint32_t getNumberOfAutomata() const {return mNumAutomata;}
+  inline uint32_t getNumberOfPlants() const {return mNumPlants;}
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
   inline bool isPlantOnly() const {return mNumAutomata == mNumPlants;}
@@ -64,19 +64,19 @@ public:
   //# Setup
   void resetLocalTransitions();
   void countLocalTransition(bool selfloop);
-  void mergeLocalToGlobal(bool isplant, uint32 numstates);
-  bool isLocallySelflooped(uint32 numstates) const;
+  void mergeLocalToGlobal(bool isplant, uint32_t numstates);
+  bool isLocallySelflooped(uint32_t numstates) const;
 
 private:
   //##########################################################################
   //# Data Members
-  uint32 mEventCode;
-  uint32 mNumAutomata;
-  uint32 mNumPlants;
+  uint32_t mEventCode;
+  uint32_t mNumAutomata;
+  uint32_t mNumPlants;
   bool mIsOnlySelfloops;
   bool mIsOnlySelfloopsDisabledInSpec;
   bool mIsGloballyDisabled;
-  uint32 mNumLocalTransitions;
+  uint32_t mNumLocalTransitions;
   bool mIsOnlyLocalSelfloops;
 };
 

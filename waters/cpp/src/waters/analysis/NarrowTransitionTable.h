@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   NarrowTransitionTable
 //###########################################################################
-//# $Id$
+//# $Id: NarrowTransitionTable.h 5237 2010-02-15 04:09:55Z robi $
 //###########################################################################
 
 
@@ -20,7 +20,7 @@
 #endif
 
 #include "waters/base/HashTable.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace jni {
@@ -48,48 +48,48 @@ public:
   explicit NarrowTransitionTable
     (const NarrowPreTransitionTable* pre,
      jni::ClassCache* cache,
-     const HashTable<const jni::EventGlue*, NarrowEventRecord*>& eventmap);
+     const PtrHashTable<const jni::EventGlue*, NarrowEventRecord*>& eventmap);
   explicit NarrowTransitionTable(const NarrowTransitionTable* reverse,
 				 const NarrowEventRecord* const* events);
   ~NarrowTransitionTable();
 
   //##########################################################################
   //# Simple Access
-  inline uint32 getAutomatonIndex() const {return mAutomatonIndex;}
+  inline uint32_t getAutomatonIndex() const {return mAutomatonIndex;}
   inline bool isPlant() const {return mIsPlant;}
   inline const AutomatonRecord* getAutomaton() const {return mAutomaton;}
 
   //##########################################################################
   //# Iteration
-  inline uint32 iterator(uint32 state) const {return mStateTable[state];}
-  inline uint32 hasNext(uint32 iterator) const
-    {return mBuffers[iterator] != UNDEF_UINT32;}
-  inline uint32 next(uint32 iterator) const {return iterator + 2;}
-  inline uint32 getEvent(uint32 iterator) const {return mBuffers[iterator];}
-  inline uint32 getRawSuccessors(uint32 iterator) const
+  inline uint32_t iterator(uint32_t state) const {return mStateTable[state];}
+  inline uint32_t hasNext(uint32_t iterator) const
+    {return mBuffers[iterator] != UINT32_MAX;}
+  inline uint32_t next(uint32_t iterator) const {return iterator + 2;}
+  inline uint32_t getEvent(uint32_t iterator) const {return mBuffers[iterator];}
+  inline uint32_t getRawSuccessors(uint32_t iterator) const
     {return mBuffers[iterator + 1];}
-  inline uint32 getRawNondetSuccessor(uint32 offset) const
+  inline uint32_t getRawNondetSuccessor(uint32_t offset) const
     {return mBuffers[offset];}
 
   //##########################################################################
   //# Debug Output
 #ifdef DEBUG
-  void dump(uint32 a, const NarrowEventRecord* const* events) const;
+  void dump(uint32_t a, const NarrowEventRecord* const* events) const;
 #endif /* DEBUG */
 
   //##########################################################################
   //# Class Constants
-  static const uint32 TAG_END_OF_LIST = 0x80000000;
+  static const uint32_t TAG_END_OF_LIST = 0x80000000;
 
   //##########################################################################
   //# Data Members
   AutomatonRecord* mAutomaton;
-  uint32 mAutomatonIndex;
+  uint32_t mAutomatonIndex;
   bool mIsPlant;
-  uint32 mNumStates;
-  uint32 mNumTransitions;
-  uint32* mStateTable;
-  uint32* mBuffers;
+  uint32_t mNumStates;
+  uint32_t mNumTransitions;
+  uint32_t* mStateTable;
+  uint32_t* mBuffers;
 };
 
 

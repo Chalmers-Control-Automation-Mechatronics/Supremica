@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   GlobalAlphabet
 //###########################################################################
-//# $Id$
+//# $Id: GlobalAlphabet.cpp 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -24,12 +24,12 @@ namespace waters {
 //# GlobalAlphabet: Constructors & Destructors
 
 GlobalAlphabet::
-GlobalAlphabet(uint32 numuncont, uint32 numcont)
+GlobalAlphabet(uint32_t numuncont, uint32_t numcont)
   : mFirstControllable(numuncont),
     mNumEvents(numuncont + numcont)
 {
   mEventNames = new jstring[mNumEvents];
-  for (uint32 i = 0; i < mNumEvents; i++) {
+  for (uint32_t i = 0; i < mNumEvents; i++) {
     mEventNames[i] = 0;
   }
 }
@@ -46,7 +46,7 @@ GlobalAlphabet::
 //# GlobalAlphabet: Initialisation
 
 void GlobalAlphabet::
-initEventName(uint32 code, jstring name)
+initEventName(uint32_t code, jstring name)
 {
   mEventNames[code] = name;
 }

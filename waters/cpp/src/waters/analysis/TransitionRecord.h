@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionRecord
 //###########################################################################
-//# $Id$
+//# $Id: TransitionRecord.h 4742 2009-07-28 23:43:19Z robi $
 //###########################################################################
 
 
@@ -19,7 +19,7 @@
 #pragma once
 #endif
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 #include "waters/base/LinkedRecordList.h"
 
 
@@ -53,15 +53,15 @@ public:
   //##########################################################################
   //# Simple Access
   inline const AutomatonRecord* getAutomaton() const {return mAutomaton;}
-  inline uint32 getDeterministicSuccessorShifted(uint32 source) const
+  inline uint32_t getDeterministicSuccessorShifted(uint32_t source) const
     {return mDeterministicSuccessorsShifted[source];}
-  inline uint32 getNumberOfNondeterministicSuccessors(uint32 source) const
+  inline uint32_t getNumberOfNondeterministicSuccessors(uint32_t source) const
     {return mNumNondeterministicSuccessors[source];} // unsafe
-  inline uint32 getNondeterministicSuccessorShifted
-    (uint32 source, uint32 index) const
+  inline uint32_t getNondeterministicSuccessorShifted
+    (uint32_t source, uint32_t index) const
     {return mNondeterministicSuccessorsShifted[source][index];} // unsafe
-  uint32 getNumberOfSuccessors(uint32 source) const; // slow
-  uint32 getSuccessorShifted(uint32 source, uint32 index) const; // slow
+  uint32_t getNumberOfSuccessors(uint32_t source) const; // slow
+  uint32_t getSuccessorShifted(uint32_t source, uint32_t index) const; // slow
   inline bool isAlwaysDisabled() const {return mWeight == 0;}
   inline bool isAlwaysEnabled() const {return mWeight == PROBABILITY_1;}
   inline bool isOnlySelfloops() const {return mIsOnlySelfloops;}
@@ -88,24 +88,24 @@ public:
 
   //##########################################################################
   //# Set up
-  bool addDeterministicTransition(uint32 source, uint32 target);
-  void addNondeterministicTransition(uint32 source, uint32 target);
+  bool addDeterministicTransition(uint32_t source, uint32_t target);
+  void addNondeterministicTransition(uint32_t source, uint32_t target);
   void normalize();
-  uint32 getCommonTarget() const;
-  bool markTransitionTaken(const uint32* tuple);
+  uint32_t getCommonTarget() const;
+  bool markTransitionTaken(const uint32_t* tuple);
   int removeTransitionsNotTaken();
   void removeSelfloops();
 
   //##########################################################################
   //# Trace Computation
-  void storeNondeterministicTarget(const uint32* sourcetuple,
-				   const uint32* targettuple,
+  void storeNondeterministicTarget(const uint32_t* sourcetuple,
+				   const uint32_t* targettuple,
 				   const jni::MapGlue& statemap) const;
 
   //##########################################################################
   //# Class Constants
-  static const uint32 NO_TRANSITION = 0xffffffff;
-  static const uint32 MULTIPLE_TRANSITIONS = 0xfffffffe;
+  static const uint32_t NO_TRANSITION = 0xffffffff;
+  static const uint32_t MULTIPLE_TRANSITIONS = 0xfffffffe;
 
 private:
   //##########################################################################
@@ -117,12 +117,12 @@ private:
   const AutomatonRecord* mAutomaton;
   int mWeight;
   bool mIsOnlySelfloops;
-  uint32* mFlags;
-  uint32* mDeterministicSuccessorsShifted;
-  uint32* mNumNondeterministicSuccessors;
-  uint32* mNondeterministicBuffer;
-  uint32** mNondeterministicSuccessorsShifted;
-  uint32 mNumNotTaken;
+  uint32_t* mFlags;
+  uint32_t* mDeterministicSuccessorsShifted;
+  uint32_t* mNumNondeterministicSuccessors;
+  uint32_t* mNondeterministicBuffer;
+  uint32_t** mNondeterministicSuccessorsShifted;
+  uint32_t mNumNotTaken;
   TransitionRecord* mNextInSearch;
   TransitionRecord* mNextInUpdate;
   TransitionRecord* mNextInNotTaken;
@@ -130,8 +130,8 @@ private:
 
   //##########################################################################
   //# Class Constants
-  static const uint32 FLAG_NONDET = 0x00000001;
-  static const uint32 FLAG_TAKEN = 0x00000002;
+  static const uint32_t FLAG_NONDET = 0x00000001;
+  static const uint32_t FLAG_TAKEN = 0x00000002;
 
   static const int PROBABILITY_1 = 0x40000000;
   static const float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
@@ -214,22 +214,22 @@ public:
   //##########################################################################
   //# Initial State Iteration
   void setupInit(const AutomatonRecord* aut);
-  bool advanceInit(uint32* tuple);
+  bool advanceInit(uint32_t* tuple);
 
   //##########################################################################
   //# Transition Iteration
-  uint32 setup(const TransitionRecord* trans, uint32 source);
-  bool advance(uint32* tuple);
-  uint32 reset();
-  uint32 next();
-  uint32 current();
+  uint32_t setup(const TransitionRecord* trans, uint32_t source);
+  bool advance(uint32_t* tuple);
+  uint32_t reset();
+  uint32_t next();
+  uint32_t current();
 
 private:
   //##########################################################################
   //# Data Members
   const AutomatonRecord* mAutomatonRecord;
   const TransitionRecord* mTransitionRecord;
-  uint32 mSource;
+  uint32_t mSource;
   int mIndex;  
 };
 

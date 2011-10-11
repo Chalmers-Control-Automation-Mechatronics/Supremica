@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionUpdateRecord
 //###########################################################################
-//# $Id$
+//# $Id: TransitionUpdateRecord.h 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 
@@ -19,7 +19,7 @@
 #pragma once
 #endif
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace waters {
@@ -41,10 +41,10 @@ public:
 
   //##########################################################################
   //# Simple Access
-  inline uint32 getWordIndex() const {return mWordIndex;}
-  inline uint32 getKeptMask() const {return mKeptMask;}
-  inline uint32 getCommonMask() const {return mCommonMask;}
-  inline uint32 getCommonTargets() const {return mCommonTargets;}
+  inline uint32_t getWordIndex() const {return mWordIndex;}
+  inline uint32_t getKeptMask() const {return mKeptMask;}
+  inline uint32_t getCommonMask() const {return mCommonMask;}
+  inline uint32_t getCommonTargets() const {return mCommonTargets;}
   inline TransitionRecord* getTransitionRecords() const
     {return mTransitionRecords;}
 
@@ -55,10 +55,10 @@ public:
 private:
   //##########################################################################
   //# Data Members
-  uint32 mWordIndex;
-  uint32 mKeptMask;
-  uint32 mCommonMask;
-  uint32 mCommonTargets;
+  uint32_t mWordIndex;
+  uint32_t mKeptMask;
+  uint32_t mCommonMask;
+  uint32_t mCommonTargets;
   TransitionRecord* mTransitionRecords;
 };
 

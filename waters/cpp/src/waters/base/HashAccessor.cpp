@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashAccessor
 //###########################################################################
-//# $Id$
+//# $Id: HashAccessor.cpp 4766 2009-10-08 08:26:53Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -18,157 +18,123 @@
 
 namespace waters {
 
+
+//############################################################################
+//# Elementary Arithmetic
+//############################################################################
+
+int log2(hashindex_t x)
+{
+  int result = 0;
+  if (x > 1) {
+    x--;
+    do {
+      x >>= 1;
+      result++;
+    } while (x);
+  }
+  return result;
+}
+
+
 //############################################################################
 //# Some Hash Functions
 //############################################################################
 
-const uint32 gold = 0x9e3779b9;
+const uint64_t GOLD64 = 0x9e3779b97f4a7c13LL;
 
-#define mix(a,b,c) \
-{ \
-  a -= b; a -= c; a ^= (c >> 13); \
-  b -= c; b -= a; b ^= (a << 8); \
-  c -= a; c -= b; c ^= (b >> 13); \
-  a -= b; a -= c; a ^= (c >> 12); \
-  b -= c; b -= a; b ^= (a << 16); \
-  c -= a; c -= b; c ^= (b >> 5); \
-  a -= b; a -= c; a ^= (c >> 3); \
-  b -= c; b -= a; b ^= (a << 10); \
-  c -= a; c -= b; c ^= (b >> 15); \
-}
+uint64_t* FACTORS = 0;
+uint32_t NUM_FACTORS = 0;
 
-uint32 hashInt(uint32 key)
+
+void initHashFactors(uint32_t size)
 {
-  register uint32 a = key - gold;
-  register uint32 b = 0;
-  register uint32 c = -a;
-
-  a -= gold; a ^= (gold >> 13);
-  b -= a; b ^= (a << 8);
-  c -= a; c -= b; c ^= (b >> 13);
-  a -= b; a -= c; a ^= (c >> 12);
-  b -= c; b -= a; b ^= (a << 16);
-  c -= a; c -= b; c ^= (b >> 5);
-  a -= b; a -= c; a ^= (c >> 3);
-  b -= c; b -= a; b ^= (a << 10);
-  c -= a; c -= b; c ^= (b >> 15);
-
-  return c;
-}
-
-
-uint32 hashInt(int key)
-{
-  return hashInt((uint32) key);
-}
-
-
-uint32 hashInt(const void* key)
-{
-  return hashInt((uint32) key);
-}
-
-
-uint32 hashIntArray(const uint32* key, const int len)
-{
-  register uint32 a = gold;
-  register uint32 b = gold;
-  register uint32 c = gold;
-  register int rest = len;
-
-  // Handle most of the key ...
-  while (rest >= 3) {
-    a += key[0];
-    b += key[1];
-    c += key[2];
-    mix(a,b,c);
-    key += 3;
-    rest -= 3;
+  uint32_t numFactors = (size / 2) + 1;
+  if (numFactors > NUM_FACTORS) {
+    NUM_FACTORS = numFactors;
+    FACTORS = new uint64_t[NUM_FACTORS];
+    uint64_t factor = GOLD64;
+    for (uint32_t i = 0; i < NUM_FACTORS; i++) {
+      FACTORS[i] = factor;
+      factor *= GOLD64;
+    }
   }
-
-  // Handle the last 1 or 2 words ...
-  switch(rest) {
-    // all the case statements fall through ...
-  case 2: b += key[1];
-  case 1: a += key[0];
-    // case 0: nothing left to add
-  }
-  mix(a,b,c);
- 
-  return c;
 }
 
 
-uint32 hashIntArray(const uint32* key, const int len, uint32 mask0)
+uint64_t hashInt(uint64_t key)
 {
-  register uint32 a = gold;
-  register uint32 b = gold;
-  register uint32 c = gold;
-  register int rest = len;
+  return key * GOLD64;
+}
 
+
+uint64_t hashIntArray(const uint32_t* array, uint32_t size, uint32_t mask0)
+{
+  register int rest = size;
+  register int factor = 0;
+  register uint64_t a;
+  register uint64_t b;
+  register uint64_t result = 0;
   // Handle most of the key ...
-  while (rest >= 3) {
-    a += key[0] & mask0;
-    b += key[1];
-    c += key[2];
-    mix(a,b,c);
+  while (rest >= 4) {
+    a = (array[0] & mask0) + ((uint64_t) array[1] << 32) + FACTORS[factor++];
+    b = array[2] + ((uint64_t) array[3] << 32) + FACTORS[factor++];
+    result += a * b;
+    array += 4;
+    rest -= 4;
     mask0 = ~0;
-    key += 3;
-    rest -= 3;
   }
-
-  // Handle the last 1 or 2 words ...
-  switch(rest) {
-    // all the case statements fall through ...
-  case 2: b += key[1];
-  case 1: a += key[0] & mask0;
-    // case 0: nothing left to add
+  // Handle the last 0-3 words ...
+  switch (rest) {
+  case 3: 
+    a = (array[0] & mask0) + ((uint64_t) array[1] << 32) + FACTORS[factor++];
+    b = array[2] + FACTORS[factor];
+    result += a * b;
+    break;
+  case 2:
+    result +=
+      ((array[0] & mask0) + ((uint64_t) array[1] << 32)) * FACTORS[factor];
+    break;
+  case 1:
+    result += (array[0] & mask0) * FACTORS[factor];
+    break;
+  default:
+    break;
   }
-  mix(a,b,c);
- 
-  return c;
+  return result;
 }
 
 
-uint32 hashString(const char* key)
+uint64_t hashString(const char* key)
 {
-  int len = strlen(key);
-  register uint32 a = gold;
-  register uint32 b = gold;
-  register uint32 c = gold;
+  const int len = strlen(key);
   register int rest = len;
-
+  register uint64_t result = GOLD64 * len;
   // Handle most of the key ...
-  while (rest >= 12) {
-    a += (key[0] + (key[1] << 8) + (key[2] << 16) + (key[3] << 24));
-    b += (key[4] + (key[5] << 8) + (key[6] << 16) + (key[7] << 24));
-    c += (key[8] + (key[9] << 8) + (key[10] << 16)+ (key[11] << 24));
-    mix(a,b,c);
-    key += 12;
-    rest -= 12;
+  while (rest >= 8) {
+    result +=
+      (uint64_t) key[0] + ((uint64_t) key[1] << 8) +
+      ((uint64_t) key[2] << 16) + ((uint64_t) key[3] << 24) +
+      ((uint64_t) key[4] << 32) + ((uint64_t) key[5] << 40) +
+      ((uint64_t) key[6] << 48) + ((uint64_t) key[7] << 56);
+    result *= GOLD64;
+    key += 8;
+    rest -= 8;
   }
-
-  // Handle the last 11 bytes ...
-  c += len;
-  switch(rest) {
+  // Handle the last 0-7 bytes ...
+  switch (rest) {
     // all the case statements fall through ...
-  case 11: c += (key[10] << 24);
-  case 10: c += (key[9] << 16);
-  case 9 : c += (key[8] << 8);
-    // the first byte of c is reserved for the length
-  case 8 : b += (key[7] << 24);
-  case 7 : b += (key[6] << 16);
-  case 6 : b += (key[5] << 8);
-  case 5 : b += key[4];
-  case 4 : a += (key[3] << 24);
-  case 3 : a += (key[2] << 16);
-  case 2 : a += (key[1] << 8);
-  case 1 : a += key[0];
+  case 7 : result += (uint64_t) key[6] << 48;
+  case 6 : result += (uint64_t) key[5] << 40;
+  case 5 : result += (uint64_t) key[4] << 32;
+  case 4 : result += (uint64_t) key[3] << 24;
+  case 3 : result += (uint64_t) key[2] << 16;
+  case 2 : result += (uint64_t) key[1] << 8;
+  case 1 : result += (uint64_t) key[0];
     // case 0: nothing left to add
   }
-  mix(a,b,c);
- 
-  return c;
+  return result;
 }
+
 
 }  /* namespace waters */

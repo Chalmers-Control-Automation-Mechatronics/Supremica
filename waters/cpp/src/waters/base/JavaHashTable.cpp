@@ -4,12 +4,14 @@
 //# PACKAGE: waters.base
 //# CLASS:   JavaHashTable
 //###########################################################################
-//# $Id$
+//# $Id: JavaHashTable.cpp 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
 #pragma implementation
 #endif
+
+#include <iostream>
 
 #include <jni.h>
 
@@ -30,8 +32,8 @@ namespace waters {
 //############################################################################
 //# ObjectHashAccessor: Hash Methods
 
-uint32 ObjectHashAccessor::
-hash(const void* key)
+uint64_t ObjectHashAccessor::
+hash(intptr_t key)
   const
 {
   const jobject object = (const jobject) key;
@@ -42,7 +44,7 @@ hash(const void* key)
 
 
 bool ObjectHashAccessor::
-equals(const void* key1, const void* key2)
+equals(intptr_t key1, intptr_t key2)
   const
 {
   const jobject object1 = (const jobject) key1;

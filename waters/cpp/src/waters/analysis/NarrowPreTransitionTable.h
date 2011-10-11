@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   NarrowPreTransitionTable
 //###########################################################################
-//# $Id$
+//# $Id: NarrowPreTransitionTable.h 4788 2009-10-27 09:17:36Z robi $
 //###########################################################################
 
 #ifndef _NarrowPreTransitionTable_h_
@@ -20,7 +20,7 @@
 
 #include "waters/base/HashAccessor.h"
 #include "waters/base/HashTable.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 #include "waters/base/LinkedRecordList.h"
 
 
@@ -56,9 +56,8 @@ private:
 public:
   //##########################################################################
   //# Hash Methods
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const {return value;}
+  virtual uint64_t hash(intptr_t key) const;
+  virtual bool equals(intptr_t key1, intptr_t key2) const;
 };
 
 
@@ -94,43 +93,44 @@ class NarrowTransitionRecord
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit NarrowTransitionRecord(uint32 state = UNDEF_UINT32,
+  explicit NarrowTransitionRecord(uint32_t state = UINT32_MAX,
                                   const NarrowEventRecord* event = 0) :
     mState(state), mEvent(event), mNumSuccessors(1), mNext(0) {}
   ~NarrowTransitionRecord() {delete mNext;}
-  void init(uint32 state, const NarrowEventRecord* event)
+  void init(uint32_t state, const NarrowEventRecord* event)
     {mState = state; mEvent = event;}
 
   //##########################################################################
   //# Simple Access
   const NarrowEventRecord* getEvent() const {return mEvent;}
-  uint32 getEventCode() const;
+  uint32_t getEventCode() const;
   bool isDeterministic() const {return mNumSuccessors <= 1;}
-  uint32 getNumberOfSuccessors() const {return mNumSuccessors;}
+  uint32_t getNumberOfSuccessors() const {return mNumSuccessors;}
   NarrowTransitionRecord* getNext() const {return mNext;}
   void addSuccessor() {mNumSuccessors++;}
   void setNext(NarrowTransitionRecord* next) {mNext = next;}
-  void setBufferPos(uint32 pos) {mBufferPos = pos;}
+  void setBufferPos(uint32_t pos) {mBufferPos = pos;}
 
   //##########################################################################
   //# Building the Transition Table
-  void putSuccessor(uint32* buffer, uint32 code, uint32 endtag);
+  void putSuccessor(uint32_t* buffer, uint32_t code, uint32_t endtag);
 
   //##########################################################################
   //# Comparing and Hashing
   int compareTo(const NarrowTransitionRecord* record) const;
-  static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
+  static const NarrowTransitionRecordHashAccessor* getHashAccessor()
+    {return &theHashAccessor;}
   static const LinkedRecordAccessor<NarrowTransitionRecord>* getListAccessor()
     {return &theListAccessor;}
 
 private:
   //##########################################################################
   //# Data Members
-  uint32 mState;
+  uint32_t mState;
   const NarrowEventRecord* mEvent;
-  uint32 mNumSuccessors;
+  uint32_t mNumSuccessors;
   NarrowTransitionRecord* mNext;
-  uint32 mBufferPos;
+  uint32_t mBufferPos;
 
   //##########################################################################
   //# Class Variables
@@ -152,7 +152,7 @@ class NarrowStateRecord
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit NarrowStateRecord(uint32 code) :
+  explicit NarrowStateRecord(uint32_t code) :
     mNumEvents(0),
     mTransitionRecords(0)
   {}
@@ -160,8 +160,8 @@ public:
 
   //##########################################################################
   //# Simple Access
-  uint32 getNumberOfEnabledEvents() const {return mNumEvents;}
-  uint32 getNumberOfNondeterministicTransitions() const;
+  uint32_t getNumberOfEnabledEvents() const {return mNumEvents;}
+  uint32_t getNumberOfNondeterministicTransitions() const;
   NarrowTransitionRecord* getTransitions() const {return mTransitionRecords;}
   void addTransition(NarrowTransitionRecord* trans);
   void removeSkippable(const NarrowPreTransitionTable* pre);
@@ -170,7 +170,7 @@ public:
 private:
   //##########################################################################
   //# Data Members
-  uint32 mNumEvents;
+  uint32_t mNumEvents;
   NarrowTransitionRecord* mTransitionRecords;
 };
 
@@ -186,16 +186,16 @@ public:
   //# Constructors & Destructors
   NarrowPreTransitionTable(AutomatonRecord* aut,
 			   jni::ClassCache* cache,
-			   const HashTable<const jni::EventGlue*,
-			                   NarrowEventRecord*>& eventmap);
+			   const PtrHashTable<const jni::EventGlue*,
+			                      NarrowEventRecord*>& eventmap);
   ~NarrowPreTransitionTable();
 
   //##########################################################################
   //# Simple Access
   AutomatonRecord* getAutomaton() const {return mAutomaton;}
-  NarrowStateRecord* getNarrowStateRecord(uint32 code) const
+  NarrowStateRecord* getNarrowStateRecord(uint32_t code) const
     {return &mNarrowStates[code];}
-  uint32 getStateCode(const jni::StateGlue& state) const
+  uint32_t getStateCode(const jni::StateGlue& state) const
     {return mStateMap->get(&state);}
   bool isLocallySelflooped(const NarrowEventRecord *event) const;
   const jni::SetGlue& getUniqueTransitions() const
@@ -206,8 +206,8 @@ private:
   //# Data Members
   AutomatonRecord* mAutomaton;
   NarrowStateRecord* mNarrowStates;
-  HashTable<const jni::StateGlue*,uint32>* mStateMap;
-  HashTable<const jni::EventGlue*,NarrowEventRecord*>* mSelfloopMap;
+  Int32PtrHashTable<const jni::StateGlue*,uint32_t>* mStateMap;
+  PtrHashTable<const jni::EventGlue*,NarrowEventRecord*>* mSelfloopMap;
   jni::SetGlue* mUniqueTransitions;
 };
 

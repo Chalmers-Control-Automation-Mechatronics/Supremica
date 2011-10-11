@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   BroadProductExplorer
 //###########################################################################
-//# $Id$
+//# $Id: BroadProductExplorer.cpp 6185 2011-06-05 09:05:08Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -138,8 +138,8 @@ teardown()
          trans = trans->getNextInSearch()) {                            \
       const AutomatonRecord* aut = trans->getAutomaton();               \
       const int a = aut->getAutomatonIndex();                           \
-      const uint32 source = sourcetuple[a];                             \
-      const uint32 target = trans->getDeterministicSuccessorShifted(source); \
+      const uint32_t source = sourcetuple[a];                             \
+      const uint32_t target = trans->getDeterministicSuccessorShifted(source); \
       if (target == TransitionRecord::NO_TRANSITION) {                  \
         dis = aut;                                                      \
         break;                                                          \
@@ -150,21 +150,21 @@ teardown()
 #define EXPAND_ENABLED_TRANSITIONS(numwords, source,                    \
                                    sourcetuple, sourcepacked, event)    \
   {                                                                     \
-    uint32* bufferpacked = getStateSpace().prepare();                   \
+    uint32_t* bufferpacked = getStateSpace().prepare();                   \
     if (event->isDeterministic()) {                                     \
       for (int w = 0; w < numwords; w++) {                              \
         TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
         if (update == 0) {                                              \
           bufferpacked[w] = sourcepacked[w];                            \
         } else {                                                        \
-          uint32 word = (sourcepacked[w] & update->getKeptMask()) |     \
+          uint32_t word = (sourcepacked[w] & update->getKeptMask()) |     \
             update->getCommonTargets();                                 \
           for (TransitionRecord* trans = update->getTransitionRecords(); \
                trans != 0;                                              \
                trans = trans->getNextInUpdate()) {                      \
             const AutomatonRecord* aut = trans->getAutomaton();         \
             const int a = aut->getAutomatonIndex();                     \
-            const uint32 source = sourcetuple[a];                       \
+            const uint32_t source = sourcetuple[a];                       \
             word |= trans->getDeterministicSuccessorShifted(source);    \
           }                                                             \
           bufferpacked[w] = word;                                       \
@@ -178,15 +178,15 @@ teardown()
         if (update == 0) {                                              \
           bufferpacked[w] = sourcepacked[w];                            \
         } else {                                                        \
-          uint32 word = (sourcepacked[w] & update->getKeptMask()) |     \
+          uint32_t word = (sourcepacked[w] & update->getKeptMask()) |     \
             update->getCommonTargets();                                 \
           for (TransitionRecord* trans = update->getTransitionRecords(); \
                trans != 0;                                              \
                trans = trans->getNextInUpdate()) {                      \
             const AutomatonRecord* aut = trans->getAutomaton();         \
             const int a = aut->getAutomatonIndex();                     \
-            const uint32 source = sourcetuple[a];                       \
-            uint32 succ = trans->getDeterministicSuccessorShifted(source); \
+            const uint32_t source = sourcetuple[a];                       \
+            uint32_t succ = trans->getDeterministicSuccessorShifted(source); \
             if (succ == TransitionRecord::MULTIPLE_TRANSITIONS) {       \
               succ = mNondeterministicTransitionIterators[ndend++].     \
                 setup(trans, source);                                   \
@@ -232,7 +232,7 @@ teardown()
 
 
 bool BroadProductExplorer::
-expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
+expandSafetyState(const uint32_t* sourcetuple, const uint32_t* sourcepacked)
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   for (int e = 0; e < mNumEventRecords; e++) {
@@ -253,7 +253,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 #undef ADD_NEW_STATE
 #define ADD_NEW_STATE(source)                                           \
   {                                                                     \
-    uint32 code = getStateSpace().add();                                \
+    uint32_t code = getStateSpace().add();                                \
     if (code != source) {                                               \
       setConflictKind(jni::ConflictKind_CONFLICT);                      \
       if (code == getNumberOfStates()) {                                \
@@ -266,7 +266,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 #undef ADD_NEW_STATE_ALLOC
 #define ADD_NEW_STATE_ALLOC(source, bufferpacked)                       \
   {                                                                     \
-    uint32 code = getStateSpace().add();                                \
+    uint32_t code = getStateSpace().add();                                \
     if (code != source) {                                               \
       setConflictKind(jni::ConflictKind_CONFLICT);                      \
       if (code == getNumberOfStates()) {                                \
@@ -277,9 +277,9 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
   }
 
 bool BroadProductExplorer::
-expandNonblockingReachabilityState(uint32 source,
-                                   const uint32* sourcetuple,
-                                   const uint32* sourcepacked)
+expandNonblockingReachabilityState(uint32_t source,
+                                   const uint32_t* sourcetuple,
+                                   const uint32_t* sourcepacked)
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   setConflictKind(jni::ConflictKind_DEADLOCK);
@@ -326,8 +326,8 @@ expandNonblockingReachabilityState(uint32 source,
 #define ADD_NEW_STATE_ALLOC(source, bufferpacked) ADD_NEW_STATE(source)
 
 void BroadProductExplorer::
-expandNonblockingCoreachabilityState(const uint32* targettuple,
-                                     const uint32* targetpacked)
+expandNonblockingCoreachabilityState(const uint32_t* targettuple,
+                                     const uint32_t* targetpacked)
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   EXPAND(numwords, TARGET, targettuple, targetpacked);
@@ -338,12 +338,12 @@ expandNonblockingCoreachabilityState(const uint32* targettuple,
 
 /*
 void BroadProductExplorer::
-doIterativeTarjan(uint32 start)
+doIterativeTarjan(uint32_t start)
 {
   TarjanControlStack controlStack;
   TarjanStateStack stateStack;
-  uint32* currenttuple = new uint32[mNumAutomata];
-  uint32 succ = UNDEF_UINT32;
+  uint32_t* currenttuple = new uint32_t[mNumAutomata];
+  uint32_t succ = UINT32_MAX;
 
 
   storeTarjanIndex(start);
@@ -351,14 +351,14 @@ doIterativeTarjan(uint32 start)
 
   while (!controlStack.isEmpty()) {
     TarjanStackFrame& frame = controlStack.top();
-    uint32 current = frame.getStateCode();
-    uint32* currentpacked = mStateSpace->get(current);
+    uint32_t current = frame.getStateCode();
+    uint32_t* currentpacked = mStateSpace->get(current);
     getAutomatonEncoding().decode(currentpacked, currenttuple);
-    uint32 currentindex = getTarjanIndex(current);
+    uint32_t currentindex = getTarjanIndex(current);
     while (true) {
       if (frame.hasNondeterministicIterators()) {
-        uint32 first = frame.getFirstNondeterministicSuccessor();
-        uint32* succpacked = getStateSpace().prepare(first);
+        uint32_t first = frame.getFirstNondeterministicSuccessor();
+        uint32_t* succpacked = getStateSpace().prepare(first);
         if (frame.advanceNondeterministicTransitionIterators(succpacked)) {
           succ = getStateSpace().add();
         } else {
@@ -377,9 +377,9 @@ doIterativeTarjan(uint32 start)
           e++;
         }
         if (dis == 0) {
-          succ = UNDEF_UINT32;
+          succ = UINT32_MAX;
         } else {
-          uint32* succpacked = getStateSpace().prepare();
+          uint32_t* succpacked = getStateSpace().prepare();
           if (event->isDeterministic()) {
             for (int w = 0; w < numwords; w++) {
               TransitionUpdateRecord* update =
@@ -387,14 +387,14 @@ doIterativeTarjan(uint32 start)
               if (update == 0) {
                 succpacked[w] = currentpacked[w];
               } else {
-                uint32 word = (sourcepacked[w] & update->getKeptMask()) |
+                uint32_t word = (sourcepacked[w] & update->getKeptMask()) |
                   update->getCommonTargets();
                 for (TransitionRecord* trans = update->getTransitionRecords();
                      trans != 0;
                      trans = trans->getNextInUpdate()) {
                   const AutomatonRecord* aut = trans->getAutomaton();
                   const int a = aut->getAutomatonIndex();
-                  const uint32 source = sourcetuple[a];
+                  const uint32_t source = sourcetuple[a];
                   word |= trans->getDeterministicSuccessorShifted(source);
                 }
                 succpacked[w] = word;
@@ -408,15 +408,15 @@ doIterativeTarjan(uint32 start)
               if (update == 0) {                                        
                 succpacked[w] = sourcepacked[w];                      
               } else {                                                  
-                uint32 word = (sourcepacked[w] & update->getKeptMask()) |
+                uint32_t word = (sourcepacked[w] & update->getKeptMask()) |
                   update->getCommonTargets(); 
                 for (TransitionRecord* trans = update->getTransitionRecords();
                      trans != 0;                                        
                      trans = trans->getNextInUpdate()) {                
                   const AutomatonRecord* aut = trans->getAutomaton();
                   const int a = aut->getAutomatonIndex();
-                  const uint32 source = sourcetuple[a];
-                  uint32 succ =
+                  const uint32_t source = sourcetuple[a];
+                  uint32_t succ =
                     trans->getDeterministicSuccessorShifted(source); 
                   if (succ == TransitionRecord::MULTIPLE_TRANSITIONS) {
                     frame.createNondeterministicTransitionIterators
@@ -434,13 +434,13 @@ doIterativeTarjan(uint32 start)
           }
         }
       }
-      if (succ == UNDEF_UINT32) {
+      if (succ == UINT32_MAX) {
         // All successors have been processed---
         // complete the visit() method, then return.
         if (frame.isRoot()) {
           setInComponent(current);
           while (!stateStack.isEmpty()) {
-            uint32 next = stateStack.top();
+            uint32_t next = stateStack.top();
             if (currentindex <= getTarjanIndex(next)) {
               stateStack.pop();
               setTarjanIndex(next, currentindex);
@@ -455,8 +455,8 @@ doIterativeTarjan(uint32 start)
         controlStack.pop();
         if (!inComponent(current)) {
           TarjanStackFrame& parentframe = controlStack.top();
-          uint32 parent = parentframe.getStateCode();
-          uint32 parentindex = getTarjanIndex(current);
+          uint32_t parent = parentframe.getStateCode();
+          uint32_t parentindex = getTarjanIndex(current);
           if (currentindex < parentindex) {
             setTarjanIndex(parent, currentindex);
             parentframe.setRoot(false);
@@ -471,7 +471,7 @@ doIterativeTarjan(uint32 start)
         break;
       } else if (!inComponent(succ)) {
         // Skip the recursive call because the successor was visited already.
-        uint32 succindex = getTarjanIndex(succ);
+        uint32_t succindex = getTarjanIndex(succ);
         if (succindex < currentindex) {
           currentindex = succindex;
           setTarjanIndex(current, currentindex);
@@ -523,7 +523,7 @@ setupReverseTransitionRelations()
 #define ADD_NEW_STATE(source) checkTraceState()
 
 void BroadProductExplorer::
-expandTraceState(const uint32* targettuple, const uint32* targetpacked)
+expandTraceState(const uint32_t* targettuple, const uint32_t* targetpacked)
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   const BroadEventRecord* event;
@@ -550,8 +550,8 @@ expandTraceState(const uint32* targettuple, const uint32* targetpacked)
 
 
 void BroadProductExplorer::
-storeNondeterministicTargets(const uint32* sourcetuple,
-                             const uint32* targettuple,
+storeNondeterministicTargets(const uint32_t* sourcetuple,
+                             const uint32_t* targettuple,
                              const jni::MapGlue& map)
 {
   const BroadEventRecord* event = (const BroadEventRecord*) getTraceEvent();
@@ -569,8 +569,9 @@ setupSafety()
   jni::ClassCache* cache = getCache();
   const jni::SetGlue events = getModel().getEventsGlue(cache);
   const int numevents = events.size();
-  const HashAccessor* eventaccessor = BroadEventRecord::getHashAccessor();
-  HashTable<const jni::EventGlue*,BroadEventRecord*>
+  const EventRecordHashAccessor* eventaccessor =
+    BroadEventRecord::getHashAccessor();
+  PtrHashTable<const jni::EventGlue*,BroadEventRecord*>
     eventmap(eventaccessor, numevents);
   setupEventMap(eventmap);
 
@@ -610,8 +611,9 @@ setupNonblocking()
   jni::ClassCache* cache = getCache();
   const jni::SetGlue events = getModel().getEventsGlue(cache);
   const int numevents = events.size();
-  const HashAccessor* eventaccessor = BroadEventRecord::getHashAccessor();
-  HashTable<const jni::EventGlue*,BroadEventRecord*>
+  const EventRecordHashAccessor* eventaccessor =
+    BroadEventRecord::getHashAccessor();
+  PtrHashTable<const jni::EventGlue*,BroadEventRecord*>
     eventmap(eventaccessor, numevents);
   setupEventMap(eventmap);
 
@@ -650,7 +652,7 @@ setupNonblocking()
 
 
 void BroadProductExplorer::
-setupEventMap(HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
+setupEventMap(PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
   jni::ClassCache* cache = getCache();
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
@@ -681,10 +683,11 @@ void BroadProductExplorer::
 setupTransitions
   (AutomatonRecord* aut,
    const jni::AutomatonGlue& autglue,
-   const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
+   const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
   jni::ClassCache* cache = getCache();
-  HashTable<const jni::StateGlue*,uint32>* statemap = aut->createStateMap();
+  Int32PtrHashTable<const jni::StateGlue*,uint32_t>* statemap =
+    aut->createStateMap();
   const jni::CollectionGlue transitions = autglue.getTransitionsGlue(cache);
   const jni::TreeSetGlue uniqtrans(&transitions, cache);
   int maxpass = 1;
@@ -696,9 +699,9 @@ setupTransitions
       const jni::EventGlue& eventglue = trans.getEventGlue(cache);
       BroadEventRecord* eventrecord = eventmap.get(&eventglue);
       const jni::StateGlue& sourceglue = trans.getSourceGlue(cache);
-      const uint32 sourcecode = statemap->get(&sourceglue);
+      const uint32_t sourcecode = statemap->get(&sourceglue);
       const jni::StateGlue& targetglue = trans.getTargetGlue(cache);
-      const uint32 targetcode = statemap->get(&targetglue);
+      const uint32_t targetcode = statemap->get(&targetglue);
       if (pass == 1) {
         const bool det =
           eventrecord->addDeterministicTransition(aut, sourcecode, targetcode);
@@ -717,7 +720,7 @@ setupTransitions
 
 void BroadProductExplorer::
 setupCompactEventList
-  (const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
+  (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
   mMaxNondeterministicUpdates = 0;
   mNumEventRecords = eventmap.size();

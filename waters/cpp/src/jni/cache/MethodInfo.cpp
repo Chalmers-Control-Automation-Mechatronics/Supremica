@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   MethodInfo
 //###########################################################################
-//# $Id$
+//# $Id: MethodInfo.cpp 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -21,7 +21,7 @@ namespace jni {
 //###########################################################################
 
 MethodInfo::
-MethodInfo(waters::uint32 code,
+MethodInfo(uint32_t code,
            const char* name, 
            const char* signature)
 {

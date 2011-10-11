@@ -19,14 +19,12 @@
 #pragma once
 #endif
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
+
+#include "HashAccessor.h"
 
 
 namespace waters {
-
-class HashAccessor;
-class HashOverflowBucket;
-class HashOverflowPair;
 
 
 //############################################################################
@@ -38,24 +36,20 @@ class HashTableIterator
 public:
   //##########################################################################
   //# Constructors
-  explicit HashTableIterator(const HashOverflowBucket* bucket) :
-    mIndex(0), mBucket(bucket)
-  {}
+  explicit HashTableIterator() : mIndex(0) {}
 
   //##########################################################################
   //# Simple Access
-  uint32 getIndex() const {return mIndex;};
-  const HashOverflowBucket* getBucket() const {return mBucket;};
+  hashindex_t getIndex() const {return mIndex;}
 
   //##########################################################################
   //# Iteration
-  void skip();
+  hashindex_t skip() {return ++mIndex;}
 
 private:
   //##########################################################################
   //# Data Members
-  uint32 mIndex;
-  const HashOverflowBucket* mBucket;
+  hashindex_t mIndex;
 };
 
 
@@ -63,88 +57,194 @@ private:
 //# class HashTable <typeless>
 //############################################################################
 
-class UntypedHashTable
+template <typename K, typename V>
+class RawHashTable
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit UntypedHashTable(const HashAccessor* accessor, uint32 size);
-  ~UntypedHashTable();
+  explicit RawHashTable(const HashAccessor<K,V>* accessor,
+                        hashindex_t size);
+  ~RawHashTable();
 
   //##########################################################################
   //# Access
   void clear();
-  void* get(const void* key) const;
-  void* add(void* value);
-  void rehash(uint32 newsize);
-  const HashAccessor* getHashAccessor() const {return mAccessor;}
+  V get(K key) const;
+  V add(V value);
+  void rehash(hashindex_t newsize);
+  const HashAccessor<K,V>* getHashAccessor() const {return mAccessor;}
 
   //##########################################################################
   //# Iteration
-  int size() const {return mNumElements;}
-  HashTableIterator iterator() const;
+  hashindex_t size() const {return mNumElements;}
+  HashTableIterator iterator() const {return HashTableIterator();}
   bool hasNext(HashTableIterator& iter) const;
-  void* untypedNext(HashTableIterator& iter) const;
+  V rawNext(HashTableIterator& iter) const;
 
 private:
   //##########################################################################
   //# Auxiliary Methods
-  bool isfound(const void* key, void* value) const;
-  void* found(const void* key, void* value) const;
-  void* advance(HashTableIterator& iter) const;
-  void skip(HashTableIterator& iter) const;
-  HashOverflowBucket* newBucket();
-  HashOverflowPair* newSlot();
-  void recycle(HashOverflowBucket* bucket);
+  hashindex_t allocatedSize() const {return mMask + 1;}
+  bool isFound(K key, V value) const;
+  V found(K key, V value) const;
 
   //##########################################################################
   //# Data Members
-  const HashAccessor* mAccessor;
-  void* mDefault;
-  int mNumElements;
-  uint32 mTableMask;
-  void** mTable;
-  HashOverflowBucket* mOverflowList;
-  HashOverflowBucket* mRecycledList;
+  const HashAccessor<K,V>* mAccessor;
+  V mDefault;
+  hashindex_t mMask;
+  int mShiftDown;
+  hashindex_t mThreshold;
+  hashindex_t mNumElements;
+  V* mTable;
 };
 
 
 //############################################################################
-//# template HashTable <typed>
+//# template Int32HashTable <typed>
 //############################################################################
 
-template <class Key, class Value>
-class HashTable : public UntypedHashTable
+template <typename K, typename V>
+class Int32HashTable : public RawHashTable<int32_t,int32_t>
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit HashTable(const HashAccessor* accessor, uint32 size = 16) :
-    UntypedHashTable(accessor, size)
-  {
-  }
-
-  ~HashTable()
+  explicit Int32HashTable(const HashAccessor<int32_t,int32_t>* accessor,
+			  hashindex_t size = 16) :
+    RawHashTable<int32_t,int32_t>(accessor, size)
   {
   }
 
   //##########################################################################
   //# Access
-  Value get(Key key) const
+  V get(K key) const
   {
-    return (Value) UntypedHashTable::get((const void*) key);
+    return (V) RawHashTable<int32_t,int32_t>::get((int32_t) key);
   }
 
-  Value add(const Value value)
+  V add(const V value)
   {
-    return (Value) UntypedHashTable::add((void*) value);
+    return (V) RawHashTable<int32_t,int32_t>::add((int32_t) value);
   }
 
   //##########################################################################
   //# Iteration
-  Value next(HashTableIterator& iter) const
+  V next(HashTableIterator& iter) const
   {
-    return (Value) untypedNext(iter);
+    return (V) rawNext(iter);
+  }
+};
+
+
+//############################################################################
+//# template Int64HashTable <typed>
+//############################################################################
+
+template <typename K, typename V>
+class Int64HashTable : public RawHashTable<int64_t,int64_t>
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit Int64HashTable(const HashAccessor<int64_t,int64_t>* accessor,
+			  hashindex_t size = 16) :
+    RawHashTable<int64_t,int64_t>(accessor, size)
+  {
+  }
+
+  //##########################################################################
+  //# Access
+  V get(K key) const
+  {
+    return (V) RawHashTable<int64_t,int64_t>::get((int64_t) key);
+  }
+
+  V add(const V value)
+  {
+    return (V) RawHashTable<int64_t,int64_t>::add((int64_t) value);
+  }
+
+  //##########################################################################
+  //# Iteration
+  V next(HashTableIterator& iter) const
+  {
+    return (V) rawNext(iter);
+  }
+};
+
+
+//############################################################################
+//# template PtrHashTable <typed>
+//############################################################################
+
+template <typename K, typename V>
+class PtrHashTable : public RawHashTable<intptr_t,intptr_t>
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit PtrHashTable(const HashAccessor<intptr_t,intptr_t>* accessor,
+			hashindex_t size = 16) :
+    RawHashTable<intptr_t,intptr_t>(accessor, size)
+  {
+  }
+
+  //##########################################################################
+  //# Access
+  V get(K key) const
+  {
+    return (V) RawHashTable<intptr_t,intptr_t>::get((intptr_t) key);
+  }
+
+  V add(const V value)
+  {
+    return (V) RawHashTable<intptr_t,intptr_t>::add((intptr_t) value);
+  }
+
+  //##########################################################################
+  //# Iteration
+  V next(HashTableIterator& iter) const
+  {
+    return (V) rawNext(iter);
+  }
+};
+
+
+//############################################################################
+//# template Int32PtrHashTable <typed>
+//############################################################################
+
+template <typename K, typename V>
+class Int32PtrHashTable : public RawHashTable<intptr_t,int32_t>
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit Int32PtrHashTable(const HashAccessor<intptr_t,int32_t>* accessor,
+			     hashindex_t size = 16) :
+    RawHashTable<intptr_t,int32_t>(accessor, size)
+  {
+  }
+
+  //##########################################################################
+  //# Access
+  V get(K key) const
+  {
+    return (V) RawHashTable<intptr_t,int32_t>::get((intptr_t) key);
+  }
+
+  V add(const V value)
+  {
+    return (V) RawHashTable<intptr_t,int32_t>::add((intptr_t) value);
+  }
+
+  //##########################################################################
+  //# Iteration
+  V next(HashTableIterator& iter) const
+  {
+    return (V) rawNext(iter);
   }
 };
 

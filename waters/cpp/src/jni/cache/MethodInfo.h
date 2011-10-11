@@ -19,7 +19,7 @@
 #pragma once
 #endif
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace jni {
@@ -32,7 +32,7 @@ class MethodInfo {
 public:
   //#########################################################################
   //# Constructors
-  explicit MethodInfo(waters::uint32 code,
+  explicit MethodInfo(uint32_t code,
                       const char* name, 
                       const char* signature);
 
@@ -44,7 +44,7 @@ public:
 private:
   //#########################################################################
   //# Data Members
-  waters::uint32 mCode;
+  uint32_t mCode;
   const char* mName;
   const char* mSignature;
 };

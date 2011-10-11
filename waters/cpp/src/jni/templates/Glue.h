@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for Glue.h header file
 //###########################################################################
-//# $Id$
+//# $Id: Glue.h 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 $+
@@ -29,7 +29,7 @@ $+
 #pragma once
 #endif
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace jni {
@@ -43,11 +43,11 @@ class ClassInfo;
 
 $FOREACH-CLASS
 $IF-REF
-const waters::uint32 CLASS_$CLASSNAME$ = $INDEX;
+const uint32_t CLASS_$CLASSNAME$ = $INDEX;
 $ENDIF
 $ENDFOR
 
-const waters::uint32 CLASS_COUNT = $COUNT;
+const uint32_t CLASS_COUNT = $COUNT;
 
 extern const ClassInfo CLASSINFO[];
 
@@ -59,7 +59,7 @@ extern const ClassInfo CLASSINFO[];
 $FOREACH-CLASS
 $IF-HASMETHODS
 $FOREACH-METHOD
-const waters::uint32 METHOD_$CLASSNAME_$METHODCODENAME$ = $METHODNO;
+const uint32_t METHOD_$CLASSNAME_$METHODCODENAME$ = $METHODNO;
 $ENDFOR
 
 $ENDIF

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id$
+//# $Id: EventRecord.cpp 4774 2009-10-12 18:51:25Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -28,17 +28,17 @@ namespace waters {
 //############################################################################
 //# EventRecordHashAccessor: Hash Methods
 
-uint32 EventRecordHashAccessor::
-hash(const void* key)
+uint64_t EventRecordHashAccessor::
+hash(intptr_t key)
   const
 {
   const jni::EventGlue* event = (const jni::EventGlue*) key;
-  return (uint32) event->hashCode();
+  return event->hashCode();
 }
 
 
 bool EventRecordHashAccessor::
-equals(const void* key1, const void* key2)
+equals(intptr_t key1, intptr_t key2)
   const
 {
   const jni::EventGlue* event1 = (const jni::EventGlue*) key1;
@@ -47,12 +47,12 @@ equals(const void* key1, const void* key2)
 }
 
 
-const void* EventRecordHashAccessor::
-getKey(const void* value)
+intptr_t EventRecordHashAccessor::
+getKey(intptr_t value)
   const
 {
   const EventRecord* record = (const EventRecord*) value;
-  return &record->getJavaEvent();
+  return (intptr_t) &record->getJavaEvent();
 }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   ArrayList
 //###########################################################################
-//# $Id$
+//# $Id: ArrayList.h 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 
@@ -19,7 +19,7 @@
 #pragma once
 #endif
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace waters {
@@ -35,7 +35,7 @@ class ArrayList
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ArrayList(uint32 size = 16) :
+  explicit ArrayList(uint32_t size = 16) :
     mNumElements(0),
     mArraySize(size),
     mArray(new Value[size])
@@ -49,13 +49,13 @@ public:
 
   //##########################################################################
   //# Access
-  uint32 size()
+  uint32_t size()
     const
   {
     return mNumElements;
   }
 
-  Value get(uint32 index)
+  Value get(uint32_t index)
     const
   {
     return mArray[index];
@@ -75,12 +75,12 @@ public:
 private:
   //##########################################################################
   //# Auxiliary Methods
-  void grow(uint32 newsize)
+  void grow(uint32_t newsize)
   {
     if (newsize > mArraySize) {
       mArraySize <<= 1;
       Value* newarray = new Value[mArraySize];
-      for (uint32 i = 0; i < mNumElements; i++) {
+      for (uint32_t i = 0; i < mNumElements; i++) {
 	newarray[i] = mArray[i];
       }
       delete [] mArray;
@@ -90,8 +90,8 @@ private:
 
   //##########################################################################
   //# Data Members
-  uint32 mNumElements;
-  uint32 mArraySize;
+  uint32_t mNumElements;
+  uint32_t mArraySize;
   Value* mArray;
 };
 

@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassInfo
 //###########################################################################
-//# $Id$
+//# $Id: ClassInfo.cpp 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -24,11 +24,11 @@ namespace jni {
 //# ClassInfo: Constructors
 
 ClassInfo::
-ClassInfo(waters::uint32 code,
+ClassInfo(uint32_t code,
           const char* name,
           const ClassInfo* baseclass,
-          waters::uint32 nummethods,
-          waters::uint32 numfields,
+          uint32_t nummethods,
+          uint32_t numfields,
           const MethodInfo* methods)
 {
   mCode = code;
@@ -42,7 +42,7 @@ ClassInfo(waters::uint32 code,
 //###########################################################################
 //# ClassInfo: Simple Access
 
-waters::uint32 ClassInfo::
+uint32_t ClassInfo::
 getFirstCode()
   const
 {
@@ -51,10 +51,10 @@ getFirstCode()
 
 
 const MethodInfo* ClassInfo::
-getMethodInfo(waters::uint32 methodcode)
+getMethodInfo(uint32_t methodcode)
   const
 {
-  waters::uint32 firstcode = getFirstCode();
+  uint32_t firstcode = getFirstCode();
   if (methodcode < firstcode) {
     return mBaseClass->getMethodInfo(methodcode);
   } else {
@@ -64,7 +64,7 @@ getMethodInfo(waters::uint32 methodcode)
 
 
 const MethodInfo* ClassInfo::
-getFieldInfo(waters::uint32 fieldcode)
+getFieldInfo(uint32_t fieldcode)
   const
 {
   int firstcode = getFirstCode();

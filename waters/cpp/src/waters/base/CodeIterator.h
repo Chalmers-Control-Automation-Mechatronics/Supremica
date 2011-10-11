@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   CodeIterator
 //###########################################################################
-//# $Id$
+//# $Id: CodeIterator.h 4707 2009-05-20 22:45:16Z robi $
 //###########################################################################
 
 
@@ -19,7 +19,7 @@
 #pragma once
 #endif
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace waters {
@@ -33,19 +33,19 @@ class CodeIterator
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit CodeIterator(uint32 start, uint32 stop)
+  explicit CodeIterator(uint32_t start, uint32_t stop)
     : mPos(start), mStop(stop) {};
 
   //##########################################################################
   //# Simple Access
   bool hasNext() const {return mPos < mStop;};
-  uint32 next() {return mPos++;};
+  uint32_t next() {return mPos++;};
 
 private:
   //##########################################################################
   //# Data Members
-  uint32 mPos;
-  const uint32 mStop;
+  uint32_t mPos;
+  const uint32_t mStop;
 };
 
 }   /* namespace waters */
