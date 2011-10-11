@@ -1,9 +1,10 @@
 #java specific to ignore
 *.class 
-bin/*
-build/*
+bin/
+build/
 dist/
 lib/unjared/
+logs/
 resources/
 src/net/sourceforge/waters/external/promela/parser/
 src/org/supremica/Version.java
