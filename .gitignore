@@ -1,5 +1,4 @@
-#java specific to ignore
-*.class 
+# Supremica specific to ignore
 bin/
 build/
 dist/
@@ -19,9 +18,11 @@ waters/cpp/src/waters/javah/
 waters/java/classes/
 waters/java/jar/
 waters/java/src/net/sourceforge/waters/xsd/
+.supremica
 
 # generic files to ignore
 *~
+*.class 
 *.lock
 *.log
 *.DS_Store
