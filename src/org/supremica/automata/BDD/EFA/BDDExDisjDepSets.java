@@ -118,8 +118,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
             To perform the backward search, we change the markedStates as the target states 
             by exchanging the location and variable domains. 
          */
-        BDD currentCoreachableStatesBDD = markedStates.id().replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+        BDD currentCoreachableStatesBDD = markedStates.id().replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
         BDD previousCoreachableStatesBDD = null;
         
         boolean forward = false;
@@ -127,9 +126,14 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         while (!workset.empty()) {
             previousCoreachableStatesBDD = currentCoreachableStatesBDD.id();
             int choice = workset.pickOne(forward);
-            BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
-            currentCoreachableStatesBDD = preImage(bddExAutomata, currentCoreachableStatesBDD, currentTransitionRelation);
-            workset.advance(choice, !previousCoreachableStatesBDD.equals(currentCoreachableStatesBDD));
+            if (choice == Integer.MAX_VALUE) {
+                return currentCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
+                        .replaceWith(bddExAutomata.destToSourceVariablePairing);
+            } else {
+                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
+                currentCoreachableStatesBDD = preImage(bddExAutomata, currentCoreachableStatesBDD, currentTransitionRelation);
+                workset.advance(choice, !previousCoreachableStatesBDD.equals(currentCoreachableStatesBDD));
+            }
         }
         return currentCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
                 .replaceWith(bddExAutomata.destToSourceVariablePairing);
@@ -137,13 +141,11 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
 
     @Override
     public BDD reachableBackwardWorkSetAlgorithm(BDD markedStates, BDD reachableStates) {
-                
+        
         workset.reset();
         
-        BDD reachableStatesAsTargetStates = reachableStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
-        BDD markedStatesAsTargetStates = markedStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
+        BDD reachableStatesAsTargetStates = reachableStates.id().replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
+        BDD markedStatesAsTargetStates = markedStates.id().replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
         BDD currentReachableAndCoreachableStatesBDD = markedStatesAsTargetStates.and(reachableStatesAsTargetStates);
         BDD previousReachableAndCoreachableStatesBDD = null;
         
@@ -152,9 +154,14 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         while (!workset.empty()) {
             previousReachableAndCoreachableStatesBDD = currentReachableAndCoreachableStatesBDD.id();
             int choice = workset.pickOne(forward);
-            BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
-            currentReachableAndCoreachableStatesBDD = reachableStatesAsTargetStates.and(preImage(bddExAutomata, currentReachableAndCoreachableStatesBDD, currentTransitionRelation));
-            workset.advance(choice, !previousReachableAndCoreachableStatesBDD.equals(currentReachableAndCoreachableStatesBDD));
+            if (choice == Integer.MAX_VALUE) {
+                return currentReachableAndCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
+                        .replaceWith(bddExAutomata.destToSourceVariablePairing);
+            } else {
+                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
+                currentReachableAndCoreachableStatesBDD = reachableStatesAsTargetStates.and(preImage(bddExAutomata, currentReachableAndCoreachableStatesBDD, currentTransitionRelation));
+                workset.advance(choice, !previousReachableAndCoreachableStatesBDD.equals(currentReachableAndCoreachableStatesBDD));
+            }
         }
         return currentReachableAndCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
                 .replaceWith(bddExAutomata.destToSourceVariablePairing);
@@ -182,13 +189,11 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
 
     @Override
     public BDD backwardRestrictedWorkSetAlgorithm(BDD markedStates, BDD forbiddenStates) {
-                
+        
         workset.reset();
         
-        BDD markedStatesAsTargetStates = markedStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
-        BDD forbiddenStatesAsTargetStates = forbiddenStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
+        BDD markedStatesAsTargetStates = markedStates.id().replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
+        BDD forbiddenStatesAsTargetStates = forbiddenStates.id().replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
         BDD currentCoreachableStatesBDD = markedStatesAsTargetStates;//.and(forbiddenStatesAsTargetStates.not());
         BDD previousCoreachableStatesBDD = null;
         
@@ -197,9 +202,14 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         while (!workset.empty()) {
             previousCoreachableStatesBDD = currentCoreachableStatesBDD.id();
             int choice = workset.pickOne(forward);
-            BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
-            currentCoreachableStatesBDD = restrictedPreImage(bddExAutomata, currentCoreachableStatesBDD, forbiddenStatesAsTargetStates, currentTransitionRelation);
-            workset.advance(choice, !previousCoreachableStatesBDD.equals(currentCoreachableStatesBDD));
+            if (choice == Integer.MAX_VALUE) {
+                return currentCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
+                        .replaceWith(bddExAutomata.destToSourceVariablePairing);
+            } else {
+                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
+                currentCoreachableStatesBDD = restrictedPreImage(bddExAutomata, currentCoreachableStatesBDD, forbiddenStatesAsTargetStates, currentTransitionRelation);
+                workset.advance(choice, !previousCoreachableStatesBDD.equals(currentCoreachableStatesBDD));
+            }
         }
         return currentCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
                 .replaceWith(bddExAutomata.destToSourceVariablePairing);
