@@ -57,18 +57,20 @@ import org.apache.log4j.Logger;
 
 
 /**
- * A general compositional model analyser to be subclassed for different
- * algorithms. This model analyser implements compositional minimisation
+ * <P>A general compositional model analyser to be subclassed for different
+ * algorithms.</P>
+ *
+ * <P>This model analyser implements compositional minimisation
  * of the input model, and leaves it to the subclasses to decide what is
  * to be done with the minimisation result. It provides a variety of
- * candidate selection heuristics, which can be configured by the user.
+ * candidate selection heuristics, which can be configured by the user.</P>
  *
- * <I>References:</I><BR>
+ * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
  * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
  * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
  * Nonblocking, Proc. 7th International Conference on Control and Automation,
- * ICCA'09, 448-453, Christchurch, New Zealand, 2009.<BR>
+ * ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
  *
  * @author Robi Malik
  */
