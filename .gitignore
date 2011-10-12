@@ -28,3 +28,5 @@ waters/java/src/net/sourceforge/waters/xsd/
 *.DS_Store
 *.swp
 *.out
+/.settings/
+/nbproject/private/

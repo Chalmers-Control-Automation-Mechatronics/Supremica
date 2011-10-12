@@ -605,17 +605,30 @@ class PropertiesControllerPanel
         @SuppressWarnings("unused")
 		Box buttonBox = new Box(BoxLayout.X_AXIS);
 
+        /*
+         * Implementing a search function for the config dialog
+         */
+        JTextField searchStr = new JTextField("this doesn't work yet. soon...");
+        Action searchAction = new SearchAction(theDialog, searchStr);
+        JPanel searchPanel = new JPanel();
+        JButton searchButton = new JButton(searchAction);
+        searchPanel.add(searchStr);
+        searchPanel.add(searchButton);
+        add(searchPanel, BorderLayout.WEST);
+        add(Box.createHorizontalGlue());
+        
+        
         Action applyAction = new ApplyChangesAction(theDialog);
         JButton applyButton = new JButton(applyAction);
         theDialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),"apply");
         theDialog.getRootPane().getActionMap().put("apply", applyAction);
-        add(applyButton, BorderLayout.CENTER);
+        add(applyButton, BorderLayout.EAST);
 
         Action cancelAction = new CancelDialogAction(theDialog);
         JButton cancelButton = new JButton(cancelAction);
         theDialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,0),"cancel");
         theDialog.getRootPane().getActionMap().put("cancel", cancelAction);
-        add(cancelButton, BorderLayout.CENTER);
+        add(cancelButton, BorderLayout.EAST);
     }
 
     private class CancelDialogAction
@@ -641,6 +654,54 @@ class PropertiesControllerPanel
         }
     }
 
+    private class SearchAction
+      extends AbstractAction
+    {
+        JTextField text_field;
+        JComponent content_pane;
+        int component_count = 0;
+        int current_comp = 0;
+        
+        final static String SEARCH_BUTTON_TEXT_1 = "Search";
+        final static String SEARCH_BUTTON_TEXT_2 = "Again";
+        
+        public SearchAction(PropertiesDialog dialog, JTextField text_field)
+        {
+            super(SEARCH_BUTTON_TEXT_1);
+            putValue(SHORT_DESCRIPTION, "Search preferences for the given string");
+            putValue(MNEMONIC_KEY, KeyEvent.VK_S);
+            
+            this.text_field = text_field;
+            this.content_pane = (JComponent)dialog.getContentPane();  // we know for a JDialog this is really a JComponent
+        }
+        
+        public void actionPerformed(ActionEvent e)
+        {
+          System.out.println("SearchAction.actionPerformed called!");
+          
+            putValue(NAME, SEARCH_BUTTON_TEXT_2);
+            final int component_count = content_pane.getComponentCount();
+            final java.awt.Component[] components = content_pane.getComponents();
+            while(current_comp < component_count)
+            {
+              System.out.println("Component number " + current_comp + " checked");
+              final java.awt.Component comp = components[current_comp++];
+              if(comp instanceof JLabel)
+              {
+                  JLabel label = (JLabel)comp;
+                  // if(text_field.getText().matches(label.getText()))
+                  {
+                    // Show it... how to do that?
+                    text_field.setText(label.getText());
+                  }
+              }
+              
+            }
+            current_comp = 0;
+            putValue(NAME, SEARCH_BUTTON_TEXT_1);
+        }
+    }
+    
     private class ApplyChangesAction
         extends AbstractAction
     {
