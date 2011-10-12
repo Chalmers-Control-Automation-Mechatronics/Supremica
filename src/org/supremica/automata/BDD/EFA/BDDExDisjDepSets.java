@@ -19,6 +19,7 @@ import static org.supremica.automata.BDD.EFA.ReachabilityUtilities.restrictedPre
  * @author zhennan
  * @version 1.0 
  */
+
 public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
 
     BDDExtendedAutomata bddExAutomata;
@@ -97,7 +98,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         while (!workset.empty()) {
             previousReachablestatesBDD = currentReachableStatesBDD.id();
             int choice = workset.pickOne(forward);
-            BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
+            BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice);
             currentReachableStatesBDD = image(bddExAutomata, currentReachableStatesBDD, currentTransitionRelation);
             workset.advance(choice, !previousReachablestatesBDD.equals(currentReachableStatesBDD));
         }
@@ -130,7 +131,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
                 return currentCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
                         .replaceWith(bddExAutomata.destToSourceVariablePairing);
             } else {
-                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
+                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice);
                 currentCoreachableStatesBDD = preImage(bddExAutomata, currentCoreachableStatesBDD, currentTransitionRelation);
                 workset.advance(choice, !previousCoreachableStatesBDD.equals(currentCoreachableStatesBDD));
             }
@@ -158,7 +159,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
                 return currentReachableAndCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
                         .replaceWith(bddExAutomata.destToSourceVariablePairing);
             } else {
-                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
+                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice);
                 currentReachableAndCoreachableStatesBDD = reachableStatesAsTargetStates.and(preImage(bddExAutomata, currentReachableAndCoreachableStatesBDD, currentTransitionRelation));
                 workset.advance(choice, !previousReachableAndCoreachableStatesBDD.equals(currentReachableAndCoreachableStatesBDD));
             }
@@ -180,7 +181,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         while (!workset.empty()) {
             previousReachablestatesBDD = currentReachableStatesBDD.id();
             int choice = workset.pickOne(forward);
-            BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
+            BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice);
             currentReachableStatesBDD = restrictedImage(bddExAutomata, currentReachableStatesBDD, forbiddenStates, currentTransitionRelation);
             workset.advance(choice, !previousReachablestatesBDD.equals(currentReachableStatesBDD));
         }
@@ -206,7 +207,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
                 return currentCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing)
                         .replaceWith(bddExAutomata.destToSourceVariablePairing);
             } else {
-                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice).exist(bddExAutomata.getEventVarSet());
+                BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice);
                 currentCoreachableStatesBDD = restrictedPreImage(bddExAutomata, currentCoreachableStatesBDD, forbiddenStatesAsTargetStates, currentTransitionRelation);
                 workset.advance(choice, !previousCoreachableStatesBDD.equals(currentCoreachableStatesBDD));
             }

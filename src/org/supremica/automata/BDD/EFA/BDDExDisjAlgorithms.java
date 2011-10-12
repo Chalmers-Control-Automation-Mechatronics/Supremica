@@ -8,6 +8,7 @@ import net.sf.javabdd.BDD;
  * @author Zhennan
  * @version  1.0
  */
+
 public interface BDDExDisjAlgorithms {
     
     /** Given the initial state (deterministic EFAs), the method returns a set of states (expressed in terms of BDD) which can
@@ -17,8 +18,8 @@ public interface BDDExDisjAlgorithms {
     public BDD forwardWorkSetAlgorithm(BDD initialStates);
     
     /** Given a set of marked states, the method returns a set of states (expressed in terms of BDD) which can be co-reached
-     *    from any marked state. The method is typically used to find all the co-reachable states from the marked states while
-     *    disregard the forbidden states. 
+     *   from any marked state. The method is typically used to find all the co-reachable states from the marked states while
+     *   disregard the forbidden states. 
      */
     public BDD backwardWorkSetAlgorithm(BDD markedStates);
     
