@@ -33,8 +33,11 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.ProductDESBuilder;
+import net.sourceforge.waters.model.analysis.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -66,10 +69,22 @@ import org.apache.log4j.Logger;
 
 public class CompositionalSynthesizer
   extends AbstractCompositionalModelAnalyzer
+  implements ProductDESBuilder
 {
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a compositional synthesiser without a model.
+   * @param factory
+   *          Factory used for trace construction.
+   */
+  public CompositionalSynthesizer
+    (final ProductDESProxyFactory factory)
+  {
+    this(factory, IdenticalKindTranslator.getInstance());
+  }
+
   /**
    * Creates a compositional synthesiser without a model.
    * @param factory
@@ -154,6 +169,43 @@ public class CompositionalSynthesizer
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
+  public void setOutputName(final String name)
+  {
+    mOutputName = name;
+  }
+
+  public String getOutputName()
+  {
+    return mOutputName;
+  }
+
+  public void setConstructsResult(final boolean construct)
+  {
+    mConstructsResult = construct;
+  }
+
+  public boolean getConstructsResult()
+  {
+    return mConstructsResult;
+  }
+
+  public ProductDESProxy getComputedProxy()
+  {
+    final ProductDESResult result = getAnalysisResult();
+    return result.getComputedProductDES();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
+  public ProductDESProxy getComputedProductDES()
+  {
+    return getComputedProxy();
+  }
+
+
+  //#########################################################################
   //# Configuration
   public void setMarkingProposition(final EventProxy marking)
   {
@@ -177,6 +229,10 @@ public class CompositionalSynthesizer
       final CompositionalSynthesisResult result = getAnalysisResult();
       if (!result.isFinished()) {
         result.setSatisfied(true);
+        if (mConstructsResult) {
+          final ProductDESProxyFactory factory = getFactory();
+          result.close(factory, mOutputName);
+        }
       }
       final Logger logger = getLogger();
       logger.debug("CompositionalSynthesizer done.");
@@ -418,7 +474,7 @@ public class CompositionalSynthesizer
       final int limit = getMonolithicStateLimit();
       syncBuilder.setNodeLimit(limit);
       syncBuilder.run();
-      automaton = syncBuilder.getComputedProxy();
+      automaton = syncBuilder.getComputedAutomaton();
       break;
     }
 
@@ -887,7 +943,7 @@ public class CompositionalSynthesizer
       } finally {
         builder.clearMask();
       }
-      final AutomatonProxy newSupervisor = builder.getComputedProxy();
+      final AutomatonProxy newSupervisor = builder.getComputedAutomaton();
       final EventEncoding newEncoding =
         new EventEncoding(newSupervisor, translator);
       final ListBufferTransitionRelation newRel =
@@ -1265,9 +1321,12 @@ public class CompositionalSynthesizer
 
   //#########################################################################
   //# Data Members
+  private String mOutputName;
+  private boolean mConstructsResult = true;
   private EventProxy mDefaultMarking;
   private EventProxy mUsedDefaultMarking;
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
+
 }

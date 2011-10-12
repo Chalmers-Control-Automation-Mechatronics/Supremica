@@ -1318,14 +1318,14 @@ public abstract class AbstractCompositionalModelAnalyzer
     try {
       mCurrentSynchronousProductBuilder.run();
       final AutomatonProxy sync =
-        mCurrentSynchronousProductBuilder.getComputedProxy();
+        mCurrentSynchronousProductBuilder.getComputedAutomaton();
       mEventHasDisappeared |= sync.getEvents().size() < expectedNumberOfEvents;
       final SynchronousProductStateMap stateMap =
         mCurrentSynchronousProductBuilder.getStateMap();
       return new HidingStep(sync, hidden, tau, stateMap);
     } finally {
       final CompositionalAnalysisResult stats = getAnalysisResult();
-      final AutomatonResult<AutomatonProxy> result =
+      final AutomatonResult result =
         mCurrentSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
       mCurrentSynchronousProductBuilder.clearMask();
@@ -2774,7 +2774,7 @@ public abstract class AbstractCompositionalModelAnalyzer
           // skip this one ...
         } finally {
           final CompositionalAnalysisResult stats = getAnalysisResult();
-          final AutomatonResult<AutomatonProxy> result =
+          final AutomatonResult result =
             mCurrentSynchronousProductBuilder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }

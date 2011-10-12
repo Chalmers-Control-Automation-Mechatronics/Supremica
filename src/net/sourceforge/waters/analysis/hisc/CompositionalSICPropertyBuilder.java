@@ -372,7 +372,7 @@ public class CompositionalSICPropertyBuilder
     builder.setOutputName(name);
     builder.setOutputKind(kind);
     builder.run();
-    return builder.getComputedProxy();
+    return builder.getComputedAutomaton();
   }
 
   private AutomatonProxy createConstantSIC5Test(final EventProxy answer,

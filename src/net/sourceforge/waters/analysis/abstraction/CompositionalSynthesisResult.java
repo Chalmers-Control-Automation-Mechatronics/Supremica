@@ -11,9 +11,14 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
@@ -27,6 +32,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 
 public class CompositionalSynthesisResult
   extends CompositionalAnalysisResult
+  implements ProductDESResult
 {
 
   //#########################################################################
@@ -37,6 +43,41 @@ public class CompositionalSynthesisResult
   public CompositionalSynthesisResult()
   {
     mSupervisors = new ArrayList<AutomatonProxy>();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ProxyResult
+  public ProductDESProxy getComputedProxy()
+  {
+    return mProductDES;
+  }
+
+
+  public void setComputedProxy(final ProductDESProxy des)
+  {
+    setSatisfied(des != null);
+    mProductDES = des;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ProductDESResult
+  public ProductDESProxy getComputedProductDES()
+  {
+    return getComputedProxy();
+  }
+
+
+  public Collection<AutomatonProxy> getComputedAutomata()
+  {
+    return mSupervisors;
+  }
+
+
+  public void setComputedProductDES(final ProductDESProxy des)
+  {
+    setComputedProxy(des);
   }
 
 
@@ -57,31 +98,45 @@ public class CompositionalSynthesisResult
     super.merge(other);
     final CompositionalSynthesisResult result =
       (CompositionalSynthesisResult) other;
-    final Collection<AutomatonProxy> sups = result.getSupervisors();
+    final Collection<AutomatonProxy> sups = result.getComputedAutomata();
     mSupervisors.addAll(sups);
   }
 
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.VerificationResult
-  /**
-   * Gets the list of synthesised supervisors.
-   */
-  public Collection<AutomatonProxy> getSupervisors()
-  {
-    return mSupervisors;
-  }
 
+  //#########################################################################
+  //# Specific Access
   /**
    * Adds the given automaton to the list of synthesised supervisors.
    */
-  public void addSupervisor(final AutomatonProxy sup)
+  void addSupervisor(final AutomatonProxy sup)
   {
     mSupervisors.add(sup);
+  }
+
+  /**
+   * Completes the result by constructing and storing a product DES consisting
+   * of the synthesised supervisors.
+   * @param  factory  Factory used to construct the product DES.
+   * @param  name     Name to be given to the product DES.
+   */
+  void close(final ProductDESProxyFactory factory, String name)
+  {
+    if (isSatisfied()) {
+      final Collection<EventProxy> events =
+        Candidate.getAllEvents(mSupervisors);
+      if (name == null) {
+        name = Candidate.getCompositionName("", mSupervisors);
+      }
+      final ProductDESProxy des =
+        factory.createProductDESProxy(name, events, mSupervisors);
+      setComputedProductDES(des);
+    }
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Collection<AutomatonProxy> mSupervisors;
+  private ProductDESProxy mProductDES;
+  private final List<AutomatonProxy> mSupervisors;
 
 }

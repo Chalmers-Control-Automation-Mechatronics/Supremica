@@ -1667,14 +1667,14 @@ public class OPConflictChecker
     try {
       mCurrentSynchronousProductBuilder.run();
       final AutomatonProxy sync =
-        mCurrentSynchronousProductBuilder.getComputedProxy();
+        mCurrentSynchronousProductBuilder.getComputedAutomaton();
       mEventHasDisappeared |= sync.getEvents().size() < expectedNumberOfEvents;
       final SynchronousProductStateMap stateMap =
         mCurrentSynchronousProductBuilder.getStateMap();
       return new HidingStep(sync, local, tau, stateMap);
     } finally {
       final CompositionalVerificationResult stats = getAnalysisResult();
-      final AutomatonResult<AutomatonProxy> result =
+      final AutomatonResult result =
         mCurrentSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
       mCurrentSynchronousProductBuilder.clearMask();
@@ -2890,7 +2890,7 @@ public class OPConflictChecker
           // skip this one ...
         } finally {
           final CompositionalVerificationResult stats = getAnalysisResult();
-          final AutomatonResult<AutomatonProxy> result =
+          final AutomatonResult result =
             mCurrentSynchronousProductBuilder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }
@@ -2956,7 +2956,7 @@ public class OPConflictChecker
           // skip this one ...
         } finally {
           final CompositionalVerificationResult stats = getAnalysisResult();
-          final AutomatonResult<AutomatonProxy> result =
+          final AutomatonResult result =
             mCurrentSynchronousProductBuilder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }
@@ -2989,7 +2989,7 @@ public class OPConflictChecker
       }
     }
 
-    public void recordStatistics(final AutomatonResult<AutomatonProxy> result)
+    public void recordStatistics(final AutomatonResult result)
     {
       result.setPeakNumberOfNodes(mCount);
     }

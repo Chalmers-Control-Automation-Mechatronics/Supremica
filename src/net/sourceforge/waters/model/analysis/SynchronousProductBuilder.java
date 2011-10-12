@@ -11,7 +11,6 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -26,7 +25,7 @@ import net.sourceforge.waters.model.des.EventProxy;
  */
 
 public interface SynchronousProductBuilder
-  extends AutomatonBuilder<AutomatonProxy>
+  extends AutomatonBuilder
 {
 
   //#########################################################################

@@ -178,7 +178,7 @@ public class OPSearchAutomatonSimplifierTest
     mSimplifier.setModel(before);
     mSimplifier.setHiddenEvents(hidden);
     final boolean result = mSimplifier.run();
-    final AutomatonProxy aut = mSimplifier.getComputedProxy();
+    final AutomatonProxy aut = mSimplifier.getComputedAutomaton();
     final String basename = appendSuffixes(desname, mBindings);
     final String comment =
       "Test output from " + ProxyTools.getShortClassName(mSimplifier) + '.';

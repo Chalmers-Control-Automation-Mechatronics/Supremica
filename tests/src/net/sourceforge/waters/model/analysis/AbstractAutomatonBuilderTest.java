@@ -178,7 +178,7 @@ public abstract class AbstractAutomatonBuilderTest
     runAutomatonBuilderWithBindings(des, expect);
   }
 
-  protected AutomatonBuilder<AutomatonProxy> getAutomatonBuilder()
+  protected AutomatonBuilder getAutomatonBuilder()
   {
     return mAutomatonBuilder;
   }
@@ -207,7 +207,7 @@ public abstract class AbstractAutomatonBuilderTest
    *          The factory used by the model analyser to create its output.
    * @return An instance of the model verifier
    */
-  protected abstract AutomatonBuilder<AutomatonProxy> createAutomatonBuilder
+  protected abstract AutomatonBuilder createAutomatonBuilder
     (ProductDESProxyFactory factory);
 
   /**
@@ -252,7 +252,7 @@ public abstract class AbstractAutomatonBuilderTest
     getLogger().info("Checking " + des.getName() + " ...");
     configureAutomatonBuilder(des);
     mAutomatonBuilder.run();
-    final AutomatonProxy result = mAutomatonBuilder.getComputedProxy();
+    final AutomatonProxy result = mAutomatonBuilder.getComputedAutomaton();
     checkResult(des, result, expect);
     getLogger().info("Done " + des.getName());
   }
@@ -286,7 +286,7 @@ public abstract class AbstractAutomatonBuilderTest
 
   //#########################################################################
   //# Data Members
-  private AutomatonBuilder<AutomatonProxy> mAutomatonBuilder;
+  private AutomatonBuilder mAutomatonBuilder;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
 

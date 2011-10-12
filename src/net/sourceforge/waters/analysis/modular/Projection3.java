@@ -37,7 +37,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class Projection3
-  extends AbstractAutomatonBuilder<AutomatonProxy>
+  extends AbstractAutomatonBuilder
   implements SafetyProjectionBuilder
 {
 

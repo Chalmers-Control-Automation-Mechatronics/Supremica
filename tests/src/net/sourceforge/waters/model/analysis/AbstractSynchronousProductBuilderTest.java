@@ -12,7 +12,6 @@ package net.sourceforge.waters.model.analysis;
 import java.util.List;
 import java.util.LinkedList;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -56,7 +55,7 @@ public abstract class AbstractSynchronousProductBuilderTest
     throws Exception
   {
     try {
-      final AutomatonBuilder<AutomatonProxy> builder = getAutomatonBuilder();
+      final AutomatonBuilder builder = getAutomatonBuilder();
       builder.setNodeLimit(2);
       testTransferline__1();
       fail("Expected overflow not caught!");
