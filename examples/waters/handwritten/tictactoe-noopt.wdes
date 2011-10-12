@@ -44,6 +44,7 @@ The control objective is to synthesise a strategy for the second player (black) 
     <ns2:AutomataList>
         <ns2:Automaton Kind="PLANT" Name="move">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][0]"/>
                 <ns2:EventRef Name="black[0][1]"/>
                 <ns2:EventRef Name="black[0][2]"/>
@@ -64,8 +65,16 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="white[2][2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="black"/>
-                <ns2:State Initial="true" Name="white"/>
+                <ns2:State Name="black">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="white">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="white" Source="black" Event="black[0][0]"/>
@@ -90,13 +99,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[0][0]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][0]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[0][0]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[0][0]"/>
@@ -106,13 +124,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[0][1]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][1]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[0][1]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[0][1]"/>
@@ -122,13 +149,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[0][2]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][2]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[0][2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[0][2]"/>
@@ -138,13 +174,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[1][0]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[1][0]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[1][0]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[1][0]"/>
@@ -154,13 +199,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[1][1]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[1][1]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[1][1]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[1][1]"/>
@@ -170,13 +224,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[1][2]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[1][2]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[1][2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[1][2]"/>
@@ -186,13 +249,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[2][0]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[2][0]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[2][0]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[2][0]"/>
@@ -202,13 +274,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[2][1]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[2][1]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[2][1]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[2][1]"/>
@@ -218,13 +299,22 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="square[2][2]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[2][2]"/>
                 <ns2:EventRef Name="draw"/>
                 <ns2:EventRef Name="white[2][2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="full"/>
-                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="empty">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="full" Source="empty" Event="black[2][2]"/>
@@ -234,6 +324,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="black_xwin[0]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][0]"/>
                 <ns2:EventRef Name="black[0][1]"/>
                 <ns2:EventRef Name="black[0][2]"/>
@@ -249,10 +340,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_black_x[0]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="black[0][0]"/>
@@ -296,16 +403,33 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="white_xwin[0]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="white[0][0]"/>
                 <ns2:EventRef Name="white[0][1]"/>
                 <ns2:EventRef Name="white[0][2]"/>
                 <ns2:EventRef Name="winner_white_x[0]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="white[0][0]"/>
@@ -322,6 +446,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="black_xwin[1]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[1][0]"/>
                 <ns2:EventRef Name="black[1][1]"/>
                 <ns2:EventRef Name="black[1][2]"/>
@@ -337,10 +462,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_black_x[1]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="black[1][0]"/>
@@ -384,16 +525,33 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="white_xwin[1]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="white[1][0]"/>
                 <ns2:EventRef Name="white[1][1]"/>
                 <ns2:EventRef Name="white[1][2]"/>
                 <ns2:EventRef Name="winner_white_x[1]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="white[1][0]"/>
@@ -410,6 +568,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="black_xwin[2]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[2][0]"/>
                 <ns2:EventRef Name="black[2][1]"/>
                 <ns2:EventRef Name="black[2][2]"/>
@@ -425,10 +584,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_black_x[2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="black[2][0]"/>
@@ -472,16 +647,33 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="white_xwin[2]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="white[2][0]"/>
                 <ns2:EventRef Name="white[2][1]"/>
                 <ns2:EventRef Name="white[2][2]"/>
                 <ns2:EventRef Name="winner_white_x[2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="white[2][0]"/>
@@ -498,6 +690,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="black_ywin[0]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][0]"/>
                 <ns2:EventRef Name="black[1][0]"/>
                 <ns2:EventRef Name="black[2][0]"/>
@@ -513,10 +706,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_black_y[0]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="black[0][0]"/>
@@ -560,16 +769,33 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="white_ywin[0]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="white[0][0]"/>
                 <ns2:EventRef Name="white[1][0]"/>
                 <ns2:EventRef Name="white[2][0]"/>
                 <ns2:EventRef Name="winner_white_y[0]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="s3"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="white[0][0]"/>
@@ -586,6 +812,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="black_ywin[1]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][1]"/>
                 <ns2:EventRef Name="black[1][1]"/>
                 <ns2:EventRef Name="black[2][1]"/>
@@ -601,10 +828,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_black_y[1]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="black[0][1]"/>
@@ -648,16 +891,33 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="white_ywin[1]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="white[0][1]"/>
                 <ns2:EventRef Name="white[1][1]"/>
                 <ns2:EventRef Name="white[2][1]"/>
                 <ns2:EventRef Name="winner_white_y[1]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="s3"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="white[0][1]"/>
@@ -674,6 +934,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="black_ywin[2]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][2]"/>
                 <ns2:EventRef Name="black[1][2]"/>
                 <ns2:EventRef Name="black[2][2]"/>
@@ -689,10 +950,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_black_y[2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="black[0][2]"/>
@@ -736,16 +1013,33 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="white_ywin[2]">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="white[0][2]"/>
                 <ns2:EventRef Name="white[1][2]"/>
                 <ns2:EventRef Name="white[2][2]"/>
                 <ns2:EventRef Name="winner_white_y[2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="s3"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="white[0][2]"/>
@@ -762,6 +1056,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="black_dwin1">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][0]"/>
                 <ns2:EventRef Name="black[1][1]"/>
                 <ns2:EventRef Name="black[2][2]"/>
@@ -777,10 +1072,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_black_d1"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="s3"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="black[0][0]"/>
@@ -824,16 +1135,33 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="white_dwin1">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="white[0][0]"/>
                 <ns2:EventRef Name="white[1][1]"/>
                 <ns2:EventRef Name="white[2][2]"/>
                 <ns2:EventRef Name="winner_white_d1"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Name="s3"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="white[0][0]"/>
@@ -850,6 +1178,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="black_dwin2">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="black[0][2]"/>
                 <ns2:EventRef Name="black[1][1]"/>
                 <ns2:EventRef Name="black[2][0]"/>
@@ -865,10 +1194,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_black_d2"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="black[0][2]"/>
@@ -912,16 +1257,33 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="white_dwin2">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="white[0][2]"/>
                 <ns2:EventRef Name="white[1][1]"/>
                 <ns2:EventRef Name="white[2][0]"/>
                 <ns2:EventRef Name="winner_white_d2"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="s0"/>
-                <ns2:State Name="s1"/>
-                <ns2:State Name="s2"/>
-                <ns2:State Name="s3"/>
+                <ns2:State Initial="true" Name="s0">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="s3">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Target="s1" Source="s0" Event="white[0][2]"/>
@@ -987,6 +1349,7 @@ The control objective is to synthesise a strategy for the second player (black) 
         </ns2:Automaton>
         <ns2:Automaton Kind="SPEC" Name="white_never_win">
             <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
                 <ns2:EventRef Name="winner_white_d1"/>
                 <ns2:EventRef Name="winner_white_d2"/>
                 <ns2:EventRef Name="winner_white_x[0]"/>
@@ -997,7 +1360,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <ns2:EventRef Name="winner_white_y[2]"/>
             </ns2:EventRefList>
             <ns2:StateList>
-                <ns2:State Initial="true" Name="init"/>
+                <ns2:State Initial="true" Name="init">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
             </ns2:StateList>
         </ns2:Automaton>
     </ns2:AutomataList>
