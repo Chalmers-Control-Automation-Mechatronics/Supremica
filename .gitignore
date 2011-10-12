@@ -2,22 +2,14 @@
 bin/
 build/
 dist/
-lib/unjared/
 logs/
 resources/
-src/net/sourceforge/waters/external/promela/parser/
 src/org/supremica/Version.java
 src/org/supremica/manufacturingTables/xsd/eop
 src/org/supremica/manufacturingTables/xsd/il/
 src/org/supremica/manufacturingTables/xsd/pr/
 src/org/supremica/manufacturingTables/xsd/processeditor/
 src/org/supremica/manufacturingTables/xsd/vr/
-tests/build/
-waters/cpp/src/jni/glue/
-waters/cpp/src/waters/javah/
-waters/java/classes/
-waters/java/jar/
-waters/java/src/net/sourceforge/waters/xsd/
 .supremica
 
 # generic files to ignore
