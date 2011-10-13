@@ -14,7 +14,7 @@ karlerik@control.lth.se.
 
 From 2005-02-17 Waters is included. Waters includes the graphical
 editor and simulator for automata. Waters is developed by Robi Malik,
-at the University of Waikato, New Zealand.  Robi can be reached at
+at the University of Waikato, New Zealand. Robi can be reached at
 robi@waikato.ac.nz.
 
 To report problems or ask questions, send email to knut@supremica.org
@@ -35,8 +35,9 @@ A short tutorial on how to compile and run Supremica is following.
     copy the licensed jar files to lib/licensed
     The two files should be named JGo.jar and JGoLayout.jar, respectively.
     Note, if you do not have licensed versions of JGo then the trial version
-    will be used. The trial JGo files are in the CVS, but not the licensed
-    files. This implies that you have to manually update the licensed files.
+    will be used. The trial JGo files are in the git repository, but not the
+    licensed files. This implies that you have to manually update the licensed
+    files.
     
     If you have got a C++ compiler and want to compile the C++ sources of
     the Waters libraries, you need to configure it first. Enter the
