@@ -39,6 +39,39 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
+/**
+ * <P>A test for synthesis algorithms.</P>
+ *
+ * <P>This test is used to check whether a synthesis algorithm is
+ * implemented correctly. It uses a fixed set of modules containing
+ * simple synthesis problems, runs synthesis on each of them and checks
+ * whether the result is correct.</P>
+ *
+ * <P>All test modules contain a model consisting of plants and
+ * specifications, plus a supervisor representing the expected result.
+ * The test checks whether a supervisor is obtained by the synthesis
+ * algorithm under test if a solution exists, or whether a failure is
+ * correctly reported where no solution exists. If a solution exists,
+ * it furthermore checks whether the returned supervisor ensures
+ * controllability and nonblocking, and whether it is least restrictive
+ * according to the expected result given in the test module.</P>
+ *
+ * <P>After running each test, the automata created by synthesis saved in
+ * the <CODE>logs/</CODE> directory, along with any counterexamples
+ * produced in verification for failed tests.</P>
+ *
+ * <P>This test class can be subclassed to test different synthesis
+ * implementations. The synthesis implementation only needs to implement the
+ * {@link ProductDESBuilder} interface to be tested. Monolithic and
+ * compositional synthesis are both supported.</P>
+ *
+ * <P>TODO. Presently, the test performs plantification. This should
+ * probably be done by individual synthesisers instead, as not all
+ * algorithms will require this step.</P>
+ *
+ * @author Robi Malik
+ */
+
 public abstract class AbstractSynthesizerTest
   extends AbstractAnalysisTest
 {
@@ -106,6 +139,7 @@ public abstract class AbstractSynthesizerTest
     testEmpty();
     testSajed();
     testSmallFactory2();
+    testTransferLine1();
   }
 
   public void testOverflowException()
@@ -137,6 +171,22 @@ public abstract class AbstractSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "small_factory_2";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testTransferLine1() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "transferline_1";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testTransferLine2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "transferline_2";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -404,6 +454,14 @@ public abstract class AbstractSynthesizerTest
 
   //#########################################################################
   //# Plantification
+  /**
+   * Returns a plantified version of the given product DES.
+   * Plantification means that all specification automata are replaced
+   * by plants with uncontrollable transitions to a dump state added to
+   * all states where the uncontrollable event in question is not defined.
+   * This method implements simple plantification.
+   * All uncontrollable events are considered.
+   */
   private ProductDESProxy plantify(final ProductDESProxy des)
     throws OverflowException
   {
