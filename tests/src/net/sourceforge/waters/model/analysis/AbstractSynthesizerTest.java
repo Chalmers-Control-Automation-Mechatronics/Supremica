@@ -140,6 +140,14 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testTrafficlights() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "trafficlights";
+    runSynthesizer(group, subdir, name, true);
+  }
+
 
   //#########################################################################
   //# Instantiating and Checking Modules
