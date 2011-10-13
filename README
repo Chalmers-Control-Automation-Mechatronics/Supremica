@@ -1,204 +1,102 @@
 README
-====== 
+======
 
-NOW with SVN
+You need a git client to checkout the sources. Please check
+the help system in github.com account for more information.
 
-To run Supremica you need a Java2 1.6 compliant JVM.
-All development is done with Sun's JDK2 1.6. You also need
-Ant - the Java build system. Secure shell (SSH) is needed 
-for secure communication with the computers at the Department
-of Signals and Systems. 
+To compile and run Supremica you need Java 1.6 or higher
+and ANT.
 
 From 2001-09-27 JGrafChart is included. JGrafChart is a Grafcet/SFC 
-modeling tool. JGrafChart is developed by Karl-Erik Arzen, at Lund
-Institute of Technology, Sweden. Karl-Erik can be reached at karlerik@control.lth.se.
+modelling tool. JGrafChart is developed by Karl-Erik Arzen, at Lund
+Institute of Technology, Sweden. Karl-Erik can be reached at
+karlerik@control.lth.se.
 
-From 2005-02-17 Waters is included. Waters is a graphical editor for automata. 
-Waters is developed by Robi Malik, at the University of Waikato, New Zealand. 
-Robi can be reached at robi@cs.waikato.ac.nz.
+From 2005-02-17 Waters is included. Waters includes the graphical
+editor and simulator for automata. Waters is developed by Robi Malik,
+at the University of Waikato, New Zealand.  Robi can be reached at
+robi@waikato.ac.nz.
 
-To report problems or ask questions
-send email to knut@supremica.org
+To report problems or ask questions, send email to knut@supremica.org
 
 If you run benchmark problems in Supremica, please give me a chance to 
 comment the results before publishing.
 
-A short tutorial on how to compile and run
-Supremica is following. 
+
+A short tutorial on how to compile and run Supremica is following. 
 
 1. Checkout
-	Enter a directory where you want to store
-	the Supremica files, e.g. "/home/ka/projects". To checkout the
-	sources, write:
-	
-	If you are at one of S2's Unix computers:
-	> cvs checkout Supremica
-	
-	If you are at an external computer you need to do the following. 
-	First you need to tell CVS to use ssh. 
-	To do this write:
-	> export CVS_RSH=ssh  (for bash)
-	> setenv CVS_RSH ssh  (for tcsh)
-	After this you can checkout the sources, change ka to your username.
-	> cvs -d ka@supremica.s2.chalmers.se:/home/cvs checkout Supremica
-	
-	If you have licensed version of JGo and/or JGo Layout then
-	copy the licensed jar files to
-	Supremica\lib\licensed
-	The two files should be named JGo.jar and JGoLayout.jar, respectively.
-	Note, if you do not have licensed versions of JGo then the trial version
-	will be used. The trial JGo files are in the CVS, but not the licensed 
-	files. This implies that you have to manually update the licensed files.
+    Enter a directory where you want to store the Supremica files,
+    e.g. "/home/ka/projects". To checkout the sources, write:
 
-2. Compiling
+    > git clone https://github.com/Chalmers-Control-Automation-Mechatronics/Supremica.git
 
-	To compile Supremica you need to have Ant installed
-	See the links at the bottom of the page.
+    If you have licensed version of JGo and/or JGo Layout then
+    copy the licensed jar files to lib/licensed
+    The two files should be named JGo.jar and JGoLayout.jar, respectively.
+    Note, if you do not have licensed versions of JGo then the trial version
+    will be used. The trial JGo files are in the CVS, but not the licensed
+    files. This implies that you have to manually update the licensed files.
+    
+    If you have got a C++ compiler and want to compile the C++ sources of
+    the Waters libraries, you need to configure it first. Enter the
+    subdirectory waters/ inside the project directory, and copy the file
+    build.properties.sample under the name of build.properties. Then edit
+    the new file build.properties as per instructions in the file. These
+    steps are optional as it is not necessary to compile C++:
 
-	The first time you compile after a checkout you should write:
-	> ant initialize
-	
-	You should also run the previous command as soon
-	as a there is a new or updated file in Supremica/lib.
+2. Compiling and running from command line
 
-	For compiling the sources there are two main
-	alternatives.
-	
-	i. Compile all files changed since last compilation
-	> ant compile
-	
-	ii. Compile all files and build a jar file.
-	> ant build
-	
-	Alternative iii, is the preferred alternative, and is
-	also the one executed if you run ant without arguments.
-	Note that alternative i, can be fast if you only want
-	to check that some change you done is going though the
-	compiler.
-	
-	It is also possible to build only supremica or jgrafchart.
-	The commands are:
-		compile_supremica, build_supremica, rebuild_supremica,
-		compile_jgrafchart, build_jgrafchart, rebuild_jgrafchart.
-	
-3. Run
-	Three alternatives:
-	
-	i. Enter Supremica/dist, write:
-	> IDE          (for Windows)
-	> ./IDE        (for Unix)
-	
-	or 
-	
-	> JGrafChart    (for Windows)
-	> ./JGrafChart  (for Unix)
+    To compile Supremica, you need to have Ant installed
+    The first time you compile after a checkout you should write:
+    > ant initialize
 
-	or 
-	
-	> Waters    (for Windows)
-	> ./Waters  (for Unix)
-			
-	ii. Run Supremica through Ant. Enter Supremica and write
-	> ant run
-	
-	For Windows: If you have everything set up correctly you should also
-	be able to double-click on Supremica/dist/Supremica.jar
-	in the Explorer.
+    This command should be used again if you fetch a new working copy
+    that contains major changes, or if you edit non-Java files.
 
-4. Update
-	Enter the Supremica directory, write:
-	> cvs update -d -P
+    For compiling the sources there are two main alternatives.
 
-5. Commit changes
- 	Enter the Supremica directory, write:
-	> cvs commit
+    i. Compile all files changed since last compilation
+    > ant compile
 
-6. Add a new file into cvs
-	Enter the directory where the file resides, write:
-	cvs add filename.java
+    ii. Compile all files and build a jar file.
+    > ant rebuild
 
-Warning: Never save anything in the following directories:
-	build
-	dist
-	doc
-Since these directories are occasionally deleted by Ant.
+    Alternative ii is the preferred alternative, and it is
+    also the one executed if you run ant without arguments.
+    Note that alternative i can be fast if you only want
+    to check that some change you done is going though the
+    compiler.
 
-Note that the file src/org/supremica/Version.java is excluded from the CVS 
-repository since it is automatically generated by Ant when running a rebuild.
+    To run Supremica, enter Supremica/dist, and write:
+    > IDE          (for Windows)
+    > ./IDE        (for Unix)
 
-Generating JAXB files
----------------------
-Some Java files for parsing and representing XML files are automatically generated. 
-Normally you do not need to generate them since a compiled version of them are
-included in the waters_jaxb.jar file. In case you changed the xml schema then
-you need to generate new java files. This is done by executing the following command
-in the waters directory
+3. Using an IDE
 
-	> ant gen
+    Most development is done using an IDE. Netbeans and Eclipse 
+    are supported. Please see the Supremica Wiki at github.com
+    for more details on checking out and compiling using these
+    systems.
 
-This command will also compile the generated files and generate a new jar file that
-will be commited when you run cvs commit. To be able to run gen you need
-to have installed JAXB, see link below.
-
-Testing
--------
-After a commit to the CVS directory a new copy of the CVS directory
-should always be checkout to a different location from where the commit
-originated. This should be done to make sure that the commit did not break
-anything. The most common error is that the user forget to add a file to 
-the CVS directory that is necessary for the build. If the build breaks
-then the other users cannot do anything until the build is fixed again.
-Hence, it is important that you do not only check that the build will work
-for you but you MUST checkout a new version to a different location otherwise
-you will not find for example the problem where you have a new source file
-in your directory but it is not in the CVS directory.
-
-To streamline this process there is a script that will take care of all this
-for you - if you have access to one of the Signals and Systems Linux computers.
-To run the script you should log in to one of these computers, for example
-   linus.s2.chalmers.se
-   linnea.s2.chalmers.se
-   temporary.s2.chalmers.se
-Make sure that you can checkout and compile manually with the commands above. The
-script can be found at 
-/users/s2/knut/bin/check_supremica
-If you want access the script easily then you can do a soft link to you local directory.
-If you do this then you will automatically get access to all updates of this script.
-> ln -s /users/s2/knut/bin/check_supremica .
-The script will then do a checkout, an initialize, a rebuild, a run_tests and finally
-remove all the files. The files will be checkout to /tmp/your_user_name_random. 
-The /tmp directory is on a local harddrive resulting in a fast compilation. If there
-is an error then you should fix that as soon as possible.
-
-Performance
------------
-If running Supremica on examples where much memory are needed performance might
-suffer if the JVM is started with too little heap-memory.
-
-In Sun's JVM it is possible to set the initial and
-max size of the heap.
-
-Example:
-java -Xms128M -Xmx196M -jar Supremica
-will set the initial heap size to 128M and the maximum heap size
-to 196M. If you know that 196M is required to finish the example
-then setting the heap size to this size from the start will give
-better performance.
 
 More information
 ----------------
 
+Supremica Wiki at github.com
+https://github.com/Chalmers-Control-Automation-Mechatronics/Supremica/wiki
+
 Ant - the build system
-http://jakarta.apache.org/ant/
+http://ant.apache.org/
 
-Cvs - the Concurrent Version System
-http://www.cvshome.org/
+Eclipse IDE
+http://www.eclipse.org
 
-Sun Java JDK
+Git documentation
+http://help.github.com/
+
+Java homepage
 http://java.sun.com/
 
-IBM Java JDK
-http://www.ibm.com/java
-
-JAXB - Java Architecture for XML Binding 
-http://java.sun.com/xml/jaxb/
+NetBeans IDE
+http://www.netbeans.com/
