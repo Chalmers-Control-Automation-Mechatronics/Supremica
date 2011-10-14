@@ -109,16 +109,16 @@ public class PropertiesDialog
 {
     private static final long serialVersionUID = 1L;
 
-    private Frame owner;
+    private final Frame owner;
     private JPanel dialogPanel = null;
     /** Where the properties show up. */
     private JTabbedPane tabbedPane = null;
-    /** The place for controlbuttons for this dialog. */
+    /** The place for control buttons for this dialog. */
     private PropertiesControllerPanel controlPanel = null;
 
     private final List<Chooser> chooserList = new LinkedList<Chooser>();
 
-    public PropertiesDialog(Frame owner)
+    public PropertiesDialog(final Frame owner)
     {
         // Create dialog
         super(owner, "Preferences", true);
@@ -137,10 +137,10 @@ public class PropertiesDialog
         dialogPanel.add(controlPanel, BorderLayout.SOUTH);
 
         // For all types of properties
-        for (PropertyType type: PropertyType.values())
+        for (final PropertyType type: PropertyType.values())
         {
             // Create a new panel to put in a tabbed pane
-            JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
             /*
             JPanel panel = new JPanel();
@@ -166,8 +166,8 @@ public class PropertiesDialog
         //pack();
 
         // Center the window
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension frameSize = getSize();
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final Dimension frameSize = getSize();
         if (frameSize.height > screenSize.height)
         {
             frameSize.height = screenSize.height;
@@ -180,7 +180,7 @@ public class PropertiesDialog
         setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
         addWindowListener(new WindowAdapter()
         {
-            public void windowClosing(WindowEvent e)
+            public void windowClosing(final WindowEvent e)
             {
                 doCancel();
             }
@@ -207,7 +207,7 @@ public class PropertiesDialog
                 // Write the changes to the config file
                 SupremicaProperties.saveProperties();
             }
-            catch (IOException exx)
+            catch (final IOException exx)
             {
                 System.err.println("Failed to save changes to config-file: " + exx.getMessage());
             }
@@ -218,7 +218,7 @@ public class PropertiesDialog
         owner.repaint();
     }
 
-    public void setVisible(boolean toVisible)
+    public void setVisible(final boolean toVisible)
     {
         if (toVisible)
         {
@@ -233,7 +233,7 @@ public class PropertiesDialog
      */
     private void getAttributes()
     {
-        for (Chooser chooser : chooserList)
+        for (final Chooser chooser : chooserList)
         {
             chooser.getFromConfig();
         }
@@ -244,7 +244,7 @@ public class PropertiesDialog
      */
     private boolean setAttributes()
     {
-        for (Chooser chooser : chooserList)
+        for (final Chooser chooser : chooserList)
         {
             chooser.setInConfig();
         }
@@ -255,7 +255,7 @@ public class PropertiesDialog
         return true;
     }
 
-    private void fillPropertyPanel(PropertyType type, JPanel panel)
+    private void fillPropertyPanel(final PropertyType type, final JPanel panel)
     {
 	// Find all properties of this type and add to the panel
 	for (final Property property : Property.getAllProperties())
@@ -266,28 +266,28 @@ public class PropertiesDialog
 		// Depending on the kind of property, different choice mechanics...
 		if (property instanceof BooleanProperty)
 		{
-		    BooleanChooser chooser = new BooleanChooser((BooleanProperty) property);
+		    final BooleanChooser chooser = new BooleanChooser((BooleanProperty) property);
 		    chooser.setEnabled(!property.isImmutable());
 		    chooserList.add(chooser);
 		    panel.add(chooser);
 		}
 		else if (property instanceof IntegerProperty)
 		{
-		    IntegerChooser chooser = new IntegerChooser((IntegerProperty) property);
+		    final IntegerChooser chooser = new IntegerChooser((IntegerProperty) property);
 		    chooser.setEnabled(!property.isImmutable());
 		    chooserList.add(chooser);
 		    panel.add(chooser);
 		}
 		else if (property instanceof DoubleProperty)
 		{
-		    DoubleChooser chooser = new DoubleChooser((DoubleProperty) property);
+		    final DoubleChooser chooser = new DoubleChooser((DoubleProperty) property);
 		    chooser.setEnabled(!property.isImmutable());
 		    chooserList.add(chooser);
 		    panel.add(chooser);
 		}
 		else if (property instanceof ObjectProperty)
 		{
-		    StringChooser chooser = new StringChooser((ObjectProperty) property);
+		    final StringChooser chooser = new StringChooser((ObjectProperty) property);
 		    chooser.setEnabled(!property.isImmutable());
 		    chooserList.add(chooser);
 		    panel.add(chooser);
@@ -311,7 +311,7 @@ public class PropertiesDialog
          * Update to current value in the config.
          */
         public void getFromConfig();
-        
+
         public String getLabel();  // Not really relevant here, but makes things immensly more easy for SearchAction
     }
 
@@ -323,7 +323,7 @@ public class PropertiesDialog
 
         private final BooleanProperty property;
 
-        BooleanChooser(BooleanProperty property)
+        BooleanChooser(final BooleanProperty property)
         {
             super(property.getComment(), ((BooleanProperty) property).get());
             this.property = property;
@@ -339,7 +339,7 @@ public class PropertiesDialog
         {
             setSelected(property.get());
         }
-        
+
         public String getLabel() { return getText(); }
     }
 
@@ -371,7 +371,7 @@ public class PropertiesDialog
 
             // JFormattedTextField!
             numberFormat = NumberFormat.getIntegerInstance();
-            NumberFormatter formatter = new NumberFormatter(numberFormat);
+            final NumberFormatter formatter = new NumberFormatter(numberFormat);
             formatter.setMinimum(new Integer(property.getMinValue()));
             formatter.setMaximum(new Integer(property.getMaxValue()));
             text = new JFormattedTextField(formatter);
@@ -398,12 +398,12 @@ public class PropertiesDialog
                 text.addPropertyChangeListener(new PropertyChangeListener()
                 {
                     // If the text changes value, update the slider
-                    public void propertyChange(PropertyChangeEvent e)
+                    public void propertyChange(final PropertyChangeEvent e)
                     {
                         // Is the value being changed?
                         if ("value".equals(e.getPropertyName()))
                         {
-                            Number value = (Number) e.getNewValue();
+                            final Number value = (Number) e.getNewValue();
                             if (value != null)
                             {
                                 slider.setValue(value.intValue());
@@ -414,7 +414,7 @@ public class PropertiesDialog
                 slider.addChangeListener(new ChangeListener()
                 {
                     // If the slider changes state, update the text
-                    public void stateChanged(ChangeEvent e)
+                    public void stateChanged(final ChangeEvent e)
                     {
                         slider.setValue((int) (Math.round((double) (slider.getValue()) / property.getTick()) * property.getTick()));
                         if (!slider.getValueIsAdjusting())
@@ -440,20 +440,20 @@ public class PropertiesDialog
             {
                 try
                 {
-					Number num = numberFormat.parse(text.getText());
+					final Number num = numberFormat.parse(text.getText());
                     property.set(num.intValue());
                 }
-                catch (ParseException ex)
+                catch (final ParseException ex)
                 {
 					System.err.println("ParseException: " + ex.getMessage());
                     // Error in number format, ignore this result without error message!
                 }
-                catch (NumberFormatException ex)
+                catch (final NumberFormatException ex)
                 {
 					System.err.println("NumberFormatException: " + ex.getMessage());
                     // Error in number format, ignore this result without error message!
                 }
-                catch (IllegalArgumentException ex)
+                catch (final IllegalArgumentException ex)
                 {
                     System.err.println("Error setting value of property " + property + ", value out of range.");
                 }
@@ -464,7 +464,7 @@ public class PropertiesDialog
         {
             text.setText(""+property.get());
         }
-        
+
         public String getLabel() {  return label.getText(); }
     }
 
@@ -493,9 +493,9 @@ public class PropertiesDialog
             this.add(label);
 
             // JFormattedTextField!
-            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            final NumberFormat numberFormat = NumberFormat.getNumberInstance();
             numberFormat.setParseIntegerOnly(false);
-            NumberFormatter formatter = new NumberFormatter(numberFormat);
+            final NumberFormatter formatter = new NumberFormatter(numberFormat);
             formatter.setMinimum(new Double(property.getMinValue()));
             formatter.setMaximum(new Double(property.getMaxValue()));
             text = new JFormattedTextField(formatter);
@@ -513,11 +513,11 @@ public class PropertiesDialog
                 {
                     property.set(Double.parseDouble(text.getText()));
                 }
-                catch (NumberFormatException ex)
+                catch (final NumberFormatException ex)
                 {
                     // Error in number format, ignore this result without error message!
                 }
-                catch (IllegalArgumentException ex)
+                catch (final IllegalArgumentException ex)
                 {
                     System.err.println("Error setting value of property " + property + ", value out of range.");
                 }
@@ -528,7 +528,7 @@ public class PropertiesDialog
         {
             text.setText(""+property.get());
         }
-        
+
         public String getLabel() {  return label.getText(); }
     }
 
@@ -548,8 +548,8 @@ public class PropertiesDialog
         private JTextField text = null;
         private JComboBox selector = null;
         private JLabel label = null;
-        
-        StringChooser(ObjectProperty property)
+
+        StringChooser(final ObjectProperty property)
         {
             super();
             this.property = property;
@@ -598,7 +598,7 @@ public class PropertiesDialog
             else
                 selector.setSelectedItem(property.get());
         }
-        
+
         public String getLabel() {  return label.getText(); }
     }
 }
@@ -610,35 +610,36 @@ class PropertiesControllerPanel
     @SuppressWarnings("unused")
 	private PropertiesDialog theDialog = null;
 
-    public PropertiesControllerPanel(PropertiesDialog theDialog)
+    public PropertiesControllerPanel(final PropertiesDialog theDialog)
     {
         this.theDialog = theDialog;
 
         @SuppressWarnings("unused")
+        final
 		Box buttonBox = new Box(BoxLayout.X_AXIS);
 
         /*
          * Implementing a search function for the config dialog
          */
-        JTextField searchStr = new JTextField(20);
+        final JTextField searchStr = new JTextField(20);
         searchStr.setPreferredSize(searchStr.getPreferredSize());
-        Action searchAction = new SearchAction(theDialog, searchStr);
-        JButton searchButton = new JButton(searchAction);
-        JPanel searchPanel = new JPanel();
+        final Action searchAction = new SearchAction(theDialog, searchStr);
+        final JButton searchButton = new JButton(searchAction);
+        final JPanel searchPanel = new JPanel();
         searchPanel.add(searchStr);
         searchPanel.add(searchButton);
         add(searchPanel, BorderLayout.WEST);
         add(Box.createHorizontalGlue());
-  
-        
-        Action applyAction = new ApplyChangesAction(theDialog);
-        JButton applyButton = new JButton(applyAction);
+
+
+        final Action applyAction = new ApplyChangesAction(theDialog);
+        final JButton applyButton = new JButton(applyAction);
         theDialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),"apply");
         theDialog.getRootPane().getActionMap().put("apply", applyAction);
         add(applyButton, BorderLayout.EAST);
 
-        Action cancelAction = new CancelDialogAction(theDialog);
-        JButton cancelButton = new JButton(cancelAction);
+        final Action cancelAction = new CancelDialogAction(theDialog);
+        final JButton cancelButton = new JButton(cancelAction);
         theDialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,0),"cancel");
         theDialog.getRootPane().getActionMap().put("cancel", cancelAction);
         add(cancelButton, BorderLayout.EAST);
@@ -648,10 +649,10 @@ class PropertiesControllerPanel
         extends AbstractAction
     {
         private static final long serialVersionUID = 1L;
-		
+
 		private final JDialog dialog;
 
-        public CancelDialogAction(JDialog dialog)
+        public CancelDialogAction(final JDialog dialog)
         {
             super("Cancel");
             putValue(SHORT_DESCRIPTION, "Cancel the dialog without saving the preferences");
@@ -661,7 +662,7 @@ class PropertiesControllerPanel
             this.dialog = dialog;
         }
 
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(final ActionEvent e)
         {
             dialog.setVisible(false);
         }
@@ -672,39 +673,39 @@ class PropertiesControllerPanel
     {
         JTextField text_field;
         JTabbedPane tabbed_pane;
-        int component_count = 0;
         int current_tab = 0;
         int current_label = 0;
-        boolean searching = false;  // keeps track of wether we're searching or not
         Object boxed_obj = null;
-        
+
+        private static final long serialVersionUID = 1L;
+
         final static String SEARCH_BUTTON_TEXT_1 = "Search";
         final static String SEARCH_BUTTON_TEXT_2 = "Again";
-        
-        public SearchAction(PropertiesDialog dialog, JTextField text_field)
+
+        public SearchAction(final PropertiesDialog dialog, final JTextField text_field)
         {
             super(SEARCH_BUTTON_TEXT_1);
             putValue(SHORT_DESCRIPTION, "Search this Preferences dialog for the given string");
             putValue(MNEMONIC_KEY, KeyEvent.VK_S);
-            
+
             this.text_field = text_field;
             this.text_field.setToolTipText("Eneter string to search for");
             // Get the JTabbedPane which conatins all the JPanels with all the options
-            JComponent contp = (JComponent)dialog.getContentPane();  // we know for a JDialog this is really a JComponent
+            final JComponent contp = (JComponent)dialog.getContentPane();  // we know for a JDialog this is really a JComponent
             final java.awt.Component[] components = contp.getComponents();
             for(int i = 0; i < contp.getComponentCount(); i++)
             {
               if(components[i] instanceof JTabbedPane)  // then this is the one! And there can be only one
                 this.tabbed_pane = (JTabbedPane)components[i];
-            }  
+            }
         }
-        
-        private boolean search_tab(JPanel tab)
+
+        private boolean search_tab(final JPanel tab)
         {
             final int component_count = tab.getComponentCount();
             final java.awt.Component[] components = tab.getComponents();
             final String srch_str = "(?i).*" + text_field.getText() + ".*";
-            
+
             // Un-box if some element has already been boxed
             if(boxed_obj != null)
             {
@@ -723,16 +724,16 @@ class PropertiesControllerPanel
             }
             while(current_label < component_count)
             {
-              /* Elements on the panels can be either 
+              /* Elements on the panels can be either
                * BooleanChooser (which is_a JCheckBox (and a Chooser))
                * DoubleChooser (which is_a Chooser and a JPanel)
                * IntegerChooser (which is_a Chooser and a JPanel)
                * StringChooser (which is_a Chooser and a JPanel)
                */
-              final java.awt.Component comp = components[current_label++];     
+              final java.awt.Component comp = components[current_label++];
               if(comp instanceof JCheckBox)
               {
-                 JCheckBox cbox = (JCheckBox)comp;
+                 final JCheckBox cbox = (JCheckBox)comp;
                  if(cbox.getText().matches(srch_str))
                   {
                     cbox.setBorderPainted(true);
@@ -743,7 +744,7 @@ class PropertiesControllerPanel
               }
               else if(comp instanceof PropertiesDialog.Chooser)
               {
-                PropertiesDialog.Chooser schooser = (PropertiesDialog.Chooser)comp;
+                final PropertiesDialog.Chooser schooser = (PropertiesDialog.Chooser)comp;
                 if(schooser.getLabel().matches(srch_str))
                 {
                     // If it's a Chooser but not a JCheckBox, then it is a JPanel
@@ -756,11 +757,11 @@ class PropertiesControllerPanel
             current_label = 0;
             return false; // did not find anything new on this tab
         }
-        
-        public void actionPerformed(ActionEvent e)
+
+        public void actionPerformed(final ActionEvent e)
         {
           // System.out.println("SearchAction.actionPerformed called, we are " + (searching ? "" : "not ") + "searching");
-          
+
             putValue(NAME, SEARCH_BUTTON_TEXT_2);
             final int component_count = tabbed_pane.getComponentCount();
             final java.awt.Component[] components = tabbed_pane.getComponents();
@@ -784,7 +785,7 @@ class PropertiesControllerPanel
             putValue(NAME, SEARCH_BUTTON_TEXT_1);
         }
     }
-    
+
     private class ApplyChangesAction
         extends AbstractAction
     {
@@ -792,7 +793,7 @@ class PropertiesControllerPanel
 
         private final PropertiesDialog dialog;
 
-        public ApplyChangesAction(PropertiesDialog dialog)
+        public ApplyChangesAction(final PropertiesDialog dialog)
         {
             super("Apply");
             putValue(SHORT_DESCRIPTION, "Saves the preferences and closes this dialog");
@@ -802,7 +803,7 @@ class PropertiesControllerPanel
             this.dialog = dialog;
         }
 
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(final ActionEvent e)
         {
             dialog.doApply();
 
