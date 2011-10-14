@@ -300,7 +300,7 @@ public class PropertiesDialog
     /**
      * Interface for setting and getting a property from Config.
      */
-    private interface Chooser
+    protected interface Chooser
     {
         /**
          * Put the current value in the config.
@@ -311,6 +311,8 @@ public class PropertiesDialog
          * Update to current value in the config.
          */
         public void getFromConfig();
+        
+        public String getLabel();  // Not really relevant here, but makes things immensly more easy for SearchAction
     }
 
     private class BooleanChooser
@@ -337,7 +339,8 @@ public class PropertiesDialog
         {
             setSelected(property.get());
         }
-
+        
+        public String getLabel() { return getText(); }
     }
 
     /**
@@ -354,6 +357,7 @@ public class PropertiesDialog
 
         JFormattedTextField text;
         JSlider slider;
+        JLabel label = null;
         NumberFormat numberFormat;
 
         IntegerChooser(final IntegerProperty property)
@@ -362,7 +366,7 @@ public class PropertiesDialog
             this.property = property;
 
             // Label
-            JLabel label = new JLabel(property.getComment());
+            this.label = new JLabel(property.getComment());
             this.add(label);
 
             // JFormattedTextField!
@@ -460,6 +464,8 @@ public class PropertiesDialog
         {
             text.setText(""+property.get());
         }
+        
+        public String getLabel() {  return label.getText(); }
     }
 
     /**
@@ -474,6 +480,7 @@ public class PropertiesDialog
         private final DoubleProperty property;
 
         JFormattedTextField text;
+        JLabel label = null;
 //        JSlider slider;
 
         DoubleChooser(final DoubleProperty property)
@@ -482,7 +489,7 @@ public class PropertiesDialog
             this.property = property;
 
             // Label
-            JLabel label = new JLabel(property.getComment());
+            this.label = new JLabel(property.getComment());
             this.add(label);
 
             // JFormattedTextField!
@@ -521,6 +528,8 @@ public class PropertiesDialog
         {
             text.setText(""+property.get());
         }
+        
+        public String getLabel() {  return label.getText(); }
     }
 
     /**
@@ -528,7 +537,7 @@ public class PropertiesDialog
      * this becomes a JComboBox with those as choices, otherwise this becomes an
      * editable JTextField.
      */
-    private class StringChooser
+    protected class StringChooser
         extends JPanel
         implements Chooser
     {
@@ -538,12 +547,13 @@ public class PropertiesDialog
 
         private JTextField text = null;
         private JComboBox selector = null;
-
+        private JLabel label = null;
+        
         StringChooser(ObjectProperty property)
         {
             super();
             this.property = property;
-            JLabel label = new JLabel(property.getComment());
+            this.label = new JLabel(property.getComment());
             this.add(label);
 
             if (property.legalValues() == null)
@@ -588,6 +598,8 @@ public class PropertiesDialog
             else
                 selector.setSelectedItem(property.get());
         }
+        
+        public String getLabel() {  return label.getText(); }
     }
 }
 
@@ -608,15 +620,16 @@ class PropertiesControllerPanel
         /*
          * Implementing a search function for the config dialog
          */
-        JTextField searchStr = new JTextField("this doesn't work yet. soon...");
+        JTextField searchStr = new JTextField(20);
+        searchStr.setPreferredSize(searchStr.getPreferredSize());
         Action searchAction = new SearchAction(theDialog, searchStr);
-        JPanel searchPanel = new JPanel();
         JButton searchButton = new JButton(searchAction);
+        JPanel searchPanel = new JPanel();
         searchPanel.add(searchStr);
         searchPanel.add(searchButton);
         add(searchPanel, BorderLayout.WEST);
         add(Box.createHorizontalGlue());
-        
+  
         
         Action applyAction = new ApplyChangesAction(theDialog);
         JButton applyButton = new JButton(applyAction);
@@ -658,9 +671,12 @@ class PropertiesControllerPanel
       extends AbstractAction
     {
         JTextField text_field;
-        JComponent content_pane;
+        JTabbedPane tabbed_pane;
         int component_count = 0;
-        int current_comp = 0;
+        int current_tab = 0;
+        int current_label = 0;
+        boolean searching = false;  // keeps track of wether we're searching or not
+        Object boxed_obj = null;
         
         final static String SEARCH_BUTTON_TEXT_1 = "Search";
         final static String SEARCH_BUTTON_TEXT_2 = "Again";
@@ -668,36 +684,103 @@ class PropertiesControllerPanel
         public SearchAction(PropertiesDialog dialog, JTextField text_field)
         {
             super(SEARCH_BUTTON_TEXT_1);
-            putValue(SHORT_DESCRIPTION, "Search preferences for the given string");
+            putValue(SHORT_DESCRIPTION, "Search this Preferences dialog for the given string");
             putValue(MNEMONIC_KEY, KeyEvent.VK_S);
             
             this.text_field = text_field;
-            this.content_pane = (JComponent)dialog.getContentPane();  // we know for a JDialog this is really a JComponent
+            this.text_field.setToolTipText("Eneter string to search for");
+            // Get the JTabbedPane which conatins all the JPanels with all the options
+            JComponent contp = (JComponent)dialog.getContentPane();  // we know for a JDialog this is really a JComponent
+            final java.awt.Component[] components = contp.getComponents();
+            for(int i = 0; i < contp.getComponentCount(); i++)
+            {
+              if(components[i] instanceof JTabbedPane)  // then this is the one! And there can be only one
+                this.tabbed_pane = (JTabbedPane)components[i];
+            }  
+        }
+        
+        private boolean search_tab(JPanel tab)
+        {
+            final int component_count = tab.getComponentCount();
+            final java.awt.Component[] components = tab.getComponents();
+            final String srch_str = "(?i).*" + text_field.getText() + ".*";
+            
+            // Un-box if some element has already been boxed
+            if(boxed_obj != null)
+            {
+              if(boxed_obj instanceof JCheckBox)
+              {
+                ((JCheckBox)boxed_obj).setBorderPainted(false);
+                boxed_obj = null;
+              }
+              else if(boxed_obj instanceof JPanel)
+              {
+                ((JPanel)boxed_obj).setBorder(null);  // Unpaint the border
+                boxed_obj = null;
+              }
+              else
+                 assert false : "instanceof error in search_tab"; // Should not happen!
+            }
+            while(current_label < component_count)
+            {
+              /* Elements on the panels can be either 
+               * BooleanChooser (which is_a JCheckBox (and a Chooser))
+               * DoubleChooser (which is_a Chooser and a JPanel)
+               * IntegerChooser (which is_a Chooser and a JPanel)
+               * StringChooser (which is_a Chooser and a JPanel)
+               */
+              final java.awt.Component comp = components[current_label++];     
+              if(comp instanceof JCheckBox)
+              {
+                 JCheckBox cbox = (JCheckBox)comp;
+                 if(cbox.getText().matches(srch_str))
+                  {
+                    cbox.setBorderPainted(true);
+                    cbox.setBorder(new javax.swing.border.LineBorder(java.awt.Color.blue, 2));
+                    boxed_obj = cbox;
+                     return true;  // found one!
+                  }
+              }
+              else if(comp instanceof PropertiesDialog.Chooser)
+              {
+                PropertiesDialog.Chooser schooser = (PropertiesDialog.Chooser)comp;
+                if(schooser.getLabel().matches(srch_str))
+                {
+                    // If it's a Chooser but not a JCheckBox, then it is a JPanel
+                    ((JPanel)schooser).setBorder(new javax.swing.border.LineBorder(java.awt.Color.blue, 2));
+                    boxed_obj = schooser;
+                    return true;
+                }
+              }
+            }
+            current_label = 0;
+            return false; // did not find anything new on this tab
         }
         
         public void actionPerformed(ActionEvent e)
         {
-          System.out.println("SearchAction.actionPerformed called!");
+          // System.out.println("SearchAction.actionPerformed called, we are " + (searching ? "" : "not ") + "searching");
           
             putValue(NAME, SEARCH_BUTTON_TEXT_2);
-            final int component_count = content_pane.getComponentCount();
-            final java.awt.Component[] components = content_pane.getComponents();
-            while(current_comp < component_count)
+            final int component_count = tabbed_pane.getComponentCount();
+            final java.awt.Component[] components = tabbed_pane.getComponents();
+            while(current_tab < component_count)
             {
-              System.out.println("Component number " + current_comp + " checked");
-              final java.awt.Component comp = components[current_comp++];
-              if(comp instanceof JLabel)
-              {
-                  JLabel label = (JLabel)comp;
-                  // if(text_field.getText().matches(label.getText()))
+                final java.awt.Component comp = components[current_tab];
+                if(comp instanceof JPanel)
+                {
+                  tabbed_pane.setSelectedComponent(comp);
+                  // Search this panels components
+                  if(!search_tab((JPanel)comp))
                   {
-                    // Show it... how to do that?
-                    text_field.setText(label.getText());
+                      current_tab++;  // we didn't find anything on this tab, go to next
+                      continue;
                   }
-              }
-              
+                  return;
+                }
             }
-            current_comp = 0;
+            current_tab = 0;
+            tabbed_pane.setSelectedComponent(components[0]);
             putValue(NAME, SEARCH_BUTTON_TEXT_1);
         }
     }
