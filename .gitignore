@@ -3,6 +3,7 @@ bin/
 build/
 dist/
 logs/
+nbproject/private/
 resources/
 src/org/supremica/Version.java
 src/org/supremica/manufacturingTables/xsd/eop

@@ -213,9 +213,11 @@ class AutomataSelectorFactory
     /**
      * AutomataSelector a set of specs/sups/plants,
      * For each spec/sup it returns that automaton together with the plants with which
-     * it shares uc-events (bt default it never returns a spec with no plants)
+     * it shares uc-events (by default it never returns a spec with no plants)
      * If closedSet == true the returned set is closed in that all plants that share
      * uc-events with any plant in the set is also included
+     * If solitary_spec is true, a spec that does not share any uc-events with any
+     * plant will be returned, else such specs are simply skipped
      */
     static class PerSpecificationAutomataSelector
         implements AutomataSelector

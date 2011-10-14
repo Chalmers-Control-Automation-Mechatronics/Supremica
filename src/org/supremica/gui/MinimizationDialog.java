@@ -192,7 +192,7 @@ public class MinimizationDialog
             // Disable bisimulation equivalence if library is missing!
             if (!BisimulationEquivalenceMinimizer.libraryLoaded())
             {
-                logger.warn("Library BisimulationEquivalence not in path, using Java implementation.");
+                logger.warn("LibraryBisimulationEquivalence not found (not in path? 32/64-bit problem?), using Java implementation.");
                 minimizationTypeBox.removeItem(EquivalenceRelation.BISIMULATIONEQUIVALENCE);
             }
 
