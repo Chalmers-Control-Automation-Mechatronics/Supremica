@@ -59,11 +59,14 @@
 package org.supremica.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -77,10 +80,12 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -91,11 +96,13 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import org.supremica.properties.BooleanProperty;
+import org.supremica.properties.ColorProperty;
 import org.supremica.properties.DoubleProperty;
 import org.supremica.properties.IntegerProperty;
 import org.supremica.properties.ObjectProperty;
@@ -255,64 +262,62 @@ public class PropertiesDialog
         return true;
     }
 
-    private void fillPropertyPanel(final PropertyType type, final JPanel panel)
+    private void fillPropertyPanel(final PropertyType type,
+                                   final JPanel panel)
     {
-	// Find all properties of this type and add to the panel
-	for (final Property property : Property.getAllProperties())
-	{
-	    // I only want properties of the current type
-	    if (property.getPropertyType() == type)
-	    {
-		// Depending on the kind of property, different choice mechanics...
-		if (property instanceof BooleanProperty)
-		{
-		    final BooleanChooser chooser = new BooleanChooser((BooleanProperty) property);
-		    chooser.setEnabled(!property.isImmutable());
-		    chooserList.add(chooser);
-		    panel.add(chooser);
-		}
-		else if (property instanceof IntegerProperty)
-		{
-		    final IntegerChooser chooser = new IntegerChooser((IntegerProperty) property);
-		    chooser.setEnabled(!property.isImmutable());
-		    chooserList.add(chooser);
-		    panel.add(chooser);
-		}
-		else if (property instanceof DoubleProperty)
-		{
-		    final DoubleChooser chooser = new DoubleChooser((DoubleProperty) property);
-		    chooser.setEnabled(!property.isImmutable());
-		    chooserList.add(chooser);
-		    panel.add(chooser);
-		}
-		else if (property instanceof ObjectProperty)
-		{
-		    final StringChooser chooser = new StringChooser((ObjectProperty) property);
-		    chooser.setEnabled(!property.isImmutable());
-		    chooserList.add(chooser);
-		    panel.add(chooser);
-		}
-	    }
-	}
-
+      // Find all properties of this type and add to the panel
+      for (final Property property : Property.getAllProperties()) {
+        // I only want properties of the current type
+        if (property.getPropertyType() == type) {
+          // Depending on the kind of property, different choice mechanics...
+          final Chooser chooser;
+          if (property instanceof BooleanProperty) {
+            chooser = new BooleanChooser((BooleanProperty) property);
+          } else if (property instanceof IntegerProperty) {
+            chooser = new IntegerChooser((IntegerProperty) property);
+          } else if (property instanceof DoubleProperty) {
+            chooser = new DoubleChooser((DoubleProperty) property);
+          } else if (property instanceof ObjectProperty) {
+            chooser = new StringChooser((ObjectProperty) property);
+          } else if (property instanceof ColorProperty) {
+            chooser = new ColorChooser((ColorProperty) property);
+          } else {
+            continue;
+          }
+          chooser.setEnabled(!property.isImmutable());
+          chooserList.add(chooser);
+          panel.add((Component) chooser);
+        }
+      }
     }
+
 
     /**
      * Interface for setting and getting a property from Config.
      */
-    protected interface Chooser
+    interface Chooser
     {
         /**
-         * Put the current value in the config.
+         * Puts the current value in the config.
          */
         public void setInConfig();
 
         /**
-         * Update to current value in the config.
+         * Updates to current value in the config.
          */
         public void getFromConfig();
 
-        public String getLabel();  // Not really relevant here, but makes things immensly more easy for SearchAction
+        /**
+         * Enables or disables this control.
+         */
+        public void setEnabled(boolean enable);
+
+        /**
+         * Gets the label used to describe the property in the dialog.
+         * Not really relevant here, but makes things immensely more easy
+         * for {@link #SearchAction}.
+         */
+        public String getLabel();
     }
 
     private class BooleanChooser
@@ -469,7 +474,7 @@ public class PropertiesDialog
     }
 
     /**
-     * Chooser for DoubleProperty:s. The chooser is a JFormattedTextField.
+     * Chooser for DoubleProperties. The chooser is a JFormattedTextField.
      */
     private class DoubleChooser
         extends JPanel
@@ -533,11 +538,11 @@ public class PropertiesDialog
     }
 
     /**
-     * Chooser for StringProperty:s. If the StringProperty has a set of legal values,
+     * Chooser for StringProperties. If the StringProperty has a set of legal values,
      * this becomes a JComboBox with those as choices, otherwise this becomes an
      * editable JTextField.
      */
-    protected class StringChooser
+    private class StringChooser
         extends JPanel
         implements Chooser
     {
@@ -601,7 +606,100 @@ public class PropertiesDialog
 
         public String getLabel() {  return label.getText(); }
     }
+
+
+    //#######################################################################
+    //# Inner Class ColorChooser
+    /**
+     * Chooser for colour properties.
+     * Consists of a label describing the property and a button showing
+     * the colour. When the button is clicked, a {@link JColorChooser}
+     * dialog pops up.
+     */
+    private class ColorChooser
+      extends JPanel
+      implements ActionListener, Chooser
+    {
+      //#####################################################################
+      //# Constructors
+      private ColorChooser(final ColorProperty property)
+      {
+        mProperty = property;
+        mLabel = new JLabel(property.getComment());
+        add(mLabel);
+        mButton = new JButton("Click to change");
+        final Border bevel = BorderFactory.createLoweredBevelBorder();
+        final Border empty = BorderFactory.createEmptyBorder(4, 6, 4, 6);
+        final Border border = BorderFactory.createCompoundBorder(bevel, empty);
+        mButton.setBorder(border);
+        mButton.setFocusPainted(false);
+        getFromConfig();
+        mButton.addActionListener(this);
+        add(mButton);
+      }
+
+      //#####################################################################
+      //# Interface org.supremica.properties.PropertiesDialog.Chooser
+      public void setInConfig()
+      {
+        if (!mProperty.isImmutable()) {
+          final Color color = getColor();
+          mProperty.set(color);
+        }
+      }
+
+      public void getFromConfig()
+      {
+        final Color color = mProperty.get();
+        setColor(color);
+      }
+
+      public String getLabel()
+      {
+        return mLabel.getText();
+      }
+
+      //#####################################################################
+      //# Interface java.awt.event.ActionListener
+      public void actionPerformed(final ActionEvent event)
+      {
+        final String title = "Choose " + mProperty.getComment();
+        final Color color = getColor();
+        final Color newcolor = JColorChooser.showDialog(this, title, color);
+        if (newcolor != null) {
+          setColor(newcolor);
+        }
+      }
+
+      //#####################################################################
+      //# Auxiliary Methods
+      private Color getColor()
+      {
+        return mButton.getBackground();
+      }
+
+      private void setColor(final Color color)
+      {
+        mButton.setBackground(color);
+        if (30 * color.getRed() + 59 * color.getGreen() +
+            11 * color.getBlue() > 12750) {
+          mButton.setForeground(Color.BLACK);
+        } else {
+          mButton.setForeground(Color.WHITE);
+        }
+      }
+
+      //#####################################################################
+      //# Data Members
+      private final ColorProperty mProperty;
+      private final JLabel mLabel;
+      private final JButton mButton;
+
+      private static final long serialVersionUID = 1L;
+    }
+
 }
+
 
 class PropertiesControllerPanel
     extends JPanel
