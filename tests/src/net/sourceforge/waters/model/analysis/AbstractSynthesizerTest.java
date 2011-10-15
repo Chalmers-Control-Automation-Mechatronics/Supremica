@@ -158,6 +158,22 @@ public abstract class AbstractSynthesizerTest
 
   //#########################################################################
   //# Test Cases --- synthesis
+  public void testBigFactory() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "big_factory";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testCell() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "cell";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testSajed() throws Exception
   {
     final String group = "tests";
