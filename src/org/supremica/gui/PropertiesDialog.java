@@ -722,6 +722,7 @@ class PropertiesControllerPanel
         final JTextField searchStr = new JTextField(20);
         searchStr.setPreferredSize(searchStr.getPreferredSize());
         final Action searchAction = new SearchAction(theDialog, searchStr);
+        searchStr.addActionListener(searchAction);
         final JButton searchButton = new JButton(searchAction);
         final JPanel searchPanel = new JPanel();
         searchPanel.add(searchStr);
@@ -787,8 +788,8 @@ class PropertiesControllerPanel
             putValue(MNEMONIC_KEY, KeyEvent.VK_S);
 
             this.text_field = text_field;
-            this.text_field.setToolTipText("Eneter string to search for");
-            // Get the JTabbedPane which conatins all the JPanels with all the options
+            this.text_field.setToolTipText("Enter string to search for");
+            // Get the JTabbedPane which contains all the JPanels with all the options
             final JComponent contp = (JComponent)dialog.getContentPane();  // we know for a JDialog this is really a JComponent
             final java.awt.Component[] components = contp.getComponents();
             for(int i = 0; i < contp.getComponentCount(); i++)
