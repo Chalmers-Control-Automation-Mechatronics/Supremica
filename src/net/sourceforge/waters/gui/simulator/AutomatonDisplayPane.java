@@ -7,9 +7,7 @@
 //# $Id$
 //###########################################################################
 
-
 package net.sourceforge.waters.gui.simulator;
-
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -79,6 +77,8 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
+import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class AutomatonDisplayPane
@@ -124,7 +124,8 @@ public class AutomatonDisplayPane
       height = (int) Math.ceil(imageRect.getHeight());
     }
     setPreferredSize(new Dimension(width, height));
-    setBackground(EditorColor.BACKGROUNDCOLOR);
+    mBackgroundListener =
+      Config.GUI_EDITOR_BACKGROUND_COLOR.addBackgroundListener(this);
     sim.attach(this);
     final MouseHandler handler = new MouseHandler();
     addMouseListener(handler);
@@ -251,12 +252,16 @@ public class AutomatonDisplayPane
 
   //#########################################################################
   //# Repaint Support
+  @Override
   public void close()
   {
+    Config.GUI_EDITOR_BACKGROUND_COLOR.
+      removePropertyChangeListener(mBackgroundListener);
     mSim.detach(this);
     super.close();
   }
 
+  @Override
   protected void graphChanged(final ModelChangeEvent event)
   {
     super.graphChanged(event);
@@ -855,6 +860,7 @@ public class AutomatonDisplayPane
   private final ModuleContainer mContainer;
   private final DisplayPanePopupFactory mPopupFactory;
   private final GraphToolTipVisitor mToolTipVisitor;
+  private final SupremicaPropertyChangeListener mBackgroundListener;
 
   private AffineTransform mTransform;
   private AffineTransform mInverseTransform;

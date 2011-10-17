@@ -609,7 +609,7 @@ public class AutomataSynthesizer
         final Automata supervisors = new Automata();
 
         // Selector - always start with non-max perm
-        final AutomataSelector selector = AutomataSelectorFactory.getAutomataSelector(aut, synthesizerOptions, true);   // MF Change here, return solitary specs
+        final AutomataSelector selector = AutomataSelectorFactory.getAutomataSelector(aut, synthesizerOptions, !synthesizerOptions.getRemoveUnecessarySupervisors());   // MF Change here, return solitary specs if we are not to remove unnecessary supervisors
 
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()

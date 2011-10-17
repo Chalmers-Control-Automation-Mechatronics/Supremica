@@ -1,16 +1,17 @@
 # Supremica specific to ignore
-bin/
-build/
-dist/
-logs/
-resources/
-src/org/supremica/Version.java
-src/org/supremica/manufacturingTables/xsd/eop
-src/org/supremica/manufacturingTables/xsd/il/
-src/org/supremica/manufacturingTables/xsd/pr/
-src/org/supremica/manufacturingTables/xsd/processeditor/
-src/org/supremica/manufacturingTables/xsd/vr/
-.supremica
+/bin/
+/build/
+/dist/
+/logs/
+/nbproject/private/
+/resources/
+/src/org/supremica/Version.java
+/src/org/supremica/manufacturingTables/xsd/eop
+/src/org/supremica/manufacturingTables/xsd/il/
+/src/org/supremica/manufacturingTables/xsd/pr/
+/src/org/supremica/manufacturingTables/xsd/processeditor/
+/src/org/supremica/manufacturingTables/xsd/vr/
+/.supremica
 
 # generic files to ignore
 *~
@@ -20,3 +21,5 @@ src/org/supremica/manufacturingTables/xsd/vr/
 *.DS_Store
 *.swp
 *.out
+junit*.properties
+Thumbs.db
