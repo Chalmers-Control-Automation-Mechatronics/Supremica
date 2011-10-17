@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @author  zhennan
  * @version 1.0
- * 
+ *
  */
 
 public class FORCEAlgorithmAdapter {
@@ -25,16 +25,16 @@ public class FORCEAlgorithmAdapter {
     private double lowest_cost; // lowest cost so far
     private double edge_start, edge_end; // internal variables, do not use
     private int dfs_count; // class global variable for labelling
-    private boolean use_win4; // are we useing the window4 methods or not?
-    
-    private Graph gf;
+    private final boolean use_win4; // are we useing the window4 methods or not?
+
+    private final Graph gf;
 
     /**
      * set use_win4 to true if you also would like to use a 4 node big sliding-window
      * exhaustive search.
      *
      */
-    public FORCEAlgorithmAdapter(Graph graph, boolean use_win4) {
+    public FORCEAlgorithmAdapter(final Graph graph, final boolean use_win4) {
         this.gf = graph;
         this.use_win4 = use_win4;
     }
@@ -50,19 +50,19 @@ public class FORCEAlgorithmAdapter {
 
         // create an array of nodes
         int idx = 0;
-        for (Enumeration<?> it = gf.getNodes().elements(); it.hasMoreElements(); idx++) {
+        for (final Enumeration<?> it = gf.getNodes().elements(); it.hasMoreElements(); idx++) {
             nodes[idx] = (Node) it.nextElement();
         }
 
         // get |Ev| in extra2 and |e| in extra3
         compute_cardinality();
-        
+
         // get ready
         int max_itr = (int) (STOP_CONST_C * Math.log(1 + size)); // max number of iterations
         if (max_itr < MIN_ITR) {
             max_itr = MIN_ITR;
         }
-        
+
         // iterate
         lowest_cost = Double.MAX_VALUE;
         for (int rounds = 0; rounds < TOTAL_ROUNDS; rounds++) {
@@ -78,7 +78,7 @@ public class FORCEAlgorithmAdapter {
             }
 
             // do a series of iterations
-            double span = iterate(max_itr);
+            final double span = iterate(max_itr);
 
             // see how good it was
             if (span < lowest_cost) {
@@ -94,7 +94,7 @@ public class FORCEAlgorithmAdapter {
     }
 
     // --------------------------------------------------------------
-    private boolean useWin4(double span) {
+    private boolean useWin4(final double span) {
         if (!use_win4) {
             return false;
         }
@@ -117,7 +117,7 @@ public class FORCEAlgorithmAdapter {
      * do max_itr iterations
      *
      */
-    private double iterate(int max_itr) {
+    private double iterate(final int max_itr) {
 
         // stop_conv is the number of time we can allow the same ordering_cost before we terminate
         int stop_cong = max_itr / 3;
@@ -131,7 +131,7 @@ public class FORCEAlgorithmAdapter {
         for (int itr = 0; itr < max_itr; itr++) {
             force();
 
-            double tmp = ordering_cost();
+            final double tmp = ordering_cost();
 
             // dont keep one forever if we have already converged!
             if (tmp == last) {
@@ -161,7 +161,7 @@ public class FORCEAlgorithmAdapter {
     private void force() {
         // 1. compute COG in extra4
         for (int i = 0; i < size; i++) {
-            Node n1 = nodes[i];
+            final Node n1 = nodes[i];
             double sum = n1.lv;
 
             Edge e = n1.firstOut;
@@ -181,7 +181,7 @@ public class FORCEAlgorithmAdapter {
 
         // 2. center
         for (int i = 0; i < size; i++) {
-            Node n1 = nodes[i];
+            final Node n1 = nodes[i];
 
             n1.lvp = n1.cog;
 
@@ -226,8 +226,8 @@ public class FORCEAlgorithmAdapter {
      * try a permutation of all possible orderings. since this is exponential,
      * we will only consider a sliding window of four elements
      */
-    private double window4(double current_span) {
-        int len = size - 4;
+    private double window4(final double current_span) {
+        final int len = size - 4;
 
         if (len < 1) {
             return current_span; // nothing can be done :(
@@ -274,7 +274,7 @@ public class FORCEAlgorithmAdapter {
                             nodes[ i + 2].lv = window_tmp[i3];
                             nodes[ i + 3].lv = window_tmp[i4];
 
-                            double span = ordering_cost();
+                            final double span = ordering_cost();
                             if (best > span) {
                                 best = span;
                                 save1 = i1;
@@ -350,9 +350,10 @@ public class FORCEAlgorithmAdapter {
     }
 
     /**
-     * max cut is the size of the largest cut in the graph.
-     * the i:th cut is the number of connections across level i + 0.5,
+     * Max cut is the size of the largest cut in the graph.
+     * The i:th cut is the number of connections across level i + 0.5.
      */
+    @SuppressWarnings("unused")
     private double max_cut() {
 
         // XXX: i am sure that there is a better way for doing so, but im am too tired to figure that out right now
@@ -382,9 +383,9 @@ public class FORCEAlgorithmAdapter {
     }
 
     /**
-     * max span is the size of the ongest hyper-edge
-     *
+     * Max span is the size of the longest hyper-edge.
      */
+    @SuppressWarnings("unused")
     private double max_span() {
         double span = 0;
 
@@ -396,11 +397,10 @@ public class FORCEAlgorithmAdapter {
     }
 
     /**
-     *  compute the total span.
+     * Computes the total span.
      *
      * Span of hyperedge:
      * difference between the greatest and smallest vertices connected by the same hyperedge
-     *
      */
     private double total_span() {
         double span = 0;
@@ -417,7 +417,7 @@ public class FORCEAlgorithmAdapter {
      * internal function to find the edges of an hyperedge :)
      * stores the results in edge_start and edge_end.
      */
-    private void find_hyperedge_ends(Node n1) {
+    private void find_hyperedge_ends(final Node n1) {
         // find the end points of this hyperedge
         double min = n1.lv;
         double max = n1.lv;
@@ -445,7 +445,7 @@ public class FORCEAlgorithmAdapter {
      * we must start with some initial order ...
      */
     private void create_random_order() {
-        int[] perm = Util.permutate(size);
+        final int[] perm = Util.permutate(size);
         for (int idx = 0; idx < size; idx++) {
             nodes[idx].lv = perm[idx];
         }
@@ -461,7 +461,7 @@ public class FORCEAlgorithmAdapter {
     }
 
     // do DFS labelling starting from this node
-    private void dfs_label(Node root) {
+    private void dfs_label(final Node root) {
         dfs_count = 0;
 
         for (int i = 0; i < size; i++) {
@@ -477,7 +477,7 @@ public class FORCEAlgorithmAdapter {
     }
 
     // the recusrive part of DFS_label
-    private void dfs_label_rec(Node n) {
+    private void dfs_label_rec(final Node n) {
         if (n.lv != -1) {
             return;
         }

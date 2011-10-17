@@ -29,7 +29,7 @@ A short tutorial on how to compile and run Supremica is following.
     Enter a directory where you want to store the Supremica files,
     e.g. "/home/ka/projects". To checkout the sources, write:
 
-    > git clone https://github.com/Chalmers-Control-Automation-Mechatronics/Supremica.git
+    > git clone git@github.com:Chalmers-Control-Automation-Mechatronics/Supremica.git
 
     If you have licensed version of JGo and/or JGo Layout then
     copy the licensed jar files to lib/licensed

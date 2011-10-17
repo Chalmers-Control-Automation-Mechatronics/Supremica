@@ -8,7 +8,6 @@ package org.supremica.automata.BDD.EFA;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
-import java.util.ArrayList;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +25,7 @@ import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+
 import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.PSupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.ResultOverflows;
@@ -46,7 +46,7 @@ public class BDDExtendedManager
     private Map<String, Integer> variableStringToIndexMap;
 
     BDDExtendedAutomata bddExAutomata;
-    
+
     public BDDExtendedManager()
     {
         this(BDDLibraryType.fromDescription(Config.BDD2_BDDLIBRARY.getAsString()));
@@ -67,7 +67,7 @@ public class BDDExtendedManager
             factory.setCacheRatio(Config.BDD2_CACHERATIO.get());
         }
     }
-    
+
     public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final BDDFactory mFactory, final int bitnum)
     {
         if(P_TC == 0)
@@ -142,9 +142,9 @@ public class BDDExtendedManager
         return factory.extDomain(size);
     }
 
-    public void partialReverseVarOrdering(int[] varOrdering)
+    public void partialReverseVarOrdering(final int[] varOrdering)
     {
-        int[] updatedVarOrdering = factory.getVarOrder();
+        final int[] updatedVarOrdering = factory.getVarOrder();
         for(int i = 0; i<varOrdering.length; i++)
         {
             updatedVarOrdering[varOrdering[i]] = varOrdering[varOrdering.length-1-i];
@@ -503,7 +503,7 @@ public class BDDExtendedManager
         bdd.orWith(sourceBDD);
     }
 
-    private int getMin(int[] array)
+    private int getMin(final int[] array)
     {
         int min = Integer.MAX_VALUE;
         for(int i = 0; i < array.length; i++)
@@ -520,17 +520,17 @@ public class BDDExtendedManager
         We assume the the most significant bit is at the top of the variable ordering.
         'bdd' represents the values for one single clock.
      */
-    public int getMinimalValue(BDD bdd)
+    public int getMinimalValue(final BDD bdd)
     {
         int minValue = 0;
 
-        String nameOfClock = bddExAutomata.getAutVarName(bdd.var());        
-        int minBDDVarContent =  getMin(bddExAutomata.getSourceVariableDomain(nameOfClock).vars());
+        final String nameOfClock = bddExAutomata.getAutVarName(bdd.var());
+        final int minBDDVarContent =  getMin(bddExAutomata.getSourceVariableDomain(nameOfClock).vars());
 
         BDD iterateBDD = bdd.id();
         while(!iterateBDD.isOne())
         {
-            BDD lowChild = iterateBDD.low();
+            final BDD lowChild = iterateBDD.low();
             BDD nextIterateBDD = lowChild.id();
 
             if(lowChild.isZero())
@@ -559,7 +559,7 @@ public class BDDExtendedManager
         final BDD t2 = edges.getSpecMonolithicUncontrollableEdgesForwardBDD().and(t1).exist(bddExAutomata.getDestStatesVarSet());
         return t1.and(t2.not()).exist(bddExAutomata.getDestStatesVarSet()).exist(bddExAutomata.getEventVarSet());
         }
-        
+
     }
 
     public BDD uncontrollableBackward(final BDD forbidden)
@@ -672,11 +672,11 @@ public class BDDExtendedManager
                     bddExAutomata.getSourceVariableDomain(nameOfClock).size().intValue(),minClockValue);
             SupremicaBDDBitVector clockBDDVec = bddExAutomata.getBDDBitVecSource(nameOfClock);
 
-            BDD extendedClockBDD = clockBDDVec.gte(minClockValueBDDVec);           
+            BDD extendedClockBDD = clockBDDVec.gte(minClockValueBDDVec);
             Qm = Qm.or(extendedClockBDD);
 */
             Qkn = (Qk.or(Qm)).and(forbidden.not());
-            
+
         } while (!Qkn.equals(Qk));
 
 //        try{out.close();}catch (final Exception e){}
@@ -722,28 +722,28 @@ public class BDDExtendedManager
      /** Return a set of initial uncontrollable states. */
     BDD getDisjunctiveInitiallyUncontrollableStates()
     {
-        
+
         if (bddExAutomata.plants.isEmpty() || bddExAutomata.specs.isEmpty()) {
             return getZeroBDD();
         } else {
-            
+
             final TIntArrayList plantUncontrollableEvents = bddExAutomata.plantUncontrollableEventIndexList;
             final TIntArrayList specUncontrollableEvents = bddExAutomata.specUncontrollableEventIndexList;
-            
-            final TIntObjectHashMap<BDD> plantsEnabledStates = 
+
+            final TIntObjectHashMap<BDD> plantsEnabledStates =
                     new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.plants, plantUncontrollableEvents).getUncontrollableEvents2EnabledStates();
-            final TIntObjectHashMap<BDD> specEnabledStates = 
+            final TIntObjectHashMap<BDD> specEnabledStates =
                     new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents).getUncontrollableEvents2EnabledStates();
-            
+
             final BDD uncontrollableStates = getZeroBDD();
-            
+
             for (int i = 0; i < specUncontrollableEvents.size(); i++) {
                 if (plantUncontrollableEvents.contains(specUncontrollableEvents.get(i))) {
                     final int eventIndex = specUncontrollableEvents.get(i);
                     uncontrollableStates.orWith(plantsEnabledStates.get(eventIndex).and(specEnabledStates.get(eventIndex).not()));
                 }
             }
-            
+
             return uncontrollableStates;
         }
     }
