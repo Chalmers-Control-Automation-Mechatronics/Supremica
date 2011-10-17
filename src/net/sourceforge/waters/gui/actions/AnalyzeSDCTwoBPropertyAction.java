@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   AnalyzeSICProperty6Action
 //###########################################################################
-//# $Id: AnalyzeSICProperty6Action.java 5926 2010-09-23 03:54:41Z robi $
+//# $Id$
 //###########################################################################
 
 

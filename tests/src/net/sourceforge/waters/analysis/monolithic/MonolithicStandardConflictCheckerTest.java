@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicConflictCheckerTest
 //###########################################################################
-//# $Id: MonolithicConflictCheckerTest.java 4962 2009-12-15 02:23:35Z rmf18 $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;

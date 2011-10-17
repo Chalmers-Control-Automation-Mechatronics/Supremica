@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeLanguageInclusionChecker
 //###########################################################################
-//# $Id: NativeLanguageInclusionChecker.java 5927 2010-09-24 04:54:47Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.abstraction;

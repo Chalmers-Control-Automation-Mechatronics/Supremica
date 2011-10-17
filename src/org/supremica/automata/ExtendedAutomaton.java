@@ -269,7 +269,6 @@ public class ExtendedAutomaton
                     unconAlphabetString.add(e.getName());
                 }
             }
-//            System.err.println(edge.getSource()+"-->"+edge.getTarget());
             locationToOutgoingEdgesMap.get(edge.getSource()).add(edge);
             locationToIngoingEdgesMap.get(edge.getTarget()).add(edge);
         }

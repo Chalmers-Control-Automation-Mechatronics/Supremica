@@ -263,7 +263,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                 eventDomain = manager.createDomain(((List<EventDeclProxy>) obj).size());
                 eventDomain.setName("Events");
                 numberOfUsedBDDVariables += eventDomain.varNum();
-        //        System.err.println("event variables: "+eventDomain.set().toString());
+//                System.err.println("event variables: "+eventDomain.set().toString());
         /*        for(EventDeclProxy e: orgExAutomata.unionAlphabet)
                 {
                     System.out.println(e.getName()+": "+getEventIndex(e));
@@ -311,7 +311,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                     bddVar2AutVarName.put(sourceVars[i], automatonName);
                 }
 
-    //            System.err.println("sourceLocation variables: "+sourceLocationDomain.set().toString());
+//                System.err.println("sourceLocation variables: "+sourceLocationDomain.set().toString());
                 final BDDDomain destLocationDomain = manager.createDomain(nbrOfStates);
                 numberOfUsedBDDVariables += destLocationDomain.varNum();
 
@@ -388,6 +388,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
 
         System.err.println("Variable ordering: "+variableOrderingNames);
+//        for(int i = 0; i < manager.getFactory().getVarOrder().length; i++)
+//            System.out.println(i+": "+manager.getFactory().getVarOrder()[i]);
 //        System.out.println("number of transitions: "+((BDDMonolithicTransitions)bddTransitions).transitionForwardBDD.pathCount());
     }
 
@@ -499,10 +501,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         final int domain = orgExAutomata.getVarDomain(varName);
 
         final BDDDomain tempVarDomain = manager.createDomain(domain);
+        manager.partialReverseVarOrdering(tempVarDomain.vars());
 //        System.err.println("tempVar variables: "+tempVarDomain.set().toString());
         final BDDDomain sourceVarDomain = manager.createDomain(domain);
-        numberOfUsedBDDVariables += sourceVarDomain.varNum();
+        manager.partialReverseVarOrdering(sourceVarDomain.vars());
 
+        numberOfUsedBDDVariables += sourceVarDomain.varNum();
 
         final int[] sourceVars = sourceVarDomain.vars();
         for(int i = 0; i<sourceVars.length; i++)
@@ -518,6 +522,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         sourceVariablesVarSet.unionWith(sourceVarDomain.set());
 
         final BDDDomain destVarDomain = manager.createDomain(domain);
+        manager.partialReverseVarOrdering(destVarDomain.vars());
+
         numberOfUsedBDDVariables += destVarDomain.varNum();
 //        System.err.println("destVar variables: "+destVarDomain.set().toString());
         BDDBitVecTargetVarsMap.put(var.getName(), manager.createSupremicaBDDBitVector(BDDBitVectoryType, manager.getFactory(),destVarDomain));
@@ -561,6 +567,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     public BDDDomain getSourceLocationDomain(final String automaton)
     {
         return sourceLocationDomains[theIndexMap.getExAutomatonIndex(automaton)];
+    }
+
+    public BDDDomain getSourceVariableDomain(final String variable)
+    {
+        return sourceVarDomains[theIndexMap.getVariableIndexByName(variable)];
     }
 
     public BDDDomain getDestLocationDomain(final String automaton)
@@ -701,7 +712,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
     public BDD getInitialState()
     {
-//        return (initValuesBDD);
+ //       return (initialLocationsBDD);
         return initialLocationsBDD.and(initValuesBDD);
     }
 
@@ -805,7 +816,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             
             //nbrOfReachableStates = nbrOfStatesBDD(reachableStatesBDD);
             final IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
-            nbrOfReachableStates = nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).longValue();
+            nbrOfReachableStates = nbrOfStatesIDD(idd).longValue();
 //            nbrOfReachableStates = -1;
 
 
@@ -839,7 +850,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             System.err.println("Coreachable states computed!");
             //nbrOfCoreachableStates = nbrOfStatesBDD(coreachableStatesBDD);
             final IDD idd = generateIDD(coreachableStatesBDD, coreachableStatesBDD);
-            nbrOfCoreachableStates = nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).longValue();
+            nbrOfCoreachableStates = nbrOfStatesIDD(idd).longValue();
 //            nbrOfCoreachableStates = 1;
         }
 
@@ -862,10 +873,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             }
 
             System.err.println("Nonblocking and controllable states computed!");
-
             //nbrOfNonblockingControllableStates = nbrOfStatesBDD(nonblockingControllableStatesBDD);
+
             final IDD idd = generateIDD(nonblockingControllableStatesBDD, nonblockingControllableStatesBDD);
-            nbrOfNonblockingControllableStates = nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).longValue();
+            nbrOfNonblockingControllableStates = nbrOfStatesIDD(idd).longValue();
         }
 
         return nonblockingControllableStatesBDD;
@@ -900,7 +911,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
             //nbrOfControllableStates = nbrOfStatesBDD(controllableStatesBDD);
             final IDD idd = generateIDD(controllableStatesBDD, controllableStatesBDD);
-            nbrOfControllableStates = nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).longValue();
+            nbrOfControllableStates = nbrOfStatesIDD(idd).longValue();
         }
 
         return controllableStatesBDD;
@@ -911,7 +922,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         if (nonblockingStatesBDD == null)
         {
 //            System.err.println("Marked states: "+nbrOfStatesBDD(getMarkedStates()));
+            System.err.println("Start computing reachable states...");
             reachableStatesBDD = getReachableStates();
+            System.err.println("Start computing coreachable states...");
 //            reachableStatesBDD.printDot();
             coreachableStatesBDD = getCoreachableStates();
 
@@ -933,7 +946,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 //            BDD2IDD2PS(nonblockingStatesBDD, nonblockingStatesBDD, "nonblockingStates");
             System.err.println("Nonblocking states computed!");
             final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
-            nbrOfNonblockingStates = nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).longValue();
+            nbrOfNonblockingStates = nbrOfStatesIDD(idd).longValue();
 //            nbrOfNonblockingStates = 1;
 
             nbrOfBlockingStates = nbrOfReachableStates - nbrOfNonblockingStates;
@@ -1161,6 +1174,32 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
     }
 
+    public BigInteger nbrOfStatesIDD(final IDD idd)
+    {
+        //iterate through the idd-variables and find the first one that corresponds to a varibale or automaton
+        if(idd.getRoot().getName().equals("0"))
+            return BigInteger.ZERO;
+        
+        String firstVarAut = "";
+        for(Object va:variableOrdering)
+        {
+            if(va instanceof ExtendedAutomaton)
+            {
+                firstVarAut = ((ExtendedAutomaton)va).getName();
+                break;
+            }
+            if(va instanceof VariableComponentProxy)
+            {
+                firstVarAut = ((VariableComponentProxy)va).getName();
+                break;
+            }
+        }
+        int indexVar1 = variableOrderingNames.indexOf(firstVarAut);
+        int indexVar2 = variableOrderingNames.indexOf(idd.getRoot().getName());
+        return nbrOfStatesIDD(idd,new HashMap<IDDNode,BigInteger>()).multiply(statesBetweenVars(indexVar1,indexVar2));
+    }
+
+
     public BigInteger nbrOfStatesIDD(final IDD idd, final HashMap<IDDNode,BigInteger> cache)
     {
         BigInteger nbrOfStates = BigInteger.ZERO;
@@ -1172,14 +1211,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         {
             for(final IDD child: idd.getChildren())
             {
-                final BigInteger statesBetweenChildren = statesBetweenVars(idd.getRoot().getName(),child.getRoot().getName());
-                final long currStates = idd.labelOfChild(child).size();
+                int indexVar1 = variableOrderingNames.indexOf(idd.getRoot().getName());
+                int indexVar2 = variableOrderingNames.indexOf(child.getRoot().getName());
+                final BigInteger statesBetweenChildren = statesBetweenVars(indexVar1+1,indexVar2);
+                final BigInteger currStates = BigInteger.valueOf(idd.labelOfChild(child).size());
                 BigInteger newNbrOfStates = cache.get(child.getRoot());
                 if(newNbrOfStates == null)
                 {
                     newNbrOfStates = nbrOfStatesIDD(child, cache);
                 }
-                nbrOfStates = nbrOfStates.add(statesBetweenChildren.multiply(newNbrOfStates.multiply(BigInteger.valueOf(currStates))));
+                nbrOfStates = nbrOfStates.add(statesBetweenChildren.multiply(newNbrOfStates.multiply(currStates)));
             }
         }
         cache.put(idd.getRoot(), nbrOfStates);
@@ -1187,14 +1228,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
     }
 
-    public BigInteger statesBetweenVars(final String var1, final String var2)
+    public BigInteger statesBetweenVars(final int indexVar1, final int indexVar2)
     {
         BigInteger output = BigInteger.ONE;
-        if(!var1.equals("1"))
+        if(!(variableOrderingNames.get(indexVar1)).equals("1"))
         {
-            final int indexVar1 = variableOrderingNames.indexOf(var1);
-            final int indexVar2 = variableOrderingNames.indexOf(var2);
-            for(final String var:variableOrderingNames.subList(indexVar1+1, indexVar2))
+            for(final String var:variableOrderingNames.subList(indexVar1, indexVar2))
             {
                 final int isAutomaton = theIndexMap.isStringEFAorVar(var);
                 if(isAutomaton == 0)

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
 //# CLASS:   RemovalOfAlphaMarkingsRuleTest
 //###########################################################################
-//# $Id: RemovalOfAlphaMarkingsRuleTest.java 5431 2010-03-29 10:26:57Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.gnonblocking;

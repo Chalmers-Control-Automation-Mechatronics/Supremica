@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
 //# CLASS:   CompositionalVerificationResult
 //###########################################################################
-//# $Id: CompositionalVerificationResult.java 6387 2011-07-30 10:29:50Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.abstraction;

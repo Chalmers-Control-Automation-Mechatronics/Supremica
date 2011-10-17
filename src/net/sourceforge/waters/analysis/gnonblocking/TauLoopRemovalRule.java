@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
 //# CLASS:   ObservationEquivalenceRule
 //###########################################################################
-//# $Id: ObservationEquivalenceRule.java 5596 2010-04-29 23:44:19Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.gnonblocking;

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AnalyzerSynthesizerAction
 //###########################################################################
-//# $Id: AnalyzerSynthesizerAction.java 4750 2009-09-01 00:33:54Z robi $
+//# $Id$
 //###########################################################################
 
 package org.supremica.gui.ide.actions;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingModelVerifierFactory
 //###########################################################################
-//# $Id: ProjectingModelVerifierFactory.java 4468 2008-11-01 21:54:58Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;

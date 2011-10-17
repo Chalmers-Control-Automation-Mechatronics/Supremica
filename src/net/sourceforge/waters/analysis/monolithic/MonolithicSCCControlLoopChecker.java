@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: MonolithicControlLoopChecker.java 5540 2010-04-14 10:47:01Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;

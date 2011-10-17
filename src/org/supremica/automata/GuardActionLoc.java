@@ -28,7 +28,7 @@ public class GuardActionLoc {
         this.guards = guardActionBlock.getGuards();
         this.actions = guardActionBlock.getActions();
         this.location = location;
-    }
+}
 
     public GuardActionBlockProxy getGuardActionBlock()
     {
