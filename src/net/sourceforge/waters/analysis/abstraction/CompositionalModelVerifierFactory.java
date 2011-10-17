@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.composing
 //# CLASS:   ComposeModelVerifierFactory
 //###########################################################################
-//# $Id: ComposingModelVerifierFactory.java 6059 2011-04-21 10:42:50Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.abstraction;

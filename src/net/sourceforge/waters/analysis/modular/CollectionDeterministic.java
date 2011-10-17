@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   DeterministicStateADT
 //###########################################################################
-//# $Id: Projection2.java 5752 2010-06-04 04:53:20Z craig $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;

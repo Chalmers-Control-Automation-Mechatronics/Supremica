@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicControlLoopCheckerTest
 //###########################################################################
-//# $Id: MonolithicControlLoopCheckerTest.java 4526 2008-11-17 01:35:52Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
