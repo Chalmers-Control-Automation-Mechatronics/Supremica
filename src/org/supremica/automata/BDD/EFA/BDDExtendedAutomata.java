@@ -248,20 +248,21 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
 
 //        System.out.println("domain: "+orgExAutomata.getDomain());
-        setVariableOrdering();
+        //setVariableOrdering();
         // Set after the IDD bug is fixed.
-//        if(synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
-//            setVariableOrdering();
-//        else{
-//            FORCEAutomatonVariableSorter forceSorter = new FORCEAutomatonVariableSorter(orgExAutomata);
-//            forceSorter.sort();
-//
-//            variableOrdering.addAll(forceSorter.getVariableOrdering());
-//            variableOrdering.add(unionAlphabet);
-//
-//            variableOrderingNames.addAll(forceSorter.getVariableOrderingNames());
-//            variableOrderingNames.add("Events");
-//        }
+        if(synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
+            setVariableOrdering();
+        else{
+            FORCEAutomatonVariableSorter forceSorter = new FORCEAutomatonVariableSorter(orgExAutomata);
+            forceSorter.sort();
+
+            variableOrdering.addAll(forceSorter.getVariableOrdering());
+            variableOrdering.add(unionAlphabet);
+
+            variableOrderingNames.addAll(forceSorter.getVariableOrderingNames());
+            variableOrderingNames.add("Events");
+            variableOrderingNames.add("1");
+        }
 
         //Manually set the variable ordering
 //        manuallySetVariableOrderingNames();
