@@ -11,7 +11,6 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -28,22 +27,22 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Robi Malik
  */
 
-public abstract class AbstractAutomatonBuilder<P extends Proxy>
-  extends AbstractModelAnalyzer
-  implements AutomatonBuilder<P>
+public abstract class AbstractAutomatonBuilder
+  extends AbstractModelBuilder<AutomatonProxy>
+  implements AutomatonBuilder
 {
 
   //#########################################################################
   //# Constructors
   public AbstractAutomatonBuilder(final ProductDESProxyFactory factory)
   {
-    super(factory, IdenticalKindTranslator.getInstance());
+    super(factory);
   }
 
   public AbstractAutomatonBuilder(final ProductDESProxy model,
                                   final ProductDESProxyFactory factory)
   {
-    super(model, factory, IdenticalKindTranslator.getInstance());
+    super(model, factory);
   }
 
   public AbstractAutomatonBuilder(final ProductDESProxy model,
@@ -56,7 +55,7 @@ public abstract class AbstractAutomatonBuilder<P extends Proxy>
   public AbstractAutomatonBuilder(final AutomatonProxy aut,
                                   final ProductDESProxyFactory factory)
   {
-    super(aut, factory, IdenticalKindTranslator.getInstance());
+    super(aut, factory);
   }
 
   public AbstractAutomatonBuilder(final AutomatonProxy aut,
@@ -69,16 +68,6 @@ public abstract class AbstractAutomatonBuilder<P extends Proxy>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.AutomatonBuilder
-  public void setOutputName(final String name)
-  {
-    mOuptutName = name;
-  }
-
-  public String getOutputName()
-  {
-    return mOuptutName;
-  }
-
   public void setOutputKind(final ComponentKind kind)
   {
     mOutputKind = kind;
@@ -89,38 +78,24 @@ public abstract class AbstractAutomatonBuilder<P extends Proxy>
     return mOutputKind;
   }
 
-  public void setConstructsResult(final boolean construct)
+  public AutomatonProxy getComputedAutomaton()
   {
-    mConstructsResult = construct;
+    return getComputedProxy();
   }
 
-  public boolean getConstructsResult()
+  @Override
+  public AutomatonResult getAnalysisResult()
   {
-    return mConstructsResult;
-  }
-
-  public P getComputedProxy()
-  {
-    final AutomatonResult<P> result = getAnalysisResult();
-    if (result != null) {
-      return result.getComputedProxy();
-    } else {
-      throw new IllegalStateException("Call run() first!");
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public AutomatonResult<P> getAnalysisResult()
-  {
-    return (AutomatonResult<P>) super.getAnalysisResult();
+    return (AutomatonResult) super.getAnalysisResult();
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
-  protected AutomatonResult<P> createAnalysisResult()
+  @Override
+  protected AutomatonResult createAnalysisResult()
   {
-    return new AutomatonResult<P>();
+    return new DefaultAutomatonResult();
   }
 
 
@@ -130,44 +105,14 @@ public abstract class AbstractAutomatonBuilder<P extends Proxy>
    * Stores an automaton result indicating successful computation.
    * Setting the automaton also marks the analysis run as completed and
    * sets the Boolean result.
-   * @param  proxy    The computed automaton, or <CODE>null</CODE> to
+   * @param  aut    The computed automaton, or <CODE>null</CODE> to
    *                indicate an unsuccessful computation. The Boolean analysis
    *                result is set to <CODE>false</CODE> if and only if this
    *                parameter is <CODE>null</CODE>.
    */
-  protected boolean setAutomatonResult(final P proxy)
+  protected boolean setAutomatonResult(final AutomatonProxy aut)
   {
-    final AutomatonResult<P> result = getAnalysisResult();
-    result.setComputedProxy(proxy);
-    return result.isSatisfied();
-  }
-
-  /**
-   * Computes a name for the output object.
-   * @return The name set by the user, if present, or a default name computed
-   *         from the names of the automata in the input model.
-   * @see #setOutputName(String) setOutputName()
-   */
-  protected String computeOutputName()
-  {
-    if (mOuptutName != null) {
-      return mOuptutName;
-    } else {
-      final StringBuffer buffer = new StringBuffer("{");
-      final ProductDESProxy model = getModel();
-      final Collection<AutomatonProxy> automata = model.getAutomata();
-      boolean first = true;
-      for (final AutomatonProxy aut : automata) {
-        if (first) {
-          first = false;
-        } else {
-          buffer.append(',');
-        }
-        buffer.append(aut.getName());
-      }
-      buffer.append('}');
-      return buffer.toString();
-    }
+    return setProxyResult(aut);
   }
 
   /**
@@ -201,9 +146,7 @@ public abstract class AbstractAutomatonBuilder<P extends Proxy>
 
   //#########################################################################
   //# Data Members
-  private String mOuptutName;
   private ComponentKind mOutputKind;
-  private boolean mConstructsResult = true;
 
 }
 

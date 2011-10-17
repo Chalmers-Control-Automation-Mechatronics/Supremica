@@ -224,34 +224,14 @@ public class HalfWaySynthesisTRSimplifierTest
     final String name = "HalfwaySynthesis_9.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
-  /**
-   * A test to see whether a single abstraction rule object can perform multiple
-   * abstractions in sequence.
-  public void testReentrant() throws Exception
+
+  public void test_HalfwaySynthesis_10() throws Exception
   {
-    test_noncoreachableStatesRemoval_1();
-    test_reachableLoop();
-    test_noncoreachableStatesRemoval_3();
-    test_selfLoops();
-    test_reachableBeforeNotAfter();
-    test_multipleIncomingTransitions();
-    test_multipleOutgoingTransitions();
-    test_noncoreachableStatesRemoval_2();
-    test_noTransitions();
-    test_unreachableLoop();
-    test_noncoreachableStatesRemoval_1();
-    test_selfLoops();
-    test_reachableBeforeNotAfter();
-    test_noncoreachableStatesRemoval_2();
-    test_stateWithReachableAndNonreachablePath();
-    test_noTransitions();
-    test_unreachableLoop();
-    test_noncoreachableStatesRemoval_3();
-    test_multipleOutgoingTransitions();
-    test_stateWithReachableAndNonreachablePath();
-    test_reachableLoop();
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "HalfwaySynthesis_10.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
   }
-  */
 
   @Override
   public void test_basic_7() throws Exception
@@ -260,6 +240,23 @@ public class HalfWaySynthesisTRSimplifierTest
     final String subdir = "abstraction";
     final String name = "HalfwaySynthesisBasic_7.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  /**
+   * A test to see whether a single abstraction rule object can perform
+   * multiple abstractions in sequence.
+   */
+  public void testReentrant() throws Exception
+  {
+    test_HalfwaySynthesis_1();
+    test_HalfwaySynthesis_2();
+    test_HalfwaySynthesis_3();
+    test_HalfwaySynthesis_4();
+    test_HalfwaySynthesis_5();
+    test_HalfwaySynthesis_4();
+    test_HalfwaySynthesis_3();
+    test_HalfwaySynthesis_2();
+    test_HalfwaySynthesis_1();
   }
 
 

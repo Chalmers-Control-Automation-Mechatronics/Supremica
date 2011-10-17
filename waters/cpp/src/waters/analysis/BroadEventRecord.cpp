@@ -139,7 +139,7 @@ compareForBackwardSearch(const void* elem1, const void* elem2)
 
 bool BroadEventRecord::
 addDeterministicTransition(const AutomatonRecord* aut,
-                           uint32 source, uint32 target)
+                           uint32_t source, uint32_t target)
 {
   if (mIsGloballyDisabled) {
     return true;
@@ -154,7 +154,7 @@ addDeterministicTransition(const AutomatonRecord* aut,
 
 void BroadEventRecord::
 addNondeterministicTransition(const AutomatonRecord* aut,
-                              uint32 source, uint32 target)
+                              uint32_t source, uint32_t target)
 {
   if (mUsedSearchRecords != 0 && mUsedSearchRecords->getAutomaton() == aut) {
     mUsedSearchRecords->addNondeterministicTransition(source, target);
@@ -273,7 +273,7 @@ setupNotTakenSearchRecords()
 }
 
 void BroadEventRecord::
-markTransitionsTaken(const uint32* tuple)
+markTransitionsTaken(const uint32_t* tuple)
 {
   TransitionRecord* prev = 0;
   TransitionRecord* trans = mNotTakenSearchRecords;
@@ -347,8 +347,8 @@ reverse()
 //# BroadEventRecord: Trace Computation
 
 void BroadEventRecord::
-storeNondeterministicTargets(const uint32* sourcetuple,
-                             const uint32* targettuple,
+storeNondeterministicTargets(const uint32_t* sourcetuple,
+                             const uint32_t* targettuple,
                              const jni::MapGlue& map)
   const
 {
@@ -401,18 +401,18 @@ addReversedList(TransitionRecord* trans)
         enqueueSearchRecord(trans);
       } else {
         const AutomatonRecord* aut = trans->getAutomaton();
-        const uint32 numstates = aut->getNumberOfStates();
+        const uint32_t numstates = aut->getNumberOfStates();
         const int shift = aut->getShift();
         trans->setNextInSearch(0);
         TransitionRecord* reversed = new TransitionRecord(aut, 0, trans);
         int maxpass = 1;
         for (int pass = 1; pass <= maxpass; pass++) {
-          for (uint32 source = 0; source < numstates; source++) {
-            const uint32 numsucc = trans->getNumberOfSuccessors(source);
-            for (uint32 offset = 0; offset < numsucc; offset++) {
-              const uint32 shiftedtarget =
+          for (uint32_t source = 0; source < numstates; source++) {
+            const uint32_t numsucc = trans->getNumberOfSuccessors(source);
+            for (uint32_t offset = 0; offset < numsucc; offset++) {
+              const uint32_t shiftedtarget =
                 trans->getSuccessorShifted(source, offset);
-              const uint32 target = shiftedtarget >> shift;
+              const uint32_t target = shiftedtarget >> shift;
               if (pass == 1) {
                 if (!reversed->addDeterministicTransition(target, source)) {
                   maxpass = 2;
@@ -462,8 +462,8 @@ clearSearchAndUpdateRecords()
 
 void BroadEventRecord::
 storeNondeterministicTargets(TransitionRecord* trans,
-                             const uint32* sourcetuple,
-                             const uint32* targettuple,
+                             const uint32_t* sourcetuple,
+                             const uint32_t* targettuple,
                              const jni::MapGlue& map)
   const
 {
@@ -490,12 +490,12 @@ dumpTransitionRecords()
     const AutomatonRecord* aut = trans->getAutomaton();
     std::cerr << "  " << (const char*) aut->getName()
               << " (" << aut->getAutomatonIndex() << ") [";
-    uint32 numstates = aut->getNumberOfStates();
-    for (uint32 state = 0; state < numstates; state++) {
+    uint32_t numstates = aut->getNumberOfStates();
+    for (uint32_t state = 0; state < numstates; state++) {
       if (state > 0) {
         std::cerr << ',';
       }
-      uint32 shifted = trans->getDeterministicSuccessorShifted(state);
+      uint32_t shifted = trans->getDeterministicSuccessorShifted(state);
       switch (shifted) {
       case TransitionRecord::NO_TRANSITION:
         std::cerr << '-';

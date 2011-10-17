@@ -22,7 +22,7 @@
 #include <jni.h>
 
 #include "waters/base/CodeIterator.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace waters {
@@ -36,22 +36,22 @@ class GlobalAlphabet
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit GlobalAlphabet(uint32 numuncont, uint32 numcont);
+  explicit GlobalAlphabet(uint32_t numuncont, uint32_t numcont);
   ~GlobalAlphabet();
 
   //##########################################################################
   //# Initialisation
-  void initEventName(uint32 code, jstring name);
+  void initEventName(uint32_t code, jstring name);
 
   //##########################################################################
   //# Simple Access
-  uint32 getNumEvents() const
+  uint32_t getNumEvents() const
     {return mNumEvents;};
-  bool isUncontrollable(uint32 code) const
+  bool isUncontrollable(uint32_t code) const
     {return code < mFirstControllable;};
-  bool isControllable(uint32 code) const
+  bool isControllable(uint32_t code) const
     {return code >= mFirstControllable;};
-  jstring getEventName(uint32 code) const
+  jstring getEventName(uint32_t code) const
     {return mEventNames[code];};
 
   //##########################################################################
@@ -66,8 +66,8 @@ public:
 private:
   //##########################################################################
   //# Data Members
-  const uint32 mFirstControllable;
-  const uint32 mNumEvents;
+  const uint32_t mFirstControllable;
+  const uint32_t mNumEvents;
   jstring* mEventNames;
 };
 

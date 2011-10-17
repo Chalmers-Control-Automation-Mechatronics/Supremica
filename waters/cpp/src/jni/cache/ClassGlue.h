@@ -4,7 +4,7 @@
 //# PACKAGE: jni.javah
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlue.h,v 1.2 2005-11-05 09:47:15 robi Exp $
+//# $Id$
 //###########################################################################
 
 
@@ -21,11 +21,7 @@
 
 #include <jni.h>
 
-#include "waters/base/IntTypes.h"
-
-namespace waters {
-  class HashAccessor;
-}
+#include <stdint.h>
 
 
 namespace jni {
@@ -75,9 +71,9 @@ public:
   //# Access
   const ClassKey* getClassKey() const {return &mKey;};
   jclass getJavaClass() const {return mKey.getJavaClass();};
-  jmethodID getMethodID(waters::uint32 methodcode);
-  jmethodID getStaticMethodID(waters::uint32 methodcode);
-  jobject getStaticFinalField(waters::uint32 fieldcode);
+  jmethodID getMethodID(uint32_t methodcode);
+  jmethodID getStaticMethodID(uint32_t methodcode);
+  jobject getStaticFinalField(uint32_t fieldcode);
   JNIEnv* getEnvironment() const {return mEnvironment;};
 
 private:

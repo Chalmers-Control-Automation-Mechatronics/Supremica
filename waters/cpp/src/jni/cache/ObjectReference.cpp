@@ -26,14 +26,14 @@ namespace jni {
 //# ObjectReference: Constructors & Destructors
 
 ObjectReference::
-ObjectReference(waters::uint32 classcode, ClassCache* cache)
+ObjectReference(uint32_t classcode, ClassCache* cache)
 {
   mClass = cache->getClass(classcode);
 }
 
 ObjectReference::
 ObjectReference(jobject javaobject,
-                waters::uint32 classcode,
+                uint32_t classcode,
                 ClassCache* cache,
                 bool global)
 {
@@ -41,7 +41,7 @@ ObjectReference(jobject javaobject,
     JNIEnv* env = cache->getEnvironment();
     jclass javaclass = env->GetObjectClass(javaobject);
     mClass = cache->getClass(javaclass, classcode);
-    mRefCount = global ? UNDEF_UINT32 : 1;
+    mRefCount = global ? UINT32_MAX : 1;
   } else {
     cache->throwJavaException
       (CLASS_NullPointerException, "Trying to create NULL object!");
@@ -73,19 +73,19 @@ initJavaObject(jobject javaobject)
   mRefCount = 1;
 }
 
-waters::uint32 ObjectReference::
+uint32_t ObjectReference::
 addReference()
 {
-  if (mRefCount < UNDEF_UINT32) {
+  if (mRefCount < UINT32_MAX) {
     mRefCount++;
   }
   return mRefCount;
 }
 
-waters::uint32 ObjectReference::
+uint32_t ObjectReference::
 removeReference()
 {
-  if (mRefCount < UNDEF_UINT32) {
+  if (mRefCount < UINT32_MAX) {
     mRefCount--;
   }
   return mRefCount;

@@ -4,7 +4,7 @@
 //# PACKAGE: jni.javah
 //# CLASS:   PreJavaException
 //###########################################################################
-//# $Id: PreJavaException.h,v 1.3 2006-11-15 01:26:40 robi Exp $
+//# $Id$
 //###########################################################################
 
 
@@ -21,7 +21,7 @@
 
 #include <jni.h>
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace jni {
@@ -42,8 +42,8 @@ class PreJavaException {
 public:
   //#########################################################################
   //# Constructors, Destructors & Co.
-  explicit PreJavaException(waters::uint32 classcode);
-  explicit PreJavaException(waters::uint32 classcode,
+  explicit PreJavaException(uint32_t classcode);
+  explicit PreJavaException(uint32_t classcode,
 			    const char* msg,
 			    bool staticString = false);
   PreJavaException(const PreJavaException& partner);
@@ -52,7 +52,7 @@ public:
 
   //#########################################################################
   //# Simple Access
-  const waters::uint32 getClassCode() const {return mClassCode;}
+  const uint32_t getClassCode() const {return mClassCode;}
   const char* getMessage() const {return mMessage;}
 
   //#########################################################################
@@ -66,7 +66,7 @@ private:
 
   //#########################################################################
   //# Data Members
-  waters::uint32 mClassCode;
+  uint32_t mClassCode;
   bool mStaticString;
   char* mMessage;
 };

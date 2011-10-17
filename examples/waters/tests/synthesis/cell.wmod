@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="cell" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Model of a manufacturing cell consisting of a robot, a machine, an input conveyor,
+an input buffer, an output buffer, and an output conveyor, originally due to W. M. Wonham.
+The machine takes a workpiece from the input buffer (event start), cuts it to specified dimensions, and places it in the output buffer (finish). The robot takes a workpiece from the input conveyor (load[i]) and puts it in the input buffer (unload[i]), or takes a workpiece from the output buffer (load[o]) and puts it on the output conveyor (unload[o]). The conveyors (incon and outcon) can be advanced to bring in new workpieces (\advance[i]), or to remove completed workpieces (\advance[o]). The input and output buffers can store at most one workpiece at a time.
+The objective is to control the manufacturing cell in the least restrictive controllable and nonblocking way such that there can never be an overflow or underflow of the input or output buffer.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="advance">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="i"/>
+                    <SimpleIdentifier Name="o"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="unload">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="i"/>
+                    <SimpleIdentifier Name="o"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="load">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="i"/>
+                    <SimpleIdentifier Name="o"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="inbuf">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="F">
+                        <PointGeometry>
+                            <Point Y="160" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-5" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="E">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="80" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-7" X="13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="F" Source="E">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="unload">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="120" X="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="E" Source="F">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="-38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="129"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="incon">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="64" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-8" X="14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="full">
+                        <PointGeometry>
+                            <Point Y="128" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-6" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="full" Source="empty">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="advance">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="97" X="142"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="full">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="-49"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="95" X="114"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="machine">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="48" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="working">
+                        <PointGeometry>
+                            <Point Y="112" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="idle" Source="working">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="80" X="85"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="working" Source="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="81" X="109"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="outbuf">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="F">
+                        <PointGeometry>
+                            <Point Y="160" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-2" X="12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="E">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="80" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-10" X="16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="E" Source="F">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="o"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-49"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="127"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="F" Source="E">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="outcon">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="full">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="96" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-5" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="empty">
+                        <PointGeometry>
+                            <Point Y="32" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="empty" Source="full">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="advance">
+                                <SimpleIdentifier Name="o"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-74"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="63" X="114"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="full" Source="empty">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="unload">
+                                <SimpleIdentifier Name="o"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="65" X="142"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="robot">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="96"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="1" X="-43"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="-8" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="loading">
+                        <PointGeometry>
+                            <Point Y="176" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-5" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="unloading">
+                        <PointGeometry>
+                            <Point Y="48" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-8" X="12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="idle" Source="unloading">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="unload">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="83" X="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="unloading" Source="idle">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="-51"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="81" X="80"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="loading" Source="idle">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="o"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="-52"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="143" X="83"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="idle" Source="loading">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="unload">
+                                <SimpleIdentifier Name="o"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="143" X="110"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="outbuf_sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="F">
+                        <PointGeometry>
+                            <Point Y="160" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-2" X="12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="E">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="80" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-10" X="16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="E" Source="F">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="o"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-49"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="127"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="F" Source="E">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="E" Source="E">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-33" X="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="81" X="193"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="overflow_sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="64" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point Y="128" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point Y="192" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-8" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="o"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="-53"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="160" X="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="160" X="191"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="o"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="-51"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="96" X="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="96" X="190"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

@@ -1,0 +1,2409 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="trafficlights" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Synthesis version of trafficlights example.
+The intersection between a larger main street and a smaller side street is to be controlled using traffic lights. The side street is equipped with a sensor that can detect the arrival of a car, but there is no such facility on the main street.
+The traffic lights can be switched using controllable events red[side], red[main], yellow[side], yellow[main], green[side], and green[main], representing a change of the side or main street traffic lights to red, yellow, or green. The uncontrollable events enter[side], enter[main], leave[side], and leave[main], indicate that a car from the side or main street enters or leaves the intersection. The uncontrollable event arrive[side] represents the side street sensor and indicates that a car has arrived in front of the side street lights. Furthermore, the system includes a timer that sends an uncontrollable tick event every five seconds.
+The system is to be controlled subject to the following constraints:
+1.) Accidents are avoided. It does never happen that there are cars from the side street and the main street on the intersection at the same time.
+2.) Lights always follow the sequence green--yellow--red--green.
+3.) Lights stay yellow for at least five seconds, and green for at least 15 seconds.
+4.) Normally, the system keeps the main street lights green and the side street lights red. Only if a car is detected in the side street, the side street lights should change to green.
+This is a simplified version of the original example. In the original example, the events enter[main], leave[main], and leave[side] are unobservable and hence cannot be used by the supervisor.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="Streets">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="main"/>
+                    <SimpleIdentifier Name="side"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="arrive">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="side"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="enter">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="side"/>
+                    <SimpleIdentifier Name="main"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="leave">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="main"/>
+                    <SimpleIdentifier Name="side"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="tick"/>
+        <EventDecl Kind="CONTROLLABLE" Name="green">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="main"/>
+                    <SimpleIdentifier Name="side"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="red">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="main"/>
+                    <SimpleIdentifier Name="side"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="yellow">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="main"/>
+                    <SimpleIdentifier Name="side"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="arrive">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="WAIT">
+                        <PointGeometry>
+                            <Point Y="160" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-5" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="FREE">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="96" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-8" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="FREE" Source="WAIT">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="-72"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="128" X="177"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="WAIT" Source="FREE">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="129" X="208"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <ForeachComponent Name="ST">
+            <SimpleIdentifier Name="Streets"/>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="enter">
+                        <SimpleIdentifier Name="ST"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Name="GO">
+                                <PointGeometry>
+                                    <Point Y="128" X="112"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="6" X="-34"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="STOP">
+                                <PointGeometry>
+                                    <Point Y="64" X="112"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="5" X="-49"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="STOP" Source="STOP">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="red">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="10" X="19"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="26" X="114"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="GO" Source="STOP">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="green">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="yellow">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-14" X="-63"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="97" X="98"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="STOP" Source="GO">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="red">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-7" X="5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="95" X="128"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="GO" Source="GO">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="green">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="yellow">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="enter">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-43" X="18"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="164" X="112"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="leave">
+                        <SimpleIdentifier Name="ST"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Name="CROSS1">
+                                <PointGeometry>
+                                    <Point Y="160" X="96"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="-9" X="-54"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="CROSS0">
+                                <PointGeometry>
+                                    <Point Y="112" X="96"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="-8" X="-57"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="OUT">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="48" X="96"/>
+                                </PointGeometry>
+                                <InitialArrowGeometry>
+                                    <Point Y="-18" X="0"/>
+                                </InitialArrowGeometry>
+                                <LabelGeometry>
+                                    <Point Y="-6" X="-36"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="OUT" Source="CROSS1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="leave">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-44" X="-52"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="72" X="167"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="OUT" Source="OUT">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="tick"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-13" X="-28"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="48" X="54"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="CROSS0" Source="OUT">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="enter">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-14" X="-15"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="80" X="109"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="CROSS1" Source="CROSS0">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="tick"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-10" X="-31"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="OUT" Source="CROSS0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="leave">
+                                        <SimpleIdentifier Name="ST"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="3" X="-48"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="80" X="84"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <SimpleComponent Kind="PLANT" Name="lights_main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="RED">
+                        <PointGeometry>
+                            <Point Y="64" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-13" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="YELLOW">
+                        <PointGeometry>
+                            <Point Y="160" X="256"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="GREEN">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="160" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="10" X="-24"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="GREEN" Source="RED">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="99" X="149"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="YELLOW" Source="RED">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-34"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="97" X="239"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RED" Source="GREEN">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="174"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="YELLOW" Source="GREEN">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="4" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="143" X="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RED" Source="YELLOW">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="120" X="216"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="GREEN" Source="YELLOW">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="175" X="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="lights_side">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="RED">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="64" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-14" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="YELLOW">
+                        <PointGeometry>
+                            <Point Y="160" X="256"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="GREEN">
+                        <PointGeometry>
+                            <Point Y="160" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="8" X="-22"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="YELLOW" Source="GREEN">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="143" X="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RED" Source="GREEN">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="174"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="GREEN" Source="YELLOW">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="175" X="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RED" Source="YELLOW">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="120" X="216"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="GREEN" Source="RED">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="99" X="149"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="YELLOW" Source="RED">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="97" X="239"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="nocrash">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="FULL">
+                        <PointGeometry>
+                            <Point Y="192" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="7" X="-2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="EMPTY">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="96" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-23" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="FULL" Source="EMPTY">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="146" X="212"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="EMPTY" Source="FULL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="-67"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="145" X="172"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="sequence_main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="red">
+                        <PointGeometry>
+                            <Point Y="64" X="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="1" X="-27"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="3" X="-2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="yellow0">
+                        <PointGeometry>
+                            <Point Y="224" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-28"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="yellow1">
+                        <PointGeometry>
+                            <Point Y="144" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="64" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-22"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green1">
+                        <PointGeometry>
+                            <Point Y="64" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-19" X="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green2">
+                        <PointGeometry>
+                            <Point Y="144" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green3">
+                        <PointGeometry>
+                            <Point Y="224" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="3" X="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green4">
+                        <PointGeometry>
+                            <Point Y="224" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-21"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="yellow0" Source="green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="-38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="224" X="144"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Target="yellow1" Source="yellow0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="green0" Source="red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="64" X="64"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Target="green1" Source="green0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="green2" Source="green1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="green3" Source="green2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="green4" Source="green3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="red" Source="yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-62"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="144" X="64"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Target="green4" Source="green4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="183" X="144"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="red" Source="red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="7" X="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="24" X="66"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="yellow1" Source="yellow1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="145" X="24"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="sequence_side">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="green3">
+                        <PointGeometry>
+                            <Point Y="224" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="3" X="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green2">
+                        <PointGeometry>
+                            <Point Y="144" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green1">
+                        <PointGeometry>
+                            <Point Y="64" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-19" X="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green0">
+                        <PointGeometry>
+                            <Point Y="64" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-22"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="green4">
+                        <PointGeometry>
+                            <Point Y="224" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-21"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="yellow0">
+                        <PointGeometry>
+                            <Point Y="224" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-28"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="yellow1">
+                        <PointGeometry>
+                            <Point Y="144" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="red">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="64" X="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="1" X="-27"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="3" X="-2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="yellow0" Source="green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="-38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="240" X="192"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Target="yellow1" Source="yellow0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="green0" Source="red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="80" X="112"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Target="green1" Source="green0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="green2" Source="green1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="green3" Source="green2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="green4" Source="green3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="red" Source="yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-62"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="160" X="112"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Target="green4" Source="green4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="183" X="144"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="red" Source="red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="7" X="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="24" X="66"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="yellow1" Source="yellow1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="145" X="24"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="req_only">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="WAIT">
+                        <PointGeometry>
+                            <Point Y="96" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-5" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="FREE">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="32" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-8" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="FREE" Source="WAIT">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="-72"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="64" X="129"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="WAIT" Source="FREE">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="65" X="160"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="WAIT" Source="WAIT">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-32" X="-94"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="135" X="145"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="alternate">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="main">
+                        <PointGeometry>
+                            <Point Y="112" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-33"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="side">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="1" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="side" Source="main">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-36"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="100" X="119"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="main" Source="side">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="126" X="118"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green0"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green1"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green2"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green3"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green4"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow0"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow1"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green1"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green2"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green3"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green4"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow0"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow1"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green0"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green1"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green2"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green3"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green4"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow0"/>
+                    <SimpleNode Name="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow1"/>
+                    <SimpleNode Name="main.FREE.STOP.STOP.OUT.CROSS0.RED.RED.FULL.FREE.red.red"/>
+                    <SimpleNode Name="main.FREE.STOP.STOP.OUT.CROSS1.RED.RED.FULL.FREE.red.red"/>
+                    <SimpleNode Initial="true" Name="main.FREE.STOP.STOP.OUT.OUT.RED.RED.EMPTY.FREE.red.red"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green0"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green1"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green2"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green3"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green4"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow0"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow1"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green1"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green2"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green3"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green4"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow0"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow1"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green0"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green1"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green2"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green3"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow0"/>
+                    <SimpleNode Name="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1"/>
+                    <SimpleNode Name="main.WAIT.STOP.STOP.OUT.CROSS0.RED.RED.FULL.WAIT.red.red"/>
+                    <SimpleNode Name="main.WAIT.STOP.STOP.OUT.CROSS1.RED.RED.FULL.WAIT.red.red"/>
+                    <SimpleNode Name="main.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green0.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green1.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green2.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green3.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green4.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green1.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green2.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green3.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green4.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green0.red">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green1.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green2.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green3.red"/>
+                    <SimpleNode Name="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green4.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green0.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green1.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green2.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green3.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green4.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow0.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow1.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green1.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green2.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green3.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green4.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS1.OUT.YELLOW.RED.FULL.WAIT.yellow0.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.CROSS1.OUT.YELLOW.RED.FULL.WAIT.yellow1.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green0.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green1.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green2.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green3.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow0.red"/>
+                    <SimpleNode Name="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow1.red"/>
+                    <SimpleNode Name="side.WAIT.STOP.STOP.CROSS0.OUT.RED.RED.FULL.WAIT.red.red"/>
+                    <SimpleNode Name="side.WAIT.STOP.STOP.CROSS1.OUT.RED.RED.FULL.WAIT.red.red"/>
+                    <SimpleNode Name="side.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green1" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green0" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green0" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green2" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green1" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green1" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green3" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green2" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green2" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green4" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green3" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green3" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow0" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green4" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green4" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green4" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow1" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow0" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow0" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow1" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow1" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.STOP.OUT.CROSS0.RED.RED.FULL.FREE.red.red" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow1" Source="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green1" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green1" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green2" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green2" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green3" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green3" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow0" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green4" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green4" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.FREE.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow0" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow0" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow1" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.STOP.OUT.CROSS1.RED.RED.FULL.FREE.red.red" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow1" Source="main.FREE.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.FREE.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green1" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green0" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green2" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green1" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green3" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green2" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green4" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green3" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green4" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow0" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4" Source="main.FREE.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.FREE.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow1" Source="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow0" Source="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow1" Source="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.STOP.OUT.OUT.RED.RED.EMPTY.FREE.red.red" Source="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1" Source="main.FREE.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.FREE.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.STOP.OUT.CROSS1.RED.RED.FULL.FREE.red.red" Source="main.FREE.STOP.STOP.OUT.CROSS0.RED.RED.FULL.FREE.red.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.STOP.OUT.OUT.RED.RED.EMPTY.FREE.red.red" Source="main.FREE.STOP.STOP.OUT.CROSS0.RED.RED.FULL.FREE.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.CROSS0.RED.RED.FULL.WAIT.red.red" Source="main.FREE.STOP.STOP.OUT.CROSS0.RED.RED.FULL.FREE.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.STOP.OUT.OUT.RED.RED.EMPTY.FREE.red.red" Source="main.FREE.STOP.STOP.OUT.CROSS1.RED.RED.FULL.FREE.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.CROSS1.RED.RED.FULL.WAIT.red.red" Source="main.FREE.STOP.STOP.OUT.CROSS1.RED.RED.FULL.FREE.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.STOP.OUT.OUT.RED.RED.EMPTY.FREE.red.red" Source="main.FREE.STOP.STOP.OUT.OUT.RED.RED.EMPTY.FREE.red.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="main.FREE.STOP.STOP.OUT.OUT.RED.RED.EMPTY.FREE.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green0.red" Source="main.FREE.STOP.STOP.OUT.OUT.RED.RED.EMPTY.FREE.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green1" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green0" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green2" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green1" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green3" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green2" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green4" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green3" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow0" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green4" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.WAIT.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow1" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow0" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow1" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.CROSS0.RED.RED.FULL.WAIT.red.red" Source="main.WAIT.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.WAIT.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green1" Source="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green2" Source="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green3" Source="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow0" Source="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4" Source="main.WAIT.STOP.GO.OUT.CROSS1.RED.GREEN.FULL.WAIT.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow0" Source="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1" Source="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.CROSS1.RED.RED.FULL.WAIT.red.red" Source="main.WAIT.STOP.GO.OUT.CROSS1.RED.YELLOW.FULL.WAIT.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green0" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green1" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green1" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green2" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green2" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green3" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green3" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS0.RED.GREEN.FULL.FREE.red.green4" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow0" Source="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow0" Source="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1" Source="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.FREE.STOP.GO.OUT.CROSS0.RED.YELLOW.FULL.FREE.red.yellow1" Source="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1" Source="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="main.WAIT.STOP.GO.OUT.OUT.RED.YELLOW.EMPTY.WAIT.red.yellow1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.CROSS1.RED.RED.FULL.WAIT.red.red" Source="main.WAIT.STOP.STOP.OUT.CROSS0.RED.RED.FULL.WAIT.red.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="main.WAIT.STOP.STOP.OUT.CROSS0.RED.RED.FULL.WAIT.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="main.WAIT.STOP.STOP.OUT.CROSS1.RED.RED.FULL.WAIT.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="main.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green0.red" Source="main.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green1.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green0.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green0.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green0.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green2.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green1.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green1.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green1.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green3.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green2.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green2.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green2.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green4.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green3.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green3.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green3.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green4.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green4.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green4.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green4.red" Source="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green1.red" Source="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green1.red" Source="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green2.red" Source="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green2.red" Source="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green3.red" Source="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green3.red" Source="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green4.red" Source="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green4.red" Source="side.FREE.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.FREE.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green0.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green1.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green0.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green0.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green1.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green2.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green1.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green1.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green2.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green3.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green2.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green2.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green3.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green4.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green3.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green3.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.FREE.green4.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green4.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green4.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red" Source="side.FREE.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.FREE.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="arrive">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green1.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green0.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green0.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green2.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green1.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green1.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green3.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green2.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green2.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green4.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green3.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green3.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow0.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green4.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green4.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.YELLOW.RED.FULL.WAIT.yellow1.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow0.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow0.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.YELLOW.RED.FULL.WAIT.yellow1.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow1.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow1.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.STOP.STOP.CROSS0.OUT.RED.RED.FULL.WAIT.red.red" Source="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green1.red" Source="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green2.red" Source="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green3.red" Source="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS1.OUT.YELLOW.RED.FULL.WAIT.yellow0.red" Source="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red" Source="side.WAIT.GO.STOP.CROSS1.OUT.GREEN.RED.FULL.WAIT.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow0.red" Source="side.WAIT.GO.STOP.CROSS1.OUT.YELLOW.RED.FULL.WAIT.yellow0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow1.red" Source="side.WAIT.GO.STOP.CROSS1.OUT.YELLOW.RED.FULL.WAIT.yellow1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.STOP.STOP.CROSS1.OUT.RED.RED.FULL.WAIT.red.red" Source="side.WAIT.GO.STOP.CROSS1.OUT.YELLOW.RED.FULL.WAIT.yellow1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green0.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green1.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green0.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green1.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green2.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green1.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green2.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green2.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green3.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green2.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green3.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green3.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green3.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.GREEN.RED.FULL.WAIT.green4.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow0.red" Source="side.WAIT.GO.STOP.OUT.OUT.GREEN.RED.EMPTY.WAIT.green4.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="yellow">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow0.red" Source="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow0.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow1.red" Source="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow0.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.CROSS0.OUT.YELLOW.RED.FULL.WAIT.yellow1.red" Source="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="enter">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow1.red" Source="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow1.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="side.WAIT.GO.STOP.OUT.OUT.YELLOW.RED.EMPTY.WAIT.yellow1.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="red">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.STOP.STOP.CROSS1.OUT.RED.RED.FULL.WAIT.red.red" Source="side.WAIT.STOP.STOP.CROSS0.OUT.RED.RED.FULL.WAIT.red.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="side.WAIT.STOP.STOP.CROSS0.OUT.RED.RED.FULL.WAIT.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="side.WAIT.STOP.STOP.CROSS1.OUT.RED.RED.FULL.WAIT.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="leave">
+                                <SimpleIdentifier Name="main"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="main.WAIT.STOP.GO.OUT.OUT.RED.GREEN.EMPTY.WAIT.red.green0" Source="side.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="green">
+                                <SimpleIdentifier Name="side"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="side.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red" Source="side.WAIT.STOP.STOP.OUT.OUT.RED.RED.EMPTY.WAIT.red.red">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

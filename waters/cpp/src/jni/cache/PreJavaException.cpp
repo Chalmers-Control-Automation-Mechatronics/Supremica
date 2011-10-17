@@ -28,14 +28,14 @@ namespace jni {
 //# PreJavaException: Constructors, Destructors & Co.
 
 PreJavaException::
-PreJavaException(waters::uint32 classcode)
+PreJavaException(uint32_t classcode)
   : mClassCode(classcode)
 {
   initMessage(0,true);
 }
 
 PreJavaException::
-PreJavaException(waters::uint32 classcode,
+PreJavaException(uint32_t classcode,
                  const char* msg,
                  bool staticString)
   : mClassCode(classcode)

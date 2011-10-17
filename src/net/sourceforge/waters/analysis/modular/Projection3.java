@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   Projection2
 //###########################################################################
-//# $Id: Projection2.java 5886 2010-08-08 22:29:32Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -37,7 +37,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class Projection3
-  extends AbstractAutomatonBuilder<AutomatonProxy>
+  extends AbstractAutomatonBuilder
   implements SafetyProjectionBuilder
 {
 

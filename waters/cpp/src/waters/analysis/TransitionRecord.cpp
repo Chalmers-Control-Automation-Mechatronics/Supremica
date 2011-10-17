@@ -56,18 +56,18 @@ TransitionRecord(const AutomatonRecord* aut,
     mNextInUpdate(0),
     mNextInNotTaken(0)
 {
-  const uint32 numstates = aut->getNumberOfStates();
-  mFlags = new uint32[numstates];
-  mDeterministicSuccessorsShifted = new uint32[numstates];
+  const uint32_t numstates = aut->getNumberOfStates();
+  mFlags = new uint32_t[numstates];
+  mDeterministicSuccessorsShifted = new uint32_t[numstates];
   if (fwd == 0) {
     mForwardRecord = this;
-    for (uint32 code = 0; code < numstates; code++) {
+    for (uint32_t code = 0; code < numstates; code++) {
       mFlags[code] = 0;
       mDeterministicSuccessorsShifted[code] = NO_TRANSITION;
     }
   } else {
     mForwardRecord = fwd;
-    for (uint32 code = 0; code < numstates; code++) {
+    for (uint32_t code = 0; code < numstates; code++) {
       mFlags[code] = fwd->mFlags[code];
       mDeterministicSuccessorsShifted[code] = NO_TRANSITION;
     }
@@ -92,8 +92,8 @@ TransitionRecord::
 //############################################################################
 //# TransitionRecord: Simple Access
 
-uint32 TransitionRecord::
-getNumberOfSuccessors(uint32 source)
+uint32_t TransitionRecord::
+getNumberOfSuccessors(uint32_t source)
   const
 {
   switch (mDeterministicSuccessorsShifted[source]) {
@@ -106,11 +106,11 @@ getNumberOfSuccessors(uint32 source)
   }  
 }
 
-uint32 TransitionRecord::
-getSuccessorShifted(uint32 source, uint32 index)
+uint32_t TransitionRecord::
+getSuccessorShifted(uint32_t source, uint32_t index)
   const
 {
-  const uint32 lookup = mDeterministicSuccessorsShifted[source];
+  const uint32_t lookup = mDeterministicSuccessorsShifted[source];
   if (lookup != MULTIPLE_TRANSITIONS) {
     return lookup;
   } else if (index < mNumNondeterministicSuccessors[source]) {
@@ -185,9 +185,9 @@ getSearchAccessor(bool controllable)
 //# TransitionRecord: Set up
 
 bool TransitionRecord::
-addDeterministicTransition(uint32 source, uint32 target)
+addDeterministicTransition(uint32_t source, uint32_t target)
 {
-  const uint32 lookup = mDeterministicSuccessorsShifted[source];
+  const uint32_t lookup = mDeterministicSuccessorsShifted[source];
   if (lookup == NO_TRANSITION) {
     const int shift = mAutomaton->getShift();
     mDeterministicSuccessorsShifted[source] = target << shift;
@@ -201,8 +201,8 @@ addDeterministicTransition(uint32 source, uint32 target)
     return false;
   } else {
     if (mNumNondeterministicSuccessors == 0) {
-      const uint32 numstates = mAutomaton->getNumberOfStates();
-      mNumNondeterministicSuccessors = new uint32[numstates];
+      const uint32_t numstates = mAutomaton->getNumberOfStates();
+      mNumNondeterministicSuccessors = new uint32_t[numstates];
     }
     mFlags[source] |= FLAG_NONDET;
     mDeterministicSuccessorsShifted[source] = MULTIPLE_TRANSITIONS;
@@ -213,13 +213,13 @@ addDeterministicTransition(uint32 source, uint32 target)
 }
 
 void TransitionRecord::
-addNondeterministicTransition(uint32 source, uint32 target)
+addNondeterministicTransition(uint32_t source, uint32_t target)
 {
   if (mDeterministicSuccessorsShifted[source] == MULTIPLE_TRANSITIONS) {
     setupNondeterministicBuffers();
     const int shift = mAutomaton->getShift();
-    const uint32 shiftedtarget = target << shift;
-    const uint32 offset = mNumNondeterministicSuccessors[source]++;
+    const uint32_t shiftedtarget = target << shift;
+    const uint32_t offset = mNumNondeterministicSuccessors[source]++;
     mNondeterministicSuccessorsShifted[source][offset] = shiftedtarget;
   }
 }
@@ -236,22 +236,22 @@ normalize()
   }
 }
 
-uint32 TransitionRecord::
+uint32_t TransitionRecord::
 getCommonTarget()
   const
 {
   if (mNondeterministicBuffer != 0) {
-    return UNDEF_UINT32;
+    return UINT32_MAX;
   }
-  const uint32 numstates = mAutomaton->getNumberOfStates();
-  uint32 result = UNDEF_UINT32;
-  for (uint32 code = 0; code < numstates; code++) {
-    const uint32 succ = mDeterministicSuccessorsShifted[code];
+  const uint32_t numstates = mAutomaton->getNumberOfStates();
+  uint32_t result = UINT32_MAX;
+  for (uint32_t code = 0; code < numstates; code++) {
+    const uint32_t succ = mDeterministicSuccessorsShifted[code];
     if (succ != NO_TRANSITION) {
-      if (result == UNDEF_UINT32) {
+      if (result == UINT32_MAX) {
         result = succ;
       } else if (result != succ) {
-        return UNDEF_UINT32;
+        return UINT32_MAX;
       }
     }      
   }
@@ -259,11 +259,11 @@ getCommonTarget()
 }
 
 bool TransitionRecord::
-markTransitionTaken(const uint32* tuple)
+markTransitionTaken(const uint32_t* tuple)
 {
-  uint32 index = mAutomaton->getAutomatonIndex();
-  uint32 code = tuple[index];
-  uint32 flags = mFlags[code];
+  uint32_t index = mAutomaton->getAutomatonIndex();
+  uint32_t code = tuple[index];
+  uint32_t flags = mFlags[code];
   if ((flags & FLAG_TAKEN) == 0) {
     mFlags[code] = flags | FLAG_TAKEN;
     return --mNumNotTaken == 0;
@@ -276,14 +276,14 @@ int TransitionRecord::
 removeTransitionsNotTaken()
 {
   if (mNumNotTaken) {
-    uint32 numstates = mAutomaton->getNumberOfStates();
+    uint32_t numstates = mAutomaton->getNumberOfStates();
     int shift = mAutomaton->getShift();
     bool keepnd = false;
     bool onlyself = true;
     int newweight = 0;
-    for (uint32 source = 0; source < numstates; source++) {
+    for (uint32_t source = 0; source < numstates; source++) {
       if (mFlags[source] & FLAG_TAKEN) {
-        uint32 succ = mDeterministicSuccessorsShifted[source];
+        uint32_t succ = mDeterministicSuccessorsShifted[source];
         switch (succ) {
         case NO_TRANSITION:
           break;
@@ -321,28 +321,28 @@ removeTransitionsNotTaken()
 void TransitionRecord::
 removeSelfloops()
 {
-  uint32 numstates = mAutomaton->getNumberOfStates();
+  uint32_t numstates = mAutomaton->getNumberOfStates();
   int shift = mAutomaton->getShift();
   bool keepnd = false;
   bool renorm = false;
   int newweight = 0;
-  for (uint32 source = 0; source < numstates; source++) {
-    uint32 shiftedsource = source << shift;
-    uint32 succ = mDeterministicSuccessorsShifted[source];
+  for (uint32_t source = 0; source < numstates; source++) {
+    uint32_t shiftedsource = source << shift;
+    uint32_t succ = mDeterministicSuccessorsShifted[source];
     if (succ == shiftedsource) {
       mDeterministicSuccessorsShifted[source] = NO_TRANSITION;
       renorm = true;
     } else if (succ == MULTIPLE_TRANSITIONS) {
-      uint32* ndlist = mNondeterministicSuccessorsShifted[source];
-      uint32 ndcount = mNumNondeterministicSuccessors[source];
-      uint32 writeindex = UNDEF_UINT32;
-      for (uint32 readindex = 0; readindex < ndcount; readindex++) {
+      uint32_t* ndlist = mNondeterministicSuccessorsShifted[source];
+      uint32_t ndcount = mNumNondeterministicSuccessors[source];
+      uint32_t writeindex = UINT32_MAX;
+      for (uint32_t readindex = 0; readindex < ndcount; readindex++) {
         succ = ndlist[readindex];
         if (succ == shiftedsource) {
-          if (writeindex == UNDEF_UINT32) {
+          if (writeindex == UINT32_MAX) {
             writeindex = readindex;
           }
-        } else if (writeindex != UNDEF_UINT32) {
+        } else if (writeindex != UINT32_MAX) {
           ndlist[writeindex++] = succ;
         }
       }
@@ -358,7 +358,7 @@ removeSelfloops()
       default:
         mNumNondeterministicSuccessors[source] = writeindex;
         // fall through ...
-      case UNDEF_UINT32:
+      case UINT32_MAX:
         keepnd = true;
         newweight++;
         break;
@@ -385,8 +385,8 @@ removeSelfloops()
 //# TransitionRecord: Trace Computation
 
 void TransitionRecord::
-storeNondeterministicTarget(const uint32* sourcetuple,
-                            const uint32* targettuple,
+storeNondeterministicTarget(const uint32_t* sourcetuple,
+                            const uint32_t* targettuple,
                             const jni::MapGlue& statemap)
   const
 {
@@ -394,10 +394,10 @@ storeNondeterministicTarget(const uint32* sourcetuple,
     mForwardRecord->storeNondeterministicTarget
       (sourcetuple, targettuple, statemap);
   } else {
-    const uint32 index = mAutomaton->getAutomatonIndex();
-    const uint32 source = sourcetuple[index];
+    const uint32_t index = mAutomaton->getAutomatonIndex();
+    const uint32_t source = sourcetuple[index];
     if (mFlags[source] & FLAG_NONDET) {
-      const uint32 target = targettuple[index];
+      const uint32_t target = targettuple[index];
       const jni::StateGlue& state = mAutomaton->getJavaState(target);
       const jni::AutomatonGlue& aut = mAutomaton->getJavaAutomaton();
       statemap.put(&aut, &state);
@@ -413,17 +413,17 @@ void TransitionRecord::
 setupNondeterministicBuffers()
 {
   if (mNondeterministicBuffer == 0) {
-    const uint32 numstates = mAutomaton->getNumberOfStates();
-    uint32 buffersize = 0;
-    uint32 state;
+    const uint32_t numstates = mAutomaton->getNumberOfStates();
+    uint32_t buffersize = 0;
+    uint32_t state;
     for (state = 0; state < numstates; state++) {
       if (mDeterministicSuccessorsShifted[state] == MULTIPLE_TRANSITIONS) {
         buffersize += mNumNondeterministicSuccessors[state];
       }
     }
-    mNondeterministicBuffer = new uint32[buffersize];
-    mNondeterministicSuccessorsShifted = new uint32*[numstates];
-    uint32 next = 0;
+    mNondeterministicBuffer = new uint32_t[buffersize];
+    mNondeterministicSuccessorsShifted = new uint32_t*[numstates];
+    uint32_t next = 0;
     for (state = 0; state < numstates; state++) {
       switch (mDeterministicSuccessorsShifted[state]) {
       case NO_TRANSITION:
@@ -455,7 +455,7 @@ setupNondeterministicBuffers()
   
 NondeterministicTransitionIterator::
 NondeterministicTransitionIterator() :
-  mAutomatonRecord(0), mTransitionRecord(0), mSource(0), mIndex(UNDEF_UINT32)
+  mAutomatonRecord(0), mTransitionRecord(0), mSource(0), mIndex(UINT32_MAX)
 {
 }
 
@@ -471,11 +471,11 @@ setupInit(const AutomatonRecord* aut)
 }
 
 bool NondeterministicTransitionIterator::
-advanceInit(uint32* tuple)
+advanceInit(uint32_t* tuple)
 {
   const int w = mAutomatonRecord->getWordIndex();
   tuple[w] &= ~mAutomatonRecord->getBitMask();
-  uint32 next = mIndex + 1;
+  uint32_t next = mIndex + 1;
   if (next == mAutomatonRecord->getEndOfInitialStates1()) {
     next = mAutomatonRecord->getFirstInitialState2();
   }
@@ -495,8 +495,8 @@ advanceInit(uint32* tuple)
 //############################################################################
 //# NondeterministicTransitionIterator: Transition Iteration
 
-uint32 NondeterministicTransitionIterator::
-setup(const TransitionRecord* trans, uint32 source)
+uint32_t NondeterministicTransitionIterator::
+setup(const TransitionRecord* trans, uint32_t source)
 {
   mAutomatonRecord = trans->getAutomaton();
   mTransitionRecord = trans;
@@ -505,12 +505,12 @@ setup(const TransitionRecord* trans, uint32 source)
 }
 
 bool NondeterministicTransitionIterator::
-advance(uint32* tuple)
+advance(uint32_t* tuple)
 {
   const AutomatonRecord* aut = mAutomatonRecord;
   const int w = aut->getWordIndex();
   tuple[w] &= ~aut->getBitMask();
-  uint32 succ = next();
+  uint32_t succ = next();
   if (succ == TransitionRecord::NO_TRANSITION) {
     tuple[w] |= reset();
     return true;
@@ -520,7 +520,7 @@ advance(uint32* tuple)
   }
 }
 
-uint32 NondeterministicTransitionIterator::
+uint32_t NondeterministicTransitionIterator::
 reset()
 {
   mIndex =
@@ -528,7 +528,7 @@ reset()
   return current();
 }
 
-uint32 NondeterministicTransitionIterator::
+uint32_t NondeterministicTransitionIterator::
 next()
 {
   if (mIndex > 0) {
@@ -539,7 +539,7 @@ next()
   }
 }
 
-uint32 NondeterministicTransitionIterator::
+uint32_t NondeterministicTransitionIterator::
 current()
 {
   return

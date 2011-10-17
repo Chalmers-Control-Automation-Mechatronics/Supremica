@@ -18,7 +18,7 @@
 #include "jni/cache/ClassInfo.h"
 #include "jni/cache/MethodInfo.h"
 #include "jni/glue/Glue.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace jni {
@@ -35,17 +35,17 @@ ClassGlue::
 ClassGlue(const ClassInfo* info, jclass javaclass, JNIEnv* env)
   : mKey(info, (jclass) env->NewGlobalRef(javaclass))
 {
-  if (waters::uint32 methodcount = info->getNumMethods()) {
+  if (uint32_t methodcount = info->getNumMethods()) {
     mMethodTable = new jmethodID[methodcount];
-    for (waters::uint32 i = 0; i < methodcount; i++) {
+    for (uint32_t i = 0; i < methodcount; i++) {
       mMethodTable[i] = 0;
     }
   } else {
     mMethodTable = 0;
   }
-  if (waters::uint32 fieldcount = info->getNumFields()) {
+  if (uint32_t fieldcount = info->getNumFields()) {
     mStaticFinalFieldTable = new jobject[fieldcount];
-    for (waters::uint32 i = 0; i < fieldcount; i++) {
+    for (uint32_t i = 0; i < fieldcount; i++) {
       mStaticFinalFieldTable[i] = 0;
     }
   } else {
@@ -60,8 +60,8 @@ ClassGlue::
 {
   delete [] mMethodTable;
   const ClassInfo* info = mKey.getClassInfo();
-  if (waters::uint32 fieldcount = info->getNumFields()) {
-    for (waters::uint32 i = 0; i < fieldcount; i++) {
+  if (uint32_t fieldcount = info->getNumFields()) {
+    for (uint32_t i = 0; i < fieldcount; i++) {
       mEnvironment->DeleteLocalRef(mStaticFinalFieldTable[i]);
     }
     delete [] mStaticFinalFieldTable;
@@ -75,7 +75,7 @@ ClassGlue::
 //# ClassGlue: Access
 
 jmethodID ClassGlue::
-getMethodID(waters::uint32 methodcode)
+getMethodID(uint32_t methodcode)
 {
   jmethodID result = mMethodTable[methodcode];
   if (result == 0) {
@@ -95,7 +95,7 @@ getMethodID(waters::uint32 methodcode)
 
 
 jmethodID ClassGlue::
-getStaticMethodID(waters::uint32 methodcode)
+getStaticMethodID(uint32_t methodcode)
 {
   jmethodID result = mMethodTable[methodcode];
   if (result == 0) {
@@ -115,7 +115,7 @@ getStaticMethodID(waters::uint32 methodcode)
 
 
 jobject ClassGlue::
-getStaticFinalField(waters::uint32 fieldcode)
+getStaticFinalField(uint32_t fieldcode)
 {
   jobject result = mStaticFinalFieldTable[fieldcode];
   if (result == 0) {

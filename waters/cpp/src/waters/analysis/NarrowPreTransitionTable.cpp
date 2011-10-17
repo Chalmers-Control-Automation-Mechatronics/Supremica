@@ -36,23 +36,23 @@ namespace waters {
 //############################################################################
 //# NarrowTransitionRecordHashAccessor: Hash Methods
 
-uint32 NarrowTransitionRecordHashAccessor::
-hash(const void* key)
+uint64_t NarrowTransitionRecordHashAccessor::
+hash(intptr_t key)
   const
 {
   const NarrowTransitionRecord* trans = (const NarrowTransitionRecord*) key;
   const jni::EventGlue& jevent = trans->mEvent->getJavaEvent();
-  uint32 code[] = {trans->mState, (uint32) jevent.hashCode()};
-  return hashIntArray(code, 2);
+  uint64_t code = trans->mState | ((uint64_t) jevent.hashCode() << 32);
+  return hashInt(code);
 }
 
 
 bool NarrowTransitionRecordHashAccessor::
-equals(const void* key1, const void* key2)
+equals(intptr_t val1, intptr_t val2)
   const
 {
-  const NarrowTransitionRecord* trans1 = (const NarrowTransitionRecord*) key1;
-  const NarrowTransitionRecord* trans2 = (const NarrowTransitionRecord*) key2;
+  const NarrowTransitionRecord* trans1 = (const NarrowTransitionRecord*) val1;
+  const NarrowTransitionRecord* trans2 = (const NarrowTransitionRecord*) val2;
   return trans1->mState == trans2->mState && trans1->mEvent == trans2->mEvent;
 }
 
@@ -96,7 +96,7 @@ compare(const NarrowTransitionRecord* record1,
 //############################################################################
 //# NarrowTransitionRecord: Simple Access
 
-uint32 NarrowTransitionRecord::
+uint32_t NarrowTransitionRecord::
 getEventCode()
   const
 {
@@ -121,7 +121,7 @@ compareTo(const NarrowTransitionRecord* record)
 //# NarrowTransitionRecord: Building the Transition Table
 
 void NarrowTransitionRecord::
-putSuccessor(uint32* buffer, uint32 code, uint32 endtag)
+putSuccessor(uint32_t* buffer, uint32_t code, uint32_t endtag)
 {
   // std::cerr << "putsucc:" << mNumSuccessors << ":"
   //           << mBufferPos << "->" << code << std::endl;
@@ -148,15 +148,15 @@ const NarrowTransitionRecordListAccessor
 //############################################################################
 //# NarrowStateRecord: Simple Access
 
-uint32 NarrowStateRecord::
+uint32_t NarrowStateRecord::
 getNumberOfNondeterministicTransitions()
   const
 {
-  uint32 result = 0;
+  uint32_t result = 0;
   for (const NarrowTransitionRecord* current = mTransitionRecords;
        current != 0;
        current = current->getNext()) {
-    const uint32 numsucc = current->getNumberOfSuccessors();
+    const uint32_t numsucc = current->getNumberOfSuccessors();
     if (numsucc > 1) {
       result += numsucc;
     }
@@ -215,18 +215,18 @@ sort()
 NarrowPreTransitionTable::
 NarrowPreTransitionTable(AutomatonRecord* aut,
 			 jni::ClassCache* cache,
-			 const HashTable<const jni::EventGlue*,
-			                 NarrowEventRecord*>& eventmap)
+			 const PtrHashTable<const jni::EventGlue*,
+                                            NarrowEventRecord*>& eventmap)
   : mAutomaton(aut),
     mNarrowStates(0),
     mStateMap(0),
     mSelfloopMap(0),
     mUniqueTransitions(0)
 {
-  const uint32 numstates = mAutomaton->getNumberOfStates();
+  const uint32_t numstates = mAutomaton->getNumberOfStates();
   mNarrowStates =
     (NarrowStateRecord*) new char[numstates * sizeof(NarrowStateRecord)];
-  for (uint32 code = 0; code < numstates; code++) {
+  for (uint32_t code = 0; code < numstates; code++) {
     new (&mNarrowStates[code]) NarrowStateRecord(code);
   }
 
@@ -245,8 +245,9 @@ NarrowPreTransitionTable(AutomatonRecord* aut,
   const jni::CollectionGlue transitions = autglue.getTransitionsGlue(cache);
   mUniqueTransitions = new jni::TreeSetGlue(&transitions, cache);
   const int numtrans = mUniqueTransitions->size();
-  const HashAccessor* taccessor = NarrowTransitionRecord::getHashAccessor();
-  HashTable<NarrowTransitionRecord*,NarrowTransitionRecord*>
+  const NarrowTransitionRecordHashAccessor* taccessor =
+    NarrowTransitionRecord::getHashAccessor();
+  PtrHashTable<NarrowTransitionRecord*,NarrowTransitionRecord*>
     transmap(taccessor, numtrans);
 
   mStateMap = mAutomaton->createStateMap();
@@ -261,9 +262,9 @@ NarrowPreTransitionTable(AutomatonRecord* aut,
       continue;
     }
     const jni::StateGlue& source = trans.getSourceGlue(cache);
-    const uint32 sourcecode = mStateMap->get(&source);
+    const uint32_t sourcecode = mStateMap->get(&source);
     const jni::StateGlue& target = trans.getTargetGlue(cache);
-    const uint32 targetcode = mStateMap->get(&target);
+    const uint32_t targetcode = mStateMap->get(&target);
     eventrecord->countLocalTransition(sourcecode == targetcode);
     if (newtrans == 0) {
       newtrans = new NarrowTransitionRecord(sourcecode, eventrecord);
@@ -280,8 +281,8 @@ NarrowPreTransitionTable(AutomatonRecord* aut,
   }
 
   const int numevents = events.size();
-  const HashAccessor* eaccessor = EventRecord::getHashAccessor();
-  mSelfloopMap = new HashTable<const jni::EventGlue*,NarrowEventRecord*>
+  const EventRecordHashAccessor* eaccessor = EventRecord::getHashAccessor();
+  mSelfloopMap = new PtrHashTable<const jni::EventGlue*,NarrowEventRecord*>
     (eaccessor, numevents);
   const bool isplant = mAutomaton->isPlant();
   const jni::IteratorGlue eventiter2 = events.iteratorGlue(cache);
@@ -302,8 +303,8 @@ NarrowPreTransitionTable(AutomatonRecord* aut,
 NarrowPreTransitionTable::
 ~NarrowPreTransitionTable()
 {
-  const uint32 numstates = mAutomaton->getNumberOfStates();
-  for (uint32 code = 0; code < numstates; code++) {
+  const uint32_t numstates = mAutomaton->getNumberOfStates();
+  for (uint32_t code = 0; code < numstates; code++) {
     mNarrowStates[code].~NarrowStateRecord();
   }
   delete (const char*) mNarrowStates;

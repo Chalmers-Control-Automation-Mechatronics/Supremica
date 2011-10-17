@@ -76,20 +76,20 @@ NarrowProductExplorer::
 ~NarrowProductExplorer()
 {
   if (mEventRecords != 0) {
-    for (uint32 e = 0; e < mNumEventRecords; e++) {
+    for (uint32_t e = 0; e < mNumEventRecords; e++) {
       delete mEventRecords[e];
     }
     delete[] mEventRecords;
   }
-  const uint32 numaut = getNumberOfAutomata();
+  const uint32_t numaut = getNumberOfAutomata();
   if (mTransitionTables != 0) {
-    for (uint32 a = 0; a < numaut; a++) {
+    for (uint32_t a = 0; a < numaut; a++) {
       mTransitionTables[a].~NarrowTransitionTable();
     }
     delete[] (char*) mTransitionTables;
   }
   if (mNonReversedTransitionTables != 0) {
-    for (uint32 a = 0; a < numaut; a++) {
+    for (uint32_t a = 0; a < numaut; a++) {
       mNonReversedTransitionTables[a].~NarrowTransitionTable();
     }
     delete[] (char*) mNonReversedTransitionTables;
@@ -112,9 +112,9 @@ setup()
 
   // Check initial states ...
   jni::ClassCache* cache = getCache();
-  const uint32 numaut = getNumberOfAutomata();
+  const uint32_t numaut = getNumberOfAutomata();
   mNumPlants = 0;
-  for (uint32 a = 0; a < numaut; a++) {
+  for (uint32_t a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     if (aut->isPlant()) {
       mNumPlants++;
@@ -126,9 +126,10 @@ setup()
 
   // Establish initial event map ...
   const jni::SetGlue events = getModel().getEventsGlue(cache);
-  const uint32 numevents = events.size();
-  const HashAccessor* eventaccessor = NarrowEventRecord::getHashAccessor();
-  HashTable<const jni::EventGlue*,NarrowEventRecord*>
+  const uint32_t numevents = events.size();
+  const EventRecordHashAccessor* eventaccessor =
+    NarrowEventRecord::getHashAccessor();
+  PtrHashTable<const jni::EventGlue*,NarrowEventRecord*>
     eventmap(eventaccessor, numevents);
   const jni::IteratorGlue iter = events.iteratorGlue(cache);
   while (iter.hasNext()) {
@@ -152,7 +153,7 @@ setup()
   // Build pre-transition tables ...
   NarrowPreTransitionTable* pretrans = (NarrowPreTransitionTable*)
     new char[numaut * sizeof(NarrowPreTransitionTable)];
-  for (uint32 a = 0; a < numaut; a++) {
+  for (uint32_t a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     new (&pretrans[a]) NarrowPreTransitionTable(aut, cache, eventmap);
   }
@@ -161,7 +162,7 @@ setup()
   mNumEventRecords = eventmap.size();
   mEventRecords = new NarrowEventRecord*[mNumEventRecords];
   HashTableIterator hiter = eventmap.iterator();
-  uint32 e = 0;
+  uint32_t e = 0;
   while (eventmap.hasNext(hiter)) {
     mEventRecords[e++] = eventmap.next(hiter);
   }
@@ -180,7 +181,7 @@ setup()
   mNonReversedTransitionTables = 0;
   mTransitionTables =
     (NarrowTransitionTable*) new char[numaut * sizeof(NarrowTransitionTable)];
-  for (uint32 a = 0; a < numaut; a++) {
+  for (uint32_t a = 0; a < numaut; a++) {
     NarrowPreTransitionTable* pre = &pretrans[a];
     new (&mTransitionTables[a]) NarrowTransitionTable(pre, cache, eventmap);
     // mTransitionTables[a].dump(a, mEventRecords);
@@ -189,10 +190,10 @@ setup()
   delete (const char*) pretrans;
 
   // More allocation ...
-  mIterator = new uint32[numaut];
-  mNondetIterator = new uint32[numaut];
-  mCurrentAutomata = new uint32[numaut];
-  mTargetTuple = new uint32[numaut];
+  mIterator = new uint32_t[numaut];
+  mNondetIterator = new uint32_t[numaut];
+  mCurrentAutomata = new uint32_t[numaut];
+  mTargetTuple = new uint32_t[numaut];
 }
 
 
@@ -200,23 +201,23 @@ void NarrowProductExplorer::
 teardown()
 {
   if (mEventRecords != 0) {
-    for (uint32 e = 0; e < mNumEventRecords; e++) {
+    for (uint32_t e = 0; e < mNumEventRecords; e++) {
       delete mEventRecords[e];
     }
     mNumEventRecords = 0;
     delete [] mEventRecords;
     mEventRecords = 0;
   }
-  const uint32 numaut = getNumberOfAutomata();
+  const uint32_t numaut = getNumberOfAutomata();
   if (mTransitionTables != 0) {
-    for (uint32 a = 0; a < numaut; a++) {
+    for (uint32_t a = 0; a < numaut; a++) {
       mTransitionTables[a].~NarrowTransitionTable();
     }
     delete [] (char*) mTransitionTables;
     mTransitionTables = 0;
   }
   if (mNonReversedTransitionTables != 0) {
-    for (uint32 a = 0; a < numaut; a++) {
+    for (uint32_t a = 0; a < numaut; a++) {
       mNonReversedTransitionTables[a].~NarrowTransitionTable();
     }
     delete[] (char*) mNonReversedTransitionTables;
@@ -238,11 +239,11 @@ teardown()
 #define EXPAND(source, sourcetuple, minevent, numaut, TAG)              \
   {                                                                     \
     minevent = mNumEventRecords;                                        \
-    uint32 mincount = UNDEF_UINT32;                                     \
-    for (uint32 a = 0; a < numaut; a++) {                               \
+    uint32_t mincount = UINT32_MAX;                                     \
+    for (uint32_t a = 0; a < numaut; a++) {                               \
       const NarrowTransitionTable& table = mTransitionTables[a];        \
       mIterator[a] = table.iterator(sourcetuple[a]);                    \
-      uint32 e = table.getEvent(mIterator[a]);                          \
+      uint32_t e = table.getEvent(mIterator[a]);                          \
       if (e < minevent) {                                               \
         minevent = e;                                                   \
         mincount = 1;                                                   \
@@ -255,10 +256,10 @@ teardown()
       if (mincount == mEventRecords[minevent]->getNumberOfAutomata()) { \
         ADD_SUCCESSORS(source, sourcetuple, mincount, numaut, TAG);     \
       }                                                                 \
-      uint32 newminevent = mNumEventRecords;                            \
-      for (uint32 a = 0; a < numaut; a++) {                             \
+      uint32_t newminevent = mNumEventRecords;                            \
+      for (uint32_t a = 0; a < numaut; a++) {                             \
         const NarrowTransitionTable& table = mTransitionTables[a];      \
-        uint32 e = table.getEvent(mIterator[a]);                        \
+        uint32_t e = table.getEvent(mIterator[a]);                        \
         if (e == minevent) {                                            \
           mIterator[a] = table.next(mIterator[a]);                      \
           e = table.getEvent(mIterator[a]);                             \
@@ -277,15 +278,15 @@ teardown()
 
 #define ADD_SUCCESSORS(source, sourcetuple, autcount, numaut, TAG)      \
   {                                                                     \
-    for (uint32 a = 0; a < numaut; a++) {                               \
+    for (uint32_t a = 0; a < numaut; a++) {                               \
       mTargetTuple[a] = sourcetuple[a];                                 \
     }                                                                   \
-    uint32 ndcount = 0;                                                 \
-    for (uint32 i = 0; i < autcount; i++) {                             \
-      const uint32 a = mCurrentAutomata[i];                             \
-      const uint32 iter = mIterator[a];                                 \
+    uint32_t ndcount = 0;                                                 \
+    for (uint32_t i = 0; i < autcount; i++) {                             \
+      const uint32_t a = mCurrentAutomata[i];                             \
+      const uint32_t iter = mIterator[a];                                 \
       const NarrowTransitionTable& table = mTransitionTables[a];        \
-      const uint32 raw = table.getRawSuccessors(iter);                  \
+      const uint32_t raw = table.getRawSuccessors(iter);                  \
       if (raw & TAG) {                                                  \
         mTargetTuple[a] = raw & ~TAG;                                   \
       } else {                                                          \
@@ -294,23 +295,23 @@ teardown()
         mTargetTuple[a] = table.getRawNondetSuccessor(raw);             \
       }                                                                 \
     }                                                                   \
-    uint32 ndindex = 0;                                                 \
+    uint32_t ndindex = 0;                                                 \
     do {                                                                \
-      uint32* packed = getStateSpace().prepare();                       \
+      uint32_t* packed = getStateSpace().prepare();                       \
       getAutomatonEncoding().encode(mTargetTuple, packed);              \
       ADD_NEW_STATE(source);                                            \
       for (ndindex = 0; ndindex < ndcount; ndindex++) {                 \
-        const uint32 a = mCurrentAutomata[ndindex];                     \
+        const uint32_t a = mCurrentAutomata[ndindex];                     \
         const NarrowTransitionTable& table = mTransitionTables[a];      \
-        const uint32 offset = mNondetIterator[ndindex];                 \
-        const uint32 raw = table.getRawNondetSuccessor(offset);         \
+        const uint32_t offset = mNondetIterator[ndindex];                 \
+        const uint32_t raw = table.getRawNondetSuccessor(offset);         \
         if (raw & TAG) {                                                \
-          const uint32 iter = mIterator[a];                             \
-          const uint32 next =                                           \
+          const uint32_t iter = mIterator[a];                             \
+          const uint32_t next =                                           \
             mNondetIterator[ndindex] = table.getRawSuccessors(iter);    \
           mTargetTuple[a] = table.getRawNondetSuccessor(next);          \
         } else {                                                        \
-          const uint32 next = mNondetIterator[ndindex] = offset + 1;    \
+          const uint32_t next = mNondetIterator[ndindex] = offset + 1;    \
           mTargetTuple[a] = table.getRawNondetSuccessor(next) & ~TAG;   \
           break;                                                        \
         }                                                               \
@@ -330,19 +331,19 @@ teardown()
 
 
 bool NarrowProductExplorer::
-expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
+expandSafetyState(const uint32_t* sourcetuple, const uint32_t* sourcepacked)
 {
-  const uint32 numaut = getNumberOfAutomata();
-  const uint32 TAG = NarrowTransitionTable::TAG_END_OF_LIST;
-  uint32 minevent = mNumEventRecords;
-  uint32 mincount = UNDEF_UINT32;
-  uint32 plantcount = UNDEF_UINT32;
-  uint32 speconly = mFirstSpecOnlyUncontrollable;
+  const uint32_t numaut = getNumberOfAutomata();
+  const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
+  uint32_t minevent = mNumEventRecords;
+  uint32_t mincount = UINT32_MAX;
+  uint32_t plantcount = UINT32_MAX;
+  uint32_t speconly = mFirstSpecOnlyUncontrollable;
 
-  for (uint32 a = 0; a < numaut; a++) {
+  for (uint32_t a = 0; a < numaut; a++) {
     const NarrowTransitionTable& table = mTransitionTables[a];
     mIterator[a] = table.iterator(sourcetuple[a]);
-    uint32 e = table.getEvent(mIterator[a]);
+    uint32_t e = table.getEvent(mIterator[a]);
     if (e < minevent) {
       minevent = e;
       mCurrentAutomata[0] = a;
@@ -376,10 +377,10 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       setTraceEvent(event);
       return false;
     }
-    uint32 newminevent = mNumEventRecords;
-    for (uint32 a = 0; a < numaut; a++) {
+    uint32_t newminevent = mNumEventRecords;
+    for (uint32_t a = 0; a < numaut; a++) {
       const NarrowTransitionTable& table = mTransitionTables[a];
-      uint32 e = table.getEvent(mIterator[a]);
+      uint32_t e = table.getEvent(mIterator[a]);
       if (e == minevent) {
         mIterator[a] = table.next(mIterator[a]);
         e = table.getEvent(mIterator[a]);
@@ -411,7 +412,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 #undef ADD_NEW_STATE
 #define ADD_NEW_STATE(source)                                           \
   {                                                                     \
-    const uint32 target = getStateSpace().add();                        \
+    const uint32_t target = getStateSpace().add();                        \
     if (target != source) {                                             \
       setConflictKind(jni::ConflictKind_CONFLICT);                      \
       if (target == getNumberOfStates()) {                              \
@@ -423,13 +424,13 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 
 
 bool NarrowProductExplorer::
-expandNonblockingReachabilityState(uint32 source,
-                                   const uint32* sourcetuple,
-                                   const uint32* sourcepacked)
+expandNonblockingReachabilityState(uint32_t source,
+                                   const uint32_t* sourcetuple,
+                                   const uint32_t* sourcepacked)
 {
-  const uint32 numaut = getNumberOfAutomata();
-  const uint32 TAG = NarrowTransitionTable::TAG_END_OF_LIST;
-  uint32 minevent = UNDEF_UINT32;
+  const uint32_t numaut = getNumberOfAutomata();
+  const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
+  uint32_t minevent = UINT32_MAX;
   setConflictKind(jni::ConflictKind_DEADLOCK);
   if (getTransitionLimit() > 0) {
 #   define ADD_TRANSITION addCoreachabilityTransition
@@ -457,12 +458,12 @@ expandNonblockingReachabilityState(uint32 source,
 
 
 void NarrowProductExplorer::
-expandNonblockingCoreachabilityState(const uint32* targettuple,
-                                     const uint32* targetpacked)
+expandNonblockingCoreachabilityState(const uint32_t* targettuple,
+                                     const uint32_t* targetpacked)
 {
-  const uint32 TAG = NarrowTransitionTable::TAG_END_OF_LIST;
-  const uint32 numaut = getNumberOfAutomata();
-  uint32 minevent = UNDEF_UINT32;
+  const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
+  const uint32_t numaut = getNumberOfAutomata();
+  uint32_t minevent = UINT32_MAX;
   EXPAND(TARGET, targettuple, minevent, numaut, TAG);
 }
 
@@ -474,11 +475,11 @@ void NarrowProductExplorer::
 setupReverseTransitionRelations()
 {
   if (mNonReversedTransitionTables == 0) {
-    const uint32 numaut = getNumberOfAutomata();
+    const uint32_t numaut = getNumberOfAutomata();
     mNonReversedTransitionTables = mTransitionTables;
     mTransitionTables = (NarrowTransitionTable*)
       new char[numaut * sizeof(NarrowTransitionTable)];
-    for (uint32 a = 0; a < numaut; a++) {
+    for (uint32_t a = 0; a < numaut; a++) {
       // mNonReversedTransitionTables[a].dump(a, mEventRecords);
       const NarrowTransitionTable* orig = &mNonReversedTransitionTables[a];
       new (&mTransitionTables[a]) NarrowTransitionTable(orig, mEventRecords);
@@ -492,11 +493,11 @@ setupReverseTransitionRelations()
 
 
 void NarrowProductExplorer::
-expandTraceState(const uint32* targettuple, const uint32* targetpacked)
+expandTraceState(const uint32_t* targettuple, const uint32_t* targetpacked)
 {
-  const uint32 TAG = NarrowTransitionTable::TAG_END_OF_LIST;
-  const uint32 numaut = getNumberOfAutomata();
-  uint32 minevent = UNDEF_UINT32;
+  const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
+  const uint32_t numaut = getNumberOfAutomata();
+  uint32_t minevent = UINT32_MAX;
   try {
     EXPAND(TARGET, targettuple, minevent, numaut, TAG);
   } catch (const SearchAbort& abort) {
@@ -513,19 +514,19 @@ expandTraceState(const uint32* targettuple, const uint32* targetpacked)
 
 
 void NarrowProductExplorer::
-storeNondeterministicTargets(const uint32* sourcetuple,
-                             const uint32* targettuple,
+storeNondeterministicTargets(const uint32_t* sourcetuple,
+                             const uint32_t* targettuple,
                              const jni::MapGlue& statemap)
 {
-  const uint32 numaut = getNumberOfAutomata();
+  const uint32_t numaut = getNumberOfAutomata();
   const NarrowEventRecord* event = (const NarrowEventRecord*) getTraceEvent();
-  const uint32 e = event->getEventCode();
-  for (uint32 a = 0; a < numaut; a++) {
+  const uint32_t e = event->getEventCode();
+  for (uint32_t a = 0; a < numaut; a++) {
     const NarrowTransitionTable& table =
       mNonReversedTransitionTables ?
       mNonReversedTransitionTables[a] : mTransitionTables[a];
-    uint32 iter = table.iterator(sourcetuple[a]);
-    uint32 current = table.getEvent(iter);
+    uint32_t iter = table.iterator(sourcetuple[a]);
+    uint32_t current = table.getEvent(iter);
     while (current < e) {
       iter = table.next(iter);
       current = table.getEvent(iter);

@@ -593,7 +593,7 @@ public class ProjectingSafetyVerifier
           mProjector.setForbidden(localforbiddenEvents);
           mProjector.setNodeLimit(mMaxProjStates);
           mProjector.run();
-          minAutomaton = mProjector.getComputedProxy();
+          minAutomaton = mProjector.getComputedAutomaton();
           if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
             final TransitionRelation tr = new TransitionRelation(minAutomaton, null);
             tr.setMarkingToStatesWithOutgoing(forbiddenEvents);

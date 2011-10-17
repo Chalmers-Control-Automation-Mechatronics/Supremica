@@ -19,8 +19,9 @@
 #pragma once
 #endif
 
+#include <stdint.h>
+
 #include "waters/base/ArrayList.h"
-#include "waters/base/IntTypes.h"
 #include "waters/base/HashTable.h"
 
 
@@ -33,51 +34,51 @@ class AutomatonEncoding;
 //# class StateSpace
 //############################################################################
 
-class StateSpace : public IntHashAccessor
+class StateSpace : public Int32HashAccessor
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit StateSpace(const AutomatonEncoding* encoding, uint32 limit);
+  explicit StateSpace(const AutomatonEncoding* encoding, uint32_t limit);
   virtual ~StateSpace();
 
   //##########################################################################
   //# Simple Access
   inline int getEncodingSize() const {return mEncodingSize;}
   inline int getNumberOfSignificantWords() const {return mNumSignificantWords;}
-  inline uint32 size() const {return mNumStates;}
+  inline uint32_t size() const {return mNumStates;}
 
   //##########################################################################
   //# Access
-  uint32* get(uint32 index) const;
-  uint32* prepare();
-  uint32* prepare(uint32 index);
-  uint32 add();
-  inline uint32 find() const {return mLookupTable.get(mNumStates);}
+  uint32_t* get(uint32_t index) const;
+  uint32_t* prepare();
+  uint32_t* prepare(uint32_t index);
+  uint32_t add();
+  inline uint32_t find() const {return mLookupTable.get(mNumStates);}
   void clear();
 
   //##########################################################################
   //# Hash Methods
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const {return value;}
+  virtual uint64_t hash(int32_t key) const;
+  virtual bool equals(int32_t key1, int32_t key2) const;
+  virtual int32_t getKey(int32_t value) const {return value;}
 
 private:
   //##########################################################################
   //# Data Members
   int mEncodingSize;
   int mNumSignificantWords;
-  uint32 mNumStates;
-  uint32 mStateLimit;
-  ArrayList<uint32*> mBlocks;
-  HashTable<uint32,uint32> mLookupTable;
+  uint32_t mNumStates;
+  uint32_t mStateLimit;
+  ArrayList<uint32_t*> mBlocks;
+  Int32HashTable<uint32_t,uint32_t> mLookupTable;
 
   //##########################################################################
   //# Class Constants
-  static const uint32 INITBLOCKS = 256;
-  static const uint32 BLOCKSHIFT = 10;
-  static const uint32 BLOCKSIZE = 1 << BLOCKSHIFT;
-  static const uint32 BLOCKMASK = BLOCKSIZE - 1;
+  static const uint32_t INITBLOCKS = 256;
+  static const uint32_t BLOCKSHIFT = 10;
+  static const uint32_t BLOCKSIZE = 1 << BLOCKSHIFT;
+  static const uint32_t BLOCKMASK = BLOCKSIZE - 1;
 };
 
 
@@ -90,12 +91,12 @@ class TaggedStateSpace : public StateSpace
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit TaggedStateSpace(const AutomatonEncoding* encoding, uint32 limit);
+  explicit TaggedStateSpace(const AutomatonEncoding* encoding, uint32_t limit);
 
   //##########################################################################
   //# Hash Methods
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
+  virtual uint64_t hash(int32_t key) const;
+  virtual bool equals(int32_t key1, int32_t key2) const;
 
 private:
   //##########################################################################

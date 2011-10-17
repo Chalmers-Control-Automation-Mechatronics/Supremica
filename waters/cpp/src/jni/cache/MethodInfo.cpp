@@ -21,7 +21,7 @@ namespace jni {
 //###########################################################################
 
 MethodInfo::
-MethodInfo(waters::uint32 code,
+MethodInfo(uint32_t code,
            const char* name, 
            const char* signature)
 {

@@ -34,6 +34,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
@@ -679,17 +680,21 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // a fixed ordering for automata
       final Set<AutomatonProxy> automata = model.getAutomata();
       final int numaut = automata.size();
-      final List<AutomatonSchema> list = new ArrayList<AutomatonSchema>(numaut);
+      final List<AutomatonSchema> list =
+        new ArrayList<AutomatonSchema>(numaut);
       for (final AutomatonProxy aut : automata) {
-        switch (translator.getComponentKind(aut)) {
-        case PLANT:
-        case SPEC:
-          final AutomatonSchema schema =
-              new AutomatonSchema(aut, eventmap, marking, preconditionMarking);
-          list.add(schema);
-          break;
-        default:
-          break;
+        final ComponentKind kind = translator.getComponentKind(aut);
+        if (kind != null) {
+          switch (kind) {
+          case PLANT:
+          case SPEC:
+            final AutomatonSchema schema =
+            new AutomatonSchema(aut, eventmap, marking, preconditionMarking);
+            list.add(schema);
+            break;
+          default:
+            break;
+          }
         }
       }
       // Calculate the encoding data. This should be in a

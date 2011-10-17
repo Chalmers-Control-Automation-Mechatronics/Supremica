@@ -35,12 +35,12 @@ class ProductDES
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ProductDES(uint32 numprops, uint32 numuncont, uint32 numcont);
+  explicit ProductDES(uint32_t numprops, uint32_t numuncont, uint32_t numcont);
   ~ProductDES();
 
   //##########################################################################
   //# Initialisation
-  void initEventName(uint32 code, jstring name);
+  void initEventName(uint32_t code, jstring name);
 
   //##########################################################################
   //# Simple Access

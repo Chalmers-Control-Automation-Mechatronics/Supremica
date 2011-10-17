@@ -15,10 +15,6 @@ public class ReinforcementLearningPlusTabuSearch {
     private static final int ADD_REWARD = 2;
     private static final int ADD_PUNISH = -1;
     private int max_activity;
-    @SuppressWarnings("unused")
-    private int num_access;
-    @SuppressWarnings("unused")
-    private int num_advance;
     private int[] activity = null, queue2 = null;
     private boolean punish_inactive;
 
@@ -41,8 +37,6 @@ public class ReinforcementLearningPlusTabuSearch {
     }
 
     public void reset() {
-        num_access = 0;
-        num_advance = 0;
         if (activity != null) {
             for (int i = 0; i < activity.length; i++) {
                 activity[i] = 0;
@@ -62,12 +56,6 @@ public class ReinforcementLearningPlusTabuSearch {
     }
 
     public void advance(final int element, final boolean changed) {
-
-        num_access++;
-
-        if (changed) {
-            num_advance++;
-        }
         if (punish_inactive) {
             activity[element] += (changed) ? ADD_REWARD : ADD_PUNISH;
             // dont let it grow more than we can handle...

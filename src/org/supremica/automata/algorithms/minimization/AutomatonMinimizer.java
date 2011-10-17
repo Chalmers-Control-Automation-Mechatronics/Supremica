@@ -277,7 +277,7 @@ public class AutomatonMinimizer
           final KindTranslator translator = IdenticalKindTranslator.getInstance();
          final OPSearchAutomatonSimplifier simp =
             new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
-          final AutomatonProxy result = simp.getComputedProxy();
+          final AutomatonProxy result = simp.getComputedAutomaton();
           if (result != aut) {
             final ProjectBuildFromWaters exporter =
               new ProjectBuildFromWaters(null);
@@ -629,7 +629,7 @@ public class AutomatonMinimizer
         }
 
         // Remove from alphabet epsilon events that are never used
-        
+
         removeUnusedEpsilonEvents(theAutomaton);
         // Message
         if (Config.VERBOSE_MODE.isTrue())
@@ -708,30 +708,28 @@ public class AutomatonMinimizer
           {
               final Arc arc = arcIt.next();
               final LabeledEvent event = arc.getEvent();
-              if (event.isUnobservable())   // this is where isTau() did not work, right? (What if we have other non-tau un-observable events?)
+ 
+              if(event.isTauEvent())
               {
-                 final LabeledEvent orig = TauEvent.getOriginalEvent(event);    // MF: changed event.getName() to just event (see TauEvent)
-                 if(orig != null)   // what if we get null here? Then we leave an un-obs/tau event in the alphabet and on the arc...
+                final LabeledEvent orig = ((TauEvent)event).getOriginalEvent();
+                assert(orig != null); // It should never happen that orig == null!
+                assert(aut.getAlphabet().contains(event));  // It should never happen that event is not in the alphabet
+                if( !aut.getAlphabet().contains(orig) )  // should this be an assertion?
                  {
-                     arc.setEvent(orig);
-                     if( !aut.getAlphabet().contains(orig) )
-                     {
-                         aut.getAlphabet().addEvent(orig);
-
-                         if(aut.getAlphabet().contains(event))
-                         {
-                            aut.getAlphabet().removeEvent(event);
-                         }
-                     }
-                  }
-              }
+                     aut.getAlphabet().addEvent(orig);
+                 }
+                arc.setEvent(orig);
+                aut.getAlphabet().removeEvent(event);
+             }
           }
-     }
+      }
 
 
 
-    public static void renameBackToOriginalEvents(final Automata auto){
-        for(final Automaton aut:auto){
+    public static void renameBackToOriginalEvents(final Automata auto)
+    {
+        for(final Automaton aut:auto)
+        {
            renameBackToOriginalEvents(aut);
         }
     }
@@ -1666,7 +1664,7 @@ public class AutomatonMinimizer
     public int mergeEpsilonLoops(final Automaton aut)
     {
         final StateSet statesToExamine = new StateSet(aut.getStateSet());
-        
+
 
         // Count the removed states
         int count = 0;
@@ -1692,10 +1690,10 @@ public class AutomatonMinimizer
             while (forwardsClosure.size() != 0)
             {
                 final State two = forwardsClosure.remove();
-                
+
                 if (backwardsClosure.contains(two))
                 {
-                    
+
                     // Merge!
                     count++;
                     statesToExamine.remove(two);

@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -91,12 +92,14 @@ public class GraphPanel
   //# Repaint Support
   public void registerSupremicaPropertyChangeListeners()
   {
+    Config.GUI_EDITOR_BACKGROUND_COLOR.addPropertyChangeListener(this);
     Config.GUI_EDITOR_NODE_RADIUS.addPropertyChangeListener(this);
     Config.GUI_EDITOR_EDGEARROW_AT_END.addPropertyChangeListener(this);
   }
 
   public void unregisterSupremicaPropertyChangeListeners()
   {
+    Config.GUI_EDITOR_BACKGROUND_COLOR.removePropertyChangeListener(this);
     Config.GUI_EDITOR_NODE_RADIUS.removePropertyChangeListener(this);
     Config.GUI_EDITOR_EDGEARROW_AT_END.removePropertyChangeListener(this);
   }
@@ -115,7 +118,8 @@ public class GraphPanel
   //# Repainting
   protected void paintGrid(final Graphics g)
   {
-    g.setColor(EditorColor.BACKGROUNDCOLOR);
+    final Color background = Config.GUI_EDITOR_BACKGROUND_COLOR.get();
+    g.setColor(background);
     g.fillRect(0, 0, getWidth(), getHeight());
     g.setColor(EditorColor.GRIDCOLOR);
 

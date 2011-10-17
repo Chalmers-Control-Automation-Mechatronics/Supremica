@@ -41,15 +41,15 @@ TarjanStackFrameNondeterministic::
 //############################################################################
 //# TarjanStackFrameNondeterministic: Advanced Access
 
-uint32 TarjanStackFrameNondeterministic::
-setupTransitionIterator(const TransitionRecord* trans, uint32 source)
+uint32_t TarjanStackFrameNondeterministic::
+setupTransitionIterator(const TransitionRecord* trans, uint32_t source)
 {
   int ndend = mTransitionIteratorEnd++;
   return mTransitionIterators[ndend].setup(trans, source);
 }
 
 bool TarjanStackFrameNondeterministic::
-advanceTransitionIterators(uint32* bufferpacked)
+advanceTransitionIterators(uint32_t* bufferpacked)
 {
   for (int index = 0; index < mTransitionIteratorEnd; index++) {
     if (!mTransitionIterators[index].advance(bufferpacked)) {
@@ -85,7 +85,7 @@ TarjanStackFrame::
 //# TarjanStackFrame: Advanced Access
 
 void TarjanStackFrame::
-reset(uint32 state)
+reset(uint32_t state)
 {
   mIsRoot = true;
   mStateCode = state;
@@ -112,7 +112,7 @@ createNondeterministicTransitionIterators(int max)
 //# TarjanControlStack: Access
 
 TarjanStackFrame& TarjanControlStack::
-push(uint32 state)
+push(uint32_t state)
 {
   if (mStackPointer == size()) {
     add();
@@ -138,7 +138,7 @@ clear()
 //# TarjanStateStack: Access
 
 void TarjanStateStack::
-push(uint32 state)
+push(uint32_t state)
 {
   if (mStackPointer == size()) {
     add(state);
@@ -151,7 +151,7 @@ push(uint32 state)
 void TarjanStateStack::
 clear()
 {
-  BlockedArrayList<uint32>::clear();
+  BlockedArrayList<uint32_t>::clear();
   mStackPointer = 0;
 }
 

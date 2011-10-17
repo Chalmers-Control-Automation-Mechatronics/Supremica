@@ -29,7 +29,7 @@ namespace waters {
 //# ReverseTransitionStore: Constructors & Destructors
 
 ReverseTransitionStore::
-ReverseTransitionStore(uint32 limit)
+ReverseTransitionStore(uint32_t limit)
   : mTransitionLimit(limit),
     mNumTransitions(0),
     mNextLocalIndex(BLOCK_SIZE),
@@ -43,12 +43,12 @@ ReverseTransitionStore(uint32 limit)
 ReverseTransitionStore::
 ~ReverseTransitionStore()
 {
-  for (uint32 i = 0; i < mHeadBlocks.size(); i++) {
-    uint32* block = mHeadBlocks.get(i);
+  for (uint32_t i = 0; i < mHeadBlocks.size(); i++) {
+    uint32_t* block = mHeadBlocks.get(i);
     delete [] block;
   }
-  for (uint32 j = 0; j < mNodeBlocks.size(); j++) {
-    uint32* block = mNodeBlocks.get(j);
+  for (uint32_t j = 0; j < mNodeBlocks.size(); j++) {
+    uint32_t* block = mNodeBlocks.get(j);
     delete [] block;
   }
 }
@@ -58,36 +58,36 @@ ReverseTransitionStore::
 //# ReverseTransitionStore: Access
 
 void ReverseTransitionStore::
-addTransition(uint32 source, uint32 target)
+addTransition(uint32_t source, uint32_t target)
 {
   // suppress selfloops
   if (source == target) {
     return;
   }
   // find or allocate block
-  const uint32 headblockno = target >> BLOCK_SHIFT;
-  const uint32 headindex = target & BLOCK_MASK;
-  uint32* headblock;
-  uint32 head;
+  const uint32_t headblockno = target >> BLOCK_SHIFT;
+  const uint32_t headindex = target & BLOCK_MASK;
+  uint32_t* headblock;
+  uint32_t head;
   if (headblockno < mHeadBlocks.size()) {
     headblock = mHeadBlocks.get(headblockno);
     head = headblock[headindex];
   } else {
     do {
-      headblock = new uint32[BLOCK_SIZE];
-      for (uint32 i = 0; i < BLOCK_SIZE; i++) {
-        headblock[i] = UNDEF_UINT32;
+      headblock = new uint32_t[BLOCK_SIZE];
+      for (uint32_t i = 0; i < BLOCK_SIZE; i++) {
+        headblock[i] = UINT32_MAX;
       }
       mHeadBlocks.add(headblock);
     } while (headblockno >= mHeadBlocks.size());
-    head = UNDEF_UINT32;
+    head = UINT32_MAX;
   }
 
   // suppress duplicate transitions
-  uint32 nodeindex;
-  uint32* nodeblock;
+  uint32_t nodeindex;
+  uint32_t* nodeblock;
   if ((head & TAG_DATA) == 0) {
-    const uint32 nodeblockno = head >> BLOCK_SHIFT;
+    const uint32_t nodeblockno = head >> BLOCK_SHIFT;
     nodeblock = mNodeBlocks.get(nodeblockno);
     nodeindex = head & BLOCK_MASK;
     if (nodeblock[nodeindex] == source) {
@@ -103,14 +103,14 @@ addTransition(uint32 source, uint32 target)
       nodeblock[nodeindex - 1] = source;
       return;
     }
-  } else if (head == UNDEF_UINT32) {
+  } else if (head == UINT32_MAX) {
     headblock[headindex] = TAG_DATA | source;
     mNumTransitions++;
     return;
   } else if ((head & ~TAG_DATA) == source) {
     return;
   } else {
-    nodeindex = UNDEF_UINT32;
+    nodeindex = UINT32_MAX;
     nodeblock = 0;
   }
 
@@ -121,7 +121,7 @@ addTransition(uint32 source, uint32 target)
   }
   mNumTransitions++;
   if (mNextLocalIndex == BLOCK_SIZE) {
-    mCurrentNodeBlock = new uint32[BLOCK_SIZE];
+    mCurrentNodeBlock = new uint32_t[BLOCK_SIZE];
     mNodeBlocks.add(mCurrentNodeBlock);
     mNextLocalIndex = 0;
   }
@@ -133,39 +133,39 @@ addTransition(uint32 source, uint32 target)
   mNextLocalIndex = nodeindex;
 }
 
-uint32 ReverseTransitionStore::
-iterator(uint32 target)
+uint32_t ReverseTransitionStore::
+iterator(uint32_t target)
   const
 {
-  const uint32 headblockno = target >> BLOCK_SHIFT;
+  const uint32_t headblockno = target >> BLOCK_SHIFT;
   if (headblockno < mHeadBlocks.size()) {
-    const uint32* headblock = mHeadBlocks.get(headblockno);
-    const uint32 headindex = target & BLOCK_MASK;
+    const uint32_t* headblock = mHeadBlocks.get(headblockno);
+    const uint32_t headindex = target & BLOCK_MASK;
     return headblock[headindex];
   } else {
-    return UNDEF_UINT32;
+    return UINT32_MAX;
   }
 }
 
-uint32 ReverseTransitionStore::
-hasNext(uint32 iterator)
+uint32_t ReverseTransitionStore::
+hasNext(uint32_t iterator)
   const
 {
-  return iterator != UNDEF_UINT32;
+  return iterator != UINT32_MAX;
 }
 
-uint32 ReverseTransitionStore::
-next(uint32& iterator)
+uint32_t ReverseTransitionStore::
+next(uint32_t& iterator)
   const
 {
   if (iterator & TAG_DATA) {
-    const uint32 data = iterator & ~TAG_DATA;
-    iterator = UNDEF_UINT32;
+    const uint32_t data = iterator & ~TAG_DATA;
+    iterator = UINT32_MAX;
     return data;
   } else {
-    const uint32 blockno = iterator >> BLOCK_SHIFT;
-    const uint32* block = mNodeBlocks.get(blockno);
-    const uint32 index = iterator & BLOCK_MASK;
+    const uint32_t blockno = iterator >> BLOCK_SHIFT;
+    const uint32_t* block = mNodeBlocks.get(blockno);
+    const uint32_t index = iterator & BLOCK_MASK;
     if ((index & NODE_MASK) == NODE_SIZE - 2) {
       iterator = block[index + 1];
     } else {
@@ -185,22 +185,22 @@ next(uint32& iterator)
   (code & TAG_DATA ? "+" : "") << (code & ~TAG_DATA)
 
 void ReverseTransitionStore::
-dump(uint32 numstates)
+dump(uint32_t numstates)
   const
 {
   std::cerr << "HEADS:" << std::endl;
-  for (uint32 hindex = 0; hindex < numstates; hindex++) {
-    const uint32 headblockno = hindex >> BLOCK_SHIFT;
-    const uint32 headindex = hindex & BLOCK_MASK;
-    const uint32* headblock = mHeadBlocks.get(headblockno);
-    const uint32 head = headblock[headindex];
+  for (uint32_t hindex = 0; hindex < numstates; hindex++) {
+    const uint32_t headblockno = hindex >> BLOCK_SHIFT;
+    const uint32_t headindex = hindex & BLOCK_MASK;
+    const uint32_t* headblock = mHeadBlocks.get(headblockno);
+    const uint32_t head = headblock[headindex];
     std::cerr << "H" << hindex << ": " << DUMPING(head) << std::endl;
   }
-  for (uint32 bindex = 0; bindex < mNextGlobalIndex; bindex++) {
-    const uint32 blockno = bindex >> BLOCK_SHIFT;
-    const uint32 index = bindex & BLOCK_MASK;
-    const uint32* block = mNodeBlocks.get(blockno);
-    const uint32 data = block[index];
+  for (uint32_t bindex = 0; bindex < mNextGlobalIndex; bindex++) {
+    const uint32_t blockno = bindex >> BLOCK_SHIFT;
+    const uint32_t index = bindex & BLOCK_MASK;
+    const uint32_t* block = mNodeBlocks.get(blockno);
+    const uint32_t data = block[index];
     std::cerr << "N" << bindex << ": " << DUMPING(data) << std::endl;
   }
 }

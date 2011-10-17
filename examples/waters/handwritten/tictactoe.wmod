@@ -1,268 +1,1397 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tictactoe" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-<ns2:Comment>A model of a tic tac toe game. The size of the game board can be parametrised. The model uses event aliases in the 'game_over' model and the 'white_never_wins' model.</ns2:Comment>
-<ConstantAliasList>
-<ConstantAlias>
-<SimpleIdentifier Name="size"/>
-<ConstantAliasExpression>
-<IntConstant Value="3"/>
-</ConstantAliasExpression>
-</ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="coords"/>
-<ConstantAliasExpression>
-<BinaryExpression Operator="..">
-<IntConstant Value="1"/>
-<SimpleIdentifier Name="size"/>
-</BinaryExpression>
-</ConstantAliasExpression>
-</ConstantAlias>
-</ConstantAliasList>
-<EventDeclList>
-<EventDecl Name="white" Kind="UNCONTROLLABLE">
-<RangeList>
-<SimpleIdentifier Name="coords"/>
-<SimpleIdentifier Name="coords"/>
-</RangeList>
-</EventDecl>
-<EventDecl Name="black" Kind="CONTROLLABLE">
-<RangeList>
-<SimpleIdentifier Name="coords"/>
-<SimpleIdentifier Name="coords"/>
-</RangeList>
-</EventDecl>
-<EventDecl Name="draw" Kind="UNCONTROLLABLE"/>
-<EventDecl Name="white_win_x" Kind="UNCONTROLLABLE">
-<RangeList>
-<SimpleIdentifier Name="coords"/>
-</RangeList>
-</EventDecl>
-<EventDecl Name="white_win_y" Kind="UNCONTROLLABLE">
-<RangeList>
-<SimpleIdentifier Name="coords"/>
-</RangeList>
-</EventDecl>
-<EventDecl Name="white_win_d1" Kind="UNCONTROLLABLE"/>
-<EventDecl Name="white_win_d2" Kind="UNCONTROLLABLE"/>
-<EventDecl Name="black_win_x" Kind="UNCONTROLLABLE">
-<RangeList>
-<SimpleIdentifier Name="coords"/>
-</RangeList>
-</EventDecl>
-<EventDecl Name="black_win_y" Kind="UNCONTROLLABLE">
-<RangeList>
-<SimpleIdentifier Name="coords"/>
-</RangeList>
-</EventDecl>
-<EventDecl Name="black_win_d1" Kind="UNCONTROLLABLE"/>
-<EventDecl Name="black_win_d2" Kind="UNCONTROLLABLE"/>
-<EventDecl Name=":accepting" Kind="PROPOSITION"/>
-</EventDeclList>
-<EventAliasList>
-<EventAlias>
-<SimpleIdentifier Name="white_win"/>
-<EventListExpression>
-<EventList>
-<SimpleIdentifier Name="white_win_x"/>
-<SimpleIdentifier Name="white_win_y"/>
-<SimpleIdentifier Name="white_win_d1"/>
-<SimpleIdentifier Name="white_win_d2"/>
-</EventList>
-</EventListExpression>
-</EventAlias>
-<EventAlias>
-<SimpleIdentifier Name="black_win"/>
-<EventListExpression>
-<EventList>
-<SimpleIdentifier Name="black_win_x"/>
-<SimpleIdentifier Name="black_win_y"/>
-<SimpleIdentifier Name="black_win_d1"/>
-<SimpleIdentifier Name="black_win_d2"/>
-</EventList>
-</EventListExpression>
-</EventAlias>
-</EventAliasList>
-<ComponentList>
-<ForeachComponent Name="x">
-<SimpleIdentifier Name="coords"/>
-<ComponentList>
-<ForeachComponent Name="y">
-<SimpleIdentifier Name="coords"/>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="square">
-<SimpleIdentifier Name="x"/>
-<SimpleIdentifier Name="y"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Name="free" Initial="true"/>
-<SimpleNode Name="white"/>
-<SimpleNode Name="black"/>
-</NodeList>
-<EdgeList>
-<Edge Source="free" Target="white">
-<LabelBlock>
-<IndexedIdentifier Name="white">
-<SimpleIdentifier Name="x"/>
-<SimpleIdentifier Name="y"/>
-</IndexedIdentifier>
-</LabelBlock>
-</Edge>
-<Edge Source="white" Target="white">
-<LabelBlock>
-<IndexedIdentifier Name="white_win_x">
-<SimpleIdentifier Name="x"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="white_win_y">
-<SimpleIdentifier Name="y"/>
-</IndexedIdentifier>
-<ForeachEvent Name=":dummy">
-<BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="x"/>
-<SimpleIdentifier Name="y"/>
-</BinaryExpression>
-<EventList>
-<SimpleIdentifier Name="white_win_d1"/>
-</EventList>
-</ForeachEvent>
-<ForeachEvent Name=":dummy">
-<BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="x"/>
-<BinaryExpression Operator="+">
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="size"/>
-<SimpleIdentifier Name="y"/>
-</BinaryExpression>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<EventList>
-<SimpleIdentifier Name="white_win_d2"/>
-</EventList>
-</ForeachEvent>
-<SimpleIdentifier Name="draw"/>
-</LabelBlock>
-</Edge>
-<Edge Source="free" Target="black">
-<LabelBlock>
-<IndexedIdentifier Name="black">
-<SimpleIdentifier Name="x"/>
-<SimpleIdentifier Name="y"/>
-</IndexedIdentifier>
-</LabelBlock>
-</Edge>
-<Edge Source="black" Target="black">
-<LabelBlock>
-<IndexedIdentifier Name="black_win_x">
-<SimpleIdentifier Name="x"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="black_win_y">
-<SimpleIdentifier Name="y"/>
-</IndexedIdentifier>
-<ForeachEvent Name=":dummy">
-<BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="x"/>
-<SimpleIdentifier Name="y"/>
-</BinaryExpression>
-<EventList>
-<SimpleIdentifier Name="black_win_d1"/>
-</EventList>
-</ForeachEvent>
-<ForeachEvent Name=":dummy">
-<BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="x"/>
-<BinaryExpression Operator="+">
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="size"/>
-<SimpleIdentifier Name="y"/>
-</BinaryExpression>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<EventList>
-<SimpleIdentifier Name="black_win_d2"/>
-</EventList>
-</ForeachEvent>
-<SimpleIdentifier Name="draw"/>
-</LabelBlock>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="turn"/>
-<Graph>
-<NodeList>
-<SimpleNode Name="white" Initial="true"/>
-<SimpleNode Name="black"/>
-</NodeList>
-<EdgeList>
-<Edge Source="white" Target="black">
-<LabelBlock>
-<SimpleIdentifier Name="white"/>
-</LabelBlock>
-</Edge>
-<Edge Source="black" Target="white">
-<LabelBlock>
-<SimpleIdentifier Name="black"/>
-</LabelBlock>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="game_over"/>
-<Graph>
-<NodeList>
-<SimpleNode Name="game" Initial="true"/>
-<SimpleNode Name="over">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="game" Target="over">
-<LabelBlock>
-<SimpleIdentifier Name="white_win"/>
-<SimpleIdentifier Name="black_win"/>
-<SimpleIdentifier Name="draw"/>
-</LabelBlock>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<SimpleComponent Kind="SPEC">
-<SimpleIdentifier Name="white_never_wins"/>
-<Graph>
-<LabelBlock>
-<SimpleIdentifier Name="white_win"/>
-</LabelBlock>
-<NodeList>
-<SimpleNode Name="init" Initial="true"/>
-</NodeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
+    <ns2:Comment>Model of Tic-Tac-Toe game.
+Two players, white and black, take turns to occupy squares in 3x3 grid. The winner is the player who first occupies a horizontal, vertical, or diagonal row of three squares.
+The control objective is to synthesise a strategy for the second player (black) that prevents the first player (white) from winning. Synthesis can be used to find such a strategy.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="winner_white_x">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="winner_white_y">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="winner_white_d1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="winner_white_d2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="white">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="draw"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="winner_black_d1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="winner_black_d2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="black">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="winner_black_x">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="winner_black_y">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="move">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="black">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="176" X="208"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="6" X="13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="white">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="176" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="5" X="-40"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="black" Source="white">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="white"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="161" X="169"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="white" Source="black">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="black"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="191" X="167"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <ForeachComponent Name="x">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="2"/>
+            </BinaryExpression>
+            <ComponentList>
+                <ForeachComponent Name="y">
+                    <BinaryExpression Operator="..">
+                        <IntConstant Value="0"/>
+                        <IntConstant Value="2"/>
+                    </BinaryExpression>
+                    <ComponentList>
+                        <SimpleComponent Kind="PLANT">
+                            <IndexedIdentifier Name="square">
+                                <SimpleIdentifier Name="x"/>
+                                <SimpleIdentifier Name="y"/>
+                            </IndexedIdentifier>
+                            <Graph>
+                                <NodeList>
+                                    <SimpleNode Name="full">
+                                        <EventList>
+                                            <SimpleIdentifier Name=":accepting"/>
+                                        </EventList>
+                                        <PointGeometry>
+                                            <Point Y="128" X="240"/>
+                                        </PointGeometry>
+                                        <LabelGeometry>
+                                            <Point Y="24" X="-7"/>
+                                        </LabelGeometry>
+                                    </SimpleNode>
+                                    <SimpleNode Initial="true" Name="empty">
+                                        <EventList>
+                                            <SimpleIdentifier Name=":accepting"/>
+                                        </EventList>
+                                        <PointGeometry>
+                                            <Point Y="128" X="160"/>
+                                        </PointGeometry>
+                                        <LabelGeometry>
+                                            <Point Y="22" X="-17"/>
+                                        </LabelGeometry>
+                                    </SimpleNode>
+                                </NodeList>
+                                <EdgeList>
+                                    <Edge Target="full" Source="full">
+                                        <LabelBlock>
+                                            <SimpleIdentifier Name="draw"/>
+                                            <LabelGeometry Anchor="NW">
+                                                <Point Y="-30" X="-33"/>
+                                            </LabelGeometry>
+                                        </LabelBlock>
+                                        <SplineGeometry>
+                                            <Point Y="128" X="283"/>
+                                        </SplineGeometry>
+                                    </Edge>
+                                    <Edge Target="full" Source="empty">
+                                        <LabelBlock>
+                                            <IndexedIdentifier Name="white">
+                                                <SimpleIdentifier Name="x"/>
+                                                <SimpleIdentifier Name="y"/>
+                                            </IndexedIdentifier>
+                                            <IndexedIdentifier Name="black">
+                                                <SimpleIdentifier Name="x"/>
+                                                <SimpleIdentifier Name="y"/>
+                                            </IndexedIdentifier>
+                                            <LabelGeometry Anchor="NW">
+                                                <Point Y="-36" X="-32"/>
+                                            </LabelGeometry>
+                                        </LabelBlock>
+                                    </Edge>
+                                </EdgeList>
+                            </Graph>
+                        </SimpleComponent>
+                    </ComponentList>
+                </ForeachComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="x">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="2"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="black_xwin">
+                        <SimpleIdentifier Name="x"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="s0">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="80"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="11" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s1">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="160"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="11" X="-7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s2">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="240"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="8" X="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s3">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="320"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="10" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="s1" Source="s1">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="white"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="3" X="-20"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="149" X="160"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="s2" Source="s1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="0"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="1"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="2"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-48" X="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s1" Source="s0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="0"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="1"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="2"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-49" X="-31"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s0" Source="s0">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="white"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="1" X="-19"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="150" X="79"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="s3" Source="s3">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="winner_black_x">
+                                        <SimpleIdentifier Name="x"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="17" X="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="112" X="360"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="s3" Source="s2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="0"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="1"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="2"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-49" X="-28"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s2" Source="s2">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="white"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="2" X="-18"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="149" X="239"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="white_xwin">
+                        <SimpleIdentifier Name="x"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="s0">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="80"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="9" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s1">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="160"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="9" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s2">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="240"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="9" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s3">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="320"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="9" X="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="s3" Source="s3">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="winner_white_x">
+                                        <SimpleIdentifier Name="x"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="17" X="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="112" X="360"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="s2" Source="s1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="0"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="1"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="2"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-49" X="-28"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s3" Source="s2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="0"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="1"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="2"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-49" X="-27"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s1" Source="s0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="0"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="1"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="2"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-49" X="-31"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="y">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="2"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="black_ywin">
+                        <SimpleIdentifier Name="y"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="s0">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="80"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="11" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s1">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="160"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="12" X="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s2">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="240"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="12" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s3">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="320"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="11" X="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="s3" Source="s3">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="winner_black_y">
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="17" X="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="112" X="360"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="s3" Source="s2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="1"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="2"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-50" X="-30"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s2" Source="s2">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="white"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="2" X="-16"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="150" X="239"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="s2" Source="s1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="1"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="2"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-50" X="-30"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s1" Source="s1">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="white"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="3" X="-19"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="149" X="161"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="s1" Source="s0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="1"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="black">
+                                        <IntConstant Value="2"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-51" X="-32"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s0" Source="s0">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="white"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="2" X="-21"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="152" X="80"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="white_ywin">
+                        <SimpleIdentifier Name="y"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Name="s3">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="320"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="11" X="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s2">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="240"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="11" X="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="s1">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="160"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="12" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="s0">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="112" X="80"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="11" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="s2" Source="s1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="1"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="2"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-52" X="-30"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s3" Source="s2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="1"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="2"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-51" X="-28"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s1" Source="s0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="1"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="white">
+                                        <IntConstant Value="2"/>
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-52" X="-32"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="s3" Source="s3">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="winner_white_y">
+                                        <SimpleIdentifier Name="y"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="17" X="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="112" X="360"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <SimpleComponent Kind="PLANT" Name="black_dwin1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="320"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="11" X="-10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="white"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="148" X="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-49" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="winner_black_d1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="148" X="320"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-50" X="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="white"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="149" X="240"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-50" X="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="white"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="148" X="81"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="white_dwin1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="320"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="11" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="11" X="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="11" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="10" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-49" X="-34"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-48" X="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-48" X="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="winner_white_d1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="17" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="112" X="360"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="black_dwin2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="8" X="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="10" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="320"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="24" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="white"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="152" X="241"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-46" X="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="white"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="150" X="80"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-47" X="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="black">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-47" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="white"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="151" X="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="winner_black_d2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="17" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="112" X="360"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="white_dwin2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="9" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="11" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="11" X="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="320"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="12" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-48" X="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="winner_white_d2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="17" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="112" X="360"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-49" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="white">
+                                <IntConstant Value="2"/>
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-48" X="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="game_over">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="game">
+                        <PointGeometry>
+                            <Point Y="160" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="8" X="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="over">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="160" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="8" X="-12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="over" Source="game">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="winner_black_d1"/>
+                            <SimpleIdentifier Name="winner_black_d2"/>
+                            <SimpleIdentifier Name="winner_black_x"/>
+                            <SimpleIdentifier Name="winner_black_y"/>
+                            <SimpleIdentifier Name="winner_white_d1"/>
+                            <SimpleIdentifier Name="winner_white_d2"/>
+                            <SimpleIdentifier Name="winner_white_x"/>
+                            <SimpleIdentifier Name="winner_white_y"/>
+                            <SimpleIdentifier Name="draw"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-136" X="-49"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="white_never_win">
+            <Graph>
+                <LabelBlock>
+                    <SimpleIdentifier Name="winner_white_d1"/>
+                    <SimpleIdentifier Name="winner_white_d2"/>
+                    <SimpleIdentifier Name="winner_white_x"/>
+                    <SimpleIdentifier Name="winner_white_y"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="26" X="103"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="init">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="48" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="11" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
 </Module>

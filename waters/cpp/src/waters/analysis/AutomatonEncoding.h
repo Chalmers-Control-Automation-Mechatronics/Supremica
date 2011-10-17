@@ -23,7 +23,7 @@
 
 #include "waters/base/HashAccessor.h"
 #include "waters/base/HashTable.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 namespace jni {
   class ClassCache;
@@ -54,9 +54,9 @@ private:
 public:
   //##########################################################################
   //# Hash Methods
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const;
+  virtual uint64_t hash(intptr_t key) const;
+  virtual bool equals(intptr_t key1, intptr_t key2) const;
+  virtual intptr_t getKey(intptr_t value) const;
 };
 
 
@@ -65,7 +65,7 @@ public:
 //# class AutomatonRecord
 //############################################################################
 
-class AutomatonRecord : public IntHashAccessor
+class AutomatonRecord : public Int32PtrHashAccessor
 {
 public:
   //##########################################################################
@@ -81,21 +81,21 @@ public:
   //# Simple Access
   const jni::AutomatonGlue& getJavaAutomaton() const {return mJavaAutomaton;}
   inline bool isPlant() const {return mIsPlant;}
-  inline uint32 getNumberOfStates() const {return mNumStates;}
-  inline uint32 getFirstInitialState1() const {return mFirstInitialState1;}
-  inline uint32 getEndOfInitialStates1() const {return mEndInitialStates1;}
-  inline uint32 getFirstInitialState2() const {return mFirstInitialState2;}
-  inline uint32 getEndOfInitialStates2() const {return mEndInitialStates2;}
-  uint32 getNumberOfInitialStates() const;
-  inline uint32 getFirstMarkedState() const {return mFirstMarkedState;}
-  inline uint32 getNumberOfMarkedStates() const
+  inline uint32_t getNumberOfStates() const {return mNumStates;}
+  inline uint32_t getFirstInitialState1() const {return mFirstInitialState1;}
+  inline uint32_t getEndOfInitialStates1() const {return mEndInitialStates1;}
+  inline uint32_t getFirstInitialState2() const {return mFirstInitialState2;}
+  inline uint32_t getEndOfInitialStates2() const {return mEndInitialStates2;}
+  uint32_t getNumberOfInitialStates() const;
+  inline uint32_t getFirstMarkedState() const {return mFirstMarkedState;}
+  inline uint32_t getNumberOfMarkedStates() const
     {return mNumStates - mFirstMarkedState;}
-  inline bool isMarkedState(uint32 code) const
+  inline bool isMarkedState(uint32_t code) const
     {return code >= mFirstMarkedState;}
   inline bool isAllMarked() const {return mFirstMarkedState == 0;}
-  inline uint32 getNumberOfPreMarkedStates() const
+  inline uint32_t getNumberOfPreMarkedStates() const
     {return mEndPreMarkedStates - mFirstPreMarkedState;}
-  inline bool isPreMarkedState(uint32 code) const
+  inline bool isPreMarkedState(uint32_t code) const
     {return code >= mFirstPreMarkedState && code < mEndPreMarkedStates;}
   inline bool isAllPreMarked() const
     {return mFirstPreMarkedState == 0 && mEndPreMarkedStates == mNumStates;}
@@ -105,8 +105,8 @@ public:
   inline int getShift() const {return mShift;}
   inline int getBitMask() const {return mBitMask;}
   jni::JavaString getName() const;
-  jni::JavaString getStateName(uint32 code) const;
-  const jni::StateGlue& getJavaState(uint32 code) const;
+  jni::JavaString getStateName(uint32_t code) const;
+  const jni::StateGlue& getJavaState(uint32_t code) const;
 
   //##########################################################################
   //# Comparing and Hashing
@@ -116,28 +116,29 @@ public:
   static int compareByMarking(const void* elem1, const void* elem2);
   int compareToByPreMarking(const AutomatonRecord* partner) const;
   static int compareByPreMarking(const void* elem1, const void* elem2);
-  static inline const HashAccessor* getHashAccessor()
+  static inline const AutomatonRecordHashAccessor* getHashAccessor()
     {return &theHashAccessor;}
 
   //##########################################################################
   //# Setting up
   inline void setAutomatonIndex(int index) {mAutomatonIndex = index;}
   void allocate(int wordindex, int shift);
-  HashTable<const jni::StateGlue*,uint32>* createStateMap();
-  void deleteStateMap(HashTable<const jni::StateGlue*,uint32>* statemap);
+  Int32PtrHashTable<const jni::StateGlue*,uint32_t>* createStateMap();
+  void deleteStateMap
+    (Int32PtrHashTable<const jni::StateGlue*,uint32_t>* statemap);
 
   //##########################################################################
   //# Hash Methods (for states!!!)
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const;
+  virtual uint64_t hash(intptr_t key) const;
+  virtual bool equals(intptr_t key1, intptr_t key2) const;
+  virtual intptr_t getKey(int32_t value) const;
 
 private:
   //##########################################################################
   //# Auxiliary Methods
   void initNonMarking(jni::ClassCache* cache, bool allmarked);
   void initMarking(const jni::EventGlue& marking,
-		   uint32& firstmarkedref,
+		   uint32_t& firstmarkedref,
 		   jni::ClassCache* cache);
   void initMarking(const jni::EventGlue& alpha,
 		   const jni::EventGlue& omega,
@@ -155,19 +156,19 @@ private:
   jni::AutomatonGlue mJavaAutomaton;
   jni::StateGlue* mJavaStates;
   bool mIsPlant;
-  uint32 mNumStates;
+  uint32_t mNumStates;
   int mNumBits;
   int mAutomatonIndex;
   int mWordIndex;
   int mShift;
-  uint32 mBitMask;
-  uint32 mFirstInitialState1;
-  uint32 mEndInitialStates1;
-  uint32 mFirstInitialState2;
-  uint32 mEndInitialStates2;
-  uint32 mFirstMarkedState;
-  uint32 mFirstPreMarkedState;
-  uint32 mEndPreMarkedStates;
+  uint32_t mBitMask;
+  uint32_t mFirstInitialState1;
+  uint32_t mEndInitialStates1;
+  uint32_t mFirstInitialState2;
+  uint32_t mEndInitialStates2;
+  uint32_t mFirstMarkedState;
+  uint32_t mFirstPreMarkedState;
+  uint32_t mEndPreMarkedStates;
 
   //##########################################################################
   //# Class Constants
@@ -203,63 +204,63 @@ public:
   inline int getNumberOfRecords() const {return mNumRecords;}
   inline AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
-  uint32 getInverseTagMask() const;
+  uint32_t getInverseTagMask() const;
   bool hasSpecs() const;
   int getNumberOfNondeterministicInitialAutomata() const;
 
   //##########################################################################
   //# Encoding and Decoding
-  void encode(const uint32* decoded, uint32* encoded) const;
-  void decode(const uint32* encoded, uint32* decoded) const;
-  uint32 get(const uint32* encoded, int index) const;
-  void set(uint32* encoded, int index, uint32 code) const;
-  void shift(uint32* decoded) const;
+  void encode(const uint32_t* decoded, uint32_t* encoded) const;
+  void decode(const uint32_t* encoded, uint32_t* decoded) const;
+  uint32_t get(const uint32_t* encoded, int index) const;
+  void set(uint32_t* encoded, int index, uint32_t code) const;
+  void shift(uint32_t* decoded) const;
 
   //##########################################################################
   //# Marking
   bool isTriviallyNonblocking() const {return mIsTriviallyNonblocking;}
   bool isTriviallyBlocking() const {return mIsTriviallyBlocking;}
-  bool isMarkedStateTuplePacked(const uint32* encoded) const;
-  bool isMarkedStateTuple(const uint32* decoded) const;
-  bool isPreMarkedStateTuplePacked(const uint32* encoded) const;
-  bool isPreMarkedStateTuple(const uint32* decoded) const;
+  bool isMarkedStateTuplePacked(const uint32_t* encoded) const;
+  bool isMarkedStateTuple(const uint32_t* decoded) const;
+  bool isPreMarkedStateTuplePacked(const uint32_t* encoded) const;
+  bool isPreMarkedStateTuple(const uint32_t* decoded) const;
 
   //##########################################################################
   //# Masking
-  void initMask(uint32* mask) const;
-  void addToMask(uint32* mask, int index) const;
-  bool equals(const uint32* encoded1,
-	      const uint32* encoded2,
-	      const uint32* nmask) const;
+  void initMask(uint32_t* mask) const;
+  void addToMask(uint32_t* mask, int index) const;
+  bool equals(const uint32_t* encoded1,
+	      const uint32_t* encoded2,
+	      const uint32_t* nmask) const;
 
   //##########################################################################
   //# Tagging
-  inline bool hasTag(const uint32* encoded, const uint32 tag) const
+  inline bool hasTag(const uint32_t* encoded, const uint32_t tag) const
     {return (encoded[0] & tag) != 0;}
-  inline void setTag(uint32* encoded, const uint32 tag) const
+  inline void setTag(uint32_t* encoded, const uint32_t tag) const
     {encoded[0] |= tag;}
-  inline void clearTag(uint32* encoded, const uint32 tag) const
+  inline void clearTag(uint32_t* encoded, const uint32_t tag) const
     {encoded[0] &= ~tag;}
 
   //##########################################################################
   //# Trace Computation
   void storeNondeterministicInitialStates
-    (const uint32* tuple, const jni::MapGlue& statemap) const;
+    (const uint32_t* tuple, const jni::MapGlue& statemap) const;
 
   //##########################################################################
   //# Debug Output
 #ifdef DEBUG
   void dump() const;
-  void dumpEncodedState(const uint32* encoded) const;
-  void dumpDecodedState(const uint32* decoded) const;
+  void dumpEncodedState(const uint32_t* encoded) const;
+  void dumpDecodedState(const uint32_t* decoded) const;
 #endif /* DEBUG */
 
   //##########################################################################
   //# Public Class Constants
-  static const uint32 TAG0 = 0x00000001;
-  static const uint32 TAG1 = 0x00000002;
-  static const uint32 TAG2 = 0x00000004;
-  static const uint32 TAG3 = 0x00000008;
+  static const uint32_t TAG0 = 0x00000001;
+  static const uint32_t TAG1 = 0x00000002;
+  static const uint32_t TAG2 = 0x00000004;
+  static const uint32_t TAG3 = 0x00000008;
 
 private:
   //##########################################################################

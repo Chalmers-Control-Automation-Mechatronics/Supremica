@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="HalfwaySynthesis_10" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A simple test for halfway synthesis. This tests whether a nonblocking plant with an unreachable state is left unchanged.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="arrive"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="enter"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="WAIT">
+                        <PointGeometry>
+                            <Point Y="96" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-5" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="FREE">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="32" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-8" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="dump">
+                        <PointGeometry>
+                            <Point Y="96" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="FREE" Source="WAIT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="64" X="97"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="WAIT" Source="FREE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="65" X="128"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

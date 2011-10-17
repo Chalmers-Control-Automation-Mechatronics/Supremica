@@ -44,17 +44,17 @@ namespace waters {
 //############################################################################
 //# AutomatonRecordHashAccessor: Hash Methods
 
-uint32 AutomatonRecordHashAccessor::
-hash(const void* key)
+uint64_t AutomatonRecordHashAccessor::
+hash(intptr_t key)
   const
 {
   const jni::AutomatonGlue* aut = (const jni::AutomatonGlue*) key;
-  return (uint32) aut->hashCode();
+  return aut->hashCode();
 }
 
 
 bool AutomatonRecordHashAccessor::
-equals(const void* key1, const void* key2)
+equals(intptr_t key1, intptr_t key2)
   const
 {
   const jni::AutomatonGlue* aut1 = (const jni::AutomatonGlue*) key1;
@@ -63,12 +63,12 @@ equals(const void* key1, const void* key2)
 }
 
 
-const void* AutomatonRecordHashAccessor::
-getKey(const void* value)
+intptr_t AutomatonRecordHashAccessor::
+getKey(intptr_t value)
   const
 {
   const AutomatonRecord* record = (const AutomatonRecord*) value;
-  return &record->getJavaAutomaton();
+  return (intptr_t) &record->getJavaAutomaton();
 }
 
 
@@ -127,7 +127,7 @@ AutomatonRecord(const jni::AutomatonGlue& aut,
 AutomatonRecord::
 ~AutomatonRecord()
 {
-  for (uint32 code = 0; code < mNumStates; code++) {
+  for (uint32_t code = 0; code < mNumStates; code++) {
     mJavaStates[code].jni::StateGlue::~StateGlue();
   }
   free(mJavaStates);
@@ -137,7 +137,7 @@ AutomatonRecord::
 //############################################################################
 //# AutomatonRecord: Simple Access
 
-uint32 AutomatonRecord::
+uint32_t AutomatonRecord::
 getNumberOfInitialStates()
   const
 {
@@ -157,7 +157,7 @@ getName()
 }
 
 jni::JavaString AutomatonRecord::
-getStateName(uint32 code)
+getStateName(uint32_t code)
   const
 {
   const jni::StateGlue& state = mJavaStates[code];
@@ -168,7 +168,7 @@ getStateName(uint32 code)
 }
 
 const jni::StateGlue& AutomatonRecord::
-getJavaState(uint32 code)
+getJavaState(uint32_t code)
   const
 {
   return mJavaStates[code];
@@ -258,19 +258,19 @@ allocate(int wordindex, int shift)
   mBitMask = ((1 << mNumBits) - 1) << shift;
 }
 
-HashTable<const jni::StateGlue*,uint32>* AutomatonRecord::
+Int32PtrHashTable<const jni::StateGlue*,uint32_t>* AutomatonRecord::
 createStateMap()
 {
-  HashTable<const jni::StateGlue*,uint32>* statemap =
-    new HashTable<const jni::StateGlue*,uint32>(this, mNumStates);
-  for (uint32 code = 0; code < mNumStates; code++) {
+  Int32PtrHashTable<const jni::StateGlue*,uint32_t>* statemap =
+    new Int32PtrHashTable<const jni::StateGlue*,uint32_t>(this, mNumStates);
+  for (uint32_t code = 0; code < mNumStates; code++) {
     statemap->add(code);
   }
   return statemap;
 }
 
 void AutomatonRecord::
-deleteStateMap(HashTable<const jni::StateGlue*,uint32>* statemap)
+deleteStateMap(Int32PtrHashTable<const jni::StateGlue*,uint32_t>* statemap)
 {
   delete statemap;
 }
@@ -284,12 +284,12 @@ initNonMarking(jni::ClassCache* cache, bool allmarked)
 {
   const jni::SetGlue states = mJavaAutomaton.getStatesGlue(cache);
   const jni::IteratorGlue iter = states.iteratorGlue(cache);
-  uint32 nextinit = 0;
-  uint32 nextnoninit = mNumStates - 1;
+  uint32_t nextinit = 0;
+  uint32_t nextnoninit = mNumStates - 1;
   while (iter.hasNext()) {
     jobject javaobject = iter.next();
     jni::StateGlue state(javaobject, cache);
-    uint32 code;
+    uint32_t code;
     if (state.isInitial()) {
       code = nextinit++;
     } else {
@@ -306,12 +306,12 @@ initNonMarking(jni::ClassCache* cache, bool allmarked)
 
 void AutomatonRecord::
 initMarking(const jni::EventGlue& marking,
-            uint32& firstmarkedref,
+            uint32_t& firstmarkedref,
             jni::ClassCache* cache)
 {
   static const int CAT_COUNT = 4;
   int cat;
-  uint32 catindex[CAT_COUNT];
+  uint32_t catindex[CAT_COUNT];
   for (cat = 0; cat < CAT_COUNT; cat++) {
     catindex[cat] = 0;
   }
@@ -323,9 +323,9 @@ initMarking(const jni::EventGlue& marking,
     cat = getCategory(state, marking, cache);
     catindex[cat]++;
   }
-  uint32 start = 0;
+  uint32_t start = 0;
   for (cat = 0; cat < CAT_COUNT; cat++) {
-    uint32 next = start + catindex[cat];
+    uint32_t next = start + catindex[cat];
     catindex[cat] = start;
     start = next;
   }
@@ -334,7 +334,7 @@ initMarking(const jni::EventGlue& marking,
     jobject javaobject = iter2.next();
     jni::StateGlue state(javaobject, cache);
     cat = getCategory(state, marking, cache);
-    const uint32 code = catindex[cat]++;
+    const uint32_t code = catindex[cat]++;
     new (&mJavaStates[code]) jni::StateGlue(state);
   }
   mFirstInitialState1 = catindex[0];
@@ -349,7 +349,7 @@ initMarking(const jni::EventGlue& alpha,
 {
   static const int CAT_COUNT = 8;
   int cat;
-  uint32 catindex[CAT_COUNT];
+  uint32_t catindex[CAT_COUNT];
   for (cat = 0; cat < CAT_COUNT; cat++) {
     catindex[cat] = 0;
   }
@@ -361,9 +361,9 @@ initMarking(const jni::EventGlue& alpha,
     cat = getCategory(state, alpha, omega, cache);
     catindex[cat]++;
   }
-  uint32 start = 0;
+  uint32_t start = 0;
   for (cat = 0; cat < CAT_COUNT; cat++) {
-    uint32 next = start + catindex[cat];
+    uint32_t next = start + catindex[cat];
     catindex[cat] = start;
     start = next;
   }
@@ -372,7 +372,7 @@ initMarking(const jni::EventGlue& alpha,
     jobject javaobject = iter2.next();
     jni::StateGlue state(javaobject, cache);
     cat = getCategory(state, alpha, omega, cache);
-    const uint32 code = catindex[cat]++;
+    const uint32_t code = catindex[cat]++;
     new (&mJavaStates[code]) jni::StateGlue(state);
   }
   if (catindex[0] == catindex[2]) {
@@ -418,8 +418,8 @@ getCategory(const jni::StateGlue& state,
 //############################################################################
 //# AutomatonRecord: Hash Methods (for states!!!)
 
-uint32 AutomatonRecord::
-hash(const void* key)
+uint64_t AutomatonRecord::
+hash(intptr_t key)
   const
 {
   const jni::StateGlue* state = (const jni::StateGlue*) key;
@@ -427,8 +427,9 @@ hash(const void* key)
   return waters::hashInt(javahash);
 }
 
+
 bool AutomatonRecord::
-equals(const void* key1, const void* key2)
+equals(intptr_t key1, intptr_t key2)
   const
 {
   const jni::StateGlue* state1 = (const jni::StateGlue*) key1;
@@ -436,12 +437,12 @@ equals(const void* key1, const void* key2)
   return state1->equals(state2);
 }
 
-const void* AutomatonRecord::
-getKey(const void* value)
+
+intptr_t AutomatonRecord::
+getKey(int32_t value)
   const
 {
-  const uint32 code = (uint32) value;
-  return &mJavaStates[code];
+  return (intptr_t) &mJavaStates[value];
 }
 
 
@@ -583,7 +584,7 @@ AutomatonEncoding::
 //############################################################################
 //# AutomatonEncoding: Simple Access
 
-uint32 AutomatonEncoding::
+uint32_t AutomatonEncoding::
 getInverseTagMask()
   const
 {
@@ -622,18 +623,18 @@ getNumberOfNondeterministicInitialAutomata()
 //# AutomatonEncoding: Encoding and Decoding
 
 void AutomatonEncoding::
-encode(const uint32* decoded, uint32* encoded)
+encode(const uint32_t* decoded, uint32_t* encoded)
   const
 {
   int a = 0;
   int w = 0;
   for (; w < mNumSignificantWords; w++) {
     const int end = mWordStop[w];
-    uint32 word = 0;
+    uint32_t word = 0;
     for (; a < end; a++) {
       const AutomatonRecord* record = mAutomatonRecords[a];
       const int shift = record->getShift();
-      const uint32 code = decoded[a];
+      const uint32_t code = decoded[a];
       word |= (code << shift);
     }
     encoded[w] = word;
@@ -644,47 +645,47 @@ encode(const uint32* decoded, uint32* encoded)
 }
 
 void AutomatonEncoding::
-decode(const uint32* encoded, uint32* decoded)
+decode(const uint32_t* encoded, uint32_t* decoded)
   const
 {
   int a = 0;
   for (int w = 0; w < mNumSignificantWords; w++) {
     const int end = mWordStop[w];
-    const uint32 word = encoded[w];
+    const uint32_t word = encoded[w];
     for (; a < end; a++) {
       const AutomatonRecord* record = mAutomatonRecords[a];
       const int shift = record->getShift();
-      const uint32 mask = record->getBitMask();
+      const uint32_t mask = record->getBitMask();
       decoded[a] = (word & mask) >> shift;
     }
   }
 }
 
-uint32 AutomatonEncoding::
-get(const uint32* encoded, int index)
+uint32_t AutomatonEncoding::
+get(const uint32_t* encoded, int index)
   const
 {
   const AutomatonRecord* record = mAutomatonRecords[index];
   const int w = record->getWordIndex();
-  const uint32 word = encoded[w];
+  const uint32_t word = encoded[w];
   const int shift = record->getShift();
-  const uint32 mask = record->getBitMask();
+  const uint32_t mask = record->getBitMask();
   return (word & mask) >> shift;
 }
 
 void AutomatonEncoding::
-set(uint32* encoded, int index, uint32 code)
+set(uint32_t* encoded, int index, uint32_t code)
   const
 {
   const AutomatonRecord* record = mAutomatonRecords[index];
   const int w = record->getWordIndex();
   const int shift = record->getShift();
-  const uint32 mask = record->getBitMask();
+  const uint32_t mask = record->getBitMask();
   encoded[w] = (encoded[w] & ~mask) | (code << shift);
 }
 
 void AutomatonEncoding::
-shift(uint32* decoded)
+shift(uint32_t* decoded)
   const
 {
   for (int a = 0; a < mNumRecords; a++) {
@@ -699,13 +700,13 @@ shift(uint32* decoded)
 //# AutomatonEncoding: Marking
 
 bool AutomatonEncoding::
-isMarkedStateTuplePacked(const uint32* encoded)
+isMarkedStateTuplePacked(const uint32_t* encoded)
   const
 {
   for (int a = 0; a < mNumMarkingTestRecords; a++) {
     const AutomatonRecord* record = mMarkingTestRecords[a];
-    const uint32 index = record->getAutomatonIndex();
-    const uint32 state = get(encoded, index);
+    const uint32_t index = record->getAutomatonIndex();
+    const uint32_t state = get(encoded, index);
     if (!record->isMarkedState(state)) {
       return false;
     }
@@ -714,12 +715,12 @@ isMarkedStateTuplePacked(const uint32* encoded)
 }
 
 bool AutomatonEncoding::
-isMarkedStateTuple(const uint32* decoded)
+isMarkedStateTuple(const uint32_t* decoded)
   const
 {
   for (int a = 0; a < mNumMarkingTestRecords; a++) {
     const AutomatonRecord* record = mMarkingTestRecords[a];
-    const uint32 index = record->getAutomatonIndex();
+    const uint32_t index = record->getAutomatonIndex();
     if (!record->isMarkedState(decoded[index])) {
       return false;
     }
@@ -728,13 +729,13 @@ isMarkedStateTuple(const uint32* decoded)
 }
 
 bool AutomatonEncoding::
-isPreMarkedStateTuplePacked(const uint32* encoded)
+isPreMarkedStateTuplePacked(const uint32_t* encoded)
   const
 {
   for (int a = 0; a < mNumPreMarkingTestRecords; a++) {
     const AutomatonRecord* record = mPreMarkingTestRecords[a];
-    const uint32 index = record->getAutomatonIndex();
-    const uint32 state = get(encoded, index);
+    const uint32_t index = record->getAutomatonIndex();
+    const uint32_t state = get(encoded, index);
     if (!record->isPreMarkedState(state)) {
       return false;
     }
@@ -743,12 +744,12 @@ isPreMarkedStateTuplePacked(const uint32* encoded)
 }
 
 bool AutomatonEncoding::
-isPreMarkedStateTuple(const uint32* decoded)
+isPreMarkedStateTuple(const uint32_t* decoded)
   const
 {
   for (int a = 0; a < mNumPreMarkingTestRecords; a++) {
     const AutomatonRecord* record = mPreMarkingTestRecords[a];
-    const uint32 index = record->getAutomatonIndex();
+    const uint32_t index = record->getAutomatonIndex();
     if (!record->isPreMarkedState(decoded[index])) {
       return false;
     }
@@ -761,7 +762,7 @@ isPreMarkedStateTuple(const uint32* decoded)
 //# AutomatonEncoding: Masking
 
 void AutomatonEncoding::
-initMask(uint32* mask)
+initMask(uint32_t* mask)
   const
 {
   for (int w = 0; w < mNumSignificantWords; w++) {
@@ -770,17 +771,17 @@ initMask(uint32* mask)
 }
 
 void AutomatonEncoding::
-addToMask(uint32* mask, int index)
+addToMask(uint32_t* mask, int index)
   const
 {
   const AutomatonRecord* record = mAutomatonRecords[index];
   const int w = record->getWordIndex();
-  const uint32 imask = record->getBitMask();
+  const uint32_t imask = record->getBitMask();
   mask[w] |= imask;
 }
 
 bool AutomatonEncoding::
-equals(const uint32* encoded1, const uint32* encoded2, const uint32* nmask)
+equals(const uint32_t* encoded1, const uint32_t* encoded2, const uint32_t* nmask)
   const
 {
   for (int w = 0; w < mNumSignificantWords; w++) {
@@ -796,14 +797,14 @@ equals(const uint32* encoded1, const uint32* encoded2, const uint32* nmask)
 //# AutomatonEncoding: Trace Computation
 
 void AutomatonEncoding::
-storeNondeterministicInitialStates(const uint32* tuple,
+storeNondeterministicInitialStates(const uint32_t* tuple,
                                    const jni::MapGlue& statemap)
 const
 {
   for (int a = 0; a < mNumRecords; a++) {
     const AutomatonRecord* aut = mAutomatonRecords[a];
     if (aut->getNumberOfInitialStates() > 1) {
-      const uint32 code = tuple[a];
+      const uint32_t code = tuple[a];
       const jni::StateGlue& stateglue = aut->getJavaState(code);
       const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
       statemap.put(&autglue, &stateglue);
@@ -839,7 +840,7 @@ dump()
 }
 
 void AutomatonEncoding::
-dumpEncodedState(const uint32* encoded)
+dumpEncodedState(const uint32_t* encoded)
   const
 {
   std::cerr << '(';
@@ -850,20 +851,20 @@ dumpEncodedState(const uint32* encoded)
     std::cerr << encoded[w];
   }
   std::cerr << ") = ";
-  uint32* decoded = new uint32[mNumRecords];
+  uint32_t* decoded = new uint32_t[mNumRecords];
   decode(encoded, decoded);
   dumpDecodedState(decoded);
   delete [] decoded;
 }
 
 void AutomatonEncoding::
-dumpDecodedState(const uint32* decoded)
+dumpDecodedState(const uint32_t* decoded)
   const
 {
   std::cerr << '(';
   for (int a = 0; a < mNumRecords; a++) {
     const AutomatonRecord* record = mAutomatonRecords[a];
-    const uint32 code = decoded[a];
+    const uint32_t code = decoded[a];
     const jni::JavaString name = record->getStateName(code);
     if (a > 0) {
       std::cerr << ',';

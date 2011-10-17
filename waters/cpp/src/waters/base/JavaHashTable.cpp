@@ -11,6 +11,8 @@
 #pragma implementation
 #endif
 
+#include <iostream>
+
 #include <jni.h>
 
 #include "jni/cache/PreJavaException.h"
@@ -30,8 +32,8 @@ namespace waters {
 //############################################################################
 //# ObjectHashAccessor: Hash Methods
 
-uint32 ObjectHashAccessor::
-hash(const void* key)
+uint64_t ObjectHashAccessor::
+hash(intptr_t key)
   const
 {
   const jobject object = (const jobject) key;
@@ -42,7 +44,7 @@ hash(const void* key)
 
 
 bool ObjectHashAccessor::
-equals(const void* key1, const void* key2)
+equals(intptr_t key1, intptr_t key2)
   const
 {
   const jobject object1 = (const jobject) key1;
@@ -76,16 +78,16 @@ JavaHashTable(JNIEnv* env, jint initsize)
 //############################################################################
 //# HashTable: Invocation through JNI
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_createNativeHashSet
   (JNIEnv* env, jobject /* nset */, jint initsize)
 {
-  return (jint) new waters::JavaHashTable(env, initsize);
+  return (jlong) new waters::JavaHashTable(env, initsize);
 }
 
 JNIEXPORT void JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_destroyNativeHashSet
-  (JNIEnv* env, jobject /* nset */, jint handler)
+  (JNIEnv* env, jobject /* nset */, jlong handler)
 {
   waters::JavaHashTable* table = (waters::JavaHashTable*) handler;
   waters::HashTableIterator iter = table->iterator();
@@ -98,7 +100,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_destroyNativeHashSet
 
 JNIEXPORT jint JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_getNativeSize
-  (JNIEnv* /* env */, jobject /* nset */, jint handler)
+  (JNIEnv* /* env */, jobject /* nset */, jlong handler)
 {
   const waters::JavaHashTable* table = (const waters::JavaHashTable*) handler;
   return table->size();
@@ -106,7 +108,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_getNativeSize
 
 JNIEXPORT jboolean JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_containsNative
-  (JNIEnv* /* env */, jobject /* nset */, jint handler, jobject item)
+  (JNIEnv* /* env */, jobject /* nset */, jlong handler, jobject item)
 {
   const waters::JavaHashTable* table = (const waters::JavaHashTable*) handler;
   return table->get(item) ? JNI_TRUE : JNI_FALSE;
@@ -114,7 +116,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_containsNative
 
 JNIEXPORT jboolean JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_addNative
-  (JNIEnv *env, jobject /* nset */, jint handler, jobject item)
+  (JNIEnv *env, jobject /* nset */, jlong handler, jobject item)
 {
   waters::JavaHashTable* table = (waters::JavaHashTable*) handler;
   jobject gitem = env->NewGlobalRef(item);
@@ -129,24 +131,24 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_addNative
 
 JNIEXPORT void JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_clearNative
-  (JNIEnv* /* env */, jobject /* nset */, jint handler)
+  (JNIEnv* /* env */, jobject /* nset */, jlong handler)
 {
   waters::JavaHashTable* table = (waters::JavaHashTable*) handler;
   table->clear();
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_createNativeIterator
-  (JNIEnv* /* env */, jobject /* nset */, jint handler)
+  (JNIEnv* /* env */, jobject /* nset */, jlong handler)
 {
   const waters::JavaHashTable* table = (const waters::JavaHashTable*) handler;
   waters::HashTableIterator iter = table->iterator();
-  return (jint) new waters::HashTableIterator(iter);
+  return (jlong) new waters::HashTableIterator(iter);
 }
 
 JNIEXPORT void JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_destroyNativeIterator
-  (JNIEnv* /* env */, jobject /* nset */, jint handler)
+  (JNIEnv* /* env */, jobject /* nset */, jlong handler)
 {
   waters::HashTableIterator* iter = (waters::HashTableIterator*) handler;
   delete iter;
@@ -154,7 +156,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_destroyNativeIterator
 
 JNIEXPORT jobject JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_getNativeNext
-  (JNIEnv* /* env */, jobject /* nset */, jint thandler, jint ihandler)
+  (JNIEnv* /* env */, jobject /* nset */, jlong thandler, jlong ihandler)
 {
   const waters::JavaHashTable* table = (const waters::JavaHashTable*) thandler;
   waters::HashTableIterator* iter = (waters::HashTableIterator*) ihandler;
@@ -163,7 +165,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_getNativeNext
 
 JNIEXPORT jboolean JNICALL
 Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_hasNativeNext
-  (JNIEnv* /* env */, jobject /* nset */, jint thandler, jint ihandler)
+  (JNIEnv* /* env */, jobject /* nset */, jlong thandler, jlong ihandler)
 {
   const waters::JavaHashTable* table = (const waters::JavaHashTable*) thandler;
   waters::HashTableIterator* iter = (waters::HashTableIterator*) ihandler;

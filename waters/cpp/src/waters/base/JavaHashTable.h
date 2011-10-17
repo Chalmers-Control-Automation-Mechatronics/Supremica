@@ -26,8 +26,6 @@
 
 namespace waters {
 
-class HashAccessor;
-
 
 //###########################################################################
 //# Class ObjectHashAccessor
@@ -42,9 +40,8 @@ public:
 
   //##########################################################################
   //# Hash Methods
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const {return value;};
+  virtual uint64_t hash(intptr_t key) const;
+  virtual bool equals(intptr_t key1, intptr_t key2) const;
 
 private:
   //##########################################################################
@@ -83,7 +80,7 @@ private:
   //# Data Members
   mutable jni::ClassCache mCache;
   const ObjectHashAccessor mAccessor;
-  HashTable<jobject,jobject> mTable;
+  PtrHashTable<jobject,jobject> mTable;
 };
 
 

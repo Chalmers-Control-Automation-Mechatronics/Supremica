@@ -468,7 +468,7 @@ public class SICPropertyBuilder
     builder.setOutputName(name);
     builder.setOutputKind(kind);
     builder.run();
-    return builder.getComputedProxy();
+    return builder.getComputedAutomaton();
   }
 
   private AutomatonProxy createSIC5Test(final EventProxy answer,

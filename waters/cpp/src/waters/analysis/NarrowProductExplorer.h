@@ -19,10 +19,11 @@
 #pragma once
 #endif
 
+#include <stdint.h>
+
 #include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESGlue.h"
-#include "waters/base/HashTable.h"
-#include "waters/base/IntTypes.h"
+
 #include "waters/analysis/ProductExplorer.h"
 
 
@@ -67,35 +68,35 @@ protected:
   virtual void setup();
   virtual void teardown();
   virtual bool expandSafetyState
-    (const uint32* sourcetuple, const uint32* sourcepacked);
+    (const uint32_t* sourcetuple, const uint32_t* sourcepacked);
   virtual bool expandNonblockingReachabilityState
-    (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked);
+    (uint32_t source, const uint32_t* sourcetuple, const uint32_t* sourcepacked);
   virtual void expandNonblockingCoreachabilityState
-    (const uint32* targettuple, const uint32* targetpacked);
+    (const uint32_t* targettuple, const uint32_t* targetpacked);
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState
-    (const uint32* targettuple,	const uint32* targetpacked);
+    (const uint32_t* targettuple,	const uint32_t* targetpacked);
   virtual void storeNondeterministicTargets
-    (const uint32* sourcetuple, const uint32* targettuple,
+    (const uint32_t* sourcetuple, const uint32_t* targettuple,
      const jni::MapGlue& statemap);
 
 private:
   //##########################################################################
   //# Private Auxiliary Methods
-  void addSuccessorStates(const uint32* sourcetuple, uint32 autcount);
+  void addSuccessorStates(const uint32_t* sourcetuple, uint32_t autcount);
 
   //##########################################################################
   //# Data Members
-  uint32 mNumEventRecords;
-  uint32 mFirstSpecOnlyUncontrollable;
-  uint32 mNumPlants;
+  uint32_t mNumEventRecords;
+  uint32_t mFirstSpecOnlyUncontrollable;
+  uint32_t mNumPlants;
   NarrowEventRecord** mEventRecords;
   NarrowTransitionTable* mTransitionTables;
   NarrowTransitionTable* mNonReversedTransitionTables;
-  uint32* mIterator;
-  uint32* mNondetIterator;
-  uint32* mCurrentAutomata;
-  uint32* mTargetTuple;
+  uint32_t* mIterator;
+  uint32_t* mNondetIterator;
+  uint32_t* mCurrentAutomata;
+  uint32_t* mTargetTuple;
 };
 
 }   /* namespace waters */

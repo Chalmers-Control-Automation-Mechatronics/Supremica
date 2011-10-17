@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectReference
 //###########################################################################
-//# $Id: ObjectReference.h,v 1.2 2006-08-20 11:02:43 robi Exp $
+//# $Id$
 //###########################################################################
 
 
@@ -21,7 +21,7 @@
 
 #include <jni.h>
 
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace jni {
@@ -38,9 +38,9 @@ class ObjectReference {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ObjectReference(waters::uint32 classcode, ClassCache* cache);
+  explicit ObjectReference(uint32_t classcode, ClassCache* cache);
   explicit ObjectReference(jobject javaobject,
-			   waters::uint32 classcode,
+			   uint32_t classcode,
 			   ClassCache* cache,
 			   bool global = false);
   ~ObjectReference();
@@ -51,15 +51,15 @@ public:
   jobject getJavaObject() const {return mJavaObject;};
   jobject returnJavaObject();
   void initJavaObject(jobject javaobject);
-  waters::uint32 addReference();
-  waters::uint32 removeReference();
+  uint32_t addReference();
+  uint32_t removeReference();
 
 private:
   //##########################################################################
   //# Data Members
   ClassGlue* mClass;
   jobject mJavaObject;
-  waters::uint32 mRefCount;
+  uint32_t mRefCount;
 };
 
 }   /* namespace jni */

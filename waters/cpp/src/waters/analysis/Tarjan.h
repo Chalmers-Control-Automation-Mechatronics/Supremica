@@ -20,7 +20,7 @@
 #endif
 
 #include "waters/base/BlockedArrayList.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 
 namespace waters {
@@ -43,21 +43,21 @@ public:
 
   //##########################################################################
   //# Simple Access
-  inline uint32 getFirstStateCode() const {return mFirstStateCode;}
-  inline void setFirstStateCode(uint32 state) {mFirstStateCode = state;}
+  inline uint32_t getFirstStateCode() const {return mFirstStateCode;}
+  inline void setFirstStateCode(uint32_t state) {mFirstStateCode = state;}
 
   //##########################################################################
   //# Iteration
   inline void reset() {mTransitionIteratorEnd = 0;}
   inline bool hasTransitionIterators() const
     {return mTransitionIteratorEnd != 0;}
-  uint32 setupTransitionIterator(const TransitionRecord* trans, uint32 source);
-  bool advanceTransitionIterators(uint32* bufferpacked);
+  uint32_t setupTransitionIterator(const TransitionRecord* trans, uint32_t source);
+  bool advanceTransitionIterators(uint32_t* bufferpacked);
 
 private:
   //##########################################################################
   //# Data Members
-  uint32 mFirstStateCode;
+  uint32_t mFirstStateCode;
   NondeterministicTransitionIterator* mTransitionIterators;
   int mTransitionIteratorEnd;
 };
@@ -78,34 +78,34 @@ public:
   //##########################################################################
   //# Simple Access
   inline bool isRoot() const {return mIsRoot;}
-  inline uint32 getStateCode() const {return mStateCode;}
-  inline uint32 getEventCode() const {return mEventCode;}
+  inline uint32_t getStateCode() const {return mStateCode;}
+  inline uint32_t getEventCode() const {return mEventCode;}
   inline bool hasNondeterministicTransitionIterators() const
     {return mNondeterministicInfo->hasTransitionIterators();}
-  inline uint32 getFirstNondeterministicSuccessor() const
+  inline uint32_t getFirstNondeterministicSuccessor() const
     {return mNondeterministicInfo->getFirstStateCode();}
   inline void setRoot(bool root) {mIsRoot = root;}
-  inline void setStateCode(uint32 state) {mStateCode = state;}
-  inline void setEventCode(uint32 event) {mEventCode = event;}
-  inline void setFirstNondeterministicSuccessor(uint32 state)
+  inline void setStateCode(uint32_t state) {mStateCode = state;}
+  inline void setEventCode(uint32_t event) {mEventCode = event;}
+  inline void setFirstNondeterministicSuccessor(uint32_t state)
     {mNondeterministicInfo->setFirstStateCode(state);}
 
   //##########################################################################
   //# Advanced Access
-  void reset(uint32 state);
+  void reset(uint32_t state);
   void createNondeterministicTransitionIterators(int max);
-  inline uint32 setupNondeterministicTransitionIterator
-    (const TransitionRecord* trans, uint32 source)
+  inline uint32_t setupNondeterministicTransitionIterator
+    (const TransitionRecord* trans, uint32_t source)
     {return mNondeterministicInfo->setupTransitionIterator(trans, source);}
-  inline bool advanceNondeterministicTransitionIterators(uint32* bufferpacked)
+  inline bool advanceNondeterministicTransitionIterators(uint32_t* bufferpacked)
     {return mNondeterministicInfo->advanceTransitionIterators(bufferpacked);}
 
 private:
   //##########################################################################
   //# Data Members
   bool mIsRoot;
-  uint32 mStateCode;
-  uint32 mEventCode;
+  uint32_t mStateCode;
+  uint32_t mEventCode;
   TarjanStackFrameNondeterministic* mNondeterministicInfo;
 };
 
@@ -126,14 +126,14 @@ public:
   //# Access
   bool isEmpty() const {return mStackPointer == 0;}
   TarjanStackFrame& top() const {return getref(mStackPointer);}
-  TarjanStackFrame& push(uint32 state);
+  TarjanStackFrame& push(uint32_t state);
   void pop() {mStackPointer--;}
   void clear();
 
 private:
   //##########################################################################
   //# Data Members
-  uint32 mStackPointer;
+  uint32_t mStackPointer;
 };
 
 
@@ -141,7 +141,7 @@ private:
 //# class TarjanStateStack
 //############################################################################
 
-class TarjanStateStack : private BlockedArrayList<uint32>
+class TarjanStateStack : private BlockedArrayList<uint32_t>
 {
 public:
   //##########################################################################
@@ -152,15 +152,15 @@ public:
   //##########################################################################
   //# Access
   bool isEmpty() const {return mStackPointer == 0;}
-  uint32 top() const {return get(mStackPointer);}
-  uint32 pop() {return get(mStackPointer--);}
-  void push(uint32 state);
+  uint32_t top() const {return get(mStackPointer);}
+  uint32_t pop() {return get(mStackPointer--);}
+  void push(uint32_t state);
   void clear();
 
 private:
   //##########################################################################
   //# Data Members
-  uint32 mStackPointer;
+  uint32_t mStackPointer;
 };
 
 

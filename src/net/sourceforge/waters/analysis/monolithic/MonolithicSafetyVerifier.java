@@ -111,16 +111,18 @@ public class MonolithicSafetyVerifier
         new LinkedList<AutomatonProxy>();
       for (final AutomatonProxy aut : model.getAutomata()) {
         final ComponentKind kind = translator.getComponentKind(aut);
-        switch (kind) {
-        case PLANT:
-          mNumPlants++;
-          automata.add(aut);
-          break;
-        case SPEC:
-          automata.add(aut);
-          break;
-        default:
-          break;
+        if (kind != null) {
+          switch (kind) {
+          case PLANT:
+            mNumPlants++;
+            automata.add(aut);
+            break;
+          case SPEC:
+            automata.add(aut);
+            break;
+          default:
+            break;
+          }
         }
       }
 

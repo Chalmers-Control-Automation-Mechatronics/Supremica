@@ -29,7 +29,7 @@ namespace waters {
 
 TransitionUpdateRecord::
 TransitionUpdateRecord()
-  : mKeptMask(UNDEF_UINT32),
+  : mKeptMask(UINT32_MAX),
     mCommonMask(0),
     mCommonTargets(0),
     mTransitionRecords(0)
@@ -49,10 +49,10 @@ bool TransitionUpdateRecord::
 addTransition(TransitionRecord* trans)
 {
   const AutomatonRecord* aut = trans->getAutomaton();
-  const uint32 mask = aut->getBitMask();
+  const uint32_t mask = aut->getBitMask();
   mKeptMask &= ~mask;
-  const uint32 target = trans->getCommonTarget();
-  if (target == UNDEF_UINT32) {
+  const uint32_t target = trans->getCommonTarget();
+  if (target == UINT32_MAX) {
     trans->setNextInUpdate(mTransitionRecords);
     mTransitionRecords = trans;
     return true;

@@ -19,448 +19,188 @@
 
 namespace waters {
 
-//###########################################################################
-//# Class HashOverflowPair
-//###########################################################################
-
-class HashOverflowPair {
-  //#########################################################################
-  //# Friends
-  friend class UntypedHashTable;
-  friend class HashOverflowBucket;
-
-  //#########################################################################
-  //# Data Members
-private:
-  void* mValue;
-  void* mNext;
-};
-
 
 //###########################################################################
-//# Class HashOverflowBucket
-//###########################################################################
-
-const uint32 OVERFLOWBUCKETSIZE = 256;
-const uint32 OVERFLOWBUCKETSLOTS = (OVERFLOWBUCKETSIZE - 2) >> 1;
-
-
-class HashOverflowBucket {
-public:
-  //#########################################################################
-  //# Constructors & Destructors
-  HashOverflowBucket();
-  HashOverflowBucket(HashOverflowBucket* next);
-  ~HashOverflowBucket();
-
-  //#########################################################################
-  //# Access
-  void reset() {mNextSlot = 0;};
-  HashOverflowPair* newSlot();
-  HashOverflowBucket* getNext() const {return mNextBucket;};
-  void setNext(HashOverflowBucket* next) {mNextBucket = next;};
-
-  //#########################################################################
-  //# Iteration
-  uint32 iterationSize() const {return mNextSlot << 1;};
-  void* iterationGet(uint32 iter) const;
-
-  //#########################################################################
-  //# Recycling
-  void rehash(UntypedHashTable* table);
-  void deleteChain();
-
-private:
-  //#########################################################################
-  //# Data Members
-  HashOverflowBucket* mNextBucket;
-  uint32 mNextSlot;
-  HashOverflowPair mSlots[OVERFLOWBUCKETSLOTS];  
-};
-
-
-//###########################################################################
-//# HashOverflowBucket: Constructors & Destructors
-
-HashOverflowBucket::
-HashOverflowBucket()
-{
-  mNextBucket = 0;
-  mNextSlot = 0;
-}
-
-HashOverflowBucket::
-HashOverflowBucket(HashOverflowBucket* next)
-{
-  mNextBucket = next;
-  mNextSlot = 0;
-}
-
-HashOverflowBucket::
-~HashOverflowBucket()
-{
-  if (mNextBucket) {
-    mNextBucket->deleteChain();
-  }
-}
-
-
-//###########################################################################
-//# HashOverflowBucket: Acccess
-
-HashOverflowPair* HashOverflowBucket::
-newSlot()
-{
-  if (mNextSlot < OVERFLOWBUCKETSLOTS) {
-    return &mSlots[mNextSlot++];
-  } else {
-    return 0;
-  }
-}
-
-
-//###########################################################################
-//# HashOverflowBucket: Iteration
-
-void* HashOverflowBucket::
-iterationGet(uint32 iter)
-  const
-{
-  const HashOverflowPair& pair = mSlots[iter >> 1];
-  if (iter & 1) {
-    return pair.mValue;
-  } else {
-    return pair.mNext;
-  }
-}
-
-
-//###########################################################################
-//# HashOverflowBucket: Recycling
-
-void HashOverflowBucket::
-rehash(UntypedHashTable* table)
-{
-  const HashAccessor* accessor = table->getHashAccessor();
-  for (uint32 i = 0; i < mNextSlot; i++) {
-    void* value = mSlots[i].mValue;
-    table->add(value);
-    value = mSlots[i].mNext;
-    if (!accessor->isLink(value)) {
-      table->add(value);
-    }
-  }
-}
-
-/**
- * Deletes the chain of hash overflow buckets iteratively, to avoid
- * stack overflow for long lists. This method works like a call to the
- * destructor (but it does not work for NULL objects).
- */
-void HashOverflowBucket::
-deleteChain()
-{
-  HashOverflowBucket* victim = this;
-  while (victim) {
-    HashOverflowBucket* next = victim->mNextBucket;
-    victim->mNextBucket = 0;
-    delete victim;
-    victim = next;
-  }
-}
-
-
-//############################################################################
-//# class HashTableIterator
-//############################################################################
-
-//############################################################################
-//# HashTableIterator: Iteration
-
-void HashTableIterator::
-skip()
-{
-  mIndex++;
-  if (mBucket && mIndex == mBucket->iterationSize()) {
-    mIndex = 0;
-    mBucket = mBucket->getNext();
-  }
-}
-
-
-//###########################################################################
-//# Class UntypedHashTable
+//# Class RawHashTable
 //###########################################################################
 
 //###########################################################################
-//# UntypedHashTable: Constructors & Destructors
+//# RawHashTable: Constructors & Destructors
 
-UntypedHashTable::
-UntypedHashTable(const HashAccessor* accessor, uint32 size)
+template <typename K, typename V>
+RawHashTable<K,V>::
+RawHashTable(const HashAccessor<K,V>* accessor, hashindex_t size)
 {
   mAccessor = accessor;
   mDefault = mAccessor->getDefaultValue();
   size = size < 16 ? 16 : tablesize(size);
+  mMask = size - 1;
+  mShiftDown = 64 - log2(size);
+  mThreshold = size >> 1;
   mNumElements = 0;
-  mTableMask = size - 1;
-  mTable = new void*[size];
-  for (uint32 i = 0; i < size; i++) {
+  mTable = new V[size];
+  for (hashindex_t i = 0; i < size; i++) {
     mTable[i] = mDefault;
   }
-  mOverflowList = 0;
-  mRecycledList = 0;
 }
 
 
-UntypedHashTable::
-~UntypedHashTable()
+template <typename K, typename V>
+RawHashTable<K,V>::
+~RawHashTable()
 {
   delete [] mTable;
-  delete mOverflowList;
-  delete mRecycledList;
 }
 
 
 //###########################################################################
-//# UntypedHashTable: Access
+//# RawHashTable: Access
 
-void UntypedHashTable::
+template <typename K, typename V>
+void RawHashTable<K,V>::
 clear()
 {
   mNumElements = 0;
-  for (uint32 i = 0; i <= mTableMask; i++) {
+  hashindex_t size = allocatedSize();
+  for (hashindex_t i = 0; i < size; i++) {
     mTable[i] = mDefault;
   }
-  if (mOverflowList != 0) {
-    HashOverflowBucket* last = mOverflowList;
-    while (HashOverflowBucket* next = last->getNext()) {
-      last = next;
-    }
-    last->setNext(mRecycledList);
-    mRecycledList = mOverflowList;
-    mOverflowList = 0;
-  }
 }
 
-void* UntypedHashTable::
-get(const void* key)
+
+template <typename K, typename V>
+V RawHashTable<K,V>::
+get(K key)
   const
 {
-  uint32 index = mAccessor->hash(key) & mTableMask;
-  void* value = mTable[index];
-  if (value == mDefault) {
-    return value;
+  hashindex_t index = mAccessor->hash(key) >> mShiftDown;
+  V value = mTable[index];
+  hashindex_t probe = 1;
+  while (value != mDefault && !isFound(key, value)) {
+    index = (index + probe++) & mMask;
+    value = mTable[index];
   }
-  while (void* link = mAccessor->detagLink(value)) {
-    HashOverflowPair* pair = (HashOverflowPair*) link;
-    value = pair->mValue;
-    if (isfound(key, value)) {
-      return value;
-    }
-    value = pair->mNext;
-  }
-  return found(key, value);
+  return value;
 }
 
 
-void* UntypedHashTable::
-add(void* value)
+template <typename K, typename V>
+V RawHashTable<K,V>::
+add(V value)
 {
-  if (mNumElements >= (int) mTableMask) {
-    rehash(mTableMask + 2);
-  }
-
-  const void* key = mAccessor->getKey(value);
-  uint32 index = mAccessor->hash(key) & mTableMask;
-  void** ref = &mTable[index];
-  void* present = *ref;
-  if (present == mDefault) {
-    mNumElements++;
-    *ref = value;
-    return value;
-  }
-  while (void* link = mAccessor->detagLink(present)) {
-    HashOverflowPair* pair = (HashOverflowPair*) link;
-    present = pair->mValue;
-    if (isfound(key, present)) {
+  if (mNumElements >= mThreshold) {
+    rehash(mMask + 2);
+  }  
+  K key = mAccessor->getKey(value);
+  hashindex_t index = mAccessor->hash(key) >> mShiftDown;
+  hashindex_t probe = 1;
+  for (hashindex_t i = 0; i <= mNumElements; i++) {
+    V present = mTable[index];
+    if (present == mDefault) {
+      mNumElements++;
+      return mTable[index] = value;
+    } else if (isFound(key, present)) {
       return present;
     }
-    ref = &pair->mNext;
-    present = *ref;
+    index = (index + probe++) & mMask;
   }
-  if (isfound(key, present)) {
-    return present;
-  } else {
-    mNumElements++;
-    HashOverflowPair* pair = newSlot();
-    *ref = mAccessor->entagLink(pair);
-    pair->mValue = present;
-    pair->mNext = value;
-    return value;
-  }
+  rehash(mMask + 2);
+  return add(value);
 }
 
 
-void UntypedHashTable::
-rehash(uint32 newsize)
+template <typename K, typename V>
+void RawHashTable<K,V>::
+rehash(hashindex_t newsize)
 {
-  uint32 oldsize = mTableMask + 1;
-  void** oldtable = mTable;
-  HashOverflowBucket* oldoverflow = mOverflowList;
-  uint32 i;
-
+  hashindex_t i;
+  hashindex_t oldsize = allocatedSize();
+  V* oldtable = mTable;
   newsize = newsize < 16 ? 16 : tablesize(newsize);
+  mMask = newsize - 1;
+  mShiftDown = 64 - log2(newsize);
+  mThreshold = newsize >> 1;
   mNumElements = 0;
-  mTableMask = newsize - 1;
-  mTable = new void*[newsize];
+  mTable = new V[newsize];
   for (i = 0; i < newsize; i++) {
     mTable[i] = mDefault;
   }
-  mOverflowList = 0;
-
-  while (oldoverflow != 0) {
-    HashOverflowBucket* next = oldoverflow->getNext();
-    oldoverflow->rehash(this);
-    recycle(oldoverflow);
-    oldoverflow = next;
-  }
   for (i = 0; i < oldsize; i++) {
-    void* value = oldtable[i];
-    if (value != mDefault && !mAccessor->isLink(value))  {
+    V value = oldtable[i];
+    if (value != mDefault)  {
       add(value);
     }
   }
-
   delete [] oldtable;
 }
 
 
 //###########################################################################
-//# UntypedHashTable: Iteration
+//# RawHashTable: Iteration
 
-HashTableIterator UntypedHashTable::
-iterator()
-  const
-{
-  HashTableIterator iter(mOverflowList);
-  return iter;
-}
-
-
-bool UntypedHashTable::
+template <typename K, typename V>
+bool RawHashTable<K,V>::
 hasNext(HashTableIterator& iter)
   const
 {
-  return advance(iter) != mDefault;
+  hashindex_t index = iter.getIndex();
+  while (index <= mMask) {
+    V item = mTable[index];
+    if (item != mDefault) {
+      return true;
+    }
+    index = iter.skip();
+  }
+  return false;
 }
 
 
-void* UntypedHashTable::
-untypedNext(HashTableIterator& iter)
+template <typename K, typename V>
+V RawHashTable<K,V>::
+rawNext(HashTableIterator& iter)
   const
 {
-  void* item = advance(iter);
-  if (item != mDefault) {
-    skip(iter);
+  hashindex_t index = iter.getIndex();
+  while (index <= mMask) {
+    V item = mTable[index];
+    index = iter.skip();
+    if (item != mDefault) {
+      return item;
+    }
   }
-  return item;
+  return mDefault;
 }
 
 
 //###########################################################################
-//# UntypedHashTable: Auxiliary Methods
+//# RawHashTable: Auxiliary Methods
 
-bool UntypedHashTable::
-isfound(const void* key, void* value) const
+template <typename K, typename V>
+bool RawHashTable<K,V>::
+isFound(const K key, V value) const
 {
-  const void* foundkey = mAccessor->getKey(value);
-  return mAccessor->equals(key, foundkey);
+  K foundKey = mAccessor->getKey(value);
+  return mAccessor->equals(key, foundKey);
 }
 
 
-void* UntypedHashTable::
-found(const void* key, void* value) const
+template <typename K, typename V>
+V RawHashTable<K,V>::
+found(const K key, V value) const
 {
-  if (isfound(key, value)) {
+  if (isFound(key, value)) {
     return value;
   } else {
     return mDefault;
   }
 }
-
-  
-void* UntypedHashTable::
-advance(HashTableIterator& iter)
-  const
-{
-  while (true) {
-    const uint32 index = iter.getIndex();
-    if (const HashOverflowBucket* bucket = iter.getBucket()) {
-      void* item = bucket->iterationGet(index);
-      if (!mAccessor->isLink(item)) {
-        return item;
-      }
-    } else {
-      if (index > mTableMask) {
-        return mDefault;
-      }
-      void* item = mTable[index];
-      if (item != mDefault && !mAccessor->isLink(item)) {
-        return item;
-      }
-    }
-    skip(iter);
-  }
-}
       
 
-void UntypedHashTable::
-skip(HashTableIterator& iter)
-  const
-{
-  iter.skip();
-}
+//###########################################################################
+//# RawHashTable: Instances
 
-
-HashOverflowBucket* UntypedHashTable::
-newBucket()
-{
-  HashOverflowBucket* bucket;
-  if (mRecycledList == 0) {
-    bucket = new HashOverflowBucket(mOverflowList);
-  } else {
-    bucket = mRecycledList;
-    mRecycledList = bucket->getNext();
-    bucket->reset();
-    bucket->setNext(mOverflowList);
-  }
-  mOverflowList = bucket;
-  return bucket;
-}
-
-
-HashOverflowPair* UntypedHashTable::
-newSlot()
-{
-  if (mOverflowList == 0) {
-    return newBucket()->newSlot();
-  } else {
-    HashOverflowPair* slot = mOverflowList->newSlot();
-    if (slot != 0) {
-      return slot;
-    } else {
-      return newBucket()->newSlot();
-    }
-  }
-}
-
-
-void UntypedHashTable::
-recycle(HashOverflowBucket* bucket)
-{
-  bucket->setNext(mRecycledList);
-  mRecycledList = bucket;
-}
-
+template class RawHashTable<int32_t,int32_t>;
+template class RawHashTable<int64_t,int64_t>;
+template class RawHashTable<int64_t,int32_t>;
 
 }  /* namespace waters */

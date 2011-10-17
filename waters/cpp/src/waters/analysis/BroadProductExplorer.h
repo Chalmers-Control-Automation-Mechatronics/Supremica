@@ -22,7 +22,7 @@
 #include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "waters/base/HashTable.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 #include "waters/analysis/ProductExplorer.h"
 
 
@@ -65,16 +65,16 @@ protected:
   virtual void setup();
   virtual void teardown();
   virtual bool expandSafetyState
-    (const uint32* sourcetuple, const uint32* sourcepacked);
+    (const uint32_t* sourcetuple, const uint32_t* sourcepacked);
   virtual bool expandNonblockingReachabilityState
-    (uint32 source, const uint32* sourcetuple, const uint32* sourcepacked);
+    (uint32_t source, const uint32_t* sourcetuple, const uint32_t* sourcepacked);
   virtual void expandNonblockingCoreachabilityState
-    (const uint32* targettuple, const uint32* targetpacked);
+    (const uint32_t* targettuple, const uint32_t* targetpacked);
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState
-    (const uint32* targettuple,	const uint32* targetpacked);
+    (const uint32_t* targettuple,	const uint32_t* targetpacked);
   virtual void storeNondeterministicTargets
-    (const uint32* sourcetuple, const uint32* targettuple,
+    (const uint32_t* sourcetuple, const uint32_t* targettuple,
      const jni::MapGlue& map);
 
 private:
@@ -83,13 +83,13 @@ private:
   void setupSafety();
   void setupNonblocking();
   void setupEventMap
-    (HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+    (PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
   void setupTransitions
     (AutomatonRecord* aut,
      const jni::AutomatonGlue& autglue,
-     const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+     const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
   void setupCompactEventList
-    (const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+    (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
 
   //##########################################################################
   //# Data Members
@@ -98,7 +98,7 @@ private:
   BroadEventRecord** mReversedEventRecords;
   int mMaxNondeterministicUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
-  uint32 mTraceLimit;
+  uint32_t mTraceLimit;
 };
 
 }   /* namespace waters */

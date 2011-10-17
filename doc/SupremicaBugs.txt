@@ -49,3 +49,10 @@ Bug state: Reported
 Algo: BDD
 What happens: The c++ dll's are 32-bit and cannot be used in 64-bit windows. This essentially makes many of the algos useless on 64-bit windows.
 What should happen: c++ dll's should be available in 32- as well as 64-bits.
+
+2011-10-05 MF
+Not a bug: Reported
+What: We need a set of globally defined delimiter characters that we can use when generating strings (names, labels etc) internally. These need to be characters that the user cannot manually input; only names/labels generated automatically from within Supremica can use these.
+Why: To minimize conflicts between internally (automatically) generated labels and manually input ones.
+2011-10-15 RM
+I am using ":" for this purpose.

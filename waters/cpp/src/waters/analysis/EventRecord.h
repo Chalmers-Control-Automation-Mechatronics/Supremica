@@ -21,7 +21,7 @@
 
 #include "jni/glue/EventGlue.h"
 #include "waters/base/HashAccessor.h"
-#include "waters/base/IntTypes.h"
+#include <stdint.h>
 
 namespace jni {
   class ClassCache;
@@ -47,9 +47,9 @@ private:
 public:
   //##########################################################################
   //# Hash Methods
-  virtual uint32 hash(const void* key) const;
-  virtual bool equals(const void* key1, const void* key2) const;
-  virtual const void* getKey(const void* value) const;
+  virtual uint64_t hash(intptr_t key) const;
+  virtual bool equals(intptr_t key1, intptr_t key2) const;
+  virtual intptr_t getKey(intptr_t value) const;
 };
 
 
@@ -77,7 +77,8 @@ public:
   //##########################################################################
   //# Comparing and Hashing
   virtual int compareTo(const EventRecord* partner) const;
-  static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
+  static const EventRecordHashAccessor* getHashAccessor()
+    {return &theHashAccessor;}
   static int compare(const void* elem1, const void* elem2);
 
 private:

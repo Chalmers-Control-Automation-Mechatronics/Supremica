@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.model.analysis.AutomatonResult;
+import net.sourceforge.waters.model.analysis.DefaultAutomatonResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
@@ -29,7 +29,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
  */
 
 public class PartitionedAutomatonResult
-  extends AutomatonResult<AutomatonProxy>
+  extends DefaultAutomatonResult
 {
   //#########################################################################
   //# Constructor
@@ -85,12 +85,12 @@ public class PartitionedAutomatonResult
    *                    the operation.
    * @param  partition  The partition that was applied to the input automaton.
    */
-  public void setAutomaton(final AutomatonProxy aut,
-                           final StateEncoding inputEnc,
-                           final StateEncoding outputEnc,
-                           final List<int[]> partition)
+  public void setComputedAutomaton(final AutomatonProxy aut,
+                                   final StateEncoding inputEnc,
+                                   final StateEncoding outputEnc,
+                                   final List<int[]> partition)
   {
-    super.setComputedProxy(aut);
+    super.setComputedAutomaton(aut);
     mInputEncoding = inputEnc;
     mOutputEncoding = outputEnc;
     mPartition = partition;
