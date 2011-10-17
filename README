@@ -71,7 +71,7 @@ A short tutorial on how to compile and run Supremica is following.
 
     To run Supremica, enter Supremica/dist, and write:
     > IDE          (for Windows)
-    > ./IDE        (for Unix)
+    > ./IDE        (for Linux)
 
 3. Using an IDE
 
