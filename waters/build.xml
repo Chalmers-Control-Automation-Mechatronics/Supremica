@@ -4,7 +4,7 @@
   <description>
   </description>
 
-  <property file="build.properties"/>                                    
+  <property file="build.properties"/>
 
   <property name="supremica.root" location=".."/>
   <property name="supremica.lib" location="${supremica.root}/lib"/>
@@ -273,7 +273,7 @@
     </java> 
   </target>
 
-  <target name="cpp" depends="javah,jniglue"
+  <target name="cpp" depends="javah,jniglue" if="native.make"
           description="Build native library.">
     <exec executable="${native.make}" dir="${cpp}"
           failonerror="true" failifexecutionfails="false">
