@@ -62,7 +62,7 @@ import org.apache.log4j.Logger;
  */
 
 public class OPSearchAutomatonSimplifier
-  extends AbstractAutomatonBuilder<AutomatonProxy>
+  extends AbstractAutomatonBuilder
 {
 
   //#########################################################################
@@ -214,7 +214,7 @@ public class OPSearchAutomatonSimplifier
         String msg = "EXIT " + ProxyTools.getShortClassName(this) + ".run()";
         final PartitionedAutomatonResult result = getAnalysisResult();
         final AutomatonProxy aut =
-          result == null ? null : result.getComputedProxy();
+          result == null ? null : result.getComputedAutomaton();
         if (aut != null) {
           msg += ": " + aut.getStates().size() + " states and " +
                  aut.getTransitions().size() + " transitions";
@@ -1401,7 +1401,7 @@ public class OPSearchAutomatonSimplifier
     final StateEncoding inputEnc = new StateEncoding(mOriginalStates);
     final StateEncoding outputEnc = new StateEncoding(states);
     final PartitionedAutomatonResult result = getAnalysisResult();
-    result.setAutomaton(aut, inputEnc, outputEnc, outputPartition);
+    result.setComputedAutomaton(aut, inputEnc, outputEnc, outputPartition);
     return result.isSatisfied();
   }
 

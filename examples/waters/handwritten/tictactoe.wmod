@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tictactoe" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>COMP452/552-10B Tic-Tac-Toe Game Example</ns2:Comment>
-    <ConstantAliasList>
-        <ConstantAlias Name="BOARD">
-            <ConstantAliasExpression>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="2"/>
-                </BinaryExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-    </ConstantAliasList>
+    <ns2:Comment>Model of Tic-Tac-Toe game.
+Two players, white and black, take turns to occupy squares in 3x3 grid. The winner is the player who first occupies a horizontal, vertical, or diagonal row of three squares.
+The control objective is to synthesise a strategy for the second player (black) that prevents the first player (white) from winning. Synthesis can be used to find such a strategy.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="winner_white_x">
             <RangeList>

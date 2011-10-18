@@ -1822,7 +1822,7 @@ public class AutomataVerifier
         final int limit = verificationOptions.getReachabilityStateLimit();
         sync.setNodeLimit(limit);
         sync.run();
-        aut = sync.getComputedProxy();
+        aut = sync.getComputedAutomaton();
         break;
       }
       final Collection<EventProxy> hidden = new ArrayList<EventProxy>(2);

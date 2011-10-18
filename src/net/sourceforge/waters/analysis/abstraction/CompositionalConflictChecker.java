@@ -1493,8 +1493,7 @@ public class CompositionalConflictChecker
           // skip this one ...
         } finally {
           final CompositionalVerificationResult stats = getAnalysisResult();
-          final AutomatonResult<AutomatonProxy> result =
-            builder.getAnalysisResult();
+          final AutomatonResult result = builder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }
       }
@@ -1528,7 +1527,7 @@ public class CompositionalConflictChecker
       }
     }
 
-    public void recordStatistics(final AutomatonResult<AutomatonProxy> result)
+    public void recordStatistics(final AutomatonResult result)
     {
       result.setPeakNumberOfNodes(mCount);
     }

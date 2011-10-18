@@ -277,7 +277,7 @@ public class AutomatonMinimizer
           final KindTranslator translator = IdenticalKindTranslator.getInstance();
          final OPSearchAutomatonSimplifier simp =
             new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
-          final AutomatonProxy result = simp.getComputedProxy();
+          final AutomatonProxy result = simp.getComputedAutomaton();
           if (result != aut) {
             final ProjectBuildFromWaters exporter =
               new ProjectBuildFromWaters(null);
@@ -629,7 +629,7 @@ public class AutomatonMinimizer
         }
 
         // Remove from alphabet epsilon events that are never used
-        
+
         removeUnusedEpsilonEvents(theAutomaton);
         // Message
         if (Config.VERBOSE_MODE.isTrue())
@@ -1664,7 +1664,7 @@ public class AutomatonMinimizer
     public int mergeEpsilonLoops(final Automaton aut)
     {
         final StateSet statesToExamine = new StateSet(aut.getStateSet());
-        
+
 
         // Count the removed states
         int count = 0;
@@ -1690,10 +1690,10 @@ public class AutomatonMinimizer
             while (forwardsClosure.size() != 0)
             {
                 final State two = forwardsClosure.remove();
-                
+
                 if (backwardsClosure.contains(two))
                 {
-                    
+
                     // Merge!
                     count++;
                     statesToExamine.remove(two);

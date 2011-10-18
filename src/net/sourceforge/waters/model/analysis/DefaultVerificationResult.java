@@ -14,8 +14,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 
 /**
  * The standard implementation of the {@link VerificationResult} interface.
- * The default analysis provides read/write access to all the data provided
- * by the interface.
+ * The default verification result provides read/write access to all the data
+ * provided by the interface.
  *
  * @author Robi Malik
  */
@@ -46,7 +46,7 @@ public class DefaultVerificationResult
     }
   }
 
-  
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.VerificationResult
   public TraceProxy getCounterExample()

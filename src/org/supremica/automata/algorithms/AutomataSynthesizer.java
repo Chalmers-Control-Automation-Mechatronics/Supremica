@@ -53,11 +53,11 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractCompositionalModelAnalyzer;
-import net.sourceforge.waters.analysis.abstraction.CompositionalSynthesisResult;
 import net.sourceforge.waters.analysis.abstraction.CompositionalSynthesizer;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -376,12 +376,13 @@ public class AutomataSynthesizer
             (AbstractCompositionalModelAnalyzer.MinS);
 
           synthesizer.run();
-          final CompositionalSynthesisResult watersResult =
+          final ProductDESResult watersResult =
             synthesizer.getAnalysisResult();
           final ProjectBuildFromWaters importer =
             new ProjectBuildFromWaters(null);
           if (watersResult.isSatisfied()) {
-            for (final AutomatonProxy proxy : watersResult.getSupervisors()) {
+            for (final AutomatonProxy proxy :
+                 watersResult.getComputedAutomata()) {
               final Automaton aut = importer.build(proxy);
               result.addAutomaton(aut);
             }
