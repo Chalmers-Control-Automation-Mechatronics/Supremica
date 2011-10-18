@@ -11,6 +11,7 @@
 /src/org/supremica/manufacturingTables/xsd/pr/
 /src/org/supremica/manufacturingTables/xsd/processeditor/
 /src/org/supremica/manufacturingTables/xsd/vr/
+/arch.properties
 /.supremica
 
 # generic files to ignore
