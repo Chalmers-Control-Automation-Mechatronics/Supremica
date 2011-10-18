@@ -105,6 +105,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     Map<VariableComponentProxy,List<VariableComponentProxy>> var2relatedVarsMap = null;
     public double theoNbrOfReachableStates = 0;
     public int nbrOfEFAsVars = 0;
+    private boolean modelHasNoPlants = true;
+    private boolean modelHasNoSpecs = true;
 
     public ExtendedAutomata()
     {
@@ -218,9 +220,15 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 else
                     theoNbrOfReachableStates *= ((double) exAutomaton.nbrOfNodes());
 
-                if(!exAutomaton.isSpecification())
+                if(exAutomaton.isSpecification())
+                {
+
+                    modelHasNoSpecs = false;
+                }
+                else
                 {
                     plantAlphabet.addAll(exAutomaton.getAlphabet());
+                    modelHasNoPlants = false;
                 }
                 theExAutomata.add(exAutomaton);
                 exAutomatonToIndex.put(exAutomaton, nbrOfExAutomata);
@@ -229,6 +237,16 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         }
 
         nbrOfEFAsVars = variables.size()+theExAutomata.size();
+    }
+
+    public boolean modelHasNoPlants()
+    {
+        return modelHasNoPlants;
+    }
+
+    public boolean modelHasNoSpecs()
+    {
+        return modelHasNoSpecs;
     }
 
     public int getVarDomain(String varName)

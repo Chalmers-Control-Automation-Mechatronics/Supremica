@@ -287,7 +287,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         BDD uncontrollableTransitionRelationBDD = manager.getZeroBDD();
         for(final TIntIterator componentItr = getUncontrollableComponentCandidates().iterator(); componentItr.hasNext();){
             uncontrollableTransitionRelationBDD = uncontrollableTransitionRelationBDD.or(getComponentToComponentTransMap()
-                    .get(componentItr.next()).exist(bddExAutomata.getEventVarSet()));
+                    .get(componentItr.next()));
         }
         return uncontrollableTransitionRelationBDD;
     }
@@ -310,9 +310,9 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
 
         private void initialize() {
 
-            /* Create a BDD based on the event index */
-            final BDDDomain eventDomain = bddExAutomata.getEventDomain();
-            final BDD eventBDD = manager.getFactory().buildCube(eventIndex, eventDomain.vars());
+            /* Create a BDD based on the event index, there is no need. */
+            //final BDDDomain eventDomain = bddExAutomata.getEventDomain();
+            //final BDD eventBDD = manager.getFactory().buildCube(eventIndex, eventDomain.vars());
 
             final Set<ExtendedAutomaton> includedAutomata = includingAutomata2Edges.keySet();
             final Iterator<ExtendedAutomaton> autIterator = includedAutomata.iterator();
@@ -353,7 +353,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                     final int varIndex = theIndexMap.getVariableIndex(var);
                     final BDD noneUpdateVar = bddExAutomata.BDDBitVecTargetVarsMap.get(var.getName()).equ(bddExAutomata.BDDBitVecSourceVarsMap.get(var.getName()));
                     transCorrespondingToUpdatedVariables[varIndex] = transCorrespondingToUpdatedVariablesWithoutActions[varIndex].ite(transCorrespondingToUpdatedVariables[varIndex], noneUpdateVar);
-                    variableUpdateBDD[varIndex].orWith(conjunctiveTransToUpdatedVariables[varIndex].and(eventBDD));
+                    variableUpdateBDD[varIndex].orWith(conjunctiveTransToUpdatedVariables[varIndex]);
                 }
 
                 if(eventIsQualifiedForInitialComponent)
@@ -400,7 +400,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
 
                     final int varIndex = theIndexMap.getVariableIndex(var);
 
-                    final BDD t = transCorrespondingToUpdatedVariables[varIndex].and(eventBDD);
+                    final BDD t = transCorrespondingToUpdatedVariables[varIndex];
 
                     variableUpdateBDD[varIndex] = variableUpdateBDD[varIndex].or(t);
                 }
@@ -450,11 +450,11 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
 
             eventForwardTransitionWithoutActions = eventForwardTransitionWithoutActions.or(transWithoutActions);
 
-            eventToTransitionBDDwithoutActions.put(eventIndex, transWithoutActions.and(eventBDD));
+            eventToTransitionBDDwithoutActions.put(eventIndex, transWithoutActions);
 
             transWithoutActions.andWith(tmp);
 
-            final BDD isolatedTransBDD = transWithoutActions.andWith(eventBDD);
+            final BDD isolatedTransBDD = transWithoutActions;
 
             eventForwardCompleteTransitions.orWith(isolatedTransBDD);
 

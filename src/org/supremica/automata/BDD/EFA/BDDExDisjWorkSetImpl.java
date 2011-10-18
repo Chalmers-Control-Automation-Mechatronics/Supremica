@@ -31,7 +31,10 @@ public class BDDExDisjWorkSetImpl extends BDDExDisjAbstractWorkSet {
         /* CASE 1: when the fix-point computation begins, how to pick the initial component and its BDD. */
         if (whetherFirst) {
             candidateSize = pickFirstComponents();
-            choice = rl.choose(selectedCandidate, candidateSize);
+            if(candidateSize == 0)
+                choice = Integer.MAX_VALUE;
+            else
+                choice = rl.choose(selectedCandidate, candidateSize);
         } else {
             /* CASE 2: For the subsequent choices, use the field component2influencedComponents to choose. */
             candidateSize = pickSubsequentComponents();
@@ -62,11 +65,11 @@ public class BDDExDisjWorkSetImpl extends BDDExDisjAbstractWorkSet {
 
         if (choice == -1) { // The real first, round number is 0         
 
-            for(TIntIterator eventItr = firstComponentCandidates.iterator(); eventItr.hasNext();){
+            for(TIntIterator compItr = firstComponentCandidates.iterator(); compItr.hasNext();){
                
-                 int eventIndex = eventItr.next();
+                 int compIndex = compItr.next();
               
-                 TIntIntHashMap influencedComponentsMap = component2influncedComponentsMap.get(eventIndex);
+                 TIntIntHashMap influencedComponentsMap = component2influncedComponentsMap.get(compIndex);
                     int influencedSize = 0;
                     int[] influencedComponentIndicesAsKeys = influencedComponentsMap.keys();
                     for (int j = 0; j < influencedComponentIndicesAsKeys.length; j++) {
@@ -74,10 +77,10 @@ public class BDDExDisjWorkSetImpl extends BDDExDisjAbstractWorkSet {
                     }
                     if (!firstAlternatives.contains(influencedSize)) {
                         TIntHashSet components = new TIntHashSet();
-                        components.add(eventIndex);
+                        components.add(compIndex);
                         firstAlternatives.put(influencedSize, components);
                     } else {
-                        firstAlternatives.get(influencedSize).add(eventIndex);
+                        firstAlternatives.get(influencedSize).add(compIndex);
                     }
             }
                    
@@ -100,9 +103,13 @@ public class BDDExDisjWorkSetImpl extends BDDExDisjAbstractWorkSet {
                 firstAlternatives.remove(choiceWithInfluencedValue);
                 int[] sortedKeys = firstAlternatives.keys(); // The same routine as before
                 Arrays.sort(sortedKeys);
-                selectedCandidate = ((TIntHashSet) firstAlternatives.get(sortedKeys[sortedKeys.length - 1])).toArray();
-                choiceWithInfluencedValue = sortedKeys[sortedKeys.length - 1];
-                candidateSize = selectedCandidate.length;
+                if (sortedKeys.length == 0) {
+                    candidateSize = 0;
+                } else {
+                    selectedCandidate = ((TIntHashSet) firstAlternatives.get(sortedKeys[sortedKeys.length - 1])).toArray();
+                    choiceWithInfluencedValue = sortedKeys[sortedKeys.length - 1];
+                    candidateSize = selectedCandidate.length;
+                }
                 return candidateSize;
             }
         }

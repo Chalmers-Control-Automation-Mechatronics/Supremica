@@ -21,9 +21,12 @@ public class BDDExDisjPartitioningTypeFactory {
 
         if (synType == SynthesisAlgorithm.PARTITIONBDD_Event) {
             logger.info("Choose the event based paritioning algorithm ...");
-            depSets = new BDDExDisjEventDepSets(bddExAutomata);
+            BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);
+            //depSets = new BDDExDisjEventDepSets(bddExAutomata);
+            depSets = new BDDExDisjEventClusters(bddExAutomata, eventDepSets);
             workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
             depSets.setWorkSet(workset);
+            System.err.println("the number of BDDs is " + depSets.getSize());
         } else if (synType == SynthesisAlgorithm.PARTITIONBDD_Automaton) {
             logger.info("Choose the automaton based partitioning algorithm ...");
             BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);
@@ -32,7 +35,7 @@ public class BDDExDisjPartitioningTypeFactory {
             depSets.setWorkSet(workset);
         } 
         else if (synType == SynthesisAlgorithm.PARTITIONBDD_Variable) {
-            BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);;
+            BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);
             if (bddExAutomata.orgExAutomata.getVars() == null) {
                 logger.info("Not an EFA model. Choose the automaton based partitioning algorithm (default for DFA)");
                 depSets = new BDDExDisjAutmatonDepSets(bddExAutomata, eventDepSets);

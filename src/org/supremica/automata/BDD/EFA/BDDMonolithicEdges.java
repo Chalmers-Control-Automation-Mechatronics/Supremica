@@ -27,8 +27,7 @@ public class BDDMonolithicEdges
     private BDD specUncontrollableEdgesForwardBDD = null;
     private BDD plantUncontrollableEdgesBackwardBDD = null;
     private BDD specUncontrollableEdgesBackwardBDD = null;
-    private boolean systemHasNoPlants = true;
-    private boolean systemHasNoSpecs = true;
+
 
     /** Creates a new instance of BDDMonolithicEdges */
     public BDDMonolithicEdges(BDDExtendedAutomata bddExAutomata)
@@ -59,18 +58,16 @@ public class BDDMonolithicEdges
             if(currAutomaton.getExAutomaton().isSpecification())
             {
                 specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
-                systemHasNoSpecs = false;
             }
             else
             {
                 plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
-                systemHasNoPlants = false;
             }
         }
-        if(systemHasNoPlants)
+        if(bddExAutomata.getExtendedAutomata().modelHasNoPlants())
             plantUncontrollableEdgesForwardBDD = manager.getZeroBDD();
 
-        if(systemHasNoSpecs)
+        if(bddExAutomata.getExtendedAutomata().modelHasNoSpecs())
             specUncontrollableEdgesForwardBDD = manager.getZeroBDD();
 
         BDD actionsBDD = computeSynchronizedActions(bddExAutomata.forwardTransWhereVisUpdated, bddExAutomata.forwardTransAndNextValsForV);
@@ -237,9 +234,5 @@ public class BDDMonolithicEdges
         return specUncontrollableEdgesBackwardBDD;
     }
 
-    public boolean plantOrSpecDoesNotExist()
-    {
-        return systemHasNoPlants | systemHasNoSpecs;
-    }
 
 }

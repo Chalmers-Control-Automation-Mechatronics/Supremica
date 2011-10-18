@@ -4,7 +4,7 @@
   <description>
   </description>
 
-  <property file="build.properties"/>                                    
+  <property file="build.properties"/>
 
   <property name="supremica.root" location=".."/>
   <property name="supremica.lib" location="${supremica.root}/lib"/>
@@ -238,10 +238,11 @@
   </target>
 
   <target name="jniglue-compile">
+    <mkdir dir="${waters.classes}"/>
     <javac srcdir="${src}" destdir="${waters.classes}" 
-           includes="net/sourceforge/waters/build/jniglue/*.java"
+           includes="net/sourceforge/waters/build/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
-               includeantruntime="false">
+           includeantruntime="false">
       <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
     </javac>
@@ -250,7 +251,7 @@
   <target name="jniglue-jar" depends="jniglue-compile">
     <jar jarfile="${jniglue.jar}">
       <fileset dir="${waters.classes}">
-        <include name="net/sourceforge/waters/build/jniglue/*.class"/>
+        <include name="net/sourceforge/waters/build/**/*.class"/>
       </fileset>
     </jar>
   </target>
@@ -272,7 +273,7 @@
     </java> 
   </target>
 
-  <target name="cpp" depends="javah,jniglue"
+  <target name="cpp" depends="javah,jniglue" if="native.make"
           description="Build native library.">
     <exec executable="${native.make}" dir="${cpp}"
           failonerror="true" failifexecutionfails="false">

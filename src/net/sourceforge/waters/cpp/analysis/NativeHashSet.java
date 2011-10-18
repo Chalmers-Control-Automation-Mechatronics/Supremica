@@ -38,6 +38,7 @@ public class NativeHashSet<E> extends AbstractSet<E>
     addAll(collection);
   }
 
+  @Override
   protected void finalize()
   {
     destroyNativeHashSet(mNativeHandler);
@@ -56,16 +57,19 @@ public class NativeHashSet<E> extends AbstractSet<E>
     return new NativeHashSetIterator();
   }
 
+  @Override
   public boolean add(final E item)
   {
     return addNative(mNativeHandler, item);
   }
 
+  @Override
   public boolean contains(final Object item)
   {
     return containsNative(mNativeHandler, item);
   }
 
+  @Override
   public void clear()
   {
     clearNative(mNativeHandler);
@@ -74,25 +78,25 @@ public class NativeHashSet<E> extends AbstractSet<E>
 
   //#########################################################################
   //# Native Methods
-  private native int createNativeHashSet(int size);
+  private native long createNativeHashSet(int size);
 
-  private native void destroyNativeHashSet(int handler);
+  private native void destroyNativeHashSet(long handler);
 
-  private native int getNativeSize(int handler);
+  private native int getNativeSize(long handler);
 
-  private native boolean containsNative(int handler, Object item);
+  private native boolean containsNative(long handler, Object item);
 
-  private native boolean addNative(int handler, Object item);
+  private native boolean addNative(long handler, Object item);
 
-  private native void clearNative(int handler);
+  private native void clearNative(long handler);
 
-  private native int createNativeIterator(int handler);
+  private native long createNativeIterator(long handler);
 
-  private native void destroyNativeIterator(int iter);
+  private native void destroyNativeIterator(long iter);
 
-  private native E getNativeNext(int handler, int iter);
+  private native E getNativeNext(long handler, long iter);
 
-  private native boolean hasNativeNext(int handler, int iter);
+  private native boolean hasNativeNext(long handler, long iter);
 
   static {
     System.loadLibrary("waters");
@@ -111,6 +115,7 @@ public class NativeHashSet<E> extends AbstractSet<E>
       mNativeIter = createNativeIterator(mNativeHandler);
     }
 
+    @Override
     protected void finalize()
     {
       destroyNativeIterator(mNativeIter);
@@ -131,17 +136,17 @@ public class NativeHashSet<E> extends AbstractSet<E>
     public void remove()
     {
       throw new UnsupportedOperationException
-	("NativeHashSet iterator does not support removal of elements!");
+        ("NativeHashSet iterator does not support removal of elements!");
     }
 
     //#######################################################################
     //# Data Members
-    private final int mNativeIter;
+    private final long mNativeIter;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final int mNativeHandler;
+  private final long mNativeHandler;
 
 }
