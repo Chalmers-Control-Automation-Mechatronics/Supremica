@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.despot
 //# CLASS:   DESpotImporterTest
 //###########################################################################
-//# $Id: DESpotImporterTest.java 5044 2009-12-30 20:14:13Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.hisc;

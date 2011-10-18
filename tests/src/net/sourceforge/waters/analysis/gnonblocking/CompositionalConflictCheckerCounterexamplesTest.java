@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicConflictCheckerTest
 //###########################################################################
-//# $Id: MonolithicGeneralisedConflictCheckerTest.java 4965 2009-12-15 08:21:07Z rmf18 $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.gnonblocking;

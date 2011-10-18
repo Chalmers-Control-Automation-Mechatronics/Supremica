@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   NarrowPreTransitionTable
 //###########################################################################
-//# $Id: NarrowPreTransitionTable.cpp 4788 2009-10-27 09:17:36Z robi $
+//# $Id$
 //###########################################################################
 
 #ifdef __GNUG__

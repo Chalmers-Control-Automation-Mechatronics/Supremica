@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeBroadNonStoringConflictCheckerTest
 //###########################################################################
-//# $Id: NativeBroadNonStoringConflictCheckerTest.java 4825 2009-11-16 10:30:43Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;

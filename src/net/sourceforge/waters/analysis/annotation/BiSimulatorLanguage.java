@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   BiSimulator
 //###########################################################################
-//# $Id: BiSimulator.java 4514 2008-11-11 20:26:15Z js173 $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.annotation;

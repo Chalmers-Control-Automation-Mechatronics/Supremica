@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ConflictKindTranslator
 //###########################################################################
-//# $Id: ConflictKindTranslator.java 5206 2010-02-04 00:45:23Z robi $
+//# $Id$
 //###########################################################################
 
 package org.supremica.automata.algorithms;

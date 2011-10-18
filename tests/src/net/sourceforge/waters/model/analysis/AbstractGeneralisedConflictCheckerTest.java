@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractGeneralisedConflictCheckerTest
 //###########################################################################
-//# $Id: AbstractGeneralisedConflictCheckerTest.java 4768 2009-10-09 03:16:33Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
