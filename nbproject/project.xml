@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>Supremica</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>Supremica</name>
+            <properties>
+                <property name="project.dir">.</property>
+                <property name="ant.script">${project.dir}/build.xml</property>
+            </properties>
+            <folders>
+                <source-folder>
+                    <label>trunk</label>
+                    <location>${project.dir}</location>
+                </source-folder>
+                <source-folder>
+                    <label>Supremica</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>src</label>
+                    <type>java</type>
+                    <location>${project.dir}/src</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>tests\src</label>
+                    <type>java</type>
+                    <location>${project.dir}/tests/src</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <script>${ant.script}</script>
+                    <target>build</target>
+                </action>
+                <action name="clean">
+                    <script>${ant.script}</script>
+                    <target>clean</target>
+                </action>
+                <action name="javadoc">
+                    <script>${ant.script}</script>
+                    <target>doc</target>
+                </action>
+                <action name="run">
+                    <script>${ant.script}</script>
+                    <target>run</target>
+                </action>
+                <action name="test">
+                    <script>${ant.script}</script>
+                    <target>test_min</target>
+                </action>
+                <action name="rebuild">
+                    <script>${ant.script}</script>
+                    <target>clean</target>
+                    <target>build</target>
+                </action>
+                <action name="debug">
+                    <script>nbproject/ide-targets.xml</script>
+                    <target>debug-nb</target>
+                </action>
+                <action name="debug.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>debug-selected-file-in-src</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>${project.dir}/src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="run.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>run-selected-file-in-src</target>
+                    <context>
+                        <property>run.class</property>
+                        <folder>${project.dir}/tests/src</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+            </ide-actions>
+            <export>
+                <type>jar</type>
+                <location>dist/Supremica.jar</location>
+                <script>${ant.script}</script>
+                <build-target>rebuild</build-target>
+            </export>
+            <export>
+                <type>jar</type>
+                <location>dist/SupremicaTest.jar</location>
+                <script>${ant.script}</script>
+                <build-target>rebuild</build-target>
+            </export>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src</label>
+                        <location>${project.dir}/src</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>tests\src</label>
+                        <location>${project.dir}/tests/src</location>
+                    </source-folder>
+                    <source-file>
+                        <location>${ant.script}</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="javadoc"/>
+                    <ide-action name="run"/>
+                    <ide-action name="test"/>
+                    <ide-action name="debug"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+            <compilation-unit>
+                <package-root>${project.dir}/src</package-root>
+                <classpath mode="compile">lib/unjared</classpath>
+                <built-to>dist/Supremica.jar</built-to>
+                <built-to>dist/SupremicaTest.jar</built-to>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>${project.dir}/tests/src</package-root>
+                <unit-tests/>
+                <classpath mode="compile">lib/junit.jar;dist/Supremica.jar;dist/SupremicaLib.jar</classpath>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+        </java-data>
+        <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
+            <module name="org-netbeans-modules-editor-indent">
+                <node name="CodeStyle">
+                    <property name="usedProfile" value="project"/>
+                    <node name="project">
+                        <property name="tab-size" value="8"/>
+                        <property name="text-limit-width" value="80"/>
+                    </node>
+                </node>
+                <node name="text">
+                    <node name="x-java">
+                        <node name="CodeStyle">
+                            <node name="project">
+                                <property name="wrapExtendsImplementsKeyword" value="WRAP_IF_LONG"/>
+                                <property name="alignMultilineParenthesized" value="true"/>
+                                <property name="wrapTernaryOps" value="WRAP_IF_LONG"/>
+                                <property name="wrapThrowsKeyword" value="WRAP_IF_LONG"/>
+                                <property name="wrapMethodParams" value="WRAP_IF_LONG"/>
+                                <property name="spaces-per-tab" value="2"/>
+                                <property name="wrapAssignOps" value="WRAP_IF_LONG"/>
+                                <property name="alignMultilineCallArgs" value="true"/>
+                                <property name="classDeclBracePlacement" value="NEW_LINE"/>
+                                <property name="wrapChainedMethodCalls" value="WRAP_IF_LONG"/>
+                                <property name="wrapMethodCallArgs" value="WRAP_IF_LONG"/>
+                                <property name="wrapAfterBinaryOps" value="true"/>
+                                <property name="indentCasesFromSwitch" value="false"/>
+                                <property name="wrapBinaryOps" value="WRAP_IF_LONG"/>
+                                <property name="blankLinesAfterImports" value="2"/>
+                                <property name="indent-shift-width" value="2"/>
+                                <property name="text-limit-width" value="78"/>
+                                <property name="wrapAfterTernaryOps" value="true"/>
+                                <property name="text-line-wrap" value="words"/>
+                                <property name="wrapExtendsImplementsList" value="WRAP_IF_LONG"/>
+                                <property name="alignMultilineMethodParams" value="true"/>
+                                <property name="blankLinesBeforeClass" value="2"/>
+                                <property name="tab-size" value="4"/>
+                                <property name="expand-tabs" value="true"/>
+                                <property name="methodDeclBracePlacement" value="NEW_LINE"/>
+                                <property name="wrapThrowsList" value="WRAP_IF_LONG"/>
+                            </node>
+                        </node>
+                    </node>
+                </node>
+            </module>
+        </preferences>
+    </configuration>
+</project>

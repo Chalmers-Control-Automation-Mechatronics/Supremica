@@ -754,10 +754,9 @@ public class ModuleContext
             final Proxy proxy = (Proxy) value;
             final Boolean found =
               mPropositionFinderVisitor.hasPropositions(proxy);
-            if (found == null &&
-                SubjectTools.getAncestor(source,
-                                         SimpleNodeSubject.class) != null) {
-              return true;
+            if (found == null) {
+              return SubjectTools.getAncestor
+                (source, SimpleNodeSubject.class) != null;
             } else if (found) {
               return true;
             }

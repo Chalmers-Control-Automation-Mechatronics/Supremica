@@ -10,6 +10,8 @@
 
 package net.sourceforge.waters.gui;
 
+import gnu.trove.THashSet;
+
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +19,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JOptionPane;
 
@@ -79,22 +80,28 @@ class EventDeclDeleteVisitor
   {
     try {
       final int size = decls.size();
-      mNames = new HashSet<String>(size);
+      mNames = new THashSet<String>(size);
       for (final EventDeclProxy decl : decls) {
         final String name = decl.getName();
         mNames.add(name);
       }
       mDeletionVictims = new LinkedList<InsertInfo>();
-      mHasShownDialog = false;
+      mHasShownDialog = mCancelled = false;
       final ModuleProxy module = mRoot.getModuleSubject();
-      module.acceptVisitor(this);
-      for (final EventDeclProxy decl : decls) {
-        final InsertInfo info = new InsertInfo(decl);
-        mDeletionVictims.add(info);
+      try {
+        module.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        // User selected No or Cancel in dialog ...
       }
-      return mDeletionVictims;
-    } catch (final VisitorException exception) {
-      return null;
+      if (mCancelled) {
+        return null;
+      } else {
+        for (final EventDeclProxy decl : decls) {
+          final InsertInfo info = new InsertInfo(decl);
+          mDeletionVictims.add(info);
+        }
+        return mDeletionVictims;
+      }
     } finally {
       mNames = null;
       mDeletionVictims = null;
@@ -352,9 +359,15 @@ class EventDeclDeleteVisitor
     final Frame frame = mRoot.getRootWindow();
     final int choice =
       JOptionPane.showConfirmDialog(frame, buffer, "Event in Use!",
-                                    JOptionPane.OK_CANCEL_OPTION,
+                                    JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE);
-    if (choice != JOptionPane.OK_OPTION) {
+    switch (choice) {
+    case JOptionPane.YES_OPTION:
+      return;
+    case JOptionPane.NO_OPTION:
+      throw new VisitorException();
+    default:
+      mCancelled = true;
       throw new VisitorException();
     }
   }
@@ -431,5 +444,6 @@ class EventDeclDeleteVisitor
   private IdentifiedProxy mComponent;
   private Proxy mVictim;
   private boolean mHasShownDialog;
+  private boolean mCancelled;
 
 }

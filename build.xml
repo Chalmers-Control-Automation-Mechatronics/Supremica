@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <project name="Supremica" default="build" basedir=".">
-    
-    <property file="build.properties"/>    
-    
+
+    <property name="arch.properties" location="arch.properties"/>
+
+    <property file="build.properties"/>
+    <property file="${arch.properties}"/>
+
     <property name="src" value="src"/>
     <property name="testssrc" value="tests/src"/>
     <property name="benchmarkssrc" value="benchmarks/src"/>
@@ -51,8 +54,11 @@
     <property name="waters.xml" location="${waters.dir}/xml"/>
     <property name="waters.xsd" location="${waters.xml}/xsd"/>
     <property name="waters.xsl" location="${waters.xml}/xsl"/>
-    <property name="waters.jaxbjar" location="${waters.dir}/java/jar/waters_jaxb.jar"/>
-    
+    <property name="waters.jaxbjar"
+              location="${waters.dir}/java/jar/waters_jaxb.jar"/>
+    <property name="waters.jniglue.jar"
+              location="${waters.dir}/java/jar/jniglue.jar"/>
+
     <!-- JAXB -->
     <property name="activation.jar" location="${lib}/activation.jar"/>
     <property name="jaxb-api.jar" location="${lib}/jaxb-api.jar"/>
@@ -85,19 +91,8 @@
     <patternset id="all_nested_classfiles.patternset">
         <include name="**/*.class"/>
     </patternset>
-    
-    <!-- Put this in TextPad to get clickable error messages
-        Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
-        File Register = 1
-        Line Register = 2
-        Column Register = 3
-    -->
-    <!-- Enables emacs warning and error mesages. This is equal to calling jikes +E -->
-    <property name="build.compiler.emacs" value="true"/>
-    <!--
-<property name="build.compiler.pedantic" value="false"/>
--->
-    
+
+
     <!-- 
 *       Build this target after checking out the sources for the
 *       first time. 
@@ -109,13 +104,6 @@
         depends="clean,jar_supremica_lib,build,-jar_supremica_tests,cpp_waters"
         description="Rebuilds the project from scratch."/>
 
-    <!--
-<target name="eclipse_initialize">
-        <delete dir="${eclipselib}"/>
-        <mkdir dir="${eclipselib}"/>
-</target>
--->
-    
     <target name="initialize_jars" depends="-jar_waters_jaxb">  
         <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
 
@@ -225,8 +213,9 @@
     </target>
     
     <target name="clean" depends="clean_build">
+        <delete file="${arch.properties}"/>
         <delete dir="${dist}"/>
-        <mkdir dir="${dist}"/>          
+        <mkdir dir="${dist}"/>
         <delete dir="${src}/org/w3"/>
         <mkdir dir="${src}/org/w3"/>        
         <delete dir="${doc}/api"/>
@@ -552,18 +541,8 @@ Class-Path: ${manifest.pathlist}</echo>
     </target>
     
     <target name="nb_tests" depends="-jar_supremica_tests"/>
-    
-    <target name="-jar_supremica_standalone">
-        <jar jarfile="${dist}/SupremicaStandalone.jar"> 
-            <fileset dir="${build}">
-                <!--patternset-->
-                <include name="org/supremica/automata/**/*"/>
-                <!--/patternset-->                      
-            </fileset>
-        </jar>
-    </target>
-    
-    
+
+
     <target name="-jar_waters_jaxb">
         <ant dir="${waters.dir}" target="jaxb-jar" inheritAll="false"/>
     </target>
@@ -574,6 +553,25 @@ Class-Path: ${manifest.pathlist}</echo>
         <ant dir="schema/" target="gen_manufacturingtables_pr" inheritAll="false"/>
         <ant dir="schema/" target="gen_manufacturingtables_vr" inheritAll="false"/>
         <ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
+    </target>
+
+    <target name="-detect_arch" unless="java.arch">
+        <ant dir="${waters.dir}" target="jniglue-jar" inheritAll="false"/>
+        <java classname="net.sourceforge.waters.build.arch.ArchitectureDetector"
+              fork="true" failonerror="true">
+          <classpath>
+              <pathelement location="${waters.jniglue.jar}"/>
+          </classpath>
+          <arg file="${platform}"/>
+          <arg file="${arch.properties}"/>
+        </java>
+        <property file="${arch.properties}"/>
+    </target>
+
+    <target name="-dynamic_libs" depends="-detect_arch">
+        <copy todir="${dist}" failonerror="false">
+            <fileset dir="${platform}/${java.arch}/lib" includes="*"/>
+        </copy>
     </target>
 
     <target name="cpp_waters">
@@ -653,9 +651,10 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>      
         <chmod file="${dist}/RelationExtraction.cmd" perm="644"/>
     </target>
-    
-    <target name="-startfiles_supremica" depends="-startfiles_local_supremica">
-        <copy file="${templates}/StepToPPN.cmd" todir="${dist}"/>       
+
+    <target name="-startfiles_supremica"
+            depends="-startfiles_local_supremica,-dynamic_libs">
+        <copy file="${templates}/StepToPPN.cmd" todir="${dist}"/>
         <chmod file="${dist}/StepToPPN.cmd" perm="644"/>
         <copy file="${templates}/IDE.cmd" todir="${dist}"/>     
         <chmod file="${dist}/IDE.cmd" perm="644"/>
@@ -677,12 +676,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/manufacturingTablesTest" perm="755"/>
         <copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>
         <chmod file="${dist}/manufacturingTablesTest.cmd" perm="755"/>
-	<copy file="${templates}/DistributedServer" todir="${dist}"/>
-	<chmod file="${dist}/DistributedServer" perm="755"/>
-	<copy file="${templates}/DistributedNode" todir="${dist}"/>
-	<chmod file="${dist}/DistributedNode" perm="755"/>
-	<copy file="${templates}/DistributedShutdown" todir="${dist}"/>
-	<chmod file="${dist}/DistributedShutdown" perm="755"/>
         <!--
         <copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>
         <chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
@@ -694,43 +687,9 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>
         <chmod file="${dist}/SupremicaApplet.html" perm="644"/> 
         <copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>   
-        <!--
-        <copy file="${templates}/SupremicaProperties.cfg" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaProperties.cfg" perm="644"/>      
-        <copy file="${templates}/SupremicaPropertiesStandard.cfg" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaPropertiesStandard.cfg" perm="644"/>
--->
-        <copy file="${platform}/win.x86/lib/buddy.dll" todir="${dist}"/>
-        <chmod file="${dist}/buddy.dll" perm="644"/> 
-        <copy file="${platform}/win.x86/lib/cudd.dll" todir="${dist}"/>
-        <chmod file="${dist}/cudd.dll" perm="644"/> 
-        <copy file="${platform}/win.x86/lib/jdd.dll" todir="${dist}"/>
-        <chmod file="${dist}/jdd.dll" perm="644"/> 
-        <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${dist}"/>
-        <chmod file="${dist}/BisimulationEquivalence.dll" perm="644"/> 
-        <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>
-        <chmod file="${dist}/izmjnicom.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/JavaClipboard.dll" todir="${dist}"/>
-        <chmod file="${dist}/JavaClipboard.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/glpk_bridge.dll" todir="${dist}"/>
-        <chmod file="${dist}/glpk_bridge.dll" perm="644"/> 
-        <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${dist}"/>
-        <chmod file="${dist}/libbuddy.so" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libcal.so" todir="${dist}"/>
-        <chmod file="${dist}/libcal.so" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libcudd.so" todir="${dist}"/>
-        <chmod file="${dist}/libcudd.so" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libjdd.so" todir="${dist}"/>
-        <chmod file="${dist}/libjdd.so" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${dist}"/>
-        <chmod file="${dist}/libBisimulationEquivalence.so" perm="644"/>
-        <copy file="${platform}/macosx.powerpc/libBisimulationEquivalence.dylib" todir="${dist}"/>
-        <chmod file="${dist}/libBisimulationEquivalence.dylib" perm="644"/>
-        <copy file="${platform}/macosx.powerpc/libbuddy.dylib" todir="${dist}"/>
-        <chmod file="${dist}/libbuddy.dylib" perm="644"/>
+        <chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>
     </target>
-    
+
     <!--
 <target name="-startfiles_jgrafchart">
         <copy file="${templates}/JGrafChart" todir="${dist}"/>  
@@ -978,7 +937,7 @@ Class-Path: ${manifest.pathlist}</echo>
             source="1.5"
             maxmemory="512m"
             windowtitle="Supremica API"
-            bottom="Copyright &#169; 2001 - 2007 Supremica and Knut Åkesson, Martin Fabin, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
+            bottom="Copyright &#169; 2001 - 2011 Supremica and Knut Åkesson, Martin Fabian, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
             <doctitle><![CDATA[<h1>Supremica and Waters API Documentation</h1>]]></doctitle>
             <packageset dir="${src}">
                 <include name="org/supremica/**/*"/>

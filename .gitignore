@@ -11,6 +11,7 @@
 /src/org/supremica/manufacturingTables/xsd/pr/
 /src/org/supremica/manufacturingTables/xsd/processeditor/
 /src/org/supremica/manufacturingTables/xsd/vr/
+/arch.properties
 /.supremica
 
 # generic files to ignore
@@ -21,5 +22,9 @@
 *.DS_Store
 *.swp
 *.out
+*.bak
+desktop.ini
 junit*.properties
 Thumbs.db
+.dropbox
+/.settings/
