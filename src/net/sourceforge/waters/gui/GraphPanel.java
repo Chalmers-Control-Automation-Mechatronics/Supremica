@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   GraphPanel
 //###########################################################################
-//# $Id: 3964086741887b7e9b9950dca9fcb47cfe8465d0 $
+//# $Id: 6782ebe61dc3917abef0eb37347dc6a4204596f5 $
 //###########################################################################
 
 package net.sourceforge.waters.gui;

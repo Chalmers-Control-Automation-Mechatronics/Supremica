@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   ColorProperty
 //###########################################################################
-//# $Id: 591a230259171c890cc769a14b5685539d79e48b $
+//# $Id: 0afaa5405a35fce59d92513e5ee9a115fbdafe6c $
 //###########################################################################
 
 package org.supremica.properties;

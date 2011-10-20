@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
 //# CLASS:   HalfWaySynthesisTRSimplifier
 //###########################################################################
-//# $Id: abd046891c2ce67a6213d8cc3880397c7db95c25 $
+//# $Id: 44365f9ce27545868ec37b61ed041ded9c304a22 $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.abstraction;
