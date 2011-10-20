@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.arch
 //# CLASS:   ArchitectureDetector
 //###########################################################################
-//# $Id$
+//# $Id: 9303ab1ba83b8095cc47d9916723e0380cd02713 $
 //###########################################################################
 
 package net.sourceforge.waters.build.arch;

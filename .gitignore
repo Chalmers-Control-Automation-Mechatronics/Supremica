@@ -22,7 +22,9 @@
 *.DS_Store
 *.swp
 *.out
+*.bak
 desktop.ini
 junit*.properties
 Thumbs.db
 .dropbox
+/.settings/

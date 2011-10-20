@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.simulator
 //# CLASS:   AutomatonDisplayPane
 //###########################################################################
-//# $Id$
+//# $Id: 9d53c7d93fe448f683d95a52e5007cb4deb5329e $
 //###########################################################################
 
 package net.sourceforge.waters.gui.simulator;
