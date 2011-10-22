@@ -214,6 +214,85 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testCatMouse() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "cat_mouse";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testProductionSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "production_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testManufacturingSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "manufacturing_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testDosingUnit() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "dosing_unit";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testIPC() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "IPC";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testRobotAssemblyCell() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "robot_assembly_cell";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testTankProcess() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tank_process";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testParrow() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "parrow";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testManWolf() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "man_wolf";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testProfessorPen() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "professor_pen";
+    runSynthesizer(group, subdir, name, true);
+  }
 
   //#########################################################################
   //# Instantiating and Checking Modules

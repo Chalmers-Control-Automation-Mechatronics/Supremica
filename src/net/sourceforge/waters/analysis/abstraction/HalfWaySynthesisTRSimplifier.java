@@ -248,7 +248,7 @@ public class HalfWaySynthesisTRSimplifier
       mSupervisor.removeProperSelfLoopEvents();
     }
 
-    dumpStateUsed = false;
+    dumpStateUsed = true;
     iter.resetState(dumpState);
     while (iter.advance()) {
       final int event = iter.getCurrentEvent();
@@ -256,8 +256,7 @@ public class HalfWaySynthesisTRSimplifier
            event <= mLastLocalControllableEvent) ||
           (event > mLastSharedUncontrollableEvent)) {
         iter.remove();
-      } else {
-        dumpStateUsed = true;
+        dumpStateUsed = false;
       }
     }
 
