@@ -128,11 +128,25 @@ public class HalfWaySynthesisTRSimplifier
     return mLastSharedUncontrollableEvent;
   }
 
+  /**
+   * Sets the set of renamed event indexes.
+   * Renamed controllable events are treated specially for the benefit
+   * of compositional synthesis. Renamed controllable transitions to a
+   * dump state are not removed in the synthesised supervisor to facilitate
+   * composition with distinguishers; these transitions are only removed in
+   * the abstraction.
+   * @param renamedEventIndexes Set of proper events indexes to be considered
+   *                            as renamed.
+   */
   public void setRenamedEvents(final TIntHashSet renamedEventIndexes)
   {
     mRenamedEvents = renamedEventIndexes;
   }
 
+  /**
+   * Gets the set of renamed event indexes.
+   * @see #setRenamedEvents(TIntHashSet) setRenamedEvents()
+   */
   public TIntHashSet getRenamedEvents()
   {
     return mRenamedEvents;
@@ -183,12 +197,11 @@ public class HalfWaySynthesisTRSimplifier
     }
 
     final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
-    boolean dumpStateUsed = false;
     boolean changed = false;
     boolean addSupervisor = false;
     for (int state = badStates.nextSetBit(0); state >= 0;
          state = badStates.nextSetBit(state+1)) {
-      if(rel.isReachable(state)) {
+      if (rel.isReachable(state)) {
         iter.resetState(state);
         while (iter.advance()) {
           final int source = iter.getCurrentSourceState();
@@ -197,14 +210,13 @@ public class HalfWaySynthesisTRSimplifier
             iter.remove();
             changed = true;
           } else if (mLastLocalControllableEvent < event &&
-            event <= mLastSharedUncontrollableEvent) {
+                     event <= mLastSharedUncontrollableEvent) {
             // shared uncontrollable
             if (state != dumpState) {
               iter.remove();
               rel.addTransition(source, event, dumpState);
               changed = true;
             }
-            dumpStateUsed = true;
           } else if (mRenamedEvents != null &&
                      mRenamedEvents.contains(event)) {
             // local or shared controllable, renamed
@@ -213,7 +225,6 @@ public class HalfWaySynthesisTRSimplifier
               rel.addTransition(source, event, dumpState);
               changed = true;
             }
-            dumpStateUsed = true;
             addSupervisor = true;
           } else {
             // local or shared controllable, not renamed
@@ -227,7 +238,7 @@ public class HalfWaySynthesisTRSimplifier
           rel.setReachable(state, false);
           changed = true;
         }
-        if(rel.isInitial(state)){
+        if (rel.isInitial(state)) {
           rel.setReachable(state, false);
           changed = true;
           addSupervisor = true;
@@ -236,37 +247,29 @@ public class HalfWaySynthesisTRSimplifier
       }
     }
 
-    if(addSupervisor){
+    if (addSupervisor) {
       mSupervisor = new ListBufferTransitionRelation
           (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      if (dumpStateUsed) {
-        mSupervisor.removeOutgoingTransitions(dumpState);
-      } else {
-        mSupervisor.setReachable(dumpState, false);
-      }
+      mSupervisor.removeOutgoingTransitions(dumpState);
       mSupervisor.checkReachability();
       mSupervisor.removeProperSelfLoopEvents();
     }
 
-    dumpStateUsed = true;
-    iter.resetState(dumpState);
-    while (iter.advance()) {
-      final int event = iter.getCurrentEvent();
-      if ((event > mLastLocalUncontrollableEvent &&
-           event <= mLastLocalControllableEvent) ||
-          (event > mLastSharedUncontrollableEvent)) {
-        iter.remove();
-        dumpStateUsed = false;
+    if (mRenamedEvents != null) {
+      iter.resetState(dumpState);
+      while (iter.advance()) {
+        final int event = iter.getCurrentEvent();
+        if ((event > mLastLocalUncontrollableEvent &&
+            event <= mLastLocalControllableEvent) ||
+            (event > mLastSharedUncontrollableEvent)) {
+          iter.remove();
+          changed = true;
+        }
       }
     }
 
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    if (dumpStateUsed) {
-      changed |= rel.removeOutgoingTransitions(dumpState);
-    } else {
-      rel.setReachable(dumpState, false);
-      changed = true;
-    }
+    changed |= rel.removeOutgoingTransitions(dumpState);
     changed |= rel.checkReachability();
     changed |= rel.removeProperSelfLoopEvents();
 
