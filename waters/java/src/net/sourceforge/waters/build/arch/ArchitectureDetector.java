@@ -138,8 +138,12 @@ public class ArchitectureDetector
     writer.println("##############################################################################");
     writer.println();
     if (arch == null) {
-      writer.println("java.arch = ");
+      writer.println("java.os =");
+      writer.println("java.arch =");
     } else {
+      final int dotpos = arch.lastIndexOf('.');
+      final String os = dotpos < 0 ? arch : arch.substring(0, dotpos);
+      writer.println("java.os = " + os);
       writer.println("java.arch = " + arch);
     }
     writer.close();

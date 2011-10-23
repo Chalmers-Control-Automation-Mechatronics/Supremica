@@ -273,11 +273,15 @@
     </java> 
   </target>
 
-  <target name="cpp" depends="javah,jniglue" if="native.make"
+  <target name="-guess-arch" unless="java.arch">
+    <property name="java.arch" value="${native.ostype}"/>
+  </target>
+
+  <target name="cpp" depends="-guess-arch,javah,jniglue" if="native.make"
           description="Build native library.">
     <exec executable="${native.make}" dir="${cpp}"
           failonerror="true" failifexecutionfails="false">
-      <arg value="OSTYPE=${native.ostype}"/>
+      <arg value="JAVA_ARCH=${java.arch}"/>
     </exec>
   </target>
 
@@ -649,7 +653,16 @@
     </copy>
   </target>
 
-  <target name="clean" description="Clean up.">
+
+  <target name="-clean-cpp" depends="-guess-arch" if="native.make">
+    <exec executable="${native.make}" dir="${cpp}"
+          failifexecutionfails="false">
+      <arg value="JAVA_ARCH=${java.arch}"/>
+      <arg value="clean"/>
+    </exec>
+  </target>
+
+  <target name="clean" description="Clean up." depends="-clean-cpp">
     <delete dir="${src}/net/sourceforge/waters/xsd/"/>
     <delete dir="${classes}"/>
     <delete dir="${logs}"/>
@@ -658,11 +671,6 @@
     <delete dir="${javah.dir}"/>
     <delete dir="${jniglue.outdir}"/>
     <delete dir="${antlr.promela.outdir}"/>
-    <exec executable="${native.make}" dir="${cpp}"
-          failifexecutionfails="false">
-      <arg value="OSTYPE=${native.ostype}"/>
-      <arg value="clean"/>
-    </exec>
   </target>
 
 </project>

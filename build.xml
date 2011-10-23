@@ -223,9 +223,9 @@
         <delete dir="${lib}/${unjared}"/>
         <mkdir dir="${lib}/${unjared}"/>        
         <delete dir="${resources}"/>
-        <mkdir dir="${resources}"/>        
+        <mkdir dir="${resources}"/>
         <delete dir="${lib}/${unjared}/META-INF"/>
-        <mkdir dir="${lib}/${unjared}/META-INF"/>        
+        <mkdir dir="${lib}/${unjared}/META-INF"/>
         <ant dir="${waters.dir}" target="clean" inheritAll="false"/>
     </target>
     
@@ -574,10 +574,27 @@ Class-Path: ${manifest.pathlist}</echo>
         </copy>
     </target>
 
-    <target name="cpp_waters">
-        <ant dir="${waters.dir}" target="cpp" inheritAll="false"/>
+    <target name="cpp_waters" depends="-detect_arch">
+        <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+            <property name="java.arch" value="${java.arch}"/>
+        </ant>
         <copy todir="${dist}" failonerror="false">
-            <fileset dir="${waters.dir}/cpp/lib" includes="*"/>
+            <fileset dir="${waters.dir}/cpp/lib/${java.arch}" includes="*"/>
+        </copy>
+    </target>
+
+    <target name="ccpp_waters" depends="-detect_arch">
+        <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+            <property name="java.arch" value="${java.os}.x86"/>
+        </ant>
+        <copy todir="${platform}/${java.os}.x86" failonerror="false">
+            <fileset dir="${waters.dir}/cpp/lib/${java.os}.x86" includes="*"/>
+        </copy>
+        <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+            <property name="java.arch" value="${java.os}.amd64"/>
+        </ant>
+        <copy todir="${platform}/${java.os}.x86" failonerror="false">
+            <fileset dir="${waters.dir}/cpp/lib/${java.os}.amd64" includes="*"/>
         </copy>
     </target>
 
