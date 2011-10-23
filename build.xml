@@ -579,22 +579,27 @@ Class-Path: ${manifest.pathlist}</echo>
             <property name="java.arch" value="${java.arch}"/>
         </ant>
         <copy todir="${dist}" failonerror="false">
-            <fileset dir="${waters.dir}/cpp/lib/${java.arch}" includes="*"/>
+            <fileset dir="${waters.dir}/cpp/lib/${java.arch}.debug"
+            	     includes="*"/>
         </copy>
     </target>
 
     <target name="ccpp_waters" depends="-detect_arch">
         <ant dir="${waters.dir}" target="cpp" inheritAll="false">
             <property name="java.arch" value="${java.os}.x86"/>
+            <property name="make.release" value="1"/>
         </ant>
         <copy todir="${platform}/${java.os}.x86" failonerror="false">
-            <fileset dir="${waters.dir}/cpp/lib/${java.os}.x86" includes="*"/>
+            <fileset dir="${waters.dir}/cpp/lib/${java.os}.x86"
+                     includes="*"/>
         </copy>
         <ant dir="${waters.dir}" target="cpp" inheritAll="false">
             <property name="java.arch" value="${java.os}.amd64"/>
+            <property name="make.release" value="1"/>
         </ant>
-        <copy todir="${platform}/${java.os}.x86" failonerror="false">
-            <fileset dir="${waters.dir}/cpp/lib/${java.os}.amd64" includes="*"/>
+        <copy todir="${platform}/${java.os}.amd64" failonerror="false">
+            <fileset dir="${waters.dir}/cpp/lib/${java.os}.amd64"
+                     includes="*"/>
         </copy>
     </target>
 
