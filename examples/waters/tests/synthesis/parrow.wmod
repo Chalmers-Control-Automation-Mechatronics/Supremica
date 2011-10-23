@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="parrow" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Parrow's protocol, an ideal protocol for data transmission, however not physically viable since the 'acknowledgement' signals also have to travel in an unreliable medium. The Sender, Receiver and Medium should together show the Desired behaviour. A physically viable protocol is the alternating bit protocol.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="acknowledge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="receive"/>
+        <EventDecl Kind="CONTROLLABLE" Name="send"/>
+        <EventDecl Observable="false" Kind="CONTROLLABLE" Name="tau_lost"/>
+        <EventDecl Observable="false" Kind="CONTROLLABLE" Name="tau_ok"/>
+        <EventDecl Kind="CONTROLLABLE" Name="timeout"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="Medium">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="m0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="m1"/>
+                    <SimpleNode Name="m2"/>
+                    <SimpleNode Name="m3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="m1" Source="m0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m2" Source="m1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_ok"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m3" Source="m1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_lost"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m0" Source="m2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m0" Source="m3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Desired behaviour">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Sender">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="acknowledge"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Receiver">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="r0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="r1"/>
+                    <SimpleNode Name="r2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="r1" Source="r0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r2" Source="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r0" Source="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="acknowledge"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0.m0.r0.s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.m0.r2.s2"/>
+                    <SimpleNode Name="q1.m0.r0.s1"/>
+                    <SimpleNode Name="q1.m0.r1.s2"/>
+                    <SimpleNode Name="q1.m1.r0.s2"/>
+                    <SimpleNode Name="q1.m2.r0.s2"/>
+                    <SimpleNode Name="q1.m3.r0.s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1.m0.r0.s1" Source="q0.m0.r0.s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.m0.r0.s0" Source="q0.m0.r2.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="acknowledge"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.m1.r0.s2" Source="q1.m0.r0.s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.m0.r2.s2" Source="q1.m0.r1.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.m2.r0.s2" Source="q1.m1.r0.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_ok"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.m3.r0.s2" Source="q1.m1.r0.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_lost"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.m0.r1.s2" Source="q1.m2.r0.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.m0.r0.s1" Source="q1.m3.r0.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

@@ -1,0 +1,1308 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="production_system" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment></ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="arrive1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="arrive2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="arrive3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="arrivex"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attach"/>
+        <EventDecl Kind="CONTROLLABLE" Name="dip"/>
+        <EventDecl Kind="CONTROLLABLE" Name="done1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="doneA"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="doneB"/>
+        <EventDecl Kind="CONTROLLABLE" Name="enter"/>
+        <EventDecl Kind="CONTROLLABLE" Name="exit"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="exit_item"/>
+        <EventDecl Kind="CONTROLLABLE" Name="leave1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="leave2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="leave3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="leavex"/>
+        <EventDecl Kind="CONTROLLABLE" Name="package"/>
+        <EventDecl Kind="CONTROLLABLE" Name="polish"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="put1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="put2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="put3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="startA"/>
+        <EventDecl Kind="CONTROLLABLE" Name="startB"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take_item"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="Exit">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrivex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit"/>
+                            <SimpleIdentifier Name="leavex"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Joint1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive1"/>
+                            <SimpleIdentifier Name="put1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave1"/>
+                            <SimpleIdentifier Name="take1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Attaching">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attach"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Transporter">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3" Source="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4" Source="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrivex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q5" Source="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leavex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q6" Source="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7" Source="q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q8" Source="q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1" Source="q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Polishing">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip"/>
+                            <SimpleIdentifier Name="polish"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Joint2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive2"/>
+                            <SimpleIdentifier Name="put2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave2"/>
+                            <SimpleIdentifier Name="take2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Assembly">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4" Source="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="doneA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4" Source="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="doneB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Joint3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive3"/>
+                            <SimpleIdentifier Name="put3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave3"/>
+                            <SimpleIdentifier Name="take3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Packaging">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0.q0.q0.q0.q0.q0.q0.q0.q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q0.q0.q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q0.q0.q3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q0.q0.q5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q0.q0.q7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q0.q1.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q0.q2.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q1.q0.q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q1.q0.q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q1.q0.q3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q1.q0.q5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q1.q0.q7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q1.q1.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q1.q2.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q2.q0.q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q2.q0.q1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q2.q0.q3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q2.q0.q5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q2.q0.q7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q2.q1.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q0.q2.q2.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q1.q0.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q1.q1.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q0.q1.q2.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q1.q0.q0.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q1.q0.q1.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q0.q1.q0.q2.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q1.q0.q0.q0.q0.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q1.q0.q0.q1.q0.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q0.q1.q0.q0.q2.q0.q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q1.q0.q0.q0.q0.q0.q4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q1.q0.q0.q0.q1.q0.q4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q0.q1.q0.q0.q0.q2.q0.q4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q1.q0.q0.q0.q0.q0.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q1.q0.q0.q0.q0.q1.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q1.q0.q0.q0.q0.q2.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q2.q0.q0.q0.q0.q0.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q2.q0.q0.q0.q0.q1.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q2.q0.q0.q0.q0.q2.q0.q8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q2.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q2.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q2.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q3.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q3.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q3.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q4.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q4.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q4.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q1" Source="q0.q0.q0.q0.q0.q0.q0.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q0" Source="q0.q0.q0.q0.q0.q0.q0.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q1" Source="q0.q0.q0.q0.q0.q0.q0.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q0.q0.q2" Source="q0.q0.q0.q0.q0.q0.q0.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q3" Source="q0.q0.q0.q0.q0.q0.q0.q0.q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q1.q0.q0.q0.q0.q0.q4" Source="q0.q0.q0.q0.q0.q0.q0.q0.q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrivex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q5" Source="q0.q0.q0.q0.q0.q0.q0.q0.q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q0.q0.q6" Source="q0.q0.q0.q0.q0.q0.q0.q0.q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q7" Source="q0.q0.q0.q0.q0.q0.q0.q0.q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q0.q0.q8" Source="q0.q0.q0.q0.q0.q0.q0.q0.q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q1.q2" Source="q0.q0.q0.q0.q0.q0.q0.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip"/>
+                            <SimpleIdentifier Name="polish"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q2.q2" Source="q0.q0.q0.q0.q0.q0.q0.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q1.q2" Source="q0.q0.q0.q0.q0.q0.q0.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q2.q2" Source="q0.q0.q0.q0.q0.q0.q0.q2.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q0.q0.q2" Source="q0.q0.q0.q0.q0.q0.q0.q2.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q1" Source="q0.q0.q0.q0.q0.q0.q1.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q0" Source="q0.q0.q0.q0.q0.q0.q1.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q1" Source="q0.q0.q0.q0.q0.q0.q1.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q1.q0.q2" Source="q0.q0.q0.q0.q0.q0.q1.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q3" Source="q0.q0.q0.q0.q0.q0.q1.q0.q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q1.q0.q0.q0.q1.q0.q4" Source="q0.q0.q0.q0.q0.q0.q1.q0.q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrivex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q5" Source="q0.q0.q0.q0.q0.q0.q1.q0.q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q1.q0.q6" Source="q0.q0.q0.q0.q0.q0.q1.q0.q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q7" Source="q0.q0.q0.q0.q0.q0.q1.q0.q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q1.q0.q8" Source="q0.q0.q0.q0.q0.q0.q1.q0.q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q1.q2" Source="q0.q0.q0.q0.q0.q0.q1.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip"/>
+                            <SimpleIdentifier Name="polish"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q2.q2" Source="q0.q0.q0.q0.q0.q0.q1.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q1.q2" Source="q0.q0.q0.q0.q0.q0.q1.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q2.q2" Source="q0.q0.q0.q0.q0.q0.q1.q2.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q1.q0.q2" Source="q0.q0.q0.q0.q0.q0.q1.q2.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q0" Source="q0.q0.q0.q0.q0.q0.q2.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q1" Source="q0.q0.q0.q0.q0.q0.q2.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q1" Source="q0.q0.q0.q0.q0.q0.q2.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q2.q0.q2" Source="q0.q0.q0.q0.q0.q0.q2.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q3" Source="q0.q0.q0.q0.q0.q0.q2.q0.q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q1.q0.q0.q0.q2.q0.q4" Source="q0.q0.q0.q0.q0.q0.q2.q0.q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrivex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q5" Source="q0.q0.q0.q0.q0.q0.q2.q0.q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q2.q0.q6" Source="q0.q0.q0.q0.q0.q0.q2.q0.q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q7" Source="q0.q0.q0.q0.q0.q0.q2.q0.q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q2.q0.q8" Source="q0.q0.q0.q0.q0.q0.q2.q0.q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q1.q2" Source="q0.q0.q0.q0.q0.q0.q2.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q1.q2" Source="q0.q0.q0.q0.q0.q0.q2.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip"/>
+                            <SimpleIdentifier Name="polish"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q2.q2" Source="q0.q0.q0.q0.q0.q0.q2.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q2.q2" Source="q0.q0.q0.q0.q0.q0.q2.q2.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q2.q0.q2" Source="q0.q0.q0.q0.q0.q0.q2.q2.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q1" Source="q0.q0.q0.q0.q0.q1.q0.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q1.q0.q8" Source="q0.q0.q0.q0.q0.q1.q0.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q1.q0.q0.q0.q0.q0.q0.q8" Source="q0.q0.q0.q0.q0.q1.q0.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q1" Source="q0.q0.q0.q0.q0.q1.q1.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q2.q0.q8" Source="q0.q0.q0.q0.q0.q1.q1.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q1.q0.q0.q0.q0.q1.q0.q8" Source="q0.q0.q0.q0.q0.q1.q1.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q1" Source="q0.q0.q0.q0.q0.q1.q2.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q0.q0.q8" Source="q0.q0.q0.q0.q0.q1.q2.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q1.q0.q0.q0.q0.q2.q0.q8" Source="q0.q0.q0.q0.q0.q1.q2.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q7" Source="q0.q0.q0.q0.q1.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q1.q0.q6" Source="q0.q0.q0.q0.q1.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q0.q0.q0.q0.q0.q0.q0.q6" Source="q0.q0.q0.q0.q1.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q7" Source="q0.q0.q0.q0.q1.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q2.q0.q6" Source="q0.q0.q0.q0.q1.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q0.q0.q0.q0.q0.q1.q0.q6" Source="q0.q0.q0.q0.q1.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q7" Source="q0.q0.q0.q0.q1.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q0.q0.q6" Source="q0.q0.q0.q0.q1.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q0.q0.q0.q0.q0.q2.q0.q6" Source="q0.q0.q0.q0.q1.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q3" Source="q0.q0.q0.q1.q0.q0.q0.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q1.q2" Source="q0.q0.q0.q1.q0.q0.q0.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q1.q0.q2" Source="q0.q0.q0.q1.q0.q0.q0.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q3" Source="q0.q0.q0.q1.q0.q0.q1.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q1.q2" Source="q0.q0.q0.q1.q0.q0.q1.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q2.q0.q2" Source="q0.q0.q0.q1.q0.q0.q1.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q3" Source="q0.q0.q0.q1.q0.q0.q2.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q1.q2" Source="q0.q0.q0.q1.q0.q0.q2.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q1.q0.q0.q0.q0.q2" Source="q0.q0.q0.q1.q0.q0.q2.q0.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q0" Source="q0.q0.q1.q0.q0.q0.q0.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q0.q0.q5" Source="q0.q0.q1.q0.q0.q0.q0.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leavex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q1.q0.q0.q0.q1.q0.q4" Source="q0.q0.q1.q0.q0.q0.q0.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q0" Source="q0.q0.q1.q0.q0.q0.q1.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q1.q0.q5" Source="q0.q0.q1.q0.q0.q0.q1.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leavex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q1.q0.q0.q0.q2.q0.q4" Source="q0.q0.q1.q0.q0.q0.q1.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q0" Source="q0.q0.q1.q0.q0.q0.q2.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q0.q2.q0.q5" Source="q0.q0.q1.q0.q0.q0.q2.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leavex"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q1.q0.q0.q0.q0.q0.q4" Source="q0.q0.q1.q0.q0.q0.q2.q0.q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q1.q0.q0.q0.q0.q1.q0.q8" Source="q0.q1.q0.q0.q0.q0.q0.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q2.q0.q0.q0.q0.q0.q0.q8" Source="q0.q1.q0.q0.q0.q0.q0.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attach"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q1.q0.q0.q0.q0.q2.q0.q8" Source="q0.q1.q0.q0.q0.q0.q1.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q2.q0.q0.q0.q0.q1.q0.q8" Source="q0.q1.q0.q0.q0.q0.q1.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attach"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q1.q0.q0.q0.q0.q0.q0.q8" Source="q0.q1.q0.q0.q0.q0.q2.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q2.q0.q0.q0.q0.q2.q0.q8" Source="q0.q1.q0.q0.q0.q0.q2.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attach"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q0.q0.q8" Source="q0.q2.q0.q0.q0.q0.q0.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q2.q0.q0.q0.q0.q1.q0.q8" Source="q0.q2.q0.q0.q0.q0.q0.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q1.q0.q8" Source="q0.q2.q0.q0.q0.q0.q1.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q2.q0.q0.q0.q0.q2.q0.q8" Source="q0.q2.q0.q0.q0.q0.q1.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q0.q1.q2.q0.q8" Source="q0.q2.q0.q0.q0.q0.q2.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q2.q0.q0.q0.q0.q0.q0.q8" Source="q0.q2.q0.q0.q0.q0.q2.q0.q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q0.q0.q0.q0.q0.q1.q0.q6" Source="q1.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q0.q0.q0.q0.q0.q0.q0.q6" Source="q1.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q0.q0.q0.q0.q0.q0.q0.q6" Source="q1.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q0.q0.q0.q0.q0.q2.q0.q6" Source="q1.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q0.q0.q0.q0.q0.q1.q0.q6" Source="q1.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q0.q0.q0.q0.q0.q1.q0.q6" Source="q1.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q0.q0.q0.q0.q0.q0.q0.q6" Source="q1.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q0.q0.q0.q0.q0.q2.q0.q6" Source="q1.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q0.q0.q0.q0.q0.q2.q0.q6" Source="q1.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q0.q0.q0.q0.q0.q1.q0.q6" Source="q2.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q0.q0.q6" Source="q2.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="doneA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q0.q0.q0.q0.q0.q2.q0.q6" Source="q2.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q1.q0.q6" Source="q2.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="doneA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q0.q0.q0.q0.q0.q0.q0.q6" Source="q2.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q2.q0.q6" Source="q2.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="doneA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q0.q0.q0.q0.q0.q1.q0.q6" Source="q3.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q0.q0.q6" Source="q3.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="doneB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q0.q0.q0.q0.q0.q2.q0.q6" Source="q3.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q1.q0.q6" Source="q3.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="doneB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q0.q0.q0.q0.q0.q0.q0.q6" Source="q3.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q2.q0.q6" Source="q3.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="doneB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q0.q0.q6" Source="q4.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q1.q0.q6" Source="q4.q0.q0.q0.q0.q0.q0.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q1.q0.q6" Source="q4.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q2.q0.q6" Source="q4.q0.q0.q0.q0.q0.q1.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.q0.q0.q1.q0.q2.q0.q6" Source="q4.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="put2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0.q0.q0.q0.q0.q0.q6" Source="q4.q0.q0.q0.q0.q0.q2.q0.q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_item"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

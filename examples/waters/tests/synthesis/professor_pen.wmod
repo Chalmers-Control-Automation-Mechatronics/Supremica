@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="professor_pen" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Two Professors competing for mutual resources, pen and paper. Each Professor can request any of the resources in any order. Both resources are needed simultaneously to work. The spec essentially says that the Professors should be able to work and rest over and over again. Manual synthesis of one supervisor for each spec will lead to a blocking system. Supremica is smarter than that.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="paper11"/>
+        <EventDecl Kind="CONTROLLABLE" Name="paper21"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pen11"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pen21"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="return10"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="return20"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="Paper">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper11"/>
+                            <SimpleIdentifier Name="paper21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="return10"/>
+                            <SimpleIdentifier Name="return20"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Pen">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen11"/>
+                            <SimpleIdentifier Name="pen21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="return10"/>
+                            <SimpleIdentifier Name="return20"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Professor 1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="p10">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="paper">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="pen">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="work">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="paper" Source="p10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="pen" Source="p10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="work" Source="paper">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="work" Source="pen">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="p10" Source="work">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="return10"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Professor 2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="p20">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="paper">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="pen">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="work">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="paper" Source="p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="pen" Source="p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="work" Source="paper">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="work" Source="pen">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="p20" Source="work">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="return20"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0.q0.p10.p20">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="140" X="161"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q1.p10.pen">
+                        <PointGeometry>
+                            <Point Y="222" X="232"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.q1.pen.p20">
+                        <PointGeometry>
+                            <Point Y="190" X="65"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.q0.p10.paper">
+                        <PointGeometry>
+                            <Point Y="91" X="258"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.q0.paper.p20">
+                        <PointGeometry>
+                            <Point Y="59" X="88"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.q1.p10.work">
+                        <PointGeometry>
+                            <Point Y="159" X="257"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.q1.work.p20">
+                        <PointGeometry>
+                            <Point Y="122" X="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q0.q1.p10.pen" Source="q0.q0.p10.p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen21"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="187" X="197"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q0.q1.pen.p20" Source="q0.q0.p10.p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="170" X="110"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q1.q0.p10.paper" Source="q0.q0.p10.p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper21"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="110" X="212"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q1.q0.paper.p20" Source="q0.q0.p10.p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="94" X="124"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q1.q1.p10.work" Source="q0.q1.p10.pen">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper21"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="196" X="252"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q1.q1.work.p20" Source="q0.q1.pen.p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="paper11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="159" X="55"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q1.q1.p10.work" Source="q1.q0.p10.paper">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen21"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="122" X="267"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q1.q1.work.p20" Source="q1.q0.paper.p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pen11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="85" X="68"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q0.q0.p10.p20" Source="q1.q1.p10.work">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="return20"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q0.p10.p20" Source="q1.q1.work.p20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="return10"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

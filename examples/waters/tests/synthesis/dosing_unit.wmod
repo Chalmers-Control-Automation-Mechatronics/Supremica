@@ -1,0 +1,1635 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="dosing_unit" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This is a model of a dosing unit in a chemical batch system, adapted from 'Implementation Considerations in Supervisory Control' by P. Dietrich, R. Malik, W.M. Wonham and B.A. Brandin. The system is not controllable but it is nonblocking.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="L1off"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="L1on"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="L2off"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="L2on"/>
+        <EventDecl Kind="CONTROLLABLE" Name="closeA"/>
+        <EventDecl Kind="CONTROLLABLE" Name="closeB"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="jelly"/>
+        <EventDecl Kind="CONTROLLABLE" Name="openA"/>
+        <EventDecl Kind="CONTROLLABLE" Name="openB"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="start"/>
+        <EventDecl Kind="CONTROLLABLE" Name="stirrerOff"/>
+        <EventDecl Kind="CONTROLLABLE" Name="stirrerOn"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="stop"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="Valve B">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="b1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="b2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="b1" Source="b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2" Source="b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b1" Source="b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2" Source="b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                            <SimpleIdentifier Name="L2off"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="No flushing, never jelly">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="a1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="a2"/>
+                    <SimpleNode Name="a3"/>
+                    <SimpleNode Name="a4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="a2" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a4" Source="a4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Level measuring sensors">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="a1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="a2"/>
+                    <SimpleNode Name="a3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="a2" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Valve A">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="a1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="a2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="a1" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                            <SimpleIdentifier Name="L2on"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Start/stop trigger">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="a1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="a2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="a2" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Valve A specification">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="a1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="a2"/>
+                    <SimpleNode Name="a3"/>
+                    <SimpleNode Name="a4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="a1" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a4" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a4" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a4" Source="a4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Stirrer specification">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="a1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="a2"/>
+                    <SimpleNode Name="a3"/>
+                    <SimpleNode Name="a4"/>
+                    <SimpleNode Name="a5"/>
+                    <SimpleNode Name="a6"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="a1" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a4" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a5" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a6" Source="a3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a4" Source="a4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a5" Source="a4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a4" Source="a5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a5" Source="a5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a6" Source="a5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a3" Source="a6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a5" Source="a6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a6" Source="a6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOn"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Stirrer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="a1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="a2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="a1" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a2" Source="a1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="a1" Source="a2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Valve B specification">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="b1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="b2"/>
+                    <SimpleNode Name="b3"/>
+                    <SimpleNode Name="b4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="b1" Source="b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2" Source="b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b3" Source="b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b1" Source="b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2" Source="b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b4" Source="b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b1" Source="b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b3" Source="b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b4" Source="b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2" Source="b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b3" Source="b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b4" Source="b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openB"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Empty-full-empty cycle">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="b1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="b2"/>
+                    <SimpleNode Name="b3"/>
+                    <SimpleNode Name="b4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="b1" Source="b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                            <SimpleIdentifier Name="openB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2" Source="b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2" Source="b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b3" Source="b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b3" Source="b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                            <SimpleIdentifier Name="openB"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b4" Source="b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b1" Source="b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b4" Source="b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openB"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
+            <Graph>
+                <LabelBlock>
+                    <SimpleIdentifier Name="jelly"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="5" X="5"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="b1.a1.a1.a1.a1.a1.a1.a1.b1.b1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="70" X="231"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a1.a1.a2.a1.a1.a1.b1.b1">
+                        <PointGeometry>
+                            <Point Y="93" X="268"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a1.a2.a1.a4.a1.a2.b1.b2">
+                        <PointGeometry>
+                            <Point Y="104" X="229"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a1.a2.a2.a4.a1.a2.b1.b2">
+                        <PointGeometry>
+                            <Point Y="130" X="267"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a2.a1.a1.a1.a2.a1.b1.b1">
+                        <PointGeometry>
+                            <Point Y="61" X="361"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a2.a1.a2.a1.a2.a1.b1.b1">
+                        <PointGeometry>
+                            <Point Y="65" X="398"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a2.a2.a1.a4.a2.a2.b1.b2">
+                        <PointGeometry>
+                            <Point Y="104" X="360"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a2.a2.a2.a4.a2.a2.b1.b2">
+                        <PointGeometry>
+                            <Point Y="102" X="398"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a3.a1.a1.a1.a1.a1.b2.b1">
+                        <PointGeometry>
+                            <Point Y="139" X="127"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a3.a1.a2.a1.a1.a1.b2.b1">
+                        <PointGeometry>
+                            <Point Y="181" X="169"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a3.a2.a1.a4.a1.a2.b2.b2">
+                        <PointGeometry>
+                            <Point Y="169" X="127"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b1.a1.a3.a2.a2.a4.a1.a2.b2.b2">
+                        <PointGeometry>
+                            <Point Y="211" X="173"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b2.a2.a1.a1.a2.a2.a1.a1.b1.b3">
+                        <PointGeometry>
+                            <Point Y="64" X="616"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b2.a2.a1.a2.a2.a5.a1.a2.b1.b4">
+                        <PointGeometry>
+                            <Point Y="92" X="626"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b2.a2.a2.a1.a1.a2.a2.a1.b1.b3">
+                        <PointGeometry>
+                            <Point Y="113" X="481"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b2.a2.a2.a1.a2.a2.a2.a1.b1.b3">
+                        <PointGeometry>
+                            <Point Y="108" X="521"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b2.a2.a2.a2.a1.a5.a2.a2.b1.b4">
+                        <PointGeometry>
+                            <Point Y="149" X="480"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b2.a2.a2.a2.a2.a5.a2.a2.b1.b4">
+                        <PointGeometry>
+                            <Point Y="141" X="527"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b3.a3.a1.a1.a2.a3.a1.a3.b1.b3">
+                        <PointGeometry>
+                            <Point Y="336" X="386"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b3.a3.a1.a2.a2.a6.a1.a4.b1.b4">
+                        <PointGeometry>
+                            <Point Y="362" X="396"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b3.a3.a2.a1.a1.a3.a2.a3.b1.b3">
+                        <PointGeometry>
+                            <Point Y="200" X="541"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b3.a3.a2.a1.a2.a3.a2.a3.b1.b3">
+                        <PointGeometry>
+                            <Point Y="241" X="491"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b3.a3.a2.a2.a1.a6.a2.a4.b1.b4">
+                        <PointGeometry>
+                            <Point Y="228" X="546"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b3.a3.a2.a2.a2.a6.a2.a4.b1.b4">
+                        <PointGeometry>
+                            <Point Y="268" X="503"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b3.a3.a3.a1.a2.a3.a1.a3.b2.b3">
+                        <PointGeometry>
+                            <Point Y="356" X="259"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b3.a3.a3.a2.a2.a6.a1.a4.b2.b4">
+                        <PointGeometry>
+                            <Point Y="383" X="265"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b4.a2.a1.a1.a2.a2.a1.a1.b1.b3">
+                        <PointGeometry>
+                            <Point Y="374" X="58"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b4.a2.a1.a2.a2.a5.a1.a2.b1.b4">
+                        <PointGeometry>
+                            <Point Y="398" X="72"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b4.a2.a3.a1.a1.a2.a1.a1.b2.b3">
+                        <PointGeometry>
+                            <Point Y="223" X="72"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b4.a2.a3.a1.a2.a2.a1.a1.b2.b3">
+                        <PointGeometry>
+                            <Point Y="299" X="130"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b4.a2.a3.a2.a1.a5.a1.a2.b2.b4">
+                        <PointGeometry>
+                            <Point Y="250" X="76"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="b4.a2.a3.a2.a2.a5.a1.a2.b2.b4">
+                        <PointGeometry>
+                            <Point Y="326" X="138"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="b1.a1.a1.a2.a1.a4.a1.a2.b1.b2" Source="b1.a1.a1.a1.a1.a1.a1.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="83" X="236"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a1.a1.a1.a1.a1.b1.b1" Source="b1.a1.a1.a1.a2.a1.a1.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="74" X="248"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a2.a2.a4.a1.a2.b1.b2" Source="b1.a1.a1.a1.a2.a1.a1.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="110" X="279"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a1.a1.a1.a1.a1.b1.b1" Source="b1.a1.a1.a2.a1.a4.a1.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="82" X="214"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a2.a2.a1.a4.a2.a2.b1.b2" Source="b1.a1.a1.a2.a1.a4.a1.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="106" X="292"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a1.a2.a1.a1.a1.b1.b1" Source="b1.a1.a1.a2.a2.a4.a1.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="110" X="257"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a2.a1.a4.a1.a2.b1.b2" Source="b1.a1.a1.a2.a2.a4.a1.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="117" X="245"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a2.a2.a2.a4.a2.a2.b1.b2" Source="b1.a1.a1.a2.a2.a4.a1.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="106" X="333"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a1.a1.a1.a1.a1.b1.b1" Source="b1.a1.a2.a1.a1.a1.a2.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="54" X="293"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a2.a2.a1.a4.a2.a2.b1.b2" Source="b1.a1.a2.a1.a1.a1.a2.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="79" X="348"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a1.a1.a2.a2.a1.b1.b3" Source="b1.a1.a2.a1.a1.a1.a2.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="81" X="421"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a1.a2.a1.a1.a1.b1.b1" Source="b1.a1.a2.a1.a2.a1.a2.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="73" X="334"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a2.a1.a1.a1.a2.a1.b1.b1" Source="b1.a1.a2.a1.a2.a1.a2.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="54" X="380"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a2.a2.a2.a4.a2.a2.b1.b2" Source="b1.a1.a2.a1.a2.a1.a2.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="80" X="413"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a1.a2.a2.a2.a1.b1.b3" Source="b1.a1.a2.a1.a2.a1.a2.a1.b1.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="76" X="464"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a2.a1.a1.a1.a2.a1.b1.b1" Source="b1.a1.a2.a2.a1.a4.a2.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="79" X="369"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a2.a1.a5.a2.a2.b1.b4" Source="b1.a1.a2.a2.a1.a4.a2.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="131" X="419"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a2.a1.a2.a1.a2.a1.b1.b1" Source="b1.a1.a2.a2.a2.a4.a2.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="80" X="390"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a2.a2.a1.a4.a2.a2.b1.b2" Source="b1.a1.a2.a2.a2.a4.a2.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a2.a2.a5.a2.a2.b1.b4" Source="b1.a1.a2.a2.a2.a4.a2.a2.b1.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a1.a1.a1.a1.a1.b1.b1" Source="b1.a1.a3.a1.a1.a1.a1.a1.b2.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="95" X="172"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a2.a1.a4.a1.a2.b2.b2" Source="b1.a1.a3.a1.a1.a1.a1.a1.b2.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="151" X="131"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a1.a2.a1.a1.a1.b1.b1" Source="b1.a1.a3.a1.a2.a1.a1.a1.b2.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="135" X="218"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a1.a1.a1.a1.a1.b2.b1" Source="b1.a1.a3.a1.a2.a1.a1.a1.b2.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="156" X="146"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a2.a2.a4.a1.a2.b2.b2" Source="b1.a1.a3.a1.a2.a1.a1.a1.b2.b1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="195" X="181"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a2.a1.a4.a1.a2.b1.b2" Source="b1.a1.a3.a2.a1.a4.a1.a2.b2.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="133" X="172"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a1.a1.a1.a1.a1.b2.b1" Source="b1.a1.a3.a2.a1.a4.a1.a2.b2.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="151" X="109"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a1.a2.a2.a4.a1.a2.b1.b2" Source="b1.a1.a3.a2.a2.a4.a1.a2.b2.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="174" X="221"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a1.a2.a1.a1.a1.b2.b1" Source="b1.a1.a3.a2.a2.a4.a1.a2.b2.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="199" X="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a2.a1.a4.a1.a2.b2.b2" Source="b1.a1.a3.a2.a2.a4.a1.a2.b2.b2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="192" X="145"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a1.a2.a2.a5.a1.a2.b1.b4" Source="b2.a2.a1.a1.a2.a2.a1.a1.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="71" X="639"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a1.a1.a2.a2.a1.a1.b1.b3" Source="b2.a2.a1.a2.a2.a5.a1.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="78" X="618"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a2.a2.a5.a2.a2.b1.b4" Source="b2.a2.a1.a2.a2.a5.a1.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openA"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="118" X="584"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a1.a2.a2.a2.a1.b1.b3" Source="b2.a2.a2.a1.a1.a2.a2.a1.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="104" X="504"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a2.a1.a5.a2.a2.b1.b4" Source="b2.a2.a2.a1.a1.a2.a2.a1.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="130" X="492"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a1.a1.a3.a2.a3.b1.b3" Source="b2.a2.a2.a1.a1.a2.a2.a1.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="155" X="516"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a1.a1.a2.a2.a1.a1.b1.b3" Source="b2.a2.a2.a1.a2.a2.a2.a1.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="79" X="573"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a2.a2.a5.a2.a2.b1.b4" Source="b2.a2.a2.a1.a2.a2.a2.a1.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="542"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a1.a2.a3.a2.a3.b1.b3" Source="b2.a2.a2.a1.a2.a2.a2.a1.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a1.a1.a2.a2.a1.b1.b3" Source="b2.a2.a2.a2.a1.a5.a2.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="130" X="471"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a2.a1.a6.a2.a4.b1.b4" Source="b2.a2.a2.a2.a1.a5.a2.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="193" X="514"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a1.a2.a2.a2.a1.b1.b3" Source="b2.a2.a2.a2.a2.a5.a2.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="123" X="521"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b2.a2.a2.a2.a1.a5.a2.a2.b1.b4" Source="b2.a2.a2.a2.a2.a5.a2.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="146" X="507"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a2.a2.a6.a2.a4.b1.b4" Source="b2.a2.a2.a2.a2.a5.a2.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="208" X="521"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a1.a2.a2.a6.a1.a4.b1.b4" Source="b3.a3.a1.a1.a2.a3.a1.a3.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="349" X="403"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a1.a1.a2.a3.a1.a3.b1.b3" Source="b3.a3.a1.a2.a2.a6.a1.a4.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="357" X="382"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a3.a2.a2.a6.a1.a4.b2.b4" Source="b3.a3.a1.a2.a2.a6.a1.a4.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openB"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="381" X="332"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a1.a2.a3.a2.a3.b1.b3" Source="b3.a3.a2.a1.a1.a3.a2.a3.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="222" X="520"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a2.a1.a6.a2.a4.b1.b4" Source="b3.a3.a2.a1.a1.a3.a2.a3.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="214" X="562"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a1.a1.a2.a3.a1.a3.b1.b3" Source="b3.a3.a2.a1.a2.a3.a2.a3.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="291" X="439"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a2.a2.a6.a2.a4.b1.b4" Source="b3.a3.a2.a1.a2.a3.a2.a3.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="254" X="509"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a1.a1.a3.a2.a3.b1.b3" Source="b3.a3.a2.a2.a1.a6.a2.a4.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="218" X="540"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a2.a2.a6.a2.a4.b1.b4" Source="b3.a3.a2.a2.a1.a6.a2.a4.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="255" X="531"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a1.a2.a2.a6.a1.a4.b1.b4" Source="b3.a3.a2.a2.a2.a6.a2.a4.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeA"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="324" X="455"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a2.a1.a2.a3.a2.a3.b1.b3" Source="b3.a3.a2.a2.a2.a6.a2.a4.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="263" X="489"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a1.a1.a2.a3.a1.a3.b1.b3" Source="b3.a3.a3.a1.a2.a3.a1.a3.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="348" X="323"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b3.a3.a3.a2.a2.a6.a1.a4.b2.b4" Source="b3.a3.a3.a1.a2.a3.a1.a3.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="376" X="251"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a1.a2.a2.a1.a1.b2.b3" Source="b3.a3.a3.a1.a2.a3.a1.a3.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="b3.a3.a3.a1.a2.a3.a1.a3.b2.b3" Source="b3.a3.a3.a2.a2.a6.a1.a4.b2.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="371" X="273"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a2.a2.a5.a1.a2.b2.b4" Source="b3.a3.a3.a2.a2.a6.a1.a4.b2.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L2off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="363" X="199"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a1.a2.a2.a5.a1.a2.b1.b4" Source="b4.a2.a1.a1.a2.a2.a1.a1.b1.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="397" X="50"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a1.a1.a2.a2.a1.a1.b1.b3" Source="b4.a2.a1.a2.a2.a5.a1.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="385" X="69"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a2.a2.a5.a1.a2.b2.b4" Source="b4.a2.a1.a2.a2.a5.a1.a2.b1.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="openB"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="369" X="104"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a1.a1.a1.a1.a1.b2.b1" Source="b4.a2.a3.a1.a1.a2.a1.a1.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="176" X="90"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a1.a2.a2.a1.a1.b2.b3" Source="b4.a2.a3.a1.a1.a2.a1.a1.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="259" X="97"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a2.a1.a5.a1.a2.b2.b4" Source="b4.a2.a3.a1.a1.a2.a1.a1.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="236" X="76"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a1.a2.a1.a1.a1.b2.b1" Source="b4.a2.a3.a1.a2.a2.a1.a1.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="239" X="144"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a1.a1.a2.a2.a1.a1.b1.b3" Source="b4.a2.a3.a1.a2.a2.a1.a1.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="closeB"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="337" X="88"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a2.a2.a5.a1.a2.b2.b4" Source="b4.a2.a3.a1.a2.a2.a1.a1.b2.b3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="313" X="141"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a2.a1.a4.a1.a2.b2.b2" Source="b4.a2.a3.a2.a1.a5.a1.a2.b2.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="210" X="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a1.a1.a2.a1.a1.b2.b3" Source="b4.a2.a3.a2.a1.a5.a1.a2.b2.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="239" X="54"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b1.a1.a3.a2.a2.a4.a1.a2.b2.b2" Source="b4.a2.a3.a2.a2.a5.a1.a2.b2.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="L1off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="274" X="157"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a1.a2.a2.a1.a1.b2.b3" Source="b4.a2.a3.a2.a2.a5.a1.a2.b2.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="319" X="120"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="b4.a2.a3.a2.a1.a5.a1.a2.b2.b4" Source="b4.a2.a3.a2.a2.a5.a1.a2.b2.b4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrerOff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="294" X="99"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

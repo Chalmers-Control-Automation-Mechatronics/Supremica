@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="cat_mouse" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>The cat and mouse problem. The cat and mouse must never be in the same room. This is specified 'locally', by the five specifications for the different rooms. Since this is a static specification, this can also be expressed 'globally' as a set of forbidden states in the composed plant model, 'cat||mouse'.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c5"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c6"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="c7"/>
+        <EventDecl Kind="CONTROLLABLE" Name="m1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="m2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="m3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="m4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="m5"/>
+        <EventDecl Kind="CONTROLLABLE" Name="m6"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="mouse">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="m0"/>
+                    <SimpleNode Name="m1"/>
+                    <SimpleNode Name="m2"/>
+                    <SimpleNode Name="m3"/>
+                    <SimpleNode Initial="true" Name="m4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="m2" Source="m0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m4" Source="m0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m0" Source="m1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m1" Source="m2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m0" Source="m3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m3" Source="m4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m5"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="cat">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="c0"/>
+                    <SimpleNode Name="c1"/>
+                    <SimpleNode Initial="true" Name="c2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="c3"/>
+                    <SimpleNode Name="c4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="c1" Source="c0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="c3" Source="c0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="c2" Source="c1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="c3" Source="c1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="c0" Source="c2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="c1" Source="c3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="c4" Source="c3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="c0" Source="c4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="room2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="r2c">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="r2e"/>
+                    <SimpleNode Name="r2m"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="r2e" Source="r2c">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r2c" Source="r2e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r2m" Source="r2e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r2e" Source="r2m">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="room1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="r1c"/>
+                    <SimpleNode Initial="true" Name="r1e">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="r1m"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="r1e" Source="r1c">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c2"/>
+                            <SimpleIdentifier Name="c7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r1c" Source="r1e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c1"/>
+                            <SimpleIdentifier Name="c7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r1m" Source="r1e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r1e" Source="r1m">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="room0">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="r0c"/>
+                    <SimpleNode Initial="true" Name="r0e">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="r0m"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="r0e" Source="r0c">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c1"/>
+                            <SimpleIdentifier Name="c4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r0c" Source="r0e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c3"/>
+                            <SimpleIdentifier Name="c6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r0m" Source="r0e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m3"/>
+                            <SimpleIdentifier Name="m6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r0e" Source="r0m">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m1"/>
+                            <SimpleIdentifier Name="m4"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="room4">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="r4c"/>
+                    <SimpleNode Name="r4e"/>
+                    <SimpleNode Initial="true" Name="r4m">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="r4e" Source="r4c">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r4c" Source="r4e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r4m" Source="r4e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r4e" Source="r4m">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m5"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="room3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="r3c"/>
+                    <SimpleNode Initial="true" Name="r3e">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="r3m"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="r3e" Source="r3c">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c5"/>
+                            <SimpleIdentifier Name="c7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r3c" Source="r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c4"/>
+                            <SimpleIdentifier Name="c7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r3m" Source="r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="r3e" Source="r3m">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
+            <Graph>
+                <LabelBlock>
+                    <SimpleIdentifier Name="c5"/>
+                    <SimpleIdentifier Name="c6"/>
+                    <SimpleIdentifier Name="m1"/>
+                    <SimpleIdentifier Name="m2"/>
+                    <SimpleIdentifier Name="m3"/>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Name="m0.c2.r2c.r1e.r0m.r4e.r3e"/>
+                    <SimpleNode Name="m3.c2.r2c.r1e.r0e.r4e.r3m"/>
+                    <SimpleNode Name="m4.c0.r2e.r1e.r0c.r4m.r3e"/>
+                    <SimpleNode Name="m4.c1.r2e.r1c.r0e.r4m.r3e"/>
+                    <SimpleNode Initial="true" Name="m4.c2.r2c.r1e.r0e.r4m.r3e">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="m4.c3.r2e.r1e.r0e.r4m.r3c"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="m4.c2.r2c.r1e.r0e.r4m.r3e" Source="m0.c2.r2c.r1e.r0m.r4e.r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m0.c2.r2c.r1e.r0m.r4e.r3e" Source="m3.c2.r2c.r1e.r0e.r4e.r3m">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m4.c1.r2e.r1c.r0e.r4m.r3e" Source="m4.c0.r2e.r1e.r0c.r4m.r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m4.c3.r2e.r1e.r0e.r4m.r3c" Source="m4.c0.r2e.r1e.r0c.r4m.r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m4.c2.r2c.r1e.r0e.r4m.r3e" Source="m4.c1.r2e.r1c.r0e.r4m.r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m4.c3.r2e.r1e.r0e.r4m.r3c" Source="m4.c1.r2e.r1c.r0e.r4m.r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m3.c2.r2c.r1e.r0e.r4e.r3m" Source="m4.c2.r2c.r1e.r0e.r4m.r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="m5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m4.c0.r2e.r1e.r0c.r4m.r3e" Source="m4.c2.r2c.r1e.r0e.r4m.r3e">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="m4.c1.r2e.r1c.r0e.r4m.r3e" Source="m4.c3.r2e.r1e.r0e.r4m.r3c">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c7"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
