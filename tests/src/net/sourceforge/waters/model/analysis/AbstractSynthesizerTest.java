@@ -15,7 +15,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
@@ -294,6 +296,54 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testteleNetwork() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tele_network";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testPV35() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "pv35";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testThreeRobot() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "three_robot";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testPathFinder() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "path_finder";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testCofeeMachine() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "cofee_machine";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testBallProcess() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "ball_Process";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runSynthesizer(final String group,
@@ -564,10 +614,12 @@ public abstract class AbstractSynthesizerTest
    * all states where the uncontrollable event in question is not defined.
    * This method implements simple plantification.
    * All uncontrollable events are considered.
+   * @throws EventNotFoundException
    */
   private ProductDESProxy plantify(final ProductDESProxy des)
-    throws OverflowException
+    throws OverflowException, EventNotFoundException
   {
+    mMarkingProposition = AbstractConflictChecker.getMarkingProposition(des);
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int numAutomata = automata.size();
     final Collection<AutomatonProxy> plantified =
@@ -597,6 +649,11 @@ public abstract class AbstractSynthesizerTest
     throws OverflowException
   {
     final Collection<EventProxy> events = spec.getEvents();
+    final Set <EventProxy> newEvents = new HashSet <EventProxy>(events.size()+1);
+    newEvents.addAll(events);
+    if (!events.contains(mMarkingProposition)) {
+      newEvents.add(mMarkingProposition);
+    }
     final int numEvents = events.size();
     final Collection<EventProxy> uncontrollables =
       new ArrayList<EventProxy>(numEvents);
@@ -615,31 +672,66 @@ public abstract class AbstractSynthesizerTest
                                        CONFIG_SUCCESSORS);
     final int numStates = rel.getNumberOfStates();
     final Collection<StateProxy> states = new ArrayList<StateProxy>(numStates + 1);
+    final Collection <StateProxy> newStates = new ArrayList<StateProxy>(numStates + 1);
     states.addAll(spec.getStates());
     StateProxy dump = null;
+    boolean dumpUsed = false;
     final Collection<TransitionProxy> transitions =
       new ArrayList<TransitionProxy>(spec.getTransitions());
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     for (int s = 0; s < numStates; s++) {
       final StateProxy state = stateEnc.getState(s);
-      for (final EventProxy event : uncontrollables) {
-        final int e = eventEnc.getEventCode(event);
-        iter.reset(s, e);
-        if (!iter.advance()) {
-          if (dump == null) {
-            dump = factory.createStateProxy(":dump");
-            states.add(dump);
+      final Collection<EventProxy> newPropostion = new HashSet<EventProxy>
+        (state.getPropositions().size());
+      newPropostion.addAll(state.getPropositions());
+      newPropostion.add(mMarkingProposition);
+      if (!events.contains(mMarkingProposition)) {
+          final StateProxy newState = factory.createStateProxy
+            (state.getName(), state.isInitial(), newPropostion);
+
+          newStates.add(newState);
+        for (final EventProxy event : uncontrollables) {
+          final int e = eventEnc.getEventCode(event);
+          iter.reset(s, e);
+          if (!iter.advance()) {
+            if (dump == null) {
+              dump = factory.createStateProxy(":dump");
+              newStates.add(dump);
+              dumpUsed=true;
+            }
+            final TransitionProxy trans =
+              factory.createTransitionProxy(newState, event, dump);
+            transitions.add(trans);
           }
-          final TransitionProxy trans =
-            factory.createTransitionProxy(state, event, dump);
-          transitions.add(trans);
+        }
+      } else {
+        for (final EventProxy event : uncontrollables) {
+          final int e = eventEnc.getEventCode(event);
+          iter.reset(s, e);
+          if (!iter.advance()) {
+            if (dump == null) {
+              dump = factory.createStateProxy(":dump");
+              states.add(dump);
+              dumpUsed=true;
+            }
+            final TransitionProxy trans =
+              factory.createTransitionProxy(state, event, dump);
+            transitions.add(trans);
+          }
         }
       }
     }
-    final String name = spec.getName();
-    return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                        events, states, transitions);
+    if(dumpUsed & !events.contains(mMarkingProposition)) {
+      final String name = spec.getName();
+      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
+                                          newEvents, newStates, transitions);
+    } else {
+      final String name = spec.getName();
+      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
+                                          events, states, transitions);
+    }
+
   }
 
 
@@ -746,5 +838,6 @@ public abstract class AbstractSynthesizerTest
   private ConflictChecker mConflictChecker;
   private JAXBTraceMarshaller mTraceMarshaller;
   private List<ParameterBindingProxy> mBindings;
+  private EventProxy mMarkingProposition;
 
 }

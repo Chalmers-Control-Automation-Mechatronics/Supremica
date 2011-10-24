@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="pv35" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A simple example of two robots, having several possible working sequences and sharing one mutex zone. This example was used in a graduate DES-course (PV35, ProViking research school) to demonstrate the steps of the A* optimization algorithm. The optimal cycle time (without security delays) is 15 time units.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_book_A"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_book_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_book_C"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_home_A"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_home_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_move_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_start_A"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_start_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_start_C"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_unbook_A"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_unbook_B"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R1_unbook_C"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R2_book"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R2_home"/>
+        <EventDecl Kind="CONTROLLABLE" Name="R2_unbook"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="Z1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1"/>
+                    <SimpleNode Name="q2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_A"/>
+                            <SimpleIdentifier Name="R1_book_B"/>
+                            <SimpleIdentifier Name="R1_book_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2" Source="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_A"/>
+                            <SimpleIdentifier Name="R1_unbook_B"/>
+                            <SimpleIdentifier Name="R1_unbook_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0" Source="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="R2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0, cost=3.0"/>
+                    <SimpleNode Name="q1, cost=5.0"/>
+                    <SimpleNode Name="q2, cost=2.0"/>
+                    <SimpleNode Name="q3, cost=0.0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q1, cost=5.0" Source="q0, cost=3.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2, cost=2.0" Source="q1, cost=5.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3, cost=0.0" Source="q2, cost=2.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="R1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0, cost=0.0"/>
+                    <SimpleNode Name="q1, cost=5.0"/>
+                    <SimpleNode Name="q11, cost=4.0"/>
+                    <SimpleNode Name="q12, cost=7.0"/>
+                    <SimpleNode Name="q13, cost=5.0"/>
+                    <SimpleNode Name="q2, cost=0.0"/>
+                    <SimpleNode Name="q3, cost=5.0"/>
+                    <SimpleNode Name="q4, cost=2.0"/>
+                    <SimpleNode Name="q5, cost=10.0"/>
+                    <SimpleNode Name="q6, cost=5.0"/>
+                    <SimpleNode Name="q7, cost=0.0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q11, cost=4.0" Source="q0, cost=0.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q12, cost=7.0" Source="q0, cost=0.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q13, cost=5.0" Source="q0, cost=0.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4, cost=2.0" Source="q1, cost=5.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1, cost=5.0" Source="q11, cost=4.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2, cost=0.0" Source="q12, cost=7.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_move_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3, cost=5.0" Source="q13, cost=5.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q5, cost=10.0" Source="q2, cost=0.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2, cost=0.0" Source="q3, cost=5.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7, cost=0.0" Source="q4, cost=2.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q6, cost=5.0" Source="q5, cost=10.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7, cost=0.0" Source="q6, cost=5.0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_B"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="sup(R1||R2||Z1)">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0.q0.q0"/>
+                    <SimpleNode Name="q0.q1.q2"/>
+                    <SimpleNode Name="q0.q2.q0"/>
+                    <SimpleNode Name="q0.q3.q0"/>
+                    <SimpleNode Name="q1.q0.q1"/>
+                    <SimpleNode Name="q1.q2.q1"/>
+                    <SimpleNode Name="q1.q3.q1"/>
+                    <SimpleNode Name="q11.q0.q0"/>
+                    <SimpleNode Name="q11.q1.q2"/>
+                    <SimpleNode Name="q11.q2.q0"/>
+                    <SimpleNode Name="q11.q3.q0"/>
+                    <SimpleNode Name="q12.q0.q0"/>
+                    <SimpleNode Name="q12.q1.q2"/>
+                    <SimpleNode Name="q12.q2.q0"/>
+                    <SimpleNode Name="q12.q3.q0"/>
+                    <SimpleNode Name="q13.q0.q0"/>
+                    <SimpleNode Name="q13.q1.q2"/>
+                    <SimpleNode Name="q13.q2.q0"/>
+                    <SimpleNode Name="q13.q3.q0"/>
+                    <SimpleNode Name="q2.q0.q0"/>
+                    <SimpleNode Name="q2.q1.q2"/>
+                    <SimpleNode Name="q2.q2.q0"/>
+                    <SimpleNode Name="q2.q3.q0"/>
+                    <SimpleNode Name="q3.q0.q1"/>
+                    <SimpleNode Name="q3.q2.q1"/>
+                    <SimpleNode Name="q3.q3.q1"/>
+                    <SimpleNode Name="q4.q0.q0"/>
+                    <SimpleNode Name="q4.q1.q2"/>
+                    <SimpleNode Name="q4.q2.q0"/>
+                    <SimpleNode Name="q4.q3.q0"/>
+                    <SimpleNode Name="q5.q0.q1"/>
+                    <SimpleNode Name="q5.q2.q1"/>
+                    <SimpleNode Name="q5.q3.q1"/>
+                    <SimpleNode Name="q6.q0.q0"/>
+                    <SimpleNode Name="q6.q1.q2"/>
+                    <SimpleNode Name="q6.q2.q0"/>
+                    <SimpleNode Name="q6.q3.q0"/>
+                    <SimpleNode Name="q7.q0.q0"/>
+                    <SimpleNode Name="q7.q1.q2"/>
+                    <SimpleNode Name="q7.q2.q0"/>
+                    <SimpleNode Name="q7.q3.q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q0.q1.q2" Source="q0.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q11.q0.q0" Source="q0.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q12.q0.q0" Source="q0.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q13.q0.q0" Source="q0.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q2.q0" Source="q0.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q11.q1.q2" Source="q0.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q12.q1.q2" Source="q0.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q13.q1.q2" Source="q0.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q0.q3.q0" Source="q0.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q11.q2.q0" Source="q0.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q12.q2.q0" Source="q0.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q13.q2.q0" Source="q0.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q11.q3.q0" Source="q0.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q12.q3.q0" Source="q0.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q13.q3.q0" Source="q0.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_start_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q0.q0" Source="q1.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q3.q1" Source="q1.q2.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q2.q0" Source="q1.q2.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q3.q0" Source="q1.q3.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q0.q1" Source="q11.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q11.q1.q2" Source="q11.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q11.q2.q0" Source="q11.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q2.q1" Source="q11.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q11.q3.q0" Source="q11.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1.q3.q1" Source="q11.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q12.q1.q2" Source="q12.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q0.q0" Source="q12.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_move_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q12.q2.q0" Source="q12.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q1.q2" Source="q12.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_move_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q12.q3.q0" Source="q12.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q2.q0" Source="q12.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_move_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q3.q0" Source="q12.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_move_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q13.q1.q2" Source="q13.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q0.q1" Source="q13.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q13.q2.q0" Source="q13.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q13.q3.q0" Source="q13.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q2.q1" Source="q13.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q3.q1" Source="q13.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q1.q2" Source="q2.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q5.q0.q1" Source="q2.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q2.q0" Source="q2.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q3.q0" Source="q2.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q5.q2.q1" Source="q2.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q5.q3.q1" Source="q2.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_book_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q0.q0" Source="q3.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q2.q0" Source="q3.q2.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3.q3.q1" Source="q3.q2.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2.q3.q0" Source="q3.q3.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_C"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q1.q2" Source="q4.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q0.q0" Source="q4.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q2.q0" Source="q4.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q1.q2" Source="q4.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q4.q3.q0" Source="q4.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q2.q0" Source="q4.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q3.q0" Source="q4.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_A"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q6.q0.q0" Source="q5.q0.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q5.q3.q1" Source="q5.q2.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q6.q2.q0" Source="q5.q2.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q6.q3.q0" Source="q5.q3.q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_unbook_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q6.q1.q2" Source="q6.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q0.q0" Source="q6.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q6.q2.q0" Source="q6.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q1.q2" Source="q6.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q6.q3.q0" Source="q6.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q2.q0" Source="q6.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q3.q0" Source="q6.q3.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R1_home_B"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q1.q2" Source="q7.q0.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_book"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q2.q0" Source="q7.q1.q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_unbook"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q7.q3.q0" Source="q7.q2.q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="R2_home"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
