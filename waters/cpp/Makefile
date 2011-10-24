@@ -27,11 +27,9 @@ else
 endif
 
 ifeq "$(ARCH)" "$(JAVA_ARCH)"
-  export OS_ARCH         = $(JAVAOS)
-  export DEP             = dependencies
+  export OS_ARCH         = $(JAVA_ARCH)
 else
   export OS_ARCH         = $(JAVAOS).$(ARCH)
-  export DEP             = dependencies.$(ARCH)
 endif
 
 ifeq "$(ARCH)" "x86"
@@ -42,6 +40,14 @@ ifeq "$(ARCH)" "amd64"
   export ARCH_FLAGS      = -m64
 endif
 
+ifeq "$(DEBUG)" "1"
+  export OS_ARCH_D       = $(OS_ARCH).debug
+  export CFLAGS          = -g -DDEBUG -O2
+else
+  export OS_ARCH_D       = $(OS_ARCH)
+  export CFLAGS          = -O6
+endif
+
 
 #############################################################################
 # List of sources
@@ -50,8 +56,8 @@ export PROJECT  = waters
 export SRCDIR   = src
 export JNIDIR   = $(SRCDIR)/jni
 export CPPDIR   = $(SRCDIR)/waters
-export OBJDIR   = objects/$(OS_ARCH)
-export LIBDIR   = lib/$(OS_ARCH)
+export OBJDIR   = objects/$(OS_ARCH_D)
+export LIBDIR   = lib/$(OS_ARCH_D)
 
 export CPP	= $(wildcard $(CPPDIR)/analysis/*.cpp) \
               $(wildcard $(CPPDIR)/base/*.cpp) \
@@ -77,10 +83,10 @@ ifdef JAVA_HOME
   JNI_INC       = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/$(JAVAOS)"
 endif
 
-export CFLAGS   = -O2 -g -Wall -DDEBUG -D__STDC_LIMIT_MACROS \
-                  $(ARCH_FLAGS) $(EXTRA_CFLAGS)
+export CFLAGS   += -Wall -D__STDC_LIMIT_MACROS $(ARCH_FLAGS) $(EXTRA_CFLAGS)
 export INCDIRS	= -I$(SRCDIR) $(JNI_INC)
 export LDFLAGS	= $(ARCH_FLAGS) $(EXTRA_LDFLAGS)
+export DEP      = dependencies.$(OS_ARCH)
 
 
 #############################################################################
@@ -90,7 +96,7 @@ all::
 			@$(MAKE) -f Makefile.dep
 
 clean::
-			-$(call RMFILE,dependencies*)
+			-$(call RMFILE,dependencies.*)
 			-$(call RMDIR,objects)
 			-$(call RMDIR,lib)
 

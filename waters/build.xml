@@ -42,7 +42,6 @@
   <property name="classes" location="java/classes"/>
   <property name="antlr" location="antlr"/>
   <property name="cpp" location="cpp"/>
-  <property name="cpplib" location="${cpp}/lib"/>
   <property name="docsrc" location="java/javadoc"/>
   <property name="supremica.examples" location="${supremica.root}/examples"/>
   <property name="waters.examples" location="${supremica.examples}/waters"/>
@@ -91,13 +90,6 @@
     <pathelement location="${junit.jar}"/>
   </path>
 
-  <pathconvert property="waters.library.path" targetos="unix">
-    <path>
-      <pathelement path="${java.library.path}"/>
-      <pathelement location="${cpplib}"/>
-      <pathelement location="${bddlib}"/>
-    </path>
-  </pathconvert>
 
   <target name="init">
     <tstamp/>
@@ -275,14 +267,28 @@
 
   <target name="-guess-arch" unless="java.arch">
     <property name="java.arch" value="${native.ostype}"/>
+    <property name="cpp.lib.dir" location="${cpp}/lib/${java.arch}"/>
   </target>
 
-  <target name="cpp" depends="-guess-arch,javah,jniglue" if="native.make"
-          description="Build native library.">
+  <target name="-set-debug" depends="-guess-arch" unless="make.release">
+    <property name="cpp.debug.suffix" value=".debug"/>
+    <property name="cpp.debug" value="1"/>
+  </target>
+
+  <target name="cpp" depends="-guess-arch,-set-debug,javah,jniglue"
+          if="native.make" description="Build native library.">
     <exec executable="${native.make}" dir="${cpp}"
           failonerror="true" failifexecutionfails="false">
-      <arg value="JAVA_ARCH=${java.arch}"/>
+        <arg value="JAVA_ARCH=${java.arch}"/>
+        <arg value="DEBUG=${cpp.debug}"/>
     </exec>
+    <pathconvert property="waters.library.path">
+      <path>
+        <pathelement location="${cpp.lib.dir}${cpp.debug.suffix}"/>
+        <pathelement location="${bddlib}"/>
+        <pathelement path="${java.library.path}"/>
+      </path>
+    </pathconvert>
   </target>
 
   <target name="waters" depends="waters-jar,cpp"
@@ -350,7 +356,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}" if="native.make">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/op/*.java"/>
+          <include name="**/Native*.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
