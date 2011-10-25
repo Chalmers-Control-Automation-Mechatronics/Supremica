@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="debounce" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ConstantAliasList>
+        <ConstantAlias Name="BITS">
+            <ConstantAliasExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="chg_value">
+            <RangeList>
+                <SimpleIdentifier Name="BITS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="reset">
+            <RangeList>
+                <SimpleIdentifier Name="BITS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="timer">
+            <RangeList>
+                <SimpleIdentifier Name="BITS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="timeout">
+            <RangeList>
+                <SimpleIdentifier Name="BITS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="new_value">
+            <RangeList>
+                <SimpleIdentifier Name="BITS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <ForeachComponent Name="I">
+            <SimpleIdentifier Name="BITS"/>
+            <ComponentList>
+                <SimpleComponent Kind="SPEC">
+                    <IndexedIdentifier Name="debouncing_ok">
+                        <SimpleIdentifier Name="I"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <LabelBlock>
+                            <IndexedIdentifier Name="chg_value">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="new_value">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="reset">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="timeout">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="timer">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                        <NodeList>
+                            <SimpleNode Name="FLIP">
+                                <PointGeometry>
+                                    <Point Y="176" X="256"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="7" X="11"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="INIT">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="96" X="256"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="6" X="11"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="CHG">
+                                <PointGeometry>
+                                    <Point Y="336" X="256"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="7" X="12"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="WAIT">
+                                <PointGeometry>
+                                    <Point Y="256" X="256"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="6" X="11"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="INIT" Source="CHG">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="new_value">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="chg_value">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="69" X="11"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="217" X="159"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="INIT" Source="INIT">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="reset">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="timeout">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-17" X="5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="96" X="296"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="FLIP" Source="INIT">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="new_value">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-7" X="4"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="CHG" Source="WAIT">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="timeout">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-6" X="5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Target="INIT" Source="WAIT">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="new_value">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="30" X="-19"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="177" X="191"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="INIT" Source="FLIP">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="new_value">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="21" X="-48"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="137" X="223"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="WAIT" Source="FLIP">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="timer">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-6" X="6"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="216" X="256"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="FLIP" Source="FLIP">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="reset">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="timeout">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-15" X="3"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="177" X="296"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="I">
+            <SimpleIdentifier Name="BITS"/>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="sensor_and_filter">
+                        <SimpleIdentifier Name="I"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <LabelBlock>
+                            <IndexedIdentifier Name="new_value">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="s0">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="195" X="183"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="24" X="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="s0" Source="s0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="new_value">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="7" X="14"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="168" X="210"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="I">
+            <SimpleIdentifier Name="BITS"/>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="timer">
+                        <SimpleIdentifier Name="I"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <LabelBlock>
+                            <IndexedIdentifier Name="reset">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="timeout">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="timer">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                        <NodeList>
+                            <SimpleNode Name="on">
+                                <PointGeometry>
+                                    <Point Y="48" X="144"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="5" X="12"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="off">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point Y="48" X="48"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point Y="5" X="-25"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Target="on" Source="off">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="timer">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="6" X="-16"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="65" X="97"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="off" Source="on">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="reset">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="timeout">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-29" X="-21"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="32" X="96"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="CHG.off"/>
+                    <SimpleNode Name="FLIP.off"/>
+                    <SimpleNode Name="FLIP.on"/>
+                    <SimpleNode Initial="true" Name="INIT.off">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="INIT.on"/>
+                    <SimpleNode Name="WAIT.on"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="INIT.off" Source="CHG.off">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="chg_value">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="new_value">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="INIT.off" Source="FLIP.off">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="new_value">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="WAIT.on" Source="FLIP.off">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="timer">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="FLIP.off" Source="FLIP.on">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="reset">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="timeout">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="INIT.on" Source="FLIP.on">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="new_value">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="FLIP.off" Source="INIT.off">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="new_value">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="FLIP.on" Source="INIT.on">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="new_value">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="INIT.off" Source="INIT.on">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="reset">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="timeout">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="CHG.off" Source="WAIT.on">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="timeout">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="INIT.on" Source="WAIT.on">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="new_value">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

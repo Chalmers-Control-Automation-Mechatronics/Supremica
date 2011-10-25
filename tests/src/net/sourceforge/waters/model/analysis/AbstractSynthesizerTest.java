@@ -15,7 +15,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -349,6 +351,30 @@ public abstract class AbstractSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "ball_Process";
+    runSynthesizer(group, subdir, name, false);
+  }
+
+  public void testSimpleManufacturingSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "simple_manufacturing_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testDebounce() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "debounce";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testFalko() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "falko";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -657,11 +683,6 @@ public abstract class AbstractSynthesizerTest
     throws OverflowException
   {
     final Collection<EventProxy> events = spec.getEvents();
-    final Set <EventProxy> newEvents = new HashSet <EventProxy>(events.size()+1);
-    newEvents.addAll(events);
-    if (!events.contains(mMarkingProposition)) {
-      newEvents.add(mMarkingProposition);
-    }
     final int numEvents = events.size();
     final Collection<EventProxy> uncontrollables =
       new ArrayList<EventProxy>(numEvents);
@@ -680,65 +701,75 @@ public abstract class AbstractSynthesizerTest
                                        CONFIG_SUCCESSORS);
     final int numStates = rel.getNumberOfStates();
     final Collection<StateProxy> states = new ArrayList<StateProxy>(numStates + 1);
-    final Collection <StateProxy> newStates = new ArrayList<StateProxy>(numStates + 1);
     states.addAll(spec.getStates());
     StateProxy dump = null;
-    boolean dumpUsed = false;
     final Collection<TransitionProxy> transitions =
       new ArrayList<TransitionProxy>(spec.getTransitions());
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     for (int s = 0; s < numStates; s++) {
       final StateProxy state = stateEnc.getState(s);
-      final Collection<EventProxy> newPropostion = new HashSet<EventProxy>
-        (state.getPropositions().size());
-      newPropostion.addAll(state.getPropositions());
-      newPropostion.add(mMarkingProposition);
-      if (!events.contains(mMarkingProposition)) {
-          final StateProxy newState = factory.createStateProxy
-            (state.getName(), state.isInitial(), newPropostion);
-
-          newStates.add(newState);
-        for (final EventProxy event : uncontrollables) {
-          final int e = eventEnc.getEventCode(event);
-          iter.reset(s, e);
-          if (!iter.advance()) {
-            if (dump == null) {
-              dump = factory.createStateProxy(":dump");
-              newStates.add(dump);
-              dumpUsed=true;
-            }
-            final TransitionProxy trans =
-              factory.createTransitionProxy(newState, event, dump);
-            transitions.add(trans);
+      for (final EventProxy event : uncontrollables) {
+        final int e = eventEnc.getEventCode(event);
+        iter.reset(s, e);
+        if (!iter.advance()) {
+          if (dump == null) {
+            dump = factory.createStateProxy(":dump");
+            states.add(dump);
           }
-        }
-      } else {
-        for (final EventProxy event : uncontrollables) {
-          final int e = eventEnc.getEventCode(event);
-          iter.reset(s, e);
-          if (!iter.advance()) {
-            if (dump == null) {
-              dump = factory.createStateProxy(":dump");
-              states.add(dump);
-              dumpUsed=true;
-            }
-            final TransitionProxy trans =
-              factory.createTransitionProxy(state, event, dump);
-            transitions.add(trans);
-          }
+          final TransitionProxy trans =
+            factory.createTransitionProxy(state, event, dump);
+          transitions.add(trans);
         }
       }
     }
-    if(dumpUsed & !events.contains(mMarkingProposition)) {
+
+    if (dump != null & !events.contains(mMarkingProposition)) {
+      final Collection<TransitionProxy> newTransitions =
+        new ArrayList<TransitionProxy>();
+      final Set <EventProxy> newEvents = new HashSet <EventProxy>
+        (events.size()+1);
+      final Collection <StateProxy> newStates = new ArrayList<StateProxy>
+        (numStates + 1);
+      final HashMap <StateProxy, StateProxy> mapStates = new HashMap
+        <StateProxy, StateProxy>();
+
+      newEvents.addAll(events);
+      newEvents.add(mMarkingProposition);
+      for (final TransitionProxy trans : transitions) {
+        final StateProxy sourceState = trans.getSource();
+        final StateProxy targetState = trans.getTarget();
+        final EventProxy event = trans.getEvent();
+        final List<StateProxy> transitionState = new ArrayList<StateProxy>(2);
+        transitionState.add(sourceState);
+        transitionState.add(targetState);
+        for (final Iterator<StateProxy> it = transitionState.iterator();
+          it.hasNext();) {
+          final StateProxy state =it.next();
+
+          if (!mapStates.containsKey(state) ) {
+            final Collection<EventProxy> newPropostion = new HashSet<EventProxy>();
+            newPropostion.addAll(state.getPropositions());
+            if (state != dump) {
+              newPropostion.add(mMarkingProposition);
+            }
+            final StateProxy newState = factory.createStateProxy
+              (state.getName(), state.isInitial(), newPropostion);
+            newStates.add(newState);
+            mapStates.put(state, newState);
+          }
+        }
+        final TransitionProxy newTransition = factory.createTransitionProxy
+          (mapStates.get(sourceState), event, mapStates.get(targetState));
+        newTransitions.add(newTransition);
+      }
       final String name = spec.getName();
       return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                          newEvents, newStates, transitions);
-    } else {
-      final String name = spec.getName();
-      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                          events, states, transitions);
+                                        newEvents, newStates, newTransitions);
     }
+    final String name = spec.getName();
+    return factory.createAutomatonProxy(name, ComponentKind.PLANT,
+                                        events, states, transitions);
 
   }
 
