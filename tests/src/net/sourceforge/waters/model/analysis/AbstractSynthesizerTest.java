@@ -176,6 +176,14 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testPlantify() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "plantify";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testSajed() throws Exception
   {
     final String group = "tests";
