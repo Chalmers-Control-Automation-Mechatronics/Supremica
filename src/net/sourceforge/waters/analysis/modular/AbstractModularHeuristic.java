@@ -158,10 +158,16 @@ abstract class AbstractModularHeuristic
     for (final AutomatonProxy automaton : automata) {
       final KindTranslator translator = getKindTranslator();
       final int i = getNumberOfAcceptedEvents(automaton, counterExample);
-      if (i != counterExample.getEvents().size()) {
-        if (!specs ||
-            translator.getEventKind(counterExample.getEvents().get(i)) ==
-              EventKind.CONTROLLABLE) {
+      final List<EventProxy> events = counterExample.getEvents();
+      if (i != events.size()) {
+        final boolean rejected;
+        if (i < 0 || !specs) {
+          rejected = true;
+        } else {
+          final EventProxy event = counterExample.getEvents().get(i);
+          rejected = translator.getEventKind(event) == EventKind.CONTROLLABLE;
+        }
+        if (rejected) {
           if (bestautomaton == null ||
               comp.compare(bestautomaton, automaton) < 0) {
             bestautomaton = automaton;

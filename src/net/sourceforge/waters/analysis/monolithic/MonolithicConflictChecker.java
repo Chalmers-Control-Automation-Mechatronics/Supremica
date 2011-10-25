@@ -468,7 +468,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       final StateProxy[] state = new StateProxy[automata.length];
       for (int i = 0; i < automata.length; i++) {
         state[i] = automata[i].getInitialState();
-        assert state[i] != null : "Every automaton must have an initial state";
+        if (state[i] == null) {
+          return;
+        }
       }
       final long init = mStateSchema.encodeState(state);
       addNewState(init, -1);

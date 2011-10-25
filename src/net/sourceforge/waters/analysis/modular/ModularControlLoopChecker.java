@@ -94,51 +94,39 @@ public class ModularControlLoopChecker
         while (removedLoopEvents);
         final LoopTraceProxy loop = testAll();
         if (loop != null) {
-          setFailedResult(loop);
-          return false;
+          return setFailedResult(loop);
         }
-        boolean failed = true;
         AutomataGroup primary = null;
         int bestScore = Integer.MIN_VALUE;
-        for (final AutomataGroup group : mAutoSets)
-        {
-          if (group.getScore() > bestScore)
-          {
+        for (final AutomataGroup group : mAutoSets) {
+          if (group.getScore() > bestScore) {
             bestScore = group.getScore();
             primary = group;
           }
         }
+        if (primary == null) {
+          return setSatisfiedResult();
+        }
         bestScore = Integer.MIN_VALUE;
         AutomataGroup bestGroup = null;
-        if (primary.getTrace() != null) {
-          for (final AutomataGroup checkLoop : mAutoSets) {
-            if (checkLoop != primary) {
-              final int score = checkLoop.isControlLoop(primary, mTranslator);
-              if (score > bestScore)
-              {
-                bestGroup = checkLoop;
-                bestScore = score;
-              }
+        assert primary.getTrace() != null : "Primary has no trace!";
+        for (final AutomataGroup checkLoop : mAutoSets) {
+          if (checkLoop != primary) {
+            final int score = checkLoop.isControlLoop(primary, mTranslator);
+            if (score > bestScore) {
+              bestGroup = checkLoop;
+              bestScore = score;
             }
           }
-          if (bestGroup != null)
-          {
-            checkAbort();
-            //System.out.println("DEBUG: Merged with score " + bestGroup.isControlLoop(primary, mTranslator) + " at time " + System.currentTimeMillis());
-            mAutoSets.remove(bestGroup);
-            primary.merge(bestGroup);
-            failed = false;
-            mTotalCompositions++;
-            updateResult(primary);
-           }
         }
-        else
-          throw new IllegalArgumentException("Primary has no trace. This shouldn't happen, as the implementation demands that such a group has a score of Integer.MIN_VALUE");
-        if (failed)
-          throw new AnalysisException("ERROR: Two automata could not be selected for merging. Scoring system may not work. Num Events: " + mLoopEvents.size());
+        assert bestGroup != null : "Could not find two automata for merging!";
+        checkAbort();
+        mAutoSets.remove(bestGroup);
+        primary.merge(bestGroup);
+        mTotalCompositions++;
+        updateResult(primary);
       }
-    }
-    finally {
+    } finally {
       tearDown();
     }
   }

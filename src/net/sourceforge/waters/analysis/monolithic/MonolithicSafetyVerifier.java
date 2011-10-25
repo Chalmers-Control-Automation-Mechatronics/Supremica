@@ -192,6 +192,9 @@ public class MonolithicSafetyVerifier
             }
           }
         }
+        if (initialState == null) {
+          return setSatisfiedResult();
+        }
         // Store all the information by automaton type
         final ComponentKind kind = translator.getComponentKind(ap);
         switch (kind) {

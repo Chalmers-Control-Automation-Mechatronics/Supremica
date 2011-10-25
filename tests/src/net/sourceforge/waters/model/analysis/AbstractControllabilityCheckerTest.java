@@ -408,6 +408,14 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void test_Nasty_EmptySpec() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "empty_spec.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void test_Nasty_JustProperty() throws Exception
   {
     final String group = "tests";

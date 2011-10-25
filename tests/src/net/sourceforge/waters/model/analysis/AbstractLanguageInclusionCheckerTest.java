@@ -84,6 +84,14 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testEmptyProp() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "empty_prop.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testVerriegel4Counter1() throws Exception
   {
     final String group = "tests";

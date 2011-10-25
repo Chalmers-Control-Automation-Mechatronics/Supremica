@@ -286,7 +286,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
           }
         }
         removeSelfloopedEvents(alphabet);
-        if (alphabet.isEmpty()) {
+        if (mNumReachableStates > 0 && alphabet.isEmpty()) {
           return null;
         }
       } else {

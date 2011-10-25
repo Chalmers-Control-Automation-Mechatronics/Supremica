@@ -102,6 +102,9 @@ public class MonolithicSCCControlLoopChecker
   {
     try {
       setUp();
+      if (mEncodedInitialStateTuple == null) {
+        return setSatisfiedResult();
+      }
       // insert initial state tuple to global state and state list
       mGlobalStateSet.getOrAdd(mEncodedInitialStateTuple);
       mUnvisitedList.add(mEncodedInitialStateTuple);
@@ -122,19 +125,15 @@ public class MonolithicSCCControlLoopChecker
         final LoopTraceProxy counterexample = computeCounterExample();
         return setFailedResult(counterexample);
       }
-    }
-    catch (final OutOfMemoryError e)
-    {
+    } catch (final OutOfMemoryError error) {
       mTransitionList = null;
       mMap = null;
       mUnvisitedList = null;
       stack = null;
       mLoopEvents = null;
       System.gc();
-      System.out.println("DEBUG: Out of Memory Error solved");
-      throw new AnalysisException();
-    }
-    finally {
+      throw new OverflowException(error);
+    } finally {
       tearDown();
     }
   }
@@ -364,16 +363,23 @@ public class MonolithicSCCControlLoopChecker
     }
 
     // create initial state tuple
+    mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
     mInitialStateTuple = new int[mNumAutomata];
     int i = 0;
     for (final AutomatonProxy aProxy: mAutomataList) {
       int j = 0;
+      boolean hasinit = false;
       for (final StateProxy sProxy: aProxy.getStates()) {
         if (sProxy.isInitial() == true) {
+          hasinit = true;
           mInitialStateTuple[i] = j;
           break;
         }
         j++;
+      }
+      if (!hasinit) {
+        mInitialStateTuple = null;
+        return;
       }
       i++;
     }
@@ -386,11 +392,9 @@ public class MonolithicSCCControlLoopChecker
     mEncodedInitialStateTuple =
       new EncodedStateTuple(encode(mInitialStateTuple));
     // initialise state tuple list
-    mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
     mUnvisitedList = new ArrayList<EncodedStateTuple>(SIZE_BUFFER);
 
     // Resetting everything
-
     mEncodedCurrTuple = null;
     mEncodedPreviousStateTuple = null;
     mEncodedRootStateTuple = null;

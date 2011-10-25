@@ -98,6 +98,9 @@ public class MonolithicControlLoopChecker
   {
     try {
       setUp();
+      if (mEncodedInitialStateTuple == null) {
+        return setSatisfiedResult();
+      }
       // insert initial state tuple to global state and state list
       mGlobalStateSet.getOrAdd(mEncodedInitialStateTuple);
       mUnvisitedList.add(mEncodedInitialStateTuple);
@@ -318,16 +321,23 @@ public class MonolithicControlLoopChecker
     }
 
     // create initial state tuple
+    mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
     mInitialStateTuple = new int[mNumAutomata];
     int i = 0;
     for (final AutomatonProxy aProxy: mAutomataList) {
+      boolean hasinit = false;
       int j = 0;
       for (final StateProxy sProxy: aProxy.getStates()) {
         if (sProxy.isInitial() == true) {
+          hasinit = true;
           mInitialStateTuple[i] = j;
           break;
         }
         j++;
+      }
+      if (!hasinit) {
+        mInitialStateTuple = null;
+        return;
       }
       i++;
     }
@@ -340,7 +350,6 @@ public class MonolithicControlLoopChecker
     mEncodedInitialStateTuple =
       new EncodedStateTuple(encode(mInitialStateTuple));
     // initialise state tuple list
-    mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
     mUnvisitedList = new ArrayList<EncodedStateTuple>(SIZE_BUFFER);
   }
 

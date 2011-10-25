@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="empty_prop" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>A test that involves a property without any states.
+This model should fail a language inclusion check, because the plant accepts the empty trace, but the property does not.</Comment>
+<ns2:EventList>
+<ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="u"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="PLANT" Name="plant">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="u"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="S1"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="S1" Source="S0" Event="u"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PROPERTY" Name="empty"/>
+</ns2:AutomataList>
+</ns2:ProductDES>
