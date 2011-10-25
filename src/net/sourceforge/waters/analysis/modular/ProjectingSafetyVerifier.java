@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import gnu.trove.THashSet;
+
 import java.lang.Comparable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,12 +39,14 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -247,22 +251,52 @@ public class ProjectingSafetyVerifier
     throws AnalysisException
   {
     setUp();
-    Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
-    final Set<AutomatonProxy> specs = new HashSet<AutomatonProxy>();
-    final Set<AutomatonProxy> origspecs = new HashSet<AutomatonProxy>();
-    final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
-    final Set<EventProxy> forbiddenEvents = new HashSet<EventProxy>();
-    final Set<EventProxy> events = new HashSet<EventProxy>(getModel().getEvents());
-    final Map<EventProxy, EventProxy> forbtouncont = new HashMap<EventProxy, EventProxy>();
-    for (final AutomatonProxy automaton : getModel().getAutomata()) {
-      switch (getKindTranslator().getComponentKind(automaton)) {
-        case PLANT :  plants.add(automaton);
-                      break;
-        case SPEC  :  origspecs.add(automaton);
-                      break;
-        default : break;
+    Set<AutomatonProxy> plants = new THashSet<AutomatonProxy>();
+    final Set<AutomatonProxy> specs = new THashSet<AutomatonProxy>();
+    final Set<AutomatonProxy> origspecs = new THashSet<AutomatonProxy>();
+    final Set<AutomatonProxy> automata = new THashSet<AutomatonProxy>();
+    final Set<EventProxy> forbiddenEvents = new THashSet<EventProxy>();
+    final ProductDESProxy model = getModel();
+    final Set<EventProxy> events = new THashSet<EventProxy>(model.getEvents());
+    final Map<EventProxy, EventProxy> forbtouncont =
+      new HashMap<EventProxy, EventProxy>();
+    final KindTranslator translator = getKindTranslator();
+    AutomatonProxy initUncontrollable = null;
+    for (final AutomatonProxy aut : getModel().getAutomata()) {
+      switch (translator.getComponentKind(aut)) {
+        case PLANT:
+          if (AutomatonTools.hasInitialState(aut)) {
+            plants.add(aut);
+          } else {
+            return setSatisfiedResult();
+          }
+          break;
+        case SPEC:
+          if (AutomatonTools.hasInitialState(aut)) {
+            origspecs.add(aut);
+          } else if (translator.getEventKind(KindTranslator.INIT) ==
+                     EventKind.CONTROLLABLE) {
+            return setSatisfiedResult();
+          } else {
+            initUncontrollable = aut;
+          }
+          break;
+        default:
+          break;
       }
     }
+    if (initUncontrollable != null) {
+      final ProductDESProxyFactory factory = getFactory();
+      final String tracename = getTraceName();
+      final String comment =
+        getTraceComment(null, initUncontrollable, null);
+      final TraceStepProxy step = factory.createTraceStepProxy(null);
+      final List<TraceStepProxy> steps = Collections.singletonList(step);
+      final SafetyTraceProxy counterexample = factory.createSafetyTraceProxy
+        (tracename, comment, null, model, automata, steps);
+      return setFailedResult(counterexample);
+    }
+
     int l = 0;
     for (final AutomatonProxy s : origspecs) {
       final Object[] array = convertSpec(s, l, forbtouncont);
@@ -286,10 +320,10 @@ public class ProjectingSafetyVerifier
     for (final AutomatonProxy a : automata) {
       events.addAll(a.getEvents());
     }
-    final ProductDESProxy model =
+    final ProductDESProxy newModel =
       getFactory().createProductDESProxy("model", events, automata);
-    final ProjectionList list = project(model, forbiddenEvents);
-    final ProductDESProxy pmodel = list == null ? model : list.getModel();
+    final ProjectionList list = project(newModel, forbiddenEvents);
+    final ProductDESProxy pmodel = list == null ? newModel : list.getModel();
     mChecker.setModel(pmodel);
     mChecker.setNodeLimit(getNodeLimit());
     mChecker.setKindTranslator(new KindTranslator()
@@ -313,11 +347,11 @@ public class ProjectingSafetyVerifier
       //mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
       mStates = (int) mChecker.getAnalysisResult().getTotalNumberOfStates();
       TraceProxy counter = mChecker.getCounterExample();
-      counter = list.getTrace(counter, model);
+      counter = list.getTrace(counter, newModel);
       final List<EventProxy> e = new ArrayList<EventProxy>(counter.getEvents());
       e.set(e.size() - 1, forbtouncont.get(e.get(e.size() - 1)));
-      counter = getFactory().createSafetyTraceProxy(getModel().getName(),
-                                                    getModel(), e);
+      counter = getFactory().createSafetyTraceProxy(model.getName(),
+                                                    model, e);
       return setFailedResult(counter);
     }
   }
@@ -383,7 +417,7 @@ public class ProjectingSafetyVerifier
       }
     }
     final StateProxy onestate =
-      getFactory().createStateProxy("one", true, new HashSet<EventProxy>());
+      getFactory().createStateProxy("one", true, null);
     final AutomatonProxy plant =
       getFactory().createAutomatonProxy(a.getName() + ":plant",
                                         ComponentKind.PLANT,
@@ -393,7 +427,7 @@ public class ProjectingSafetyVerifier
                                         ComponentKind.SPEC,
                                         uncont.values(),
                                         Collections.singleton(onestate),
-                                        new HashSet<TransitionProxy>());
+                                        null);
     return new Object[] {plant, spec, uncont};
   }
 

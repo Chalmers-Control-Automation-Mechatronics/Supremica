@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.bdd;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -233,6 +234,40 @@ public class BDDSafetyVerifier
   }
 
   @Override
+  BDD createInitialStateBDD(final AutomatonBDD autBDD)
+  {
+    final BDDFactory bddFactory = getBDDFactory();
+    final BDD autinit = autBDD.createInitialStateBDD(bddFactory);
+    if (autinit.isZero()) {
+      final VerificationResult result = getAnalysisResult();
+      final KindTranslator translator = getKindTranslator();
+      if (result.isFinished() && result.isSatisfied()) {
+        // result is already set
+      } else if (autBDD.getKind() == ComponentKind.PLANT ||
+                 translator.getEventKind(KindTranslator.INIT) ==
+                 EventKind.CONTROLLABLE) {
+        result.setSatisfied(true);
+      } else {
+        final ProductDESProxyFactory desFactory = getFactory();
+        final String tracename = getTraceName();
+        final AutomatonProxy aut = autBDD.getAutomaton();
+        final String comment = getTraceComment(null, aut, null);
+        final ProductDESProxy model = getModel();
+        final List<AutomatonProxy> automata = getAutomata();
+        final TraceStepProxy step = desFactory.createTraceStepProxy(null);
+        final List<TraceStepProxy> steps = Collections.singletonList(step);
+        final SafetyTraceProxy counterexample =
+          desFactory.createSafetyTraceProxy
+          (tracename, comment, null, model, automata, steps);
+        result.setCounterExample(counterexample);
+      }
+      return null;
+    } else {
+      return autinit;
+    }
+  }
+
+  @Override
   boolean containsBadState(final BDD reached)
   {
     for (final ConditionPartitionBDD part : mConditionBDDs) {
@@ -311,7 +346,6 @@ public class BDDSafetyVerifier
    * @return An English string that describes why the safety property is
    *         violated, which can be used as a trace comment.
    */
-  @SuppressWarnings("unused")
   private String getTraceComment(final EventProxy event,
                                  final AutomatonProxy aut,
                                  final StateProxy state)

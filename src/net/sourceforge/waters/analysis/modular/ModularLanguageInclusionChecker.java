@@ -21,6 +21,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
@@ -72,8 +73,10 @@ public class ModularLanguageInclusionChecker
                                          final ProductDESProxyFactory factory,
                                          final SafetyVerifier checker)
   {
-    super(model, factory);
-    setKindTranslator(LanguageInclusionKindTranslator.getInstance());
+    super(model,
+          LanguageInclusionKindTranslator.getInstance(),
+          LanguageInclusionDiagnostics.getInstance(),
+          factory);
     mChecker = checker;
     mStates = 0;
     setNodeLimit(10000000);

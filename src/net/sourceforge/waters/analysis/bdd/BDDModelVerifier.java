@@ -334,32 +334,34 @@ public abstract class BDDModelVerifier
     mLevels = new ArrayList<BDD>();
     mLevels.add(initial);
     for (final AutomatonBDD autBDD : mAutomatonBDDs) {
-      final BDD autinit = autBDD.getInitialStateBDD(mBDDFactory);
-      if (autinit.isZero()) {
-        setSatisfiedResult();
-        return null;
-      }
-      initial.andWith(autinit);
-      final AutomatonProxy aut = autBDD.getAutomaton();
-      final Collection<EventProxy> localevents = aut.getEvents();
-      for (final EventBDD eventBDD : eventBDDs) {
-        final EventProxy event = eventBDD.getEvent();
-        if (localevents.contains(event)) {
-          eventBDD.startAutomaton(autBDD, mBDDFactory);
+      final BDD autinit = createInitialStateBDD(autBDD);
+      if (autinit != null) {
+        initial.andWith(autinit);
+        final AutomatonProxy aut = autBDD.getAutomaton();
+        final Collection<EventProxy> localevents = aut.getEvents();
+        for (final EventBDD eventBDD : eventBDDs) {
+          final EventProxy event = eventBDD.getEvent();
+          if (localevents.contains(event)) {
+            eventBDD.startAutomaton(autBDD, mBDDFactory);
+          }
         }
-      }
-      for (final TransitionProxy trans : aut.getTransitions()) {
-        final StateProxy source = trans.getSource();
-        if (autBDD.isReachable(source)) {
-          final EventProxy event = trans.getEvent();
-          final EventBDD eventBDD = eventmap.get(event);
-          eventBDD.includeTransition(trans, mBDDFactory);
+        for (final TransitionProxy trans : aut.getTransitions()) {
+          final StateProxy source = trans.getSource();
+          if (autBDD.isReachable(source)) {
+            final EventProxy event = trans.getEvent();
+            final EventBDD eventBDD = eventmap.get(event);
+            eventBDD.includeTransition(trans, mBDDFactory);
+          }
         }
+        for (final EventBDD eventBDD : eventBDDs) {
+          eventBDD.finishAutomaton(mBDDFactory);
+        }
+        mIsFullyDeterministic &= autBDD.isDeterministic();
       }
-      for (final EventBDD eventBDD : eventBDDs) {
-        eventBDD.finishAutomaton(mBDDFactory);
-      }
-      mIsFullyDeterministic &= autBDD.isDeterministic();
+    }
+    final VerificationResult result = getAnalysisResult();
+    if (result.isFinished()) {
+      return null;
     }
 
     final int numvars = mBDDFactory.varNum();
@@ -394,6 +396,17 @@ public abstract class BDDModelVerifier
       logger.debug("Merged transitions: " + transcount0 + " >> " + transcount1);
     }
     return eventBDDs;
+  }
+
+  BDD createInitialStateBDD(final AutomatonBDD autBDD)
+  {
+    final BDD autinit = autBDD.createInitialStateBDD(mBDDFactory);
+    if (autinit.isZero()) {
+      setSatisfiedResult();
+      return null;
+    } else {
+      return autinit;
+    }
   }
 
   BDD getInitialStateBDD()

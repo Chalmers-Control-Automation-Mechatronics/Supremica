@@ -76,6 +76,7 @@ ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mMarking(marking),
     mStateLimit(UINT32_MAX),
     mTransitionLimit(UINT32_MAX),
+    mIsInitialUncontrollable(false),
     mIsAbortRequested(false),
     mEncoding(0),
     mStateSpace(0),
@@ -127,24 +128,31 @@ runSafetyCheck()
     setup();
     bool result;
     if (mIsTrivial) {
-      result = true;
+      result = (mTraceAutomaton == 0);
     } else {
       storeInitialStates(true);
       result = doSafetySearch();
-      if (!result) {
-        mTraceStartTime = clock();
+    }
+    if (!result) {
+      mTraceStartTime = clock();
+      mTraceList = new jni::LinkedListGlue(mCache);
+      if (mTraceAutomaton) {
+        mJavaTraceAutomaton = mTraceAutomaton->getJavaAutomaton();
+      }
+      if (mTraceEvent == 0) {
+        jni::TraceStepGlue step = mFactory.createTraceStepProxyGlue(0, mCache);
+        mTraceList->add(&step);
+      } else {
         mJavaTraceEvent = mTraceEvent->getJavaEvent();
         if (mTraceAutomaton) {
-          mJavaTraceAutomaton = mTraceAutomaton->getJavaAutomaton();
           const uint32_t* packed = mStateSpace->get(mTraceState);
           const uint32_t autindex = mTraceAutomaton->getAutomatonIndex();
           const uint32_t statecode = mEncoding->get(packed, autindex);
           mJavaTraceState = mTraceAutomaton->getJavaState(statecode);
         }
-        mTraceList = new jni::LinkedListGlue(mCache);
         jni::TraceStepGlue step =
           mFactory.createTraceStepProxyGlue(&mJavaTraceEvent, mCache);
-        mTraceList->add(0, &step);
+        mTraceList->add(&step);
         const uint32_t level = mDepthMap->size() - 2;
         computeCounterExample(*mTraceList, level);
       }
@@ -749,6 +757,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
     waters::ProductExplorerFinalizer finalizer(gchecker);
     waters::ProductExplorer* checker =
       finalizer.createProductExplorer(translator, nomarking, nomarking, cache);
+    bool initUncont = gchecker.isInitialUncontrollable();
+    checker->setInitialUncontrollable(initUncont);
     bool result = checker->runSafetyCheck();
     jni::VerificationResultGlue vresult =
       gchecker.createAnalysisResultGlue(&cache);

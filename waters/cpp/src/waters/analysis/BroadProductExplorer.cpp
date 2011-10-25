@@ -580,8 +580,11 @@ setupSafety()
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
-    if (aut->getNumberOfInitialStates() == 0) {
+    if (aut->getNumberOfInitialStates() == 0 && !isTrivial()) {
       setTrivial();
+      if (!aut->isPlant() && isInitialUncontrollable()) {
+        setTraceEvent(0, aut);
+      }
     }
     setupTransitions(aut, autglue, eventmap);
     const jni::SetGlue& events = autglue.getEventsGlue(cache);

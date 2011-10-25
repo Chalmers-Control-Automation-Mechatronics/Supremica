@@ -14,6 +14,7 @@ import gnu.trove.THashSet;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -149,6 +150,7 @@ public class MonolithicSafetyVerifier
       mSystemState = new int[mNumAutomata];
 
       // Separate the automatons by kind
+      AutomatonProxy initUncontrollable = null;
       for (final AutomatonProxy ap : automata) {
         // Get all states
         stateSet = ap.getStates();
@@ -192,11 +194,17 @@ public class MonolithicSafetyVerifier
             }
           }
         }
+        final ComponentKind kind = translator.getComponentKind(ap);
         if (initialState == null) {
-          return setSatisfiedResult();
+          if (kind == ComponentKind.PLANT ||
+              translator.getEventKind(KindTranslator.INIT) ==
+              EventKind.CONTROLLABLE) {
+            return setSatisfiedResult();
+          } else {
+            initUncontrollable = ap;
+          }
         }
         // Store all the information by automaton type
-        final ComponentKind kind = translator.getComponentKind(ap);
         switch (kind) {
         case PLANT:
           mAutomata[ck] = ap;
@@ -220,6 +228,17 @@ public class MonolithicSafetyVerifier
         default:
           break;
         }
+      }
+      if (initUncontrollable != null) {
+        final ProductDESProxyFactory factory = getFactory();
+        final String tracename = getTraceName();
+        final String comment =
+          getTraceComment(null, initUncontrollable, null);
+        final TraceStepProxy step = factory.createTraceStepProxy(null);
+        final List<TraceStepProxy> steps = Collections.singletonList(step);
+        final SafetyTraceProxy counterexample = factory.createSafetyTraceProxy
+          (tracename, comment, null, model, automata, steps);
+        return setFailedResult(counterexample);
       }
 
       // Set the mCodePosition list
@@ -562,11 +581,11 @@ public class MonolithicSafetyVerifier
     steps.add(0, init);
     final String tracename = getTraceName();
     final String comment = getTraceComment(event0, aut, state0);
+    final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
     final SafetyTraceProxy trace = factory.createSafetyTraceProxy
-      (tracename, comment, null, des, null, steps);
+      (tracename, comment, null, des, automata, steps);
     return trace;
   }
-
 
   //#########################################################################
   //# Data Members
