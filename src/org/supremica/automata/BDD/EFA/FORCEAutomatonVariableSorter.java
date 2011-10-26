@@ -34,12 +34,14 @@ public class FORCEAutomatonVariableSorter {
     private ExtendedAutomata origin;
     List<Object> variableOrdering; // the result variable ordering list to return
     List<String> variableOrderingNames;  // the result name list to return
+    List<String> initialOrderingNames;
     
     
-    public FORCEAutomatonVariableSorter(ExtendedAutomata originAutomata) {
+    public FORCEAutomatonVariableSorter(ExtendedAutomata originAutomata, List<String> variableOrderingNames) {
         this.origin = originAutomata;
-        this.variableOrdering = new ArrayList<Object>();
-        this.variableOrderingNames = new ArrayList<String>();
+        this.variableOrdering = new ArrayList<Object>(origin.size() + origin.getVars().size());
+        this.variableOrderingNames = new ArrayList<String>(origin.size() + origin.getVars().size());
+        this.initialOrderingNames = variableOrderingNames;
     }
     
     public void sort(){
@@ -54,7 +56,7 @@ public class FORCEAutomatonVariableSorter {
         Map<String, AutVar> var2AutVar = new HashMap<String, AutVar>(variableList.size());
 
         for (ExtendedAutomaton efa : automatonList) {
-            autVarList.add(new AutVar(AutVar.TYPE_EFA, efa, efa.getName(), new HashSet<EventDeclProxy>(efa.getAlphabet())));
+            var2AutVar.put(efa.getName(), new AutVar(AutVar.TYPE_EFA, efa, efa.getName(), new HashSet<EventDeclProxy>(efa.getAlphabet())));
             for (EdgeProxy anEdge : efa.getTransitions()) {
                 HashSet<EventDeclProxy> eventsOfCurrEdge = new HashSet<EventDeclProxy>();
                 for (Iterator<Proxy> eventIterator = anEdge.getLabelBlock().getEventList().iterator(); eventIterator.hasNext();) {
@@ -86,7 +88,10 @@ public class FORCEAutomatonVariableSorter {
             }
         }
         
-        autVarList.addAll(var2AutVar.values());
+        
+        for(int i = 1; i < initialOrderingNames.size() - 1; i ++){
+            autVarList.add(var2AutVar.get(initialOrderingNames.get(i)));
+        }
         
         // Build the graph from the autVarList which is necessary for FORCE algorithm of Arash's version
         Graph graph = buildGraph(autVarList);
@@ -96,7 +101,7 @@ public class FORCEAutomatonVariableSorter {
         algo.init();
         int [] ordering = algo.ordering();
         
-        // Fill in these two fields
+        // Fill in these two field
         for(int i = 0; i < ordering.length; i++){
             variableOrdering.add(autVarList.get(ordering[i]).getOwner());
             variableOrderingNames.add(autVarList.get(ordering[i]).getLabel());

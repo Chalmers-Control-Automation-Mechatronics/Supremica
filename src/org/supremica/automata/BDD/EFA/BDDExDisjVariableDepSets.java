@@ -78,32 +78,24 @@ public class BDDExDisjVariableDepSets extends BDDExDisjDepSetsDecorator{
             variableToBDD.put(variableIndex, manager.getZeroBDD());
         }
 
-        final TIntObjectHashMap<HashSet<String>> eventIndex2GuardVariables = eventParDepSets.getEventIndex2GuardVariables();
         final TIntObjectHashMap<HashSet<String>> eventIndex2UpdatedVariables = eventParDepSets.getEventIndex2UpdatedVariables();
 
-        int[] eventIndicesAsKeys = eventIndex2GuardVariables.keys();
+        int[] eventIndicesAsKeys = eventIndex2UpdatedVariables.keys();
 
         for (int i = 0; i < eventIndicesAsKeys.length; i++) {
 
             int currEventIndex = eventIndicesAsKeys[i];
 
-            HashSet<String> guardVariablesForCurrEventIndex = eventIndex2GuardVariables.get(currEventIndex);
             HashSet<String> updatedVariablesForCurrEventIndex = eventIndex2UpdatedVariables.get(currEventIndex);
 
-            if (guardVariablesForCurrEventIndex.isEmpty() && updatedVariablesForCurrEventIndex.isEmpty()) {
+            if (updatedVariablesForCurrEventIndex.isEmpty()) {
                 final int[] variableIndicesAsKeys = variableToEvents.keys();
-                for (int j = 0; i < variableIndicesAsKeys.length; j++) {
+                for (int j = 0; j < variableIndicesAsKeys.length; j++) {
                     variableToEvents.get(variableIndicesAsKeys[j]).add(currEventIndex);
                 }
             } else {
-                for (String aGuardVariable : guardVariablesForCurrEventIndex) {
-                    variableToEvents.get(variableNameToIndex.get(aGuardVariable)).add(currEventIndex);
-                }
-
                 for (String aUpdatedVariable : updatedVariablesForCurrEventIndex) {
-                    if (!guardVariablesForCurrEventIndex.contains(aUpdatedVariable)) {
-                        variableToEvents.get(variableNameToIndex.get(aUpdatedVariable)).add(currEventIndex);
-                    }
+                    variableToEvents.get(variableNameToIndex.get(aUpdatedVariable)).add(currEventIndex);
                 }
             }
         }
