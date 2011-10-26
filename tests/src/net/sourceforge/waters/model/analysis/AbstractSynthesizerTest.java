@@ -16,11 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicLanguageInclusionChecker;
@@ -653,7 +649,8 @@ public abstract class AbstractSynthesizerTest
   private ProductDESProxy plantify(final ProductDESProxy des)
     throws OverflowException, EventNotFoundException
   {
-    mMarkingProposition = AbstractConflictChecker.getMarkingProposition(des);
+    final EventProxy markingProposition =
+      AbstractConflictChecker.getMarkingProposition(des);
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int numAutomata = automata.size();
     final Collection<AutomatonProxy> plantified =
@@ -664,7 +661,7 @@ public abstract class AbstractSynthesizerTest
         plantified.add(aut);
         break;
       case SPEC:
-        final AutomatonProxy plant = plantify(aut);
+        final AutomatonProxy plant = plantify(aut, markingProposition);
         plantified.add(plant);
         break;
       default:
@@ -679,7 +676,8 @@ public abstract class AbstractSynthesizerTest
                                          events, plantified);
   }
 
-  private AutomatonProxy plantify(final AutomatonProxy spec)
+  private AutomatonProxy plantify(final AutomatonProxy spec,
+                                  final EventProxy markingProposition)
     throws OverflowException
   {
     final Collection<EventProxy> events = spec.getEvents();
@@ -724,18 +722,18 @@ public abstract class AbstractSynthesizerTest
       }
     }
 
-    if (dump != null & !events.contains(mMarkingProposition)) {
+    final String name = spec.getName();
+    if (dump != null & !events.contains(markingProposition)) {
       final Collection<TransitionProxy> newTransitions =
         new ArrayList<TransitionProxy>();
-      final Set <EventProxy> newEvents = new HashSet <EventProxy>
+      final Collection<EventProxy> newEvents = new ArrayList<EventProxy>
         (events.size()+1);
       final Collection <StateProxy> newStates = new ArrayList<StateProxy>
         (numStates + 1);
       final HashMap <StateProxy, StateProxy> mapStates = new HashMap
         <StateProxy, StateProxy>();
-
       newEvents.addAll(events);
-      newEvents.add(mMarkingProposition);
+      newEvents.add(markingProposition);
       for (final TransitionProxy trans : transitions) {
         final StateProxy sourceState = trans.getSource();
         final StateProxy targetState = trans.getTarget();
@@ -743,18 +741,17 @@ public abstract class AbstractSynthesizerTest
         final List<StateProxy> transitionState = new ArrayList<StateProxy>(2);
         transitionState.add(sourceState);
         transitionState.add(targetState);
-        for (final Iterator<StateProxy> it = transitionState.iterator();
-          it.hasNext();) {
-          final StateProxy state =it.next();
-
-          if (!mapStates.containsKey(state) ) {
-            final Collection<EventProxy> newPropostion = new HashSet<EventProxy>();
-            newPropostion.addAll(state.getPropositions());
+        for (final StateProxy state : transitionState) {
+          if (!mapStates.containsKey(state)) {
+            final Collection<EventProxy> propositions = state.getPropositions();
+            final Collection<EventProxy> newPropostions =
+              new ArrayList<EventProxy>(propositions.size() + 1);
+            newPropostions.addAll(propositions);
             if (state != dump) {
-              newPropostion.add(mMarkingProposition);
+              newPropostions.add(markingProposition);
             }
             final StateProxy newState = factory.createStateProxy
-              (state.getName(), state.isInitial(), newPropostion);
+              (state.getName(), state.isInitial(), newPropostions);
             newStates.add(newState);
             mapStates.put(state, newState);
           }
@@ -763,14 +760,12 @@ public abstract class AbstractSynthesizerTest
           (mapStates.get(sourceState), event, mapStates.get(targetState));
         newTransitions.add(newTransition);
       }
-      final String name = spec.getName();
       return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                        newEvents, newStates, newTransitions);
+                                          newEvents, newStates, newTransitions);
+    } else {
+      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
+                                          events, states, transitions);
     }
-    final String name = spec.getName();
-    return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                        events, states, transitions);
-
   }
 
 
@@ -877,6 +872,5 @@ public abstract class AbstractSynthesizerTest
   private ConflictChecker mConflictChecker;
   private JAXBTraceMarshaller mTraceMarshaller;
   private List<ParameterBindingProxy> mBindings;
-  private EventProxy mMarkingProposition;
 
 }
