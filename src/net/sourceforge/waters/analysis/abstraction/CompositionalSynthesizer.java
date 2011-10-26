@@ -450,7 +450,15 @@ public class CompositionalSynthesizer
     (final List<AutomatonProxy> automata)
     throws AnalysisException
   {
-    final AutomatonProxy automaton;
+    AutomatonProxy automaton = null;
+    for (final AutomatonProxy aut : automata) {
+      if(aut.getStates().size() < 1) {
+        final CompositionalSynthesisResult result = getAnalysisResult();
+        result.setSatisfied(false);
+        return false;
+      }
+    }
+
     switch (automata.size()) {
     case 0:
       return true;

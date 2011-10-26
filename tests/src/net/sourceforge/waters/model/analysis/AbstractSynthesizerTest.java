@@ -374,6 +374,14 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testZeroSup() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "test_zero_sup";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runSynthesizer(final String group,
