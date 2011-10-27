@@ -350,7 +350,7 @@ public class CompositionalSynthesizer
       final ListBufferTransitionRelation supervisor =
         synStep.getSupervisor();
       if (supervisor != null) {
-        if (supervisor.getNumberOfReachableStates() < 1) {
+        if (supervisor.isEmpty()) {
           result.setSatisfied(false);
           return;
         } else {

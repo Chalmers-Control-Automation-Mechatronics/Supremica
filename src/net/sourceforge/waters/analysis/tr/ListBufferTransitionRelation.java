@@ -432,6 +432,16 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Returns whether this transition relation is empty.
+   * @return <CODE>true</CODE> if all states are marked as unreachable,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isEmpty()
+  {
+    return mStateBuffer.isEmpty();
+  }
+
+  /**
    * Gets the number of reachable states in the transition relation. A state
    * is considered reachable if its reachability flag is set.
    */
