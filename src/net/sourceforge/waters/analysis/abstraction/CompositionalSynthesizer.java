@@ -225,8 +225,10 @@ public class CompositionalSynthesizer
   {
     try {
       setUp();
-      runCompositionalMinimisation();
       final CompositionalSynthesisResult result = getAnalysisResult();
+      if (!result.isFinished()) {
+        runCompositionalMinimisation();
+      }
       if (!result.isFinished()) {
         result.setSatisfied(true);
         if (mConstructsResult) {
@@ -347,13 +349,15 @@ public class CompositionalSynthesizer
       final EventEncoding eventEnc = synStep.getEventEncoding();
       final ListBufferTransitionRelation supervisor =
         synStep.getSupervisor();
-      if(supervisor != null){
-        final AutomatonProxy newSupervisor =
-          createRenamedSupervisor (supervisor,eventEnc);
-        if(newSupervisor.getStates().size() < 1) {
+      if (supervisor != null) {
+        if (supervisor.getNumberOfReachableStates() < 1) {
           result.setSatisfied(false);
+          return;
+        } else {
+          final AutomatonProxy newSupervisor =
+            createRenamedSupervisor(supervisor, eventEnc);
+          result.addSupervisor(newSupervisor);
         }
-        result.addSupervisor(newSupervisor);
       }
 
       // Apply inverse renaming to other automata

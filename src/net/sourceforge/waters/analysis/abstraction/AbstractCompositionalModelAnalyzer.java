@@ -1144,8 +1144,9 @@ public abstract class AbstractCompositionalModelAnalyzer
   private boolean simplifyDirtyAutomata()
     throws AnalysisException
   {
+    final AnalysisResult analysisResult = getAnalysisResult();
     boolean result = false;
-    while (!mDirtyAutomata.isEmpty()) {
+    while (!mDirtyAutomata.isEmpty() && !analysisResult.isFinished()) {
       final AutomatonProxy aut = mDirtyAutomata.remove();
       final Collection<EventProxy> events = aut.getEvents();
       final int numEvents = events.size();
