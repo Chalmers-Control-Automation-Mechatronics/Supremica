@@ -182,6 +182,14 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testNoPlant() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "no_plant";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testSajed() throws Exception
   {
     final String group = "tests";
@@ -574,25 +582,40 @@ public abstract class AbstractSynthesizerTest
         ProxyTools.getShortClassName(mSynthesizer) + '.';
       final Collection<EventProxy> events = des.getEvents();
       final Collection<AutomatonProxy> plants = des.getAutomata();
-      final Collection<AutomatonProxy> supervisors =
+      final Collection<AutomatonProxy> computedSupervisors =
         result.getComputedAutomata();
-      final int numAutomata = plants.size() + supervisors.size();
+      final int numAutomata = plants.size() + computedSupervisors.size();
       final Collection<AutomatonProxy> automata =
         new ArrayList<AutomatonProxy>(numAutomata);
-      automata.addAll(plants);
-      automata.addAll(supervisors);
+      final Collection<AutomatonProxy> expectedSupervisors =
+        new ArrayList<AutomatonProxy>(plants.size());
+      for (final AutomatonProxy aut : plants) {
+        switch (aut.getKind()) {
+        case PLANT:
+        case SPEC:
+          automata.add(aut);
+          break;
+        case SUPERVISOR:
+          expectedSupervisors.add(aut);
+          break;
+        default:
+          break;
+        }
+      }
+      automata.addAll(computedSupervisors);
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      final ProductDESProxy replaced =
+        factory.createProductDESProxy(name, comment, null, events, automata);
+      saveDES(replaced, basename);
+      assertTrue("Expected failed synthesis, but got a result!", expect);
+      verifySupervisor(replaced, mControllabilityChecker,
+                       null, "controllable");
+      verifySupervisor(replaced, mConflictChecker, null, "nonconflicting");
+      automata.addAll(expectedSupervisors);
       final ProductDESProxy combined =
         factory.createProductDESProxy(name, comment, null, events, automata);
-      saveDES(combined, basename);
-      assertTrue("Expected failed synthesis, but got a result!", expect);
-      final KindTranslator vtrans =
-        new VerificationKindTranslator(supervisors);
-      verifySupervisor(combined, mControllabilityChecker,
-                       vtrans, "controllable");
-      verifySupervisor(combined, mConflictChecker, vtrans, "nonconflicting");
       final KindTranslator ltrans =
-        new LeastRestrictivenessKindTranslator(supervisors);
+        new LeastRestrictivenessKindTranslator(computedSupervisors);
       verifySupervisor(combined, mLanguageInclusionChecker,
                        ltrans, "least restrictive");
     } else {
@@ -608,7 +631,9 @@ public abstract class AbstractSynthesizerTest
     throws Exception
   {
     verifier.setModel(des);
-    verifier.setKindTranslator(translator);
+    if (translator != null) {
+      verifier.setKindTranslator(translator);
+    }
     verifier.run();
     if (!verifier.isSatisfied()) {
       final TraceProxy counterexample = verifier.getCounterExample();
@@ -774,50 +799,6 @@ public abstract class AbstractSynthesizerTest
       return factory.createAutomatonProxy(name, ComponentKind.PLANT,
                                           events, states, transitions);
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class VerificationKindTranslator
-  private static class VerificationKindTranslator
-    implements KindTranslator
-  {
-    //#######################################################################
-    //# Constructor
-    private VerificationKindTranslator
-      (final Collection<AutomatonProxy> computedSupervisors)
-    {
-      mComputedSupervisors = new THashSet<AutomatonProxy>(computedSupervisors);
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-    public ComponentKind getComponentKind(final AutomatonProxy aut)
-    {
-      switch (aut.getKind()) {
-      case PLANT:
-        return ComponentKind.PLANT;
-      case SPEC:
-        return ComponentKind.SPEC;
-      case SUPERVISOR:
-        if (mComputedSupervisors.contains(aut)) {
-          return ComponentKind.SPEC;
-        } else {
-          return null;
-        }
-      default:
-        return null;
-      }
-    }
-
-    public EventKind getEventKind(final EventProxy event)
-    {
-      return event.getKind();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final Collection<AutomatonProxy> mComputedSupervisors;
   }
 
 
