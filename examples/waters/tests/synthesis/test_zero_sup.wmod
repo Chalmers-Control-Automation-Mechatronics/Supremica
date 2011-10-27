@@ -107,16 +107,5 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
-            <Graph>
-                <LabelBlock>
-                    <SimpleIdentifier Name=":accepting"/>
-                    <SimpleIdentifier Name="a"/>
-                    <SimpleIdentifier Name="c"/>
-                    <SimpleIdentifier Name="u"/>
-                    <SimpleIdentifier Name="v"/>
-                </LabelBlock>
-            </Graph>
-        </SimpleComponent>
     </ComponentList>
 </Module>

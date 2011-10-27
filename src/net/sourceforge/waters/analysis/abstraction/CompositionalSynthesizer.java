@@ -350,6 +350,9 @@ public class CompositionalSynthesizer
       if(supervisor != null){
         final AutomatonProxy newSupervisor =
           createRenamedSupervisor (supervisor,eventEnc);
+        if(newSupervisor.getStates().size() < 1) {
+          result.setSatisfied(false);
+        }
         result.addSupervisor(newSupervisor);
       }
 
@@ -451,14 +454,6 @@ public class CompositionalSynthesizer
     throws AnalysisException
   {
     AutomatonProxy automaton = null;
-    for (final AutomatonProxy aut : automata) {
-      if(aut.getStates().size() < 1) {
-        final CompositionalSynthesisResult result = getAnalysisResult();
-        result.setSatisfied(false);
-        return false;
-      }
-    }
-
     switch (automata.size()) {
     case 0:
       return true;

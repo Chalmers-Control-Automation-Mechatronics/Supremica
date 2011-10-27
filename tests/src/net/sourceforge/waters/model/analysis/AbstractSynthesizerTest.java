@@ -387,7 +387,7 @@ public abstract class AbstractSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "test_zero_sup";
-    runSynthesizer(group, subdir, name, true);
+    runSynthesizer(group, subdir, name, false);
   }
 
   //#########################################################################
