@@ -111,7 +111,10 @@ public class ArchitectureDetector
           System.loadLibrary(libname);
           return true;
         } catch (final UnsatisfiedLinkError error) {
-          return false;
+          final String msg = error.getMessage();
+          if (!msg.contains("Can't find dependent libraries")) {
+            return false;
+          }
         } catch (final SecurityException exception) {
           throw new RuntimeException(exception);
         } catch (final NoSuchFieldException exception) {

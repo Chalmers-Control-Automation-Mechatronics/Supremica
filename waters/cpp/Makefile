@@ -20,7 +20,7 @@ else
   export JAVAOS        = win32
   export ARCH          = $(patsubst win32.%,%,$(JAVA_ARCH))
   export EXTRA_CFLAGS  = -D_JNI_IMPLEMENTATION_
-  export EXTRA_LDFLAGS = -Wl,--kill-at
+  export EXTRA_LDFLAGS = -Wl,--kill-at -static-libgcc -static-libstdc++
   export LIB_SUFFIX    = dll
   RMDIR                = $(if $(wildcard $(1)),rd /s /q $(subst /,\,$(1)))
   RMFILE               = $(if $(wildcard $(1)),del $(subst /,\,$(1)))

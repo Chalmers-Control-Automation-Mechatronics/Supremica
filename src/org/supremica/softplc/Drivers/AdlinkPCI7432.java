@@ -39,13 +39,13 @@ public class AdlinkPCI7432
 		this(0);
 	}
 
-	public AdlinkPCI7432(int cardNumber)
+	public AdlinkPCI7432(final int cardNumber)
 		throws Exception
 	{
 		this(cardNumber, false, true);
 	}
 
-	public AdlinkPCI7432(int cardNumber, boolean invertInputs, boolean invertOutputs)
+	public AdlinkPCI7432(final int cardNumber, final boolean invertInputs, final boolean invertOutputs)
 		throws Exception
 	{
 		if (cardNumber > Short.MAX_VALUE)
@@ -87,7 +87,7 @@ public class AdlinkPCI7432
 		return nrOfDigitalInputs;
 	}
 
-	public synchronized void setSignalArray(boolean[] outputs)
+	public synchronized void setSignalArray(final boolean[] outputs)
 		throws Exception
 	{
 		if (outputs == null)
@@ -105,7 +105,7 @@ public class AdlinkPCI7432
 			throw new SupremicaException("The card is not initialized");
 		}
 
-		int value = toInt(outputs, invertOutputs);
+		final int value = toInt(outputs, invertOutputs);
 
 		this.outputs = outputs;
 
@@ -113,7 +113,7 @@ public class AdlinkPCI7432
 		AdlinkPCI7432.WritePort(card, (short) 0, value);
 	}
 
-	public synchronized void getSignalArray(boolean[] values)
+	public synchronized void getSignalArray(final boolean[] values)
 		throws Exception
 	{
 		if (!initialized)
@@ -121,7 +121,7 @@ public class AdlinkPCI7432
 			throw new SupremicaException("The card is not initialized");
 		}
 
-		int value = AdlinkPCI7432.ReadPort(card, (short) 0);
+		final int value = AdlinkPCI7432.ReadPort(card, (short) 0);
 
 		fromInt(value, values, invertInputs);
 	}
@@ -148,7 +148,7 @@ public class AdlinkPCI7432
 
 	public String[] getInputDescriptions()
 	{
-		String[] temp = new String[nrOfSignalsIn];
+		final String[] temp = new String[nrOfSignalsIn];
 
 		for (int i = 0; i < nrOfSignalsOut; i++)
 		{
@@ -160,7 +160,7 @@ public class AdlinkPCI7432
 
 	public String[] getOutputDescriptions()
 	{
-		String[] temp = new String[nrOfSignalsOut];
+		final String[] temp = new String[nrOfSignalsOut];
 
 		for (int i = 0; i < nrOfSignalsOut; i++)
 		{
@@ -171,7 +171,7 @@ public class AdlinkPCI7432
 	}
 
 	// help functions
-	private static final int toInt(boolean[] values, boolean invert)
+	private static final int toInt(final boolean[] values, final boolean invert)
 	{
 		int value = 0;
 
@@ -188,11 +188,11 @@ public class AdlinkPCI7432
 		return value;
 	}
 
-	private static final void fromInt(int value, boolean[] values, boolean invert)
+	private static final void fromInt(int value, final boolean[] values, final boolean invert)
 	{
 		for (int i = 0; i < values.length; i++)
 		{
-			int currValue = value & 1;
+			final int currValue = value & 1;
 
 			if (currValue == 0)
 			{
@@ -207,9 +207,9 @@ public class AdlinkPCI7432
 		}
 	}
 
-	public static final String toString(boolean[] values)
+	public static final String toString(final boolean[] values)
 	{
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 
 		for (int i = 0; i < values.length; i++)
 		{
@@ -229,7 +229,7 @@ public class AdlinkPCI7432
 	public void printInputs()
 		throws Exception
 	{
-		boolean[] inputs = new boolean[nrOfDigitalInputs];
+		final boolean[] inputs = new boolean[nrOfDigitalInputs];
 
 		getSignalArray(inputs);
 		System.out.println(AdlinkPCI7432.toString(inputs));
@@ -241,11 +241,11 @@ public class AdlinkPCI7432
 		System.out.println(AdlinkPCI7432.toString(outputs));
 	}
 
-	public static void main(String[] args)
+	public static void main(final String[] args)
 		throws Exception
 	{
-		AdlinkPCI7432 driver = new AdlinkPCI7432(0, false, true);
-		boolean[] outputs = new boolean[32];
+		final AdlinkPCI7432 driver = new AdlinkPCI7432(0, false, true);
+		final boolean[] outputs = new boolean[32];
 
 		System.out.println("s 1: for setting output 1");
 		System.out.println("r 2: for resetting output 2");
@@ -257,13 +257,13 @@ public class AdlinkPCI7432
 
 		while (cont)
 		{
-			String response = Console.readLine("> ");
-			char operation = response.charAt(0);
+			final String response = Console.readLine("> ");
+			final char operation = response.charAt(0);
 
 			if (operation == 's')
 			{
-				String channelString = response.substring(2, response.length());
-				int channel = Integer.parseInt(channelString);
+				final String channelString = response.substring(2, response.length());
+				final int channel = Integer.parseInt(channelString);
 
 				outputs[channel] = true;
 
@@ -271,8 +271,8 @@ public class AdlinkPCI7432
 			}
 			else if (operation == 'r')
 			{
-				String channelString = response.substring(2, response.length());
-				int channel = Integer.parseInt(channelString);
+				final String channelString = response.substring(2, response.length());
+				final int channel = Integer.parseInt(channelString);
 
 				outputs[channel] = false;
 
@@ -303,6 +303,7 @@ public class AdlinkPCI7432
 
 	static
 	{
+	    // TODO Use relative path
 		System.load("C:/Documents and Settings/cengic/My Documents/devel/Supremica/platform/win.x86/lib/AdlinkPCI7432.dll");
 	}
 }
