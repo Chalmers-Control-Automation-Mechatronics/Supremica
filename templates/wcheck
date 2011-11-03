@@ -15,13 +15,13 @@ for F in "$@"; do
     -bdd)
         FACTORY="$WPACK.analysis.bdd.BDDModelVerifierFactory"
         ;;
-    -comp)
+    -comp|-composing)
         FACTORY="$WPACK.analysis.abstraction.CompositionalModelVerifierFactory"
         ;;
     -dist)
         FACTORY="$WPACK.analysis.distributed.DistributedModelVerifierFactory"
         ;;
-    -gnb|-composing)
+    -gnb)
         FACTORY="$WPACK.analysis.gnonblocking.GNBModelVerifierFactory"
         ;;
     -mod|-modular)
