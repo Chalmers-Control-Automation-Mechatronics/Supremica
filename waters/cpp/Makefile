@@ -53,6 +53,7 @@ endif
 # List of sources
 
 export PROJECT  = waters
+export INCDIR   = include
 export SRCDIR   = src
 export JNIDIR   = $(SRCDIR)/jni
 export CPPDIR   = $(SRCDIR)/waters
@@ -80,7 +81,7 @@ export CXX      = g++
 # flags
 
 ifdef JAVA_HOME
-  JNI_INC       = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/$(JAVAOS)"
+  JNI_INC       = -I"$(INCDIR)/java" -I"$(INCDIR)/java/$(JAVAOS)"
 endif
 
 export CFLAGS   += -Wall -D__STDC_LIMIT_MACROS $(ARCH_FLAGS) $(EXTRA_CFLAGS)

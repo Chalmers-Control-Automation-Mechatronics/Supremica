@@ -36,11 +36,6 @@ optimize=off
 # Simply uncomment the following two lines.
 #native.make = make
 #native.ostype = linux-gnu
-# However, not all Linux distributions include the JNI headers in the
-# compiler's include path. If you get errrors that jni.h is not found,
-# you can fix this by setting the JAVA_HOME environment variable to the
-# JDK installation directory. (Make sure that $JAVA_HOME/include contains
-# the file jni.h)
 
 # For Windows, you need to install MinGW and SED.
 # First download and install MinGW from http://tdm-gcc.tdragon.net/ .
