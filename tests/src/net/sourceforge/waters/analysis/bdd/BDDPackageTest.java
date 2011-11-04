@@ -53,15 +53,23 @@ public class BDDPackageTest extends AbstractWatersTest
   public void testBDDPackage_buddy_after_jdd()
     throws SecurityException, NoSuchMethodException
   {
-    System.loadLibrary("jdd");
-    testBDDPackage(BDDPackage.BUDDY);
+    try {
+      System.loadLibrary("jdd");
+      testBDDPackage(BDDPackage.BUDDY);
+    } catch (final UnsatisfiedLinkError error) {
+      // No jdd.dll --- no problem.
+    }
   }
 
   public void testBDDPackage_buddy_before_jdd()
     throws SecurityException, NoSuchMethodException
   {
-    testBDDPackage(BDDPackage.BUDDY);
-    System.loadLibrary("jdd");
+    try {
+      testBDDPackage(BDDPackage.BUDDY);
+      System.loadLibrary("jdd");
+    } catch (final UnsatisfiedLinkError error) {
+      // No jdd.dll --- no problem.
+    }
   }
 
   public void testBDDPackage_cudd()
