@@ -8,28 +8,36 @@
 #############################################################################
 # OS dependent
 
-ifeq "$(findstring linux,$(JAVA_ARCH))" "linux"
-  export JAVAOS        = linux
-  export ARCH          = $(patsubst linux.%,%,$(JAVA_ARCH))
-  export EXTRA_CFLAGS  = -fPIC
-  export LIB_PREFIX    = lib
-  export LIB_SUFFIX    = so
+TARGET_ARCH            ?= $(HOST_ARCH)
+
+ifeq "$(findstring linux,$(HOST_ARCH))" "linux"
+  export HOST_OS       = linux
   RMDIR                = rm -rf $(strip $(1))
   RMFILE               = rm -f $(strip $(1))
 else
-  export JAVAOS        = win32
-  export ARCH          = $(patsubst win32.%,%,$(JAVA_ARCH))
-  export EXTRA_CFLAGS  = -D_JNI_IMPLEMENTATION_
-  export EXTRA_LDFLAGS = -Wl,--kill-at -static-libgcc -static-libstdc++
-  export LIB_SUFFIX    = dll
+  export HOST_OS       = win32
   RMDIR                = $(if $(wildcard $(1)),rd /s /q $(subst /,\,$(1)))
   RMFILE               = $(if $(wildcard $(1)),del $(subst /,\,$(1)))
 endif
 
-ifeq "$(ARCH)" "$(JAVA_ARCH)"
-  export OS_ARCH         = $(JAVA_ARCH)
+ifeq "$(findstring linux,$(TARGET_ARCH))" "linux"
+  export TARGET_OS     = linux
+  export ARCH          = $(patsubst linux.%,%,$(TARGET_ARCH))
+  export EXTRA_CFLAGS  = -fPIC
+  export LIB_PREFIX    = lib
+  export LIB_SUFFIX    = so
 else
-  export OS_ARCH         = $(JAVAOS).$(ARCH)
+  export TARGET_OS     = win32
+  export ARCH          = $(patsubst win32.%,%,$(TARGET_ARCH))
+  export EXTRA_CFLAGS  = -D_JNI_IMPLEMENTATION_
+  export EXTRA_LDFLAGS = -Wl,--kill-at -static-libgcc -static-libstdc++
+  export LIB_SUFFIX    = dll
+endif
+
+ifeq "$(ARCH)" "$(TARGET_ARCH)"
+  export OS_ARCH         = $(TARGET_ARCH)
+else
+  export OS_ARCH         = $(TARGET_OS).$(ARCH)
 endif
 
 ifeq "$(ARCH)" "x86"
@@ -46,6 +54,25 @@ ifeq "$(DEBUG)" "1"
 else
   export OS_ARCH_D       = $(OS_ARCH)
   export CFLAGS          = -O6
+endif
+
+
+#############################################################################
+# Cross-compiling Linux -> Windows
+
+ifeq "$(HOST_OS)" "$(TARGET_OS)"
+  export CXX             = g++
+else
+  ifeq "$(TARGET_OS)" "win32"
+    ifeq "$(ARCH)" "x86"
+      export CXX         = i686-w64-mingw32-g++
+      export LD          = i686-w64-mingw32-g++
+    endif
+    ifeq "$(ARCH)" "amd64"
+      export CXX         = x86_64-w64-mingw32-g++
+      export LD          = x86_64-w64-mingw32-g++
+    endif
+  endif
 endif
 
 
@@ -74,19 +101,13 @@ export HPP	= $(wildcard $(CPPDIR)/base/*.h) \
 export OBJ      = $(CPP:$(SRCDIR)%.cpp=$(OBJDIR)%.o)
 export LIB      = $(LIBDIR)/$(LIB_PREFIX)$(PROJECT).$(LIB_SUFFIX)
 
-# commands
-
-export CXX      = g++
-
 # flags
 
-ifdef JAVA_HOME
-  JNI_INC       = -I"$(INCDIR)/java" -I"$(INCDIR)/java/$(JAVAOS)"
-endif
+JNI_INC       = -I"$(INCDIR)/java" -I"$(INCDIR)/java/$(TARGET_OS)"
 
 export CFLAGS   += -Wall -D__STDC_LIMIT_MACROS $(ARCH_FLAGS) $(EXTRA_CFLAGS)
-export INCDIRS	= -I$(SRCDIR) $(JNI_INC)
-export LDFLAGS	= $(ARCH_FLAGS) $(EXTRA_LDFLAGS)
+export INCDIRS  = -I$(SRCDIR) $(JNI_INC)
+export LDFLAGS  = $(ARCH_FLAGS) $(EXTRA_LDFLAGS)
 export DEP      = dependencies.$(OS_ARCH)
 
 

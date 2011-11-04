@@ -555,7 +555,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
     </target>
 
-    <target name="-detect_arch" unless="java.arch">
+    <target name="-detect_arch" unless="native.host.arch">
         <ant dir="${waters.dir}" target="jniglue-jar" inheritAll="false"/>
         <java classname="net.sourceforge.waters.build.arch.ArchitectureDetector"
               fork="true" failonerror="true">
@@ -570,37 +570,55 @@ Class-Path: ${manifest.pathlist}</echo>
 
     <target name="-dynamic_libs" depends="-detect_arch">
         <copy todir="${dist}" failonerror="false">
-            <fileset dir="${platform}/${java.arch}/lib" includes="*"/>
+            <fileset dir="${platform}/${native.host.arch}/lib" includes="*"/>
         </copy>
     </target>
 
-    <target name="cpp_waters" depends="-detect_arch">
+    <target name="cpp_waters" depends="-detect_arch"
+            description="Builds debug version of Waters dynamic link library.">
         <ant dir="${waters.dir}" target="cpp" inheritAll="false">
-            <property name="java.arch" value="${java.arch}"/>
+            <property name="native.host.arch" value="${native.host.arch}"/>
         </ant>
         <copy todir="${dist}" failonerror="false">
-            <fileset dir="${waters.dir}/cpp/lib/${java.arch}.debug"
-            	     includes="*"/>
+            <fileset dir="${waters.dir}/cpp/lib/${native.host.arch}.debug"
+                     includes="*"/>
         </copy>
     </target>
 
-    <target name="ccpp_waters" depends="-detect_arch">
-        <ant dir="${waters.dir}" target="cpp" inheritAll="false">
-            <property name="java.arch" value="${java.os}.x86"/>
-            <property name="make.release" value="1"/>
-        </ant>
-        <copy todir="${platform}/${java.os}.x86" failonerror="false">
-            <fileset dir="${waters.dir}/cpp/lib/${java.os}.x86"
-                     includes="*"/>
-        </copy>
-        <ant dir="${waters.dir}" target="cpp" inheritAll="false">
-            <property name="java.arch" value="${java.os}.amd64"/>
-            <property name="make.release" value="1"/>
-        </ant>
-        <copy todir="${platform}/${java.os}.amd64" failonerror="false">
-            <fileset dir="${waters.dir}/cpp/lib/${java.os}.amd64"
-                     includes="*"/>
-        </copy>
+    <target name="ccpp_waters" depends="-detect_arch"
+            description="Builds Waters dynamic libraries for multiple platforms.">
+      <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+        <property name="native.host.arch" value="${native.host.arch}"/>
+        <property name="native.target.arch" value="win32.x86"/>
+        <property name="make.release" value="1"/>
+      </ant>
+      <copy todir="${platform}/win32.x86/lib" failonerror="false">
+        <fileset dir="${waters.dir}/cpp/lib/win32.x86" includes="*"/>
+      </copy>
+      <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+        <property name="native.host.arch" value="${native.host.arch}"/>
+        <property name="native.target.arch" value="win32.amd64"/>
+        <property name="make.release" value="1"/>
+      </ant>
+      <copy todir="${platform}/win32.amd64/lib" failonerror="false">
+        <fileset dir="${waters.dir}/cpp/lib/win32.amd64" includes="*"/>
+      </copy>
+      <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+        <property name="native.host.arch" value="${native.host.arch}"/>
+        <property name="native.target.arch" value="linux.x86"/>
+        <property name="make.release" value="1"/>
+      </ant>
+      <copy todir="${platform}/linux.x86/lib" failonerror="false">
+        <fileset dir="${waters.dir}/cpp/lib/linux.x86" includes="*"/>
+      </copy>
+      <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+        <property name="native.host.arch" value="${native.host.arch}"/>
+        <property name="native.target.arch" value="linux.amd64"/>
+        <property name="make.release" value="1"/>
+      </ant>
+      <copy todir="${platform}/linux.amd64/lib" failonerror="false">
+        <fileset dir="${waters.dir}/cpp/lib/linux.amd64" includes="*"/>
+      </copy>
     </target>
 
     <target name="-jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
