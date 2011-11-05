@@ -109,22 +109,10 @@ public class CompositionalSynthesizerExperiments
   //# Configuration
   void setPreselectingHeuristic(final String name)
   {
-    // TODO Do this like setSelectingHeuristic()
-    /*
-    if (mPreselecting.equals("mint")) {
-      mSynthesizer.setPreselectingHeuristic(mSynthesizer
-        .createHeuristicMinT());
-    } else if (mPreselecting.equals("maxs")) {
-      mSynthesizer.setPreselectingHeuristic(mSynthesizer
-        .createHeuristicMaxS());
-    } else if (mPreselecting.equals("mustl")) {
-      mSynthesizer.setPreselectingHeuristic(mSynthesizer
-        .createHeuristicMustL());
-    } else {
-      System.err
-        .println("Error: Preselecting Heuristic not specified correctly, it must be one of: mint, maxs, mustl");
-    }
-    */
+    final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory factory =
+      mSynthesizer.getPreselectingMethodFactory();
+    mPreselecting = factory.getEnumValue(name);
+
   }
 
   /**
@@ -160,12 +148,110 @@ public class CompositionalSynthesizerExperiments
     } finally {
       final CompositionalSynthesisResult stats =
         (CompositionalSynthesisResult) mSynthesizer.getAnalysisResult();
+      stats.printCSVHorizontalHeadings(mPrintWriter);
       mPrintWriter.print(name);
       mPrintWriter.print(',');
       stats.printCSVHorizontal(mPrintWriter);
       mPrintWriter.println();
     }
   }
+
+  //#########################################################################
+  //# Main Method
+  public static void main(final String[] args)
+  {
+    if (args.length == 3) {
+      try {
+        final String filename = args[0];
+        final String outputprop = System.getProperty("waters.test.outputdir");
+        final String preselectingHeuristic = args[1];
+        final String selectingHeuristic = args[2];
+        final CompositionalSynthesizerExperiments
+          experiment =
+            new CompositionalSynthesizerExperiments
+              (outputprop + filename);
+        experiment.setPreselectingHeuristic(preselectingHeuristic);
+        experiment.setSelectingHeuristic(selectingHeuristic);
+        experiment.setUp();
+        experiment.runAllTests();
+        experiment.tearDown();
+      } catch (final Throwable exception) {
+        System.err.println("FATAL ERROR");
+        exception.printStackTrace(System.err);
+      }
+    } else {
+      System.err
+      .println("Usage: CompositionalGeneralisedSynthesizerCheckerExperiments "
+      + "outputFilename preselectingHeuristic selectingHeuristic " +
+      "listOfRulesSelection");
+    }
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  void runAllTests() throws Exception
+  {
+    synthesiseCentralLockingDritueren();
+    synthesiseCentralLockingKoordwsp();
+    synthesiseCentralLockingKoordwspBlock();
+    synthesiseCentralLockingVerriegel3();
+    synthesiseCentralLockingVerriegel3b();
+    synthesiseFischertechnik();
+    synthesisAssemblyStation1();
+    synthesisLargetCoherent();
+    synthesisTransportUnit1();
+  }
+
+
+  //#########################################################################
+  //# Models
+  private void synthesiseCentralLockingDritueren() throws Exception
+  {
+    runModel("valid", "central_locking", "dreitueren.wmod");
+  }
+
+  private void synthesiseCentralLockingKoordwsp() throws Exception
+  {
+    runModel("valid", "central_locking", "koordwsp.wmod");
+  }
+
+  private void synthesiseCentralLockingKoordwspBlock() throws Exception
+  {
+    runModel("valid", "central_locking", "koordwsp_block.wmod");
+  }
+
+  private void synthesiseCentralLockingVerriegel3() throws Exception
+  {
+    runModel("valid", "central_locking", "verriegel3.wmod");
+  }
+
+  private void synthesiseCentralLockingVerriegel3b() throws Exception
+  {
+    runModel("valid", "central_locking", "verriegel3b.wmod");
+  }
+
+  private void synthesiseFischertechnik() throws Exception
+  {
+    runModel("valid", "fischertechnik", "fischertechnik.wmod");
+  }
+
+  private void synthesisAssemblyStation1() throws Exception
+  {
+    runModel("valid", "AIP", "assembly_station1.wmod");
+  }
+
+  private void synthesisLargetCoherent() throws Exception
+  {
+    runModel("valid", "AIP", "larget_coherent.wmod");
+  }
+
+  private void synthesisTransportUnit1() throws Exception
+  {
+    runModel("valid", "AIP", "transport_unit1.wmod");
+  }
+
+
 
 
   //#########################################################################
@@ -174,7 +260,7 @@ public class CompositionalSynthesizerExperiments
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
 
-  private final AbstractCompositionalModelAnalyzer.PreselectingMethod
+  private AbstractCompositionalModelAnalyzer.PreselectingMethod
     mPreselecting;
   private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
 }
