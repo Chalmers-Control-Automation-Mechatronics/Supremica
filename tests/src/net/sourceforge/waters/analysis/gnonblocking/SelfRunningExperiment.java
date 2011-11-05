@@ -9,38 +9,37 @@ package net.sourceforge.waters.analysis.gnonblocking;
 public class SelfRunningExperiment
 {
 
-  public SelfRunningExperiment(final String property, final String filename,
-                               final int rules) throws Exception
+  public SelfRunningExperiment(final String property,
+                               final String filename,
+                               final int rules)
+    throws Exception
   {
-    final String outputprop = System.getProperty("waters.test.outputdir");
-
     for (int preselecting = 0; preselecting < 3; preselecting++) {
       final String preselectingHeuristic =
-          getPreselectingHeuristic(preselecting);
+        getPreselectingHeuristic(preselecting);
       for (int selecting = 0; selecting < 6; selecting++) {
         final String selectingHeuristic = getSelectingHeuristic(selecting);
         final String entirefilename =
-            filename + " " + preselecting + " " + selecting + ".csv";
+          filename + '_' + preselecting + '_' + selecting + ".csv";
         if (property.equals("standardnonblocking")) {
           final CompositionalStandardConflictCheckerExperiments experiment =
-              new CompositionalStandardConflictCheckerExperiments(outputprop
-                  + entirefilename, preselectingHeuristic, selectingHeuristic,
-                  rules);
+            new CompositionalStandardConflictCheckerExperiments
+              (entirefilename, preselectingHeuristic,
+               selectingHeuristic, rules);
           experiment.setUp();
           experiment.runAllTests();
           experiment.tearDown();
         } else if (property.equals("generalisednonblocking")) {
           final CompositionalGeneralisedConflictCheckerExperiments experiment =
-              new CompositionalGeneralisedConflictCheckerExperiments(outputprop
-                  + filename, preselectingHeuristic, selectingHeuristic, rules);
+            new CompositionalGeneralisedConflictCheckerExperiments
+              (entirefilename, preselectingHeuristic,
+               selectingHeuristic, rules);
           experiment.setUp();
           experiment.runAllTests();
           experiment.tearDown();
         }
-
       }
     }
-
   }
 
   private static String getSelectingHeuristic(final int selecting)

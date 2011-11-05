@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -48,6 +49,8 @@ public class CompositionalSynthesizerExperiments
     mPrintWriter = null;
     mPreselecting = preselectingHeuristic;
     mSelecting = selectingHeuristic;
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    mSynthesizer = new CompositionalSynthesizer(factory);
   }
 
 
@@ -57,8 +60,6 @@ public class CompositionalSynthesizerExperiments
   protected void setUp() throws Exception
   {
     super.setUp();
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mSynthesizer = new CompositionalSynthesizer(factory);
     mPrintWriter = new PrintWriter(mOut, true);
     final int internalStateLimit = 5000;
     mSynthesizer.setInternalStateLimit(internalStateLimit);
@@ -142,9 +143,8 @@ public class CompositionalSynthesizerExperiments
     mSynthesizer.setModel(des);
     try {
       mSynthesizer.run();
-    } catch (final Exception e) {
-      System.out.print(e.getMessage());
-      mPrintWriter.println(name + "," + e.getMessage());
+    } catch (final AnalysisException exception) {
+      mPrintWriter.println(name + "," + exception.getMessage());
     } finally {
       final CompositionalSynthesisResult stats =
         (CompositionalSynthesisResult) mSynthesizer.getAnalysisResult();

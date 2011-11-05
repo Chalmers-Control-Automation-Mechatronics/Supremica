@@ -58,10 +58,8 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   protected void setUp() throws Exception
   {
     super.setUp();
-    mProductDESProxyFactory = ProductDESElementFactory.getInstance();
     mProductDESMarshaller =
       new JAXBProductDESMarshaller(mProductDESProxyFactory);
-    mModuleProxyFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller =
       new JAXBModuleMarshaller(mModuleProxyFactory, optable, false);
@@ -329,8 +327,11 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   //#########################################################################
   //# Data Members
-  private ProductDESProxyFactory mProductDESProxyFactory;
-  private ModuleProxyFactory mModuleProxyFactory;
+  private final ProductDESProxyFactory mProductDESProxyFactory =
+    ProductDESElementFactory.getInstance();
+  private final ModuleProxyFactory mModuleProxyFactory =
+    ModuleElementFactory.getInstance();
+
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
