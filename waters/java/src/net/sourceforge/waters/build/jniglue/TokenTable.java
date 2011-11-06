@@ -51,9 +51,9 @@ class TokenTable {
   static final Token T_STATIC = new Token(C_STATIC, "static");
 
   static final Token T_REF =
-    new ClassModifierToken(C_REF, "ref", ClassModifier.M_REF); 
+    new ClassModifierToken(C_REF, "ref", ClassModifier.M_REF);
   static final Token T_ARG =
-    new ClassModifierToken(C_ARG, "arg", ClassModifier.M_ARG); 
+    new ClassModifierToken(C_ARG, "arg", ClassModifier.M_ARG);
   static final Token T_GLUE =
     new ClassModifierToken(C_GLUE, "glue", ClassModifier.M_GLUE);
 
@@ -67,6 +67,8 @@ class TokenTable {
     new SimpleTypeToken(SimpleTypeGlue.TYPE_DOUBLE);
   static final Token T_TYPE_INT =
     new SimpleTypeToken(SimpleTypeGlue.TYPE_INT);
+  static final Token T_TYPE_LONG =
+    new SimpleTypeToken(SimpleTypeGlue.TYPE_LONG);
   static final Token T_TYPE_STRING =
     new SimpleTypeToken(SimpleTypeGlue.TYPE_STRING);
 
@@ -106,6 +108,7 @@ class TokenTable {
     recordToken(T_TYPE_CHAR);
     recordToken(T_TYPE_DOUBLE);
     recordToken(T_TYPE_INT);
+    recordToken(T_TYPE_LONG);
     recordToken(T_TYPE_STRING);
   }
 

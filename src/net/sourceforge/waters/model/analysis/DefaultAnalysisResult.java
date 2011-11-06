@@ -41,6 +41,7 @@ public class DefaultAnalysisResult
     mTotalNumberOfTransitions = -1.0;
     mPeakNumberOfTransitions = -1.0;
     mPeakNumberOfNodes = -1;
+    mPeakMemoryUsage = getCurrentMemoryUsage();
   }
 
 
@@ -64,6 +65,11 @@ public class DefaultAnalysisResult
   public long getRunTime()
   {
     return mRunTime;
+  }
+
+  public long getPeakMemoryUsage()
+  {
+    return mPeakMemoryUsage;
   }
 
   public int getTotalNumberOfAutomata()
@@ -112,6 +118,13 @@ public class DefaultAnalysisResult
   public void setRuntime(final long time)
   {
     mRunTime = time;
+  }
+
+  public void updatePeakMemoryUsage(final long usage)
+  {
+    if (usage > mPeakMemoryUsage) {
+      mPeakMemoryUsage = usage;
+    }
   }
 
   public void setNumberOfStates(final double numstates)
@@ -198,11 +211,25 @@ public class DefaultAnalysisResult
         Math.max(mPeakNumberOfTransitions, other.getPeakNumberOfTransitions());
       mPeakNumberOfNodes =
         Math.max(mPeakNumberOfNodes, other.getPeakNumberOfNodes());
+      mPeakMemoryUsage =
+        Math.max(mPeakMemoryUsage, other.getPeakMemoryUsage());
     } else {
       throw new ClassCastException
         ("Attempting to merge " + ProxyTools.getShortClassName(this) +
          " with " + ProxyTools.getShortClassName(other) + "!");
     }
+  }
+
+  /**
+   * Updates the recorded memory usage.
+   * This method checks whether the amount of memory currently in use by
+   * the Java virtual machine exceeds the currently recorded memory usage,
+   * and if so, updates the recorded usage.
+   */
+  public void updatePeakMemoryUsage()
+  {
+    final long usage = getCurrentMemoryUsage();
+    updatePeakMemoryUsage(usage);
   }
 
 
@@ -241,6 +268,7 @@ public class DefaultAnalysisResult
       final float seconds = 0.001f * mRunTime;
       formatter.format("Total runtime: %.3fs\n", seconds);
     }
+    writer.println("Memory usage: " + (mPeakMemoryUsage >> 10) + " kB");
     if (mTotalNumberOfAutomata >= 0) {
       writer.println("Total number of automata: " + mTotalNumberOfAutomata);
     }
@@ -275,6 +303,8 @@ public class DefaultAnalysisResult
     if (mRunTime >= 0) {
       writer.print(mRunTime);
     }
+    writer.print(',');
+    writer.print(mPeakMemoryUsage);
     writer.print(',');
     if (mTotalNumberOfAutomata >= 0) {
       writer.print(mTotalNumberOfAutomata);
@@ -311,6 +341,7 @@ public class DefaultAnalysisResult
     writer.print(",PeakStates");
     writer.print(",PeakTrans");
     writer.print(",PeakNodes");
+    writer.print(",Mem");
   }
 
 
@@ -349,6 +380,12 @@ public class DefaultAnalysisResult
     }
   }
 
+  public static long getCurrentMemoryUsage()
+  {
+    final Runtime runtime = Runtime.getRuntime();
+    return runtime.totalMemory() - runtime.freeMemory();
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -362,5 +399,6 @@ public class DefaultAnalysisResult
   private double mTotalNumberOfTransitions;
   private double mPeakNumberOfTransitions;
   private int mPeakNumberOfNodes;
+  private long mPeakMemoryUsage;
 
 }

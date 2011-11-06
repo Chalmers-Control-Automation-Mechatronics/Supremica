@@ -266,6 +266,8 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     if (mAnalysisResult != null) {
       final long current = System.currentTimeMillis();
       mAnalysisResult.setRuntime(current - mStartTime);
+      final long usage = DefaultAnalysisResult.getCurrentMemoryUsage();
+      mAnalysisResult.updatePeakMemoryUsage(usage);
     }
   }
 

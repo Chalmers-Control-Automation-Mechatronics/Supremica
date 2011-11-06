@@ -1370,6 +1370,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final double peakTrans =
       Math.max(result.getPeakNumberOfTransitions(), numTrans);
     result.setPeakNumberOfTransitions(peakTrans);
+    result.updatePeakMemoryUsage();
   }
 
   private void recordUnsuccessfulComposition()

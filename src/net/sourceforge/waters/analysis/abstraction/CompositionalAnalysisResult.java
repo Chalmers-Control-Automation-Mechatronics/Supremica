@@ -163,6 +163,10 @@ public class CompositionalAnalysisResult
     } else if (result != null) {
       mSynchronousProductStats.merge(result);
     }
+    if (result != null) {
+      final long usage = result.getPeakMemoryUsage();
+      updatePeakMemoryUsage(usage);
+    }
   }
 
   public void addMonolithicAnalysisResult(final AnalysisResult result)
@@ -172,6 +176,10 @@ public class CompositionalAnalysisResult
       mMonolithicStats = result;
     } else if (result != null) {
       mMonolithicStats.merge(result);
+    }
+    if (result != null) {
+      final long usage = result.getPeakMemoryUsage();
+      updatePeakMemoryUsage(usage);
     }
   }
 

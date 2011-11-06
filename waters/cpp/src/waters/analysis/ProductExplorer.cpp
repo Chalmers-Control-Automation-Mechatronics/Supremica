@@ -17,6 +17,13 @@
 #include <time.h>
 #include <stdlib.h>
 
+#ifdef __MINGW32__
+#  include <windows.h>
+#  include <psapi.h>
+#else
+#  include <sys/resource.h>
+#endif
+
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/JavaString.h"
 #include "jni/cache/PreJavaException.h"
@@ -242,6 +249,23 @@ addStatistics(const jni::VerificationResultGlue& vresult)
   vresult.setNumberOfStates(mNumStates);
   vresult.setNumberOfTransitions(mNumTransitions);
   vresult.setPeakNumberOfNodes(mNumStates);
+#ifdef __MINGW32__
+  /*
+  PROCESS_MEMORY_COUNTERS counters;
+  if (GetProcessMemoryInfo(GetCurrentProcess(), &counters,
+                           sizeof(PROCESS_MEMORY_COUNTERS))) {
+    jlong usage = counters.PeakWorkingSetSize;
+    vresult.updatePeakMemoryUsage(usage);
+  }
+  */
+#else
+  struct rusage rusage;
+  if (getrusage(RUSAGE_SELF, &rusage) == 0) {
+    jlong usage = rusage.ru_maxrss << 10;
+    vresult.updatePeakMemoryUsage(usage);
+  }
+#endif
+
   /*
   char buffer[40];
   double totaltime =
@@ -691,8 +715,7 @@ public:
 
   ~ProductExplorerFinalizer()
   {
-    mNativeModelVerifier.setNativeModelAnalyzer(0);
-    delete mProductExplorer;
+    finalize();
   }
 
   //##########################################################################
@@ -729,6 +752,17 @@ public:
     return mProductExplorer;
   }
 
+  //##########################################################################
+  //# Finalisation
+  void finalize()
+  {
+    if (mProductExplorer != 0) {
+      mNativeModelVerifier.setNativeModelAnalyzer(0);
+      delete mProductExplorer;
+      mProductExplorer = 0;
+    }
+  }
+
 private:
   //##########################################################################
   //# Data Members
@@ -749,12 +783,12 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
   (JNIEnv* env, jobject jchecker)
 {
   jni::ClassCache cache(env);
+  jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
+  waters::ProductExplorerFinalizer finalizer(gchecker);
   try {
-    jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
     jni::KindTranslatorGlue translator =
       gchecker.getKindTranslatorGlue(&cache);
     jni::EventGlue nomarking(0, &cache);
-    waters::ProductExplorerFinalizer finalizer(gchecker);
     waters::ProductExplorer* checker =
       finalizer.createProductExplorer(translator, nomarking, nomarking, cache);
     bool initUncont = gchecker.isInitialUncontrollable();
@@ -773,14 +807,22 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       return vresult.returnJavaObject();
     }
   } catch (const std::bad_alloc& error) {
+    finalizer.finalize();
     jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);
     cache.throwJavaException(glue);
     return 0;
   } catch (const jni::PreJavaException& pre) {
+    finalizer.finalize();
     pre.throwJavaException(cache);
     return 0;
   } catch (const jni::ExceptionGlue& glue) {
+    finalizer.finalize();
     cache.throwJavaException(glue);
+    return 0;
+  } catch (const jthrowable& throwable) {
+    env->ExceptionClear();
+    finalizer.finalize();
+    env->Throw(throwable);
     return 0;
   }
 }
@@ -791,13 +833,13 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
   (JNIEnv* env, jobject jchecker)
 {
   jni::ClassCache cache(env);
+  jni::NativeConflictCheckerGlue gchecker(jchecker, &cache);
+  waters::ProductExplorerFinalizer finalizer(gchecker);
   try {
-    jni::NativeConflictCheckerGlue gchecker(jchecker, &cache);
     jni::KindTranslatorGlue translator =
       gchecker.getKindTranslatorGlue(&cache);
     jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
     jni::EventGlue premarking = gchecker.getPreconditionMarkingGlue(&cache);
-    waters::ProductExplorerFinalizer finalizer(gchecker);
     waters::ProductExplorer* checker =
       finalizer.createProductExplorer(translator, premarking, marking, cache);
     bool result = checker->runNonblockingCheck();
@@ -815,14 +857,22 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       return vresult.returnJavaObject();
     }
   } catch (const std::bad_alloc& error) {
+    finalizer.finalize();
     jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);
     cache.throwJavaException(glue);
     return 0;
   } catch (const jni::PreJavaException& pre) {
+    finalizer.finalize();
     pre.throwJavaException(cache);
     return 0;
   } catch (const jni::ExceptionGlue& glue) {
+    finalizer.finalize();
     cache.throwJavaException(glue);
+    return 0;
+  } catch (const jthrowable& throwable) {
+    env->ExceptionClear();
+    finalizer.finalize();
+    env->Throw(throwable);
     return 0;
   }
 }

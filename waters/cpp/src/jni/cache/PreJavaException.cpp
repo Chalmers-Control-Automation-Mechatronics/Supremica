@@ -11,6 +11,7 @@
 #pragma implementation
 #endif
 
+#include <iostream>
 #include <string.h>
 
 #include "jni/cache/ClassCache.h"
@@ -26,6 +27,13 @@ namespace jni {
 
 //###########################################################################
 //# PreJavaException: Constructors, Destructors & Co.
+
+PreJavaException::
+PreJavaException()
+  : mClassCode(UINT32_MAX)
+{
+  initMessage(0,true);
+}
 
 PreJavaException::
 PreJavaException(uint32_t classcode)
@@ -79,7 +87,16 @@ jint PreJavaException::
 throwJavaException(ClassCache& cache)
   const
 {
-  return cache.throwJavaException(mClassCode, mMessage);
+  if (mClassCode < UINT32_MAX) {
+    std::cerr << "howdy1" << std::endl;
+    return cache.throwJavaException(mClassCode, mMessage);
+  } else {
+    std::cerr << "howdy2" << std::endl;
+    JNIEnv* env = cache.getEnvironment();
+    jthrowable exception = env->ExceptionOccurred();
+    std::cerr << exception << std::endl;
+    return 0;
+  }
 }
 
 
