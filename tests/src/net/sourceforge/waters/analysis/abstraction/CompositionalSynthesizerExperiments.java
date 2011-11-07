@@ -67,15 +67,12 @@ public class CompositionalSynthesizerExperiments
     mSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
     final int finalStateLimit = 2000000;
     mSynthesizer.setMonolithicStateLimit(finalStateLimit);
-    final int finalTransitionLimit = 0;
-    mSynthesizer.setMonolithicTransitionLimit(finalTransitionLimit);
     mSynthesizer.setPreselectingMethod(mPreselecting);
     mSynthesizer.setSelectingMethod(mSelecting);
     mPrintWriter.println("InternalStateLimit," + internalStateLimit +
                          ",InternalTransitionLimit," +
                          internalTransitionLimit +
-                         ",FinalStateLimit," + finalStateLimit +
-                         ",FinalTransitionLimit," + finalTransitionLimit);
+                         ",FinalStateLimit," + finalStateLimit);
     mPrintWriter.println("PreselHeuristic," + mPreselecting +
                          ",SelecHeuristic," + mSelecting);
 
@@ -153,6 +150,7 @@ public class CompositionalSynthesizerExperiments
       mPrintWriter.print(',');
       stats.printCSVHorizontal(mPrintWriter);
       mPrintWriter.println();
+      // TODO Format everything properly.
     }
   }
 

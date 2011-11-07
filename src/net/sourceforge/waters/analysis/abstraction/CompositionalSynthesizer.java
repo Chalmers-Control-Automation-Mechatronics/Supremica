@@ -38,6 +38,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.ProductDESBuilder;
 import net.sourceforge.waters.model.analysis.ProductDESResult;
+import net.sourceforge.waters.model.analysis.SupervisorTooBigException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -330,6 +331,94 @@ public class CompositionalSynthesizer
     final MonolithicSynchronousProductBuilder builder =
       getCurrentSynchronousProductBuilder();
     builder.setPruningDeadlocks(true);
+  }
+
+  @Override
+  protected AutomatonProxy plantify(final AutomatonProxy spec)
+    throws OverflowException
+  {
+    final KindTranslator translator = getKindTranslator();
+    final Collection<EventProxy> events = spec.getEvents();
+    final int numEvents = events.size();
+    final Collection<EventProxy> uncontrollables =
+      new ArrayList<EventProxy>(numEvents);
+    for (final EventProxy event : events) {
+      if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
+        uncontrollables.add(event);
+      }
+    }
+    final EventEncoding eventEnc =
+      new EventEncoding(uncontrollables, translator);
+    final StateEncoding stateEnc = new StateEncoding(spec);
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(spec, eventEnc, stateEnc,
+                                       ListBufferTransitionRelation.
+                                       CONFIG_SUCCESSORS);
+    final int numStates = rel.getNumberOfStates();
+    final Collection<StateProxy> states =
+      new ArrayList<StateProxy>(numStates + 1);
+    states.addAll(spec.getStates());
+    StateProxy dump = null;
+    final Collection<TransitionProxy> transitions =
+      new ArrayList<TransitionProxy>(spec.getTransitions());
+    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+    final ProductDESProxyFactory factory = getFactory();
+    for (int s = 0; s < numStates; s++) {
+      final StateProxy state = stateEnc.getState(s);
+      for (final EventProxy event : uncontrollables) {
+        final int e = eventEnc.getEventCode(event);
+        iter.reset(s, e);
+        if (!iter.advance()) {
+          if (dump == null) {
+            dump = factory.createStateProxy(":dump");
+            states.add(dump);
+          }
+          final TransitionProxy trans =
+            factory.createTransitionProxy(state, event, dump);
+          transitions.add(trans);
+        }
+      }
+    }
+
+    final String name = spec.getName();
+    if (dump != null & !events.contains(mUsedDefaultMarking)) {
+      final Collection<TransitionProxy> newTransitions =
+        new ArrayList<TransitionProxy>();
+      final Collection<EventProxy> newEvents =
+        new ArrayList<EventProxy>(numEvents + 1);
+      newEvents.addAll(events);
+      newEvents.add(mUsedDefaultMarking);
+      final Collection <StateProxy> newStates =
+        new ArrayList<StateProxy>(numStates + 1);
+      final HashMap<StateProxy,StateProxy> mapStates =
+        new HashMap<StateProxy,StateProxy>(numStates + 1);
+      for (final StateProxy state : spec.getStates()) {
+        final Collection<EventProxy> propositions = state.getPropositions();
+        final Collection<EventProxy> newPropostions =
+          new ArrayList<EventProxy>(propositions.size() + 1);
+        newPropostions.addAll(propositions);
+        newPropostions.add(mUsedDefaultMarking);
+        final StateProxy newState = factory.createStateProxy
+          (state.getName(), state.isInitial(), newPropostions);
+        newStates.add(newState);
+        mapStates.put(state, newState);
+      }
+      newStates.add(dump);
+      mapStates.put(dump, dump);
+      for (final TransitionProxy trans : transitions) {
+        final StateProxy sourceState = trans.getSource();
+        final StateProxy targetState = trans.getTarget();
+        final EventProxy event = trans.getEvent();
+        final TransitionProxy newTransition = factory.createTransitionProxy
+          (mapStates.get(sourceState), event, mapStates.get(targetState));
+        newTransitions.add(newTransition);
+      }
+      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
+                                          newEvents, newStates, newTransitions);
+    } else {
+      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
+                                          events, states, transitions);
+    }
   }
 
   @Override
@@ -939,14 +1028,18 @@ public class CompositionalSynthesizer
       final ProductDESProxy model = createProductDESProxy (automata);
       final MonolithicSynchronousProductBuilder builder =
         getCurrentSynchronousProductBuilder();
+      builder.setNodeLimit(getMonolithicStateLimit());
+      builder.setTransitionLimit(getMonolithicTransitionLimit());
+      builder.setModel(model);
+      for (final DistinguisherInfo info:renamings) {
+        final EventProxy original = info.getOriginalEvent();
+        final List<EventProxy> replacement = info.getReplacement();
+        builder.addMask(replacement, original);
+      }
       try {
-        builder.setModel(model);
-        for(final DistinguisherInfo info:renamings) {
-          final EventProxy original = info.getOriginalEvent();
-          final List<EventProxy> replacement = info.getReplacement();
-          builder.addMask(replacement, original);
-        }
         builder.run();
+      } catch (final OverflowException exception) {
+        throw new SupervisorTooBigException(exception);
       } finally {
         builder.clearMask();
       }

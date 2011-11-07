@@ -15,23 +15,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicLanguageInclusionChecker;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -390,6 +383,15 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, false);
   }
 
+  public void testKoordWspSynth() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "koordwsp_synth";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runSynthesizer(final String group,
@@ -562,8 +564,7 @@ public abstract class AbstractSynthesizerTest
       throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
-    final ProductDESProxy plantified = plantify(des);
-    configureSynthesizer(plantified);
+    configureSynthesizer(des);
     mSynthesizer.run();
     final ProductDESResult result = mSynthesizer.getAnalysisResult();
     checkResult(des, result, expect);
@@ -664,140 +665,6 @@ public abstract class AbstractSynthesizerTest
     if (prop != null) {
       final int limit = Integer.parseInt(prop);
       mSynthesizer.setNodeLimit(limit);
-    }
-  }
-
-
-  //#########################################################################
-  //# Plantification
-  /**
-   * Returns a plantified version of the given product DES.
-   * Plantification means that all specification automata are replaced
-   * by plants with uncontrollable transitions to a dump state added to
-   * all states where the uncontrollable event in question is not defined.
-   * This method implements simple plantification.
-   * All uncontrollable events are considered.
-   * @throws EventNotFoundException
-   */
-  private ProductDESProxy plantify(final ProductDESProxy des)
-    throws OverflowException, EventNotFoundException
-  {
-    final EventProxy markingProposition =
-      AbstractConflictChecker.getMarkingProposition(des);
-    final Collection<AutomatonProxy> automata = des.getAutomata();
-    final int numAutomata = automata.size();
-    final Collection<AutomatonProxy> plantified =
-      new ArrayList<AutomatonProxy>(numAutomata);
-    for (final AutomatonProxy aut : automata) {
-      switch (aut.getKind()) {
-      case PLANT:
-        plantified.add(aut);
-        break;
-      case SPEC:
-        final AutomatonProxy plant = plantify(aut, markingProposition);
-        plantified.add(plant);
-        break;
-      default:
-        break;
-      }
-    }
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final String name = des.getName();
-    final String comment = "Plantified version of " + name;
-    final Collection<EventProxy> events = des.getEvents();
-    return factory.createProductDESProxy(name, comment, null,
-                                         events, plantified);
-  }
-
-  private AutomatonProxy plantify(final AutomatonProxy spec,
-                                  final EventProxy markingProposition)
-    throws OverflowException
-  {
-    final Collection<EventProxy> events = spec.getEvents();
-    final int numEvents = events.size();
-    final Collection<EventProxy> uncontrollables =
-      new ArrayList<EventProxy>(numEvents);
-    for (final EventProxy event : events) {
-      if (event.getKind() == EventKind.UNCONTROLLABLE) {
-        uncontrollables.add(event);
-      }
-    }
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventEncoding eventEnc =
-      new EventEncoding(uncontrollables, translator);
-    final StateEncoding stateEnc = new StateEncoding(spec);
-    final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(spec, eventEnc, stateEnc,
-                                       ListBufferTransitionRelation.
-                                       CONFIG_SUCCESSORS);
-    final int numStates = rel.getNumberOfStates();
-    final Collection<StateProxy> states = new ArrayList<StateProxy>(numStates + 1);
-    states.addAll(spec.getStates());
-    StateProxy dump = null;
-    final Collection<TransitionProxy> transitions =
-      new ArrayList<TransitionProxy>(spec.getTransitions());
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    for (int s = 0; s < numStates; s++) {
-      final StateProxy state = stateEnc.getState(s);
-      for (final EventProxy event : uncontrollables) {
-        final int e = eventEnc.getEventCode(event);
-        iter.reset(s, e);
-        if (!iter.advance()) {
-          if (dump == null) {
-            dump = factory.createStateProxy(":dump");
-            states.add(dump);
-          }
-          final TransitionProxy trans =
-            factory.createTransitionProxy(state, event, dump);
-          transitions.add(trans);
-        }
-      }
-    }
-
-    final String name = spec.getName();
-    if (dump != null & !events.contains(markingProposition)) {
-      final Collection<TransitionProxy> newTransitions =
-        new ArrayList<TransitionProxy>();
-      final Collection<EventProxy> newEvents = new ArrayList<EventProxy>
-        (events.size()+1);
-      final Collection <StateProxy> newStates = new ArrayList<StateProxy>
-        (numStates + 1);
-      final HashMap <StateProxy, StateProxy> mapStates = new HashMap
-        <StateProxy, StateProxy>();
-      newEvents.addAll(events);
-      newEvents.add(markingProposition);
-      for (final TransitionProxy trans : transitions) {
-        final StateProxy sourceState = trans.getSource();
-        final StateProxy targetState = trans.getTarget();
-        final EventProxy event = trans.getEvent();
-        final List<StateProxy> transitionState = new ArrayList<StateProxy>(2);
-        transitionState.add(sourceState);
-        transitionState.add(targetState);
-        for (final StateProxy state : transitionState) {
-          if (!mapStates.containsKey(state)) {
-            final Collection<EventProxy> propositions = state.getPropositions();
-            final Collection<EventProxy> newPropostions =
-              new ArrayList<EventProxy>(propositions.size() + 1);
-            newPropostions.addAll(propositions);
-            if (state != dump) {
-              newPropostions.add(markingProposition);
-            }
-            final StateProxy newState = factory.createStateProxy
-              (state.getName(), state.isInitial(), newPropostions);
-            newStates.add(newState);
-            mapStates.put(state, newState);
-          }
-        }
-        final TransitionProxy newTransition = factory.createTransitionProxy
-          (mapStates.get(sourceState), event, mapStates.get(targetState));
-        newTransitions.add(newTransition);
-      }
-      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                          newEvents, newStates, newTransitions);
-    } else {
-      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                          events, states, transitions);
     }
   }
 

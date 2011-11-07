@@ -335,13 +335,13 @@ public class DefaultAnalysisResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     writer.print("Result,RunTime");
+    writer.print(",PeakMem");
     writer.print(",TotAut");
     writer.print(",TotStates");
     writer.print(",TotTrans");
     writer.print(",PeakStates");
     writer.print(",PeakTrans");
     writer.print(",PeakNodes");
-    writer.print(",Mem");
   }
 
 

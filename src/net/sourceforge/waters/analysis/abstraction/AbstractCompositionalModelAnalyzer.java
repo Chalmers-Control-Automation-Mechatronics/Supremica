@@ -505,6 +505,22 @@ public abstract class AbstractCompositionalModelAnalyzer
   //#########################################################################
   //# Hooks
   /**
+   * Converts the given specification to a plant.
+   * This method is called initially on every specification automaton in the
+   * input model to give compositional synthesis the opportunity to convert
+   * specifications to plants.
+   * @param  spec     Specification to be converted.
+   * @return Plantified version of specification. The default implementation
+   *         simply returns <CODE>null</CODE> to indicate that specs are
+   *         not included in the check.
+   */
+  protected AutomatonProxy plantify(final AutomatonProxy spec)
+    throws OverflowException
+  {
+    return null;
+  }
+
+  /**
    * Performs compositional minimisation of the model.
    * This method should be called as part of the {@link #run()} method of
    * subclasses extending this class. It performs compositional minimisation
@@ -775,11 +791,21 @@ public abstract class AbstractCompositionalModelAnalyzer
     final int numEvents = model.getEvents().size();
     mEventInfoMap = new HashMap<EventProxy,EventInfo>(numEvents);
     mDirtyAutomata = new LinkedList<AutomatonProxy>();
-    for (final AutomatonProxy aut : automata) {
-      if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
+    for (AutomatonProxy aut : automata) {
+      switch (translator.getComponentKind(aut)) {
+      case SPEC:
+        aut = plantify(aut);
+        if (aut == null) {
+          break;
+        }
+        // fall through ...
+      case PLANT:
         mCurrentAutomata.add(aut);
         addEventsToAutomata(aut);
         mDirtyAutomata.add(aut);
+        break;
+      default:
+        break;
       }
     }
     final CompositionalAnalysisResult result = getAnalysisResult();
@@ -1316,6 +1342,8 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     mCurrentSynchronousProductBuilder.setConstructsResult(true);
     mCurrentSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
+    mCurrentSynchronousProductBuilder.setTransitionLimit
+      (mInternalTransitionLimit);
     mCurrentSynchronousProductBuilder.setStateCallback(null);
     mCurrentSynchronousProductBuilder.setPropositions(null);
     try {
