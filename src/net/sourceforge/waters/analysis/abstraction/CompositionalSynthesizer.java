@@ -573,22 +573,24 @@ public class CompositionalSynthesizer
       automaton = syncBuilder.getComputedAutomaton();
       break;
     }
-
-    final EventEncoding coding = createSynthesisEventEncoding(automaton);
-    final ListBufferTransitionRelation supervisor =
-      synthesise(automaton, coding);
-    if (supervisor != null) {
-      final CompositionalSynthesisResult result = getAnalysisResult();
-      if (supervisor.getNumberOfReachableStates() == 0) {
-        result.setSatisfied(false);
-        return false;
-      } else {
-        final AutomatonProxy renamedSup =
-          createRenamedSupervisor(supervisor, coding);
-        result.addSupervisor(renamedSup);
-        return true;
+    if(automaton != null){
+      final EventEncoding coding = createSynthesisEventEncoding(automaton);
+      final ListBufferTransitionRelation supervisor =
+        synthesise(automaton, coding);
+      if (supervisor != null) {
+        final CompositionalSynthesisResult result = getAnalysisResult();
+        if (supervisor.getNumberOfReachableStates() == 0) {
+          result.setSatisfied(false);
+          return false;
+        } else {
+          final AutomatonProxy renamedSup =
+            createRenamedSupervisor(supervisor, coding);
+          result.addSupervisor(renamedSup);
+          return true;
+        }
       }
-    } else {
+      return true;
+    }else {
       return true;
     }
   }

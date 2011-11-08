@@ -371,9 +371,9 @@ public class AutomataSynthesizer
           synthesizer.setMarkingProposition(marking);
           synthesizer.setInternalStateLimit(10000);
           synthesizer.setPreselectingMethod
-            (AbstractCompositionalModelAnalyzer.MustL);
+            (AbstractCompositionalModelAnalyzer.MaxS);
           synthesizer.setSelectingMethod
-            (AbstractCompositionalModelAnalyzer.MinS);
+            (AbstractCompositionalModelAnalyzer.MinSync);
 
           synthesizer.run();
           final ProductDESResult watersResult =
