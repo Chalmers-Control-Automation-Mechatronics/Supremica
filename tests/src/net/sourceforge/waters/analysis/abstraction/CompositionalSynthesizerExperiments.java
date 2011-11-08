@@ -126,7 +126,8 @@ public class CompositionalSynthesizerExperiments
 
   //#########################################################################
   //# Invocation
-  void runModel(final String group, final String subdir, final String name)
+  void runModel(final String group, final String subdir, final String name,
+                final boolean hasBeenPrinted)
   throws Exception
   {
     System.out.println("Running " + name + " ...");
@@ -145,7 +146,8 @@ public class CompositionalSynthesizerExperiments
     } finally {
       final CompositionalSynthesisResult stats =
         (CompositionalSynthesisResult) mSynthesizer.getAnalysisResult();
-      stats.printCSVHorizontalHeadings(mPrintWriter);
+      if(! hasBeenPrinted) {
+      stats.printCSVHorizontalHeadings(mPrintWriter);}
       mPrintWriter.print(name);
       mPrintWriter.print(',');
       stats.printCSVHorizontal(mPrintWriter);
@@ -206,47 +208,47 @@ public class CompositionalSynthesizerExperiments
   //# Models
   private void synthesiseCentralLockingDritueren() throws Exception
   {
-    runModel("valid", "central_locking", "dreitueren.wmod");
+    runModel("valid", "central_locking", "dreitueren.wmod", false);
   }
 
   private void synthesiseCentralLockingKoordwsp() throws Exception
   {
-    runModel("valid", "central_locking", "koordwsp.wmod");
+    runModel("valid", "central_locking", "koordwsp.wmod", true);
   }
 
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
-    runModel("valid", "central_locking", "koordwsp_block.wmod");
+    runModel("valid", "central_locking", "koordwsp_block.wmod", true);
   }
 
   private void synthesiseCentralLockingVerriegel3() throws Exception
   {
-    runModel("valid", "central_locking", "verriegel3.wmod");
+    runModel("valid", "central_locking", "verriegel3.wmod", true);
   }
 
   private void synthesiseCentralLockingVerriegel3b() throws Exception
   {
-    runModel("valid", "central_locking", "verriegel3b.wmod");
+    runModel("valid", "central_locking", "verriegel3b.wmod", true);
   }
 
   private void synthesiseFischertechnik() throws Exception
   {
-    runModel("valid", "fischertechnik", "fischertechnik.wmod");
+    runModel("valid", "fischertechnik", "fischertechnik.wmod", true);
   }
 
   private void synthesisAssemblyStation1() throws Exception
   {
-    runModel("valid", "AIP", "assembly_station1.wmod");
+    runModel("valid", "AIP", "assembly_station1.wmod", true);
   }
 
   private void synthesisLargetCoherent() throws Exception
   {
-    runModel("valid", "AIP", "larget_coherent.wmod");
+    runModel("valid", "AIP", "larget_coherent.wmod", true);
   }
 
   private void synthesisTransportUnit1() throws Exception
   {
-    runModel("valid", "AIP", "transport_unit1.wmod");
+    runModel("valid", "AIP", "transport_unit1.wmod", true);
   }
 
 
