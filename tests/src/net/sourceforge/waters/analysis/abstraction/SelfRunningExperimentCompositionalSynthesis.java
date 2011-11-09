@@ -39,7 +39,7 @@ public class SelfRunningExperimentCompositionalSynthesis
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
              selectingMethod : selectingFactory.getEnumConstants()) {
           final CompositionalSynthesizerExperiments experiment =
-            new CompositionalSynthesizerExperiments(outputDir + "results_" +
+            new CompositionalSynthesizerExperiments(outputDir +
                                              preselectingMethod.toString() +
                                              "_" +  selectingMethod.toString()
                                              + ".csv", preselectingMethod,

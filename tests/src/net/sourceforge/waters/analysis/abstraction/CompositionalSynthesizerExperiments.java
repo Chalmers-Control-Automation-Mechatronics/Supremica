@@ -147,7 +147,9 @@ public class CompositionalSynthesizerExperiments
       final CompositionalSynthesisResult stats =
         (CompositionalSynthesisResult) mSynthesizer.getAnalysisResult();
       if(! hasBeenPrinted) {
-      stats.printCSVHorizontalHeadings(mPrintWriter);}
+        stats.printCSVHorizontalHeadings(mPrintWriter);
+        mPrintWriter.println(" ");
+      }
       mPrintWriter.print(name);
       mPrintWriter.print(',');
       stats.printCSVHorizontal(mPrintWriter);
@@ -199,7 +201,7 @@ public class CompositionalSynthesizerExperiments
     synthesiseCentralLockingVerriegel3b();
     synthesiseFischertechnik();
     synthesisAssemblyStation1();
-    synthesisLargetCoherent();
+    synthesisLargestCoherent();
     synthesisTransportUnit1();
   }
 
@@ -241,9 +243,9 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "AIP", "assembly_station1.wmod", true);
   }
 
-  private void synthesisLargetCoherent() throws Exception
+  private void synthesisLargestCoherent() throws Exception
   {
-    runModel("valid", "AIP", "larget_coherent.wmod", true);
+    runModel("valid", "AIP", "largest_coherent.wmod", true);
   }
 
   private void synthesisTransportUnit1() throws Exception
