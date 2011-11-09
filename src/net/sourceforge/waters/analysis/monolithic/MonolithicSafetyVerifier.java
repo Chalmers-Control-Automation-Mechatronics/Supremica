@@ -40,6 +40,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * <P>A Java implementation of the controllability check algorithm.
@@ -260,6 +262,14 @@ public class MonolithicSafetyVerifier
         final SafetyTraceProxy counterexample = computeCounterExample();
         return setFailedResult(counterexample);
       }
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      final Logger logger = getLogger();
+      logger.debug("<out of memory>");
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }

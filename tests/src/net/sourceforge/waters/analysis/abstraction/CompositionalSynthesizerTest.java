@@ -42,12 +42,14 @@ public class CompositionalSynthesizerTest
   protected CompositionalSynthesizer createSynthesizer
     (final ProductDESProxyFactory factory)
   {
-    final CompositionalSynthesizer checker =
+    final CompositionalSynthesizer synthesizer =
       new CompositionalSynthesizer(factory);
-    checker.setInternalStateLimit(5000);
-    checker.setMonolithicStateLimit(100000);
-    checker.setInternalTransitionLimit(500000);
-    return checker;
+    synthesizer.setInternalStateLimit(5000);
+    synthesizer.setMonolithicStateLimit(100000);
+    synthesizer.setInternalTransitionLimit(500000);
+    synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MaxS);
+    synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinSync);
+    return synthesizer;
   }
 
 }

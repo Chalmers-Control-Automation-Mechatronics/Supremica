@@ -567,30 +567,30 @@ public class CompositionalSynthesizer
         getCurrentSynchronousProductBuilder();
       final ProductDESProxy des = createProductDESProxy(automata);
       syncBuilder.setModel(des);
-      final int limit = getMonolithicStateLimit();
-      syncBuilder.setNodeLimit(limit);
+      final int slimit = getMonolithicStateLimit();
+      syncBuilder.setNodeLimit(slimit);
+      final int tlimit = getMonolithicTransitionLimit();
+      syncBuilder.setTransitionLimit(tlimit);
+      syncBuilder.setConstructsResult(true);
       syncBuilder.run();
       automaton = syncBuilder.getComputedAutomaton();
       break;
     }
-    if(automaton != null){
-      final EventEncoding coding = createSynthesisEventEncoding(automaton);
-      final ListBufferTransitionRelation supervisor =
-        synthesise(automaton, coding);
-      if (supervisor != null) {
-        final CompositionalSynthesisResult result = getAnalysisResult();
-        if (supervisor.getNumberOfReachableStates() == 0) {
-          result.setSatisfied(false);
-          return false;
-        } else {
-          final AutomatonProxy renamedSup =
-            createRenamedSupervisor(supervisor, coding);
-          result.addSupervisor(renamedSup);
-          return true;
-        }
+    final EventEncoding coding = createSynthesisEventEncoding(automaton);
+    final ListBufferTransitionRelation supervisor =
+      synthesise(automaton, coding);
+    if (supervisor != null) {
+      final CompositionalSynthesisResult result = getAnalysisResult();
+      if (supervisor.getNumberOfReachableStates() == 0) {
+        result.setSatisfied(false);
+        return false;
+      } else {
+        final AutomatonProxy renamedSup =
+          createRenamedSupervisor(supervisor, coding);
+        result.addSupervisor(renamedSup);
+        return true;
       }
-      return true;
-    }else {
+    } else {
       return true;
     }
   }

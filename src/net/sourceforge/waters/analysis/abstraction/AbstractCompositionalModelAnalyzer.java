@@ -2563,8 +2563,13 @@ public abstract class AbstractCompositionalModelAnalyzer
     //# Interface PreselectingHeuristic
     public Collection<Candidate> findCandidates()
     {
-      final AutomatonProxy chosenAut = Collections.min(mCurrentAutomata, this);
-      return pairAutomaton(chosenAut, mCurrentAutomata);
+      if (mCurrentAutomata.isEmpty()) {
+        return Collections.emptyList();
+      } else {
+        final AutomatonProxy chosenAut =
+          Collections.min(mCurrentAutomata, this);
+        return pairAutomaton(chosenAut, mCurrentAutomata);
+      }
     }
 
     //#######################################################################

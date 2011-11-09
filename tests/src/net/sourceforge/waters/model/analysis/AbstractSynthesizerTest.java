@@ -391,7 +391,6 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
-
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runSynthesizer(final String group,
