@@ -45,7 +45,12 @@ public class CompositionalSynthesizerExperiments
      final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
     throws FileNotFoundException
   {
-    mOut = new FileOutputStream(statsFilename);
+    final String outputprop = System.getProperty("waters.test.outputdir");
+    final File dir = new File(outputprop);
+
+    ensureDirectoryExists(dir);
+    final File statsFile = new File(dir, statsFilename);
+    mOut = new FileOutputStream(statsFile);
     mPrintWriter = null;
     mPreselecting = preselectingHeuristic;
     mSelecting = selectingHeuristic;
@@ -148,7 +153,7 @@ public class CompositionalSynthesizerExperiments
         (CompositionalSynthesisResult) mSynthesizer.getAnalysisResult();
       if(! hasBeenPrinted) {
         stats.printCSVHorizontalHeadings(mPrintWriter);
-        mPrintWriter.println(" ");
+        mPrintWriter.println();
       }
       mPrintWriter.print(name);
       mPrintWriter.print(',');

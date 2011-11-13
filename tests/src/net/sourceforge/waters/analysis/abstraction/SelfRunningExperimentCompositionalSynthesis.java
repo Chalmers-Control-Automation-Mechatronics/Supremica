@@ -25,7 +25,7 @@ public class SelfRunningExperimentCompositionalSynthesis
   public static void main(final String[] args)
   {
     try {
-      final String outputDir = System.getProperty("waters.test.outputdir");
+      //final String outputDir = System.getProperty("waters.test.outputdir");
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
       final CompositionalSynthesizer synthesizer =
@@ -39,7 +39,7 @@ public class SelfRunningExperimentCompositionalSynthesis
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
              selectingMethod : selectingFactory.getEnumConstants()) {
           final CompositionalSynthesizerExperiments experiment =
-            new CompositionalSynthesizerExperiments(outputDir +
+            new CompositionalSynthesizerExperiments(
                                              preselectingMethod.toString() +
                                              "_" +  selectingMethod.toString()
                                              + ".csv", preselectingMethod,
