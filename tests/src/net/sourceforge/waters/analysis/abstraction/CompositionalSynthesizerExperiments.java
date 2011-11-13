@@ -80,13 +80,6 @@ public class CompositionalSynthesizerExperiments
                          ",FinalStateLimit," + finalStateLimit);
     mPrintWriter.println("PreselHeuristic," + mPreselecting +
                          ",SelecHeuristic," + mSelecting);
-
-    // TODO This may fail to print all headings. May have to print the
-    // headings from the analysis result obtained from the first test.
-    final CompositionalSynthesisResult stats =
-      new CompositionalSynthesisResult();
-    mPrintWriter.print("Model,");
-    stats.printCSVHorizontalHeadings(mPrintWriter);
   }
 
   @Override
@@ -151,7 +144,8 @@ public class CompositionalSynthesizerExperiments
     } finally {
       final CompositionalSynthesisResult stats =
         (CompositionalSynthesisResult) mSynthesizer.getAnalysisResult();
-      if(! hasBeenPrinted) {
+      if (!hasBeenPrinted) {
+        mPrintWriter.print("Model,");
         stats.printCSVHorizontalHeadings(mPrintWriter);
         mPrintWriter.println();
       }

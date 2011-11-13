@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -102,6 +103,33 @@ public class CompositionalSynthesisResult
     mSupervisors.addAll(sups);
   }
 
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(',');
+    writer.print("NumberOfSupervisors");
+    writer.print(',');
+    writer.print("LargestSupervisor");
+
+  }
+
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    super.printCSVHorizontal(writer);
+    writer.print(",");
+    writer.print(mSupervisors.size());
+    writer.print(",");
+    int largest = 0;
+    for (int i=0; i<mSupervisors.size(); i++){
+      final int currentSupSize = mSupervisors.get(i).getStates().size();
+      if (currentSupSize > largest) {
+        largest = currentSupSize;
+      }
+    }
+    writer.print(largest);
+  }
 
   //#########################################################################
   //# Specific Access
