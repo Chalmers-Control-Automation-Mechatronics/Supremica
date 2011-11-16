@@ -17,23 +17,19 @@ import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.InstanceProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
-class ComponentsTreePopupFactory
+class AliasesTreePopupFactory
   extends PopupFactory
 {
 
   //#########################################################################
   //# Constructor
-  ComponentsTreePopupFactory(final WatersPopupActionManager master,
+  AliasesTreePopupFactory(final WatersPopupActionManager master,
                              final ModuleContext context)
   {
     super(master);
-    mVisitor = new ComponentsTreePopupVisitor();
+    mVisitor = new AliasesTreePopupVisitor();
     mContext = context;
   }
 
@@ -55,20 +51,16 @@ class ComponentsTreePopupFactory
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
     popup.addSeparator();
-    final IDEAction newaut = master.getInsertSimpleComponentAction();
-    popup.add(newaut);
-    final IDEAction newvar = master.getInsertVariableAction();
-    popup.add(newvar);
-    final IDEAction newfor = master.getInsertForeachComponentAction();
-    popup.add(newfor);
+    final IDEAction showalias = master.getInsertConstantAliasAction();
+    popup.add(showalias);
     final IDEAction showcomment = master.getShowModuleCommentAction();
     popup.add(showcomment);
   }
 
 
   //#########################################################################
-  //# Inner Class GraphPopupVisitor
-  private class ComponentsTreePopupVisitor
+  //# Inner Class AliasesTreePopupVisitor
+  private class AliasesTreePopupVisitor
     extends AbstractModuleProxyVisitor
   {
 
@@ -80,41 +72,10 @@ class ComponentsTreePopupFactory
       return null;
     }
 
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-    public Object visitInstanceProxy(final InstanceProxy inst)
-    {
-      visitProxy(inst);
-      final WatersPopupActionManager master = getMaster();
-      final JPopupMenu popup = getPopup();
-      final String name = inst.getModuleName();
-      final ModuleProxy module = mContext.getModule();
-      final IDEAction gotomod = master.getGotoModuleAction(module, name);
-      popup.add(gotomod);
-      return null;
-    }
-
-    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
-    {
-      visitProxy(comp);
-      final WatersPopupActionManager master = getMaster();
-      final JPopupMenu popup = getPopup();
-      final IDEAction editgraph = master.getShowGraphAction(comp);
-      popup.add(editgraph);
-      if (comp.getKind() == ComponentKind.PROPERTY)
-      {
-        final IDEAction languageInclusion = master.getLanguageIncusionAction(comp);
-        popup.add(languageInclusion);
-      }
-      return null;
-    }
-
   }
-
-
   //#######################################################################
   //# Data Members
-  private final ComponentsTreePopupVisitor mVisitor;
+  private final AliasesTreePopupVisitor mVisitor;
   private final ModuleContext mContext;
 
 }

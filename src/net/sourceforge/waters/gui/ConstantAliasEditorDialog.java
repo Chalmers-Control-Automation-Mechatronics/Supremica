@@ -235,10 +235,10 @@ public class ConstantAliasEditorDialog
       final SimpleExpressionSubject exp0 =
         (SimpleExpressionSubject) mExpressionInput.getValue();
       final SimpleExpressionSubject exp = makeUnique(exp0);
+      final SelectionOwner panel = mRoot.getAliasesPanel();
       if (mAlias == null) {
         final ConstantAliasSubject template =
           new ConstantAliasSubject(name, exp);
-        final SelectionOwner panel = mRoot.getComponentsPanel();
         final Command command = new InsertCommand(template, panel);
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
@@ -257,7 +257,6 @@ public class ConstantAliasEditorDialog
           if (expchange) {
             template.setExpression(exp);
           }
-          final SelectionOwner panel = mRoot.getComponentsPanel();
           final Command command = new EditCommand(mAlias, template, panel);
           mRoot.getUndoInterface().executeCommand(command);
         }

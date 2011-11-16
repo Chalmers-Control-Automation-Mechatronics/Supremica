@@ -145,6 +145,12 @@ public class EditorPanel
         return mEventsTab.getPanel();
     }
 
+    public SelectionOwner getAliasesPanel()
+    {
+      return mAliasesTab.getPanel();
+    }
+
+
     public void showComponents()
     {
         mComponentsTab.activate();
@@ -352,5 +358,6 @@ public class EditorPanel
     //#########################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+
 
 }
