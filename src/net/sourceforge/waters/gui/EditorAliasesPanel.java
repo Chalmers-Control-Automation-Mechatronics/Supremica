@@ -1,8 +1,24 @@
 package net.sourceforge.waters.gui;
 
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.Autoscroll;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -37,14 +53,15 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
-public class EditorAliasesPanel extends JTree implements SelectionOwner
+public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscroll
 {
 
   public EditorAliasesPanel(final ModuleWindowInterface root,
                             final WatersPopupActionManager manager)
   {
     mRoot = root;
-    mPopupFactory = new AliasesTreePopupFactory(manager, mRoot.getModuleContext());
+    mPopupFactory =
+      new AliasesTreePopupFactory(manager, mRoot.getModuleContext());
 
     final ModuleSubject module = mRoot.getModuleSubject();
     mModel = new ConstantAliasesTreeModel(module);
@@ -58,13 +75,48 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
     // Don't expand/collapse on double-click, never collapse the root.
     setToggleClickCount(0);
     manager.installCutCopyPasteActions(this);
+
+    final DragSource dragSource = DragSource.getDefaultDragSource();
+    dragSource
+      .createDefaultDragGestureRecognizer(this,
+                                          DnDConstants.ACTION_COPY_OR_MOVE,
+                                          new TreeDragGestureListener());
+    @SuppressWarnings("unused")
+    final DropTarget dropTarget =
+      new DropTarget(this, new TreeDropTargetListener());
   }
 
-//#########################################################################
+  //#########################################################################
   //# Simple Access
   public ConstantAliasesTreeModel getConstantAliasTreeModel()
   {
     return (ConstantAliasesTreeModel) getModel();
+  }
+
+  //#######################################################################
+  //# Interface java.awt.dnd.Autoscroll
+  public Insets getAutoscrollInsets()
+  {
+    final Rectangle all = getBounds();
+    final Rectangle visible = getParent().getBounds();
+    return new Insets(visible.y - all.y + 20, 0,
+                      all.height - visible.height - visible.y + all.y + 20, 0);
+  }
+
+  public void autoscroll(final Point cursorLocn)
+  {
+    int realrow = getRowForLocation(cursorLocn.x, cursorLocn.y);
+    final Rectangle panel = getBounds();
+    if (cursorLocn.y + panel.y <= 20) {
+      if (realrow < 1) {
+        realrow = 0;
+      } else {
+        realrow--;
+      }
+    } else if (realrow < getRowCount() - 1) {
+      realrow++;
+    }
+    scrollRowToVisible(realrow);
   }
 
   //#######################################################################
@@ -205,7 +257,8 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
   public ListInsertPosition getInsertPosition(final Proxy proxy)
   {
     final ModuleSubject module = mRoot.getModuleSubject();
-    final ListSubject<? extends ProxySubject> list = module.getConstantAliasListModifiable();
+    final ListSubject<? extends ProxySubject> list =
+      module.getConstantAliasListModifiable();
     final int inspos = list.size();
     return new ListInsertPosition(list, inspos);
   }
@@ -222,16 +275,12 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
 
   public boolean canCopy(final List<? extends Proxy> items)
   {
-   /* DataFlavor common = null;
-    for (final Proxy proxy : items) {
-      final DataFlavor flavor = mDataFlavorVisitor.getDataFlavor(proxy);
-      if (common == null) {
-        common = flavor;
-      } else if (common != flavor) {
-        return false;
-      }
-    }
-    return common != null;*/
+    /*
+     * DataFlavor common = null; for (final Proxy proxy : items) { final
+     * DataFlavor flavor = mDataFlavorVisitor.getDataFlavor(proxy); if (common
+     * == null) { common = flavor; } else if (common != flavor) { return
+     * false; } } return common != null;
+     */
     return !items.isEmpty();
   }
 
@@ -242,25 +291,27 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
 
   public boolean canPaste(final Transferable transferable)
   {
-    return transferable.isDataFlavorSupported
-      (WatersDataFlavor.MODULE_ALIAS_LIST);
+    return transferable
+      .isDataFlavorSupported(WatersDataFlavor.MODULE_ALIAS_LIST);
   }
-
 
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
     final List<InsertInfo> result = new ArrayList<InsertInfo>();
     @SuppressWarnings("unchecked")
-    final
-    List<Proxy> transferData = (List<Proxy>) transferable.getTransferData(WatersDataFlavor.MODULE_ALIAS_LIST);
+    final List<Proxy> transferData =
+      (List<Proxy>) transferable
+        .getTransferData(WatersDataFlavor.MODULE_ALIAS_LIST);
     final ListSubject<? extends ProxySubject> listInModule =
       mRoot.getModuleSubject().getConstantAliasListModifiable();
     int pos = listInModule.size();
-    final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-    for(final Proxy proxy: transferData){
+    final ModuleProxyCloner cloner =
+      ModuleSubjectFactory.getCloningInstance();
+    for (final Proxy proxy : transferData) {
       final Proxy cloned = cloner.getClone(proxy);
-      final ListInsertPosition inspos = new ListInsertPosition(listInModule, pos++);
+      final ListInsertPosition inspos =
+        new ListInsertPosition(listInModule, pos++);
       final InsertInfo info = new InsertInfo(cloned, inspos);
       result.add(info);
     }
@@ -278,8 +329,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
     final ConstantAliasesTreeModel model = getConstantAliasTreeModel();
     final Set<Proxy> set = new HashSet<Proxy>(items);
     final List<InsertInfo> result = new LinkedList<InsertInfo>();
-    outer:
-    for (final Proxy proxy : items) {
+    outer: for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
       ProxySubject parent = model.getParentInTree(subject);
       if (parent != null) {
@@ -378,6 +428,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
     return path == null ? null : (Proxy) path.getLastPathComponent();
   }
 
+
   //#########################################################################
   //# Inner Class EventDeclMouseListener
   /**
@@ -392,10 +443,11 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
     {
       if (event.getButton() == MouseEvent.BUTTON1
           && event.getClickCount() == 2) {
-        final ConstantAliasSubject proxy = (ConstantAliasSubject)getClickedItem(event);
+        final ConstantAliasSubject proxy =
+          (ConstantAliasSubject) getClickedItem(event);
         @SuppressWarnings("unused")
-        final
-        ConstantAliasEditorDialog dialog = new ConstantAliasEditorDialog(mRoot, proxy);
+        final ConstantAliasEditorDialog dialog =
+          new ConstantAliasEditorDialog(mRoot, proxy);
       }
     }
 
@@ -420,6 +472,148 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
 
   }
 
+
+  //#########################################################################
+  //# Inner Class
+  /**
+   * A DragGestureListener that listens to when a drag gesture is initialised
+   */
+  private class TreeDragGestureListener implements DragGestureListener
+  {
+
+    public void dragGestureRecognized(final DragGestureEvent dge)
+    {
+      final JTree tree = (JTree) dge.getComponent();
+      final TreePath path = tree.getSelectionPath();
+      final Transferable node =
+        new AliasTransferable((Proxy) path.getLastPathComponent());
+      final List<Proxy> proxies = new ArrayList<Proxy>(1);
+      proxies.add((Proxy) path.getLastPathComponent());
+      dge.startDrag(DragSource.DefaultMoveDrop, node,
+                    new TreeDragSourceListener(proxies));
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class
+  /**
+   *
+   */
+  private class TreeDropTargetListener implements DropTargetListener
+  {
+    public void dragEnter(final DropTargetDragEvent dtde)
+    {
+    }
+
+    public void dragOver(final DropTargetDragEvent dtde)
+    {
+
+    }
+
+    public void dropActionChanged(final DropTargetDragEvent dtde)
+    {
+    }
+
+    public void dragExit(final DropTargetEvent dte)
+    {
+    }
+
+    public void drop(final DropTargetDropEvent dtde)
+    {
+      final Transferable tr = dtde.getTransferable();
+      if (tr.isDataFlavorSupported(WatersDataFlavor.MODULE_ALIAS_LIST)) {
+        dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+        try {
+          @SuppressWarnings("unchecked")
+          final List<? extends Proxy> transferData =
+            (List<? extends Proxy>) tr
+              .getTransferData(WatersDataFlavor.MODULE_ALIAS_LIST);
+
+          final ModuleProxyCloner cloner =
+            ModuleSubjectFactory.getCloningInstance();
+          final ConstantAliasSubject cloned =
+            (ConstantAliasSubject) cloner.getClone(transferData.get(0));
+
+          final ListSubject<ConstantAliasSubject> list =
+            mRoot.getModuleSubject().getConstantAliasListModifiable();
+
+          final Point location = dtde.getLocation();
+
+          int row = getClosestRowForLocation(location.x, location.y) + 1;
+
+          for (int r = 0; r < list.size(); r++) {
+            final Rectangle bounds = getRowBounds(r);
+            if (location.y < bounds.y + bounds.height / 2) {
+              row = r;
+              break;
+            }
+          }
+
+          list.add(row, cloned);
+
+        } catch (final UnsupportedFlavorException exception) {
+          exception.printStackTrace();
+        } catch (final IOException exception) {
+          exception.printStackTrace();
+        }
+
+        dtde.dropComplete(true);
+      }
+
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class
+  /**
+   *
+   */
+  private class TreeDragSourceListener implements DragSourceListener
+  {
+    public TreeDragSourceListener(final List<? extends Proxy> proxies)
+    {
+      mProxies = proxies;
+    }
+
+    public void dragEnter(final DragSourceDragEvent dsde)
+    {
+      // TODO Auto-generated method stub
+
+    }
+
+    public void dragOver(final DragSourceDragEvent dsde)
+    {
+      // TODO Auto-generated method stub
+
+    }
+
+    public void dropActionChanged(final DragSourceDragEvent dsde)
+    {
+      // TODO Auto-generated method stub
+
+    }
+
+    public void dragExit(final DragSourceEvent dse)
+    {
+      // TODO Auto-generated method stub
+
+    }
+
+    public void dragDropEnd(final DragSourceDropEvent dsde)
+    {
+      if (dsde.getDropSuccess()) {
+        mRoot.getModuleSubject().getConstantAliasListModifiable()
+          .removeAll(mProxies);
+      }
+    }
+
+    private final List<? extends Proxy> mProxies;
+
+  }
+
   /**
   *
   */
@@ -429,5 +623,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner
   private final PopupFactory mPopupFactory;
   private final ModuleWindowInterface mRoot;
   private List<Observer> mObservers;
+
+
   //private final DataFlavorVisitor mDataFlavorVisitor;
 }

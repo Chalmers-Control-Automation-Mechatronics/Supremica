@@ -76,6 +76,7 @@ class AliasesTreePopupFactory
   //#######################################################################
   //# Data Members
   private final AliasesTreePopupVisitor mVisitor;
+  @SuppressWarnings("unused")
   private final ModuleContext mContext;
 
 }

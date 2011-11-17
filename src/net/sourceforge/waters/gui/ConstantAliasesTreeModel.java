@@ -137,7 +137,7 @@ class ConstantAliasesTreeModel
   public void valueForPathChanged(final TreePath path, final Object newvalue)
   {
     throw new UnsupportedOperationException
-      ("ComponentsTreeModel does not support value change!");
+      ("ConstantAliasesTreeModel does not support value change!");
   }
 
 
