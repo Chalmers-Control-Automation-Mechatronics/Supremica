@@ -38,6 +38,16 @@ public class BDDPackageTest extends AbstractWatersTest
 
   //#########################################################################
   //# Test Cases
+  public void testBDDLibrary_buddy()
+  {
+    System.loadLibrary("buddy");
+  }
+
+  public void testBDDLibrary_cudd()
+  {
+    System.loadLibrary("cudd");
+  }
+
   public void testBDDPackage_java()
     throws SecurityException, NoSuchMethodException
   {
@@ -78,11 +88,13 @@ public class BDDPackageTest extends AbstractWatersTest
     testBDDPackage(BDDPackage.CUDD);
   }
 
+  /*
   public void testBDDPackage_cal()
     throws SecurityException, NoSuchMethodException
   {
     testBDDPackage(BDDPackage.CAL);
   }
+  */
 
   public void testEmptyReorder_java()
     throws SecurityException, NoSuchMethodException
