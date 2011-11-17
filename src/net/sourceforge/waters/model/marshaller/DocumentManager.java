@@ -604,7 +604,7 @@ public class DocumentManager
       final File file = getFile();
       if (file != null) {
         final long modtime = file.lastModified();
-        return modtime >= mOpeningTime;
+        return modtime > mOpeningTime;
       } else {
         return false;
       }

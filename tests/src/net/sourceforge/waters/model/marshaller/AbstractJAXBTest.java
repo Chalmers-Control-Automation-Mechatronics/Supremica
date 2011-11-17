@@ -180,12 +180,19 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   {
     final ProxyMarshaller<D> marshaller = getProxyMarshaller();
     final String extname = name + marshaller.getDefaultExtension();
-    final File infile = new File(subdir, extname);
-    final String infilename = "examples/" + infile.toString();
+    final StringBuffer buffer = new StringBuffer(extname);
+    File current = subdir;
+    while (current != null) {
+      final String currentName = current.getName();
+      buffer.insert(0, '/');
+      buffer.insert(0, currentName);
+      current = current.getParentFile();
+    }
+    final String infilename = "examples/" + buffer.toString();
     final URL url = AbstractJAXBTest.class.getResource(infilename);
     final DocumentManager manager = getDocumentManager();
     final DocumentProxy proxy1 = manager.load(url);
-    final File truefile = new File(getWatersInputRoot(), infile.toString());
+    final File truefile = new File(getWatersInputRoot(), buffer.toString());
     final DocumentProxy proxy2 = manager.load(truefile);
     assertProxyEquals("Structure in JAR differs from file!", proxy1, proxy2);
     assertProxyEquals("Structure in JAR differs from file!", proxy2, proxy1);
