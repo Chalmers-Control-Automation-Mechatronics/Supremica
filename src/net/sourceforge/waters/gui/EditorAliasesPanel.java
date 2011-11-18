@@ -1,5 +1,8 @@
 package net.sourceforge.waters.gui;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -33,6 +36,7 @@ import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
@@ -53,7 +57,13 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
-public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscroll
+/**
+ *
+ *
+ * @author Carly Hona
+ */
+public class EditorAliasesPanel extends JTree implements SelectionOwner,
+  Autoscroll
 {
 
   public EditorAliasesPanel(final ModuleWindowInterface root,
@@ -84,6 +94,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
     @SuppressWarnings("unused")
     final DropTarget dropTarget =
       new DropTarget(this, new TreeDropTargetListener());
+    setCellRenderer(new MyTreeCellRenderer());
   }
 
   //#########################################################################
@@ -99,13 +110,13 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
   {
     final Rectangle all = getBounds();
     final Rectangle visible = getParent().getBounds();
-    return new Insets(visible.y - all.y + 20, 0,
-                      all.height - visible.height - visible.y + all.y + 20, 0);
+    return new Insets(visible.y - all.y + 20, 0, all.height - visible.height
+                                                 - visible.y + all.y + 20, 0);
   }
 
   public void autoscroll(final Point cursorLocn)
   {
-    int realrow = getRowForLocation(cursorLocn.x, cursorLocn.y);
+    int realrow = getClosestRowForLocation(cursorLocn.x, cursorLocn.y);
     final Rectangle panel = getBounds();
     if (cursorLocn.y + panel.y <= 20) {
       if (realrow < 1) {
@@ -477,6 +488,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
   //# Inner Class
   /**
    * A DragGestureListener that listens to when a drag gesture is initialised
+   * by tree path not row
    */
   private class TreeDragGestureListener implements DragGestureListener
   {
@@ -485,31 +497,65 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
     {
       final JTree tree = (JTree) dge.getComponent();
       final TreePath path = tree.getSelectionPath();
-      final Transferable node =
-        new AliasTransferable((Proxy) path.getLastPathComponent());
-      final List<Proxy> proxies = new ArrayList<Proxy>(1);
-      proxies.add((Proxy) path.getLastPathComponent());
-      dge.startDrag(DragSource.DefaultMoveDrop, node,
-                    new TreeDragSourceListener(proxies));
+      if (path != null) {
+        final Transferable node =
+          new AliasTransferable((Proxy) path.getLastPathComponent());
+        final List<Proxy> proxies = new ArrayList<Proxy>(1);
+        proxies.add((Proxy) path.getLastPathComponent());
+        dge.startDrag(null, node, new TreeDragSourceListener(proxies));
+      }
+
     }
 
+  }
+
+  public int getRowToDropOn(final Point location)
+  {
+    int row = getClosestRowForLocation(location.x, location.y);
+    mDroppingOnLastRow = false;
+    final Rectangle bounds = getRowBounds(row);
+
+    //if location is on lower half of the row..
+    if (location.y >= bounds.y + bounds.height / 2) {
+
+      if (getRowCount() - 1 == row) {
+        mDroppingOnLastRow = true;
+      } else {
+        row++;
+      }
+    }
+    return row;
   }
 
 
   //#########################################################################
   //# Inner Class
   /**
-   *
+   * A DropTargetListener that listens for the drop event and the dragover
    */
   private class TreeDropTargetListener implements DropTargetListener
   {
+
     public void dragEnter(final DropTargetDragEvent dtde)
     {
     }
 
     public void dragOver(final DropTargetDragEvent dtde)
     {
+      final Transferable tr = dtde.getTransferable();
+      if (tr.isDataFlavorSupported(WatersDataFlavor.MODULE_ALIAS_LIST)) {
+        final ListSubject<ConstantAliasSubject> list =
+          mRoot.getModuleSubject().getConstantAliasListModifiable();
 
+        final Point location = dtde.getLocation();
+        final int row = getRowToDropOn(location);
+
+        mDropTarget = list.get(row);
+        dtde.acceptDrag(DnDConstants.ACTION_COPY);
+        repaint();
+      } else {
+        dtde.rejectDrag();
+      }
     }
 
     public void dropActionChanged(final DropTargetDragEvent dtde)
@@ -536,22 +582,20 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
           final ConstantAliasSubject cloned =
             (ConstantAliasSubject) cloner.getClone(transferData.get(0));
 
+          mDropTarget = (Proxy) cloned;
+
           final ListSubject<ConstantAliasSubject> list =
             mRoot.getModuleSubject().getConstantAliasListModifiable();
 
           final Point location = dtde.getLocation();
+          int row = getRowToDropOn(location);
 
-          int row = getClosestRowForLocation(location.x, location.y) + 1;
-
-          for (int r = 0; r < list.size(); r++) {
-            final Rectangle bounds = getRowBounds(r);
-            if (location.y < bounds.y + bounds.height / 2) {
-              row = r;
-              break;
-            }
+          if (mDroppingOnLastRow) {
+            row++;
           }
 
           list.add(row, cloned);
+          setSelectionPath(getPathForRow(row));
 
         } catch (final UnsupportedFlavorException exception) {
           exception.printStackTrace();
@@ -561,6 +605,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
 
         dtde.dropComplete(true);
       }
+      repaint();
 
     }
   }
@@ -569,7 +614,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
   //#########################################################################
   //# Inner Class
   /**
-   *
+   * DragSourceListener that listens to when the drop has finished
    */
   private class TreeDragSourceListener implements DragSourceListener
   {
@@ -580,26 +625,18 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
 
     public void dragEnter(final DragSourceDragEvent dsde)
     {
-      // TODO Auto-generated method stub
-
     }
 
     public void dragOver(final DragSourceDragEvent dsde)
     {
-      // TODO Auto-generated method stub
-
     }
 
     public void dropActionChanged(final DragSourceDragEvent dsde)
     {
-      // TODO Auto-generated method stub
-
     }
 
     public void dragExit(final DragSourceEvent dse)
     {
-      // TODO Auto-generated method stub
-
     }
 
     public void dragDropEnd(final DragSourceDropEvent dsde)
@@ -608,10 +645,60 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
         mRoot.getModuleSubject().getConstantAliasListModifiable()
           .removeAll(mProxies);
       }
+      mDropTarget = null;
+      repaint();
     }
 
     private final List<? extends Proxy> mProxies;
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class
+  /**
+   * TreeRenderer that draws a line to tell the user where the drop will occur
+   */
+  private class MyTreeCellRenderer extends DefaultTreeCellRenderer
+  {
+    public MyTreeCellRenderer()
+    {
+      super();
+    }
+
+    public Component getTreeCellRendererComponent(final JTree tree,
+                                                  final Object value,
+                                                  final boolean isSelected,
+                                                  final boolean isExpanded,
+                                                  final boolean isLeaf,
+                                                  final int row,
+                                                  final boolean hasFocus)
+    {
+      mTargetNode = (mDropTarget == (Proxy) value);
+
+      return super.getTreeCellRendererComponent(tree, value, isSelected,
+                                                isExpanded, isLeaf, row,
+                                                hasFocus);
+    }
+
+    public void paintComponent(final Graphics g)
+    {
+      super.paintComponent(g);
+      if (mTargetNode) {
+        g.setColor(Color.BLUE);
+        if (mDroppingOnLastRow) {
+          g.drawLine(0, getHeight() - 1, 20, getHeight() - 1);
+        } else {
+          g.drawLine(0, 0, 20, 0);
+        }
+      }
+    }
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    boolean mTargetNode;
   }
 
   /**
@@ -623,7 +710,8 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner, Autoscr
   private final PopupFactory mPopupFactory;
   private final ModuleWindowInterface mRoot;
   private List<Observer> mObservers;
-
+  private Proxy mDropTarget;
+  private boolean mDroppingOnLastRow;
 
   //private final DataFlavorVisitor mDataFlavorVisitor;
 }

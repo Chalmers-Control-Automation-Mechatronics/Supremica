@@ -31,9 +31,7 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 
 
 /**
- * A tree model for the components panel.
- * Mirrors the module hierarchy beneath the components list,
- * and also includes a root node representing the module itself.
+ * A tree model for the EditorAliasPanel.
  *
  * @author Robi Malik
  */
