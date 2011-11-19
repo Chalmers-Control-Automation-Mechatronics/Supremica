@@ -547,11 +547,10 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
         final ListSubject<ConstantAliasSubject> list =
           mRoot.getModuleSubject().getConstantAliasListModifiable();
 
-        final Point location = dtde.getLocation();
-        final int row = getRowToDropOn(location);
-
+        final int row = getRowToDropOn(dtde.getLocation());
         mDropTarget = list.get(row);
-        dtde.acceptDrag(DnDConstants.ACTION_COPY);
+
+        dtde.acceptDrag(DnDConstants.ACTION_MOVE);
         repaint();
       } else {
         dtde.rejectDrag();
@@ -587,9 +586,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
           final ListSubject<ConstantAliasSubject> list =
             mRoot.getModuleSubject().getConstantAliasListModifiable();
 
-          final Point location = dtde.getLocation();
-          int row = getRowToDropOn(location);
-
+          int row = getRowToDropOn(dtde.getLocation());
           if (mDroppingOnLastRow) {
             row++;
           }
@@ -614,7 +611,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
   //#########################################################################
   //# Inner Class
   /**
-   * DragSourceListener that listens to when the drop has finished
+   * DragSourceListener used to provide feedback to the user during drag/drop
    */
   private class TreeDragSourceListener implements DragSourceListener
   {
@@ -625,10 +622,12 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
     public void dragEnter(final DragSourceDragEvent dsde)
     {
+      //setCursor(DragSource.DefaultMoveNoDrop);
     }
 
     public void dragOver(final DragSourceDragEvent dsde)
     {
+      //setCursor(DragSource.DefaultMoveNoDrop);
     }
 
     public void dropActionChanged(final DragSourceDragEvent dsde)
