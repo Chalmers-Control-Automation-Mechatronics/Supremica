@@ -47,7 +47,6 @@ public class CompositionalSynthesizerExperiments
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
     final File dir = new File(outputprop);
-
     ensureDirectoryExists(dir);
     final File statsFile = new File(dir, statsFilename);
     mOut = new FileOutputStream(statsFile);
@@ -193,63 +192,125 @@ public class CompositionalSynthesizerExperiments
   //# Invocation
   void runAllTests() throws Exception
   {
-    synthesiseCentralLockingDritueren();
-    synthesiseCentralLockingKoordwsp();
     synthesiseCentralLockingKoordwspBlock();
-    synthesiseCentralLockingVerriegel3();
     synthesiseCentralLockingVerriegel3b();
+    synthesiseVerrigel4B();
+    synthesissAip0Alps();
+    synthesissAip0Aip();
+    synthesisAip0tough();
+    synthesiseTbedCtct();
+    synthesiseTbedNoderailB();
+    synthesiseTbedNoderailUncont();
     synthesiseFischertechnik();
-    synthesisAssemblyStation1();
     synthesisLargestCoherent();
-    synthesisTransportUnit1();
+    synthesisTip3Bad();
+    synthesisFenCaiWon09();
+    synthesisAGVB();
+    synthesissRhoneSubPatch0();
+    synthesissFms2003();
+    synthesiseIPC();
+    synthesiseFlexibleManufacturingSystem();
   }
 
 
   //#########################################################################
   //# Models
-  private void synthesiseCentralLockingDritueren() throws Exception
-  {
-    runModel("valid", "central_locking", "dreitueren.wmod", false);
-  }
 
-  private void synthesiseCentralLockingKoordwsp() throws Exception
-  {
-    runModel("valid", "central_locking", "koordwsp.wmod", true);
-  }
-
+  // Central locking
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
-    runModel("valid", "central_locking", "koordwsp_block.wmod", true);
-  }
-
-  private void synthesiseCentralLockingVerriegel3() throws Exception
-  {
-    runModel("valid", "central_locking", "verriegel3.wmod", true);
+    runModel("valid", "synthesis_experiment", "koordwsp_block.wmod", false);
   }
 
   private void synthesiseCentralLockingVerriegel3b() throws Exception
   {
-    runModel("valid", "central_locking", "verriegel3b.wmod", true);
+    runModel("valid", "synthesis_experiment", "verriegel3b.wmod", true);
   }
 
-  private void synthesiseFischertechnik() throws Exception
+  private void synthesiseVerrigel4B() throws Exception
   {
-    runModel("valid", "fischertechnik", "fischertechnik.wmod", true);
+    runModel("valid", "synthesis_experiment", "verriegel4b.wmod", true);
   }
 
-  private void synthesisAssemblyStation1() throws Exception
+  // AIP
+  private void synthesissAip0Alps() throws Exception
   {
-    runModel("valid", "AIP", "assembly_station1.wmod", true);
+    runModel("valid", "synthesis_experiment", "aip0alps.wmod", true);
+  }
+
+  private void synthesissAip0Aip() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "aip0aip.wmod", true);
+  }
+
+  private void synthesisAip0tough() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "aip0tough.wmod", true);
   }
 
   private void synthesisLargestCoherent() throws Exception
   {
-    runModel("valid", "AIP", "largest_coherent.wmod", true);
+    runModel("valid", "synthesis_experiment", "largest_coherent.wmod", true);
   }
 
-  private void synthesisTransportUnit1() throws Exception
+  // Train testbed
+  private void synthesiseTbedNoderailUncont() throws Exception
   {
-    runModel("valid", "AIP", "transport_unit1.wmod", true);
+    runModel("valid", "synthesis_experiment", "tbed_uncont.wmod", true);
+  }
+
+  private void synthesiseTbedNoderailB() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod",
+                                                                        true);
+  }
+
+  private void synthesiseTbedCtct() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "tbed_ctct.wmod", true);
+  }
+
+   //
+  private void synthesiseIPC() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "IPC.wmod", true);
+  }
+
+  private void synthesissRhoneSubPatch0() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "rhone_subsystem1_patch0.wmod",
+                                                                       true);
+  }
+
+  private void synthesissFms2003() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "fms2003_synth1.wmod", true);
+  }
+
+  //flexible production cell
+  private void synthesiseFischertechnik() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "ftechnik.wmod", true);
+  }
+
+  private void synthesiseFlexibleManufacturingSystem() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "flexible_man_sys.wmod", true);
+  }
+
+  private void synthesisAGVB() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "agvb.wmod", true);
+  }
+
+  private void synthesisTip3Bad() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "tip3_bad.wmod", true);
+  }
+
+  private void synthesisFenCaiWon09() throws Exception
+  {
+    runModel("valid", "synthesis_experiment", "FenCaiWon09.wmod", true);
   }
 
 

@@ -1014,9 +1014,10 @@ public class CompositionalSynthesizer
               rel.addTransition(sourceState, firstCode, target);
             }
           }
-          rel.setUsedEvent(nextCode, false);
+          if (nextCode >= 0) {
+            rel.setUsedEvent(nextCode, false);
+          }
         }
-
       }
       final EventEncoding newEncoding = new EventEncoding(events, translator);
       return createRenamedSupervisor(rel, newEncoding, listIter);

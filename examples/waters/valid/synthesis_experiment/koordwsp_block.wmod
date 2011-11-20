@@ -1,0 +1,3484 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="koordwsp_block" xmlns="http://waters.sourceforge.net/xsd/module">
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="Timers"/>
+<ConstantAliasExpression>
+<EnumSetExpression>
+<SimpleIdentifier Name="FS"/>
+<SimpleIdentifier Name="WSP"/>
+</EnumSetExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias>
+<SimpleIdentifier Name="Counters"/>
+<ConstantAliasExpression>
+<EnumSetExpression>
+<SimpleIdentifier Name="WSP"/>
+</EnumSetExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias>
+<SimpleIdentifier Name="Tueren"/>
+<ConstantAliasExpression>
+<EnumSetExpression>
+<SimpleIdentifier Name="FT"/>
+<SimpleIdentifier Name="BT"/>
+<SimpleIdentifier Name="HT"/>
+</EnumSetExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="cod_er"/>
+<EventDecl Kind="CONTROLLABLE" Name="SERFS"/>
+<EventDecl Kind="CONTROLLABLE" Name="soft_ZS"/>
+<EventDecl Kind="CONTROLLABLE" Name="ZS"/>
+<EventDecl Kind="CONTROLLABLE" Name="kein_ZS"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="zuendung_an"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="zuendung_aus"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="tuer_auf">
+<RangeList>
+<SimpleIdentifier Name="Tueren"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="reset">
+<RangeList>
+<SimpleIdentifier Name="Timers"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="wsp"/>
+<EventDecl Kind="CONTROLLABLE" Name="TAST"/>
+<EventDecl Kind="CONTROLLABLE" Name="done_ER"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ctr_lt_max">
+<RangeList>
+<SimpleIdentifier Name="Counters"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="ER_BT"/>
+<EventDecl Kind="CONTROLLABLE" Name="time">
+<RangeList>
+<SimpleIdentifier Name="Timers"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="ER_FS"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ER_FT"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ER_HK"/>
+<EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
+<EventDecl Kind="CONTROLLABLE" Name="soft_SER">
+<RangeList>
+<SimpleIdentifier Name="Tueren"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="CS"/>
+<EventDecl Kind="CONTROLLABLE" Name="soft_ER"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="cod_ser"/>
+<EventDecl Kind="CONTROLLABLE" Name="done_VR"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="tuer_zu">
+<RangeList>
+<SimpleIdentifier Name="Tueren"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="ZSA"/>
+<EventDecl Kind="CONTROLLABLE" Name="ER"/>
+<EventDecl Kind="CONTROLLABLE" Name="autom_VR"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ctr_ge_max">
+<RangeList>
+<SimpleIdentifier Name="Counters"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="ZSI"/>
+<EventDecl Kind="CONTROLLABLE" Name="done_ZS"/>
+<EventDecl Kind="CONTROLLABLE" Name="SER"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="TASTVR"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="timeout">
+<RangeList>
+<SimpleIdentifier Name="Timers"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="is_cod_ser"/>
+<EventDecl Kind="CONTROLLABLE" Name="is_cod_er"/>
+<EventDecl Kind="CONTROLLABLE" Name="reset_ctr">
+<RangeList>
+<SimpleIdentifier Name="Counters"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="VR_BT"/>
+<EventDecl Kind="CONTROLLABLE" Name="inc_ctr">
+<RangeList>
+<SimpleIdentifier Name="Counters"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="CS_ok"/>
+<EventDecl Kind="CONTROLLABLE" Name="soft_VR"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="VR_FS"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="VR_FT"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="VR_HK"/>
+<EventDecl Kind="CONTROLLABLE" Name="done_SER">
+<RangeList>
+<SimpleIdentifier Name="Tueren"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="automvr"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="autom_VR"/>
+<SimpleIdentifier Name="ER"/>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<IndexedIdentifier Name="time">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="HT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="ER">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="256" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="6" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="VR">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-21" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FS">
+<PointGeometry>
+<Point X="192" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="8" Y="15"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AU2">
+<PointGeometry>
+<Point X="192" Y="416"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="10" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AU3">
+<PointGeometry>
+<Point X="192" Y="496"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="11" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AU1">
+<PointGeometry>
+<Point X="192" Y="336"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="8" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name=":0">
+<NodeRef Name="AU1"/>
+<NodeRef Name="AU2"/>
+<NodeRef Name="AU3"/>
+<BoxGeometry>
+<Box Height="240" Width="144" X="112" Y="304"/>
+</BoxGeometry>
+</GroupNode>
+<GroupNode Name=":1">
+<NodeRef Name=":0"/>
+<NodeRef Name="AU1"/>
+<NodeRef Name="AU2"/>
+<NodeRef Name="AU3"/>
+<NodeRef Name="ER"/>
+<NodeRef Name="FS"/>
+<NodeRef Name="VR"/>
+<BoxGeometry>
+<Box Height="448" Width="336" X="32" Y="112"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="VR" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-82"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="92" Y="151"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="FS">
+<LabelBlock>
+<SimpleIdentifier Name="SERFS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-9" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="165" Y="211"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="194" Y="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="FS" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-35"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="229"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="FS" Target="FS">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="222" Y="230"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="FS" Target="AU1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="AU1" Target="AU1">
+<LabelBlock>
+<SimpleIdentifier Name="SERFS"/>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="152" Y="334"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AU1" Target="AU2">
+<LabelBlock>
+<IndexedIdentifier Name="time">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source=":1" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="HT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-72" Y="-34"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="256" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AU2" Target="AU2">
+<LabelBlock>
+<SimpleIdentifier Name="SERFS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="153" Y="415"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AU2" Target="AU3">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="AU3" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="autom_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="64" Y="355"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AU3" Target="AU3">
+<LabelBlock>
+<SimpleIdentifier Name="SERFS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="193" Y="538"/>
+</SplineGeometry>
+</Edge>
+<Edge Source=":0" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-32"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="265" Y="249"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="193" Y="189"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="FS"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-93"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="289" Y="146"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="check_cod_ser"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="cod_er"/>
+<SimpleIdentifier Name="cod_ser"/>
+<SimpleIdentifier Name="is_cod_er"/>
+<SimpleIdentifier Name="is_cod_ser"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="SER">
+<PointGeometry>
+<Point X="208" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-12" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="ER">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="SER" Target="SER">
+<LabelBlock>
+<SimpleIdentifier Name="is_cod_ser"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="240" Y="64"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="SER" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="cod_er"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="159" Y="57"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="SER">
+<LabelBlock>
+<SimpleIdentifier Name="cod_ser"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="72"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="is_cod_er"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="80" Y="65"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="cod_ser"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="cod_er"/>
+<SimpleIdentifier Name="cod_ser"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="SER">
+<PointGeometry>
+<Point X="128" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-12" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="ER">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="32" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="ER" Target="SER">
+<LabelBlock>
+<SimpleIdentifier Name="cod_ser"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="80" Y="74"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="SER" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="cod_er"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="80" Y="54"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="crash"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="done_ZS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="zuendung_an"/>
+<SimpleIdentifier Name="zuendung_aus"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="CS2a">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="2" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZS">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="528" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-28" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="416" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="CS1a">
+<PointGeometry>
+<Point X="288" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="5" Y="19"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="304" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-29" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="XX">
+<PointGeometry>
+<Point X="416" Y="336"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="CS2">
+<PointGeometry>
+<Point X="48" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-19" Y="-11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="CS1">
+<PointGeometry>
+<Point X="176" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-28" Y="13"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="CS2a" Target="CS2a">
+<LabelBlock>
+<SimpleIdentifier Name="CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="163" Y="56"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS2a" Target="CS2">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="115" Y="163"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS2a" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-74" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="288" Y="70"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS1a" Target="CS2a">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="CS1a" Target="CS1a">
+<LabelBlock>
+<SimpleIdentifier Name="CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="288" Y="57"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS1a" Target="CS1">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="243" Y="163"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="RUN">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="300" Y="250"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="XX">
+<LabelBlock>
+<SimpleIdentifier Name="done_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-20" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="373" Y="261"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_aus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="349" Y="141"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="CS1">
+<LabelBlock>
+<SimpleIdentifier Name="CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="XX" Target="RUN">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="347" Y="283"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="XX" Target="XX">
+<LabelBlock>
+<SimpleIdentifier Name="done_ZS"/>
+<SimpleIdentifier Name="CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="16" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="417" Y="379"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="XX" Target="ZS">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_aus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="459" Y="261"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS2" Target="CS2a">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_aus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-49" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="93" Y="141"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS2" Target="RUN">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="185" Y="267"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS2" Target="CS2">
+<LabelBlock>
+<SimpleIdentifier Name="CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="45" Y="254"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="RUN">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="371" Y="163"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="14" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="419" Y="56"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="ZS">
+<LabelBlock>
+<SimpleIdentifier Name="done_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="483" Y="141"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZS" Target="XX">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-20" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="485" Y="283"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZS" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="461" Y="163"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZS" Target="ZS">
+<LabelBlock>
+<SimpleIdentifier Name="done_ZS"/>
+<SimpleIdentifier Name="CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="571" Y="205"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS1" Target="CS1a">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_aus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="221" Y="141"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS1" Target="CS2">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="CS1" Target="CS1">
+<LabelBlock>
+<SimpleIdentifier Name="CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="177" Y="255"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="decoder"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="autom_VR"/>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="is_cod_er"/>
+<SimpleIdentifier Name="is_cod_ser"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="ZSA"/>
+<SimpleIdentifier Name="ZSI"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="RQSER">
+<PointGeometry>
+<Point X="112" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-17" Y="-11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RQER">
+<PointGeometry>
+<Point X="240" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-28" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RQVR">
+<PointGeometry>
+<Point X="368" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="1" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RQZS">
+<PointGeometry>
+<Point X="496" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-11" Y="-10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="TSTZS">
+<PointGeometry>
+<Point X="432" Y="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-2" Y="18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="COD">
+<PointGeometry>
+<Point X="176" Y="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-20" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZS">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="496" Y="400"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-2" Y="18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="VR">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="368" Y="400"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="6" Y="16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="SER">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="400"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-11" Y="18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ER">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="240" Y="400"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="7" Y="18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<PointGeometry>
+<Point X="304" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-4" Y="-11"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name=":1">
+<NodeRef Name="COD"/>
+<NodeRef Name="ER"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="RQER"/>
+<NodeRef Name="RQSER"/>
+<NodeRef Name="RQVR"/>
+<NodeRef Name="RQZS"/>
+<NodeRef Name="SER"/>
+<NodeRef Name="TSTZS"/>
+<NodeRef Name="VR"/>
+<NodeRef Name="ZS"/>
+<BoxGeometry>
+<Box Height="416" Width="480" X="64" Y="32"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="SER" Target="RQVR">
+<LabelBlock>
+<SimpleIdentifier Name="autom_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-105" Y="72"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="SER" Target="RQER">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="TAST"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="148" Y="272"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="SER" Target="TSTZS">
+<LabelBlock>
+<SimpleIdentifier Name="ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="RQVR">
+<LabelBlock>
+<SimpleIdentifier Name="TAST"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="COD">
+<LabelBlock>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-13" Y="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="204" Y="120"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="RQER">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="TSTZS">
+<LabelBlock>
+<SimpleIdentifier Name="ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-9" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="401" Y="120"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RQZS" Target="ZS">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="502" Y="290"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RQVR" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-44"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source=":1" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ER" Target="RQVR">
+<LabelBlock>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="autom_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="-35"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ER" Target="RQER">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="231" Y="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="TSTZS">
+<LabelBlock>
+<SimpleIdentifier Name="ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="COD" Target="RQSER">
+<LabelBlock>
+<SimpleIdentifier Name="is_cod_ser"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="COD" Target="RQER">
+<LabelBlock>
+<SimpleIdentifier Name="is_cod_er"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="VR" Target="COD">
+<LabelBlock>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-82" Y="-34"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="267" Y="354"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="RQER">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="TAST"/>
+<LabelGeometry Anchor="NW">
+<Point X="16" Y="17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="293" Y="294"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="TSTZS">
+<LabelBlock>
+<SimpleIdentifier Name="ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="RQSER" Target="SER">
+<LabelBlock>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-38"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="95" Y="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RQER" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="-60"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="247" Y="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="TSTZS" Target="RQZS">
+<LabelBlock>
+<SimpleIdentifier Name="ZSA"/>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="TSTZS" Target="RQVR">
+<LabelBlock>
+<SimpleIdentifier Name="ZSI"/>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ZS" Target="RQZS">
+<LabelBlock>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="36"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="479" Y="289"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZS" Target="COD">
+<LabelBlock>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<LabelGeometry Anchor="NW">
+<Point X="98" Y="19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="327" Y="370"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZS" Target="RQER">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="368" Y="289"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="eingabe_er"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="wsp"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="C1">
+<PointGeometry>
+<Point X="272" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="7" Y="16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="C2">
+<PointGeometry>
+<Point X="112" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-22" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ER">
+<PointGeometry>
+<Point X="272" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="6" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-21" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="C2" Target="C2">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-121"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="76" Y="347"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="C2" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="-50"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="75" Y="135"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="C1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="C1" Target="C2">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="C1" Target="C1">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="-82"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="307" Y="351"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="wsp"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-116"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="C1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ER" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="299" Y="133"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="eingabe_fs"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="wsp"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="FS">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="FS" Target="FS">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="245" Y="173"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="FS" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="-148"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="152" Y="159"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="FS">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="152" Y="193"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-145"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="61" Y="175"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="eingabe_ser"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="wsp"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="VR">
+<PointGeometry>
+<Point X="192" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="80" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="VR" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FT"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="228" Y="175"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-3" Y="-148"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="136" Y="159"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FT"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="136" Y="193"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="-141"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="40" Y="173"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="eingabe_vr"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="wsp"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="VR">
+<PointGeometry>
+<Point X="176" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="VR" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="212" Y="175"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="-149"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="120" Y="159"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="120" Y="193"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="-143"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="27" Y="174"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="eingabe_zs"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="kein_ZS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="VR">
+<PointGeometry>
+<Point X="176" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="-62"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="27" Y="142"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="120" Y="161"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="kein_ZS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-2" Y="-124"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="120" Y="124"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="VR_FS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-69"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="212" Y="144"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="NAME">
+<EnumSetExpression>
+<SimpleIdentifier Name="WSP"/>
+</EnumSetExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="ircount">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="ctr_ge_max">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="ctr_lt_max">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="inc_ctr">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset_ctr">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="32"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-21" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="144" Y="32"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="10" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="RUN" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="ctr_lt_max">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="ctr_ge_max">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="104" Y="47"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="inc_ctr">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="105" Y="20"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="reset_ctr">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="31" Y="28"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="kein_zs"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="kein_ZS"/>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="AUF">
+<PointGeometry>
+<Point X="48" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-12" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZU">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="144" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="AUF" Target="AUF">
+<LabelBlock>
+<SimpleIdentifier Name="kein_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="12" Y="43"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUF" Target="ZU">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="58"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="AUF">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="38"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="ZU">
+<LabelBlock>
+<SimpleIdentifier Name="ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="183" Y="47"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="keine_wsp"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="TASTVR"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="80" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-17" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="WSP">
+<PointGeometry>
+<Point X="192" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-16" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="WSP" Target="WSP">
+<LabelBlock>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-20" Y="-84"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="224" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="WSP" Target="IDLE">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="wsp"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="131" Y="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="WSP">
+<LabelBlock>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-118"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="136" Y="127"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="45" Y="144"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="NAME">
+<SimpleIdentifier Name="Timers"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="timer">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-18" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="176" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="time">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="119" Y="142"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="119" Y="115"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="TUER">
+<SimpleIdentifier Name="Tueren"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="tklemme">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="AUF">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-1" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZU">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-13" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="ZU" Target="AUF">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="109" Y="110"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUF" Target="ZU">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="112" Y="82"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="tuermodell"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="done_ER"/>
+<IndexedIdentifier Name="done_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="done_VR"/>
+<SimpleIdentifier Name="done_ZS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="CS">
+<PointGeometry>
+<Point X="384" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-26" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="224" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-20" Y="-10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="VR">
+<PointGeometry>
+<Point X="128" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-26" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZS">
+<PointGeometry>
+<Point X="320" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="11" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="SER">
+<PointGeometry>
+<Point X="224" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-35" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ER">
+<PointGeometry>
+<Point X="224" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-27" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name=":0">
+<NodeRef Name="ER"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="SER"/>
+<NodeRef Name="VR"/>
+<NodeRef Name="ZS"/>
+<BoxGeometry>
+<Box Height="224" Width="256" X="96" Y="48"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="ZS" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="done_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="272" Y="170"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="SER" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="done_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-79" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="214" Y="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="done_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="150"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="ZS">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="272" Y="150"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="SER">
+<LabelBlock>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="234" Y="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="170"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<LabelGeometry Anchor="NW">
+<Point X="-51" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="215" Y="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="23" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="340" Y="85"/>
+</SplineGeometry>
+</Edge>
+<Edge Source=":0" Target="CS">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="369" Y="122"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="done_ER"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="233" Y="112"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="warten"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="autom_VR"/>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="done_ER"/>
+<IndexedIdentifier Name="done_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="done_VR"/>
+<SimpleIdentifier Name="done_ZS"/>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="80" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-5" Y="-11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="208" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="RUN" Target="RUN">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="244" Y="109"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<SimpleIdentifier Name="done_ER"/>
+<IndexedIdentifier Name="done_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="done_VR"/>
+<SimpleIdentifier Name="done_ZS"/>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="131"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-60"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="93"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="autom_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="-44"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="42" Y="109"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="wspcount"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="autom_VR"/>
+<IndexedIdentifier Name="ctr_ge_max">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="ctr_lt_max">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="ER"/>
+<IndexedIdentifier Name="inc_ctr">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="TAST"/>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="wsp"/>
+<SimpleIdentifier Name="ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="WSP">
+<PointGeometry>
+<Point X="384" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-38" Y="15"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="CNT">
+<PointGeometry>
+<Point X="192" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-34" Y="13"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="TST">
+<PointGeometry>
+<Point X="288" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-33" Y="13"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="COOL">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-39" Y="16"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="TST" Target="COOL">
+<LabelBlock>
+<IndexedIdentifier Name="ctr_lt_max">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-21" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="186" Y="157"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="TST" Target="WSP">
+<LabelBlock>
+<IndexedIdentifier Name="ctr_ge_max">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="COOL" Target="COOL">
+<LabelBlock>
+<IndexedIdentifier Name="ctr_ge_max">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="ctr_lt_max">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-77" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="99" Y="77"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="COOL" Target="CNT">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="autom_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-90"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="CNT" Target="TST">
+<LabelBlock>
+<IndexedIdentifier Name="inc_ctr">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="CNT" Target="COOL">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="140"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CNT" Target="CNT">
+<LabelBlock>
+<IndexedIdentifier Name="ctr_ge_max">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="ctr_lt_max">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="193" Y="76"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="WSP" Target="COOL">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="231" Y="192"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="WSP" Target="WSP">
+<LabelBlock>
+<SimpleIdentifier Name="wsp"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="383" Y="77"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="wsptime"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="autom_VR"/>
+<SimpleIdentifier Name="ER"/>
+<IndexedIdentifier Name="reset_ctr">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="TAST"/>
+<IndexedIdentifier Name="time">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="RESET">
+<PointGeometry>
+<Point X="288" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-21" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="TIME">
+<PointGeometry>
+<Point X="128" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-16" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-8" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="208" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-13" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="RESET" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="reset_ctr">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="172" Y="148"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="RESET">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="RUN" Target="RUN">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="autom_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-69"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="207" Y="72"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="TIME">
+<LabelBlock>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="autom_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-93"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="TIME" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="time">
+<SimpleIdentifier Name="WSP"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="zsi"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="ZSA"/>
+<SimpleIdentifier Name="ZSI"/>
+<SimpleIdentifier Name="zuendung_an"/>
+<SimpleIdentifier Name="zuendung_aus"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="ZU">
+<PointGeometry>
+<Point X="192" Y="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-14" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="AUS2">
+<PointGeometry>
+<Point X="96" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-13" Y="-12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AUS1">
+<PointGeometry>
+<Point X="96" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="9" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AUS0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="272"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="0" Y="17"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AN2">
+<PointGeometry>
+<Point X="304" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="9" Y="2"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AN1">
+<PointGeometry>
+<Point X="304" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="11" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AN0">
+<PointGeometry>
+<Point X="304" Y="272"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="8" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="AUS0" Target="AUS0">
+<LabelBlock>
+<SimpleIdentifier Name="ZSA"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="56" Y="268"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUS0" Target="AN0">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="AUS0" Target="AUS1">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-63" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="86" Y="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN0" Target="AN0">
+<LabelBlock>
+<SimpleIdentifier Name="ZSI"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="342" Y="268"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN0" Target="ZU">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_aus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="250" Y="242"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN0" Target="AN1">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="294" Y="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="AN0">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-56" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="246" Y="254"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="ZU">
+<LabelBlock>
+<SimpleIdentifier Name="ZSI"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="218" Y="204"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="AUS1">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="AUS1" Target="AUS0">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-3" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="106" Y="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUS1" Target="AUS1">
+<LabelBlock>
+<SimpleIdentifier Name="ZSA"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="55" Y="175"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUS1" Target="AN1">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="200" Y="161"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUS1" Target="AUS2">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-65" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="86" Y="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN1" Target="AN0">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="314" Y="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN1" Target="AUS1">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_aus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="200" Y="191"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN1" Target="AN1">
+<LabelBlock>
+<SimpleIdentifier Name="ZSI"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="342" Y="173"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN1" Target="AN2">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-65" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="294" Y="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN2" Target="AN1">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="314" Y="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN2" Target="AN2">
+<LabelBlock>
+<SimpleIdentifier Name="ZSI"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="342" Y="77"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AN2" Target="AUS2">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_aus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="200" Y="95"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUS2" Target="AUS1">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="BT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-1" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="106" Y="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUS2" Target="AN2">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="200" Y="65"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUS2" Target="AUS2">
+<LabelBlock>
+<SimpleIdentifier Name="ZSA"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="58" Y="78"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="zuendung"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<SimpleIdentifier Name="zuendung_aus"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="AN">
+<PointGeometry>
+<Point X="208" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-1" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="AUS">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-18" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="AN" Target="AUS">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_aus"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="152" Y="79"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUS" Target="AN">
+<LabelBlock>
+<SimpleIdentifier Name="zuendung_an"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="155" Y="112"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+
