@@ -60,20 +60,26 @@ endif
 #############################################################################
 # Cross-compiling Linux -> Windows
 
+ifeq "$(CCPP)" ""
+
 ifeq "$(HOST_OS)" "$(TARGET_OS)"
   export CXX             = g++
 else
   ifeq "$(TARGET_OS)" "win32"
     ifeq "$(ARCH)" "x86"
       export CXX         = i686-w64-mingw32-g++
-      export LD          = i686-w64-mingw32-g++
     endif
     ifeq "$(ARCH)" "amd64"
       export CXX         = x86_64-w64-mingw32-g++
-      export LD          = x86_64-w64-mingw32-g++
     endif
   endif
 endif
+
+else
+export CXX		 = $(CCPP)
+endif
+
+export LD                = $(CXX)
 
 
 #############################################################################

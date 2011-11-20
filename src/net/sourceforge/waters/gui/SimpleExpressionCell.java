@@ -10,12 +10,9 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeListener;
+
 import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -30,6 +27,21 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
+/**
+ * <P>A text field to enter simple expressions.</P>
+ *
+ * <P>A SimpleExpressionCell allows the user to input text representing
+ * a Waters simple expression ({@link SimpleExpressionProxy}) of a specific
+ * type.</P>
+ *
+ * <P>This class provides support for use inside a table or list. An
+ * {@link ExpressionParser} is used to validate the input, and error messages
+ * from the parser can be sent to a configurable destination. Attempts are
+ * made to prevent the entry of characters that are not allowed in an
+ * expression of the expected type.</P>
+ *
+ * @author Robi Malik
+ */
 
 public class SimpleExpressionCell
   extends JFormattedTextField
@@ -37,36 +49,85 @@ public class SimpleExpressionCell
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a cell to enter expressions of an arbitrary type.
+   * @param  parser    The expression parser to be used for input validation.
+   *                   It can be obtained from the
+   *                   {@link ModuleWindowInterface}.
+   */
   public SimpleExpressionCell(final ExpressionParser parser)
   {
     this(Operator.TYPE_ANY, parser);
   }
 
+  /**
+   * Creates a cell to enter expressions of a specific type.
+   * @param  mask      Type mask of supported types.
+   *                   It can be defined using the constants in
+   *                   {@link Operator}.
+   * @param  parser    The expression parser to be used for input validation.
+   *                   It can be obtained from the
+   *                   {@link ModuleWindowInterface}.
+   */
   public SimpleExpressionCell(final int mask,
                               final ExpressionParser parser)
   {
     this(new DefaultInputParser(mask, parser));
   }
 
-  public SimpleExpressionCell(final Object value,
+  /**
+   * Creates a cell to enter expressions of an arbitrary type.
+   * @param  expr      The initial value for the text field.
+   * @param  parser    The expression parser to be used for input validation.
+   *                   It can be obtained from the
+   *                   {@link ModuleWindowInterface}.
+   */
+  public SimpleExpressionCell(final SimpleExpressionProxy expr,
                               final ExpressionParser parser)
   {
-    this(value, Operator.TYPE_ANY, parser);
+    this(expr, Operator.TYPE_ANY, parser);
   }
 
-  public SimpleExpressionCell(final Object value,
+  /**
+   * Creates a cell to enter expressions of a specific type.
+   * @param  expr      The initial value for the text field.
+   * @param  mask      Type mask of supported types.
+   *                   It can be defined using the constants in
+   *                   {@link Operator}.
+   * @param  parser    The expression parser to be used for input validation.
+   *                   It can be obtained from the
+   *                   {@link ModuleWindowInterface}.
+   */
+  public SimpleExpressionCell(final SimpleExpressionProxy expr,
                               final int mask,
                               final ExpressionParser parser)
   {
-    this(value, new DefaultInputParser(mask, parser));
+    this(expr, new DefaultInputParser(mask, parser));
   }
 
+  /**
+   * Creates a customised simple expression cell.
+   * @param  parser    An input parser to validate the text input.
+   *                   By specifying a customised input parser, the user
+   *                   possible to implement type checking beyond the type
+   *                   masks.
+   * @see    SimpleIdentifierInputParser
+   */
   public SimpleExpressionCell(final FormattedInputParser parser)
   {
     this(null, parser);
   }
 
-  public SimpleExpressionCell(final Object value,
+  /**
+   * Creates a customised simple expression cell.
+   * @param  expr      The initial value for the text field.
+   * @param  parser    An input parser to validate the text input.
+   *                   By specifying a customised input parser, the user
+   *                   possible to implement type checking beyond the type
+   *                   masks.
+   * @see    SimpleIdentifierInputParser
+   */
+  public SimpleExpressionCell(final SimpleExpressionProxy expr,
                               final FormattedInputParser parser)
   {
     mParser = parser;
@@ -77,23 +138,29 @@ public class SimpleExpressionCell
       new DefaultFormatterFactory(formatter);
     setFormatterFactory(factory);
     setInputVerifier(mVerifier);
-    setValue(value);
-
-    final KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    final InputMap imap = getInputMap();
-    final ActionMap amap = getActionMap();
-    final Object name = imap.get(stroke);
-    mTextFieldEscapeAction = amap.get(name);
+    setValue(expr);
   }
 
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the cell's currently used input parser.
+   * The input parser is a wrapper around the cell's {@link ExpressionParser}
+   * to perform customised type checking in addition to parsing.
+   */
   public FormattedInputParser getFormattedInputParser()
   {
     return mParser;
   }
 
+  /**
+   * Sets whether the cell allows empty input.
+   * If allowed, an empty text input is accepted and causes a
+   * <CODE>null</CODE> expression to be returned. If not allowed
+   * (the default), attempting to commit the cell without input
+   * causes an error to be reported.
+   */
   public void setAllowNull(final boolean allow)
   {
     mAllowNull = allow;
@@ -101,36 +168,22 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
-  //# Overrides for Base Class javax.swing.JComponent
-  public void setToolTipText(final String text)
-  {
-    super.setToolTipText(text);
-    final KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    final InputMap imap = getInputMap();
-    final ActionMap amap = getActionMap();
-    final Object name = imap.get(stroke);
-    final Action action = amap.get(name);
-    if (text == null) {
-      if (action != mTextFieldEscapeAction) {
-        amap.put(name, mTextFieldEscapeAction);
-      }
-    } else {
-      if (!(action instanceof CombinedEscapeAction)) {
-        final Action combined =
-          new CombinedEscapeAction(mTextFieldEscapeAction, action);
-        amap.put(name, combined);
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Input Verification
+  /**
+   * Checks whether the current cell input is valid.
+   * This method calls the cell's input parser to perform input validation.
+   * @return <CODE>true</CODE> if the cell contents have been found to be
+   *         valid and keyboard focus can be transferred to another
+   *         component.
+   */
   public boolean shouldYieldFocus()
   {
     return mVerifier.shouldYieldFocus(this);
   }
 
+  /**
+   * Restores the cell to the content it had when it was last committed.
+   */
   public void revert()
   {
     final Object oldvalue = getValue();
@@ -140,16 +193,25 @@ public class SimpleExpressionCell
 
   //#########################################################################
   //# Actions
+  /**
+   * Sets a keyboard binding for the &lt;ENTER&gt; key.
+   */
   public void addEnterAction(final Action action)
   {
     addKeyAction(KeyEvent.VK_ENTER, action);
   }
 
+  /**
+   * Sets a keyboard binding for the &lt;ESCAPE&gt; key.
+   */
   public void addEscapeAction(final Action action)
   {
     addKeyAction(KeyEvent.VK_ESCAPE, action);
   }
 
+  /**
+   * Sets a keyboard binding for the given key.
+   */
   public void addKeyAction(final int keycode, final Action action)
   {
     final KeyStroke stroke = KeyStroke.getKeyStroke(keycode, 0);
@@ -161,16 +223,29 @@ public class SimpleExpressionCell
 
   //#########################################################################
   //# Error Display
+  /**
+   * Gets the error display associated with this cell.
+   * @see #setErrorDisplay(ErrorDisplay) setErrorDisplay()
+   */
   public ErrorDisplay getErrorDisplay()
   {
     return mErrorDisplay;
   }
 
+  /**
+   * Associates an error display with this cell.
+   * The error display gets notified about any errors obtained
+   * from the parser during input validation.
+   */
   public void setErrorDisplay(final ErrorDisplay display)
   {
     mErrorDisplay = display;
   }
 
+  /**
+   * Sets the given message in the cell's error display.
+   * @see #setErrorDisplay(ErrorDisplay) setErrorDisplay()
+   */
   public void setErrorMessage(final String msg)
   {
     if (mErrorDisplay != null) {
@@ -178,6 +253,10 @@ public class SimpleExpressionCell
     }
   }
 
+  /**
+   * Clears the cell's error display.
+   * @see #setErrorDisplay(ErrorDisplay) setErrorDisplay()
+   */
   public void clearErrorMessage()
   {
     if (mErrorDisplay != null) {
@@ -327,85 +406,9 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
-  //# Inner Class CombinedEscapeAction
-  /**
-   * This is an attempt to fix a bug in Swing. When a text field has a
-   * tooltip set, any ESCAPE key events are consumed by the tooltip,
-   * even if the tooltip is not visible. This wrapper class sends the
-   * action to the tooltip if it is visible, otherwise uses the old
-   * textfield action.
-   */
-  private static class CombinedEscapeAction implements Action
-  {
-
-    //#######################################################################
-    //# Constructor
-    private CombinedEscapeAction(final Action text, final Action tooltip)
-    {
-      mTextFieldAction = text;
-      mToolTipAction = tooltip;
-    }
-
-    //#######################################################################
-    //# Interface javax.swing.Action
-    public void addPropertyChangeListener
-      (final PropertyChangeListener listener)
-    {
-      mTextFieldAction.addPropertyChangeListener(listener);
-      mToolTipAction.addPropertyChangeListener(listener);
-    }
-
-    public Object getValue(final String key)
-    {
-      return mTextFieldAction.getValue(key);
-    }
-
-    public boolean isEnabled()
-    {
-      return mTextFieldAction.isEnabled() || mToolTipAction.isEnabled();
-    }
-
-    public void putValue(final String key, final Object value)
-    {
-      mTextFieldAction.putValue(key, value);
-    }
-
-    public void removePropertyChangeListener
-      (final PropertyChangeListener listener)
-    {
-      mTextFieldAction.removePropertyChangeListener(listener);
-      mToolTipAction.removePropertyChangeListener(listener);
-    }
-
-    public void setEnabled(final boolean enabled)
-    {
-      mTextFieldAction.setEnabled(enabled);
-    }
-
-    //#######################################################################
-    //# Interface java.awt.event.ActionListener
-    public void actionPerformed(final ActionEvent event)
-    {
-      if (mToolTipAction.isEnabled()) {
-        mToolTipAction.actionPerformed(event);
-      } else if (mTextFieldAction.isEnabled()) {
-        mTextFieldAction.actionPerformed(event);
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final Action mTextFieldAction;
-    private final Action mToolTipAction;
-
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final FormattedInputParser mParser;
   private final SimpleExpressionVerifier mVerifier;
-  private final Action mTextFieldEscapeAction;
 
   private boolean mAllowNull;
   private ErrorDisplay mErrorDisplay;

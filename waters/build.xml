@@ -4,6 +4,14 @@
   <description>
   </description>
 
+  <macrodef name="propertycopy">
+    <attribute name="name"/>
+    <attribute name="from"/>
+    <sequential>
+      <property name="@{name}" value="${@{from}}"/>
+    </sequential>
+  </macrodef>
+
   <property file="build.properties"/>
 
   <property name="supremica.root" location=".."/>
@@ -280,13 +288,20 @@
     <property name="cpp.debug" value="1"/>
   </target>
 
+  <target name="-set-ccpp" if="native.compiler.${native.target.arch}">
+    <propertycopy name="cpp.ccpp"
+                  from="native.compiler.${native.target.arch}"/>
+  </target>
+
   <target name="cpp"
-      depends="-guess-host-arch,-guess-target-arch,-set-debug,javah,jniglue"
+      depends="-guess-host-arch,-guess-target-arch,-set-debug,-set-ccpp,javah,jniglue"
       if="native.make" description="Builds Waters dynamic link library.">
+    <property name="cpp.ccpp" value=""/>
     <exec executable="${native.make}" dir="${cpp}"
           failonerror="true" failifexecutionfails="false">
       <arg value="HOST_ARCH=${native.host.arch}"/>
       <arg value="TARGET_ARCH=${native.target.arch}"/>
+      <arg value="CCPP=${cpp.ccpp}"/>
       <arg value="DEBUG=${cpp.debug}"/>
     </exec>
     <pathconvert property="waters.library.path">
