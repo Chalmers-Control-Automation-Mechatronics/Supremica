@@ -58,10 +58,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * {@link ProductDESBuilder} interface to be tested. Monolithic and
  * compositional synthesis are both supported.</P>
  *
- * <P>TODO. Presently, the test performs plantification. This should
- * probably be done by individual synthesisers instead, as not all
- * algorithms will require this step.</P>
- *
  * @author Robi Malik
  */
 
@@ -150,7 +146,7 @@ public abstract class AbstractSynthesizerTest
 
 
   //#########################################################################
-  //# Test Cases --- synthesis
+  //# Test Cases --- synthesis  private void synthesiseTbedNoderailB() throws Exception
   public void testBigFactory() throws Exception
   {
     final String group = "tests";

@@ -433,11 +433,10 @@ public class CompositionalSynthesizer
   {
     final CompositionalSynthesisResult result = getAnalysisResult();
     final ProductDESProxyFactory factory = getFactory();
-    if(step instanceof SynthesisAbstractionStep){
+    if (step instanceof SynthesisAbstractionStep) {
       final SynthesisAbstractionStep synStep = (SynthesisAbstractionStep) step;
       final EventEncoding eventEnc = synStep.getEventEncoding();
-      final ListBufferTransitionRelation supervisor =
-        synStep.getSupervisor();
+      final ListBufferTransitionRelation supervisor = synStep.getSupervisor();
       if (supervisor != null) {
         if (supervisor.isEmpty()) {
           result.setSatisfied(false);
@@ -958,9 +957,9 @@ public class CompositionalSynthesizer
       renamings.add(info);
       if (!foundNondeterminism) {
         outer :
-          for (int state = 0; state<numOfStates; state++) {
+          for (int state = 0; state < numOfStates; state++) {
             int foundSuccessor = -1;
-            for (final EventProxy event: replacement) {
+            for (final EventProxy event : replacement) {
               final int code = encoding.getEventCode(event);
               final int successor;
               if (code < 0) {
@@ -989,7 +988,7 @@ public class CompositionalSynthesizer
 
     // build modified supervisor
     final KindTranslator translator = getKindTranslator();
-    if( !foundNondeterminism) {
+    if (!foundNondeterminism) {
       final TransitionIterator modifyingIter =
         rel.createSuccessorsModifyingIterator();
       final int size = encoding.getNumberOfEvents();
@@ -1006,15 +1005,16 @@ public class CompositionalSynthesizer
         while (iter.hasNext()) {
           final EventProxy nextReplacement = iter.next();
           final int nextCode = encoding.getEventCode(nextReplacement);
-          for (int sourceState = 0; sourceState<numOfStates; sourceState++) {
-            modifyingIter.reset(sourceState, nextCode);
-            if (modifyingIter.advance()) {
-              final int target = modifyingIter.getCurrentTargetState();
-              modifyingIter.remove();
-              rel.addTransition(sourceState, firstCode, target);
-            }
-          }
+          // TODO Is it correct to skip events not in the encoding?
           if (nextCode >= 0) {
+            for (int sourceState = 0; sourceState<numOfStates; sourceState++) {
+              modifyingIter.reset(sourceState, nextCode);
+              if (modifyingIter.advance()) {
+                final int target = modifyingIter.getCurrentTargetState();
+                modifyingIter.remove();
+                rel.addTransition(sourceState, firstCode, target);
+              }
+            }
             rel.setUsedEvent(nextCode, false);
           }
         }
@@ -1075,10 +1075,37 @@ public class CompositionalSynthesizer
       }
     }
     final ProductDESProxyFactory factory = getFactory();
-    final String name = "sup:" + rel.getName();
+    final String name = getUniqueSupervisorName(rel);
     rel.setName(name);
     rel.setKind(ComponentKind.SUPERVISOR);
     return rel.createAutomaton(factory, coding);
+  }
+
+  private String getUniqueSupervisorName
+    (final ListBufferTransitionRelation rel)
+  {
+    final CompositionalSynthesisResult result = getAnalysisResult();
+    final Collection<AutomatonProxy> supervisors =
+      result.getComputedAutomata();
+    String supname;
+    int index = 0;
+    boolean found;
+    do {
+      if (index == 0) {
+        supname = "sup:" + rel.getName();
+      } else {
+        supname = "sup" + index + ":" + rel.getName();
+      }
+      found = false;
+      for (final AutomatonProxy aut : supervisors) {
+        if (aut.getName().equals(supname)) {
+          found = true;
+          break;
+        }
+      }
+      index++;
+    } while (found);
+    return supname;
   }
 
 
@@ -1129,7 +1156,7 @@ public class CompositionalSynthesizer
           final ListBufferTransitionRelation supervisor =
             mHalfWaySynthesisSimplifier.getSupervisor();
           if (original == null) {
-           final ProductDESProxyFactory factory = getFactory();
+            final ProductDESProxyFactory factory = getFactory();
             final StateEncoding outputStateEnc = new StateEncoding();
             final AutomatonProxy convertedAut =
               rel.createAutomaton(factory, eventEnc, outputStateEnc);
@@ -1275,7 +1302,6 @@ public class CompositionalSynthesizer
       encoding.setNumberOfExtraStates(1);
       return encoding;
     }
-
 
     //#######################################################################
     //# Data Members

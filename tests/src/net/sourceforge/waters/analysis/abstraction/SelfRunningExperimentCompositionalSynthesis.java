@@ -38,12 +38,13 @@ public class SelfRunningExperimentCompositionalSynthesis
            preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
              selectingMethod : selectingFactory.getEnumConstants()) {
+          final String preName = preselectingMethod.toString();
+          final String selName = selectingMethod.toString();
+          System.out.println("*** " + preName + "/" + selName + " ***");
           final CompositionalSynthesizerExperiments experiment =
-            new CompositionalSynthesizerExperiments(
-                                             preselectingMethod.toString() +
-                                             "_" +  selectingMethod.toString()
-                                             + ".csv", preselectingMethod,
-                                             selectingMethod);
+            new CompositionalSynthesizerExperiments
+              (preName + "_" +  selName + ".csv",
+               preselectingMethod, selectingMethod);
           experiment.setUp();
           experiment.runAllTests();
           experiment.tearDown();
