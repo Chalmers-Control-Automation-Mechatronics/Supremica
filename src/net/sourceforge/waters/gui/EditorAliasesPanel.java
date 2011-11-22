@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.Autoscroll;
@@ -22,19 +23,28 @@ import javax.swing.Action;
 import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.gui.command.RearrangeTreeCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
 import net.sourceforge.waters.gui.transfer.AliasTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
+import net.sourceforge.waters.gui.transfer.RearrangeTreeInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -50,7 +60,7 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
  * @author Carly Hona
  */
 public class EditorAliasesPanel extends JTree implements SelectionOwner,
-  Autoscroll
+  Autoscroll, TreeSelectionListener
 {
 
   public EditorAliasesPanel(final ModuleWindowInterface root,
@@ -65,7 +75,9 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     setModel(mModel);
     final MouseListener handler = new EditorAliasMouseListener();
     addMouseListener(handler);
+    addTreeSelectionListener(this);
 
+    mDataFlavorVisitor = new DataFlavorVisitor();
     setRootVisible(false);
     setShowsRootHandles(true);
     setAutoscrolls(true);
@@ -267,13 +279,17 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   public boolean canCopy(final List<? extends Proxy> items)
   {
-    /*
-     * DataFlavor common = null; for (final Proxy proxy : items) { final
-     * DataFlavor flavor = mDataFlavorVisitor.getDataFlavor(proxy); if (common
-     * == null) { common = flavor; } else if (common != flavor) { return
-     * false; } } return common != null;
-     */
-    return !items.isEmpty();
+
+    DataFlavor common = null;
+    for (final Proxy proxy : items) {
+      final DataFlavor flavor = mDataFlavorVisitor.getDataFlavor(proxy);
+      if (common == null) {
+        common = flavor;
+      } else if (common != flavor) {
+        return false;
+      }
+    }
+    return common != null;
   }
 
   public Transferable createTransferable(final List<? extends Proxy> items)
@@ -420,9 +436,28 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     return path == null ? null : (Proxy) path.getLastPathComponent();
   }
 
+  private void fireSelectionChanged()
+  {
+    final EditorChangedEvent event = new SelectionChangedEvent(this);
+    fireEditorChangedEvent(event);
+  }
 
   //#########################################################################
-  //# Inner Class EventDeclMouseListener
+  //# Interface javax.swing.event.TreeSelectionListener
+  public void valueChanged(final TreeSelectionEvent event)
+  {
+    // Why can't the new selection be read immediately ???
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+      {
+        fireSelectionChanged();
+      }
+    });
+  }
+
+
+  //#########################################################################
+  //# Inner Class EditorAliasMouseListener
   /**
    * A simple mouse listener to trigger opening the event declaration editor
    * dialog by double-click, and to trigger a popup menu.
@@ -506,7 +541,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
           proxies.add((Proxy) paths[i].getLastPathComponent());
         }
 
-        mProxies = proxies;
+        //mProxies = proxies;
         mImportedToThisPanel = false;
         return new AliasTransferable((List<Proxy>) proxies);
       }
@@ -518,10 +553,34 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     public void exportDone(final JComponent c, final Transferable t,
                            final int action)
     {
-      if(mImportedToThisPanel){
+      if (mImportedToThisPanel) {
         if (action == MOVE) {
-          mRoot.getModuleSubject().getConstantAliasListModifiable()
-            .removeAll(mProxies);
+          final ListSubject<ConstantAliasSubject> modList =
+            mRoot.getModuleSubject().getConstantAliasListModifiable();
+
+          int row = getRowToDropOn(mDropLoc);
+          if (mDroppingOnLastRow) {
+            row++;
+          }
+
+          final int count = getSelectionCount();
+          final List<RearrangeTreeInfo> result = new ArrayList<RearrangeTreeInfo>(count);
+          final int min = getMinSelectionRow();
+          final int max = getMaxSelectionRow();
+          for (int line = min; line <= max; line++) {
+            if (isRowSelected(line)) {
+              final TreePath path = getPathForRow(line);
+              final Proxy proxy = (Proxy) path.getLastPathComponent();
+              final RearrangeTreeInfo move =
+                new RearrangeTreeInfo(proxy, new ListInsertPosition(modList, row),
+                             new ListInsertPosition(modList, line));
+              result.add(move);
+            }
+          }
+
+          final RearrangeTreeCommand allMoves =
+            new RearrangeTreeCommand(result, EditorAliasesPanel.this);
+          mRoot.getUndoInterface().executeCommand(allMoves);
         }
       }
     }
@@ -544,54 +603,50 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
       if (!canImport(support)) {
         return false;
       }
-      final Transferable tr = support.getTransferable();
-      if (support.getTransferable()
-        .isDataFlavorSupported(WatersDataFlavor.MODULE_ALIAS_LIST)) {
-        try {
-          @SuppressWarnings("unchecked")
-          final List<? extends Proxy> transferData =
-            (List<? extends Proxy>) tr
-              .getTransferData(WatersDataFlavor.MODULE_ALIAS_LIST);
-          final ListSubject<ConstantAliasSubject> list =
-            mRoot.getModuleSubject().getConstantAliasListModifiable();
-          final ModuleProxyCloner cloner =
-            ModuleSubjectFactory.getCloningInstance();
+      else {
+        mDropLoc =
+          (Point) support.getDropLocation().getDropPoint().getLocation();
 
-          final Point dl =
-            (Point) support.getDropLocation().getDropPoint().getLocation();
-          int row = getRowToDropOn(dl);
-          if (mDroppingOnLastRow) {
-            row++;
-          }
-
-          final TreePath[] pathsToSelect = new TreePath[transferData.size()];
-
-          for (int i = transferData.size() - 1; i >= 0; i--) {
-            final ConstantAliasSubject cloned =
-              (ConstantAliasSubject) cloner.getClone(transferData.get(i));
-            list.add(row, cloned);
-            pathsToSelect[i] = getPathForRow(row);
-          }
-          setSelectionPaths(pathsToSelect);
-        } catch (final UnsupportedFlavorException exception) {
-          exception.printStackTrace();
-        } catch (final IOException exception) {
-          exception.printStackTrace();
-        }
         mImportedToThisPanel = true;
         return true;
       }
-      return false;
     }
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    private List<? extends Proxy> mProxies = null;
     private boolean mImportedToThisPanel;
+    private Point mDropLoc;
   }
 
+
+  //#########################################################################
+  //# Inner Class DataFlavorVisitor
+  private class DataFlavorVisitor extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private DataFlavor getDataFlavor(final Proxy proxy)
+    {
+
+      try {
+        return (DataFlavor) proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    @Override
+    public DataFlavor visitConstantAliasProxy(final ConstantAliasProxy alias)
+    {
+      return WatersDataFlavor.MODULE_ALIAS_LIST;
+    }
+
+  }
 
   /**
   *
@@ -604,5 +659,5 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
   private List<Observer> mObservers;
   private boolean mDroppingOnLastRow;
 
-  //private final DataFlavorVisitor mDataFlavorVisitor;
+  private final DataFlavorVisitor mDataFlavorVisitor;
 }
