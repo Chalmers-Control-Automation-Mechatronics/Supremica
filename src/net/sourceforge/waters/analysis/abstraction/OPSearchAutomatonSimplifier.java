@@ -278,15 +278,15 @@ public class OPSearchAutomatonSimplifier
   }
 
   @Override
-  public PartitionedAutomatonResult getAnalysisResult()
+  public OPSearchAutomatonResult getAnalysisResult()
   {
-    return (PartitionedAutomatonResult) super.getAnalysisResult();
+    return (OPSearchAutomatonResult) super.getAnalysisResult();
   }
 
   @Override
-  protected PartitionedAutomatonResult createAnalysisResult()
+  protected OPSearchAutomatonResult createAnalysisResult()
   {
-    return new PartitionedAutomatonResult();
+    return new OPSearchAutomatonResult();
   }
 
 
@@ -744,6 +744,8 @@ public class OPSearchAutomatonSimplifier
   private void doOPSearchStep()
     throws AbortException, OverflowException
   {
+    final OPSearchAutomatonResult result = getAnalysisResult();
+    result.recordIteration();
     final long trans = findOPSearchTransition();
     final int source = (int) (trans & 0xffffffffL);
     final int target = (int) (trans >> 32);

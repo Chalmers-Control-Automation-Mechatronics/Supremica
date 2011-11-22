@@ -127,9 +127,12 @@ public class CompositionalAnalysisResult
     mRedundantEventsCount += count;
   }
 
-  public void setSimplifierStatistics(final List<TRSimplifierStatistics> stats)
+  public void setSimplifierStatistics
+    (final List<? extends TRSimplifierStatistics> stats)
   {
-    mSimplifierStatistics = stats;
+    final int size = stats.size();
+    mSimplifierStatistics = new ArrayList<TRSimplifierStatistics>(size);
+    mSimplifierStatistics.addAll(stats);
   }
 
   public void setSimplifierStatistics
