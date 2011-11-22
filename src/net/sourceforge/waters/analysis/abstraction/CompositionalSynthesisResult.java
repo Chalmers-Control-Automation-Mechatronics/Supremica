@@ -108,6 +108,8 @@ public class CompositionalSynthesisResult
   {
     super.printCSVHorizontalHeadings(writer);
     writer.print(',');
+    writer.print("RenamingIsUsed");
+    writer.print(',');
     writer.print("NumberOfSupervisors");
     writer.print(',');
     writer.print("LargestSupervisor");
@@ -118,6 +120,8 @@ public class CompositionalSynthesisResult
   public void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
+    writer.print(",");
+    writer.print(getRenamingIsUsed());
     writer.print(",");
     writer.print(mSupervisors.size());
     writer.print(",");
@@ -161,10 +165,19 @@ public class CompositionalSynthesisResult
     }
   }
 
+  void setRenamingIsUsed (final boolean isUsed) {
+    mRenamingIsUsed = isUsed;
+  }
+
+  boolean getRenamingIsUsed() {
+    return mRenamingIsUsed;
+  }
+
 
   //#########################################################################
   //# Data Members
   private ProductDESProxy mProductDES;
   private final List<AutomatonProxy> mSupervisors;
+  boolean mRenamingIsUsed;
 
 }

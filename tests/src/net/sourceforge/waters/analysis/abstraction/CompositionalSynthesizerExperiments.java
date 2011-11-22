@@ -192,24 +192,28 @@ public class CompositionalSynthesizerExperiments
   //# Invocation
   void runAllTests() throws Exception
   {
-    synthesiseCentralLockingKoordwspBlock();
-    synthesiseCentralLockingVerriegel3b();
-    synthesiseVerrigel4B();
-    synthesissAip0Alps();
-    synthesissAip0Aip();
-    synthesisAip0tough();
-    synthesiseTbedCtct();
+
+//    synthesiseTbedNoderailB();
+//    synthesiseCentralLockingKoordwspBlock();
+//    synthesiseCentralLockingVerriegel3b();
+//    synthesiseVerrigel4B();
+//    synthesissAip0Alps();
+//    synthesissAip0Aip();
+//    synthesisAip0tough();
+//    synthesiseTbedCtct();
     synthesiseTbedNoderailB();
-    synthesiseTbedNoderailUncont();
-    synthesiseFischertechnik();
-    synthesisLargestCoherent();
-    synthesisTip3Bad();
-    synthesisFenCaiWon09();
+//    synthesiseTbedNoderailUncont();
+//    synthesiseFischertechnik();
+//    synthesisLargestCoherent();
+//    synthesisTip3Bad();
+    synthesisFenCaiWon09B();
     synthesisAGVB();
+    synthesisAGV();
     synthesissRhoneSubPatch0();
     synthesissFms2003();
     synthesiseIPC();
     synthesiseFlexibleManufacturingSystem();
+
   }
 
 
@@ -224,51 +228,62 @@ public class CompositionalSynthesizerExperiments
 
   private void synthesiseCentralLockingVerriegel3b() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "verriegel3b.wmod", true);
+    runModel("valid", "synthesis_experiment", "verriegel3b.wmod", false);
   }
 
   private void synthesiseVerrigel4B() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "verriegel4b.wmod", true);
+    runModel("valid", "synthesis_experiment", "verriegel4b.wmod", false);
   }
 
   // AIP
   private void synthesissAip0Alps() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "aip0alps.wmod", true);
+    runModel("valid", "synthesis_experiment", "aip0alps.wmod", false);
   }
 
   private void synthesissAip0Aip() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "aip0aip.wmod", true);
+    runModel("valid", "synthesis_experiment", "aip0aip.wmod", false);
   }
 
   private void synthesisAip0tough() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "aip0tough.wmod", true);
+    runModel("valid", "synthesis_experiment", "aip0tough.wmod", false);
   }
 
   private void synthesisLargestCoherent() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "largest_coherent.wmod", true);
+    runModel("valid", "synthesis_experiment", "largest_coherent.wmod", false);
   }
 
   // Train testbed
   private void synthesiseTbedNoderailUncont() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tbed_uncont.wmod", true);
+    runModel("valid", "synthesis_experiment", "tbed_uncont.wmod", false);
   }
 
   private void synthesiseTbedNoderailB() throws Exception
   {
     runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod",
-                                                                        true);
+                                                                        false);
   }
 
   private void synthesiseTbedCtct() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tbed_ctct.wmod", true);
+    runModel("valid", "synthesis_experiment", "tbed_ctct.wmod", false);
   }
+
+//AGV
+   private void synthesisAGVB() throws Exception
+   {
+     runModel("valid", "synthesis_experiment", "agvb.wmod", true);
+   }
+
+   private void synthesisAGV() throws Exception
+   {
+     runModel("valid", "synthesis_experiment", "agv.wmod", true);
+   }
 
    //
   private void synthesiseIPC() throws Exception
@@ -298,19 +313,16 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "flexible_man_sys.wmod", true);
   }
 
-  private void synthesisAGVB() throws Exception
-  {
-    runModel("valid", "synthesis_experiment", "agvb.wmod", true);
-  }
+
 
   private void synthesisTip3Bad() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tip3_bad.wmod", true);
+    runModel("valid", "synthesis_experiment", "tip3_bad.wmod", false);
   }
 
-  private void synthesisFenCaiWon09() throws Exception
+  private void synthesisFenCaiWon09B() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "FenCaiWon09.wmod", true);
+    runModel("valid", "synthesis_experiment", "FenCaiWon09b.wmod", false);
   }
 
 

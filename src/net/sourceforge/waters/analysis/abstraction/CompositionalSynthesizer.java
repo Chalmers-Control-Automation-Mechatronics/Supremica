@@ -198,6 +198,7 @@ public class CompositionalSynthesizer
   }
 
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
   public ProductDESProxy getComputedProductDES()
@@ -451,6 +452,7 @@ public class CompositionalSynthesizer
       // Apply inverse renaming to other automata
       final Map<EventProxy,List<EventProxy>> renaming = synStep.getRenaming();
       if (renaming != null) {
+        result.setRenamingIsUsed(true);
         final AutomatonProxy originalAut = synStep.getOriginalAutomaton();
         final Set<AutomatonProxy> affectedAutomata =
           new THashSet<AutomatonProxy>();
@@ -1005,7 +1007,6 @@ public class CompositionalSynthesizer
         while (iter.hasNext()) {
           final EventProxy nextReplacement = iter.next();
           final int nextCode = encoding.getEventCode(nextReplacement);
-          // TODO Is it correct to skip events not in the encoding?
           if (nextCode >= 0) {
             for (int sourceState = 0; sourceState<numOfStates; sourceState++) {
               modifyingIter.reset(sourceState, nextCode);
@@ -1363,6 +1364,7 @@ public class CompositionalSynthesizer
       return mEventEncoding;
     }
 
+
     //#######################################################################
     //# Data Members
     private ListBufferTransitionRelation mSupervisor;
@@ -1457,5 +1459,4 @@ public class CompositionalSynthesizer
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
-
 }
