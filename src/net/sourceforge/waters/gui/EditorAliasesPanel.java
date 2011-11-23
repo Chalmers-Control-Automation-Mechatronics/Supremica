@@ -38,7 +38,6 @@ import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
 import net.sourceforge.waters.gui.transfer.AliasTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
-import net.sourceforge.waters.gui.transfer.RearrangeTreeInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
@@ -57,7 +56,7 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
  * The Aliases Panel which shows under the definitions tab of the module
  * editor ({@link org.supremica.gui.ide.EditorPanel EditorPanel}).
  *
- * @author Carly Hona
+ * @author Carly Hona, Robi Malik
  */
 public class EditorAliasesPanel extends JTree implements SelectionOwner,
   Autoscroll, TreeSelectionListener
@@ -499,6 +498,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   }
 
+
   //#########################################################################
   //# Inner Class AliasesPanelTransferHandler
   private class AliasesPanelTransferHandler extends TransferHandler
@@ -539,7 +539,8 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
             mRoot.getModuleSubject().getConstantAliasListModifiable();
 
           final int count = getSelectionCount();
-          final List<RearrangeTreeInfo> result = new ArrayList<RearrangeTreeInfo>(count);
+          final List<InsertInfo> inserts = new ArrayList<InsertInfo>(count);
+          final List<InsertInfo> deletes = new ArrayList<InsertInfo>(count);
           final int min = getMinSelectionRow();
           final int max = getMaxSelectionRow();
 
@@ -547,90 +548,42 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
           int rowOfDrop = getClosestRowForLocation(location.x, location.y);
           final Rectangle bounds = getRowBounds(rowOfDrop);
 
-          boolean testFurther = false;
-
-          if(count > 1){
-
-            //if drop is above the highest selection
-            if(rowOfDrop < min){
-              if (location.y >= bounds.y + bounds.height / 2 ) {
-                rowOfDrop++;
-              }
-            }
-            //if drop is below the lowest selection
-            else if(rowOfDrop > max){
-              if (location.y < bounds.y + bounds.height / 2 ) {
-                rowOfDrop -= count;
-              }
-            }
-            else{
-              testFurther = true;
-            }
-
-           // int numberProcessed = 0;
-            for (int initialRow = min; initialRow <= max; initialRow++) {
-              if (isRowSelected(initialRow)) {
-                final TreePath path = getPathForRow(initialRow);
-                final Proxy proxy = (Proxy) path.getLastPathComponent();
-
-                if(testFurther){
-                 /* if(rowOfDrop == initialRow){
-                    System.out.println("on");
-                    rowOfDrop -= numberProcessed;
-                  }
-                  else{
-                    System.out.println("in between");
-                    if (location.y < bounds.y + bounds.height / 2 ) {
-                      rowOfDrop -= numberProcessed;
-                    }
-                    else{
-                      rowOfDrop = rowOfDrop - numberProcessed + 1;
-                    }
-                  }*/
-                }
-                //numberProcessed++;
-              final RearrangeTreeInfo move =
-                new RearrangeTreeInfo(proxy, new ListInsertPosition(modList, rowOfDrop),
-                             new ListInsertPosition(modList, initialRow));
-
-              result.add(move);
-              }
-            }
-
+          //if cursor on lower half of row
+          if (location.y >= bounds.y + bounds.height / 2) {
+            rowOfDrop++;
           }
-          else{
-              final TreePath path = getPathForRow(min);
+
+          int counter = 0;
+          for (int initialRow = min; initialRow <= max; initialRow++) {
+            if (isRowSelected(initialRow)) {
+              final TreePath path = getPathForRow(initialRow);
               final Proxy proxy = (Proxy) path.getLastPathComponent();
 
-              //if drop location in lower half of row, dragging up..
-              if (location.y >= bounds.y + bounds.height / 2 ) {
-                if(rowOfDrop < min){
-                  rowOfDrop++;
-                }
+              final InsertInfo delete =
+                new InsertInfo(proxy, new ListInsertPosition(modList,
+                                                             initialRow));
+              deletes.add(delete);
+              if (initialRow < rowOfDrop) {
+                counter++;
               }
-              else{
-              //if drop location in top half of row, dragging down..
-                if (rowOfDrop > min) {
-                  rowOfDrop--;
-                }
-              }
+            }
+          }
+          rowOfDrop -= counter;
 
-              //only create the move if it isnt dropped on itself
-              if(rowOfDrop != min){
-                final RearrangeTreeInfo move =
-                new RearrangeTreeInfo(proxy, new ListInsertPosition(modList, rowOfDrop),
-                             new ListInsertPosition(modList, min));
-                result.add(move);
-              }
-              else{
-                return;
-              }
-
-
-        }
-
+          if (max - min + 1 == deletes.size() && min == rowOfDrop) {
+            return;
+          }
+          for (final InsertInfo delete : deletes) {
+            final Proxy proxy = delete.getProxy();
+            final InsertInfo insert =
+              new InsertInfo(proxy,
+                             new ListInsertPosition(modList, rowOfDrop));
+            inserts.add(insert);
+            rowOfDrop++;
+          }
           final RearrangeTreeCommand allMoves =
-            new RearrangeTreeCommand(result, EditorAliasesPanel.this);
+            new RearrangeTreeCommand(inserts, deletes,
+                                     EditorAliasesPanel.this);
           mRoot.getUndoInterface().executeCommand(allMoves);
         }
       }
@@ -653,8 +606,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     {
       if (!canImport(support)) {
         return false;
-      }
-      else {
+      } else {
         mDropLoc =
           (Point) support.getDropLocation().getDropPoint().getLocation();
         support.setShowDropLocation(true);
@@ -664,9 +616,6 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
       }
     }
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
     private boolean mImportedToThisPanel;
     private Point mDropLoc;
@@ -700,15 +649,10 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   }
 
-  /**
-  *
-  */
   private static final long serialVersionUID = 1L;
-
   private final ConstantAliasesTreeModel mModel;
   private final PopupFactory mPopupFactory;
   private final ModuleWindowInterface mRoot;
   private List<Observer> mObservers;
-
   private final DataFlavorVisitor mDataFlavorVisitor;
 }
