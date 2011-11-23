@@ -178,6 +178,7 @@ class ConstantAliasesTreeModel
           }
           break;
         }
+      case ModelChangeEvent.NAME_CHANGED:
       case ModelChangeEvent.STATE_CHANGED:
         {
           final ProxySubject psource = getVisibleAncestorInTree(source);
