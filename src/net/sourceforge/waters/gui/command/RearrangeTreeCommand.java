@@ -99,10 +99,26 @@ public class RearrangeTreeCommand
                        final boolean updatesSelection)
   {
     super(panel, "Move", updatesSelection);
-    mMoves = moves;
+    mDeletes = new ArrayList<InsertInfo>(moves.size());
+    mInserts = new ArrayList<InsertInfo>(moves.size());
+    for(final RearrangeTreeInfo move : moves){
+      final Proxy proxy = move.getProxy();
+      final InsertInfo insert = new InsertInfo(proxy , move.getInsertPosition());
+      final InsertInfo delete = new InsertInfo(proxy , move.getDeletePosition());
+      mInserts.add(insert);
+      mDeletes.add(delete);
+    }
+
+    //reverse the inserted list so it inserts in the right order
+    final List<InsertInfo> list = new ArrayList<InsertInfo>(mInserts.size());
+    for(int i = mInserts.size() - 1 ; i >= 0 ; i--){
+      list.add(mInserts.get(i));
+    }
+    mInserts = list;
+
 
     // And now for a nice name ...
-    final List<Proxy> proxies = RearrangeTreeInfo.getProxies(mMoves);
+    final List<Proxy> proxies = RearrangeTreeInfo.getProxies(moves);
     final String named = ProxyNamer.getCollectionClassName(proxies);
     if (named != null) {
       setName(named + " Move");
@@ -115,19 +131,8 @@ public class RearrangeTreeCommand
   public void execute()
   {
     final SelectionOwner panel = getPanel();
-
-    mDeletes = new ArrayList<InsertInfo>();
-    mInserts = new ArrayList<InsertInfo>();
-    for(final RearrangeTreeInfo move : mMoves){
-      final Proxy proxy = move.getProxy();
-      final InsertInfo insert = new InsertInfo(proxy , move.getInsertPosition());
-      final InsertInfo delete = new InsertInfo(proxy , move.getDeletePosition());
-      mDeletes.add(delete);
-      mInserts.add(insert);
-    }
     panel.deleteItems(mDeletes);
     panel.insertItems(mInserts);
-
     updateSelection();
   }
 
@@ -141,23 +146,23 @@ public class RearrangeTreeCommand
 
 //#########################################################################
   //# Auxiliary Methods
-  private void updateSelection(){
+  private void updateSelection()
+  {
     if (getUpdatesSelection()) {
       final List<Proxy> selection = new ArrayList<Proxy>(mInserts.size());
-    for(final InsertInfo insert : mInserts){
-      selection.add(insert.getProxy());
-    }
-    final SelectionOwner panel = getPanel();
-    panel.replaceSelection(selection);
-    panel.scrollToVisible(selection);
-    panel.activate();
+      for (final InsertInfo insert : mInserts) {
+        selection.add(insert.getProxy());
+      }
+      final SelectionOwner panel = getPanel();
+      panel.replaceSelection(selection);
+      panel.scrollToVisible(selection);
+      panel.activate();
     }
   }
 
   //#########################################################################
   //# Data Members
-  private final List<RearrangeTreeInfo> mMoves;
-  private List<InsertInfo> mDeletes;
+  private final List<InsertInfo> mDeletes;
   private List<InsertInfo> mInserts;
 
 }

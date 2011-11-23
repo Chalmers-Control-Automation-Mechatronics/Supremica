@@ -499,25 +499,6 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   }
 
-  private int getRowToDropOn(final Point location)
-  {
-    int row = getClosestRowForLocation(location.x, location.y);
-    mDroppingOnLastRow = false;
-    final Rectangle bounds = getRowBounds(row);
-
-    //if location is on lower half of the row..
-    if (location.y >= bounds.y + bounds.height / 2) {
-
-      if (getRowCount() - 1 == row) {
-        mDroppingOnLastRow = true;
-      } else {
-        row++;
-      }
-    }
-    return row;
-  }
-
-
   //#########################################################################
   //# Inner Class AliasesPanelTransferHandler
   private class AliasesPanelTransferHandler extends TransferHandler
@@ -541,7 +522,6 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
           proxies.add((Proxy) paths[i].getLastPathComponent());
         }
 
-        //mProxies = proxies;
         mImportedToThisPanel = false;
         return new AliasTransferable((List<Proxy>) proxies);
       }
@@ -558,25 +538,96 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
           final ListSubject<ConstantAliasSubject> modList =
             mRoot.getModuleSubject().getConstantAliasListModifiable();
 
-          int row = getRowToDropOn(mDropLoc);
-          if (mDroppingOnLastRow) {
-            row++;
-          }
-
           final int count = getSelectionCount();
           final List<RearrangeTreeInfo> result = new ArrayList<RearrangeTreeInfo>(count);
           final int min = getMinSelectionRow();
           final int max = getMaxSelectionRow();
-          for (int line = min; line <= max; line++) {
-            if (isRowSelected(line)) {
-              final TreePath path = getPathForRow(line);
-              final Proxy proxy = (Proxy) path.getLastPathComponent();
-              final RearrangeTreeInfo move =
-                new RearrangeTreeInfo(proxy, new ListInsertPosition(modList, row),
-                             new ListInsertPosition(modList, line));
-              result.add(move);
+
+          final Point location = mDropLoc.getLocation();
+          int rowOfDrop = getClosestRowForLocation(location.x, location.y);
+          final Rectangle bounds = getRowBounds(rowOfDrop);
+
+          boolean testFurther = false;
+
+          if(count > 1){
+
+            //if drop is above the highest selection
+            if(rowOfDrop < min){
+              if (location.y >= bounds.y + bounds.height / 2 ) {
+                rowOfDrop++;
+              }
             }
+            //if drop is below the lowest selection
+            else if(rowOfDrop > max){
+              if (location.y < bounds.y + bounds.height / 2 ) {
+                rowOfDrop -= count;
+              }
+            }
+            else{
+              testFurther = true;
+            }
+
+           // int numberProcessed = 0;
+            for (int initialRow = min; initialRow <= max; initialRow++) {
+              if (isRowSelected(initialRow)) {
+                final TreePath path = getPathForRow(initialRow);
+                final Proxy proxy = (Proxy) path.getLastPathComponent();
+
+                if(testFurther){
+                 /* if(rowOfDrop == initialRow){
+                    System.out.println("on");
+                    rowOfDrop -= numberProcessed;
+                  }
+                  else{
+                    System.out.println("in between");
+                    if (location.y < bounds.y + bounds.height / 2 ) {
+                      rowOfDrop -= numberProcessed;
+                    }
+                    else{
+                      rowOfDrop = rowOfDrop - numberProcessed + 1;
+                    }
+                  }*/
+                }
+                //numberProcessed++;
+              final RearrangeTreeInfo move =
+                new RearrangeTreeInfo(proxy, new ListInsertPosition(modList, rowOfDrop),
+                             new ListInsertPosition(modList, initialRow));
+
+              result.add(move);
+              }
+            }
+
           }
+          else{
+              final TreePath path = getPathForRow(min);
+              final Proxy proxy = (Proxy) path.getLastPathComponent();
+
+              //if drop location in lower half of row, dragging up..
+              if (location.y >= bounds.y + bounds.height / 2 ) {
+                if(rowOfDrop < min){
+                  rowOfDrop++;
+                }
+              }
+              else{
+              //if drop location in top half of row, dragging down..
+                if (rowOfDrop > min) {
+                  rowOfDrop--;
+                }
+              }
+
+              //only create the move if it isnt dropped on itself
+              if(rowOfDrop != min){
+                final RearrangeTreeInfo move =
+                new RearrangeTreeInfo(proxy, new ListInsertPosition(modList, rowOfDrop),
+                             new ListInsertPosition(modList, min));
+                result.add(move);
+              }
+              else{
+                return;
+              }
+
+
+        }
 
           final RearrangeTreeCommand allMoves =
             new RearrangeTreeCommand(result, EditorAliasesPanel.this);
@@ -606,6 +657,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
       else {
         mDropLoc =
           (Point) support.getDropLocation().getDropPoint().getLocation();
+        support.setShowDropLocation(true);
 
         mImportedToThisPanel = true;
         return true;
@@ -657,7 +709,6 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
   private final PopupFactory mPopupFactory;
   private final ModuleWindowInterface mRoot;
   private List<Observer> mObservers;
-  private boolean mDroppingOnLastRow;
 
   private final DataFlavorVisitor mDataFlavorVisitor;
 }
