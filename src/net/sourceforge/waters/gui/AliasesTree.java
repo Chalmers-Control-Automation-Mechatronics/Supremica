@@ -35,7 +35,7 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
-import net.sourceforge.waters.gui.transfer.AliasTransferable;
+import net.sourceforge.waters.gui.transfer.ConstantAliasTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
@@ -58,19 +58,20 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
  *
  * @author Carly Hona, Robi Malik
  */
-public class EditorAliasesPanel extends JTree implements SelectionOwner,
+public class AliasesTree extends JTree implements SelectionOwner,
   Autoscroll, TreeSelectionListener
 {
 
-  public EditorAliasesPanel(final ModuleWindowInterface root,
-                            final WatersPopupActionManager manager)
+  public AliasesTree(final ModuleWindowInterface root,
+                            final WatersPopupActionManager manager,
+                            final List<? extends Proxy> list)
   {
     mRoot = root;
     mPopupFactory =
       new AliasesTreePopupFactory(manager, mRoot.getModuleContext());
 
     final ModuleSubject module = mRoot.getModuleSubject();
-    mModel = new ConstantAliasesTreeModel(module);
+    mModel = new AliasesTreeModel(module, list);
     setModel(mModel);
     final MouseListener handler = new EditorAliasMouseListener();
     addMouseListener(handler);
@@ -91,9 +92,9 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   //#########################################################################
   //# Simple Access
-  public ConstantAliasesTreeModel getConstantAliasTreeModel()
+  public AliasesTreeModel getConstantAliasTreeModel()
   {
-    return (ConstantAliasesTreeModel) getModel();
+    return (AliasesTreeModel) getModel();
   }
 
   //#######################################################################
@@ -171,7 +172,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   public boolean isSelected(final Proxy proxy)
   {
-    final ConstantAliasesTreeModel model = getConstantAliasTreeModel();
+    final AliasesTreeModel model = getConstantAliasTreeModel();
     final ProxySubject subject = (ProxySubject) proxy;
     final TreePath path = model.createPath(subject);
     return isPathSelected(path);
@@ -217,7 +218,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   public Proxy getSelectableAncestor(final Proxy item)
   {
-    final ConstantAliasesTreeModel model = getConstantAliasTreeModel();
+    final AliasesTreeModel model = getConstantAliasTreeModel();
     final ProxySubject subject = (ProxySubject) item;
     if (subject == model.getRoot()) {
       return isRootVisible() ? subject : null;
@@ -239,7 +240,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   public void addToSelection(final List<? extends Proxy> items)
   {
-    final ConstantAliasesTreeModel model = getConstantAliasTreeModel();
+    final AliasesTreeModel model = getConstantAliasTreeModel();
     for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
       final TreePath path = model.createPath(subject);
@@ -249,7 +250,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   public void removeFromSelection(final List<? extends Proxy> items)
   {
-    final ConstantAliasesTreeModel model = getConstantAliasTreeModel();
+    final AliasesTreeModel model = getConstantAliasTreeModel();
     for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
       final TreePath path = model.createPath(subject);
@@ -293,13 +294,13 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   public Transferable createTransferable(final List<? extends Proxy> items)
   {
-    return new AliasTransferable(items);
+    return new ConstantAliasTransferable(items);
   }
 
   public boolean canPaste(final Transferable transferable)
   {
     return transferable
-      .isDataFlavorSupported(WatersDataFlavor.MODULE_ALIAS_LIST);
+      .isDataFlavorSupported(WatersDataFlavor.CONSTANT_ALIAS_LIST);
   }
 
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
@@ -309,7 +310,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     @SuppressWarnings("unchecked")
     final List<Proxy> transferData =
       (List<Proxy>) transferable
-        .getTransferData(WatersDataFlavor.MODULE_ALIAS_LIST);
+        .getTransferData(WatersDataFlavor.CONSTANT_ALIAS_LIST);
     final ListSubject<? extends ProxySubject> listInModule =
       mRoot.getModuleSubject().getConstantAliasListModifiable();
     int pos = listInModule.size();
@@ -333,7 +334,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
   @SuppressWarnings("unchecked")
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
-    final ConstantAliasesTreeModel model = getConstantAliasTreeModel();
+    final AliasesTreeModel model = getConstantAliasTreeModel();
     final Set<Proxy> set = new HashSet<Proxy>(items);
     final List<InsertInfo> result = new LinkedList<InsertInfo>();
     outer: for (final Proxy proxy : items) {
@@ -390,7 +391,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     if (list.isEmpty()) {
       return;
     }
-    final ConstantAliasesTreeModel model = getConstantAliasTreeModel();
+    final AliasesTreeModel model = getConstantAliasTreeModel();
     final Iterator<? extends Proxy> iter = list.iterator();
     final Proxy next = iter.next();
     final ProxySubject first;
@@ -425,7 +426,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
 
   public void close()
   {
-    final ConstantAliasesTreeModel model = getConstantAliasTreeModel();
+    final AliasesTreeModel model = getConstantAliasTreeModel();
     model.close();
   }
 
@@ -493,7 +494,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     private void maybeShowPopup(final MouseEvent event)
     {
       final Proxy clicked = getClickedItem(event);
-      mPopupFactory.maybeShowPopup(EditorAliasesPanel.this, event, clicked);
+      mPopupFactory.maybeShowPopup(AliasesTree.this, event, clicked);
     }
 
   }
@@ -523,7 +524,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
         }
 
         mImportedToThisPanel = false;
-        return new AliasTransferable((List<Proxy>) proxies);
+        return new ConstantAliasTransferable((List<Proxy>) proxies);
       }
       return null;
 
@@ -583,7 +584,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
           }
           final RearrangeTreeCommand allMoves =
             new RearrangeTreeCommand(inserts, deletes,
-                                     EditorAliasesPanel.this);
+                                     AliasesTree.this);
           mRoot.getUndoInterface().executeCommand(allMoves);
         }
       }
@@ -594,7 +595,7 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     {
       if (support.getComponent() instanceof JTree) {
         if (support.getTransferable()
-          .isDataFlavorSupported(WatersDataFlavor.MODULE_ALIAS_LIST)) {
+          .isDataFlavorSupported(WatersDataFlavor.CONSTANT_ALIAS_LIST)) {
           return true;
         }
       }
@@ -644,13 +645,13 @@ public class EditorAliasesPanel extends JTree implements SelectionOwner,
     @Override
     public DataFlavor visitConstantAliasProxy(final ConstantAliasProxy alias)
     {
-      return WatersDataFlavor.MODULE_ALIAS_LIST;
+      return WatersDataFlavor.CONSTANT_ALIAS_LIST;
     }
 
   }
 
   private static final long serialVersionUID = 1L;
-  private final ConstantAliasesTreeModel mModel;
+  private final AliasesTreeModel mModel;
   private final PopupFactory mPopupFactory;
   private final ModuleWindowInterface mRoot;
   private List<Observer> mObservers;

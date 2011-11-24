@@ -23,8 +23,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sourceforge.waters.gui.AliasesPanel;
 import net.sourceforge.waters.gui.ComponentsTree;
-import net.sourceforge.waters.gui.EditorAliasesPanel;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.EventDeclListView;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -79,13 +79,14 @@ public class EditorPanel
 		final IDE ide = mModuleContainer.getIDE();
         final WatersPopupActionManager manager = ide.getPopupActionManager();
 
-        final EditorAliasesPanel aliasesPanel =
-          new EditorAliasesPanel(this, manager);
+        final AliasesPanel aliasesPanel =
+          new AliasesPanel(this, manager);
         mAliasesTab = new Tab("Definitions", aliasesPanel);
         if (Config.INCLUDE_DEFINITIONS_PANEL.get()) {
           mAliasesTab.addToTabbedPane();
         }
-        mTabMap.put(aliasesPanel, mAliasesTab);
+        mTabMap.put(aliasesPanel.getConstantAliasesPanel(), mAliasesTab);
+        mTabMap.put(aliasesPanel.getEventAliasesPanel(), mAliasesTab);
         final EventDeclListView eventsPanel =
             new EventDeclListView(this, manager);
         mEventsTab = new Tab("Events", eventsPanel);
@@ -150,11 +151,17 @@ public class EditorPanel
         return (SelectionOwner) mEventsTab.getPanel();
     }
 
-    public SelectionOwner getAliasesPanel()
+    public SelectionOwner getConstantAliasesPanel()
     {
-      return (SelectionOwner) mAliasesTab.getPanel();
+      final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
+      return panel.getConstantAliasesPanel();
     }
 
+    public SelectionOwner getEventAliasesPanel()
+    {
+      final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
+      return panel.getEventAliasesPanel();
+    }
 
     public void showComponents()
     {

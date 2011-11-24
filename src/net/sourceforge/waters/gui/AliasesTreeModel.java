@@ -36,16 +36,16 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
  * @author Robi Malik
  */
 
-class ConstantAliasesTreeModel
+class AliasesTreeModel
   implements TreeModel, ModelObserver
 {
 
   //#########################################################################
   //# Constructor
-  ConstantAliasesTreeModel(final ModuleSubject module)
+  AliasesTreeModel(final ModuleSubject module, final List<? extends Proxy> list)
   {
     mModule = module;
-    mChildrenGetterVisitor = new ChildrenGetterVisitor();
+    mChildrenGetterVisitor = new ChildrenGetterVisitor(list);
     mTypeCheckerVisitor = new TypeCheckerVisitor();
     mListeners = null;
     mModule.addModelObserver(this);
@@ -334,6 +334,10 @@ class ConstantAliasesTreeModel
     extends AbstractModuleProxyVisitor
   {
 
+    private ChildrenGetterVisitor(final List<? extends Proxy> list){
+      mRootList = list;
+    }
+
     //#######################################################################
     //# Invocation
     @SuppressWarnings("unchecked")
@@ -348,18 +352,19 @@ class ConstantAliasesTreeModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
-    public List<Proxy> visitProxy(final Proxy proxy)
+    public List<? extends Proxy> visitProxy(final Proxy proxy)
     {
       return null;
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-    public List<ConstantAliasProxy> visitModuleProxy(final ModuleProxy module)
+    public List<? extends Proxy> visitModuleProxy(final ModuleProxy module)
     {
-      return module.getConstantAliasList();
+      return mRootList;
     }
 
+    private final List<? extends Proxy> mRootList;
   }
 
 

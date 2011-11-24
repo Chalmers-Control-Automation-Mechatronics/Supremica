@@ -34,7 +34,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * @author Robi Malik
  */
 
-public class AliasTransferable extends ProxyTransferable<Proxy>
+public class EventAliasTransferable extends ProxyTransferable<Proxy>
 {
 
   //#########################################################################
@@ -42,17 +42,17 @@ public class AliasTransferable extends ProxyTransferable<Proxy>
   /**
    * Creates a transferable that holds a single event declaration.
    */
-  public AliasTransferable(final Proxy data)
+  public EventAliasTransferable(final Proxy data)
   {
-    super(WatersDataFlavor.MODULE_ALIAS_LIST, data);
+    super(WatersDataFlavor.EVENT_ALIAS_LIST, data);
   }
 
   /**
    * Creates a transferable that holds a whole list of event declarations.
    */
-  public AliasTransferable(final List<? extends Proxy> data)
+  public EventAliasTransferable(final List<? extends Proxy> data)
   {
-    super(WatersDataFlavor.MODULE_ALIAS_LIST, data);
+    super(WatersDataFlavor.EVENT_ALIAS_LIST, data);
   }
 
 }
