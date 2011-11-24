@@ -78,19 +78,24 @@ public class EditorPanel
 
 		final IDE ide = mModuleContainer.getIDE();
         final WatersPopupActionManager manager = ide.getPopupActionManager();
-        final EditorAliasesPanel aliasesPanel = new EditorAliasesPanel(this, manager);
-        final ComponentsTree comptree = new ComponentsTree(this, manager);
+
+        final EditorAliasesPanel aliasesPanel =
+          new EditorAliasesPanel(this, manager);
         mAliasesTab = new Tab("Definitions", aliasesPanel);
         if (Config.INCLUDE_DEFINITIONS_PANEL.get()) {
           mAliasesTab.addToTabbedPane();
         }
-        final EventDeclListView eventlist =
+        mTabMap.put(aliasesPanel, mAliasesTab);
+        final EventDeclListView eventsPanel =
             new EventDeclListView(this, manager);
-        mEventsTab = new Tab("Events", eventlist);
+        mEventsTab = new Tab("Events", eventsPanel);
         mEventsTab.addToTabbedPane();
-        mComponentsTab = new Tab("Components", comptree);
+        mTabMap.put(eventsPanel, mEventsTab);
+        final ComponentsTree compPanel = new ComponentsTree(this, manager);
+        mComponentsTab = new Tab("Components", compPanel);
         mComponentsTab.addToTabbedPane();
         mComponentsTab.activate();
+        mTabMap.put(compPanel, mComponentsTab);
 
         mCommentPanel = new CommentPanel(moduleContainer);
         setRightComponent(mCommentPanel);
@@ -137,17 +142,17 @@ public class EditorPanel
 
     public SelectionOwner getComponentsPanel()
     {
-        return mComponentsTab.getPanel();
+        return (SelectionOwner) mComponentsTab.getPanel();
     }
 
     public SelectionOwner getEventsPanel()
     {
-        return mEventsTab.getPanel();
+        return (SelectionOwner) mEventsTab.getPanel();
     }
 
     public SelectionOwner getAliasesPanel()
     {
-      return mAliasesTab.getPanel();
+      return (SelectionOwner) mAliasesTab.getPanel();
     }
 
 
@@ -274,9 +279,9 @@ public class EditorPanel
     @Deprecated
     public void addComponent(final Proxy proxy)
     {
-        final SelectionOwner component = mComponentsTab.getPanel();
-        final Object inspos = component.getInsertPosition(proxy);
-        component.insertCreatedItem(proxy, inspos);
+      final SelectionOwner panel = getComponentsPanel();
+      final Object inspos = panel.getInsertPosition(proxy);
+      panel.insertCreatedItem(proxy, inspos);
     }
 
 
@@ -298,20 +303,18 @@ public class EditorPanel
         private Tab(final String name, final JComponent panel)
         {
             mPanel = panel;
-            mSelectionOwner = (SelectionOwner) panel;
             mScrollPane = new JScrollPane(panel);
             mScrollPane.setName(name);
             mScrollPane.setPreferredSize
                 (IDEDimensions.leftEditorPreferredSize);
             mScrollPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-            mTabMap.put(mSelectionOwner, this);
         }
 
         //###################################################################
         //# Simple Access
-        private SelectionOwner getPanel()
+        private JComponent getPanel()
         {
-            return mSelectionOwner;
+            return mPanel;
         }
 
         private void activate()
@@ -335,7 +338,6 @@ public class EditorPanel
         //###################################################################
         //# Data Members
         private final JComponent mPanel;
-        private final SelectionOwner mSelectionOwner;
         private final JScrollPane mScrollPane;
 
     }
