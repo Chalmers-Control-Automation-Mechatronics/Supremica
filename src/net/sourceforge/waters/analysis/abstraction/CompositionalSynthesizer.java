@@ -946,7 +946,7 @@ public class CompositionalSynthesizer
       new LinkedList<DistinguisherInfo>();
     AutomatonProxy distinguisher = null;
     boolean foundNondeterminism = false;
-    while (listIter.hasPrevious()) {
+    outer1:while (listIter.hasPrevious()) {
       final DistinguisherInfo info = listIter.previous();
       if (distinguisher == null) {
         distinguisher = info.getDistinguisher();
@@ -954,15 +954,20 @@ public class CompositionalSynthesizer
         listIter.next();
         break;
       }
+      int i = 0;
       final Collection<EventProxy> replacement = info.getReplacement();
         final Iterator<EventProxy> iter = replacement.iterator();
         while (iter.hasNext()) {
           final EventProxy nextReplacement = iter.next();
           final int nextCode = encoding.getEventCode(nextReplacement);
           if (nextCode < 0) {
-            foundNondeterminism = true;
-            break;
+            i++;
           }
+        }
+        if (i > 0 && i < replacement.size()) {
+          foundNondeterminism = true;
+          if(!renamings.contains(info))
+          renamings.add(info);
         }
       boolean found = false;
       for (final EventProxy event : replacement) {
@@ -1021,6 +1026,7 @@ public class CompositionalSynthesizer
         final Iterator<EventProxy> iter = replacement.iterator();
         final EventProxy firstReplacement = iter.next();
         final int firstCode = encoding.getEventCode(firstReplacement);
+        if (!events.contains(original))
         events.set(firstCode, original);
         while (iter.hasNext()) {
           final EventProxy nextReplacement = iter.next();

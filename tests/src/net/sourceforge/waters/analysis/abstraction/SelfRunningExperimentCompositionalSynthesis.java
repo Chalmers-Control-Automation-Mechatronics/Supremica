@@ -37,7 +37,7 @@ public class SelfRunningExperimentCompositionalSynthesis
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
            preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
-             selectingMethod : selectingFactory.getEnumConstants()) {
+             selectingMethod: selectingFactory.getEnumConstants()) {
           final String preName = preselectingMethod.toString();
           final String selName = selectingMethod.toString();
           System.out.println("*** " + preName + "/" + selName + " ***");

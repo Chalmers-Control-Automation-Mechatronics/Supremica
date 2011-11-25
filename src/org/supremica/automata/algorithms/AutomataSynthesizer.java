@@ -373,7 +373,6 @@ public class AutomataSynthesizer
           //   (AbstractCompositionalModelAnalyzer.MustL);
           // synthesizer.setSelectingMethod
           //   (AbstractCompositionalModelAnalyzer.MinS);
-
           synthesizer.run();
           final ProductDESResult watersResult =
             synthesizer.getAnalysisResult();

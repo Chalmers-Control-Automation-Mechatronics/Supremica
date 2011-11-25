@@ -387,6 +387,14 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testKoordWspBlock() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "koordwsp_block";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runSynthesizer(final String group,
