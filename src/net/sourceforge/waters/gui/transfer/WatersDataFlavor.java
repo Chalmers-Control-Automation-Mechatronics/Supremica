@@ -29,7 +29,7 @@ public class WatersDataFlavor
     new DataFlavor(ConstantAliasTransferable.class, "List<ConstantAliasProxy>");
 
   public static final DataFlavor EVENT_ALIAS_LIST =
-    new DataFlavor(ConstantAliasTransferable.class, "List<EventAliasProxy>");
+    new DataFlavor(EventAliasTransferable.class, "List<EventAliasProxy>");
 
   public static final DataFlavor EVENTDECL_LIST =
     new DataFlavor(EventDeclTransferable.class, "List<EventDeclProxy>");

@@ -22,11 +22,17 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.EventAliasProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
 
@@ -42,13 +48,14 @@ class AliasesTreeModel
 
   //#########################################################################
   //# Constructor
-  AliasesTreeModel(final ModuleSubject module, final List<? extends Proxy> list)
+  AliasesTreeModel(final ModuleSubject module,
+                   final ListSubject<? extends ProxySubject> list)
   {
     mModule = module;
     mChildrenGetterVisitor = new ChildrenGetterVisitor(list);
     mTypeCheckerVisitor = new TypeCheckerVisitor();
-    mListeners = null;
-    mModule.addModelObserver(this);
+    mList = list;
+    mList.addModelObserver(this);
   }
 
 
@@ -56,7 +63,7 @@ class AliasesTreeModel
   //# Clean Up
   void close()
   {
-    mModule.removeModelObserver(this);
+    mList.removeModelObserver(this);
     mListeners = null;
   }
 
@@ -135,7 +142,7 @@ class AliasesTreeModel
   public void valueForPathChanged(final TreePath path, final Object newvalue)
   {
     throw new UnsupportedOperationException
-      ("ConstantAliasesTreeModel does not support value change!");
+      ("AliasesTreeModel does not support value change!");
   }
 
 
@@ -166,7 +173,7 @@ class AliasesTreeModel
         {
           final ProxySubject parent = (ProxySubject) source.getParent();
           final Object value = event.getValue();
-           if (canBeInTree(value) && isInTree(parent)) {
+           if (isInTree(parent)) {
             final int index = event.getIndex();
             final TreeModelEvent newevent =
               createTreeModelEvent(parent, index, value);
@@ -227,17 +234,7 @@ class AliasesTreeModel
 
   boolean isInTree(final ProxySubject node)
   {
-    return canBeInTree(node) && getRootInTree(node) == mModule;
-  }
-
-  boolean canBeInTree(final Object node)
-  {
-    return node instanceof Proxy && canBeInTree((Proxy) node);
-  }
-
-  boolean canBeInTree(final Proxy node)
-  {
-    return mTypeCheckerVisitor.canBeInTree(node);
+    return node == mModule || SubjectTools.isAncestor(mList, node);
   }
 
   ProxySubject getRootInTree(ProxySubject node)
@@ -359,6 +356,26 @@ class AliasesTreeModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    @Override
+    public List<? extends Proxy> visitEventAliasProxy
+    (final EventAliasProxy alias)
+  {
+    final ExpressionProxy exp =  alias.getExpression();
+    if(exp instanceof EventListExpressionProxy){
+      final EventListExpressionProxy eList = (EventListExpressionProxy)exp;
+      return eList.getEventList();
+    }
+    return null;
+  }
+
+    @Override
+    public List<? extends Proxy> visitForeachProxy
+    (final ForeachProxy foreach)
+  {
+    return foreach.getBody();
+  }
+
+    @Override
     public List<? extends Proxy> visitModuleProxy(final ModuleProxy module)
     {
       return mRootList;
@@ -415,7 +432,7 @@ class AliasesTreeModel
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
     @Override
     public Boolean visitConstantAliasProxy
-      (final ConstantAliasProxy foreach)
+      (final ConstantAliasProxy alias)
     {
       return true;
     }
@@ -434,7 +451,7 @@ class AliasesTreeModel
   //# Data Members
   private final ModuleSubject mModule;
   private Collection<TreeModelListener> mListeners;
-
+  private final ListSubject<? extends ProxySubject> mList;
   private final ChildrenGetterVisitor mChildrenGetterVisitor;
   private final TypeCheckerVisitor mTypeCheckerVisitor;
 
