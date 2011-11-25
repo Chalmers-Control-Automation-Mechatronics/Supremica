@@ -339,9 +339,9 @@ public abstract class BDDModelVerifier
         initial.andWith(autinit);
         final AutomatonProxy aut = autBDD.getAutomaton();
         final Collection<EventProxy> localevents = aut.getEvents();
-        for (final EventBDD eventBDD : eventBDDs) {
-          final EventProxy event = eventBDD.getEvent();
-          if (localevents.contains(event)) {
+        for (final EventProxy event : localevents) {
+          if (isProperEvent(event)) {
+            final EventBDD eventBDD = eventmap.get(event);
             eventBDD.startAutomaton(autBDD, mBDDFactory);
           }
         }
@@ -353,8 +353,11 @@ public abstract class BDDModelVerifier
             eventBDD.includeTransition(trans, mBDDFactory);
           }
         }
-        for (final EventBDD eventBDD : eventBDDs) {
-          eventBDD.finishAutomaton(mBDDFactory);
+        for (final EventProxy event : localevents) {
+          if (isProperEvent(event)) {
+            final EventBDD eventBDD = eventmap.get(event);
+            eventBDD.finishAutomaton(mBDDFactory);
+          }
         }
         mIsFullyDeterministic &= autBDD.isDeterministic();
       }

@@ -430,7 +430,7 @@ public class BDDExtendedGuardGenerator {
         }
         else
         {
-            BDD goodBDD = states.simplify(careStatesBDD.toVarSet());
+            BDD goodBDD = states.simplify(careStatesBDD);
 //            BDD goodBDD = states.simplify(careStatesBDD.exist(automataBDD.getTestVarSet()).toVarSet());
 //            BDD goodBDD = states.exist(automataBDD.getTestVarSet());
 
