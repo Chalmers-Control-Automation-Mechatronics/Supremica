@@ -121,7 +121,7 @@ public class CompositionalSynthesisResult
   {
     super.printCSVHorizontal(writer);
     writer.print(",");
-    writer.print(getRenamingIsUsed());
+    writer.print(CompositionalSynthesizer.getRenamingIsUsed());
     writer.print(",");
     writer.print(mSupervisors.size());
     writer.print(",");
@@ -164,15 +164,6 @@ public class CompositionalSynthesisResult
       setComputedProductDES(des);
     }
   }
-
-  void setRenamingIsUsed (final boolean isUsed) {
-    mRenamingIsUsed = isUsed;
-  }
-
-  boolean getRenamingIsUsed() {
-    return mRenamingIsUsed;
-  }
-
 
   //#########################################################################
   //# Data Members

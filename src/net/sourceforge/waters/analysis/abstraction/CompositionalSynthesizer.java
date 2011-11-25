@@ -220,6 +220,14 @@ public class CompositionalSynthesizer
     return mDefaultMarking;
   }
 
+  void setRenamingIsUsed (final int renaming) {
+    mRenamingIsUsed = renaming;
+  }
+
+  static int getRenamingIsUsed() {
+    return mRenamingIsUsed;
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -228,6 +236,12 @@ public class CompositionalSynthesizer
     try {
       setUp();
       final CompositionalSynthesisResult result = getAnalysisResult();
+//      int size = 0;
+//      final Iterator<AutomatonProxy> iter = result.getComputedAutomata().iterator();
+//      while (iter.hasNext()) {
+//        final AutomatonProxy aut = iter.next();
+//        size = aut.getStates().size();
+//      }
       if (!result.isFinished()) {
         runCompositionalMinimisation();
       }
@@ -452,7 +466,6 @@ public class CompositionalSynthesizer
       // Apply inverse renaming to other automata
       final Map<EventProxy,List<EventProxy>> renaming = synStep.getRenaming();
       if (renaming != null) {
-        result.setRenamingIsUsed(true);
         final AutomatonProxy originalAut = synStep.getOriginalAutomaton();
         final Set<AutomatonProxy> affectedAutomata =
           new THashSet<AutomatonProxy>();
@@ -781,6 +794,7 @@ public class CompositionalSynthesizer
         (event, replacement, distinguisherAutomaton);
       mDistinguisherInfoList.add(info);
       mRenamedEvents.addAll(replacement);
+      setRenamingIsUsed(mDistinguisherInfoList.size());
     }
 
     return new SynthesisAbstractionStep(simplifiedAutomaton,
@@ -927,7 +941,9 @@ public class CompositionalSynthesizer
      final ListIterator<DistinguisherInfo> listIter)
     throws AnalysisException
   {
+
     if (!listIter.hasPrevious()) {
+      setRenamingIsUsed(0);
       return removeDumpStates(rel, encoding);
     }
     final int numOfStates = rel.getNumberOfStates();
@@ -946,6 +962,15 @@ public class CompositionalSynthesizer
         break;
       }
       final Collection<EventProxy> replacement = info.getReplacement();
+        final Iterator<EventProxy> iter = replacement.iterator();
+        while (iter.hasNext()) {
+          final EventProxy nextReplacement = iter.next();
+          final int nextCode = encoding.getEventCode(nextReplacement);
+          if (nextCode < 0) {
+            foundNondeterminism = true;
+            break;
+          }
+        }
       boolean found = false;
       for (final EventProxy event : replacement) {
         if (encoding.getEventCode(event) >= 0) {
@@ -1007,7 +1032,7 @@ public class CompositionalSynthesizer
         while (iter.hasNext()) {
           final EventProxy nextReplacement = iter.next();
           final int nextCode = encoding.getEventCode(nextReplacement);
-          if (nextCode >= 0) {
+//          if (nextCode >= 0) {
             for (int sourceState = 0; sourceState<numOfStates; sourceState++) {
               modifyingIter.reset(sourceState, nextCode);
               if (modifyingIter.advance()) {
@@ -1019,7 +1044,7 @@ public class CompositionalSynthesizer
             rel.setUsedEvent(nextCode, false);
           }
         }
-      }
+//      }
       final EventEncoding newEncoding = new EventEncoding(events, translator);
       return createRenamedSupervisor(rel, newEncoding, listIter);
     } else {
@@ -1459,4 +1484,5 @@ public class CompositionalSynthesizer
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
+  static int mRenamingIsUsed;
 }

@@ -163,7 +163,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     mPreselectingMethodFactory = preselectingMethodFactory;
     mPreselectingMethod = MustL;
     mSelectingMethodFactory = selectingMethodFactory;
-    mSelectingMethod = MinE;
+    mSelectingMethod = MaxC;
     mSubsumptionEnabled = false;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
