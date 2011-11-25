@@ -19,14 +19,18 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeModel;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.AliasProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -37,9 +41,10 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 
 
 /**
- * A tree model for the EditorAliasPanel.
+ * A tree model for the aliases panels.
  *
- * @author Robi Malik
+ * @see AliasesTree
+ * @author Carly Hona, Robi Malik
  */
 
 class AliasesTreeModel
@@ -52,10 +57,10 @@ class AliasesTreeModel
                    final ListSubject<? extends ProxySubject> list)
   {
     mModule = module;
-    mChildrenGetterVisitor = new ChildrenGetterVisitor(list);
+    mRootList = list;
+    mChildrenGetterVisitor = new ChildrenGetterVisitor();
     mTypeCheckerVisitor = new TypeCheckerVisitor();
-    mList = list;
-    mList.addModelObserver(this);
+    mRootList.addModelObserver(this);
   }
 
 
@@ -63,7 +68,7 @@ class AliasesTreeModel
   //# Clean Up
   void close()
   {
-    mList.removeModelObserver(this);
+    mRootList.removeModelObserver(this);
     mListeners = null;
   }
 
@@ -85,7 +90,7 @@ class AliasesTreeModel
       mChildrenGetterVisitor.getChildren(proxy);
     if (children == null) {
       throw new IllegalArgumentException
-        ("Tree node of class " + parent.getClass().getName() +
+        ("Tree node of class " + ProxyTools.getShortClassName(parent) +
          " has no children!");
     } else {
       return children.get(index);
@@ -107,16 +112,12 @@ class AliasesTreeModel
   public int getIndexOfChild(final Object parent, final Object child)
   {
     final ProxySubject proxy = (ProxySubject) parent;
-    if (isInTree(proxy)) {
-      final List<? extends Proxy> children =
-        mChildrenGetterVisitor.getChildren(proxy);
-      if (children == null) {
-        return -1;
-      } else {
-        return children.indexOf(child);
-      }
-    } else {
+    final List<? extends Proxy> children =
+      mChildrenGetterVisitor.getChildren(proxy);
+    if (children == null) {
       return -1;
+    } else {
+      return children.indexOf(child);
     }
   }
 
@@ -154,49 +155,33 @@ class AliasesTreeModel
       final Subject source = event.getSource();
       switch (event.getKind()) {
       case ModelChangeEvent.ITEM_ADDED:
-        {
-          final Object value = event.getValue();
-          if (isInTree(value)) {
-            final ProxySubject parent = (ProxySubject) source.getParent();
-            final int index = event.getIndex();
-            final TreeModelEvent newevent =
-              createTreeModelEvent(parent, index, value);
-            if (index >= 0) {
-              fireNodesInserted(newevent);
-            } else {
-              fireStructureChanged(newevent);
-            }
-          }
-          break;
-        }
       case ModelChangeEvent.ITEM_REMOVED:
-        {
-          final ProxySubject parent = (ProxySubject) source.getParent();
+        final ProxySubject parent = SubjectTools.getProxyParent(source);
+        if (canBeInTree(parent)) {
           final Object value = event.getValue();
-           if (isInTree(parent)) {
-            final int index = event.getIndex();
-            final TreeModelEvent newevent =
-              createTreeModelEvent(parent, index, value);
-            if (index >= 0) {
-              fireNodesRemoved(newevent);
-            } else {
-              fireStructureChanged(newevent);
-            }
+          final int index = event.getIndex();
+          final TreeModelEvent newevent =
+            createTreeModelEvent(parent, index, value);
+          if (index < 0) {
+            fireStructureChanged(newevent);
+          } else if (event.getKind() == ModelChangeEvent.ITEM_ADDED) {
+            fireNodesInserted(newevent);
+          } else {
+            fireNodesRemoved(newevent);
           }
           break;
         }
+        // fall through ...
       case ModelChangeEvent.NAME_CHANGED:
       case ModelChangeEvent.STATE_CHANGED:
-        {
-          final ProxySubject psource = getVisibleAncestorInTree(source);
-          if (psource != null) {
-            final TreePath path = createPath(psource);
-            final TreeModelEvent newevent =
-              new TreeModelEvent(this, path, null, null);
-            fireNodesChanged(newevent);
-          }
-          break;
+        final ProxySubject ancestor = getVisibleAncestorInTree(source);
+        if (ancestor != null) {
+          final TreePath path = createPath(ancestor);
+          final TreeModelEvent newevent =
+            new TreeModelEvent(this, path, null, null);
+          fireNodesChanged(newevent);
         }
+        break;
       default:
         break;
       }
@@ -227,41 +212,86 @@ class AliasesTreeModel
     return new TreePath(path);
   }
 
-  boolean isInTree(final Object node)
+  /**
+   * Tests whether the given object is displayed in a tree.
+   * This method checks the types of objects and their parents to
+   * determine whether an object is to be displayed in some tree view.
+   * It does not check whether the object is actually contained in this tree.
+   * @return If the object has a direct node to be rendered in a tree.
+   */
+  boolean canBeInTree(final Object node)
   {
-    return node instanceof ProxySubject && isInTree((ProxySubject) node);
+    return node instanceof Proxy && canBeInTree((Proxy) node);
   }
 
-  boolean isInTree(final ProxySubject node)
+  /**
+   * Tests whether the given {@link Proxy} is displayed in a tree.
+   * This method checks the types of objects and their parents to
+   * determine whether an object is to be displayed in some tree view.
+   * It does not check whether the object is actually contained in this tree.
+   * @return If the proxy has a direct node to be rendered in a tree.
+   */
+  boolean canBeInTree(final Proxy proxy)
   {
-    return node == mModule || SubjectTools.isAncestor(mList, node);
+    return mTypeCheckerVisitor.canBeInTree(proxy);
   }
 
-  ProxySubject getRootInTree(ProxySubject node)
-  {
-    ProxySubject root = node;
-    do {
-      node = getParentInTree(node);
-      if (node == null) {
-        return root;
-      }
-      root = node;
-    } while (true);
-  }
-
-  ProxySubject getParentInTree(final ProxySubject node)
-  {
-    final Subject parent1 = node.getParent();
-    if (parent1 == null) {
-      return null;
-    } else {
-      return (ProxySubject) parent1.getParent();
-    }
-  }
-
+  /**
+   * Finds the closest ancestor of the given object that is displayed in
+   * a tree. This method checks the types of objects and their parents to
+   * determine whether an object is to be displayed in some tree view.
+   * It does not check whether the object is actually contained in this tree.
+   * For an ancestor to be found, a contiguous sequence of parents associated
+   * to the tree must be found. Since graphs ({@link
+   * net.sourceforge.waters.model.module.GraphProxy GraphProxy}) are not
+   * associated with any tree, their children will not have any ancestor
+   * in a tree.
+   * @return The closest ancestor of the given object that has a direct
+   *         node to be rendered in a tree, or <CODE>null</CODE> if no
+   *         suitable can be determined.
+   */
   ProxySubject getVisibleAncestorInTree(final Subject subject)
   {
-    return mTypeCheckerVisitor.getVisibleAncestorInTree(subject);
+    final Proxy proxy;
+    if (subject instanceof Proxy) {
+      proxy = (Proxy) subject;
+    } else {
+      proxy = SubjectTools.getProxyParent(subject);
+    }
+    return getVisibleAncestorInTree(proxy);
+  }
+
+  /**
+   * Finds the closest ancestor of the given {@link Proxy} that is displayed
+   * in a tree. This method checks the types of objects and their parents to
+   * determine whether an object is to be displayed in some tree view. For
+   * an ancestor to be found, a contiguous sequence of parents associated to
+   * the tree must be found. Since graphs ({@link
+   * net.sourceforge.waters.model.module.GraphProxy GraphProxy}) are not
+   * associated with any tree, their children will not have any ancestor
+   * in a tree.
+   * @return The closest ancestor of the given {@link Proxy} that has a direct
+   *         node to be rendered in a tree, or <CODE>null</CODE> if no
+   *         suitable can be determined.
+   */
+  ProxySubject getVisibleAncestorInTree(final Proxy proxy)
+  {
+    return mTypeCheckerVisitor.getVisibleAncestorInTree(proxy);
+  }
+
+  /**
+   * Finds the closest proper ancestor of the given node that has a direct
+   * node to be rendered in a tree.
+   * @return The closest parent displayed in trees, or <CODE>null</CODE>
+   *         if no such parent can be found.
+   */
+  ProxySubject getParentInTree(final ProxySubject node)
+  {
+    ProxySubject parent = SubjectTools.getProxyParent(node);
+    while (parent != null && !canBeInTree(parent)) {
+      parent = SubjectTools.getProxyParent(parent);
+    }
+    return parent;
   }
 
 
@@ -327,14 +357,9 @@ class AliasesTreeModel
 
   //#########################################################################
   //# Inner Class ChildrenGetterVisitor
-  private static class ChildrenGetterVisitor
+  private class ChildrenGetterVisitor
     extends AbstractModuleProxyVisitor
   {
-
-    private ChildrenGetterVisitor(final List<? extends Proxy> list){
-      mRootList = list;
-    }
-
     //#######################################################################
     //# Invocation
     @SuppressWarnings("unchecked")
@@ -358,30 +383,28 @@ class AliasesTreeModel
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
     @Override
     public List<? extends Proxy> visitEventAliasProxy
-    (final EventAliasProxy alias)
-  {
-    final ExpressionProxy exp =  alias.getExpression();
-    if(exp instanceof EventListExpressionProxy){
-      final EventListExpressionProxy eList = (EventListExpressionProxy)exp;
-      return eList.getEventList();
+      (final EventAliasProxy alias)
+    {
+      final ExpressionProxy expr = alias.getExpression();
+      if (expr instanceof PlainEventListProxy) {
+        final PlainEventListProxy eList = (PlainEventListProxy) expr;
+        return eList.getEventList();
+      } else {
+        return null;
+      }
     }
-    return null;
-  }
 
     @Override
-    public List<? extends Proxy> visitForeachProxy
-    (final ForeachProxy foreach)
-  {
-    return foreach.getBody();
-  }
+    public List<? extends Proxy> visitForeachProxy(final ForeachProxy foreach)
+    {
+      return foreach.getBody();
+    }
 
     @Override
     public List<? extends Proxy> visitModuleProxy(final ModuleProxy module)
     {
       return mRootList;
     }
-
-    private final List<? extends Proxy> mRootList;
   }
 
 
@@ -393,28 +416,16 @@ class AliasesTreeModel
 
     //#######################################################################
     //# Invocation
-    private ProxySubject getVisibleAncestorInTree(Subject subject)
-    {
-      while (subject != null && !canBeInTree(subject)) {
-        subject = subject.getParent();
-      }
-      return (ProxySubject) subject;
-    }
-
-    private boolean canBeInTree(final Subject subject)
-    {
-      if (subject instanceof Proxy) {
-        final Proxy proxy = (Proxy) subject;
-        return canBeInTree(proxy);
-      } else {
-        return false;
-      }
-    }
-
     private boolean canBeInTree(final Proxy proxy)
     {
+      final Proxy ancestor = getVisibleAncestorInTree(proxy);
+      return ancestor == proxy;
+    }
+
+    private ProxySubject getVisibleAncestorInTree(final Proxy proxy)
+    {
       try {
-        return (Boolean) proxy.acceptVisitor(this);
+        return (ProxySubject) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
@@ -423,35 +434,68 @@ class AliasesTreeModel
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
     @Override
-    public Boolean visitProxy(final Proxy proxy)
+    public Object visitProxy(final Proxy proxy)
     {
-      return false;
+      return null;
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
     @Override
-    public Boolean visitConstantAliasProxy
-      (final ConstantAliasProxy alias)
+    public Object visitAliasProxy(final AliasProxy alias)
     {
-      return true;
+      return alias;
     }
 
     @Override
-    public Boolean visitModuleProxy(final ModuleProxy proxy)
+    public Object visitComponentProxy(final ComponentProxy comp)
     {
-      return true;
+      return comp;
+    }
+
+    @Override
+    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+    {
+      final Subject subject = (Subject) foreach;
+      final Proxy parent = SubjectTools.getProxyParent(subject);
+      return canBeInTree(parent) ? foreach : null;
+    }
+
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
+    {
+      return foreach;
+    }
+
+    @Override
+    public Object visitModuleProxy(final ModuleProxy module)
+    {
+      return module;
+    }
+
+    @Override
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      final Subject subject = (Subject) expr;
+      ProxySubject parent = SubjectTools.getProxyParent(subject);
+      if (parent instanceof ForeachProxy) {
+        return canBeInTree(parent) ? expr : null;
+      } else if (parent instanceof PlainEventListProxy) {
+        parent = SubjectTools.getProxyParent(parent);
+        return canBeInTree(parent) ? expr : null;
+      } else {
+        return parent.acceptVisitor(this);
+      }
     }
   }
-
-
 
 
   //#########################################################################
   //# Data Members
   private final ModuleSubject mModule;
   private Collection<TreeModelListener> mListeners;
-  private final ListSubject<? extends ProxySubject> mList;
+  private final ListSubject<? extends ProxySubject> mRootList;
   private final ChildrenGetterVisitor mChildrenGetterVisitor;
   private final TypeCheckerVisitor mTypeCheckerVisitor;
 

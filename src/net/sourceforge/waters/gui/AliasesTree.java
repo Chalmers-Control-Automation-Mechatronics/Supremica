@@ -269,7 +269,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     if (subject == model.getRoot()) {
       return isRootVisible() ? subject : null;
     } else {
-      return model.isInTree(subject) ? subject : null;
+      return model.canBeInTree(subject) ? subject : null;
     }
   }
 

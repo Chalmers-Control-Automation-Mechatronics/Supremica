@@ -47,15 +47,31 @@ public class SubjectTools
    * @return The closest proper ancestor of type {@link Proxy}
    *         or <CODE>null</CODE>.
    */
-  public static Subject getProxyParent(Subject subject)
+  public static ProxySubject getProxyParent(Subject subject)
   {
     do {
       subject = subject.getParent();
       if (subject instanceof Proxy) {
-        return subject;
+        return (ProxySubject) subject;
       }
     } while (subject != null);
     return null;
+  }
+
+  /**
+   * Checks whether a subject is an ancestor of another.
+   * @return <CODE>true</CODE> if the given ancestor is equal to
+   *         the given descendant or one of the descendant's parents.
+   */
+  public static boolean isAncestor(final Subject ancestor,
+                                   final Subject descendant)
+  {
+    if (ancestor == descendant) {
+      return true;
+    } else {
+      final Subject parent = descendant.getParent();
+      return parent == null ? false : isAncestor(ancestor, parent);
+    }
   }
 
   /**
@@ -79,20 +95,9 @@ public class SubjectTools
     return null;
   }
 
-  public static boolean isAncestor(final Subject ancestor,
-                                   final Subject descendant)
-  {
-    if (ancestor == descendant) {
-      return true;
-    } else {
-      final Subject parent = descendant.getParent();
-      return parent == null ? false : isAncestor(ancestor, parent);
-    }
-  }
-
   /**
    * Finds the closest ancestor, which is an instance of one of two given
-   * class.  Possible ancestors include the object itself.
+   * classes. Possible ancestors include the object itself.
    * @return The closest ancestor of this subject, which can be assigned to
    *         a variable one of the given classes, or <CODE>null</CODE> if
    *         no such ancestor can be found.
@@ -140,6 +145,7 @@ public class SubjectTools
     }
   }
 
+
   //#########################################################################
   //# Inner Class ModelObserverComparator
   private static class ModelObserverComparator
@@ -157,7 +163,5 @@ public class SubjectTools
     private static final ModelObserverComparator INSTANCE =
       new ModelObserverComparator();
   }
-
-
 
 }
