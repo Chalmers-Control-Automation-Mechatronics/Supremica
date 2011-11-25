@@ -79,6 +79,17 @@ public class SubjectTools
     return null;
   }
 
+  public static boolean isAncestor(final Subject ancestor,
+                                   final Subject descendant)
+  {
+    if (ancestor == descendant) {
+      return true;
+    } else {
+      final Subject parent = descendant.getParent();
+      return parent == null ? false : isAncestor(ancestor, parent);
+    }
+  }
+
   /**
    * Finds the closest ancestor, which is an instance of one of two given
    * class.  Possible ancestors include the object itself.

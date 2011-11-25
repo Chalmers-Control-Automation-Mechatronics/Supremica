@@ -7,7 +7,6 @@
 //# $Id: 753be8b665be586db07abad000919a8810df2419 $
 //###########################################################################
 
-
 package net.sourceforge.waters.gui;
 
 import java.awt.Color;
@@ -29,6 +28,8 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
@@ -63,16 +64,22 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>An auxiliary class to retrieve context information from a module.</P>
+ * <P>
+ * An auxiliary class to retrieve context information from a module.
+ * </P>
  *
- * <P>A module context is linked to a module ({@link ModuleSubject}).
- * It provides some look-up functionality for events by their names,
- * and acts as a central access point to determine icons from object
- * types. It is faster, but less accurate, than the compiler ({@link
- * net.sourceforge.waters.model.compiler.ModuleCompiler}).</P>
+ * <P>
+ * A module context is linked to a module ({@link ModuleSubject}). It provides
+ * some look-up functionality for events by their names, and acts as a central
+ * access point to determine icons from object types. It is faster, but less
+ * accurate, than the compiler (
+ * {@link net.sourceforge.waters.model.compiler.ModuleCompiler}).
+ * </P>
  *
- * <P>The module context can be obtained from the module container
- * ({@link org.supremica.gui.ide.ModuleContainer}).</P>
+ * <P>
+ * The module context can be obtained from the module container (
+ * {@link org.supremica.gui.ide.ModuleContainer}).
+ * </P>
  *
  * @author Robi Malik
  */
@@ -107,7 +114,6 @@ public class ModuleContext
     mGraphStatusMap = new HashMap<GraphProxy,GraphStatus>();
   }
 
-
   //#########################################################################
   //# General Access for all Types
   /**
@@ -126,7 +132,6 @@ public class ModuleContext
     return mToolTipGetterVisitor.getToolTipText(item);
   }
 
-
   //#########################################################################
   //# Simple Access
   public ModuleProxy getModule()
@@ -134,19 +139,19 @@ public class ModuleContext
     return mModule;
   }
 
-
   //#########################################################################
   //# Special Access for Events
   /**
-   * Tries to determine an event declaration for the given identifier.
-   * Given an event name, this method inspects the module to determine
-   * whether the name represents a controllable event, and uncontrollable
-   * event, or a proposition.
-   * @param  ident   The identifier representing the event name to be
-   *                 looked up.
+   * Tries to determine an event declaration for the given identifier. Given
+   * an event name, this method inspects the module to determine whether the
+   * name represents a controllable event, and uncontrollable event, or a
+   * proposition.
+   *
+   * @param ident
+   *          The identifier representing the event name to be looked up.
    * @return The event declaration that will be used when compiling the given
-   *         identifier in the context of this module, or <CODE>null</CODE>
-   *         if no suitable event declaration could be found.
+   *         identifier in the context of this module, or <CODE>null</CODE> if
+   *         no suitable event declaration could be found.
    */
   public EventDeclProxy guessEventDecl(final IdentifierProxy ident)
   {
@@ -155,15 +160,16 @@ public class ModuleContext
   }
 
   /**
-   * Tries to determine an event kind for the given identifier.  Given an
-   * event name, this method inspects the module to determine whether the
-   * name represents a controllable event, and uncontrollable event, or a
+   * Tries to determine an event kind for the given identifier. Given an event
+   * name, this method inspects the module to determine whether the name
+   * represents a controllable event, and uncontrollable event, or a
    * proposition.
-   * @param  ident   The identifier representing the event name to be
-   *                 checked.
-   * @return The event kind that will be associated with the given
-   *         identifier after compilation of the module, or <CODE>null</CODE>
-   *         to indicate that the event kind cannot be determined.
+   *
+   * @param ident
+   *          The identifier representing the event name to be checked.
+   * @return The event kind that will be associated with the given identifier
+   *         after compilation of the module, or <CODE>null</CODE> to indicate
+   *         that the event kind cannot be determined.
    */
   public EventKind guessEventKind(final IdentifierProxy ident)
   {
@@ -173,8 +179,9 @@ public class ModuleContext
 
   /**
    * Tries to determine an icon for an event with a given identifier.
-   * @return Always returns an icon, but it may be just the default
-   *         'event' icon.
+   *
+   * @return Always returns an icon, but it may be just the default 'event'
+   *         icon.
    */
   public Icon guessEventIcon(final IdentifierProxy ident)
   {
@@ -184,9 +191,10 @@ public class ModuleContext
 
   /**
    * Tries to determine an icon for a proposition with a given identifier.
-   * This method tries to be a bit smarter than {@link
-   * #guessEventIcon(IdentifierProxy) guessEventIcon()} by checking the
+   * This method tries to be a bit smarter than
+   * {@link #guessEventIcon(IdentifierProxy) guessEventIcon()} by checking the
    * names of the default propositions.
+   *
    * @return Always returns an icon, but it may be just the default
    *         'proposition' icon.
    */
@@ -196,8 +204,8 @@ public class ModuleContext
     final EventDeclProxy decl = getEventDecl(name);
     if (decl != null) {
       return getIcon(decl);
-    } else if (ident instanceof SimpleIdentifierProxy &&
-               name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+    } else if (ident instanceof SimpleIdentifierProxy
+               && name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
       return IconLoader.ICON_FORBIDDEN;
     } else {
       return PropositionIcon.getDefaultMarkedIcon();
@@ -206,20 +214,23 @@ public class ModuleContext
 
   /**
    * Tries to determine the list of proposition for a given node.
-   * @return A {@link PropositionColors} object containing the list
-   *         of all colours found on the node, including a flag indicating
-   *         the presence of the 'forbidden' marking.
+   *
+   * @return A {@link PropositionColors} object containing the list of all
+   *         colours found on the node, including a flag indicating the
+   *         presence of the 'forbidden' marking.
    */
-  public PropositionIcon.ColorInfo guessPropositionColors
-    (final GraphProxy graph, final SimpleNodeProxy node)
+  public PropositionIcon.ColorInfo guessPropositionColors(final GraphProxy graph,
+                                                          final SimpleNodeProxy node)
   {
-    return mPropositionColorCollectorVisitor.getPropositionColors(graph, node);
+    return mPropositionColorCollectorVisitor
+      .getPropositionColors(graph, node);
   }
 
   /**
    * Proposes a tool tip text for an event with a given identifier.
-   * @return Always returns a string, but it may be just the meaningless
-   *         word "event".
+   *
+   * @return Always returns a string, but it may be just the meaningless word
+   *         "event".
    */
   public String guessEventToolTipText(final IdentifierProxy ident)
   {
@@ -228,12 +239,13 @@ public class ModuleContext
   }
 
   /**
-   * Tries to determine whether the given list of identifiers can be
-   * dropped on a node. This method checks all the identifiers in the given
-   * list, recursively entering foreach-event blocks.
+   * Tries to determine whether the given list of identifiers can be dropped
+   * on a node. This method checks all the identifiers in the given list,
+   * recursively entering foreach-event blocks.
+   *
    * @return <CODE>false</CODE> if an identifier is found that can be
-   *         determined <I>not</I> to be of type proposition ({@link
-   *         EventKind#PROPOSITION}); <CODE>true</CODE> otherwise.
+   *         determined <I>not</I> to be of type proposition (
+   *         {@link EventKind#PROPOSITION}); <CODE>true</CODE> otherwise.
    */
   public boolean canDropOnNode(final Collection<? extends Proxy> idents)
   {
@@ -241,28 +253,27 @@ public class ModuleContext
   }
 
   /**
-   * Tries to determine whether the given list of identifiers can be
-   * dropped on an edge. This method checks all the identifiers in the given
-   * list, recursively entering foreach-event blocks.
+   * Tries to determine whether the given list of identifiers can be dropped
+   * on an edge. This method checks all the identifiers in the given list,
+   * recursively entering foreach-event blocks.
+   *
    * @return <CODE>false</CODE> if an identifier is found that can be
-   *         determined <I>not</I> to be controllable ({@link
-   *         EventKind#CONTROLLABLE}) or uncontrollable ({@link
-   *         EventKind#UNCONTROLLABLE}); <CODE>true</CODE> otherwise.
+   *         determined <I>not</I> to be controllable (
+   *         {@link EventKind#CONTROLLABLE}) or uncontrollable (
+   *         {@link EventKind#UNCONTROLLABLE}); <CODE>true</CODE> otherwise.
    */
   public boolean canDropOnEdge(final Collection<? extends Proxy> idents)
   {
     return mCanDropVisitor.canDrop(idents, EDGE_DROP_LIST);
   }
 
-
   //#########################################################################
   //# Event Handling Support
   /**
-   * Returns whether given event may cause the proposition status of
-   * the given graph to change. The proposition status of a graph
-   * indicates whether the graph uses any propositions, i.e., whether
-   * states without propositions are rendered with a filled or a
-   * transparent background.
+   * Returns whether given event may cause the proposition status of the given
+   * graph to change. The proposition status of a graph indicates whether the
+   * graph uses any propositions, i.e., whether states without propositions
+   * are rendered with a filled or a transparent background.
    */
   public boolean causesPropositionStatusChange(final ModelChangeEvent event,
                                                final GraphProxy graph)
@@ -275,33 +286,37 @@ public class ModuleContext
     }
   }
 
-
   //#########################################################################
   //# Checking for Duplicate Names
   /**
-   * Checks whether the given string will represent an event declaration
-   * not yet in the module, and throws an exception otherwise.
-   * @param  name     The name of an event declaration to be created.
-   * @throws ParseException to indicate that the module already contains
-   *                  an event declaration with the given name.
+   * Checks whether the given string will represent an event declaration not
+   * yet in the module, and throws an exception otherwise.
+   *
+   * @param name
+   *          The name of an event declaration to be created.
+   * @throws ParseException
+   *           to indicate that the module already contains an event
+   *           declaration with the given name.
    */
-  public void checkNewEventName(final String name)
-    throws ParseException
+  public void checkNewEventName(final String name) throws ParseException
   {
     if (getEventDecl(name) != null) {
-      throw new ParseException
-	("Name '" + name + "' is already taken by an event!", 0);
+      throw new ParseException("Name '" + name
+                               + "' is already taken by an event!", 0);
     }
   }
 
   /**
    * Checks whether the given identifier is likely to represent a component
    * not yet in the module, and throws an exception otherwise.
-   * @param  ident    The identifier representing a component ({@link
-   *                  SimpleComponentProxy}, {@link VariableComponentProxy},
-   *                  etc.) to be created.
-   * @throws ParseException to indicate that the module already contains
-   *                  a component with the given name.
+   *
+   * @param ident
+   *          The identifier representing a component (
+   *          {@link SimpleComponentProxy}, {@link VariableComponentProxy},
+   *          etc.) to be created.
+   * @throws ParseException
+   *           to indicate that the module already contains a component with
+   *           the given name.
    */
   public void checkNewComponentName(final IdentifierProxy ident)
     throws ParseException
@@ -324,61 +339,70 @@ public class ModuleContext
   }
 
   /**
-   * Finds a name for an event declaration to be pasted into the module.
-   * If the given name is not used, it is returned. Otherwise, this
-   * method constructs an alternative name that is not yet taken, such
-   * that the original name is still recognisable.
-   * @param  name     The name of an event to be added.
+   * Finds a name for an event declaration to be pasted into the module. If
+   * the given name is not used, it is returned. Otherwise, this method
+   * constructs an alternative name that is not yet taken, such that the
+   * original name is still recognisable.
+   *
+   * @param name
+   *          The name of an event to be added.
    */
   public String getPastedEventName(final String name)
   {
     final NameChecker checker = new NameChecker() {
-        public boolean isNameTaken(final String name) {
-          return getEventDecl(name) != null;
-        }
-      };
+      public boolean isNameTaken(final String name)
+      {
+        return getEventDecl(name) != null;
+      }
+    };
     return getPastedName(name, checker);
   }
 
   /**
-   * Finds a name for an event declaration to be pasted into the module.
-   * If the given name is not used, it is returned. Otherwise, this
-   * method constructs an alternative name that is not yet taken, such
-   * that the original name is still recognisable.
-   * @param  name     The name of an event to be added.
-   * @param  alsoUsed A set of names also to be considered as taken.
+   * Finds a name for an event declaration to be pasted into the module. If
+   * the given name is not used, it is returned. Otherwise, this method
+   * constructs an alternative name that is not yet taken, such that the
+   * original name is still recognisable.
+   *
+   * @param name
+   *          The name of an event to be added.
+   * @param alsoUsed
+   *          A set of names also to be considered as taken.
    */
   public String getPastedEventName(final String name,
                                    final Set<String> alsoUsed)
   {
     final NameChecker checker = new NameChecker() {
-        public boolean isNameTaken(final String name) {
-          return getEventDecl(name) != null || alsoUsed.contains(name);
-        }
-      };
+      public boolean isNameTaken(final String name)
+      {
+        return getEventDecl(name) != null || alsoUsed.contains(name);
+      }
+    };
     return getPastedName(name, checker);
   }
 
   /**
-   * Finds a name for a component to be pasted into the module.  If the
-   * given name is not used, it is returned. Otherwise, this method
-   * constructs an alternative name that is not yet taken, such that the
-   * original name is still recognisable.
-   * @param  ident    The identifier representing a component ({@link
-   *                  SimpleComponentProxy}, {@link VariableComponentProxy},
-   *                  etc.) to be added.
+   * Finds a name for a component to be pasted into the module. If the given
+   * name is not used, it is returned. Otherwise, this method constructs an
+   * alternative name that is not yet taken, such that the original name is
+   * still recognisable.
+   *
+   * @param ident
+   *          The identifier representing a component (
+   *          {@link SimpleComponentProxy}, {@link VariableComponentProxy},
+   *          etc.) to be added.
    */
-  public IdentifierSubject getPastedComponentName
-    (final IdentifierSubject ident)
+  public IdentifierSubject getPastedComponentName(final IdentifierSubject ident)
   {
     if (ident instanceof SimpleIdentifierProxy) {
       final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
       final String name = simple.getName();
       final NameChecker checker = new NameChecker() {
-          public boolean isNameTaken(final String name) {
-            return getComponent(name) != null;
-          }
-        };
+        public boolean isNameTaken(final String name)
+        {
+          return getComponent(name) != null;
+        }
+      };
       final String newname = getPastedName(name, checker);
       return newname == name ? ident : new SimpleIdentifierSubject(newname);
     } else {
@@ -387,28 +411,31 @@ public class ModuleContext
   }
 
   /**
-   * Finds a name for a component to be pasted into the module.  If the
-   * given name is not used, it is returned. Otherwise, this method
-   * constructs an alternative name that is not yet taken, such that the
-   * original name is still recognisable.
-   * @param  ident    The identifier representing a component ({@link
-   *                  SimpleComponentProxy}, {@link VariableComponentProxy},
-   *                  etc.) to be added.
-   * @param  alsoUsed A set of names also to be considered as taken.
-   *                  If the chosen name is not in this set, it is
-   *                  automatically added.
+   * Finds a name for a component to be pasted into the module. If the given
+   * name is not used, it is returned. Otherwise, this method constructs an
+   * alternative name that is not yet taken, such that the original name is
+   * still recognisable.
+   *
+   * @param ident
+   *          The identifier representing a component (
+   *          {@link SimpleComponentProxy}, {@link VariableComponentProxy},
+   *          etc.) to be added.
+   * @param alsoUsed
+   *          A set of names also to be considered as taken. If the chosen
+   *          name is not in this set, it is automatically added.
    */
-  public IdentifierSubject getPastedComponentName
-    (final IdentifierSubject ident, final Set<String> alsoUsed)
+  public IdentifierSubject getPastedComponentName(final IdentifierSubject ident,
+                                                  final Set<String> alsoUsed)
   {
     if (ident instanceof SimpleIdentifierProxy) {
       final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
       final String name = simple.getName();
       final NameChecker checker = new NameChecker() {
-          public boolean isNameTaken(final String name) {
-            return getComponent(name) != null || alsoUsed.contains(name);
-          }
-        };
+        public boolean isNameTaken(final String name)
+        {
+          return getComponent(name) != null || alsoUsed.contains(name);
+        }
+      };
       final String newname = getPastedName(name, checker);
       if (newname == name) {
         return ident;
@@ -420,7 +447,6 @@ public class ModuleContext
       return ident;
     }
   }
-
 
   //#########################################################################
   //# Static Methods
@@ -436,14 +462,15 @@ public class ModuleContext
     case SUPERVISOR:
       return IconLoader.ICON_SUPERVISOR;
     default:
-      throw new IllegalArgumentException
-        ("Unknown component kind: " + kind + "!");
+      throw new IllegalArgumentException("Unknown component kind: " + kind
+                                         + "!");
     }
   }
+
   public static Icon getEventKindIcon(final EventKind event,
                                       final boolean observable)
   {
-    switch (event){
+    switch (event) {
     case CONTROLLABLE:
       if (observable) {
         return IconLoader.ICON_CONTROLLABLE_OBSERVABLE;
@@ -459,8 +486,7 @@ public class ModuleContext
     case PROPOSITION:
       return IconLoader.ICON_PROPOSITION;
     default:
-      throw new IllegalArgumentException
-        ("Unknown event kind: " + event + "!");
+      throw new IllegalArgumentException("Unknown event kind: " + event + "!");
     }
   }
 
@@ -476,8 +502,8 @@ public class ModuleContext
     case SUPERVISOR:
       return "Supervisor";
     default:
-      throw new IllegalArgumentException
-        ("Unknown component kind: " + kind + "!");
+      throw new IllegalArgumentException("Unknown component kind: " + kind
+                                         + "!");
     }
   }
 
@@ -502,7 +528,6 @@ public class ModuleContext
     return result;
   }
 
-
   //#########################################################################
   //# Direct Access
   public EventDeclProxy getEventDecl(final String name)
@@ -515,7 +540,6 @@ public class ModuleContext
     return mComponentListWrapper.get(name);
   }
 
-
   //#########################################################################
   //# Auxiliary Methods
   private boolean hasPropositions(final GraphProxy graph)
@@ -526,7 +550,6 @@ public class ModuleContext
     }
     return status.hasPropositions();
   }
-
 
   //#########################################################################
   //# Auxiliary Static Methods
@@ -581,8 +604,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class ListSubjectWrapper
-  private class ListSubjectWrapper
-    implements ModelObserver
+  private class ListSubjectWrapper implements ModelObserver
   {
 
     //#######################################################################
@@ -645,7 +667,8 @@ public class ModuleContext
           final IdentifiedProxy comp = (IdentifiedProxy) value;
           final IdentifierProxy ident = comp.getIdentifier();
           if (ident instanceof SimpleIdentifierProxy) {
-            final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+            final SimpleIdentifierProxy simple =
+              (SimpleIdentifierProxy) ident;
             final String name = simple.getName();
             if (!mMap.containsKey(name)) {
               mMap.put(name, comp);
@@ -667,10 +690,9 @@ public class ModuleContext
         // Identifier and IdentifiedProxy objects fire STATE_CHANGED,
         // not NAME_CHANGED ...
         final Subject parent = source.getParent();
-        if (source instanceof IdentifiedProxy &&
-            parent == mList ||
-            source instanceof SimpleIdentifierProxy &&
-            parent.getParent() == mList) {
+        if (source instanceof IdentifiedProxy && parent == mList
+            || source instanceof SimpleIdentifierProxy
+            && parent.getParent() == mList) {
           mMap = null;
           mListSubject.removeModelObserver(this);
         }
@@ -696,8 +718,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class GraphStatus
-  private class GraphStatus
-    implements ModelObserver
+  private class GraphStatus implements ModelObserver
   {
 
     //#######################################################################
@@ -724,7 +745,7 @@ public class ModuleContext
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
     public void modelChanged(final ModelChangeEvent event)
     {
-     if (causesChange(event)) {
+      if (causesChange(event)) {
         toggleStatus();
       }
     }
@@ -755,8 +776,8 @@ public class ModuleContext
             final Boolean found =
               mPropositionFinderVisitor.hasPropositions(proxy);
             if (found == null) {
-              return SubjectTools.getAncestor
-                (source, SimpleNodeSubject.class) != null;
+              return SubjectTools
+                .getAncestor(source, SimpleNodeSubject.class) != null;
             } else if (found) {
               return true;
             }
@@ -792,9 +813,8 @@ public class ModuleContext
             final Proxy proxy = (Proxy) value;
             final Boolean found =
               mPropositionFinderVisitor.hasPropositions(proxy);
-            if (found == null &&
-                SubjectTools.getAncestor(source,
-                                         SimpleNodeSubject.class) != null) {
+            if (found == null
+                && SubjectTools.getAncestor(source, SimpleNodeSubject.class) != null) {
               return true;
             } else if (found) {
               return true;
@@ -806,7 +826,7 @@ public class ModuleContext
             final LabelBlockProxy blocked = mGraph.getBlockedEvents();
             if (blocked != null) {
               final Boolean found =
-                 mPropositionFinderVisitor.hasPropositions(blocked);
+                mPropositionFinderVisitor.hasPropositions(blocked);
               if (found != null && found) {
                 return true;
               }
@@ -852,8 +872,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class CanDropVisitor
-  private class CanDropVisitor
-    extends AbstractModuleProxyVisitor
+  private class CanDropVisitor extends AbstractModuleProxyVisitor
   {
 
     //#######################################################################
@@ -913,8 +932,8 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class IdentifierNameVisitor
-  private static class IdentifierNameVisitor
-    extends AbstractModuleProxyVisitor
+  private static class IdentifierNameVisitor extends
+    AbstractModuleProxyVisitor
   {
 
     //#######################################################################
@@ -941,14 +960,12 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public String visitIndexedIdentifierProxy
-      (final IndexedIdentifierProxy ident)
+    public String visitIndexedIdentifierProxy(final IndexedIdentifierProxy ident)
     {
       return ident.getName();
     }
 
-    public String visitSimpleIdentifierProxy
-      (final SimpleIdentifierProxy ident)
+    public String visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
     {
       return ident.getName();
     }
@@ -958,8 +975,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class IconGetterVisitor
-  private class IconGetterVisitor
-    extends AbstractModuleProxyVisitor
+  private class IconGetterVisitor extends AbstractModuleProxyVisitor
   {
 
     //#######################################################################
@@ -982,6 +998,19 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Icon visitConstantAliasProxy(final ConstantAliasProxy var)
+    {
+      return IconLoader.ICON_CONSTANT;
+    }
+
+    @Override
+    public Icon visitEventAliasProxy(final EventAliasProxy var)
+    {
+      return IconLoader.ICON_EVENT;
+    }
+
+    @Override
     public Icon visitEventDeclProxy(final EventDeclProxy decl)
     {
       final EventKind kind = decl.getKind();
@@ -1002,46 +1031,54 @@ public class ModuleContext
           return PropositionIcon.getDefaultMarkedIcon();
         }
       default:
-        throw new IllegalArgumentException
-          ("Unknown event kind: " + kind + "!");
+        throw new IllegalArgumentException("Unknown event kind: " + kind
+                                           + "!");
       }
     }
 
+    @Override
     public Icon visitForeachProxy(final ForeachProxy foreach)
     {
       return IconLoader.ICON_FOREACH;
     }
 
+    @Override
+    public Icon visitIdentifierProxy(final IdentifierProxy id)
+    {
+      return guessEventIcon(id);
+    }
+
+    @Override
     public Icon visitInstanceProxy(final InstanceProxy inst)
     {
       return IconLoader.ICON_INSTANCE;
     }
 
-    public Icon visitParameterBindingProxy
-      (final ParameterBindingProxy binding)
+    @Override
+    public Icon visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
       return IconLoader.ICON_BINDING;
     }
 
+    @Override
     public Icon visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final ComponentKind kind = comp.getKind();
       return getComponentKindIcon(kind);
     }
 
-    public Icon visitVariableComponentProxy
-      (final VariableComponentProxy var)
+    @Override
+    public Icon visitVariableComponentProxy(final VariableComponentProxy var)
     {
       return IconLoader.ICON_VARIABLE;
     }
-
   }
 
 
   //#########################################################################
   //# Inner Class ToolTipGetterVisitor
-  private static class ToolTipGetterVisitor
-    extends AbstractModuleProxyVisitor
+  private static class ToolTipGetterVisitor extends
+    AbstractModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1075,8 +1112,7 @@ public class ModuleContext
       return "Module instance";
     }
 
-    public String visitParameterBindingProxy
-      (final ParameterBindingProxy binding)
+    public String visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
       return "Parameter binding";
     }
@@ -1087,8 +1123,7 @@ public class ModuleContext
       return getComponentKindToolTip(kind);
     }
 
-    public String visitVariableComponentProxy
-      (final VariableComponentProxy var)
+    public String visitVariableComponentProxy(final VariableComponentProxy var)
     {
       return "EFA variable";
     }
@@ -1098,14 +1133,14 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class PropositionColorCollectorVisitor
-  private class PropositionColorCollectorVisitor
-    extends AbstractModuleProxyVisitor
+  private class PropositionColorCollectorVisitor extends
+    AbstractModuleProxyVisitor
   {
 
     //#######################################################################
     //# Invocation
-    private PropositionIcon.ColorInfo getPropositionColors
-      (final GraphProxy graph, final SimpleNodeProxy node)
+    private PropositionIcon.ColorInfo getPropositionColors(final GraphProxy graph,
+                                                           final SimpleNodeProxy node)
     {
       try {
         if (hasPropositions(graph)) {
@@ -1151,8 +1186,8 @@ public class ModuleContext
           final String name = decl.getName();
           if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
             mForbidden = true;
-          } else if (mColorSet != null &&
-                     mColorSet.add(EditorColor.DEFAULTMARKINGCOLOR)) {
+          } else if (mColorSet != null
+                     && mColorSet.add(EditorColor.DEFAULTMARKINGCOLOR)) {
             mColorList.add(EditorColor.DEFAULTMARKINGCOLOR);
           }
         } else {
@@ -1176,8 +1211,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class PropositionFinderVisitor
-  private class PropositionFinderVisitor
-    extends AbstractModuleProxyVisitor
+  private class PropositionFinderVisitor extends AbstractModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1223,8 +1257,7 @@ public class ModuleContext
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
-    public Boolean visitEventListExpressionProxy
-      (final EventListExpressionProxy elist)
+    public Boolean visitEventListExpressionProxy(final EventListExpressionProxy elist)
       throws VisitorException
     {
       final List<Proxy> list = elist.getEventList();
@@ -1240,8 +1273,7 @@ public class ModuleContext
     }
 
     @Override
-    public Boolean visitSimpleIdentifierProxy
-      (final SimpleIdentifierProxy ident)
+    public Boolean visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
     {
       final String name = ident.getName();
       if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
@@ -1289,7 +1321,6 @@ public class ModuleContext
     }
   }
 
-
   //#########################################################################
   //# Data Members
   private final ModuleProxy mModule;
@@ -1298,20 +1329,17 @@ public class ModuleContext
   private final IconGetterVisitor mIconGetterVisitor;
   private final ToolTipGetterVisitor mToolTipGetterVisitor;
   private final PropositionFinderVisitor mPropositionFinderVisitor;
-  private final PropositionColorCollectorVisitor
-    mPropositionColorCollectorVisitor;
+  private final PropositionColorCollectorVisitor mPropositionColorCollectorVisitor;
 
   private final ListSubjectWrapper mEventDeclListWrapper;
   private final ListSubjectWrapper mComponentListWrapper;
   private final Map<GraphProxy,GraphStatus> mGraphStatusMap;
 
-
   //#########################################################################
   //# Static Class Variables
   private static Pattern PATTERN = null;
 
-  private static final EventKind[] NODE_DROP_LIST =
-    {EventKind.PROPOSITION};
+  private static final EventKind[] NODE_DROP_LIST = {EventKind.PROPOSITION};
   private static final EventKind[] EDGE_DROP_LIST =
     {EventKind.CONTROLLABLE, EventKind.UNCONTROLLABLE};
 
