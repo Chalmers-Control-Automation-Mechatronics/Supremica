@@ -220,13 +220,7 @@ public class CompositionalSynthesizer
     return mDefaultMarking;
   }
 
-  void setRenamingIsUsed (final int renaming) {
-    mRenamingIsUsed = renaming;
-  }
 
-  static int getRenamingIsUsed() {
-    return mRenamingIsUsed;
-  }
 
 
   //#########################################################################
@@ -254,6 +248,7 @@ public class CompositionalSynthesizer
       }
       final Logger logger = getLogger();
       logger.debug("CompositionalSynthesizer done.");
+      result.setRenamingIsUsed(mDistinguisherInfoList.size());
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -794,7 +789,6 @@ public class CompositionalSynthesizer
         (event, replacement, distinguisherAutomaton);
       mDistinguisherInfoList.add(info);
       mRenamedEvents.addAll(replacement);
-      setRenamingIsUsed(mDistinguisherInfoList.size());
     }
 
     return new SynthesisAbstractionStep(simplifiedAutomaton,
@@ -943,7 +937,6 @@ public class CompositionalSynthesizer
   {
 
     if (!listIter.hasPrevious()) {
-      setRenamingIsUsed(0);
       return removeDumpStates(rel, encoding);
     }
     final int numOfStates = rel.getNumberOfStates();
