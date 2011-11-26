@@ -220,7 +220,6 @@ public class CompositionalSynthesizerExperiments
   //#########################################################################
   //# Models
   // Central locking
-  @SuppressWarnings("unused")
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
     runModel("valid", "synthesis_experiment", "koordwsp_block.wmod", false);
@@ -270,6 +269,7 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "tbed_uncont.wmod", false);
   }
 
+  @SuppressWarnings("unused")
   private void synthesiseTbedNoderailB() throws Exception
   {
     runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod",
@@ -283,28 +283,33 @@ public class CompositionalSynthesizerExperiments
   }
 
   //AGV
+  @SuppressWarnings("unused")
   private void synthesisAGVB() throws Exception
   {
     runModel("valid", "synthesis_experiment", "agvb.wmod", true);
   }
 
+  @SuppressWarnings("unused")
   private void synthesisAGV() throws Exception
   {
     runModel("valid", "synthesis_experiment", "agv.wmod", true);
   }
 
   //
+  @SuppressWarnings("unused")
   private void synthesiseIPC() throws Exception
   {
     runModel("valid", "synthesis_experiment", "IPC.wmod", true);
   }
 
+  @SuppressWarnings("unused")
   private void synthesissRhoneSubPatch0() throws Exception
   {
     runModel("valid", "synthesis_experiment", "rhone_subsystem1_patch0.wmod",
                                                                        true);
   }
 
+  @SuppressWarnings("unused")
   private void synthesissFms2003() throws Exception
   {
     runModel("valid", "synthesis_experiment", "fms2003_synth1.wmod", true);
@@ -312,11 +317,12 @@ public class CompositionalSynthesizerExperiments
 
   //flexible production cell
   @SuppressWarnings("unused")
-private void synthesiseFischertechnik() throws Exception
+  private void synthesiseFischertechnik() throws Exception
   {
     runModel("valid", "synthesis_experiment", "ftechnik.wmod", true);
   }
 
+  @SuppressWarnings("unused")
   private void synthesiseFlexibleManufacturingSystem() throws Exception
   {
     runModel("valid", "synthesis_experiment", "flexible_man_sys.wmod", true);
@@ -328,6 +334,7 @@ private void synthesiseFischertechnik() throws Exception
     runModel("valid", "synthesis_experiment", "tip3_bad.wmod", false);
   }
 
+  @SuppressWarnings("unused")
   private void synthesisFenCaiWon09B() throws Exception
   {
     runModel("valid", "synthesis_experiment", "FenCaiWon09b.wmod", false);

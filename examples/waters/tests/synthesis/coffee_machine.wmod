@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="cofee_machine" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="coffee_machine" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A coffee machine that accepts coins as input and allows the user to order coffee and tea. The user interface (coin, tea and coffee) can be controlled but all other behaviour of the machine is uncontrollable.
 
 Problems with the machine

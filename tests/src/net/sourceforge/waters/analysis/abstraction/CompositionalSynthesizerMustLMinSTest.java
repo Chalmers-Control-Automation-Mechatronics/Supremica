@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   CompositionalSynthesizerTest
+//# CLASS:   CompositionalSynthesizerMustLMinSTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -16,7 +16,7 @@ import net.sourceforge.waters.model.analysis.AbstractSynthesizerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class CompositionalSynthesizerTest
+public class CompositionalSynthesizerMustLMinSTest
   extends AbstractSynthesizerTest
 {
 
@@ -25,7 +25,7 @@ public class CompositionalSynthesizerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(CompositionalSynthesizerTest.class);
+      new TestSuite(CompositionalSynthesizerMustLMinSTest.class);
     return testSuite;
   }
 
@@ -48,7 +48,7 @@ public class CompositionalSynthesizerTest
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
-    synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MaxC);
+    synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinS);
     return synthesizer;
   }
 
