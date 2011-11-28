@@ -26,7 +26,6 @@ import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -454,17 +453,11 @@ class AliasesTreeModel
     }
 
     @Override
-    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Object visitForeachProxy(final ForeachProxy foreach)
     {
       final Subject subject = (Subject) foreach;
       final Proxy parent = SubjectTools.getProxyParent(subject);
       return canBeInTree(parent) ? foreach : null;
-    }
-
-    @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-    {
-      return foreach;
     }
 
     @Override

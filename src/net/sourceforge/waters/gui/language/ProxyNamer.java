@@ -21,9 +21,7 @@ import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -136,12 +134,7 @@ public class ProxyNamer {
     createEntry(EventAliasProxy.class, "Event Alias", "Event Aliases",
                 AliasProxy.class, false);
     createEntry(EventDeclProxy.class, "Event");
-    createEntry(ForeachComponentProxy.class, "Foreach Block",
-                ComponentProxy.class, false);
-    createEntry(ForeachEventAliasProxy.class, "Foreach Block",
-                IdentifierProxy.class, false);
-    createEntry(ForeachEventProxy.class, "Foreach Block",
-                IdentifierProxy.class, false);
+    createEntry(ForeachProxy.class, "Foreach Block");
     createEntry(GraphProxy.class, "Graph", "Graph");
     createEntry(GuardActionBlockProxy.class, "Guard/Action Block",
                 EdgeProxy.class, true);

@@ -51,14 +51,16 @@ import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.ConstantAliasSubject;
+import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -748,24 +750,25 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
       return WatersDataFlavor.EVENT_ALIAS_LIST;
     }
 
+    @Override
     public Object visitExpressionProxy(final ExpressionProxy proxy)
       throws VisitorException
     {
       return WatersDataFlavor.IDENTIFIER_LIST;
     }
 
-    public Object visitForeachEventAliasProxy(final ForeachEventAliasProxy proxy)
-      throws VisitorException
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
     {
-      return WatersDataFlavor.EVENT_ALIAS_LIST;
+      final Subject subject = (Subject) foreach;
+      if (SubjectTools.getAncestor(subject, EventAliasSubject.class) != null) {
+        return WatersDataFlavor.IDENTIFIER_LIST;
+      } else {
+        return getSupportedDataFlavor();
+      }
     }
 
-    public Object visitForeachEventProxy(final ForeachEventProxy proxy)
-      throws VisitorException
-    {
-      return WatersDataFlavor.IDENTIFIER_LIST;
-    }
-
+    @Override
     public Object visitIdentifierProxy(final IdentifierProxy proxy)
       throws VisitorException
     {
@@ -799,20 +802,19 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
       return null;
     }
 
-    public Object visitForeachEventAliasProxy(final ForeachEventAliasProxy proxy)
-      throws VisitorException
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
     {
-      return WatersDataFlavor.EVENT_ALIAS_LIST;
+      final Subject subject = (Subject) foreach;
+      if (SubjectTools.getAncestor(subject, EventAliasSubject.class) != null) {
+        return WatersDataFlavor.IDENTIFIER_LIST;
+      } else {
+        return getSupportedDataFlavor();
+      }
     }
 
-    public Object visitForeachEventProxy(final ForeachEventProxy proxy)
-      throws VisitorException
-    {
-      return WatersDataFlavor.IDENTIFIER_LIST;
-    }
-
+    @Override
     public Object visitModuleProxy(final ModuleProxy proxy)
-      throws VisitorException
     {
       return getSupportedDataFlavor();
     }

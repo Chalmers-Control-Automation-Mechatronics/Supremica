@@ -11,8 +11,6 @@ package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Proxy;
-
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.module.EventListType;
 import net.sourceforge.waters.xsd.module.ForeachEvent;
@@ -20,7 +18,7 @@ import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class ForeachEventListHandler
-  extends JAXBListHandler<ForeachEvent,EventListType,Proxy>
+  extends JAXBForeachHandler<ForeachEvent,EventListType>
 {
 
 
@@ -54,6 +52,15 @@ class ForeachEventListHandler
   List<ElementType> getList(final EventListType listelem)
   {
     return listelem.getList();
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class JAXBForeachHandler
+  @Override
+  ForeachEvent createForeachElement()
+  {
+    return mFactory.createForeachEvent();
   }
 
 

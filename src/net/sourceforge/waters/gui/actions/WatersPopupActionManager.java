@@ -165,7 +165,7 @@ public class WatersPopupActionManager
   public IDEAction getInsertForeachComponentAction()
   {
     final WatersActionManager master = mIDE.getActions();
-    return master.getAction(InsertForeachComponentAction.class);
+    return master.getAction(InsertForeachAction.class);
   }
 
   public IDEAction getInsertSimpleComponentAction()

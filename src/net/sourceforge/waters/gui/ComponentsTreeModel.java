@@ -21,7 +21,7 @@ import javax.swing.tree.TreeModel;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -32,6 +32,8 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
 
@@ -362,8 +364,7 @@ class ComponentsTreeModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-    public List<Proxy> visitForeachComponentProxy
-      (final ForeachComponentProxy foreach)
+    public List<Proxy> visitForeachProxy(final ForeachProxy foreach)
     {
       return foreach.getBody();
     }
@@ -428,10 +429,10 @@ class ComponentsTreeModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-    public Boolean visitForeachComponentProxy
-      (final ForeachComponentProxy foreach)
+    public Boolean visitForeachProxy(final ForeachProxy foreach)
     {
-      return true;
+      final Subject subject = (Subject) foreach;
+      return SubjectTools.getAncestor(subject, GraphSubject.class) == null;
     }
 
     public Boolean visitInstanceProxy(final InstanceProxy inst)

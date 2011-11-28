@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
 //# PACKAGE: net.sourceforge.waters.gui.actions
-//# CLASS:   InsertForeachComponentAction
+//# CLASS:   InsertConstantAliasAction
 //###########################################################################
 //# $Id$
 //###########################################################################

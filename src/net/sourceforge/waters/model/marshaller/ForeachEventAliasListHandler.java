@@ -11,8 +11,6 @@ package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Proxy;
-
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.module.EventAliasList;
 import net.sourceforge.waters.xsd.module.ForeachEventAlias;
@@ -20,7 +18,7 @@ import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class ForeachEventAliasListHandler
-  extends JAXBListHandler<ForeachEventAlias,EventAliasList,Proxy>
+  extends JAXBForeachHandler<ForeachEventAlias,EventAliasList>
 {
 
 
@@ -54,6 +52,15 @@ class ForeachEventAliasListHandler
   List<ElementType> getList(final EventAliasList listelem)
   {
     return listelem.getList();
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class JAXBForeachHandler
+  @Override
+  ForeachEventAlias createForeachElement()
+  {
+    return mFactory.createForeachEventAlias();
   }
 
 

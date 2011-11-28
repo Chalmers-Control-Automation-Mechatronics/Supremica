@@ -93,24 +93,6 @@ public class AbstractModuleProxyVisitor
     return visitProxy(proxy);
   }
 
-  public Object visitForeachComponentProxy(final ForeachComponentProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
-  public Object visitForeachEventAliasProxy(final ForeachEventAliasProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
-  public Object visitForeachEventProxy(final ForeachEventProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
   public Object visitForeachProxy(final ForeachProxy proxy)
     throws VisitorException
   {
