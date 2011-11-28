@@ -34,9 +34,6 @@ import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -274,27 +271,6 @@ public class ModuleProxyPrinter
     throws VisitorException
   {
     return visitProxy(proxy);
-  }
-
-  public Object visitForeachComponentProxy
-      (final ForeachComponentProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
-  public Object visitForeachEventAliasProxy
-      (final ForeachEventAliasProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
-  public Object visitForeachEventProxy
-      (final ForeachEventProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
   }
 
   public Object visitForeachProxy

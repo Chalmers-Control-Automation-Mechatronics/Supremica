@@ -32,7 +32,6 @@ import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
@@ -896,7 +895,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Boolean visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Boolean visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
       for (final Proxy proxy : foreach.getBody()) {
@@ -1169,7 +1168,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
       final List<Proxy> body = foreach.getBody();
@@ -1265,7 +1264,7 @@ public class ModuleContext
     }
 
     @Override
-    public Boolean visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Boolean visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
       final List<Proxy> body = foreach.getBody();

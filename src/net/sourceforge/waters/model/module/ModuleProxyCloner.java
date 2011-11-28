@@ -264,65 +264,22 @@ public class ModuleProxyCloner
     return (ExpressionProxy) proxy.acceptVisitor(this);
   }
 
-  public ForeachComponentProxy visitForeachComponentProxy
-    (final ForeachComponentProxy proxy)
-    throws VisitorException
-  {
-    final String name = proxy.getName();
-    final SimpleExpressionProxy range0 = proxy.getRange();
-    final SimpleExpressionProxy range = visitSimpleExpressionProxy(range0);
-    final SimpleExpressionProxy guard0 = proxy.getGuard();
-    final SimpleExpressionProxy guard =
-      guard0 == null ? null : visitSimpleExpressionProxy(guard0);
-    final Collection<Proxy> body0 = proxy.getBody();
-    final Collection<Proxy> body = cloneProxyCollection(body0);
-    return mFactory.createForeachComponentProxy(name,
-                                                range,
-                                                guard,
-                                                body);
-  }
-
-  public ForeachEventAliasProxy visitForeachEventAliasProxy
-    (final ForeachEventAliasProxy proxy)
-    throws VisitorException
-  {
-    final String name = proxy.getName();
-    final SimpleExpressionProxy range0 = proxy.getRange();
-    final SimpleExpressionProxy range = visitSimpleExpressionProxy(range0);
-    final SimpleExpressionProxy guard0 = proxy.getGuard();
-    final SimpleExpressionProxy guard =
-      guard0 == null ? null : visitSimpleExpressionProxy(guard0);
-    final Collection<Proxy> body0 = proxy.getBody();
-    final Collection<Proxy> body = cloneProxyCollection(body0);
-    return mFactory.createForeachEventAliasProxy(name,
-                                                 range,
-                                                 guard,
-                                                 body);
-  }
-
-  public ForeachEventProxy visitForeachEventProxy
-    (final ForeachEventProxy proxy)
-    throws VisitorException
-  {
-    final String name = proxy.getName();
-    final SimpleExpressionProxy range0 = proxy.getRange();
-    final SimpleExpressionProxy range = visitSimpleExpressionProxy(range0);
-    final SimpleExpressionProxy guard0 = proxy.getGuard();
-    final SimpleExpressionProxy guard =
-      guard0 == null ? null : visitSimpleExpressionProxy(guard0);
-    final Collection<Proxy> body0 = proxy.getBody();
-    final Collection<Proxy> body = cloneProxyCollection(body0);
-    return mFactory.createForeachEventProxy(name,
-                                            range,
-                                            guard,
-                                            body);
-  }
-
   public ForeachProxy visitForeachProxy
     (final ForeachProxy proxy)
     throws VisitorException
   {
-    return (ForeachProxy) proxy.acceptVisitor(this);
+    final String name = proxy.getName();
+    final SimpleExpressionProxy range0 = proxy.getRange();
+    final SimpleExpressionProxy range = visitSimpleExpressionProxy(range0);
+    final SimpleExpressionProxy guard0 = proxy.getGuard();
+    final SimpleExpressionProxy guard =
+      guard0 == null ? null : visitSimpleExpressionProxy(guard0);
+    final Collection<Proxy> body0 = proxy.getBody();
+    final Collection<Proxy> body = cloneProxyCollection(body0);
+    return mFactory.createForeachProxy(name,
+                                       range,
+                                       guard,
+                                       body);
   }
 
   public GraphProxy visitGraphProxy

@@ -56,15 +56,6 @@ public interface ModuleProxyVisitor
   public Object visitExpressionProxy(ExpressionProxy proxy)
     throws VisitorException;
 
-  public Object visitForeachComponentProxy(ForeachComponentProxy proxy)
-    throws VisitorException;
-
-  public Object visitForeachEventAliasProxy(ForeachEventAliasProxy proxy)
-    throws VisitorException;
-
-  public Object visitForeachEventProxy(ForeachEventProxy proxy)
-    throws VisitorException;
-
   public Object visitForeachProxy(ForeachProxy proxy)
     throws VisitorException;
 

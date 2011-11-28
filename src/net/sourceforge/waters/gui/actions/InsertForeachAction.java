@@ -14,27 +14,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.ForeachEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.ForeachComponentEditorDialog;
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to create a new foreach-component block for a module.
- * This action merely popups the foreach component creation dialog
- * ({@link ForeachComponentEditorDialog});
- * the actual component creation is done when the dialog is committed.
+ * The action to create a new foreach block for a module.
+ * This action merely pops up the foreach block creation dialog
+ * ({@link ForeachEditorDialog});
+ * the actual forach block creation is done when the dialog is committed.
  *
  * @author Robi Malik
  */
 
-public class InsertForeachComponentAction
+public class InsertForeachAction
   extends WatersAction
 {
 
   //#########################################################################
   //# Constructors
-  InsertForeachComponentAction(final IDE ide)
+  InsertForeachAction(final IDE ide)
   {
     super(ide);
     putValue(Action.NAME, "New Foreach Block ...");
@@ -49,7 +49,7 @@ public class InsertForeachComponentAction
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();
     if (root != null) {
-      new ForeachComponentEditorDialog(root);
+      new ForeachEditorDialog(root);
     }
   }
 

@@ -17,8 +17,11 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
@@ -33,7 +36,7 @@ import net.sourceforge.waters.subject.base.ProxySubject;
  * @author Robi Malik
  */
 
-public abstract class ForeachSubject
+public final class ForeachSubject
   extends NamedSubject
   implements ForeachProxy
 {
@@ -47,10 +50,10 @@ public abstract class ForeachSubject
    * @param guard The guard of the new foreach construct, or <CODE>null</CODE>.
    * @param body The body of the new foreach construct, or <CODE>null</CODE> if empty.
    */
-  protected ForeachSubject(final String name,
-                           final SimpleExpressionProxy range,
-                           final SimpleExpressionProxy guard,
-                           final Collection<? extends Proxy> body)
+  public ForeachSubject(final String name,
+                        final SimpleExpressionProxy range,
+                        final SimpleExpressionProxy guard,
+                        final Collection<? extends Proxy> body)
   {
     super(name);
     mRange = (SimpleExpressionSubject) range;
@@ -76,8 +79,8 @@ public abstract class ForeachSubject
    * @param name The name of the new foreach construct.
    * @param range The range of the new foreach construct.
    */
-  protected ForeachSubject(final String name,
-                           final SimpleExpressionProxy range)
+  public ForeachSubject(final String name,
+                        final SimpleExpressionProxy range)
   {
     this(name,
          range,
@@ -130,10 +133,29 @@ public abstract class ForeachSubject
       }
       final ListSubject<AbstractSubject> body = downcast.getBodyModifiable();
       mBody.assignFrom(body);
-      return change;
-    } else {
-      return false;
+      if (change) {
+        fireStateChanged();
+      }
     }
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Comparing
+  public Class<ForeachProxy> getProxyInterface()
+  {
+    return ForeachProxy.class;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.Proxy
+  public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
+  {
+    final ModuleProxyVisitor downcast = (ModuleProxyVisitor) visitor;
+    return downcast.visitForeachProxy(this);
   }
 
 

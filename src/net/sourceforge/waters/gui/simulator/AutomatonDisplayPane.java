@@ -68,7 +68,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.ForeachEventSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
@@ -615,7 +615,7 @@ public class AutomatonDisplayPane
           if (orig == mFocusedItem) {
             selected = true;
           } else if (orig instanceof IdentifierSubject ||
-                     orig instanceof ForeachEventSubject) {
+                     orig instanceof ForeachSubject) {
             final Subject subject = (Subject) orig;
             final EdgeSubject edge =
               SubjectTools.getAncestor(subject, EdgeSubject.class);

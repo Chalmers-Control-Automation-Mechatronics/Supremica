@@ -52,7 +52,7 @@ import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
@@ -62,7 +62,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
-import net.sourceforge.waters.subject.module.ForeachComponentSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.IdentifiedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -229,8 +229,8 @@ public class ComponentsTree
   {
     final Proxy anchor = getSelectionAnchor();
     final ListSubject<? extends ProxySubject> list;
-    if (anchor instanceof ForeachComponentSubject) {
-      final ForeachComponentSubject foreach = (ForeachComponentSubject) anchor;
+    if (anchor instanceof ForeachSubject) {
+      final ForeachSubject foreach = (ForeachSubject) anchor;
       list = foreach.getBodyModifiable();
     } else {
       final ModuleSubject module = mRoot.getModuleSubject();
@@ -303,8 +303,8 @@ public class ComponentsTree
     final ModuleContext context;
     final Set<String> names;
     final Proxy anchor = getSelectionAnchor();
-    if (anchor instanceof ForeachComponentSubject) {
-      final ForeachComponentSubject foreach = (ForeachComponentSubject) anchor;
+    if (anchor instanceof ForeachSubject) {
+      final ForeachSubject foreach = (ForeachSubject) anchor;
       list = foreach.getBodyModifiable();
       context = null;
       names = null;
@@ -560,9 +560,8 @@ public class ComponentsTree
 
   private void expand(final ProxySubject subject)
   {
-    if (subject instanceof ForeachComponentSubject) {
-      final ForeachComponentSubject foreach =
-        (ForeachComponentSubject) subject;
+    if (subject instanceof ForeachSubject) {
+      final ForeachSubject foreach = (ForeachSubject) subject;
       final ComponentsTreeModel model = getComponentsTreeModel();
       final TreePath path = model.createPath(subject);
       expandPath(path);
@@ -716,8 +715,7 @@ public class ComponentsTree
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-    public DataFlavor visitForeachComponentProxy
-      (final ForeachComponentProxy foreach)
+    public DataFlavor visitForeachProxy(final ForeachProxy foreach)
     {
       return WatersDataFlavor.MODULE_COMPONENT_LIST;
     }

@@ -45,15 +45,11 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
  * guard variable, the index range, and the optional guard expression.
  * Input validation is performed using an {@link ExpressionParser}.</P>
  *
- * <P>This is a generic dialog that supports different types of foreach
- * blocks that exist in Waters. Specific types are implemented by
- * subclasses.</P>
- *
  * @see net.sourceforge.waters.model.module.ForeachProxy ForeachProxy
  * @author Robi Malik
  */
 
-public abstract class ForeachEditorDialog
+public class ForeachEditorDialog
   extends JDialog
 {
 
@@ -84,11 +80,6 @@ public abstract class ForeachEditorDialog
 
 
   //#########################################################################
-  //# Provided by Subclasses
-  abstract ForeachSubject getTemplate();
-
-
-  //#########################################################################
   //# Access to Created Item
   /**
    * Gets the Waters subject edited by this dialog.
@@ -108,7 +99,7 @@ public abstract class ForeachEditorDialog
   private void createComponents()
   {
     final ForeachSubject template =
-      mForeach == null ? getTemplate() : mForeach;
+      mForeach == null ? TEMPLATE : mForeach;
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
         public void actionPerformed(final ActionEvent event)
@@ -278,7 +269,7 @@ public abstract class ForeachEditorDialog
         (SimpleExpressionSubject) mGuardInput.getValue();
       final SimpleExpressionSubject guard = makeUnique(guard0);
       if (mForeach == null) {
-        final ForeachSubject template = getTemplate().clone();
+        final ForeachSubject template = TEMPLATE.clone();
         template.setName(name);
         template.setRange(range);
         template.setGuard(guard);
@@ -383,6 +374,8 @@ public abstract class ForeachEditorDialog
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+  private static final ForeachSubject TEMPLATE =
+    new ForeachSubject("", new SimpleIdentifierSubject(""));
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
 
 }

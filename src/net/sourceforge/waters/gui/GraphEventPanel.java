@@ -83,7 +83,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -95,7 +95,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.ForeachEventSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -1174,10 +1174,10 @@ public class GraphEventPanel
       return null;
     }
 
-    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
-      final ForeachEventSubject subject = (ForeachEventSubject) foreach;
+      final ForeachSubject subject = (ForeachSubject) foreach;
       final ListSubject<? extends ProxySubject> body =
         subject.getBodyModifiable();
       processList(body);
@@ -1286,10 +1286,10 @@ public class GraphEventPanel
       return null;
     }
 
-    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
-      final ForeachEventSubject subject = (ForeachEventSubject) foreach;
+      final ForeachSubject subject = (ForeachSubject) foreach;
       final ListSubject<? extends ProxySubject> body =
         subject.getBodyModifiable();
       processList(body);
