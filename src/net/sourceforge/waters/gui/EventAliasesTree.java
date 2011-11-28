@@ -1,13 +1,8 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.util.List;
-
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
-import net.sourceforge.waters.gui.transfer.EventAliasTransferable;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
@@ -35,10 +30,6 @@ public class EventAliasesTree extends AliasesTree
 
   String getRootName(){
     return "Event Aliases";
-  }
-
-  Transferable getTransferable(final List<? extends Proxy> items){
-    return new EventAliasTransferable(items);
   }
 
   DataFlavor getSupportedDataFlavor()

@@ -1,13 +1,8 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.util.List;
-
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
-import net.sourceforge.waters.gui.transfer.ConstantAliasTransferable;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
@@ -36,11 +31,6 @@ public class ConstantAliasesTree extends AliasesTree
 
   String getRootName(){
     return "Named Constants";
-  }
-
-  Transferable getTransferable(final List<? extends Proxy> items)
-  {
-    return new ConstantAliasTransferable(items);
   }
 
   DataFlavor getSupportedDataFlavor()

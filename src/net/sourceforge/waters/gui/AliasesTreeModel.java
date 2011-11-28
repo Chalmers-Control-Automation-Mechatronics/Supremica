@@ -156,11 +156,12 @@ class AliasesTreeModel
       case ModelChangeEvent.ITEM_ADDED:
       case ModelChangeEvent.ITEM_REMOVED:
         final ProxySubject parent = SubjectTools.getProxyParent(source);
-        if (canBeInTree(parent)) {
+        final ProxySubject visibleAncestor = getVisibleAncestorInTree((Proxy)parent);
+        if (visibleAncestor != null) {
           final Object value = event.getValue();
           final int index = event.getIndex();
           final TreeModelEvent newevent =
-            createTreeModelEvent(parent, index, value);
+            createTreeModelEvent(visibleAncestor, index, value);
           if (index < 0) {
             fireStructureChanged(newevent);
           } else if (event.getKind() == ModelChangeEvent.ITEM_ADDED) {
@@ -457,13 +458,22 @@ class AliasesTreeModel
     {
       final Subject subject = (Subject) foreach;
       final Proxy parent = SubjectTools.getProxyParent(subject);
-      return canBeInTree(parent) ? foreach : null;
+      final Proxy visibleAncestor = getVisibleAncestorInTree(parent);
+      return canBeInTree(visibleAncestor) ? foreach : null;
     }
 
     @Override
     public Object visitModuleProxy(final ModuleProxy module)
     {
       return module;
+    }
+
+    @Override
+    public Object visitPlainEventListProxy(final PlainEventListProxy foreach)
+    {
+      final Subject subject = (Subject) foreach;
+      final Proxy parent = SubjectTools.getProxyParent(subject);
+      return canBeInTree(parent) ? parent : null;
     }
 
     @Override

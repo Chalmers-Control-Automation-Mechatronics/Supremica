@@ -57,7 +57,7 @@ class ComponentsTreeModel
     mChildrenGetterVisitor = new ChildrenGetterVisitor();
     mTypeCheckerVisitor = new TypeCheckerVisitor();
     mListeners = null;
-    mModule.addModelObserver(this);
+    mModule.getComponentListModifiable().addModelObserver(this);
   }
 
 

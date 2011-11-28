@@ -40,6 +40,9 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
+import net.sourceforge.waters.gui.transfer.ConstantAliasTransferable;
+import net.sourceforge.waters.gui.transfer.EventAliasTransferable;
+import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
@@ -126,8 +129,6 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
   abstract ListSubject<? extends ProxySubject> getRootList();
 
   abstract String getRootName();
-
-  abstract Transferable getTransferable(List<? extends Proxy> items);
 
   abstract DataFlavor getSupportedDataFlavor();
 
@@ -330,16 +331,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
 
   public boolean canCopy(final List<? extends Proxy> items)
   {
-
-    DataFlavor common = null;
-    for (final Proxy proxy : items) {
-      final DataFlavor flavor = mExportedDataFlavorVisitor.getDataFlavor(proxy);
-      if (common == null) {
-        common = flavor;
-      } else if (common != flavor) {
-        return false;
-      }
-    }
+    final DataFlavor common = getDataFlavor(items);
     return common != null;
   }
 
@@ -533,6 +525,33 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     }
   }
 
+  private Transferable getTransferable(final List<? extends Proxy> items){
+    final DataFlavor dataFlavor = getDataFlavor(items);
+    if(dataFlavor == WatersDataFlavor.CONSTANT_ALIAS_LIST){
+      return new ConstantAliasTransferable(items);
+    }
+    else if(dataFlavor == WatersDataFlavor.IDENTIFIER_LIST){
+      return new IdentifierTransferable(items);
+    }
+    else if(dataFlavor == WatersDataFlavor.EVENT_ALIAS_LIST){
+      return new EventAliasTransferable(items);
+    }
+    else return null;
+  }
+
+  private DataFlavor getDataFlavor(final List<? extends Proxy> items){
+    DataFlavor common = null;
+    for (final Proxy proxy : items) {
+      final DataFlavor flavor = mExportedDataFlavorVisitor.getDataFlavor(proxy);
+      if (common == null) {
+        common = flavor;
+      } else if (common != flavor) {
+        return null;
+      }
+    }
+    return common;
+  }
+
 
   //#########################################################################
   //# Inner Class EditorAliasMouseListener
@@ -691,6 +710,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
           return false;
         }
         final Proxy parent = (Proxy) path.getLastPathComponent();
+        //SubjectTools.isAncestor(parent, parent);
 
         if (support.getTransferable()
           .isDataFlavorSupported(mAcceptedDataFlavorVisitor
