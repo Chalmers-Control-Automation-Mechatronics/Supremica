@@ -51,6 +51,9 @@ import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
+import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -87,7 +90,8 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     addTreeSelectionListener(this);
     addFocusListener(this);
 
-    mDataFlavorVisitor = new DataFlavorVisitor();
+    mAcceptedDataFlavorVisitor = new AcceptedDataFlavorVisitor();
+    mExportedDataFlavorVisitor = new ExportedDataFlavorVisitor();
     setRootVisible(true);
     setShowsRootHandles(true);
     setAutoscrolls(true);
@@ -327,7 +331,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
 
     DataFlavor common = null;
     for (final Proxy proxy : items) {
-      final DataFlavor flavor = mDataFlavorVisitor.getDataFlavor(proxy);
+      final DataFlavor flavor = mExportedDataFlavorVisitor.getDataFlavor(proxy);
       if (common == null) {
         common = flavor;
       } else if (common != flavor) {
@@ -353,7 +357,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     final List<InsertInfo> result = new ArrayList<InsertInfo>();
     @SuppressWarnings("unchecked")
     final List<Proxy> transferData =
-      (List<Proxy>) transferable.getTransferData(mDataFlavorVisitor
+      (List<Proxy>) transferable.getTransferData(mAcceptedDataFlavorVisitor
         .getDataFlavor(getSelectionAnchor()));
     final ListSubject<? extends ProxySubject> listInModule =
       (ListSubject<? extends ProxySubject>) getRootList();
@@ -614,42 +618,55 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
           final int min = getMinSelectionRow();
           final int max = getMaxSelectionRow();
 
-          final Point location = mDropLoc.getLocation();
-          int rowOfDrop = getClosestRowForLocation(location.x, location.y);
-          final Rectangle bounds = getRowBounds(rowOfDrop);
+          int rowOfDrop = mDropLoc.getChildIndex();
 
-          //if cursor on lower half of row
-          if (location.y >= bounds.y + bounds.height / 2) {
-            rowOfDrop++;
+          ListSubject<? extends ProxySubject> targetList = null;
+          final ProxySubject parent = (ProxySubject)mDropLoc.getPath().getLastPathComponent();
+
+          if(parent instanceof ForeachSubject){
+            final ForeachSubject foreach = (ForeachSubject) parent;
+            targetList = foreach.getBodyModifiable();
+          }
+          else if(parent instanceof ModuleSubject){
+            targetList = getRootList();
+          }
+
+          if(rowOfDrop < 0){
+            rowOfDrop = targetList.size();
           }
 
           int counter = 0;
           for (int initialRow = min; initialRow <= max; initialRow++) {
             if (isRowSelected(initialRow)) {
               final TreePath path = getPathForRow(initialRow);
-              final Proxy proxy = (Proxy) path.getLastPathComponent();
+              final ProxySubject proxy = (ProxySubject) path.getLastPathComponent();
 
+              @SuppressWarnings("unchecked")
+              final
+              ListSubject<? extends ProxySubject> sourceList = (ListSubject<? extends ProxySubject>) proxy.getParent();
+              final int index = sourceList.indexOf(proxy);
               final InsertInfo delete =
                 new InsertInfo(proxy,
-                               new ListInsertPosition((ListSubject<? extends ProxySubject>) getRootList(),
-                                                      initialRow-1));
+                               new ListInsertPosition(sourceList, index));
               deletes.add(delete);
-              if (initialRow < rowOfDrop) {
+              if (targetList == sourceList && index < rowOfDrop) {
                 counter++;
               }
             }
           }
           rowOfDrop -= counter;
 
-          if (max - min + 1 == deletes.size() && min == rowOfDrop) {
+          /*if (max - min + 1 == deletes.size() && min == rowOfDrop) {
             return;
-          }
+          }*/
+
           for (final InsertInfo delete : deletes) {
             final Proxy proxy = delete.getProxy();
+
             final InsertInfo insert =
               new InsertInfo(proxy,
-                             new ListInsertPosition((ListSubject<? extends ProxySubject>) getRootList(),
-                                                    rowOfDrop-1));
+                             new ListInsertPosition(targetList,
+                                                    rowOfDrop));
             inserts.add(insert);
             rowOfDrop++;
           }
@@ -664,8 +681,18 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     public boolean canImport(final TransferSupport support)
     {
       if (support.getComponent() instanceof JTree) {
+
+        final JTree.DropLocation drop =
+          (JTree.DropLocation) support.getDropLocation();
+        final TreePath path = drop.getPath();
+        if (path == null) {
+          return false;
+        }
+        final Proxy parent = (Proxy) path.getLastPathComponent();
+
         if (support.getTransferable()
-          .isDataFlavorSupported(getSupportedDataFlavor())) {
+          .isDataFlavorSupported(mAcceptedDataFlavorVisitor
+                                   .getDataFlavor(parent))) {
           return true;
         }
       }
@@ -678,8 +705,8 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
       if (!canImport(support)) {
         return false;
       } else {
-        mDropLoc =
-          (Point) support.getDropLocation().getDropPoint().getLocation();
+
+        mDropLoc = (JTree.DropLocation) support.getDropLocation();
         support.setShowDropLocation(true);
 
         mImportedToThisPanel = true;
@@ -689,20 +716,17 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
 
     private static final long serialVersionUID = 1L;
     private boolean mImportedToThisPanel;
-    private Point mDropLoc;
+    private JTree.DropLocation mDropLoc;
   }
 
-
-  //#########################################################################
-  //# Inner Class DataFlavorVisitor
-  private class DataFlavorVisitor extends AbstractModuleProxyVisitor
+//#########################################################################
+  //# Inner Class ExportedDataFlavorVisitor
+  private class ExportedDataFlavorVisitor extends AbstractModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private DataFlavor getDataFlavor(final Proxy proxy)
     {
-
       try {
         return (DataFlavor) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
@@ -722,6 +746,75 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     public DataFlavor visitEventAliasProxy(final EventAliasProxy alias)
     {
       return WatersDataFlavor.EVENT_ALIAS_LIST;
+    }
+
+    public Object visitExpressionProxy(final ExpressionProxy proxy)
+      throws VisitorException
+    {
+      return WatersDataFlavor.IDENTIFIER_LIST;
+    }
+
+    public Object visitForeachEventAliasProxy(final ForeachEventAliasProxy proxy)
+      throws VisitorException
+    {
+      return WatersDataFlavor.EVENT_ALIAS_LIST;
+    }
+
+    public Object visitForeachEventProxy(final ForeachEventProxy proxy)
+      throws VisitorException
+    {
+      return WatersDataFlavor.IDENTIFIER_LIST;
+    }
+
+    public Object visitIdentifierProxy(final IdentifierProxy proxy)
+      throws VisitorException
+    {
+      return WatersDataFlavor.IDENTIFIER_LIST;
+    }
+
+  }
+
+  //#########################################################################
+  //# Inner Class AcceptedDataFlavorVisitor
+  private class AcceptedDataFlavorVisitor extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private DataFlavor getDataFlavor(final Proxy proxy)
+    {
+
+      try {
+        return (DataFlavor) proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    @Override
+    public DataFlavor visitEventAliasProxy(final EventAliasProxy alias)
+    {
+      return null;
+    }
+
+    public Object visitForeachEventAliasProxy(final ForeachEventAliasProxy proxy)
+      throws VisitorException
+    {
+      return WatersDataFlavor.EVENT_ALIAS_LIST;
+    }
+
+    public Object visitForeachEventProxy(final ForeachEventProxy proxy)
+      throws VisitorException
+    {
+      return WatersDataFlavor.IDENTIFIER_LIST;
+    }
+
+    public Object visitModuleProxy(final ModuleProxy proxy)
+      throws VisitorException
+    {
+      return getSupportedDataFlavor();
     }
 
   }
@@ -812,7 +905,8 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
   private final PopupFactory mPopupFactory;
   private final ModuleWindowInterface mRoot;
   private List<Observer> mObservers;
-  private final DataFlavorVisitor mDataFlavorVisitor;
+  private final AcceptedDataFlavorVisitor mAcceptedDataFlavorVisitor;
+  private final ExportedDataFlavorVisitor mExportedDataFlavorVisitor;
   private final ModuleContext mModuleContext;
   private final PrintVisitor mPrinter;
   private boolean mIsPermanentFocusOwner;
