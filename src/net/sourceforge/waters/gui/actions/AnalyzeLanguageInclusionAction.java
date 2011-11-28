@@ -215,7 +215,10 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
-      if (mSourceInfo.get(aut).getSourceObject() == mNamedProxy) {
+      final SourceInfo info = mSourceInfo.get(aut);
+      if (info == null) {
+        return super.getComponentKind(aut);
+      } else if (info.getSourceObject() == mNamedProxy) {
         return ComponentKind.SPEC;
       } else if (aut.getKind() == ComponentKind.PROPERTY) {
         return ComponentKind.PROPERTY;
