@@ -272,11 +272,10 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
   public Proxy getSelectableAncestor(final Proxy item)
   {
     final AliasesTreeModel model = getAliasTreeModel();
-    final ProxySubject subject = (ProxySubject) item;
-    if (subject == model.getRoot()) {
-      return isRootVisible() ? subject : null;
+    if (item == model.getRoot()) {
+      return isRootVisible() ? item : null;
     } else {
-      return model.canBeInTree(subject) ? subject : null;
+      return model.getVisibleAncestorInTree(item);
     }
   }
 
@@ -381,13 +380,13 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     final List<InsertInfo> result = new LinkedList<InsertInfo>();
     outer: for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
-      ProxySubject parent = model.getParentInTree(subject);
+      ProxySubject parent = model.getProperAncestorInTree(subject);
       if (parent != null) {
         while (parent.getParent() != null) {
           if (set.contains(parent)) {
             continue outer;
           }
-          parent = model.getParentInTree(parent);
+          parent = model.getProperAncestorInTree(parent);
         }
         final ListSubject<? extends ProxySubject> list =
           (ListSubject<? extends ProxySubject>) subject.getParent();
@@ -711,10 +710,9 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
         }
         final Proxy parent = (Proxy) path.getLastPathComponent();
         //SubjectTools.isAncestor(parent, parent);
-
-        if (support.getTransferable()
-          .isDataFlavorSupported(mAcceptedDataFlavorVisitor
-                                   .getDataFlavor(parent))) {
+        final DataFlavor flavor =
+          mAcceptedDataFlavorVisitor.getDataFlavor(parent);
+        if (support.getTransferable().isDataFlavorSupported(flavor)) {
           return true;
         }
       }
