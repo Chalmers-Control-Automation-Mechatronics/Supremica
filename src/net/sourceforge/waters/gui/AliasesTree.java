@@ -524,24 +524,25 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     }
   }
 
-  private Transferable getTransferable(final List<? extends Proxy> items){
+  private Transferable getTransferable(final List<? extends Proxy> items)
+  {
     final DataFlavor dataFlavor = getDataFlavor(items);
-    if(dataFlavor == WatersDataFlavor.CONSTANT_ALIAS_LIST){
+    if (dataFlavor == WatersDataFlavor.CONSTANT_ALIAS_LIST) {
       return new ConstantAliasTransferable(items);
-    }
-    else if(dataFlavor == WatersDataFlavor.IDENTIFIER_LIST){
+    } else if (dataFlavor == WatersDataFlavor.IDENTIFIER_LIST) {
       return new IdentifierTransferable(items);
-    }
-    else if(dataFlavor == WatersDataFlavor.EVENT_ALIAS_LIST){
+    } else if (dataFlavor == WatersDataFlavor.EVENT_ALIAS_LIST) {
       return new EventAliasTransferable(items);
-    }
-    else return null;
+    } else
+      return null;
   }
 
-  private DataFlavor getDataFlavor(final List<? extends Proxy> items){
+  private DataFlavor getDataFlavor(final List<? extends Proxy> items)
+  {
     DataFlavor common = null;
     for (final Proxy proxy : items) {
-      final DataFlavor flavor = mExportedDataFlavorVisitor.getDataFlavor(proxy);
+      final DataFlavor flavor =
+        mExportedDataFlavorVisitor.getDataFlavor(proxy);
       if (common == null) {
         common = flavor;
       } else if (common != flavor) {
@@ -616,6 +617,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
       if (paths != null) {
         final List<Proxy> proxies = new ArrayList<Proxy>(1);
         for (int i = 0; i < paths.length; i++) {
+
           proxies.add((Proxy) paths[i].getLastPathComponent());
         }
 
@@ -641,52 +643,93 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
           int rowOfDrop = mDropLoc.getChildIndex();
 
           ListSubject<? extends ProxySubject> targetList = null;
-          final ProxySubject parent = (ProxySubject)mDropLoc.getPath().getLastPathComponent();
+          final ProxySubject parentOfDropLoc =
+            (ProxySubject) mDropLoc.getPath().getLastPathComponent();
+          targetList = mModel.getChildren(parentOfDropLoc);
 
-          if(parent instanceof ForeachSubject){
-            final ForeachSubject foreach = (ForeachSubject) parent;
-            targetList = foreach.getBodyModifiable();
-          }
-          else if(parent instanceof ModuleSubject){
-            targetList = getRootList();
-          }
-
-          if(rowOfDrop < 0){
+          if (rowOfDrop < 0) {
             rowOfDrop = targetList.size();
           }
-
+          final List<Proxy> proxies = new ArrayList<Proxy>();
           int counter = 0;
           for (int initialRow = min; initialRow <= max; initialRow++) {
             if (isRowSelected(initialRow)) {
+              boolean hasAncestor = false;
               final TreePath path = getPathForRow(initialRow);
-              final ProxySubject proxy = (ProxySubject) path.getLastPathComponent();
+              final ProxySubject proxy =
+                (ProxySubject) path.getLastPathComponent();
 
               @SuppressWarnings("unchecked")
-              final
-              ListSubject<? extends ProxySubject> sourceList = (ListSubject<? extends ProxySubject>) proxy.getParent();
+              final ListSubject<? extends ProxySubject> sourceList =
+                (ListSubject<? extends ProxySubject>) proxy.getParent();
               final int index = sourceList.indexOf(proxy);
-              final InsertInfo delete =
-                new InsertInfo(proxy,
-                               new ListInsertPosition(sourceList, index));
-              deletes.add(delete);
-              if (targetList == sourceList && index < rowOfDrop) {
-                counter++;
+
+              for (int i = 0; i < proxies.size(); i++) {
+                if (SubjectTools.isAncestor((ProxySubject) proxies.get(i), proxy)) {
+                  hasAncestor = true;
+                }
               }
+
+              if (!hasAncestor) {
+                proxies.add(proxy);
+
+                final InsertInfo delete =
+                  new InsertInfo(proxy, new ListInsertPosition(sourceList,
+                                                               index));
+                deletes.add(delete);
+
+                if (targetList == sourceList && index < rowOfDrop) {
+                  counter++;
+                }
+              }
+
             }
           }
           rowOfDrop -= counter;
 
-          /*if (max - min + 1 == deletes.size() && min == rowOfDrop) {
-            return;
-          }*/
+          final TreePath path = getPathForRow(min);
+          final ProxySubject firstProxy =
+            (ProxySubject) path.getLastPathComponent();
+
+          @SuppressWarnings("unchecked")
+          final ListSubject<? extends ProxySubject> parentsList =
+            (ListSubject<? extends ProxySubject>) firstProxy.getParent();
+          int index = parentsList.indexOf(firstProxy);
+          final int minIndex = index;
+          boolean isContiguous = true;
+          if (targetList == parentsList) {
+            for (int selectedRow = min + 1; selectedRow <= max; selectedRow++) {
+              if (isRowSelected(selectedRow)) {
+                final TreePath pathForNext = getPathForRow(selectedRow);
+                final ProxySubject nextProxy =
+                  (ProxySubject) pathForNext.getLastPathComponent();
+                //dont need this check
+                if (parentsList.contains(nextProxy)) {
+                  if (parentsList.indexOf(nextProxy) != index + 1) {
+                    isContiguous = false;
+                    break;
+                  }
+                } else {
+                  isContiguous = false;
+                  break;
+                }
+                index++;
+              }
+            }
+            if (isContiguous) {
+              final int drop = mDropLoc.getChildIndex();
+              if (drop >= minIndex && drop <= index + 1) {
+                return;
+              }
+            }
+          }
 
           for (final InsertInfo delete : deletes) {
             final Proxy proxy = delete.getProxy();
 
             final InsertInfo insert =
-              new InsertInfo(proxy,
-                             new ListInsertPosition(targetList,
-                                                    rowOfDrop));
+              new InsertInfo(proxy, new ListInsertPosition(targetList,
+                                                           rowOfDrop));
             inserts.add(insert);
             rowOfDrop++;
           }
@@ -709,7 +752,23 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
           return false;
         }
         final Proxy parent = (Proxy) path.getLastPathComponent();
-        //SubjectTools.isAncestor(parent, parent);
+        if (support.getDropAction() == MOVE) {
+          final Subject parentSub = (Subject) parent;
+
+          final int min = getMinSelectionRow();
+          final int max = getMaxSelectionRow();
+          for (int initialRow = min; initialRow <= max; initialRow++) {
+            if (isRowSelected(initialRow)) {
+              final TreePath rowPath = getPathForRow(initialRow);
+              final ProxySubject ancestor =
+                (ProxySubject) rowPath.getLastPathComponent();
+              if (SubjectTools.isAncestor(ancestor, parentSub)) {
+                return false;
+              }
+            }
+          }
+        }
+
         final DataFlavor flavor =
           mAcceptedDataFlavorVisitor.getDataFlavor(parent);
         if (support.getTransferable().isDataFlavorSupported(flavor)) {
@@ -739,7 +798,8 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     private JTree.DropLocation mDropLoc;
   }
 
-//#########################################################################
+
+  //#########################################################################
   //# Inner Class ExportedDataFlavorVisitor
   private class ExportedDataFlavorVisitor extends AbstractModuleProxyVisitor
   {
@@ -795,6 +855,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
 
   }
 
+
   //#########################################################################
   //# Inner Class AcceptedDataFlavorVisitor
   private class AcceptedDataFlavorVisitor extends AbstractModuleProxyVisitor
@@ -817,7 +878,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     @Override
     public DataFlavor visitEventAliasProxy(final EventAliasProxy alias)
     {
-      return null;
+      return WatersDataFlavor.IDENTIFIER_LIST;
     }
 
     @Override

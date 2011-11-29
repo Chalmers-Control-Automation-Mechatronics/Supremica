@@ -25,7 +25,6 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
-import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -36,7 +35,10 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.EventAliasSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
 
 
 /**
@@ -338,6 +340,10 @@ class AliasesTreeModel
     }
   }
 
+  ListSubject<? extends ProxySubject>  getChildren(final Proxy parent){
+    return (ListSubject<? extends ProxySubject>) mChildrenGetterVisitor.getChildren(parent);
+  }
+
 
   //#########################################################################
   //# Inner Class ChildrenGetterVisitor
@@ -347,10 +353,10 @@ class AliasesTreeModel
     //#######################################################################
     //# Invocation
     @SuppressWarnings("unchecked")
-    private List<? extends Proxy> getChildren(final Proxy proxy)
+    private ListSubject<? extends ProxySubject> getChildren(final Proxy proxy)
     {
       try {
-        return (List<? extends Proxy>) proxy.acceptVisitor(this);
+        return (ListSubject<? extends ProxySubject>) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
@@ -358,7 +364,7 @@ class AliasesTreeModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
-    public List<? extends Proxy> visitProxy(final Proxy proxy)
+    public ListSubject<? extends ProxySubject> visitProxy(final Proxy proxy)
     {
       return null;
     }
@@ -366,26 +372,28 @@ class AliasesTreeModel
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
     @Override
-    public List<? extends Proxy> visitEventAliasProxy
+    public ListSubject<? extends ProxySubject> visitEventAliasProxy
       (final EventAliasProxy alias)
     {
-      final ExpressionProxy expr = alias.getExpression();
-      if (expr instanceof PlainEventListProxy) {
-        final PlainEventListProxy eList = (PlainEventListProxy) expr;
-        return eList.getEventList();
-      } else {
+      final EventAliasSubject event = (EventAliasSubject) alias;
+      if (event.getExpression() instanceof PlainEventListSubject) {
+        final PlainEventListSubject plain =
+          (PlainEventListSubject) event.getExpression();
+        return plain.getEventListModifiable();
+      }else {
         return null;
       }
     }
 
     @Override
-    public List<? extends Proxy> visitForeachProxy(final ForeachProxy foreach)
+    public ListSubject<? extends ProxySubject> visitForeachProxy(final ForeachProxy foreach)
     {
-      return foreach.getBody();
+      final ForeachSubject foreachSub = (ForeachSubject) foreach;
+      return foreachSub.getBodyModifiable();
     }
 
     @Override
-    public List<? extends Proxy> visitModuleProxy(final ModuleProxy module)
+    public ListSubject<? extends ProxySubject> visitModuleProxy(final ModuleProxy module)
     {
       return mRootList;
     }
