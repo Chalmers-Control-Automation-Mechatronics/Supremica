@@ -323,11 +323,12 @@ public class ProxyNamer {
     } else if (isAncestor(iface2, iface1)) {
       return iface2;
     } else {
-      Class<? extends Proxy> parent1 = getParent(iface1);
+      return iface1;
+      /*Class<? extends Proxy> parent1 = getParent(iface1);
       while (parent1 != null && !isAncestor(parent1, iface2)) {
         parent1 = getParent(parent1);
       }
-      return parent1;
+      return parent1;*/
     }
   }
 
