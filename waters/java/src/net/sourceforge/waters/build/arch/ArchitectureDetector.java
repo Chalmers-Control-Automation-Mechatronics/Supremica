@@ -111,7 +111,10 @@ public class ArchitectureDetector
           System.loadLibrary(libname);
           return true;
         } catch (final UnsatisfiedLinkError error) {
-          return false;
+          final String msg = error.getMessage();
+          if (!msg.contains("Can't find dependent libraries")) {
+            return false;
+          }
         } catch (final SecurityException exception) {
           throw new RuntimeException(exception);
         } catch (final NoSuchFieldException exception) {
@@ -138,13 +141,9 @@ public class ArchitectureDetector
     writer.println("##############################################################################");
     writer.println();
     if (arch == null) {
-      writer.println("java.os =");
-      writer.println("java.arch =");
+      writer.println("native.host.arch =");
     } else {
-      final int dotpos = arch.lastIndexOf('.');
-      final String os = dotpos < 0 ? arch : arch.substring(0, dotpos);
-      writer.println("java.os = " + os);
-      writer.println("java.arch = " + arch);
+      writer.println("native.host.arch = " + arch);
     }
     writer.close();
   }

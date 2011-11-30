@@ -84,6 +84,14 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testEmptyProp() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "empty_prop.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testVerriegel4Counter1() throws Exception
   {
     final String group = "tests";
@@ -498,7 +506,6 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
     final List<TraceStepProxy> steps = counterexample.getTraceSteps();
     final int len = steps.size();
-    assertTrue("Empty Counterexample!", len > 1);
 
     final Collection<AutomatonProxy> automata = des.getAutomata();
     boolean rejected = false;
@@ -521,7 +528,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
         break;
       }
     }
-    assertTrue("Counterexample not rejected by any component!", rejected);
+    assertTrue("Counterexample not rejected by any property!", rejected);
   }
 
   private int checkCounterExample(final AutomatonProxy aut,

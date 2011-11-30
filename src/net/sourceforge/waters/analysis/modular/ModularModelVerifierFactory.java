@@ -13,9 +13,11 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -67,10 +69,11 @@ public class ModularModelVerifierFactory
   public ModularLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ModularLanguageInclusionChecker
-      (null,
-       factory,
-       createControllabilityChecker(factory));
+    final SafetyVerifier mono =
+      new NativeLanguageInclusionChecker(factory);
+    final SafetyVerifier mod =
+      new ModularControllabilityChecker(null, factory, mono, false);
+    return new ModularLanguageInclusionChecker(null, factory, mod);
   }
 
 
@@ -90,9 +93,9 @@ public class ModularModelVerifierFactory
     return new ModularModelVerifierFactory(cmdline);
   }
 
+
   //#########################################################################
   //# Inner Class MergeVersion
-
   private static class MergeVersion
   extends CommandLineArgumentEnum<AutomataGroup.MergeVersion>
   {

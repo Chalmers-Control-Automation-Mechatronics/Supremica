@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
 /**
  * A general compositional model verifier to be subclassed for different
  * properties. This class adds to the general base class {@link
- * AbstractCompositionalModelAnalyser} a common {@link #run()} that
+ * AbstractCompositionalModelAnalyzer} a common {@link #run()} that
  * supports counter example computation.
  *
  * <I>References:</I><BR>

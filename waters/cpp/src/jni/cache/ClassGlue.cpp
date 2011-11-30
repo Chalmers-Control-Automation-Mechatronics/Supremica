@@ -12,13 +12,14 @@
 #endif
 
 #include <iostream>
+#include <stdint.h>
 
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ClassGlue.h"
 #include "jni/cache/ClassInfo.h"
 #include "jni/cache/MethodInfo.h"
+#include "jni/cache/PreJavaException.h"
 #include "jni/glue/Glue.h"
-#include <stdint.h>
 
 
 namespace jni {

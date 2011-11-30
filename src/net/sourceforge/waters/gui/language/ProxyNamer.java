@@ -21,8 +21,7 @@ import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -135,10 +134,7 @@ public class ProxyNamer {
     createEntry(EventAliasProxy.class, "Event Alias", "Event Aliases",
                 AliasProxy.class, false);
     createEntry(EventDeclProxy.class, "Event");
-    createEntry(ForeachComponentProxy.class, "Foreach Block",
-                ComponentProxy.class, false);
-    createEntry(ForeachEventProxy.class, "Foreach Block",
-                IdentifierProxy.class, false);
+    createEntry(ForeachProxy.class, "Foreach Block");
     createEntry(GraphProxy.class, "Graph", "Graph");
     createEntry(GuardActionBlockProxy.class, "Guard/Action Block",
                 EdgeProxy.class, true);
@@ -327,11 +323,12 @@ public class ProxyNamer {
     } else if (isAncestor(iface2, iface1)) {
       return iface2;
     } else {
-      Class<? extends Proxy> parent1 = getParent(iface1);
+      return iface1;
+      /*Class<? extends Proxy> parent1 = getParent(iface1);
       while (parent1 != null && !isAncestor(parent1, iface2)) {
         parent1 = getParent(parent1);
       }
-      return parent1;
+      return parent1;*/
     }
   }
 

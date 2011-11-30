@@ -83,6 +83,13 @@ public class CompositionalModelVerifierFactory extends AbstractModelVerifierFact
     return new CompositionalConflictChecker(method, factory);
   }
 
+  @Override
+  public CompositionalLanguageInclusionChecker createLanguageInclusionChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new CompositionalLanguageInclusionChecker(factory);
+  }
+
 
   //#########################################################################
   //# Inner Class FinalStateLimitArgument

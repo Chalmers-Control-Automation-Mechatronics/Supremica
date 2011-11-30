@@ -150,10 +150,22 @@ public class WatersPopupActionManager
     return new EditLabelRecallAction(mIDE, arg);
   }
 
+  public IDEAction getInsertConstantAliasAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertConstantAliasAction.class);
+  }
+
   public IDEAction getInsertEventDeclAction()
   {
     final WatersActionManager master = mIDE.getActions();
     return master.getAction(InsertEventDeclAction.class);
+  }
+
+  public IDEAction getInsertForeachComponentAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertForeachAction.class);
   }
 
   public IDEAction getInsertSimpleComponentAction()

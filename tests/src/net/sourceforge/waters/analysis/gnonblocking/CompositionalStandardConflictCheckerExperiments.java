@@ -33,13 +33,12 @@ public class CompositionalStandardConflictCheckerExperiments extends
   {
     if (args.length == 4) {
       final String filename = args[0];
-      final String outputprop = System.getProperty("waters.test.outputdir");
       final String preselectingHeuristic = args[1];
       final String selectingHeuristic = args[2];
       final int rules = Integer.decode(args[3]);
       final CompositionalStandardConflictCheckerExperiments experiment =
-          new CompositionalStandardConflictCheckerExperiments(outputprop
-              + filename, preselectingHeuristic, selectingHeuristic, rules);
+        new CompositionalStandardConflictCheckerExperiments
+          (filename, preselectingHeuristic, selectingHeuristic, rules);
       experiment.setUp();
       experiment.runAllTests();
       experiment.tearDown();
@@ -97,7 +96,7 @@ public class CompositionalStandardConflictCheckerExperiments extends
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "rhone_alps.wmod";
+    final String name = "aip0alps.wmod";
     runModel(group, dir, name);
   }
 

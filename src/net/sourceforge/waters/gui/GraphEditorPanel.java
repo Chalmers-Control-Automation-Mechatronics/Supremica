@@ -98,7 +98,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -123,7 +123,7 @@ import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.ForeachEventSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
@@ -637,7 +637,7 @@ public class GraphEditorPanel
         final Collection<EdgeSubject> edges = graph.getEdgesModifiable();
         edges.add(edge);
       } else if (proxy instanceof IdentifierSubject ||
-                 proxy instanceof ForeachEventSubject) {
+                 proxy instanceof ForeachSubject) {
         final ListInsertPosition inspos =
           (ListInsertPosition) insert.getInsertPosition();
         final List<?> untyped = inspos.getList();
@@ -687,7 +687,7 @@ public class GraphEditorPanel
       } else if (proxy instanceof EdgeSubject) {
         edges.remove(proxy);
       } else if (proxy instanceof IdentifierSubject ||
-                 proxy instanceof ForeachEventSubject) {
+                 proxy instanceof ForeachSubject) {
         final ListInsertPosition inspos =
           (ListInsertPosition) insert.getInsertPosition();
         final List<? extends ProxySubject> eventlist = inspos.getList();
@@ -729,7 +729,7 @@ public class GraphEditorPanel
       final Set<Proxy> scrollable = new HashSet<Proxy>();
       for (final Proxy proxy : list) {
         if (proxy instanceof IdentifierSubject ||
-            proxy instanceof ForeachEventSubject) {
+            proxy instanceof ForeachSubject) {
           final Subject subject = (Subject) proxy;
           final ProxySubject parent =
             (ProxySubject) SubjectTools.getAncestor(subject,
@@ -3538,7 +3538,7 @@ public class GraphEditorPanel
       return null;
     }
 
-    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Object visitForeachProxy(final ForeachProxy foreach)
     {
       return null;
     }
@@ -4020,7 +4020,7 @@ public class GraphEditorPanel
       }
     }
 
-    public DataFlavor visitForeachEventProxy(final ForeachEventProxy foreach)
+    public DataFlavor visitForeachProxy(final ForeachProxy foreach)
     {
       mHasIdentifiers = true;
       return null;
@@ -4126,7 +4126,7 @@ public class GraphEditorPanel
       return edge;
     }
 
-    public Proxy visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Proxy visitForeachProxy(final ForeachProxy foreach)
     {
       return visitEventListMember(foreach);
     }

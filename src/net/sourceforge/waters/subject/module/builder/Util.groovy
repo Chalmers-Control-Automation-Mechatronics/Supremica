@@ -34,8 +34,8 @@ class Util {
 	public static void assertGeneratedModuleEqualsManual(ModuleProxy generatedModule, ModuleProxy manualModule) {
 		def generated, manual
 		assert ProxyTools.isEqualListByContents(generated = new ArrayList(generatedModule.eventDeclList).sort{it.name}, manual = new ArrayList(manualModule.eventDeclList).sort{it.name}), "\ngenerated:$generated\nmanual   :$manual\n"
-		def generatedComponents = ((generatedModule.componentList.grep(SimpleComponentProxy.class) + generatedModule.componentList.grep(ForeachComponentProxy.class).body)).sort{it.name}
-		def manualComponents = ((manualModule.componentList.grep(SimpleComponentProxy.class) + manualModule.componentList.grep(ForeachComponentProxy.class).body)).sort{it.name}
+		def generatedComponents = ((generatedModule.componentList.grep(SimpleComponentProxy.class) + generatedModule.componentList.grep(ForeachProxy.class).body)).sort{it.name}
+		def manualComponents = ((manualModule.componentList.grep(SimpleComponentProxy.class) + manualModule.componentList.grep(ForeachProxy.class).body)).sort{it.name}
 		assert (generated = generatedModule.componentList.name.sort()) == (manual = manualModule.componentList.name.sort()), "\nComponent names\ngenerated:$generated\nmanual   :$manual\n"
 		assert (generated = generatedComponents.graph.collect{it.nodes.name}) == (manual = manualComponents.graph.collect{it.nodes.name}), "\ngenerated:$generated\nmanual   :$manual\n"
 		assert (generated = generatedComponents.kind) == (manual = manualComponents.kind), "\ngenerated:$generated\nmanual   :$manual\n"

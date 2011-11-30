@@ -60,13 +60,19 @@ public class LanguageInclusionDiagnostics
     final StringBuffer buffer = new StringBuffer();
     buffer.append("The model '");
     buffer.append(des.getName());
-    buffer.append("' does not satisfy the language inclusion property ");
+    buffer.append("' does not satisfy the language inclusion property '");
     buffer.append(aut.getName());
-    buffer.append(": event ");
-    buffer.append(event.getName());
-    buffer.append(" may occur in state ");
-    buffer.append(state.getName());
-    buffer.append(", but the property disallows it.");
+    buffer.append('\'');
+    if (event == null) {
+      buffer.append(", because this property has no initial state ");
+      buffer.append("and therefore represents the empty language.");
+    } else {
+      buffer.append(": event ");
+      buffer.append(event.getName());
+      buffer.append(" may occur in state ");
+      buffer.append(state.getName());
+      buffer.append(", but the property disallows it.");
+    }
     return buffer.toString();
   }
 

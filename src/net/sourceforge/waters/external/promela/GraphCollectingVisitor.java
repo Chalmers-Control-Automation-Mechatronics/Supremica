@@ -38,7 +38,7 @@ import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -165,7 +165,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final Collection<SimpleComponentProxy> c = new ArrayList<SimpleComponentProxy>();
 
       c.add(component);
-      final ForeachComponentProxy f = mFactory.createForeachComponentProxy("procid", en,null,c);
+      final ForeachProxy f = mFactory.createForeachProxy("procid", en,null,c);
       mComponents.add(f);
 
     }

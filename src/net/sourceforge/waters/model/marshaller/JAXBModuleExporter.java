@@ -34,9 +34,6 @@ import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -82,9 +79,6 @@ import net.sourceforge.waters.xsd.module.EventDecl;
 import net.sourceforge.waters.xsd.module.EventListExpression;
 import net.sourceforge.waters.xsd.module.EventListType;
 import net.sourceforge.waters.xsd.module.ExpressionType;
-import net.sourceforge.waters.xsd.module.ForeachComponent;
-import net.sourceforge.waters.xsd.module.ForeachEvent;
-import net.sourceforge.waters.xsd.module.ForeachEventAlias;
 import net.sourceforge.waters.xsd.module.ForeachType;
 import net.sourceforge.waters.xsd.module.Graph;
 import net.sourceforge.waters.xsd.module.GroupNode;
@@ -252,38 +246,17 @@ public class JAXBModuleExporter
     return visitProxy(proxy);
   }
 
-  public ForeachComponent visitForeachComponentProxy
-      (final ForeachComponentProxy proxy)
-    throws VisitorException
-  {
-    final ForeachComponent element = mFactory.createForeachComponent();
-    copyForeachComponentProxy(proxy, element);
-    return element;
-  }
-
-  public ForeachEventAlias visitForeachEventAliasProxy
-      (final ForeachEventAliasProxy proxy)
-    throws VisitorException
-  {
-    final ForeachEventAlias element = mFactory.createForeachEventAlias();
-    copyForeachEventAliasProxy(proxy, element);
-    return element;
-  }
-
-  public ForeachEvent visitForeachEventProxy
-      (final ForeachEventProxy proxy)
-    throws VisitorException
-  {
-    final ForeachEvent element = mFactory.createForeachEvent();
-    copyForeachEventProxy(proxy, element);
-    return element;
-  }
-
-  public Object visitForeachProxy
+  @Override
+  public ForeachType visitForeachProxy
       (final ForeachProxy proxy)
     throws VisitorException
   {
-    return visitNamedProxy(proxy);
+    final ForeachType element =
+      mCurrentForeachHandler.createForeachElement();
+    copyForeachProxy(proxy, element);
+    final List<Proxy> body = proxy.getBody();
+    mCurrentForeachHandler.toJAXBUnsafe(this, body, element);
+    return element;
   }
 
   public Graph visitGraphProxy
@@ -358,8 +331,12 @@ public class JAXBModuleExporter
       (final LabelBlockProxy proxy)
     throws VisitorException
   {
+    final JAXBForeachHandler<? extends ForeachType, ? extends ElementType>
+      backup = mCurrentForeachHandler;
+    mCurrentForeachHandler = mForeachEventListHandler;
     final LabelBlock element = mFactory.createLabelBlock();
     copyLabelBlockProxy(proxy, element);
+    mCurrentForeachHandler = backup;
     return element;
   }
 
@@ -410,8 +387,12 @@ public class JAXBModuleExporter
       (final PlainEventListProxy proxy)
     throws VisitorException
   {
+    final JAXBForeachHandler<? extends ElementType, ? extends ElementType>
+      backup = mCurrentForeachHandler;
+    mCurrentForeachHandler = mForeachEventListHandler;
     final EventListExpression element = mFactory.createEventListExpression();
     copyPlainEventListProxy(proxy, element);
+    mCurrentForeachHandler = backup;
     return element;
   }
 
@@ -745,36 +726,6 @@ public class JAXBModuleExporter
     copyProxy(proxy, element);
   }
 
-  private void copyForeachComponentProxy
-      (final ForeachComponentProxy proxy,
-       final ForeachComponent element)
-    throws VisitorException
-  {
-    copyForeachProxy(proxy, element);
-    final List<Proxy> body = proxy.getBody();
-    mForeachComponentListHandler.toJAXB(this, body, element);
-  }
-
-  private void copyForeachEventAliasProxy
-      (final ForeachEventAliasProxy proxy,
-       final ForeachEventAlias element)
-    throws VisitorException
-  {
-    copyForeachProxy(proxy, element);
-    final List<Proxy> body = proxy.getBody();
-    mForeachEventAliasListHandler.toJAXB(this, body, element);
-  }
-
-  private void copyForeachEventProxy
-      (final ForeachEventProxy proxy,
-       final ForeachEvent element)
-    throws VisitorException
-  {
-    copyForeachProxy(proxy, element);
-    final List<Proxy> body = proxy.getBody();
-    mForeachEventListHandler.toJAXB(this, body, element);
-  }
-
   private void copyForeachProxy
       (final ForeachProxy proxy,
        final ForeachType element)
@@ -959,8 +910,10 @@ public class JAXBModuleExporter
       (this, constantAliasListProxy, element);
     final List<EventDeclProxy> eventDeclListProxy = proxy.getEventDeclList();
     mModuleEventDeclListHandler.toJAXB(this, eventDeclListProxy, element);
+    mCurrentForeachHandler = mForeachEventAliasListHandler;
     final List<Proxy> eventAliasListProxy = proxy.getEventAliasList();
     mModuleEventAliasListHandler.toJAXB(this, eventAliasListProxy, element);
+    mCurrentForeachHandler = mForeachComponentListHandler;
     final List<Proxy> componentListProxy = proxy.getComponentList();
     mModuleComponentListHandler.toJAXB(this, componentListProxy, element);
   }
@@ -1244,6 +1197,8 @@ public class JAXBModuleExporter
 
   //#########################################################################
   //# Data Members
+  private JAXBForeachHandler<? extends ForeachType, ? extends ElementType>
+    mCurrentForeachHandler;
   private IndexedList<NodeProxy> mGraphNodeList;
 
   private static final ObjectFactory mFactory = new ObjectFactory();

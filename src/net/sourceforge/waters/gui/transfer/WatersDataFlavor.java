@@ -22,6 +22,14 @@ import java.awt.datatransfer.DataFlavor;
 
 public class WatersDataFlavor
 {
+  /**
+   * The data flavour for a constant alias
+   */
+  public static final DataFlavor CONSTANT_ALIAS_LIST =
+    new DataFlavor(ConstantAliasTransferable.class, "List<ConstantAliasProxy>");
+
+  public static final DataFlavor EVENT_ALIAS_LIST =
+    new DataFlavor(EventAliasTransferable.class, "List<EventAliasProxy>");
 
   public static final DataFlavor EVENTDECL_LIST =
     new DataFlavor(EventDeclTransferable.class, "List<EventDeclProxy>");

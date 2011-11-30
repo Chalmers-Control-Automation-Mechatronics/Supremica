@@ -246,6 +246,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testEmptySpec() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "empty_spec.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testJpt10Counter() throws Exception
   {
     final String group = "tests";

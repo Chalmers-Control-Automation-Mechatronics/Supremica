@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="agvb" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).
+The model has 22929408 reachable states, and the diameter is 186.</ns2:Comment>
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+<EventDecl Kind="CONTROLLABLE" Name="c1"/>
+<EventDecl Kind="CONTROLLABLE" Name="c10"/>
+<EventDecl Kind="CONTROLLABLE" Name="c2"/>
+<EventDecl Kind="CONTROLLABLE" Name="c3"/>
+<EventDecl Kind="CONTROLLABLE" Name="c4"/>
+<EventDecl Kind="CONTROLLABLE" Name="c5"/>
+<EventDecl Kind="CONTROLLABLE" Name="c6"/>
+<EventDecl Kind="CONTROLLABLE" Name="c7"/>
+<EventDecl Kind="CONTROLLABLE" Name="c8"/>
+<EventDecl Kind="CONTROLLABLE" Name="c9"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e10"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e11"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e20"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e21"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e30"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e31"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u10"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u11"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u20"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u21"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u22"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u23"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u24"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u25"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u26"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u27"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u28"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u29"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u30"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u31"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u40"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u41"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u42"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u43"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u44"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u45"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u50"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u51"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u52"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u53"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w11"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w12"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w13"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w14"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w15"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w21"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w22"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w23"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w24"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w31"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w32"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w33"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="w34"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="Zone1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1"/>
+<SimpleNode Name="q2"/>
+<SimpleNode Name="q3"/>
+<SimpleNode Name="q4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u23"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="u11"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u24"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="u25"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="u10"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="Zone3">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1"/>
+<SimpleNode Name="q2"/>
+<SimpleNode Name="q3"/>
+<SimpleNode Name="q4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c4"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u28"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u44"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c7"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="u20"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u29"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="u45"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="u40"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="Zone2">
+<Graph>
+<NodeList>
+<SimpleNode Name="q0"/>
+<SimpleNode Name="q1"/>
+<SimpleNode Name="q2"/>
+<SimpleNode Name="q3"/>
+<SimpleNode Initial="true" Name="q4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c6"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u21"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u26"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c5"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="u31"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u22"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="u27"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="u30"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="Zone4">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1"/>
+<SimpleNode Name="q2"/>
+<SimpleNode Name="q3"/>
+<SimpleNode Name="q4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c8"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u41"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u50"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="c9"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="u43"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u42"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="u51"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="u52"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Output">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="e21"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="e20"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="WS2">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="w21"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="w22"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="w23"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="w24"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="WS3">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="w31"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="w32"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="w33"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="w34"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="ZoneX">
+<Graph>
+<NodeList>
+<SimpleNode Name="q0"/>
+<SimpleNode Initial="true" Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2"/>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u11"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u24"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="c1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="c3"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Input3">
+<Graph>
+<NodeList>
+<SimpleNode Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Initial="true" Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="e30"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="e31"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="WS1b">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="w11"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="w12"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="w13"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="w15"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Input1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="e10"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="e11"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Seq5">
+<Graph>
+<NodeList>
+<SimpleNode Name="p4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q11">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q7">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Initial="true" Name="q8">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q9">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="p4">
+<LabelBlock>
+<SimpleIdentifier Name="w13"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="c9"/>
+</LabelBlock>
+</Edge>
+<Edge Target="p4" Source="q11">
+<LabelBlock>
+<SimpleIdentifier Name="u51"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u52"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q7" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="u53"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q8" Source="q7">
+<LabelBlock>
+<SimpleIdentifier Name="e20"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q9" Source="q8">
+<LabelBlock>
+<SimpleIdentifier Name="c10"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q11" Source="q9">
+<LabelBlock>
+<SimpleIdentifier Name="u50"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="WS1a">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="w11"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="w12"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="w13"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="w14"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Seq4">
+<Graph>
+<NodeList>
+<SimpleNode Name="p4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Initial="true" Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q11">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q12">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q7">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q8">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q9">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="p4">
+<LabelBlock>
+<SimpleIdentifier Name="w15"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="c7"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q12" Source="q11">
+<LabelBlock>
+<SimpleIdentifier Name="u44"/>
+</LabelBlock>
+</Edge>
+<Edge Target="p4" Source="q12">
+<LabelBlock>
+<SimpleIdentifier Name="u45"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u40"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="u41"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q7" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="u42"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q8" Source="q7">
+<LabelBlock>
+<SimpleIdentifier Name="w31"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q9" Source="q8">
+<LabelBlock>
+<SimpleIdentifier Name="c8"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q11" Source="q9">
+<LabelBlock>
+<SimpleIdentifier Name="u43"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Seq3">
+<Graph>
+<NodeList>
+<SimpleNode Name="q0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Initial="true" Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q5">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="q0">
+<LabelBlock>
+<SimpleIdentifier Name="w14"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="c5"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u30"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="w22"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q5" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="c6"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q0" Source="q5">
+<LabelBlock>
+<SimpleIdentifier Name="u31"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Seq2">
+<Graph>
+<NodeList>
+<SimpleNode Name="p4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q10">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q11">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q12">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q13">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q5">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q6">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q7">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Initial="true" Name="q8">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q9">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="p4">
+<LabelBlock>
+<SimpleIdentifier Name="e30"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="c3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q11" Source="q10">
+<LabelBlock>
+<SimpleIdentifier Name="u21"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q12" Source="q11">
+<LabelBlock>
+<SimpleIdentifier Name="u22"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q13" Source="q12">
+<LabelBlock>
+<SimpleIdentifier Name="u23"/>
+</LabelBlock>
+</Edge>
+<Edge Target="p4" Source="q13">
+<LabelBlock>
+<SimpleIdentifier Name="u24"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u25"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="u26"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q5" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="u27"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q6" Source="q5">
+<LabelBlock>
+<SimpleIdentifier Name="u28"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q7" Source="q6">
+<LabelBlock>
+<SimpleIdentifier Name="u29"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q8" Source="q7">
+<LabelBlock>
+<SimpleIdentifier Name="w32"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q9" Source="q8">
+<LabelBlock>
+<SimpleIdentifier Name="c4"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q10" Source="q9">
+<LabelBlock>
+<SimpleIdentifier Name="u20"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Seq1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="p2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q5">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="q1" Source="p2">
+<LabelBlock>
+<SimpleIdentifier Name="e10"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q2" Source="q1">
+<LabelBlock>
+<SimpleIdentifier Name="c1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q3" Source="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u10"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q4" Source="q3">
+<LabelBlock>
+<SimpleIdentifier Name="w23"/>
+</LabelBlock>
+</Edge>
+<Edge Target="q5" Source="q4">
+<LabelBlock>
+<SimpleIdentifier Name="c2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="p2" Source="q5">
+<LabelBlock>
+<SimpleIdentifier Name="u11"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

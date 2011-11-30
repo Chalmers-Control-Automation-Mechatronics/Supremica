@@ -59,6 +59,8 @@ class ComponentsTreePopupFactory
     popup.add(newaut);
     final IDEAction newvar = master.getInsertVariableAction();
     popup.add(newvar);
+    final IDEAction newfor = master.getInsertForeachComponentAction();
+    popup.add(newfor);
     final IDEAction showcomment = master.getShowModuleCommentAction();
     popup.add(showcomment);
   }

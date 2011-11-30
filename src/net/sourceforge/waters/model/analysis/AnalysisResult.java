@@ -65,6 +65,14 @@ public interface AnalysisResult
   public long getRunTime();
 
   /**
+   * Gets the peak memory usage. Memory usage is determined by the maximum
+   * amount of memory allocated by the Java virtual machine and any dependent
+   * libraries at any one time during the complete analysis.
+   * @return Memory used in bytes.
+   */
+  public long getPeakMemoryUsage();
+
+  /**
    * Gets the total number of automata used by the analysis.
    * @return The number of automata, or <CODE>-1</CODE> if unknown.
    */
@@ -147,6 +155,15 @@ public interface AnalysisResult
    *          Time to be stored, in milliseconds.
    */
   public void setRuntime(final long time);
+
+  /**
+   * Updates the recorded memory usage.
+   * This method checks whether the given usage exceeds the currently
+   * recorded memory usage, and if so, updates the recorded usage.
+   * @param usage
+   *          Amount of memory currently used, in bytes.
+   */
+  public void updatePeakMemoryUsage(final long usage);
 
   /**
    * Specifies a value for both the peak and total number of states constructed

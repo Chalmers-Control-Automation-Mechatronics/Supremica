@@ -2171,6 +2171,8 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
               if {[Java_IsSimpleExpressionProxy $elemtype classMap] ||
                   [string compare $varname "eventList"] == 0} {
                 set method "compareExpressionLists"
+              } elseif {[string compare $elemtype "EventDeclProxy"] == 0} {
+                set method "compareNamedSets"
               } else {
                 set method "compareLists"
               }

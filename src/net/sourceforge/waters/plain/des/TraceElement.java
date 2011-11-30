@@ -214,8 +214,13 @@ public abstract class TraceElement
 
     public EventProxy get(final int index)
     {
-      final TraceStepProxy step = mTraceSteps.get(index + 1);
-      return step.getEvent();
+      if (index >= 0) {
+        final TraceStepProxy step = mTraceSteps.get(index + 1);
+        return step.getEvent();
+      } else {
+        throw new IndexOutOfBoundsException
+          ("Bad event index in trace: " + index);
+      }
     }
 
     //#######################################################################

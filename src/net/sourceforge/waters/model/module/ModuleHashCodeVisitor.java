@@ -241,27 +241,6 @@ public class ModuleHashCodeVisitor
     return visitProxy(proxy);
   }
 
-  public Integer visitForeachComponentProxy
-    (final ForeachComponentProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
-  public Integer visitForeachEventAliasProxy
-    (final ForeachEventAliasProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
-  public Integer visitForeachEventProxy
-    (final ForeachEventProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
   public Integer visitForeachProxy
     (final ForeachProxy proxy)
     throws VisitorException

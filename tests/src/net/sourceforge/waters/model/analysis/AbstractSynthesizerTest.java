@@ -15,25 +15,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicLanguageInclusionChecker;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -66,10 +57,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * implementations. The synthesis implementation only needs to implement the
  * {@link ProductDESBuilder} interface to be tested. Monolithic and
  * compositional synthesis are both supported.</P>
- *
- * <P>TODO. Presently, the test performs plantification. This should
- * probably be done by individual synthesisers instead, as not all
- * algorithms will require this step.</P>
  *
  * @author Robi Malik
  */
@@ -160,6 +147,14 @@ public abstract class AbstractSynthesizerTest
 
   //#########################################################################
   //# Test Cases --- synthesis
+  public void testBallProcess() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "ball_Process";
+    runSynthesizer(group, subdir, name, false);
+  }
+
   public void testBigFactory() throws Exception
   {
     final String group = "tests";
@@ -168,11 +163,139 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testCatMouse() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "cat_mouse";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testCell() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "cell";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testCoffeeMachine() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "coffee_machine";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testDebounce() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "debounce";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testDosingUnit() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "dosing_unit";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testFalko() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "falko";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testIPC() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "IPC";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testManufacturingSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "manufacturing_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testManWolf() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "man_wolf";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testNoPlant() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "no_plant";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testParrow() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "parrow";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testPathFinder() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "path_finder";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testPlantify() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "plantify";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testProductionSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "production_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testProfessorPen() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "professor_pen";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testPV35() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "pv35";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testRobotAssemblyCell() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "robot_assembly_cell";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -189,6 +312,30 @@ public abstract class AbstractSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "small_factory_2";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testSimpleManufacturingSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "simple_manufacturing_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testTankProcess() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tank_process";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testTeleNetwork() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tele_network";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -216,102 +363,6 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
-  public void testCatMouse() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "cat_mouse";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testProductionSystem() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "production_system";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testManufacturingSystem() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "manufacturing_system";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testDosingUnit() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "dosing_unit";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testIPC() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "IPC";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testRobotAssemblyCell() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "robot_assembly_cell";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testTankProcess() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "tank_process";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testParrow() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "parrow";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testManWolf() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "man_wolf";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testProfessorPen() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "professor_pen";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testteleNetwork() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "tele_network";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testPV35() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "pv35";
-    runSynthesizer(group, subdir, name, true);
-  }
-
   public void testThreeRobot() throws Exception
   {
     final String group = "tests";
@@ -320,29 +371,25 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
-  public void testPathFinder() throws Exception
+  public void testZeroSup() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
-    final String name = "path_finder";
+    final String name = "test_zero_sup";
+    runSynthesizer(group, subdir, name, false);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- BIG
+  public void testKoordWspSynth() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "koordwsp_synth";
     runSynthesizer(group, subdir, name, true);
   }
 
-  public void testCofeeMachine() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "cofee_machine";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testBallProcess() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "ball_Process";
-    runSynthesizer(group, subdir, name, true);
-  }
 
   //#########################################################################
   //# Instantiating and Checking Modules
@@ -516,8 +563,7 @@ public abstract class AbstractSynthesizerTest
       throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
-    final ProductDESProxy plantified = plantify(des);
-    configureSynthesizer(plantified);
+    configureSynthesizer(des);
     mSynthesizer.run();
     final ProductDESResult result = mSynthesizer.getAnalysisResult();
     checkResult(des, result, expect);
@@ -536,25 +582,40 @@ public abstract class AbstractSynthesizerTest
         ProxyTools.getShortClassName(mSynthesizer) + '.';
       final Collection<EventProxy> events = des.getEvents();
       final Collection<AutomatonProxy> plants = des.getAutomata();
-      final Collection<AutomatonProxy> supervisors =
+      final Collection<AutomatonProxy> computedSupervisors =
         result.getComputedAutomata();
-      final int numAutomata = plants.size() + supervisors.size();
+      final int numAutomata = plants.size() + computedSupervisors.size();
       final Collection<AutomatonProxy> automata =
         new ArrayList<AutomatonProxy>(numAutomata);
-      automata.addAll(plants);
-      automata.addAll(supervisors);
+      final Collection<AutomatonProxy> expectedSupervisors =
+        new ArrayList<AutomatonProxy>(plants.size());
+      for (final AutomatonProxy aut : plants) {
+        switch (aut.getKind()) {
+        case PLANT:
+        case SPEC:
+          automata.add(aut);
+          break;
+        case SUPERVISOR:
+          expectedSupervisors.add(aut);
+          break;
+        default:
+          break;
+        }
+      }
+      automata.addAll(computedSupervisors);
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      final ProductDESProxy replaced =
+        factory.createProductDESProxy(name, comment, null, events, automata);
+      saveDES(replaced, basename);
+      assertTrue("Expected failed synthesis, but got a result!", expect);
+      verifySupervisor(replaced, mControllabilityChecker,
+                       null, "controllable");
+      verifySupervisor(replaced, mConflictChecker, null, "nonconflicting");
+      automata.addAll(expectedSupervisors);
       final ProductDESProxy combined =
         factory.createProductDESProxy(name, comment, null, events, automata);
-      saveDES(combined, basename);
-      assertTrue("Expected failed synthesis, but got a result!", expect);
-      final KindTranslator vtrans =
-        new VerificationKindTranslator(supervisors);
-      verifySupervisor(combined, mControllabilityChecker,
-                       vtrans, "controllable");
-      verifySupervisor(combined, mConflictChecker, vtrans, "nonconflicting");
       final KindTranslator ltrans =
-        new LeastRestrictivenessKindTranslator(supervisors);
+        new LeastRestrictivenessKindTranslator(computedSupervisors);
       verifySupervisor(combined, mLanguageInclusionChecker,
                        ltrans, "least restrictive");
     } else {
@@ -570,7 +631,9 @@ public abstract class AbstractSynthesizerTest
     throws Exception
   {
     verifier.setModel(des);
-    verifier.setKindTranslator(translator);
+    if (translator != null) {
+      verifier.setKindTranslator(translator);
+    }
     verifier.run();
     if (!verifier.isSatisfied()) {
       final TraceProxy counterexample = verifier.getCounterExample();
@@ -602,180 +665,6 @@ public abstract class AbstractSynthesizerTest
       final int limit = Integer.parseInt(prop);
       mSynthesizer.setNodeLimit(limit);
     }
-  }
-
-
-  //#########################################################################
-  //# Plantification
-  /**
-   * Returns a plantified version of the given product DES.
-   * Plantification means that all specification automata are replaced
-   * by plants with uncontrollable transitions to a dump state added to
-   * all states where the uncontrollable event in question is not defined.
-   * This method implements simple plantification.
-   * All uncontrollable events are considered.
-   * @throws EventNotFoundException
-   */
-  private ProductDESProxy plantify(final ProductDESProxy des)
-    throws OverflowException, EventNotFoundException
-  {
-    mMarkingProposition = AbstractConflictChecker.getMarkingProposition(des);
-    final Collection<AutomatonProxy> automata = des.getAutomata();
-    final int numAutomata = automata.size();
-    final Collection<AutomatonProxy> plantified =
-      new ArrayList<AutomatonProxy>(numAutomata);
-    for (final AutomatonProxy aut : automata) {
-      switch (aut.getKind()) {
-      case PLANT:
-        plantified.add(aut);
-        break;
-      case SPEC:
-        final AutomatonProxy plant = plantify(aut);
-        plantified.add(plant);
-        break;
-      default:
-        break;
-      }
-    }
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final String name = des.getName();
-    final String comment = "Plantified version of " + name;
-    final Collection<EventProxy> events = des.getEvents();
-    return factory.createProductDESProxy(name, comment, null,
-                                         events, plantified);
-  }
-
-  private AutomatonProxy plantify(final AutomatonProxy spec)
-    throws OverflowException
-  {
-    final Collection<EventProxy> events = spec.getEvents();
-    final Set <EventProxy> newEvents = new HashSet <EventProxy>(events.size()+1);
-    newEvents.addAll(events);
-    if (!events.contains(mMarkingProposition)) {
-      newEvents.add(mMarkingProposition);
-    }
-    final int numEvents = events.size();
-    final Collection<EventProxy> uncontrollables =
-      new ArrayList<EventProxy>(numEvents);
-    for (final EventProxy event : events) {
-      if (event.getKind() == EventKind.UNCONTROLLABLE) {
-        uncontrollables.add(event);
-      }
-    }
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventEncoding eventEnc =
-      new EventEncoding(uncontrollables, translator);
-    final StateEncoding stateEnc = new StateEncoding(spec);
-    final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(spec, eventEnc, stateEnc,
-                                       ListBufferTransitionRelation.
-                                       CONFIG_SUCCESSORS);
-    final int numStates = rel.getNumberOfStates();
-    final Collection<StateProxy> states = new ArrayList<StateProxy>(numStates + 1);
-    final Collection <StateProxy> newStates = new ArrayList<StateProxy>(numStates + 1);
-    states.addAll(spec.getStates());
-    StateProxy dump = null;
-    boolean dumpUsed = false;
-    final Collection<TransitionProxy> transitions =
-      new ArrayList<TransitionProxy>(spec.getTransitions());
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    for (int s = 0; s < numStates; s++) {
-      final StateProxy state = stateEnc.getState(s);
-      final Collection<EventProxy> newPropostion = new HashSet<EventProxy>
-        (state.getPropositions().size());
-      newPropostion.addAll(state.getPropositions());
-      newPropostion.add(mMarkingProposition);
-      if (!events.contains(mMarkingProposition)) {
-          final StateProxy newState = factory.createStateProxy
-            (state.getName(), state.isInitial(), newPropostion);
-
-          newStates.add(newState);
-        for (final EventProxy event : uncontrollables) {
-          final int e = eventEnc.getEventCode(event);
-          iter.reset(s, e);
-          if (!iter.advance()) {
-            if (dump == null) {
-              dump = factory.createStateProxy(":dump");
-              newStates.add(dump);
-              dumpUsed=true;
-            }
-            final TransitionProxy trans =
-              factory.createTransitionProxy(newState, event, dump);
-            transitions.add(trans);
-          }
-        }
-      } else {
-        for (final EventProxy event : uncontrollables) {
-          final int e = eventEnc.getEventCode(event);
-          iter.reset(s, e);
-          if (!iter.advance()) {
-            if (dump == null) {
-              dump = factory.createStateProxy(":dump");
-              states.add(dump);
-              dumpUsed=true;
-            }
-            final TransitionProxy trans =
-              factory.createTransitionProxy(state, event, dump);
-            transitions.add(trans);
-          }
-        }
-      }
-    }
-    if(dumpUsed & !events.contains(mMarkingProposition)) {
-      final String name = spec.getName();
-      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                          newEvents, newStates, transitions);
-    } else {
-      final String name = spec.getName();
-      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                          events, states, transitions);
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class VerificationKindTranslator
-  private static class VerificationKindTranslator
-    implements KindTranslator
-  {
-    //#######################################################################
-    //# Constructor
-    private VerificationKindTranslator
-      (final Collection<AutomatonProxy> computedSupervisors)
-    {
-      mComputedSupervisors = new THashSet<AutomatonProxy>(computedSupervisors);
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-    public ComponentKind getComponentKind(final AutomatonProxy aut)
-    {
-      switch (aut.getKind()) {
-      case PLANT:
-        return ComponentKind.PLANT;
-      case SPEC:
-        return ComponentKind.SPEC;
-      case SUPERVISOR:
-        if (mComputedSupervisors.contains(aut)) {
-          return ComponentKind.SPEC;
-        } else {
-          return null;
-        }
-      default:
-        return null;
-      }
-    }
-
-    public EventKind getEventKind(final EventProxy event)
-    {
-      return event.getKind();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final Collection<AutomatonProxy> mComputedSupervisors;
   }
 
 
@@ -838,6 +727,5 @@ public abstract class AbstractSynthesizerTest
   private ConflictChecker mConflictChecker;
   private JAXBTraceMarshaller mTraceMarshaller;
   private List<ParameterBindingProxy> mBindings;
-  private EventProxy mMarkingProposition;
 
 }

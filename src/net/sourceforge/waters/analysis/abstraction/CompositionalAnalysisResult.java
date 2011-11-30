@@ -127,9 +127,12 @@ public class CompositionalAnalysisResult
     mRedundantEventsCount += count;
   }
 
-  public void setSimplifierStatistics(final List<TRSimplifierStatistics> stats)
+  public void setSimplifierStatistics
+    (final List<? extends TRSimplifierStatistics> stats)
   {
-    mSimplifierStatistics = stats;
+    final int size = stats.size();
+    mSimplifierStatistics = new ArrayList<TRSimplifierStatistics>(size);
+    mSimplifierStatistics.addAll(stats);
   }
 
   public void setSimplifierStatistics
@@ -163,6 +166,10 @@ public class CompositionalAnalysisResult
     } else if (result != null) {
       mSynchronousProductStats.merge(result);
     }
+    if (result != null) {
+      final long usage = result.getPeakMemoryUsage();
+      updatePeakMemoryUsage(usage);
+    }
   }
 
   public void addMonolithicAnalysisResult(final AnalysisResult result)
@@ -172,6 +179,10 @@ public class CompositionalAnalysisResult
       mMonolithicStats = result;
     } else if (result != null) {
       mMonolithicStats.merge(result);
+    }
+    if (result != null) {
+      final long usage = result.getPeakMemoryUsage();
+      updatePeakMemoryUsage(usage);
     }
   }
 

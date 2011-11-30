@@ -9,7 +9,7 @@
 #############################################################################
 # OS dependent
 
-ifeq "$(JAVAOS)" "linux"
+ifeq "$(HOST_OS)" "linux"
   MKDIR         = mkdir -p $(strip $(1))
 else
   MKDIR         = $(if $(wildcard $(1)),,mkdir $(subst /,\,$(1)))

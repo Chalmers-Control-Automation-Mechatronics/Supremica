@@ -95,7 +95,7 @@ import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -539,7 +539,7 @@ class EPSPrinterVisitor
      * Visit the children of foreach constructs in the component list.
      */
     public Object visitForeachComponentProxy
-        (final ForeachComponentProxy foreach)
+        (final ForeachProxy foreach)
         throws VisitorException
     {
         final Collection<Proxy> body = foreach.getBody();

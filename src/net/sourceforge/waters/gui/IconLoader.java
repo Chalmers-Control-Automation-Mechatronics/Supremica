@@ -32,6 +32,7 @@ public class IconLoader
   //#########################################################################
   //# Class Constants
   private static final String NAME_AUTOMATON = "waters/automaton16";
+  private static final String NAME_CONSTANT = "waters/constant";
   private static final String NAME_CONTROLLABLE_OBSERVABLE =
     "waters/controllable";
   private static final String NAME_CONTROLLABLE_UNOBSERVABLE =
@@ -42,7 +43,6 @@ public class IconLoader
   private static final String NAME_PLANT = "waters/plant";
   private static final String NAME_PROPERTY = "waters/property";
   private static final String NAME_PROPOSITION = "waters/proposition";
-  private static final String NAME_SIMPLEPARAM = "waters/rangeparam";
   private static final String NAME_SIMULATOR_BACK = "waters/simulator_back";
   private static final String NAME_SIMULATOR_REPLAY = "waters/simulator_replay";
   private static final String NAME_SIMULATOR_RESET = "waters/simulator_reset";
@@ -67,6 +67,7 @@ public class IconLoader
   //#########################################################################
   //# Class Constants
   public static final ImageIcon ICON_AUTOMATON = getIcon(NAME_AUTOMATON);
+  public static final ImageIcon ICON_CONSTANT = getIcon(NAME_CONSTANT);
   public static final ImageIcon ICON_BINDING = null;
   public static final ImageIcon ICON_CONTROLLABLE_OBSERVABLE =
     getIcon(NAME_CONTROLLABLE_OBSERVABLE);
@@ -79,7 +80,6 @@ public class IconLoader
   public static final ImageIcon ICON_PLANT = getIcon(NAME_PLANT);
   public static final ImageIcon ICON_PROPERTY = getIcon(NAME_PROPERTY);
   public static final ImageIcon ICON_PROPOSITION = getIcon(NAME_PROPOSITION);
-  public static final ImageIcon ICON_SIMPLEPARAM = getIcon(NAME_SIMPLEPARAM);
   public static final ImageIcon ICON_SIMULATOR_BACK =
     getIcon(NAME_SIMULATOR_BACK);
   public static final ImageIcon ICON_SIMULATOR_REPLAY =

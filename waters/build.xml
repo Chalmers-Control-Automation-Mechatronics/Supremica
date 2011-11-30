@@ -4,6 +4,14 @@
   <description>
   </description>
 
+  <macrodef name="propertycopy">
+    <attribute name="name"/>
+    <attribute name="from"/>
+    <sequential>
+      <property name="@{name}" value="${@{from}}"/>
+    </sequential>
+  </macrodef>
+
   <property file="build.properties"/>
 
   <property name="supremica.root" location=".."/>
@@ -265,22 +273,36 @@
     </java> 
   </target>
 
-  <target name="-guess-arch" unless="java.arch">
-    <property name="java.arch" value="${native.ostype}"/>
-    <property name="cpp.lib.dir" location="${cpp}/lib/${java.arch}"/>
+  <target name="-guess-host-arch" unless="native.host.arch">
+    <property name="native.host.arch" value="${native.ostype}"/>
+    <property name="cpp.lib.dir" location="${cpp}/lib/${native.host.arch}"/>
   </target>
 
-  <target name="-set-debug" depends="-guess-arch" unless="make.release">
+  <target name="-guess-target-arch" unless="native.target.arch"
+          depends="-guess-host-arch">
+    <property name="native.target.arch" value="${native.host.arch}"/>
+  </target>
+
+  <target name="-set-debug" unless="make.release">
     <property name="cpp.debug.suffix" value=".debug"/>
     <property name="cpp.debug" value="1"/>
   </target>
 
-  <target name="cpp" depends="-guess-arch,-set-debug,javah,jniglue"
-          if="native.make" description="Build native library.">
+  <target name="-set-ccpp" if="native.compiler.${native.target.arch}">
+    <propertycopy name="cpp.ccpp"
+                  from="native.compiler.${native.target.arch}"/>
+  </target>
+
+  <target name="cpp"
+      depends="-guess-host-arch,-guess-target-arch,-set-debug,-set-ccpp,javah,jniglue"
+      if="native.make" description="Builds Waters dynamic link library.">
+    <property name="cpp.ccpp" value=""/>
     <exec executable="${native.make}" dir="${cpp}"
           failonerror="true" failifexecutionfails="false">
-        <arg value="JAVA_ARCH=${java.arch}"/>
-        <arg value="DEBUG=${cpp.debug}"/>
+      <arg value="HOST_ARCH=${native.host.arch}"/>
+      <arg value="TARGET_ARCH=${native.target.arch}"/>
+      <arg value="CCPP=${cpp.ccpp}"/>
+      <arg value="DEBUG=${cpp.debug}"/>
     </exec>
     <pathconvert property="waters.library.path">
       <path>
@@ -660,10 +682,10 @@
   </target>
 
 
-  <target name="-clean-cpp" depends="-guess-arch" if="native.make">
+  <target name="-clean-cpp" depends="-guess-host-arch" if="native.make">
     <exec executable="${native.make}" dir="${cpp}"
           failifexecutionfails="false">
-      <arg value="JAVA_ARCH=${java.arch}"/>
+      <arg value="HOST_ARCH=${native.host.arch}"/>
       <arg value="clean"/>
     </exec>
   </target>

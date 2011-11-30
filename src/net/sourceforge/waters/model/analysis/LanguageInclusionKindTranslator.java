@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 /**
  * <P>A kind translator used for language inclusion checking.
- * This translator remaps all event to be uncontrollable,
+ * This translator remaps all events to be uncontrollable,
  * all specs and supervisors are considered as plants, and all properties are
  * considered as specs. Such a remapping makes it possible to
  * implement language inclusion checking using a controllability

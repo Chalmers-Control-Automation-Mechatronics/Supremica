@@ -185,6 +185,7 @@ public class Simulation implements ModelObserver, Observer
       mTraceInvalidated = true;
       updateAutomata();
       final SimulatorState state = new SimulatorState(mOrderedAutomata);
+      warnAboutMissingInitialStates(state);
       mStateHistory.clear();
       mStateHistory.add(state);
       mCurrentTime = 0;
@@ -633,6 +634,28 @@ public class Simulation implements ModelObserver, Observer
         }
         Collections.sort(mOrderedAutomata);
       }
+    }
+  }
+
+  private void warnAboutMissingInitialStates(final SimulatorState state)
+  {
+    if (state.getNumberOfEnabledAutomata() < mOrderedAutomata.size()) {
+      final StringBuffer buffer =
+        new StringBuffer("Could not determine initial state for ");
+      boolean first = true;
+      for (final AutomatonProxy aut : mOrderedAutomata) {
+        if (state.getStatus(aut) == AutomatonStatus.DISABLED) {
+          if (first) {
+            first = false;
+          } else {
+            buffer.append(", ");
+          }
+          buffer.append(aut.getName());
+        }
+      }
+      buffer.append('.');
+      final IDE ide = mModuleContainer.getIDE();
+      ide.warn(buffer.toString());
     }
   }
 

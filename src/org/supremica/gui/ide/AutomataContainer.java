@@ -12,6 +12,7 @@ package org.supremica.gui.ide;
 
 import java.awt.Component;
 
+
 import org.supremica.automata.Project;
 
 

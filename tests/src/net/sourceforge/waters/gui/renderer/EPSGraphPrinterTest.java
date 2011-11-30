@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -171,8 +171,8 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
     /**
      * Visit the children of foreach constructs in the component list.
      */
-    public Object visitForeachComponentProxy
-      (final ForeachComponentProxy foreach)
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
       final Collection<Proxy> body = foreach.getBody();

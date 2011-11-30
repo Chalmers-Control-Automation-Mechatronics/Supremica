@@ -38,8 +38,9 @@ import net.sourceforge.waters.gui.actions.IDEDeselectAllAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.IDEPropertiesAction;
 import net.sourceforge.waters.gui.actions.IDESelectAllAction;
+import net.sourceforge.waters.gui.actions.InsertConstantAliasAction;
 import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
-import net.sourceforge.waters.gui.actions.InsertForeachComponentAction;
+import net.sourceforge.waters.gui.actions.InsertForeachAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
@@ -307,8 +308,11 @@ public class IDEMenuBar extends JMenuBar
         mCreateMenu.add(insvar);
         if (Config.INCLUDE_INSTANTION.isTrue()) {
           final Action insforeach =
-              actions.getAction(InsertForeachComponentAction.class);
+              actions.getAction(InsertForeachAction.class);
           mCreateMenu.add(insforeach);
+          final Action insalias =
+            actions.getAction(InsertConstantAliasAction.class);
+          mCreateMenu.add(insalias);
         }
         final Action insevent = actions.getAction(InsertEventDeclAction.class);
         mCreateMenu.add(insevent);
