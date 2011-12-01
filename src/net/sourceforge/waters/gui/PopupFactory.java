@@ -12,12 +12,18 @@ package net.sourceforge.waters.gui;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+
 import org.supremica.util.VPopupMenu;
 
 
@@ -48,6 +54,13 @@ public abstract class PopupFactory
                              final Proxy proxy)
   {
     if (event.isPopupTrigger()) {
+      if(invoker instanceof SelectionOwner && proxy != null && !(proxy instanceof ModuleProxy)){
+        final SelectionOwner selection = (SelectionOwner)invoker;
+        if(!selection.isSelected(proxy)){
+          final List<Proxy> items = Collections.singletonList(proxy);
+          selection.replaceSelection(items);
+        }
+      }
       // Paranoia. These popups require the invoking component to own the
       // keyboard focus. If we do not have it, request it first. However,
       // the focus is not granted immediately, and maybe not at all ...

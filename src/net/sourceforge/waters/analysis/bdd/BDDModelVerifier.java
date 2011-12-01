@@ -115,9 +115,10 @@ public abstract class BDDModelVerifier
     super(model, desfactory, translator);
     mBDDPackage = bddpackage;
     mVariableOrdering = VariableOrdering.FORCE;
-    mInitialSize = 50000;
-    mPartitioningSizeLimit = Integer.MAX_VALUE;
     mIsReorderingEnabled = true;
+    mInitialSize = 50000;
+    mPartitioningStrategy = TransitionPartitioningStrategy.GREEDY;
+    mPartitioningSizeLimit = Integer.MAX_VALUE;
   }
 
 
@@ -143,6 +144,16 @@ public abstract class BDDModelVerifier
     return mVariableOrdering;
   }
 
+  public void setReorderingEnabled(final boolean enable)
+  {
+    mIsReorderingEnabled = enable;
+  }
+
+  public boolean isReorderingEnabled()
+  {
+    return mIsReorderingEnabled;
+  }
+
   public void setInitialSize(final int size)
   {
     mInitialSize = size;
@@ -153,6 +164,17 @@ public abstract class BDDModelVerifier
     return mInitialSize;
   }
 
+  public void setTransitionPartitioningStrategy
+    (final TransitionPartitioningStrategy strategy)
+  {
+    mPartitioningStrategy = strategy;
+  }
+
+  public TransitionPartitioningStrategy getTransitionPartitioningStrategy()
+  {
+    return mPartitioningStrategy;
+  }
+
   public void setPartitioningSizeLimit(final int limit)
   {
     mPartitioningSizeLimit = limit < 0 ? Integer.MAX_VALUE : limit;
@@ -161,16 +183,6 @@ public abstract class BDDModelVerifier
   public int getPartitioningSizeLimit()
   {
     return mPartitioningSizeLimit;
-  }
-
-  public void setReorderingEnabled(final boolean enable)
-  {
-    mIsReorderingEnabled = enable;
-  }
-
-  public boolean isReorderingEnabled()
-  {
-    return mIsReorderingEnabled;
   }
 
 
@@ -378,7 +390,8 @@ public abstract class BDDModelVerifier
     }
 
     final Partitioning<TransitionPartitionBDD> transPartitioning =
-      new Partitioning<TransitionPartitionBDD>(TransitionPartitionBDD.class);
+      mPartitioningStrategy.createPartitioning
+        (mBDDFactory, model, mPartitioningSizeLimit);
     int transcount0 = 0;
     for (final EventBDD eventBDD : eventBDDs) {
       final BDD trans = eventBDD.getTransitionsBDD();
@@ -390,8 +403,7 @@ public abstract class BDDModelVerifier
       }
     }
     final Collection<TransitionPartitionBDD> transitions =
-      transPartitioning.mergePartitions(mAutomatonBDDs, mBDDFactory,
-                                        mPartitioningSizeLimit);
+      transPartitioning.mergePartitions(mAutomatonBDDs);
     mTransitionBDDs = new ArrayList<TransitionPartitionBDD>(transitions);
     final int transcount1 = mTransitionBDDs.size();
     final Logger logger = getLogger();
@@ -860,6 +872,7 @@ public abstract class BDDModelVerifier
   private BDDPackage mBDDPackage;
   private VariableOrdering mVariableOrdering;
   private int mInitialSize;
+  private TransitionPartitioningStrategy mPartitioningStrategy;
   private int mPartitioningSizeLimit;
   private boolean mIsReorderingEnabled;
 

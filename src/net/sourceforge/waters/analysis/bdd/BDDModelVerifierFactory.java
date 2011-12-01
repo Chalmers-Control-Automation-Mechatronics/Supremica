@@ -60,7 +60,8 @@ public class BDDModelVerifierFactory
     addArgument(new CommandLineArgumentPack());
     addArgument(new CommandLineArgumentOrder());
     addArgument(new CommandLineArgumentInitialSize());
-    addArgument(new CommandLineArgumentParitioningSizeLimit());
+    addArgument(new CommandLineArgumentPartitioningStrategy());
+    addArgument(new CommandLineArgumentPartitioningSizeLimit());
     addArgument(new CommandLineArgumentDynamic());
   }
 
@@ -189,16 +190,43 @@ public class BDDModelVerifierFactory
     }
   }
 
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentOrder
+  private static class CommandLineArgumentPartitioningStrategy
+    extends CommandLineArgumentEnum<TransitionPartitioningStrategy>
+  {
+    //#######################################################################
+    //# Constructor
+    private CommandLineArgumentPartitioningStrategy()
+    {
+      super("-part", "Set transition partitioning strategy",
+            TransitionPartitioningStrategy.class);
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModelVerifier verifier)
+    {
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final TransitionPartitioningStrategy strategy = getValue();
+      bddVerifier.setTransitionPartitioningStrategy(strategy);
+    }
+  }
+
+
   //#########################################################################
   //# Inner Class CommandLineArgumentParitioningSizeLimit
-  private static class CommandLineArgumentParitioningSizeLimit
+  private static class CommandLineArgumentPartitioningSizeLimit
     extends CommandLineArgumentInteger
   {
     //#######################################################################
     //# Constructor
-    private CommandLineArgumentParitioningSizeLimit()
+    private CommandLineArgumentPartitioningSizeLimit()
     {
-      super("-part", "Maximum BDD size when merging partitioned BDDs");
+      super("-plimit", "Maximum BDD size when merging partitioned BDDs");
     }
 
     //#######################################################################

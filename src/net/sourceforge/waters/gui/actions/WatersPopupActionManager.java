@@ -86,7 +86,12 @@ public class WatersPopupActionManager
 
   public IDEAction getDeleteAction(final Proxy arg)
   {
-    return arg == null ? getDeleteAction() : new IDEDeleteAction(mIDE, arg);
+    if(arg == null || arg instanceof ModuleProxy){
+      return getDeleteAction();
+    }
+    else{
+      return new IDEDeleteAction(mIDE, arg);
+    }
   }
 
   public IDEAction getDeselectAllAction()

@@ -47,6 +47,14 @@ class TransitionPartitionBDD
 
   //#########################################################################
   //# Overrides for Abstract Base Class PartitionBDD
+  /**
+   * Composes this partition BDD with another.
+   * @param  part          The BDD this BDD is composed with.
+   * @param  automatonBDDs Array of automaton BDDs defining the model.
+   * @param  factory       The BDD factory used to construct BDDs.
+   * @return The new partition BDD.
+   */
+  @Override
   TransitionPartitionBDD compose(final PartitionBDD part,
                                  final AutomatonBDD[] automatonBDDs,
                                  final BDDFactory factory)
@@ -54,6 +62,13 @@ class TransitionPartitionBDD
     return compose((TransitionPartitionBDD) part, automatonBDDs, factory);
   }
 
+  /**
+   * Composes this partition BDD with another transition partition BDD.
+   * @param part          The BDD this BDD is composed with.
+   * @param automatonBDDs Array of automaton BDDs defining the model.
+   * @param factory       The BDD factory used to construct BDDs.
+   * @return The new partition BDD.
+   */
   TransitionPartitionBDD compose(final TransitionPartitionBDD part,
                                  final AutomatonBDD[] automatonBDDs,
                                  final BDDFactory factory)

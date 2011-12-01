@@ -125,7 +125,7 @@ public class ProxyNamer {
   {
     mMap = new HashMap<Class<? extends Proxy>,NameEntry>(32);
     createEntry(AutomatonProxy.class, "Automaton", "Automata");
-    createEntry(AliasProxy.class, "Alias", "Aliases");
+    createEntry(AliasProxy.class, "Alias", "Aliases",  Proxy.class, false);
     createEntry(ConstantAliasProxy.class, "Named Constant",
                 AliasProxy.class, false);
     createEntry(ComponentProxy.class, "Component");
@@ -150,8 +150,9 @@ public class ProxyNamer {
                 SimpleNodeProxy.class, true);
     createEntry(LabelBlockProxy.class, "Labels", "Labels",
                 EdgeProxy.class, true);
-    createEntry(NodeProxy.class, "Node");
+    createEntry(NodeProxy.class, "Node",  Proxy.class, false);
     createEntry(ParameterBindingProxy.class, "Binding");
+    createEntry(Proxy.class, "Item");
     createEntry(QualifiedIdentifierProxy.class, "Label",
                 IdentifierProxy.class, false);
     createEntry(SimpleComponentProxy.class, "Automaton", "Automata",
@@ -255,6 +256,12 @@ public class ProxyNamer {
       if (numdecls != null) {
         return getName(EventDeclProxy.class, numdecls != 1);
       }
+      boolean removedForeach = false;
+      if (map.size() > 1) {
+        if (map.remove(ForeachProxy.class) != null) {
+          removedForeach = true;
+        }
+      }
       // Otherwise find most general supertype and use it name ...
       int count = 0;
       Class<? extends Proxy> iface = null;
@@ -264,14 +271,21 @@ public class ProxyNamer {
         iface = getLeastCommonAncestor(iface, key);
         if (isConstituentOf(key, iface)) {
           // leave count unchanged
-        } else if (isConstituentOf(iface, key)) {
-          count = entry.getValue();
+
         } else {
           count += entry.getValue();
         }
       }
       final NameEntry entry = getEntry(iface);
-      return count == 1 ? entry.getSingular() : entry.getPlural();
+      if(removedForeach){
+        return entry.getPlural();
+      }
+      else if(count == 1){
+        return entry.getSingular();
+      }
+      else{
+        return entry.getPlural();
+      }
     }
   }
 
@@ -323,12 +337,11 @@ public class ProxyNamer {
     } else if (isAncestor(iface2, iface1)) {
       return iface2;
     } else {
-      return iface1;
-      /*Class<? extends Proxy> parent1 = getParent(iface1);
+      Class<? extends Proxy> parent1 = getParent(iface1);
       while (parent1 != null && !isAncestor(parent1, iface2)) {
         parent1 = getParent(parent1);
       }
-      return parent1;*/
+      return parent1;
     }
   }
 
@@ -348,7 +361,7 @@ public class ProxyNamer {
   private boolean isConstituentOf(Class<? extends Proxy> item,
                                   final Class<? extends Proxy> ancestor)
   {
-    boolean constituent = true;
+    boolean constituent = false;
     while (item != null && item != ancestor) {
       final NameEntry entry = getEntry(item);
       constituent = entry.isConstituent();
