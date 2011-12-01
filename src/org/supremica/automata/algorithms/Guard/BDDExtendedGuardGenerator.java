@@ -25,10 +25,7 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.EFA.BDDEdges;
-import org.supremica.automata.BDD.EFA.BDDExDisjAutmatonDepSets;
 import org.supremica.automata.BDD.EFA.BDDExDisjDepSetsDecorator;
-import org.supremica.automata.BDD.EFA.BDDExDisjEventDepSets;
-import org.supremica.automata.BDD.EFA.BDDExDisjVariableDepSets;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedManager;
@@ -94,6 +91,7 @@ public class BDDExtendedGuardGenerator {
 
     private boolean isEventBlocked = false;
 
+    @SuppressWarnings("unused")
     private final EditorSynthesizerOptions options;
 
     /** Creates a new instance of BDDExtendedGuardGenerator */
@@ -834,12 +832,12 @@ public class BDDExtendedGuardGenerator {
 
         BDD tmp = manager.getZeroBDD();
 
-        BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
-        
-        BDD eventBDD = depset.getEventParDepSets().getEventIndexToTransitionBDD().get(eventIndex);
-        BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
-       
-        BDD transWithEventBDD = transBDD.and(eventBDD);
+        final BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
+
+        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToTransitionBDD().get(eventIndex);
+        final BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+
+        final BDD transWithEventBDD = transBDD.and(eventBDD);
         tmp = safeStatesWithEvent.and(transWithEventBDD).exist(automataBDD.getDestStatesVarSet())
                     .exist(automataBDD.getEventVarSet());
 
@@ -857,17 +855,17 @@ public class BDDExtendedGuardGenerator {
 
         BDD tmp = manager.getZeroBDD();
 
-        BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
-        
-        BDD eventBDD = depset.getEventParDepSets().getEventIndexToTransitionBDD().get(eventIndex);
-        BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+        final BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
 
-        BDD transWithEventBDD = transBDD.and(eventBDD);
+        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToTransitionBDD().get(eventIndex);
+        final BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+
+        final BDD transWithEventBDD = transBDD.and(eventBDD);
         tmp = reachableStatesWithEvent.and(transWithEventBDD).exist(automataBDD.getDestStatesVarSet())
                     .exist(automataBDD.getEventVarSet());
         safeStatesEnablingSigmaBDD = tmp.and(safeStatesBDD);
         mustForbiddenStatesBDD = safeStatesEnablingSigmaBDD.and(mustAllowedStatesBDD.not());
-        
+
         tmp.free();
         reachableStatesWithEvent.free();
     }

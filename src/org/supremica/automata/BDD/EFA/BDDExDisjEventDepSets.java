@@ -39,9 +39,9 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
 
     /* Define a map where the key is the index of an event in the index map while the value is an instance of EventDisParDepSet*/
     private TIntObjectHashMap<EventDisjParDepSet> events2EventDisParDepSet;
-    
+
     /* Define a map where the key is each event BDD while the value is its transition BDD */
-    private TIntObjectHashMap<BDD> eventIndexToTransitionBDD;
+    private final TIntObjectHashMap<BDD> eventIndexToTransitionBDD;
 
     /* Define a map where the key is the index of an event in the index map while the value is the BDD expression of partitioned parts*/
     private final TIntObjectHashMap<BDD> eventToCompleteTransitionBDD;
@@ -53,19 +53,19 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
     with several simple methods. Note that they are not proved yet...*/
     private final TIntObjectHashMap<TIntIntHashMap> event2ForwardInfluencedEvens;
     private final TIntObjectHashMap<TIntIntHashMap> event2BackwardInfluencedEvents;
-    
+
     /** A map from an event index to all of the updated variable names during partitioning. */
     private final TIntObjectHashMap<HashSet<String>> eventIndex2UpdatedVariables;
     /** A map from an event index to the variables in the guard associated with the transition */
     private final TIntObjectHashMap<HashSet<String>> eventIndex2GuardVariables;
-    
+
     /** An event index list in which the source states of the edges labeled by the event index are the initial locations. */
     private final TIntHashSet initialComponentCandidates;
     /** An event index list in which the target states of the edges labeled by the event index are the marked locations*/
     private final TIntHashSet markedComponentCandidates;
     /** An event index list with which the edges labeled are uncontrollable events */
     private final TIntHashSet uncontrollableComponentCandidates;
-    
+
     private  BDD uncontrollableTransitionRelationBDD;
 
     public BDDExDisjEventDepSets(final BDDExtendedAutomata bddAutomata) {
@@ -85,7 +85,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         this.initialComponentCandidates = new TIntHashSet();
         this.markedComponentCandidates = new TIntHashSet();
         this.uncontrollableComponentCandidates = new TIntHashSet();
-        
+
         this.uncontrollableTransitionRelationBDD = manager.getZeroBDD();
 
         initialize();
@@ -132,7 +132,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         if (eventIndexToTransitionBDD.isEmpty()) {
             events2EventDisParDepSet.forEachEntry(new TIntObjectProcedure<EventDisjParDepSet>() {
                 @Override
-                public boolean execute(int i, EventDisjParDepSet t) {
+                public boolean execute(final int i, final EventDisjParDepSet t) {
                     eventIndexToTransitionBDD.put(i, t.eventBDD);
                     return true;
                 }
@@ -205,10 +205,10 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         the set of updated variables by other event based BDD partitions. From this, we build the heuristic table.
          */
         if (event2BackwardInfluencedEvents.isEmpty()) {
-            
+
             if (!orgAutomata.getVars().isEmpty()) {
                 final int[] eventIndicesAsKeys = eventIndex2GuardVariables.keys();
-                
+
                 for (int i = 0; i < eventIndicesAsKeys.length; i++) {
 
                     final int currentEventIndex = eventIndicesAsKeys[i];
@@ -400,7 +400,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                 for (final VariableComponentProxy var : orgAutomata.getVars()) {
 
                     final int varIndex = theIndexMap.getVariableIndex(var);
-
+                    @SuppressWarnings("unused")
                     final BDD t = transCorrespondingToUpdatedVariables[varIndex];
                 }
 
@@ -519,7 +519,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
 
             /* Go through each edge and build these two BDD arrays*/
             for (final Iterator<EdgeProxy> edgeIterator = includingAutomata2Edges.get(anAutomaton).iterator(); edgeIterator.hasNext();) {
-                  
+
                 final EdgeProxy anEdge = edgeIterator.next();
 
                 if (anAutomaton.isLocationInitial(anEdge.getSource())) {

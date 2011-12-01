@@ -18,7 +18,7 @@ public class FORCEAlgorithmAdapter {
     private final static int TOTAL_ROUNDS = 500; // total force rounds
     private final static int MIN_ITR = 20;	// min iterations in a round
     private final static double STOP_CONST_C = 6; // constant c in the paper
-    private int[] order, cutcount;
+    private int[] order;
     private int size;
     private Node[] nodes;
     private double[] weights, window_tmp;
@@ -44,7 +44,6 @@ public class FORCEAlgorithmAdapter {
         size = gf.numOfNodes();
         nodes = new Node[size];
         order = new int[size];
-        cutcount = new int[size];
         weights = new double[size];
         window_tmp = new double[4]; // size of the window
 
