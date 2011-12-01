@@ -205,8 +205,11 @@ public class BDDSafetyVerifier
       final EventBDD[] eventBDDs = super.createEventBDDs();
       final VerificationResult result = getAnalysisResult();
       if (!result.isFinished()) {
+        final BDDFactory bddFactory = getBDDFactory();
+        final int limit = getPartitioningSizeLimit();
         final Partitioning<ConditionPartitionBDD> condPartitioning =
-          new Partitioning<ConditionPartitionBDD>(ConditionPartitionBDD.class);
+          new GreedyPartitioning<ConditionPartitionBDD>
+            (bddFactory, ConditionPartitionBDD.class, limit);
         int condcount0 = 0;
         for (final EventBDD eventBDD : eventBDDs) {
           final BDD cond = eventBDD.getControllabilityConditionBDD();
@@ -217,11 +220,9 @@ public class BDDSafetyVerifier
             condcount0++;
           }
         }
-        final BDDFactory bddFactory = getBDDFactory();
         final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
-        final int limit = getPartitioningSizeLimit();
         final Collection<ConditionPartitionBDD> conditions =
-          condPartitioning.mergePartitions(automatonBDDs, bddFactory, limit);
+          condPartitioning.mergePartitions(automatonBDDs);
         mConditionBDDs = new ArrayList<ConditionPartitionBDD>(conditions);
         final int condcount1 = mConditionBDDs.size();
         if (logger.isDebugEnabled() && condcount0 > condcount1) {
