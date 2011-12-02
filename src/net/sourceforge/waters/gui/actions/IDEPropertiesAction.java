@@ -23,6 +23,8 @@ import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
 import net.sourceforge.waters.gui.VariableEditorDialog;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
@@ -195,7 +197,9 @@ public class IDEPropertiesAction
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final ForeachSubject subject = (ForeachSubject) foreach;
-        new ForeachEditorDialog(root, subject);
+        final FocusTracker tracker = getFocusTracker();
+        final SelectionOwner panel = tracker.getWatersSelectionOwner();
+        new ForeachEditorDialog(root, panel, subject);
       }
       return true;
     }

@@ -55,12 +55,12 @@ public class ForeachEditorDialog
 
   //#########################################################################
   //# Constructors
-  public ForeachEditorDialog(final ModuleWindowInterface root)
+  public ForeachEditorDialog(final ModuleWindowInterface root, final SelectionOwner panel)
   {
-    this(root, null);
+    this(root, panel, null);
   }
 
-  public ForeachEditorDialog(final ModuleWindowInterface root,
+  public ForeachEditorDialog(final ModuleWindowInterface root, final SelectionOwner panel,
                              final ForeachSubject foreach)
   {
     super(root.getRootWindow());
@@ -70,6 +70,7 @@ public class ForeachEditorDialog
       setTitle("Editing foreach block");
     }
     mRoot = root;
+    mPanel = panel;
     mForeach = foreach;
     createComponents();
     layoutComponents();
@@ -273,8 +274,7 @@ public class ForeachEditorDialog
         template.setName(name);
         template.setRange(range);
         template.setGuard(guard);
-        final SelectionOwner panel = mRoot.getComponentsPanel();
-        final Command command = new InsertCommand(template, panel);
+        final Command command = new InsertCommand(template, mPanel);
         mForeach = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
@@ -297,8 +297,7 @@ public class ForeachEditorDialog
           if (guardchange) {
             template.setGuard(guard);
           }
-          final SelectionOwner panel = mRoot.getComponentsPanel();
-          final Command command = new EditCommand(mForeach, template, panel);
+          final Command command = new EditCommand(mForeach, template, mPanel);
           mRoot.getUndoInterface().executeCommand(command);
         }
       }
@@ -342,6 +341,7 @@ public class ForeachEditorDialog
   //# Data Members
   // Dialog state
   private final ModuleWindowInterface mRoot;
+  private final SelectionOwner mPanel;
 
   // Swing components
   private JPanel mMainPanel;

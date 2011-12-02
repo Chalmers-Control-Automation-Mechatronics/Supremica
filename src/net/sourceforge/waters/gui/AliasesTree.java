@@ -48,6 +48,7 @@ import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.TypelessForeachTransferable;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -66,7 +67,6 @@ import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.ConstantAliasSubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
-import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -314,6 +314,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     }
   }
 
+  //to do: implement for tree
   public ListInsertPosition getInsertPosition(final Proxy proxy)
   {
     final ListSubject<? extends ProxySubject> list =
@@ -375,21 +376,10 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     final Proxy anchor = getSelectionAnchor();
     final DataFlavor flavor =
       mAcceptedDataFlavorVisitor.getDataFlavor(anchor);
-    final ListSubject<? extends ProxySubject> listInModule;
-    if (anchor instanceof ForeachSubject) {
-      final ForeachSubject foreach = (ForeachSubject) anchor;
-      listInModule = foreach.getBodyModifiable();
-    } else if (anchor instanceof EventAliasProxy) {
-      final ExpressionProxy exp = ((EventAliasProxy) anchor).getExpression();
-      if (exp instanceof EventListExpressionProxy) {
-        final EventListExpressionSubject event =
-          (EventListExpressionSubject) exp;
-        listInModule = event.getEventListModifiable();
-      } else {
-        listInModule = getRootList();
-      }
-    } else {
-      listInModule = getRootList();
+
+    final ListSubject<? extends ProxySubject> listInModule = mModel.getChildren(anchor);
+    if(listInModule == null){
+      return null;
     }
 
     final int pos = listInModule.size();
@@ -572,6 +562,8 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
       return new IdentifierTransferable(items);
     } else if (dataFlavor == WatersDataFlavor.EVENT_ALIAS_LIST) {
       return new EventAliasTransferable(items);
+    }else if(dataFlavor == WatersDataFlavor.TYPELESS_FOREACH){
+      return new TypelessForeachTransferable(items);
     } else
       return null;
   }
@@ -720,7 +712,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     @Override
     public Object visitForeachProxy(final ForeachProxy foreach)
     {
-      return new ForeachEditorDialog(mRoot, (ForeachSubject) foreach);
+      return new ForeachEditorDialog(mRoot, AliasesTree.this, (ForeachSubject) foreach);
     }
 
     @Override
@@ -945,12 +937,18 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     @Override
     public Object visitForeachProxy(final ForeachProxy foreach)
     {
-      final Subject subject = (Subject) foreach;
-      if (SubjectTools.getAncestor(subject, EventAliasSubject.class) != null) {
-        return WatersDataFlavor.IDENTIFIER_LIST;
+      if (foreach.getBody().isEmpty()) {
+        return WatersDataFlavor.TYPELESS_FOREACH;
       } else {
-        return getSupportedDataFlavor();
+        final List<Proxy> list = foreach.getBody();
+        for (int i = 0; i < list.size(); i++) {
+          final DataFlavor flavor = getDataFlavor(list.get(i));
+          if( flavor != WatersDataFlavor.TYPELESS_FOREACH){
+            return flavor;
+          }
+        }
       }
+      return WatersDataFlavor.TYPELESS_FOREACH;
     }
 
     @Override

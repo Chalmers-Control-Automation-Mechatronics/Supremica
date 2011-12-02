@@ -86,4 +86,7 @@ public class WatersDataFlavor
   public static final DataFlavor PRODUCT_DES =
     new DataFlavor(ProductDESTransferable.class, "ProductDESProxy");
 
+  public static final DataFlavor TYPELESS_FOREACH =
+    new DataFlavor(TypelessForeachTransferable.class, "List<Proxy>");
+
 }

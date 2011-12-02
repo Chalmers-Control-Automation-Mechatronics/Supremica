@@ -13,9 +13,15 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
-
 import net.sourceforge.waters.gui.ForeachEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.TypelessForeachTransferable;
+import net.sourceforge.waters.plain.module.ForeachElement;
+import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -49,13 +55,49 @@ public class InsertForeachAction
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();
     if (root != null) {
-      new ForeachEditorDialog(root);
+      final FocusTracker tracker = getFocusTracker();
+      final SelectionOwner panel = tracker.getWatersSelectionOwner();
+
+      new ForeachEditorDialog(root, panel);
     }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  public void update(final EditorChangedEvent event)
+  {
+    switch (event.getKind()) {
+    case SELECTION_CHANGED:
+      updateEnabledStatus();
+      break;
+    default:
+      break;
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
+  {
+    final FocusTracker tracker = getFocusTracker();
+    final SelectionOwner watersOwner = tracker.getWatersSelectionOwner();
+    final boolean enabled;
+    if (watersOwner != null) {
+      enabled = watersOwner.canPaste(TEMPLATE_TRANSFERABLE);
+    } else {
+      enabled = false;
+    }
+    setEnabled(enabled);
   }
 
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+  private static final TypelessForeachTransferable TEMPLATE_TRANSFERABLE =
+    new TypelessForeachTransferable(new ForeachElement
+      (":dummy", new SimpleIdentifierElement(":dummy")));
 
 }
