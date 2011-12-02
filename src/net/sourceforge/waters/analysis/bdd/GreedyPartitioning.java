@@ -12,8 +12,9 @@ package net.sourceforge.waters.analysis.bdd;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.SortedSet;
+import java.util.List;
 import net.sf.javabdd.BDDFactory;
 
 
@@ -38,10 +39,10 @@ class GreedyPartitioning<P extends PartitionBDD>
   //#########################################################################
   //# Algorithm
   @Override
-  SortedSet<P> mergePartitions(final AutomatonBDD[] automatonBDDs)
+  void setUpAndMerge(final AutomatonBDD[] automatonBDDs)
   {
     final BDDFactory factory = getBDDFactory();
-    final SortedSet<P> partitions = getPartitions();
+    final List<P> partitions = getFullPartition();
     final int limit = getPartitioningSizeLimit();
     if (partitions.isEmpty()) {
       // nothing ...
@@ -74,8 +75,18 @@ class GreedyPartitioning<P extends PartitionBDD>
       }
       partitions.clear();
       partitions.addAll(completed);
+      Collections.sort(partitions);
     }
-    return partitions;
+  }
+
+  @Override
+  List<P> nextGroup(final boolean stable)
+  {
+    if (stable) {
+      return null;
+    } else {
+      return getFullPartition();
+    }
   }
 
 
@@ -84,7 +95,7 @@ class GreedyPartitioning<P extends PartitionBDD>
   private P merge(final P part, final AutomatonBDD[] automatonBDDs)
   {
     final BDDFactory factory = getBDDFactory();
-    final SortedSet<P> partitions = getPartitions();
+    final List<P> partitions = getFullPartition();
     final int limit = getPartitioningSizeLimit();
     final BitSet automata0 = part.getAutomata();
     PartitionBDD bestcomposition = null;

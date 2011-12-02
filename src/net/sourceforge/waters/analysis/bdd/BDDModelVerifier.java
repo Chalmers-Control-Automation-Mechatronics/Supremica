@@ -402,9 +402,8 @@ public abstract class BDDModelVerifier
         transcount0++;
       }
     }
-    final Collection<TransitionPartitionBDD> transitions =
-      transPartitioning.mergePartitions(mAutomatonBDDs);
-    mTransitionBDDs = new ArrayList<TransitionPartitionBDD>(transitions);
+    transPartitioning.setUpAndMerge(mAutomatonBDDs);
+    mTransitionBDDs = transPartitioning.getFullPartition();
     final int transcount1 = mTransitionBDDs.size();
     final Logger logger = getLogger();
     if (logger.isDebugEnabled() && transcount0 > transcount1) {

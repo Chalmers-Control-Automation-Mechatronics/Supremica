@@ -15,8 +15,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 import net.sf.javabdd.BDDFactory;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -60,8 +61,7 @@ class AutomatonPartitioning
   //#########################################################################
   //# Algorithm
   @Override
-  SortedSet<TransitionPartitionBDD> mergePartitions
-    (final AutomatonBDD[] automatonBDDs)
+  void setUpAndMerge(final AutomatonBDD[] automatonBDDs)
   {
     final int numEvents = mEventMap.size();
     final int threshold = (int) Math.ceil(THRESHOLD * numEvents);
@@ -72,7 +72,7 @@ class AutomatonPartitioning
       }
     }
     final BDDFactory factory = getBDDFactory();
-    final SortedSet<TransitionPartitionBDD> partitions = getPartitions();
+    final List<TransitionPartitionBDD> partitions = getFullPartition();
     partitions.clear();
     while (!mEventMap.isEmpty()) {
       final Collection<EventInfo> events = mEventMap.values();
@@ -111,7 +111,34 @@ class AutomatonPartitioning
       }
       partitions.add(part);
     }
-    return partitions;
+    Collections.sort(partitions);
+  }
+
+  @Override
+  List<TransitionPartitionBDD> nextGroup(final boolean stable)
+  {
+    if (mIterator == null) {
+      final List<TransitionPartitionBDD> partitions = getFullPartition();
+      mIterator = partitions.iterator();
+      if (!mIterator.hasNext()) {
+        return null;
+      }
+    }
+    if (stable) {
+      if (!mIterator.hasNext()) {
+        final List<TransitionPartitionBDD> partitions = getFullPartition();
+        mIterator = partitions.iterator();
+      }
+      mCurrent = mIterator.next();
+      if (mCurrent == mOldestStable) {
+        return null;
+      } else if (mOldestStable == null) {
+        mOldestStable = mCurrent;
+      }
+    } else {
+      mOldestStable = null;
+    }
+    return Collections.singletonList(mCurrent);
   }
 
 
@@ -248,6 +275,9 @@ class AutomatonPartitioning
   //#########################################################################
   //# Data Members
   private final Map<EventProxy,EventInfo> mEventMap;
+  private TransitionPartitionBDD mCurrent;
+  private TransitionPartitionBDD mOldestStable;
+  private Iterator<TransitionPartitionBDD> mIterator;
 
 
   //#########################################################################

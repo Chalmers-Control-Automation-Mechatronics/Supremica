@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -221,9 +220,8 @@ public class BDDSafetyVerifier
           }
         }
         final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
-        final Collection<ConditionPartitionBDD> conditions =
-          condPartitioning.mergePartitions(automatonBDDs);
-        mConditionBDDs = new ArrayList<ConditionPartitionBDD>(conditions);
+          condPartitioning.setUpAndMerge(automatonBDDs);
+        mConditionBDDs = condPartitioning.getFullPartition();
         final int condcount1 = mConditionBDDs.size();
         if (logger.isDebugEnabled() && condcount0 > condcount1) {
           logger.debug("Merged conditions: " + condcount0 +

@@ -9,9 +9,8 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import java.util.ArrayList;
+import java.util.List;
 import net.sf.javabdd.BDDFactory;
 
 
@@ -28,7 +27,7 @@ abstract class Partitioning<P extends PartitionBDD>
                final Class<P> clazz,
                final int partitioningSizeLimit)
   {
-    mPartitions = new TreeSet<P>();
+    mFullPartition = new ArrayList<P>();
     mBDDFactory = factory;
     mClass = clazz;
     mPartitioningSizeLimit = partitioningSizeLimit;
@@ -37,14 +36,14 @@ abstract class Partitioning<P extends PartitionBDD>
 
   //#########################################################################
   //# Simple Access
-  SortedSet<P> getPartitions()
-  {
-    return mPartitions;
-  }
-
   void add(final P part)
   {
-    mPartitions.add(part);
+    mFullPartition.add(part);
+  }
+
+  List<P> getFullPartition()
+  {
+    return mFullPartition;
   }
 
   BDDFactory getBDDFactory()
@@ -64,12 +63,14 @@ abstract class Partitioning<P extends PartitionBDD>
 
   //#########################################################################
   //# Algorithm
-  abstract SortedSet<P> mergePartitions(final AutomatonBDD[] automatonBDDs);
+  abstract void setUpAndMerge(final AutomatonBDD[] automatonBDDs);
+
+  abstract List<P> nextGroup(boolean stable);
 
 
   //#########################################################################
   //# Data Members
-  private final SortedSet<P> mPartitions;
+  private final List<P> mFullPartition;
   private final BDDFactory mBDDFactory;
   private final Class<P> mClass;
   private final int mPartitioningSizeLimit;
