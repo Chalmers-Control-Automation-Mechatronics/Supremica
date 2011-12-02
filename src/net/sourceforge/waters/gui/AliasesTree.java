@@ -314,13 +314,12 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
     }
   }
 
-  //to do: implement for tree
   public ListInsertPosition getInsertPosition(final Proxy proxy)
   {
-    final ListSubject<? extends ProxySubject> list =
-      (ListSubject<? extends ProxySubject>) getRootList();
-    final int inspos = list.size();
-    return new ListInsertPosition(list, inspos);
+    //proxy is never used??
+    final Proxy anchor = getSelectionAnchor();
+    final ListSubject<? extends ProxySubject> list = mModel.getChildren(anchor);
+    return new ListInsertPosition(list, list.size());
   }
 
   public void insertCreatedItem(final Proxy proxy, final Object insobj)
