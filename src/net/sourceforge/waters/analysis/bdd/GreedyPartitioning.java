@@ -39,7 +39,7 @@ class GreedyPartitioning<P extends PartitionBDD>
   //#########################################################################
   //# Algorithm
   @Override
-  void setUpAndMerge(final AutomatonBDD[] automatonBDDs)
+  void merge(final AutomatonBDD[] automatonBDDs)
   {
     final BDDFactory factory = getBDDFactory();
     final List<P> partitions = getFullPartition();
@@ -77,6 +77,12 @@ class GreedyPartitioning<P extends PartitionBDD>
       partitions.addAll(completed);
       Collections.sort(partitions);
     }
+  }
+
+  @Override
+  List<P> startIteration()
+  {
+    return getFullPartition();
   }
 
   @Override

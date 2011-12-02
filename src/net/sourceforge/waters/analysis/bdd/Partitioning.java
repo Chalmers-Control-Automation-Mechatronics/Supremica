@@ -63,8 +63,32 @@ abstract class Partitioning<P extends PartitionBDD>
 
   //#########################################################################
   //# Algorithm
-  abstract void setUpAndMerge(final AutomatonBDD[] automatonBDDs);
+  /**
+   * Merges the BDDs in this partitioning. This method seeks to reduce
+   * the number of individual BDDs in the partitioning based on configuration
+   * settings.
+   * @param automatonBDDs Array of automaton BDDs constituting the model.
+   */
+  abstract void merge(final AutomatonBDD[] automatonBDDs);
 
+  /**
+   * Initialises a state-search iteration using this partitioning.
+   * @return List of BDDs to be used for the first iteration,
+   *         or <CODE>null</CODE> to indicate that iteration can be stopped
+   *         because there will be no change.
+   */
+  abstract List<P> startIteration();
+
+  /**
+   * Gets the next sub-partition to be used during state-search iteration
+   * using this partitioning.
+   * @param  stable    <CODE>true</CODE> to indicate that an iteration using
+   *                   the previous BDDs returned by this method resulted
+   *                   in no change.
+   * @return List of BDDs to be used for the next iteration,
+   *         or <CODE>null</CODE> to indicate that iteration can be stopped
+   *         because there will be no further change.
+   */
   abstract List<P> nextGroup(boolean stable);
 
 

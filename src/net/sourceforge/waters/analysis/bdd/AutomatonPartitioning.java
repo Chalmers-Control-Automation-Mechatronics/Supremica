@@ -61,7 +61,7 @@ class AutomatonPartitioning
   //#########################################################################
   //# Algorithm
   @Override
-  void setUpAndMerge(final AutomatonBDD[] automatonBDDs)
+  void merge(final AutomatonBDD[] automatonBDDs)
   {
     final int numEvents = mEventMap.size();
     final int threshold = (int) Math.ceil(THRESHOLD * numEvents);
@@ -115,16 +115,28 @@ class AutomatonPartitioning
   }
 
   @Override
+  List<TransitionPartitionBDD> startIteration()
+  {
+    final List<TransitionPartitionBDD> partitions = getFullPartition();
+    mIterator = partitions.iterator();
+    if (mIterator.hasNext()) {
+      mCurrentIsStable = true;
+      mOldestStable = null;
+      mCurrent = mIterator.next();
+      return Collections.singletonList(mCurrent);
+    } else {
+      mOldestStable = mCurrent = null;
+      return null;
+    }
+  }
+
+  @Override
   List<TransitionPartitionBDD> nextGroup(final boolean stable)
   {
-    if (mIterator == null) {
-      final List<TransitionPartitionBDD> partitions = getFullPartition();
-      mIterator = partitions.iterator();
-      if (!mIterator.hasNext()) {
-        return null;
-      }
-    }
     if (stable) {
+      if (mCurrentIsStable && mOldestStable == null) {
+        mOldestStable = mCurrent;
+      }
       if (!mIterator.hasNext()) {
         final List<TransitionPartitionBDD> partitions = getFullPartition();
         mIterator = partitions.iterator();
@@ -132,10 +144,10 @@ class AutomatonPartitioning
       mCurrent = mIterator.next();
       if (mCurrent == mOldestStable) {
         return null;
-      } else if (mOldestStable == null) {
-        mOldestStable = mCurrent;
       }
+      mCurrentIsStable = true;
     } else {
+      mCurrentIsStable = false;
       mOldestStable = null;
     }
     return Collections.singletonList(mCurrent);
@@ -213,9 +225,10 @@ class AutomatonPartitioning
       mEvents = new ArrayList<EventInfo>(numEvents);
       for (final EventProxy event : events) {
         final EventInfo info = mEventMap.get(event);
-        assert info != null : "Unrecognised event in partitioning!";
-        mEvents.add(info);
-        info.addAutomaton(this);
+        if (info != null) {
+          mEvents.add(info);
+          info.addAutomaton(this);
+        }
       }
       mCloudSize = -1;
     }
@@ -277,6 +290,7 @@ class AutomatonPartitioning
   private final Map<EventProxy,EventInfo> mEventMap;
   private TransitionPartitionBDD mCurrent;
   private TransitionPartitionBDD mOldestStable;
+  private boolean mCurrentIsStable;
   private Iterator<TransitionPartitionBDD> mIterator;
 
 

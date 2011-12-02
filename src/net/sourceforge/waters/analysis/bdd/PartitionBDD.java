@@ -9,15 +9,18 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -188,6 +191,31 @@ abstract class PartitionBDD
     mBDD = altBDD;
     mNodeCount = altnodecount;
     return mBDD;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final List<EventProxy> events =
+      new ArrayList<EventProxy>(mComponents.keySet());
+    Collections.sort(events);
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append(ProxyTools.getShortClassName(this));
+    buffer.append('{');
+    boolean first = true;
+    for (final EventProxy event : events) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      buffer.append(event.getName());
+    }
+    buffer.append('}');
+    return buffer.toString();
   }
 
 

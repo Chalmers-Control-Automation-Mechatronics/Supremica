@@ -252,8 +252,9 @@ public class BDDConflictChecker
       final BDD nondeadlock = mMarkingBDD.id();
       final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
       final BDDFactory factory = getBDDFactory();
-      final List<TransitionPartitionBDD> partition = getTransitionBDDs();
-      for (final TransitionPartitionBDD part : partition) {
+      final List<TransitionPartitionBDD> partitioning =
+        getTransitionPartitioning().getFullPartition();
+      for (final TransitionPartitionBDD part : partitioning) {
         final BDD nondeadlockPart =
           part.getNonDeadlockBDD(automatonBDDs, factory);
         nondeadlock.orWith(nondeadlockPart);

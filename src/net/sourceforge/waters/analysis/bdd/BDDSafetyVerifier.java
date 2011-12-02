@@ -220,7 +220,7 @@ public class BDDSafetyVerifier
           }
         }
         final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
-          condPartitioning.setUpAndMerge(automatonBDDs);
+          condPartitioning.merge(automatonBDDs);
         mConditionBDDs = condPartitioning.getFullPartition();
         final int condcount1 = mConditionBDDs.size();
         if (logger.isDebugEnabled() && condcount0 > condcount1) {
