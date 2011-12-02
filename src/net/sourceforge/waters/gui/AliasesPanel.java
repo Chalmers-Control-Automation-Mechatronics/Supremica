@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -17,49 +16,64 @@ import javax.swing.JPanel;
 
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 
+
 /**
- * @author cph4
+ * The aliases panel inside the definitions tab of the module editor.
+ * This panel contains two tree views sitting on top of each other,
+ * for editing the constant aliases and the event aliases of a module,
+ * respectively.
+ *
+ * @see ConstantAliasTree
+ * @see EventAliasTree
+ * @author Carly Hona
  */
+
 public class AliasesPanel extends JPanel
 {
+
+  //#########################################################################
+  //# Constructors
   public AliasesPanel(final ModuleWindowInterface root,
-                              final WatersPopupActionManager manager)
-    {
+                      final WatersPopupActionManager manager)
+  {
     mConstantAliasesPanel = new ConstantAliasesTree(root, manager);
     mEventsAliasesPanel = new EventAliasesTree(root, manager);
-    setBackground(EditorColor.BACKGROUNDCOLOR);
     setLayout(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
-
     constraints.gridx = 0;
     constraints.gridy = GridBagConstraints.RELATIVE;
     constraints.anchor = GridBagConstraints.NORTHWEST;
-
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weightx = 1.0;
+    constraints.weighty = 0.0;
     add(mConstantAliasesPanel, constraints);
-
-    add(mEventsAliasesPanel, constraints);
+    constraints.fill = GridBagConstraints.BOTH;
     constraints.weighty = 1.0;
-    final JPanel invisible1 = new JPanel();
-    invisible1.setPreferredSize(new Dimension(0,0));
-    add(invisible1, constraints);
-    constraints.gridx = 1;
-    constraints.gridy = 0;
-    constraints.weightx = 1;
-    constraints.weighty = 0;
-    final JPanel invisible2 = new JPanel();
-    invisible2.setPreferredSize(new Dimension(0,0));
-    add(invisible2, constraints);
-    }
+    add(mEventsAliasesPanel, constraints);
+  }
 
-  public ConstantAliasesTree getConstantAliasesPanel(){
+
+  //#########################################################################
+  //# Simple Access
+  public ConstantAliasesTree getConstantAliasesPanel()
+  {
     return mConstantAliasesPanel;
   }
 
-  public EventAliasesTree getEventAliasesPanel(){
+  public EventAliasesTree getEventAliasesPanel()
+  {
     return mEventsAliasesPanel;
   }
 
-  private static final long serialVersionUID = 1L;
+
+  //#########################################################################
+  //# Data Members
   private final ConstantAliasesTree mConstantAliasesPanel;
-  private final  EventAliasesTree mEventsAliasesPanel;
+  private final EventAliasesTree mEventsAliasesPanel;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }
