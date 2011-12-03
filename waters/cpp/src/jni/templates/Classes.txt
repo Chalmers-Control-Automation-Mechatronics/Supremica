@@ -211,6 +211,10 @@ glue class AbortException extends Exception {
   AbortException();
 }
 
+glue class EventNotFoundException extends Exception {
+  EventNotFoundException(glue NamedProxy container, String name);
+}
+
 glue class NondeterministicDESException extends Exception {
   NondeterministicDESException(glue AutomatonProxy aut, glue StateProxy state);
   NondeterministicDESException(glue AutomatonProxy aut,
