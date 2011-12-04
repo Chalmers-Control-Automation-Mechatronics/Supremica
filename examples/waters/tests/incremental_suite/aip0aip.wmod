@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="aip0aip" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment>All the AIP models except for[AS3] and[TU4] which are disjoint from the rest.
-The model is controllable but blocking. It has 1024896624 reachable states and a diameter of 369.</ns2:Comment>
+The model is controllable and nonblocking. It has 1024896624 reachable states and a diameter of 369.</ns2:Comment>
 <ConstantAliasList>
 <ConstantAlias Name=":symbols">
 <ConstantAliasExpression>
