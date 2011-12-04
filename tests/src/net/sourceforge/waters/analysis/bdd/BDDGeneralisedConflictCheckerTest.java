@@ -14,7 +14,6 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.
   AbstractGeneralisedConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -40,10 +39,13 @@ public class BDDGeneralisedConflictCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ConflictChecker
-    createModelVerifier(final ProductDESProxyFactory factory)
+  protected BDDConflictChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
-    return new BDDConflictChecker(factory);
+    final BDDConflictChecker checker = new BDDConflictChecker(factory);
+    checker.setTransitionPartitioningStrategy
+      (TransitionPartitioningStrategy.AUTOMATA);
+    return checker;
   }
 
 }

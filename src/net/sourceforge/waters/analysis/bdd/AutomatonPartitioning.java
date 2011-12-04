@@ -115,6 +115,12 @@ class AutomatonPartitioning
   }
 
   @Override
+  boolean isStrictBFS()
+  {
+    return getFullPartition().size() <= 1;
+  }
+
+  @Override
   List<TransitionPartitionBDD> startIteration()
   {
     final List<TransitionPartitionBDD> partitions = getFullPartition();

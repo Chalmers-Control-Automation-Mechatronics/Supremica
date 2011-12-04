@@ -523,7 +523,7 @@ public abstract class BDDModelVerifier
     while (group != null) {
       final int numnodes = mBDDFactory.getNodeNum();
       if (logger.isDebugEnabled()) {
-        logger.debug("Coreachability " + (level++) + ", " +
+        logger.debug("Coreachability " + level + ", " +
                      numnodes + " nodes ...");
       }
       if (numnodes > mPeakNodes) {
@@ -555,6 +555,7 @@ public abstract class BDDModelVerifier
       current.free();
       current = prev;
       if (!stable) {
+        level++;
         reorder();
       }
       group = mTransitionPartitioning.nextGroup(stable);
@@ -599,75 +600,118 @@ public abstract class BDDModelVerifier
     for (final TransitionPartitionBDD part : partitioning) {
       part.buildBackwardCubes(mAutomatonBDDs, mBDDFactory);
     }
+    final BDDFactory bddFactory = getBDDFactory();
     BDD current = target;
-    final ProductDESProxyFactory factory = getFactory();
     final Map<AutomatonProxy,StateProxy> statemap =
       new HashMap<AutomatonProxy,StateProxy>(mNumAutomata);
     final List<TraceStepProxy> trace = new LinkedList<TraceStepProxy>();
     final ListIterator<BDD> liter = mLevels.listIterator(level);
     while (liter.hasPrevious()) {
-      final BDD prev = liter.previous();
+      TransitionPartitionBDD foundPart = null;
+      BDD foundPrev = bddFactory.zero();
+      BDD foundPreds = bddFactory.zero();
+      BDD foundPrimed = bddFactory.zero();
+      BDD prev = liter.previous();
+      parts:
       for (final TransitionPartitionBDD part : partitioning) {
         final BDDPairing renaming = part.getCurrentToNext();
-        BDD currentPrimed = current.id();
+        final BDD currentPrimed = current.id();
         currentPrimed.replaceWith(renaming);
         final BDD transpart = part.getBDD();
         final BDDVarSet cube = part.getNextStateCube();
-        BDD preds = currentPrimed.relprod(transpart, cube);
-        preds.andWith(prev.id());
-        if (preds.isZero()) {
-          currentPrimed.free();
-        } else {
-          final Map<EventProxy,TransitionPartitionBDD> map =
-            part.getTransitionComponents();
-          final Iterator<Map.Entry<EventProxy,TransitionPartitionBDD>> iter =
-            map.entrySet().iterator();
-          Map.Entry<EventProxy,TransitionPartitionBDD> entry = iter.next();
-          if (iter.hasNext()) {
-            while (true) {
-              currentPrimed.free();
-              preds.free();
-              final TransitionPartitionBDD subpart = entry.getValue();
-              final BDDPairing subrenaming = subpart.getCurrentToNext();
-              currentPrimed = current.id();
-              currentPrimed.replaceWith(subrenaming);
-              final BDD subtranspart = subpart.getBDD();
-              final BDDVarSet subcube = subpart.getNextStateCube();
-              preds = currentPrimed.relprod(subtranspart, subcube);
-              preds.andWith(prev.id());
-              if (!preds.isZero()) {
-                break;
+        final BDD preds = currentPrimed.relprod(transpart, cube);
+        BDD intersection = preds.and(prev);
+        if (!intersection.isZero()) {
+          intersection.free();
+          foundPrev.free();
+          foundPreds.free();
+          foundPrimed.free();
+          foundPart = part;
+          foundPrev = prev;
+          foundPreds = preds;
+          foundPrimed = currentPrimed;
+          if (!mTransitionPartitioning.isStrictBFS()) {
+            while (liter.hasPrevious()) {
+              prev = liter.previous();
+              intersection = preds.and(prev);
+              if (intersection.isZero()) {
+                continue parts;
               }
-              entry = iter.next();
+              intersection.free();
+              foundPrev.free();
+              foundPrev = prev;
             }
           }
-          current.free();
-          final EventProxy event = entry.getKey();
-          if (isDeterministic(event)) {
-            currentPrimed.free();
-          } else {
-            preds.free();
-            final TransitionPartitionBDD subpart = entry.getValue();
-            preds = getDeterminisedPredecessorsBDD
-              (currentPrimed, event, subpart, statemap);
-            preds.andWith(prev.id());
-          }
-          final TraceStepProxy step =
-            factory.createTraceStepProxy(event, statemap);
-          trace.add(0, step);
-          statemap.clear();
-          current = preds;
           break;
         }
+        preds.free();
+        currentPrimed.free();
       }
-      prev.free();
+      final BDD preds = createTraceStep(foundPart, foundPrev, current,
+                                        foundPreds, foundPrimed, trace);
+      if (foundPrev != prev) {
+        liter.next();
+      }
+      foundPrev.free();
+      current.free();
+      current = preds;
     }
     if (!isDeterministic(null)) {
       getDeterminisedInitialStateMap(current, statemap);
     }
-    final TraceStepProxy step = factory.createTraceStepProxy(null, statemap);
+    final ProductDESProxyFactory desFactory = getFactory();
+    final TraceStepProxy step = desFactory.createTraceStepProxy(null, statemap);
     trace.add(0, step);
     return trace;
+  }
+
+  BDD createTraceStep(final TransitionPartitionBDD part,
+                      final BDD source,
+                      final BDD target,
+                      BDD preds,
+                      BDD targetPrimed,
+                      final List<TraceStepProxy> trace)
+  {
+    final Map<EventProxy,TransitionPartitionBDD> map =
+      part.getTransitionComponents();
+    final Iterator<Map.Entry<EventProxy,TransitionPartitionBDD>> iter =
+      map.entrySet().iterator();
+    Map.Entry<EventProxy,TransitionPartitionBDD> entry = iter.next();
+    if (iter.hasNext()) {
+      while (true) {
+        preds.free();
+        targetPrimed.free();
+        final TransitionPartitionBDD subpart = entry.getValue();
+        final BDDPairing subrenaming = subpart.getCurrentToNext();
+        targetPrimed = target.id();
+        targetPrimed.replaceWith(subrenaming);
+        final BDD subtranspart = subpart.getBDD();
+        final BDDVarSet subcube = subpart.getNextStateCube();
+        preds = targetPrimed.relprod(subtranspart, subcube);
+        preds.andWith(source.id());
+        if (!preds.isZero()) {
+          break;
+        }
+        entry = iter.next();
+      }
+    }
+    final EventProxy event = entry.getKey();
+    final Map<AutomatonProxy,StateProxy> statemap;
+    if (isDeterministic(event)) {
+      statemap = null;
+      targetPrimed.free();
+    } else {
+      preds.free();
+      final TransitionPartitionBDD subpart = entry.getValue();
+      statemap = new HashMap<AutomatonProxy,StateProxy>(mNumAutomata);
+      preds = getDeterminisedPredecessorsBDD
+        (targetPrimed, event, subpart, statemap);
+      preds.andWith(source.id());
+    }
+    final ProductDESProxyFactory factory = getFactory();
+    final TraceStepProxy step = factory.createTraceStepProxy(event, statemap);
+    trace.add(0, step);
+    return preds;
   }
 
   void resetReorderIndex()

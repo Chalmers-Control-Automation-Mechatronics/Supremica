@@ -80,6 +80,12 @@ class GreedyPartitioning<P extends PartitionBDD>
   }
 
   @Override
+  boolean isStrictBFS()
+  {
+    return true;
+  }
+
+  @Override
   List<P> startIteration()
   {
     return getFullPartition();
