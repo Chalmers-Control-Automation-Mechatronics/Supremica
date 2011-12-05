@@ -39,6 +39,7 @@ import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -386,6 +387,10 @@ public class EventTableModel
       mEvents.remove(row);
     }
     fireTableRowsDeleted(row0, row1);
+  }
+
+  public ListSubject<? extends ProxySubject> getList(){
+    return mRoot.getModuleSubject().getEventDeclListModifiable();
   }
 
 

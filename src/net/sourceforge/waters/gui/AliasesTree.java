@@ -73,8 +73,8 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
- * The Aliases Panel which shows under the definitions tab of the module
- * editor ({@link org.supremica.gui.ide.EditorPanel EditorPanel}).
+ * The Aliases Tree used to view the constant aliases and the event aliases
+ * of a module.
  *
  * @author Carly Hona, Robi Malik
  */
@@ -224,7 +224,8 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
 
   public boolean canSelectMore()
   {
-    return getSelectionCount() < getRowCount();
+    // TODO change to work for components tree also
+    return getSelectionCount() < getRowCount()-1;
   }
 
   public boolean isSelected(final Proxy proxy)
@@ -255,7 +256,8 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
   {
     final int total = getRowCount();
     final List<Proxy> result = new ArrayList<Proxy>(total);
-    for (int row = 0; row < total; row++) {
+    //TODO check root is visible to account for diff trees ie.component tree
+    for (int row = 1; row < total; row++) {
       final TreePath path = getPathForRow(row);
       final Proxy proxy = (Proxy) path.getLastPathComponent();
       result.add(proxy);
@@ -316,7 +318,6 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
 
   public ListInsertPosition getInsertPosition(final Proxy proxy)
   {
-    //proxy is never used??
     final Proxy anchor = getSelectionAnchor();
     final ListSubject<? extends ProxySubject> list = mModel.getChildren(anchor);
     return new ListInsertPosition(list, list.size());
@@ -618,8 +619,8 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
   //#########################################################################
   //# Inner Class EditorAliasMouseListener
   /**
-   * A simple mouse listener to trigger opening the event declaration editor
-   * dialog by double-click, and to trigger a popup menu.
+   * A simple mouse listener to trigger opening an editor dialog or
+   * expand/collapse tree by double-click, or a popup menu by right-click.
    */
   private class EditorAliasMouseListener extends MouseAdapter
   {
@@ -671,7 +672,7 @@ public abstract class AliasesTree extends JTree implements SelectionOwner,
 
 
   //#########################################################################
-  //# Inner Class EditorDialogVisitor
+  //# Inner Class DoubleClickVisitor
   private class DoubleClickVisitor extends AbstractModuleProxyVisitor
   {
 

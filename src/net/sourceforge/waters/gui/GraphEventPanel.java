@@ -7,7 +7,6 @@
 //# $Id$
 //###########################################################################
 
-
 package net.sourceforge.waters.gui;
 
 import java.awt.Component;
@@ -18,16 +17,6 @@ import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetListener;
-import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
@@ -41,10 +30,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import javax.swing.Action;
+import javax.swing.DropMode;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -52,7 +44,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
-
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
@@ -103,18 +94,21 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 
 /**
- * <p>The Events panel which sits next to the graph editor panel.</p>
+ * <p>
+ * The Events panel which sits next to the graph editor panel.
+ * </p>
  *
- * <p>This is used to view the module events which have been selected for
- * use with this particular component, and selecting other events from the
- * module for use with this component.</p>
+ * <p>
+ * This is used to view the module events which have been selected for use
+ * with this particular component, and selecting other events from the module
+ * for use with this component.
+ * </p>
  *
  * @author Gian Perrone, Robi Malik
  */
 
-public class GraphEventPanel
-  extends NonTypingTable
-  implements FocusListener, DragGestureListener, SelectionOwner
+public class GraphEventPanel extends NonTypingTable implements FocusListener,
+  SelectionOwner// DragGestureListener,
 {
 
   //#########################################################################
@@ -135,14 +129,13 @@ public class GraphEventPanel
     final ExpressionParser parser = modroot.getExpressionParser();
     final GraphEventPanelEventHandler handler =
       new GraphEventPanelEventHandler();
-    final TableModel model = new EventTableModel(graph, handler, modroot);
+    mModel = new EventTableModel(graph, handler, modroot);
     mRoot = eroot;
     mPopupFactory = new GraphEventPanelPopupFactory(manager);
     mDeleteVisitor = new DeleteVisitor();
     mReplaceVisitor = new ReplaceVisitor();
     mObservers = null;
-
-    setModel(model);
+    setModel(mModel);
     setTableHeader(null);
     setRowHeight(22);
     setShowGrid(false);
@@ -153,8 +146,7 @@ public class GraphEventPanel
 
     final TableCellRenderer iconrenderer = new IconRenderer(false);
     setDefaultRenderer(Icon.class, iconrenderer);
-    final TableCellRenderer textrenderer0 =
-      getDefaultRenderer(Object.class);
+    final TableCellRenderer textrenderer0 = getDefaultRenderer(Object.class);
     final TableCellRenderer textrenderer1 =
       new RendererNoFocus(textrenderer0, true);
     setDefaultRenderer(Object.class, textrenderer1);
@@ -176,18 +168,17 @@ public class GraphEventPanel
     final ListSelectionListener listener = new SelectionListener();
     selmodel.addListSelectionListener(listener);
 
-    final DragSource dragsource = DragSource.getDefaultDragSource();
-    dragsource.createDefaultDragGestureRecognizer
-      (this, DnDConstants.ACTION_COPY, this);
-    final DropTargetListener dropper = new DropListener();
-    new DropTarget(this, dropper);
+    setTransferHandler(new GraphEventPanelTransferHandler());
+    setDragEnabled(true);
+    setDropMode(DropMode.INSERT);
+    setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    setupSelectionDragHack();
 
     final Action add = manager.getInsertEventLabelAction();
     addKeyboardAction(add);
     addCycleActions();
     manager.installCutCopyPasteActions(this);
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
@@ -366,11 +357,12 @@ public class GraphEventPanel
   public boolean canPaste(final Transferable transferable)
   {
     try {
-      if (transferable.isDataFlavorSupported
-          (WatersDataFlavor.IDENTIFIER_LIST)) {
+      if (transferable
+        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)) {
         @SuppressWarnings("unchecked")
-        final List<Proxy> data = (List<Proxy>)
-          transferable.getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+        final List<Proxy> data =
+          (List<Proxy>) transferable
+            .getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
         for (final Proxy proxy : data) {
           if (!containsEqualIdentifier(proxy)) {
             return true;
@@ -380,7 +372,8 @@ public class GraphEventPanel
       } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
         final String data =
           (String) transferable.getTransferData(DataFlavor.stringFlavor);
-        final ModuleWindowInterface modroot = mRoot.getModuleWindowInterface();
+        final ModuleWindowInterface modroot =
+          mRoot.getModuleWindowInterface();
         final ExpressionParser parser = modroot.getExpressionParser();
         try {
           final IdentifierProxy ident = parser.parseIdentifier(data);
@@ -406,8 +399,9 @@ public class GraphEventPanel
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
       @SuppressWarnings("unchecked")
-      final List<Proxy> data = (List<Proxy>)
-        transferable.getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+      final List<Proxy> data =
+        (List<Proxy>) transferable
+          .getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
       for (final Proxy proxy : data) {
         if (!containsEqualIdentifier(proxy)) {
           final Proxy cloned = cloner.getClone(proxy);
@@ -523,7 +517,8 @@ public class GraphEventPanel
         } else if (bounds.y > rect.y) {
           bounds.y = rect.y;
         } else if (bounds.y + bounds.height < rect.y + rect.height) {
-          bounds.height += (rect.y + rect.height) - (bounds.y + bounds.height);
+          bounds.height +=
+            (rect.y + rect.height) - (bounds.y + bounds.height);
         }
       }
     }
@@ -546,7 +541,6 @@ public class GraphEventPanel
     final EventTableModel model = (EventTableModel) getModel();
     model.close();
   }
-
 
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
@@ -578,7 +572,6 @@ public class GraphEventPanel
     }
   }
 
-
   //#########################################################################
   //# Overrides for Base Class javax.swing.JTable
   public void tableChanged(final TableModelEvent event)
@@ -590,14 +583,14 @@ public class GraphEventPanel
       switch (event.getType()) {
       case TableModelEvent.INSERT:
       case TableModelEvent.DELETE:
-	final Dimension prefsize = getPreferredSize();
-	prefsize.height = calculateHeight();
-	setPreferredSize(prefsize);
-	setPreferredScrollableViewportSize(prefsize);
-	revalidate();
-	break;
+        final Dimension prefsize = getPreferredSize();
+        prefsize.height = calculateHeight();
+        setPreferredSize(prefsize);
+        setPreferredScrollableViewportSize(prefsize);
+        revalidate();
+        break;
       default:
-	break;
+        break;
       }
     }
   }
@@ -620,7 +613,6 @@ public class GraphEventPanel
     return getPreferredSize().height < viewport.getHeight();
   }
 
-
   //#########################################################################
   //# Interface java.awt.event.FocusListener
   public void focusGained(final FocusEvent event)
@@ -637,30 +629,21 @@ public class GraphEventPanel
     }
   }
 
-
-  //#######################################################################
-  //# Interface java.awt.dnd.DragGestureListener
-  public void dragGestureRecognized(final DragGestureEvent event)
-  {
-    final EventTableModel model = (EventTableModel) getModel();
-    final int[] rows = getSelectedRows();
-    if (rows.length == 0) {
-      return;
-    }
-    final List<IdentifierSubject> idents =
-      new ArrayList<IdentifierSubject>(rows.length);
-    for(int i = 0; i < rows.length; i++) {
-      final IdentifierSubject ident = model.getIdentifier(rows[i]);
-      idents.add(ident);
-    }
-    final Transferable trans = new IdentifierTransferable(idents);
-    try {
-      event.startDrag(DragSource.DefaultCopyDrop, trans);
-    } catch (final InvalidDnDOperationException exception) {
-      throw new IllegalArgumentException(exception);
-    }
-  }
-
+  /*
+   * //#######################################################################
+   * //# Interface java.awt.dnd.DragGestureListener public void
+   * dragGestureRecognized(final DragGestureEvent event) { final
+   * EventTableModel model = (EventTableModel) getModel(); final int[] rows =
+   * getSelectedRows(); if (rows.length == 0) { return; } final
+   * List<IdentifierSubject> idents = new
+   * ArrayList<IdentifierSubject>(rows.length); for(int i = 0; i <
+   * rows.length; i++) { final IdentifierSubject ident =
+   * model.getIdentifier(rows[i]); idents.add(ident); } final Transferable
+   * trans = new IdentifierTransferable(idents); try {
+   * event.startDrag(DragSource.DefaultCopyDrop, trans); } catch (final
+   * InvalidDnDOperationException exception) { throw new
+   * IllegalArgumentException(exception); } }
+   */
 
   //#########################################################################
   //# Editing
@@ -668,22 +651,23 @@ public class GraphEventPanel
   {
     if (isEditing()) {
       final SimpleExpressionCell comp =
-	(SimpleExpressionCell) getEditorComponent();
+        (SimpleExpressionCell) getEditorComponent();
       try {
-	comp.commitEdit();
-	if (comp.getValue() == null) {
-	  return;
-	}
+        comp.commitEdit();
+        if (comp.getValue() == null) {
+          return;
+        }
       } catch (final java.text.ParseException exception) {
-	return;
+        return;
       }
       SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            if (!isEditing()) {
-              createEvent();
-            }
+        public void run()
+        {
+          if (!isEditing()) {
+            createEvent();
           }
-        });
+        }
+      });
     } else {
       clearSelection();
       final EventTableModel model = (EventTableModel) getModel();
@@ -705,22 +689,23 @@ public class GraphEventPanel
       return;
     } else if (isEditing()) {
       final SimpleExpressionCell comp =
-	(SimpleExpressionCell) getEditorComponent();
+        (SimpleExpressionCell) getEditorComponent();
       try {
-	comp.commitEdit();
-	if (comp.getValue() == null) {
-	  return;
-	}
+        comp.commitEdit();
+        if (comp.getValue() == null) {
+          return;
+        }
       } catch (final java.text.ParseException exception) {
-	return;
+        return;
       }
       SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            if (!isEditing()) {
-              editEvent(proxy);
-            }
+        public void run()
+        {
+          if (!isEditing()) {
+            editEvent(proxy);
           }
-        });
+        }
+      });
     } else {
       clearSelection();
       addRowSelectionInterval(row, row);
@@ -732,7 +717,6 @@ public class GraphEventPanel
       }
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -770,12 +754,11 @@ public class GraphEventPanel
     fireEditorChangedEvent(event);
   }
 
-
   //#########################################################################
   //# Calculating Column Widths
   /**
-   * Set the table's preferred and minimum size by checking the space
-   * needed for its contents.
+   * Set the table's preferred and minimum size by checking the space needed
+   * for its contents.
    */
   private void setPreferredSizes()
   {
@@ -815,12 +798,12 @@ public class GraphEventPanel
     for (int row = 0; row < rows; row++) {
       final Object value = model.getValueAt(row, 1);
       final Component comp =
-	renderer.getTableCellRendererComponent
-	(this, value, false, false, row, 1);
+        renderer.getTableCellRendererComponent(this, value, false, false,
+                                               row, 1);
       final Dimension size = comp.getPreferredSize();
       final int width = size.width;
       if (width > maxwidth) {
-	maxwidth = width;
+        maxwidth = width;
       }
     }
     return maxwidth;
@@ -829,14 +812,13 @@ public class GraphEventPanel
 
   //#########################################################################
   //# Local Class RendererNoFocus
-  private static class RendererNoFocus
-    implements TableCellRenderer
+  private static class RendererNoFocus implements TableCellRenderer
   {
 
     //#######################################################################
     //# Constructors
     private RendererNoFocus(final TableCellRenderer renderer,
-			    final boolean focusable)
+                            final boolean focusable)
     {
       assert renderer != null;
       mRenderer = renderer;
@@ -845,13 +827,16 @@ public class GraphEventPanel
 
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
-    public Component getTableCellRendererComponent
-      (final JTable table, final Object value, final boolean isSelected,
-       final boolean hasFocus, final int row, final int column)
+    public Component getTableCellRendererComponent(final JTable table,
+                                                   final Object value,
+                                                   final boolean isSelected,
+                                                   final boolean hasFocus,
+                                                   final int row,
+                                                   final int column)
     {
       final Component comp =
-	mRenderer.getTableCellRendererComponent
-	(table, value, isSelected, false, row, column);
+        mRenderer.getTableCellRendererComponent(table, value, isSelected,
+                                                false, row, column);
       comp.setFocusable(mFocusable);
       return comp;
     }
@@ -866,8 +851,7 @@ public class GraphEventPanel
 
   //#########################################################################
   //# Local Class IconRenderer
-  private static class IconRenderer
-    extends DefaultTableCellRenderer
+  private static class IconRenderer extends DefaultTableCellRenderer
   {
 
     //#######################################################################
@@ -879,12 +863,15 @@ public class GraphEventPanel
 
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
-    public Component getTableCellRendererComponent
-      (final JTable table, final Object value, final boolean isSelected,
-       final boolean hasFocus, final int row, final int column)
+    public Component getTableCellRendererComponent(final JTable table,
+                                                   final Object value,
+                                                   final boolean isSelected,
+                                                   final boolean hasFocus,
+                                                   final int row,
+                                                   final int column)
     {
-      super.getTableCellRendererComponent
-        (table, value, isSelected, hasFocus, row, column);
+      super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                                          row, column);
       final Icon icon = (Icon) value;
       setIcon(icon);
       setFocusable(mFocusable);
@@ -903,8 +890,7 @@ public class GraphEventPanel
 
   //#########################################################################
   //# Local Class MouseHandler
-  private class MouseHandler
-    extends MouseAdapter
+  private class MouseHandler extends MouseAdapter
   {
 
     //#######################################################################
@@ -960,8 +946,7 @@ public class GraphEventPanel
 
   //#########################################################################
   //# Local Class SelectionListener
-  private class SelectionListener
-    implements ListSelectionListener
+  private class SelectionListener implements ListSelectionListener
   {
 
     //#######################################################################
@@ -969,67 +954,30 @@ public class GraphEventPanel
     public void valueChanged(final ListSelectionEvent event)
     {
       final ListSelectionModel selmodel =
-	(ListSelectionModel) event.getSource();
+        (ListSelectionModel) event.getSource();
       if (isEditing()) {
-	// When we are editing a cell with invalid contents,
-	// and the user clicks into another row,
-	// we sometimes get spurious selection events.
-	// The following code undoes their effects.
-	final int row = getEditingRow();
-	if (row < getRowCount() &&
-	    (row != selmodel.getMinSelectionIndex() ||
-	     row != selmodel.getMaxSelectionIndex())) {
-	  setRowSelectionInterval(row, row);
-	  getEditorComponent().requestFocusInWindow();
-	}
+        // When we are editing a cell with invalid contents,
+        // and the user clicks into another row,
+        // we sometimes get spurious selection events.
+        // The following code undoes their effects.
+        final int row = getEditingRow();
+        if (row < getRowCount()
+            && (row != selmodel.getMinSelectionIndex() || row != selmodel
+              .getMaxSelectionIndex())) {
+          setRowSelectionInterval(row, row);
+          getEditorComponent().requestFocusInWindow();
+        }
       } else if (event.getValueIsAdjusting()) {
-	// Ignore extra messages ...
+        // Ignore extra messages ...
       } else {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              fireSelectionChanged();
-            }
-          });
+          public void run()
+          {
+            fireSelectionChanged();
+          }
+        });
       }
     }
-
-  }
-
-
-  //#########################################################################
-  //# Local Class DropListener
-  private class DropListener extends DropTargetAdapter
-  {
-
-    //#######################################################################
-    //# Interface java.awt.dnd.DropTargetAdapter
-    public void dragOver(final DropTargetDragEvent event)
-    {
-      final Transferable transferable = event.getTransferable();
-      if (!canPaste(transferable)) {
-        event.rejectDrag();
-      }
-    }
-
-    public void drop(final DropTargetDropEvent event)
-    {
-      try {
-        final Transferable transferable = event.getTransferable();
-        final List<InsertInfo> info = getInsertInfo(transferable);
-        if (info == null) {
-          event.rejectDrop();
-        } else {
-          final Command cmd = new InsertCommand(info, GraphEventPanel.this);
-          cmd.execute();
-          event.dropComplete(true);
-        }
-      } catch (final UnsupportedFlavorException exception) {
-        event.rejectDrop();
-      } catch (final IOException exception) {
-        event.rejectDrop();
-      }
-    }
-
   }
 
 
@@ -1037,8 +985,8 @@ public class GraphEventPanel
   //# Local Class GraphEventPanelEventHandler
   //# (Uses inner class to prevent users other than EventTableModel
   //# from calling these methods.)
-  private class GraphEventPanelEventHandler
-    implements GraphEventHandler, FocusListener
+  private class GraphEventPanelEventHandler implements GraphEventHandler,
+    FocusListener
   {
 
     //#######################################################################
@@ -1047,10 +995,11 @@ public class GraphEventPanel
     {
       if (isEditing()) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              addEvent(neo);
-            }
-          });
+          public void run()
+          {
+            addEvent(neo);
+          }
+        });
       } else {
         final Command cmd = new InsertCommand(neo, GraphEventPanel.this);
         cmd.execute();
@@ -1061,15 +1010,18 @@ public class GraphEventPanel
     {
       if (isEditing()) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              removeEvent(victim);
-            }
-          });
+          public void run()
+          {
+            removeEvent(victim);
+          }
+        });
       } else {
-        final List<IdentifierSubject> list = Collections.singletonList(victim);
+        final List<IdentifierSubject> list =
+          Collections.singletonList(victim);
         final List<InsertInfo> deletes = getDeletionVictims(list);
         if (deletes != null) {
-          final Command cmd = new DeleteCommand(deletes, GraphEventPanel.this);
+          final Command cmd =
+            new DeleteCommand(deletes, GraphEventPanel.this);
           final UndoInterface undoer = mRoot.getUndoInterface();
           undoer.executeCommand(cmd);
         }
@@ -1081,18 +1033,20 @@ public class GraphEventPanel
     {
       if (isEditing()) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              replaceEvent(old, neo);
-            }
-          });
+          public void run()
+          {
+            replaceEvent(old, neo);
+          }
+        });
       } else {
         final List<ReplaceInfo> replacements = new LinkedList<ReplaceInfo>();
         mReplaceVisitor.addReplacements(old, neo, replacements);
         final boolean undoable = !replacements.isEmpty();
         final ReplaceInfo replacement = new ReplaceInfo(old, neo);
         replacements.add(0, replacement);
-        final Command cmd = new ReplaceCommand
-          (replacements, GraphEventPanel.this, "Label Editing");
+        final Command cmd =
+          new ReplaceCommand(replacements, GraphEventPanel.this,
+                             "Label Editing");
         if (undoable) {
           final UndoInterface undoer = mRoot.getUndoInterface();
           undoer.executeCommand(cmd);
@@ -1112,19 +1066,19 @@ public class GraphEventPanel
     }
 
     /**
-     * Called when the editor cell has lost the focus.
-     * In this case, we had better check if there is any empty list cell
-     * to clean up.
+     * Called when the editor cell has lost the focus. In this case, we had
+     * better check if there is any empty list cell to clean up.
      */
     public void focusLost(final FocusEvent event)
     {
       if (!event.isTemporary()) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              final EventTableModel model = (EventTableModel) getModel();
-              model.cleanUpNullItemAtEnd();
-            }
-          });
+          public void run()
+          {
+            final EventTableModel model = (EventTableModel) getModel();
+            model.cleanUpNullItemAtEnd();
+          }
+        });
       }
     }
 
@@ -1133,8 +1087,7 @@ public class GraphEventPanel
 
   //#########################################################################
   //# Inner Class DeleteVisitor
-  private class DeleteVisitor
-    extends AbstractModuleProxyVisitor
+  private class DeleteVisitor extends AbstractModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1198,8 +1151,7 @@ public class GraphEventPanel
       return null;
     }
 
-    public Object visitEventListExpressionProxy
-      (final EventListExpressionProxy expr)
+    public Object visitEventListExpressionProxy(final EventListExpressionProxy expr)
       throws VisitorException
     {
       final EventListExpressionSubject subject =
@@ -1245,8 +1197,7 @@ public class GraphEventPanel
 
   //#########################################################################
   //# Inner Class ReplaceVisitor
-  private class ReplaceVisitor
-    extends AbstractModuleProxyVisitor
+  private class ReplaceVisitor extends AbstractModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1310,8 +1261,7 @@ public class GraphEventPanel
       return null;
     }
 
-    public Object visitEventListExpressionProxy
-      (final EventListExpressionProxy expr)
+    public Object visitEventListExpressionProxy(final EventListExpressionProxy expr)
       throws VisitorException
     {
       final EventListExpressionSubject subject =
@@ -1366,14 +1316,123 @@ public class GraphEventPanel
 
 
   //#########################################################################
+  //# Inner Class GraphEventPanelTransferHandler
+  private class GraphEventPanelTransferHandler extends TransferHandler
+  {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public int getSourceActions(final JComponent c)
+    {
+      return COPY;
+    }
+
+    @Override
+    public Transferable createTransferable(final JComponent c)
+    {
+      return GraphEventPanel.this.createTransferable(getCurrentSelection());
+    }
+
+    @Override
+    public void exportDone(final JComponent c, final Transferable t,
+                           final int action)
+    {
+
+    }
+
+    @Override
+    public boolean canImport(final TransferSupport support)
+    {
+      final DataFlavor flavor = WatersDataFlavor.IDENTIFIER_LIST;
+      if (support.getTransferable().isDataFlavorSupported(flavor)) {
+        support.setDropAction(COPY);
+        support.setShowDropLocation(false);
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public boolean importData(final TransferSupport support)
+    {
+      if (!canImport(support)) {
+        return false;
+      } else {
+        try {
+          final Transferable transferable = support.getTransferable();
+          final List<InsertInfo> info = getInsertInfo(transferable);
+          final InsertCommand allCopies =
+            new InsertCommand(info, GraphEventPanel.this);
+          mRoot.getUndoInterface().executeCommand(allCopies);
+        } catch (final IOException exception) {
+          throw new WatersRuntimeException(exception);
+        } catch (final UnsupportedFlavorException exception) {
+          throw new WatersRuntimeException(exception);
+        }
+      }
+      return true;
+    }
+
+  }
+
+  private void setupSelectionDragHack()
+  {
+    // Bracket the other mouse listeners so we may inject our lie
+    final MouseListener[] ls = getMouseListeners();
+    for (final MouseListener l : ls) {
+      removeMouseListener(l);
+    }
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(final MouseEvent e)
+      {
+        mousingRow = rowAtPoint(e.getPoint());
+        mousingInProgress = true;
+      }
+    });
+    for (final MouseListener l : ls) {
+      addMouseListener(l);
+    }
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(final MouseEvent e)
+      {
+        requestFocusInWindow();
+        mousingInProgress = false;
+      }
+    });
+  }
+
+  @Override
+  public boolean isCellSelected(final int row, final int column)
+  {
+    if (mousingInProgress && row == mousingRow) {
+      // Only lie to the canStartDrag caller. We tell the truth to everyone else.
+      final StackTraceElement[] elms = Thread.currentThread().getStackTrace();
+      for (int i = 0; i < 3; i++) {
+        if (elms[i].getMethodName().equals("canStartDrag")) {
+          return mousingInProgress;
+        }
+      }
+    }
+    return super.isCellSelected(row, column);
+  }
+
+  private int mousingRow;
+  private boolean mousingInProgress;
+
+  //#########################################################################
   //# Data Members
   private final EditorWindowInterface mRoot;
   private final PopupFactory mPopupFactory;
   private final DeleteVisitor mDeleteVisitor;
   private final ReplaceVisitor mReplaceVisitor;
-
+  private final EventTableModel mModel;
   private List<Observer> mObservers;
-
 
   //#########################################################################
   //# Class Constants

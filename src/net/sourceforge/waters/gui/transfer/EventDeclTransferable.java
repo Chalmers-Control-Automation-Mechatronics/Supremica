@@ -17,9 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 
 
 /**
@@ -65,14 +63,11 @@ public class EventDeclTransferable extends ProxyTransferable<EventDeclProxy>
   {
     if (WatersDataFlavor.IDENTIFIER_LIST.equals(flavor)) {
       if (mIdentifierList == null) {
-        final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
         final List<EventDeclProxy> data = getRawData();
         final int size = data.size();
-        mIdentifierList = new ArrayList<SimpleIdentifierProxy>(size);
+        mIdentifierList = new ArrayList<IdentifierProxy>(size);
         for (final EventDeclProxy decl : data) {
-          final String name = decl.getName();
-          final SimpleIdentifierProxy ident =
-            factory.createSimpleIdentifierProxy(name);
+          final IdentifierProxy ident = decl.getIdentifier();
           mIdentifierList.add(ident);
         }
       }
@@ -85,7 +80,7 @@ public class EventDeclTransferable extends ProxyTransferable<EventDeclProxy>
 
   //#########################################################################
   //# Data Members
-  private List<SimpleIdentifierProxy> mIdentifierList;
+  private List<IdentifierProxy> mIdentifierList;
 
 
   //#########################################################################
