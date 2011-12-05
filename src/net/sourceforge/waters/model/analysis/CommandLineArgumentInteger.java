@@ -96,7 +96,7 @@ public abstract class CommandLineArgumentInteger
       final String value = iter.next();
       mValue = Integer.parseInt(value);
       iter.remove();
-      setUsed();
+      setUsed(true);
     } else {
       failMissingValue();
     }

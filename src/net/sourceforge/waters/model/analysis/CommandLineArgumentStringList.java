@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
+//# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   CommandLineArgumentDouble
+//# CLASS:   CommandLineArgumentStringList
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -10,79 +10,69 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
- * A floating point number command line argument passed to a
- * {@link ModelVerifierFactory}. Double command line arguments are specified on
- * the command line by their name followed by a floating point number, e.g.,
- * <CODE>-part 2.5</CODE>. The parsed value is stored in the
- * <CODE>CommandLineArgumentDouble</CODE> object for retrieval.
+ * A command line argument passed to a {@link ModelVerifierFactory} to specify
+ * multiple strings. String list command line arguments can be used several
+ * times in the command line by their each time specifying a string value. The
+ * list of parsed values is stored in the
+ * <CODE>CommandLineArgumentStringList</CODE> object for retrieval.
  *
  * @author Robi Malik
  */
 
-public abstract class CommandLineArgumentDouble
+public abstract class CommandLineArgumentStringList
   extends CommandLineArgument
 {
 
   //#########################################################################
   //# Constructors
   /**
-   * Creates an optional command line argument of double type.
+   * Creates an optional command line argument of string list type.
    * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-limit&quot;</CODE>.
+   *                       for example <CODE>&quot;-marking&quot;</CODE>.
    * @param  description   A textual description of the argument.
    */
-  protected CommandLineArgumentDouble(final String name,
-                                      final String description)
+  protected CommandLineArgumentStringList(final String name,
+                                          final String description)
   {
     super(name, description);
+    mValues = new LinkedList<String>();
   }
 
   /**
-   * Creates an optional command line argument of double type.
+   * Creates a command line argument of string list type.
    * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-limit&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   * @param  value         Default value for argument.
-   */
-  protected CommandLineArgumentDouble(final String name,
-                                      final String description,
-                                      final double value)
-  {
-    super(name, description);
-    mValue = value;
-  }
-
-  /**
-   * Creates a command line argument of double type.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;limit&quot;</CODE>.
+   *                       for example <CODE>&quot;marking&quot;</CODE>.
    * @param  description   A textual description of the argument.
    * @param  required      A flag indicating whether this is a required
    *                       command line argument. The command line tool
    *                       will not accept command lines that fail to
    *                       specify all required arguments.
    */
-  protected CommandLineArgumentDouble(final String name,
-                                      final String description,
-                                      final boolean required)
+  protected CommandLineArgumentStringList(final String name,
+                                          final String description,
+                                          final boolean required)
   {
     super(name, description, required);
+    mValues = new LinkedList<String>();
   }
 
 
   //#######################################################################
   //# Simple Access
+  @Override
   protected String getArgumentTemplate()
   {
-    return "<n>";
+    return "<name>";
   }
 
-  protected double getValue()
+  protected List<String> getValues()
   {
-    return mValue;
+    return mValues;
   }
 
 
@@ -93,7 +83,7 @@ public abstract class CommandLineArgumentDouble
   {
     if (iter.hasNext()) {
       final String value = iter.next();
-      mValue = Double.parseDouble(value);
+      mValues.add(value);
       iter.remove();
       setUsed(true);
     } else {
@@ -104,6 +94,6 @@ public abstract class CommandLineArgumentDouble
 
   //#########################################################################
   //# Data Members
-  private double mValue;
+  private final List<String> mValues;
 
 }

@@ -9,13 +9,14 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import gnu.trove.THashSet;
+
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,6 +58,7 @@ public abstract class AbstractModelVerifierFactory
   //# Configuration
   protected void addArguments()
   {
+    addArgument(new EndArgument());
     addArgument(new HelpArgument());
     addArgument(new LimitArgument());
     addArgument(new MarkingArgument());
@@ -112,8 +114,10 @@ public abstract class AbstractModelVerifierFactory
       if (arg != null) {
         iter.remove();
         arg.parse(iter);
-      } else if (name.equals("--")) {
-        break;
+      } else if (name.startsWith("-")) {
+        System.err.println("Unsupported option " + name +
+                           ". Try -help to see available options.");
+        System.exit(1);
       }
     }
     checkRequiredArguments();
@@ -177,6 +181,30 @@ public abstract class AbstractModelVerifierFactory
 
 
   //#########################################################################
+  //# Inner Class EndArgument
+  private class EndArgument extends CommandLineArgument
+  {
+    //#######################################################################
+    //# Constructors
+    private EndArgument()
+    {
+      super("--", "Treat remaining arguments as file names");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void parse(final Iterator<String> iter)
+    {
+      while (iter.hasNext()) {
+        iter.next();
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class HelpArgument
   private class HelpArgument extends CommandLineArgumentFlag
   {
@@ -197,7 +225,7 @@ public abstract class AbstractModelVerifierFactory
         final String name =
           ProxyTools.getShortClassName(AbstractModelVerifierFactory.this);
         System.err.println
-        (name + " supports the following command line options:");
+          (name + " supports the following command line options:");
         final List<CommandLineArgument> args =
           new ArrayList<CommandLineArgument>(mArgumentMap.values());
         Collections.sort(args);
@@ -392,7 +420,7 @@ public abstract class AbstractModelVerifierFactory
   //#########################################################################
   //# Inner Class PropertyArgument
   private class PropertyArgument
-    extends CommandLineArgumentString
+    extends CommandLineArgumentStringList
   {
     //#######################################################################
     //# Constructors
@@ -401,42 +429,42 @@ public abstract class AbstractModelVerifierFactory
       super("-property",
             "Property for language inclusion check\n" +
             "(can be used more than once)");
+      setUsed(true);
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModuleCompiler compiler)
-    {
-      Collection<String> props = compiler.getEnabledPropertyNames();
-      if (props == null) {
-        props = new LinkedList<String>();
-        compiler.setEnabledPropertyNames(props);
-      }
-      final String name = getValue();
-      props.add(name);
-    }
-
+    @Override
     protected void configure(final ModelVerifier verifier)
     {
+      final Collection<String> props = getValues();
       if (verifier instanceof LanguageInclusionChecker) {
-        final String name = getValue();
-        final LanguageInclusionChecker lchecker =
-          (LanguageInclusionChecker) verifier;
-        final KindTranslator trans = lchecker.getKindTranslator();
-        if (trans instanceof PropertyKindTranslator) {
-          final PropertyKindTranslator ptrans = (PropertyKindTranslator) trans;
-          ptrans.addPropertyName(name);
+        if (props.isEmpty()) {
+          setUsed(false);
         } else {
-          final PropertyKindTranslator ptrans =
-            new PropertyKindTranslator(name);
-          lchecker.setKindTranslator(ptrans);
+          final LanguageInclusionChecker lchecker =
+            (LanguageInclusionChecker) verifier;
+          final Collection<String> names = getValues();
+          final PropertyKindTranslator translator =
+            new PropertyKindTranslator(names);
+          lchecker.setKindTranslator(translator);
         }
       } else {
-        fail("Command line option " + getName() +
-             " is only supported for language inclusion!");
+        if (!props.isEmpty()) {
+          fail("Command line option " + getName() +
+               " is only supported for language inclusion!");
+        }
       }
     }
+
+    @Override
+    protected void configure(final ModuleCompiler compiler)
+    {
+      final Collection<String> props = getValues();
+      compiler.setEnabledPropertyNames(props);
+    }
+
 
     //#######################################################################
     //# Printing
@@ -472,7 +500,6 @@ public abstract class AbstractModelVerifierFactory
       final int limit = getValue();
       verifier.setTransitionLimit(limit);
     }
-
   }
 
 
@@ -483,10 +510,9 @@ public abstract class AbstractModelVerifierFactory
   {
     //#######################################################################
     //# Constructor
-    PropertyKindTranslator(final String name)
+    PropertyKindTranslator(final Collection<String> names)
     {
-      mUsedPropertyNames = new HashSet<String>();
-      mUsedPropertyNames.add(name);
+      mUsedPropertyNames = new THashSet<String>(names);
     }
 
     //#######################################################################
@@ -520,13 +546,6 @@ public abstract class AbstractModelVerifierFactory
       default:
         return kind;
       }
-    }
-
-    //#######################################################################
-    //# Simple Access
-    void addPropertyName(final String name)
-    {
-      mUsedPropertyNames.add(name);
     }
 
     //#######################################################################

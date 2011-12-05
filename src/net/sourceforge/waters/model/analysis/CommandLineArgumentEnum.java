@@ -99,7 +99,7 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
         System.exit(1);
       }
       iter.remove();
-      setUsed();
+      setUsed(true);
     } else {
       failMissingValue();
     }

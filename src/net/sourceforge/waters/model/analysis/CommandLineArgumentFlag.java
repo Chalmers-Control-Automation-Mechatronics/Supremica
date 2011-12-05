@@ -54,7 +54,7 @@ public abstract class CommandLineArgumentFlag
   //# Parsing
   protected void parse(final Iterator<String> iter)
   {
-    setUsed();
+    setUsed(true);
   }
 
 }

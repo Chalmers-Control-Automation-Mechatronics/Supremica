@@ -185,8 +185,6 @@ public class CommandLineTool
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
-      final boolean noProperties =
-        !(checker instanceof LanguageInclusionChecker);
       final boolean noPropositions = !(checker instanceof ConflictChecker);
       if (wrapper == null) {
         wrapper = checker;
@@ -218,9 +216,6 @@ public class CommandLineTool
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          if (noProperties) {
-            compiler.setEnabledPropertyNames(empty);
-          }
           if (noPropositions) {
             compiler.setEnabledPropositionNames(empty);
           }

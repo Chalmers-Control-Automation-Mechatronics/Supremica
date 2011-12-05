@@ -80,7 +80,7 @@ public abstract class CommandLineArgumentString
     if (iter.hasNext()) {
       mValue = iter.next();
       iter.remove();
-      setUsed();
+      setUsed(true);
     } else {
       failMissingValue();
     }

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   CommandLineArgumentDouble
+//# CLASS:   CommandLineArgumentChain
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -79,7 +79,7 @@ public abstract class CommandLineArgumentChain
         fail("Invalid factory " + factoryname + "!");
       }
       iter.remove();
-      setUsed();
+      setUsed(true);
       mSecondaryFactory.parse(iter);
     } else {
       failMissingValue();

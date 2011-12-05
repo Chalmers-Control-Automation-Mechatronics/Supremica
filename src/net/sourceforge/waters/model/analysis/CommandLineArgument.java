@@ -105,9 +105,9 @@ public abstract class CommandLineArgument
     return mIsUsed;
   }
 
-  protected void setUsed()
+  protected void setUsed(final boolean used)
   {
-    mIsUsed = true;
+    mIsUsed = used;
   }
 
 
