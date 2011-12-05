@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.composing.ComposingControllabilityChecker;
 import net.sourceforge.waters.analysis.composing.ComposingLanguageInclusionChecker;
 import net.sourceforge.waters.analysis.composing.ComposingSafetyVerifier;
@@ -42,12 +40,6 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     return SingletonHolder.INSTANCE;
   }
 
-  public static GNBModelVerifierFactory getInstance
-    (final List<String> cmdline)
-  {
-    return new GNBModelVerifierFactory(cmdline);
-  }
-
   private static class SingletonHolder {
     private static final GNBModelVerifierFactory INSTANCE =
       new GNBModelVerifierFactory();
@@ -60,9 +52,14 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
   {
   }
 
-  private GNBModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(new FinalStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
     addArgument(new FinalTransitionLimitArgument());

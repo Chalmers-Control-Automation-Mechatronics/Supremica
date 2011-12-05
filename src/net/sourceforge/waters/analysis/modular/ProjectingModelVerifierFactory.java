@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.List;
-
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
@@ -38,12 +36,6 @@ public class ProjectingModelVerifierFactory
     return SingletonHolder.INSTANCE;
   }
 
-  public static ProjectingModelVerifierFactory
-    getInstance(final List<String> cmdline)
-  {
-    return new ProjectingModelVerifierFactory(cmdline);
-  }
-
   private static class SingletonHolder {
     private static final ProjectingModelVerifierFactory INSTANCE =
       new ProjectingModelVerifierFactory();
@@ -56,9 +48,14 @@ public class ProjectingModelVerifierFactory
   {
   }
 
-  private ProjectingModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(new MonolithicStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
     addArgument(new MonolithicTransitionLimitArgument());

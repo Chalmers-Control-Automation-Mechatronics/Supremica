@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
@@ -37,9 +35,14 @@ public class ModularModelVerifierFactory
   {
   }
 
-  public ModularModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(ModularHeuristicFactory.getMethodArgument());
     addArgument(ModularHeuristicFactory.getPreferenceArgument());
     addArgument(new MergeVersion());
@@ -85,12 +88,6 @@ public class ModularModelVerifierFactory
       theInstance = new ModularModelVerifierFactory();
     }
     return theInstance;
-  }
-
-  public static ModularModelVerifierFactory
-    getInstance(final List<String> cmdline)
-  {
-    return new ModularModelVerifierFactory(cmdline);
   }
 
 

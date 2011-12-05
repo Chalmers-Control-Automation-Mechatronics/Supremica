@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.annotation.ProjectingNonBlockingChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
@@ -34,9 +32,14 @@ public class NDProjectingModelVerifierFactory
   {
   }
 
-  private NDProjectingModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(ModularHeuristicFactory.getMethodArgument());
     addArgument(ModularHeuristicFactory.getPreferenceArgument());
   }
@@ -79,12 +82,6 @@ public class NDProjectingModelVerifierFactory
       theInstance = new NDProjectingModelVerifierFactory();
     }
     return theInstance;
-  }
-
-  public static NDProjectingModelVerifierFactory
-    getInstance(final List<String> cmdline)
-  {
-    return new NDProjectingModelVerifierFactory(cmdline);
   }
 
 

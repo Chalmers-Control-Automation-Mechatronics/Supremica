@@ -39,7 +39,6 @@ public abstract class CommandLineArgumentFlag
                                     final String description)
   {
     super(name, description);
-    mIsSet = false;
   }
 
 
@@ -47,7 +46,7 @@ public abstract class CommandLineArgumentFlag
   //# Simple Access
   protected boolean getValue()
   {
-    return mIsSet;
+    return isUsed();
   }
 
 
@@ -55,12 +54,7 @@ public abstract class CommandLineArgumentFlag
   //# Parsing
   protected void parse(final Iterator<String> iter)
   {
-    mIsSet = true;
+    setUsed();
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private boolean mIsSet;
 
 }

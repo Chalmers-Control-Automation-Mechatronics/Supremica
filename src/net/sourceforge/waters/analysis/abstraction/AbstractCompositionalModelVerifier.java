@@ -147,10 +147,6 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Configuration
-
-
-  //#########################################################################
-  //# Specific Access
   protected void setMonolithicVerifier(final ModelVerifier verifier)
   {
     mMonolithicVerifier = verifier;
@@ -182,6 +178,9 @@ public abstract class AbstractCompositionalModelVerifier
     mCurrentMonolithicVerifier.setKindTranslator(translator);
   }
 
+
+  //#########################################################################
+  //# Specific Access
   /**
    * Stores a verification result indicating that the property checked
    * is satisfied and marks the run as completed.

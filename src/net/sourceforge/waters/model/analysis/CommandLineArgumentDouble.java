@@ -88,11 +88,14 @@ public abstract class CommandLineArgumentDouble
 
   //#######################################################################
   //# Parsing
+  @Override
   protected void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
       final String value = iter.next();
       mValue = Double.parseDouble(value);
+      iter.remove();
+      setUsed();
     } else {
       failMissingValue();
     }

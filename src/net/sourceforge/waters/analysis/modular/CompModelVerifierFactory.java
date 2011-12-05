@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.annotation.CompNonBlockingChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -32,9 +30,14 @@ public class CompModelVerifierFactory
   {
   }
 
-  private CompModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(ModularHeuristicFactory.getMethodArgument());
     addArgument(ModularHeuristicFactory.getPreferenceArgument());
   }
@@ -48,6 +51,7 @@ public class CompModelVerifierFactory
     return new CompNonBlockingChecker(null, factory);
   }
 
+
   //#########################################################################
   //# Factory Instantiation
   public static CompModelVerifierFactory getInstance()
@@ -56,12 +60,6 @@ public class CompModelVerifierFactory
       theInstance = new CompModelVerifierFactory();
     }
     return theInstance;
-  }
-
-  public static CompModelVerifierFactory
-    getInstance(final List<String> cmdline)
-  {
-    return new CompModelVerifierFactory(cmdline);
   }
 
 
