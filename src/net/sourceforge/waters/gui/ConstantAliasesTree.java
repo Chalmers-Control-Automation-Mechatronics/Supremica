@@ -13,13 +13,14 @@ import net.sourceforge.waters.subject.base.ProxySubject;
  *
  * @author Carly Hona
  */
-public class ConstantAliasesTree extends AliasesTree
+public class ConstantAliasesTree extends ModuleTree
 {
 
   public ConstantAliasesTree(final ModuleWindowInterface root,
                              final WatersPopupActionManager manager)
   {
     super(root, manager);
+    mPopupFactory = new AliasesTreePopupFactory(manager, root.getModuleContext());
   }
 
 
@@ -38,6 +39,13 @@ public class ConstantAliasesTree extends AliasesTree
     return WatersDataFlavor.CONSTANT_ALIAS_LIST;
   }
 
+  PopupFactory getPopupFactory()
+  {
+    return mPopupFactory;
+  }
+
+  private final PopupFactory mPopupFactory;
   private static final long serialVersionUID = 1L;
+
 
 }

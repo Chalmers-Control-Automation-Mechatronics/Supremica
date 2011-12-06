@@ -13,13 +13,14 @@ import net.sourceforge.waters.subject.base.ProxySubject;
  *
  * @author Carly Hona
  */
-public class EventAliasesTree extends AliasesTree
+public class EventAliasesTree extends ModuleTree
 {
 
   public EventAliasesTree(final ModuleWindowInterface root,
                              final WatersPopupActionManager manager)
   {
     super(root, manager);
+    mPopupFactory = new AliasesTreePopupFactory(manager, root.getModuleContext());
   }
 
   //#########################################################################
@@ -39,4 +40,10 @@ public class EventAliasesTree extends AliasesTree
 
   private static final long serialVersionUID = 1L;
 
+  PopupFactory getPopupFactory()
+  {
+    return mPopupFactory;
+  }
+
+  private final PopupFactory mPopupFactory;
 }

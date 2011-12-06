@@ -815,7 +815,7 @@ public class ModuleContext
             if (found == null
                 && SubjectTools.getAncestor(source, SimpleNodeSubject.class) != null) {
               return true;
-            } else if (found) {
+            } else if (found != null && found) {
               return true;
             }
           }
