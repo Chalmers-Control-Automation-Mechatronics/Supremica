@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.bdd;
 import gnu.trove.THashSet;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -71,11 +72,38 @@ class AutomatonPartitioning
         new AutomatonInfo(autBDD);
       }
     }
-    final BDDFactory factory = getBDDFactory();
     final List<TransitionPartitionBDD> partitions = getFullPartition();
     partitions.clear();
+    if (mEventMap.isEmpty()) {
+      return;
+    }
+
+    final BDDFactory factory = getBDDFactory();
+    final Collection<EventInfo> events = mEventMap.values();
+    final EventInfo min0 = Collections.min(events);
+    if (min0.getAutomata().isEmpty()) {
+      final Map<BitSet,TransitionPartitionBDD> lostMap =
+        new HashMap<BitSet,TransitionPartitionBDD>();
+      for (EventInfo min = min0;
+           min.getAutomata().isEmpty();
+           min = Collections.min(events)) {
+        TransitionPartitionBDD part = min.getPartitionBDD();
+        final BitSet automata = part.getAutomata();
+        final TransitionPartitionBDD lostPart = lostMap.get(automata);
+        if (lostPart != null) {
+          part = lostPart.compose(part, automatonBDDs, factory);
+        }
+        lostMap.put(automata, part);
+        final EventProxy key = min.getEvent();
+        mEventMap.remove(key);
+        if (mEventMap.isEmpty()) {
+          break;
+        }
+      }
+      partitions.addAll(lostMap.values());
+    }
+
     while (!mEventMap.isEmpty()) {
-      final Collection<EventInfo> events = mEventMap.values();
       final EventInfo min = Collections.min(events);
       final Collection<AutomatonInfo> minAutomata = min.getAutomata();
       AutomatonInfo aut = null;
