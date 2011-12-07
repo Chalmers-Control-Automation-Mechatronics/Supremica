@@ -336,7 +336,10 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   public ListInsertPosition getInsertPosition(final Proxy proxy)
   {
     final Proxy anchor = getSelectionAnchor();
-    final ListSubject<? extends ProxySubject> list = mModel.getChildren(anchor);
+    ListSubject<? extends ProxySubject> list = mModel.getChildren(anchor);
+    if (list == null) {
+      list = getRootList();
+    }
     return new ListInsertPosition(list, list.size());
   }
 
