@@ -108,7 +108,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
  */
 
 public class GraphEventPanel extends NonTypingTable implements FocusListener,
-  SelectionOwner// DragGestureListener,
+  SelectionOwner
 {
 
   //#########################################################################
@@ -173,12 +173,14 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     setDropMode(DropMode.INSERT);
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     setupSelectionDragHack();
+    mDraggingFromThis = false;
 
     final Action add = manager.getInsertEventLabelAction();
     addKeyboardAction(add);
     addCycleActions();
     manager.installCutCopyPasteActions(this);
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
@@ -351,6 +353,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
   public Transferable createTransferable(final List<? extends Proxy> items)
   {
+    mDraggingFromThis = true;
     return new IdentifierTransferable(items);
   }
 
@@ -1320,11 +1323,6 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
   private class GraphEventPanelTransferHandler extends TransferHandler
   {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
     @Override
     public int getSourceActions(final JComponent c)
     {
@@ -1341,12 +1339,15 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     public void exportDone(final JComponent c, final Transferable t,
                            final int action)
     {
-
+      mDraggingFromThis = false;
     }
 
     @Override
     public boolean canImport(final TransferSupport support)
     {
+      if(mDraggingFromThis){
+        return false;
+      }
       final DataFlavor flavor = WatersDataFlavor.IDENTIFIER_LIST;
       if (support.getTransferable().isDataFlavorSupported(flavor)) {
         support.setDropAction(COPY);
@@ -1376,6 +1377,8 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       }
       return true;
     }
+
+    private static final long serialVersionUID = 1L;
 
   }
 
@@ -1433,6 +1436,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
   private final ReplaceVisitor mReplaceVisitor;
   private final EventTableModel mModel;
   private List<Observer> mObservers;
+  private boolean mDraggingFromThis;
 
   //#########################################################################
   //# Class Constants
@@ -1442,5 +1446,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
   private static final int MINCOLUMNWIDTH1 = 24;
 
   private static final long serialVersionUID = 1L;
+
+
 
 }

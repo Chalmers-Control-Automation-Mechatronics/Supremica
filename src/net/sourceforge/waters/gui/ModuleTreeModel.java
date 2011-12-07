@@ -41,6 +41,7 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
+import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -408,6 +409,17 @@ class ModuleTreeModel
     public ListSubject<? extends ProxySubject> visitModuleProxy(final ModuleProxy module)
     {
       return mRootList;
+    }
+
+    @Override
+    public ListSubject<? extends ProxySubject> visitParameterBindingProxy(final ParameterBindingProxy binding)
+    {
+      final ParameterBindingSubject para = (ParameterBindingSubject)binding;
+      if(para.getExpression() instanceof EventListExpressionSubject){
+        final EventListExpressionSubject list = (EventListExpressionSubject) para.getExpression();
+         return (ListSubject<? extends ProxySubject>) list.getEventListModifiable();
+      }
+      return null;
     }
   }
 

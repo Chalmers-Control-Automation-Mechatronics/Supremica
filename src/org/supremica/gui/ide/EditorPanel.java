@@ -82,7 +82,7 @@ public class EditorPanel
         final AliasesPanel aliasesPanel =
           new AliasesPanel(this, manager);
         mAliasesTab = new Tab("Definitions", aliasesPanel);
-        if (Config.INCLUDE_DEFINITIONS_PANEL.get()) {
+        if (Config.INCLUDE_INSTANTION.get()) {
           mAliasesTab.addToTabbedPane();
         }
         mTabMap.put(aliasesPanel.getConstantAliasesPanel(), mAliasesTab);
@@ -100,7 +100,7 @@ public class EditorPanel
 
         mCommentPanel = new CommentPanel(moduleContainer);
         setRightComponent(mCommentPanel);
-        Config.INCLUDE_DEFINITIONS_PANEL.addPropertyChangeListener(this);
+        Config.INCLUDE_INSTANTION.addPropertyChangeListener(this);
     }
 
 
@@ -249,8 +249,7 @@ public class EditorPanel
 
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
-      // TODO Auto-generated method stub
-      if (Config.INCLUDE_DEFINITIONS_PANEL.get()) {
+      if (Config.INCLUDE_INSTANTION.get()) {
         mAliasesTab.addToTabbedPane(0);
       }
       else{

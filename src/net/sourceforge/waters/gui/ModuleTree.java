@@ -49,6 +49,7 @@ import net.sourceforge.waters.gui.transfer.EventAliasTransferable;
 import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
+import net.sourceforge.waters.gui.transfer.ParameterBindingTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.TypelessForeachTransferable;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -361,20 +362,16 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     for (final Proxy proxy : items) {
       boolean hasAncestor = false;
       final ProxySubject subject = (ProxySubject) proxy;
-
       for (final Proxy ancestor : reducedList) {
         final ProxySubject ancestorSubject = (ProxySubject) ancestor;
         if (SubjectTools.isAncestor(ancestorSubject, subject)) {
           hasAncestor = true;
         }
       }
-
       if (!hasAncestor) {
         reducedList.add(proxy);
       }
-
     }
-
     return getTransferable(reducedList);
   }
 
@@ -392,12 +389,10 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     final Proxy anchor = getSelectionAnchor();
     final DataFlavor flavor =
       mAcceptedDataFlavorVisitor.getDataFlavor(anchor);
-
     final ListSubject<? extends ProxySubject> listInModule = mModel.getChildren(anchor);
     if(listInModule == null){
       return null;
     }
-
     final int pos = listInModule.size();
     List<InsertInfo> result = new ArrayList<InsertInfo>(pos);
     if (transferable.isDataFlavorSupported(flavor)) {
@@ -582,6 +577,8 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       return new EventAliasTransferable(items);
     }else if(dataFlavor == WatersDataFlavor.TYPELESS_FOREACH){
       return new TypelessForeachTransferable(items);
+    } else if(dataFlavor == WatersDataFlavor.PARAMETER_BINDING_LIST){
+      return new ParameterBindingTransferable(items);
     } else
       return null;
   }
@@ -845,7 +842,6 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
         final List<Proxy> proxies = new ArrayList<Proxy>();
         final int min = getMinSelectionRow();
         final int max = getMaxSelectionRow();
-
         if (action == MOVE) {
           int indexOfPrevious = -1;
           int minIndex = -1;
@@ -861,7 +857,6 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
               final ListSubject<? extends ProxySubject> sourceList =
                 (ListSubject<? extends ProxySubject>) proxy.getParent();
               final int index = sourceList.indexOf(proxy);
-
               if (mDropList == sourceList) {
                 if (indexOfPrevious == -1) {
                   indexOfPrevious = index;
@@ -903,7 +898,6 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
           final RearrangeTreeCommand allMoves =
             new RearrangeTreeCommand(inserts, deletes, ModuleTree.this);
           mRoot.getUndoInterface().executeCommand(allMoves);
-
         }
       }
     }
@@ -934,9 +928,14 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
             }
           }
         }
-        final DataFlavor flavor =
+        final DataFlavor acceptingFlavor =
           mAcceptedDataFlavorVisitor.getDataFlavor(parent);
-        if (support.getTransferable().isDataFlavorSupported(flavor)) {
+        final DataFlavor exportingFlavor =
+          mExportedDataFlavorVisitor.getDataFlavor((Proxy) path.getLastPathComponent());
+        if(exportingFlavor == WatersDataFlavor.EVENT_ALIAS_LIST && acceptingFlavor == WatersDataFlavor.IDENTIFIER_LIST){
+          support.setDropAction(COPY);
+        }
+        if (support.getTransferable().isDataFlavorSupported(acceptingFlavor)) {
           return true;
         }
       }
@@ -1158,6 +1157,23 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       return null;
     }
 
+    @Override
+    public Object visitParameterBindingProxy(final ParameterBindingProxy alias)
+      throws VisitorException
+    {
+      final ExpressionProxy exp = alias.getExpression();
+      if (exp instanceof EventListExpressionProxy) {
+        print(alias.getName());
+        print(" =");
+        if (!mExpanded) {
+          print(" ...");
+        }
+      } else {
+        super.visitParameterBindingProxy(alias);
+      }
+      return null;
+    }
+
     private boolean mExpanded;
 
   }
@@ -1167,12 +1183,8 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   {
     @Override
     public Component getTreeCellRendererComponent(final JTree tree,
-                                                  final Object value,
-                                                  final boolean selected,
-                                                  final boolean expanded,
-                                                  final boolean leaf,
-                                                  final int row,
-                                                  final boolean hasFocus)
+              final Object value, final boolean selected, final boolean expanded,
+              final boolean leaf, final int row, final boolean hasFocus)
     {
       if (selected) {
         if (mIsPermanentFocusOwner) {
@@ -1183,10 +1195,8 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
           setBorderSelectionColor(EditorColor.BACKGROUND_NOTFOCUSSED);
         }
       }
-
       super.getTreeCellRendererComponent(tree, value, selected, expanded,
                                          leaf, row, hasFocus);
-
       final Proxy proxy = (Proxy) value;
       final Icon icon = mModuleContext.getIcon(proxy);
       setIcon(icon);

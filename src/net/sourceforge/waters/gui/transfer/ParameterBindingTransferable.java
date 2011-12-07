@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui.transfer;
 
 import java.util.List;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -27,7 +28,7 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
  */
 
 public class ParameterBindingTransferable
-  extends ProxyTransferable<ParameterBindingProxy>
+  extends ProxyTransferable<Proxy>
 {
 
   //#########################################################################
@@ -44,7 +45,7 @@ public class ParameterBindingTransferable
    * Creates a transferable that holds a whole list of parameter bindings.
    */
   public ParameterBindingTransferable
-    (final List<? extends ParameterBindingProxy> data)
+    (final List<? extends Proxy> data)
   {
     super(WatersDataFlavor.PARAMETER_BINDING_LIST, data);
   }
