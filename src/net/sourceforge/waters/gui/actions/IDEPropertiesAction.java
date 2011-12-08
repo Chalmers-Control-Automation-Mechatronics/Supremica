@@ -98,7 +98,7 @@ public class IDEPropertiesAction
 
 
   //#########################################################################
-  //# Auxilary Methods
+  //# Auxiliary Methods
   private void updateEnabledStatus()
   {
     final Proxy proxy = getActionArgument();

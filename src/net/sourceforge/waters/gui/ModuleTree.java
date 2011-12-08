@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   ModuleTree
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.gui;
 
 import java.awt.Component;
@@ -26,7 +35,6 @@ import javax.swing.Action;
 import javax.swing.DropMode;
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
@@ -69,12 +77,10 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
-import net.sourceforge.waters.subject.module.ConstantAliasSubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.IdentifiedSubject;
@@ -82,7 +88,6 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
-import net.sourceforge.waters.subject.module.VariableComponentSubject;
 
 
 /**
@@ -566,13 +571,13 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
 
   //#########################################################################
   //#Auxiliary Methods
-  private void expandOrCollapseRoot(final List<? extends ProxySubject> list)
+  private void expandOrCollapseRoot()
   {
     final TreePath path = getPathForRow(0);
     if (isExpanded(path)) {
       collapsePath(path);
     } else {
-      expandAll(list);
+      expandPath(path);
     }
   }
 
@@ -704,6 +709,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   {
     //#######################################################################
     //# Interface java.awt.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1) {
@@ -712,27 +718,19 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
           clearSelection();
         }
         if (event.getClickCount() == 2) {
-          if (proxy instanceof ModuleProxy) {
-            expandOrCollapseRoot(getRootList());
-          } else if (proxy != null) {
-            if (!rootVisible) {
-              mDoubleClickVisitor.invokeDoubleClickAction(proxy, event);
-            } else {
-              @SuppressWarnings("unused")
-              final JDialog dialog =
-                mDoubleClickVisitor.getEditorDialog(proxy);
-            }
-          }
+          mDoubleClickVisitor.invokeDoubleClickAction(proxy);
         }
       }
     }
 
+    @Override
     public void mousePressed(final MouseEvent event)
     {
       requestFocusInWindow();
       maybeShowPopup(event);
     }
 
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       maybeShowPopup(event);
@@ -761,61 +759,38 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
 
     //#######################################################################
     //# Invocation
-    private JDialog getEditorDialog(final Proxy proxy)
-    {
-      try {
-        return (JDialog) proxy.acceptVisitor(this);
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
-      }
-    }
-
-    private void invokeDoubleClickAction(final Proxy proxy,
-                                         final MouseEvent event)
+    private void invokeDoubleClickAction(final Proxy proxy)
     {
       if (proxy != null) {
-        final IDEAction action = getDoubleClickAction(proxy);
-        if (action != null) {
-          final WatersPopupActionManager manager =
-            getPopupFactory().getMaster();
-          manager.invokeMouseClickAction(action, event);
+        try {
+          proxy.acceptVisitor(this);
+        } catch (final VisitorException exception) {
+          throw exception.getRuntimeException();
         }
-      }
-    }
-
-    private IDEAction getDoubleClickAction(final Proxy proxy)
-    {
-      try {
-        return (IDEAction) proxy.acceptVisitor(this);
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
       }
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
-    public IDEAction visitProxy(final Proxy proxy)
+    /**
+     * The default action pops up the properties dialog for the clicked item,
+     * if a properties dialog is available. Otherwise it does nothing.
+     */
+    @Override
+    public Object visitProxy(final Proxy proxy)
     {
       final WatersPopupActionManager manager = getPopupFactory().getMaster();
       final IDEAction action = manager.getPropertiesAction(proxy);
-      return action.isEnabled() ? action : null;
+      manager.invokeMouseClickAction(action);
+      return null;
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-    @Override
-    public Object visitConstantAliasProxy(final ConstantAliasProxy alias)
-    {
-      return new ConstantAliasEditorDialog(mRoot,
-                                           (ConstantAliasSubject) alias);
-    }
-
-    @Override
-    public Object visitEventAliasProxy(final EventAliasProxy alias)
-    {
-      return null;
-    }
-
+    /**
+     * Do nothing for identifiers and other expressions.
+     * Slightly faster than the default.
+     */
     @Override
     public Object visitExpressionProxy(final ExpressionProxy proxy)
       throws VisitorException
@@ -824,45 +799,30 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     }
 
     @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-    {
-      new ForeachEditorDialog(mRoot, ModuleTree.this,
-                              (ForeachSubject) foreach);
-      return null;
-    }
-
-    @Override
-    public Object visitIdentifierProxy(final IdentifierProxy proxy)
-      throws VisitorException
-    {
-      return null;
-    }
-
     public Object visitInstanceProxy(final InstanceProxy inst)
     {
       final WatersPopupActionManager manager = getPopupFactory().getMaster();
       final String name = inst.getModuleName();
       final ModuleProxy module = mModuleContext.getModule();
-      return manager.getGotoModuleAction(module, name);
+      final IDEAction action = manager.getGotoModuleAction(module, name);
+      manager.invokeMouseClickAction(action);
+      return null;
     }
 
     @Override
     public Object visitModuleProxy(final ModuleProxy proxy)
       throws VisitorException
     {
-      final WatersPopupActionManager manager = getPopupFactory().getMaster();
-      return manager.getShowModuleCommentAction();
+      expandOrCollapseRoot();
+      return null;
     }
 
+    @Override
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final WatersPopupActionManager manager = getPopupFactory().getMaster();
-      return manager.getShowGraphAction(comp);
-    }
-
-    public Object visitVariableComponentProxy(final VariableComponentProxy var)
-    {
-      new VariableEditorDialog(mRoot, (VariableComponentSubject) var);
+      final IDEAction action = manager.getShowGraphAction(comp);
+      manager.invokeMouseClickAction(action);
       return null;
     }
   }
@@ -1056,7 +1016,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
     public DataFlavor visitComponentProxy(final ComponentProxy comp)
     {
@@ -1112,6 +1072,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       return getSupportedDataFlavor();
     }
 
+    @Override
     public DataFlavor visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
       return WatersDataFlavor.PARAMETER_BINDING_LIST;
@@ -1137,13 +1098,15 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     @Override
     public DataFlavor visitProxy(final Proxy alias)
     {
       return null;
     }
 
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
     public DataFlavor visitEventAliasProxy(final EventAliasProxy alias)
     {
@@ -1190,22 +1153,16 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   private class PrintVisitor extends HTMLPrinter
   {
 
+    //#######################################################################
+    //# Invocation
     public String toString(final Proxy proxy, final boolean expanded)
     {
       mExpanded = expanded;
       return toString(proxy);
     }
 
-    @Override
-    public Object visitModuleProxy(final ModuleProxy module)
-      throws VisitorException
-    {
-      print("<B>");
-      print(getRootName());
-      print("</B>");
-      return null;
-    }
-
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
     public Object visitEventAliasProxy(final EventAliasProxy alias)
       throws VisitorException
@@ -1220,6 +1177,16 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       } else {
         super.visitEventAliasProxy(alias);
       }
+      return null;
+    }
+
+    @Override
+    public Object visitModuleProxy(final ModuleProxy module)
+      throws VisitorException
+    {
+      print("<B>");
+      print(getRootName());
+      print("</B>");
       return null;
     }
 
@@ -1240,8 +1207,9 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       return null;
     }
 
+    //#######################################################################
+    //# Data Members
     private boolean mExpanded;
-
   }
 
 
@@ -1280,7 +1248,9 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     private static final long serialVersionUID = 1L;
   }
 
-  private static final long serialVersionUID = 1L;
+
+  //#########################################################################
+  //# Data Members
   private final ModuleTreeModel mModel;
   private final ModuleWindowInterface mRoot;
   private List<Observer> mObservers;
@@ -1290,6 +1260,11 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   private final PrintVisitor mPrinter;
   private boolean mIsPermanentFocusOwner;
   private final DoubleClickVisitor mDoubleClickVisitor;
-
   private ListSubject<? extends ProxySubject> mDropList;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }
