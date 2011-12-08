@@ -56,6 +56,7 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
@@ -173,7 +174,6 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     setDropMode(DropMode.INSERT);
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     setupSelectionDragHack();
-    mDraggingFromThis = false;
 
     final Action add = manager.getInsertEventLabelAction();
     addKeyboardAction(add);
@@ -181,6 +181,11 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     manager.installCutCopyPasteActions(this);
   }
 
+//#########################################################################
+  //#Simple Access
+  public FocusTracker getFocusTracker(){
+    return mRoot.getModuleWindowInterface().getRootWindow().getFocusTracker();
+  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
@@ -353,7 +358,6 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
   public Transferable createTransferable(final List<? extends Proxy> items)
   {
-    mDraggingFromThis = true;
     return new IdentifierTransferable(items);
   }
 
@@ -631,22 +635,6 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       setSelectionBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
     }
   }
-
-  /*
-   * //#######################################################################
-   * //# Interface java.awt.dnd.DragGestureListener public void
-   * dragGestureRecognized(final DragGestureEvent event) { final
-   * EventTableModel model = (EventTableModel) getModel(); final int[] rows =
-   * getSelectedRows(); if (rows.length == 0) { return; } final
-   * List<IdentifierSubject> idents = new
-   * ArrayList<IdentifierSubject>(rows.length); for(int i = 0; i <
-   * rows.length; i++) { final IdentifierSubject ident =
-   * model.getIdentifier(rows[i]); idents.add(ident); } final Transferable
-   * trans = new IdentifierTransferable(idents); try {
-   * event.startDrag(DragSource.DefaultCopyDrop, trans); } catch (final
-   * InvalidDnDOperationException exception) { throw new
-   * IllegalArgumentException(exception); } }
-   */
 
   //#########################################################################
   //# Editing
@@ -1332,6 +1320,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     @Override
     public Transferable createTransferable(final JComponent c)
     {
+     getFocusTracker().setSourceOfDragOperation(GraphEventPanel.this);
       return GraphEventPanel.this.createTransferable(getCurrentSelection());
     }
 
@@ -1339,13 +1328,13 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     public void exportDone(final JComponent c, final Transferable t,
                            final int action)
     {
-      mDraggingFromThis = false;
+
     }
 
     @Override
     public boolean canImport(final TransferSupport support)
     {
-      if(mDraggingFromThis){
+      if(getFocusTracker().getSourceOfDragOperation() == GraphEventPanel.this){
         return false;
       }
       final DataFlavor flavor = WatersDataFlavor.IDENTIFIER_LIST;
@@ -1436,7 +1425,6 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
   private final ReplaceVisitor mReplaceVisitor;
   private final EventTableModel mModel;
   private List<Observer> mObservers;
-  private boolean mDraggingFromThis;
 
   //#########################################################################
   //# Class Constants

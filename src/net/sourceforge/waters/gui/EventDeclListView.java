@@ -39,7 +39,6 @@ import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
-import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -49,7 +48,6 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -593,22 +591,7 @@ public class EventDeclListView
     @Override
     public boolean importData(final TransferSupport support)
     {
-      if (!canImport(support)) {
-        return false;
-      } else {
-        try {
-          final Transferable transferable = support.getTransferable();
-          final List<InsertInfo> info = getInsertInfo(transferable);
-          final InsertCommand allCopies =
-            new InsertCommand(info, EventDeclListView.this);
-          mRoot.getUndoInterface().executeCommand(allCopies);
-        } catch (final IOException exception) {
-          throw new WatersRuntimeException(exception);
-        } catch (final UnsupportedFlavorException exception) {
-          throw new WatersRuntimeException(exception);
-        }
-      }
-      return true;
+      return false;
     }
 
     private static final long serialVersionUID = 1L;

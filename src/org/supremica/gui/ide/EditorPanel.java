@@ -11,7 +11,6 @@
 package org.supremica.gui.ide;
 
 import java.awt.Component;
-import java.awt.Frame;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -136,9 +135,9 @@ public class EditorPanel
         return mModuleContainer.getExpressionParser();
     }
 
-    public Frame getRootWindow()
+    public IDE getRootWindow()
     {
-        return (Frame) getTopLevelAncestor();
+        return (IDE) getTopLevelAncestor();
     }
 
     public SelectionOwner getComponentsPanel()

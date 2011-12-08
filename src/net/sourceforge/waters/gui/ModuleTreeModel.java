@@ -231,8 +231,8 @@ class ModuleTreeModel
    * net.sourceforge.waters.model.module.GraphProxy GraphProxy}) are not
    * associated with any tree, their children will not have any ancestor
    * in a tree.
-   * @return The closest ancestor of the given object that has a direct
-   *         node to be rendered in a tree, or <CODE>null</CODE> if no
+   * @return The given {@link Proxy} or its closest ancestor that has a
+   *         direct node to be rendered in a tree, or <CODE>null</CODE> if no
    *         suitable can be determined.
    */
   ProxySubject getVisibleAncestorInTree(final Subject subject)
@@ -249,14 +249,15 @@ class ModuleTreeModel
   /**
    * Finds the closest ancestor of the given {@link Proxy} that is displayed
    * in a tree. This method checks the types of objects and their parents to
-   * determine whether an object is to be displayed in some tree view. For
-   * an ancestor to be found, a contiguous sequence of parents associated to
-   * the tree must be found. Since graphs ({@link
-   * net.sourceforge.waters.model.module.GraphProxy GraphProxy}) are not
-   * associated with any tree, their children will not have any ancestor
+   * determine whether an object is to be displayed in some tree view. For an
+   * ancestor to be found, a contiguous sequence of parents associated to the
+   * tree must be found. Since graphs (
+   * {@link net.sourceforge.waters.model.module.GraphProxy GraphProxy}) are
+   * not associated with any tree, their children will not have any ancestor
    * in a tree.
-   * @return The closest ancestor of the given {@link Proxy} that has a direct
-   *         node to be rendered in a tree, or <CODE>null</CODE> if no
+   *
+   * @return The given {@link Proxy} or its closest ancestor that has a
+   *         direct node to be rendered in a tree, or <CODE>null</CODE> if no
    *         suitable can be determined.
    */
   ProxySubject getVisibleAncestorInTree(final Proxy proxy)
@@ -267,8 +268,8 @@ class ModuleTreeModel
   /**
    * Finds the closest proper ancestor of the given object that has a direct
    * node to be rendered in a tree.
-   * @return The closest parent displayed in trees, or <CODE>null</CODE>
-   *         if no such parent can be found.
+   * @return The closest parent displayed in trees, which is not equal to the
+   * argument, or <CODE>null</CODE> if no such parent can be found.
    */
   ProxySubject getProperAncestorInTree(final Subject subject)
   {
@@ -279,8 +280,8 @@ class ModuleTreeModel
   /**
    * Finds the closest proper ancestor of the given node that has a direct
    * node to be rendered in a tree.
-   * @return The closest parent displayed in trees, or <CODE>null</CODE>
-   *         if no such parent can be found.
+   * @return The closest parent displayed in trees, which is not equal to the
+   * argument, or <CODE>null</CODE> if no such parent can be found.
    */
   ProxySubject getProperAncestorInTree(final ProxySubject node)
   {
