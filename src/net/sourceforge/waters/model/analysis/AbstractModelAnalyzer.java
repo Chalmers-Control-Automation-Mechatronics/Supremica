@@ -265,8 +265,10 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   protected AnalysisException setExceptionResult
     (final AnalysisException exception)
   {
-    mAnalysisResult.setException(exception);
-    addStatistics();
+    if (mAnalysisResult != null) {
+      mAnalysisResult.setException(exception);
+      addStatistics();
+    }
     return exception;
   }
 
