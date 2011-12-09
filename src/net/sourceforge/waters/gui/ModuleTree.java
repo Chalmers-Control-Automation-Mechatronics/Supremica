@@ -1105,21 +1105,22 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       }
     }
 
-    private boolean hasDuplicates(final ExpressionProxy expression){
+    private boolean isInExpressionList(final ExpressionProxy expression){
 
       if(expression instanceof EventListExpressionProxy &&
         mTransferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)){
-        final EventListExpressionSubject subject = (EventListExpressionSubject)expression;
-        final List<Proxy> list = subject.getEventList();
+        final EventListExpressionSubject subject =
+          (EventListExpressionSubject) expression;
+        final List<Proxy> listOfEvents = subject.getEventList();
         try {
           @SuppressWarnings("unchecked")
           final List<Proxy> transferData =
-            (List<Proxy>) mTransferable.getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
-          for(final Proxy p : list){
-            for(final Proxy q : transferData){
-              if(ModuleEqualityVisitor.getInstance(false).equals(p, q)){
-                return true;
-              }
+            (List<Proxy>) mTransferable
+              .getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+          for (final Proxy transferredProxy : transferData) {
+            if (!ModuleEqualityVisitor.getInstance(false)
+              .contains(listOfEvents, transferredProxy)) {
+              return false;
             }
           }
 
@@ -1129,8 +1130,40 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
           exception.printStackTrace();
         }
       }
-      return false;
+      return true;
     }
+
+/*    @SuppressWarnings("unchecked")
+    private List<Proxy> getListToBeTransferred(final Transferable transferable,
+                                               final DataFlavor flavor,
+                                               final Proxy parent)
+    {
+      List<Proxy> transferData;
+      final List<Proxy> result = new ArrayList<Proxy>();
+      try {
+        transferData = (List<Proxy>) transferable.getTransferData(flavor);
+        final List<Proxy> list = (List<Proxy>) mModel.getChildren(parent);
+        if (flavor == WatersDataFlavor.IDENTIFIER_LIST) {
+          for (final Proxy transferredProxy : transferData) {
+            if (!ModuleEqualityVisitor.getInstance(false)
+              .contains(list, transferredProxy)) {
+              result.add(transferredProxy);
+            }
+          }
+        } else {
+          return transferData;
+        }
+      } catch (final UnsupportedFlavorException exception) {
+        exception.printStackTrace();
+      } catch (final IOException exception) {
+        exception.printStackTrace();
+      }
+
+      if (result.isEmpty()) {
+        return null;
+      }
+      return result;
+    }*/
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
@@ -1147,7 +1180,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     {
       final EventAliasSubject event = (EventAliasSubject) alias;
       final ExpressionProxy exp = event.getExpression();
-      if (!hasDuplicates(exp)) {
+      if (!isInExpressionList(exp)) {
         return WatersDataFlavor.IDENTIFIER_LIST;
       }
       return null;
@@ -1180,7 +1213,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     {
       final ParameterBindingSubject event = (ParameterBindingSubject) binding;
       final ExpressionProxy exp = event.getExpression();
-      if (!hasDuplicates(exp) && !(exp instanceof SimpleExpressionProxy)) {
+      if (!isInExpressionList(exp) && !(exp instanceof SimpleExpressionProxy)) {
         return WatersDataFlavor.IDENTIFIER_LIST;
       }
       return null;
