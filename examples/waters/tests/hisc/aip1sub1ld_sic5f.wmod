@@ -561,7 +561,7 @@
                 <ns2:Attribute Value="LOWDATA" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="PROPOSITION" Name=":omega"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="PROPOSITION" Name=":alpha"/>
     </EventDeclList>
     <ComponentList>
@@ -4343,7 +4343,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -4452,7 +4452,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -4561,7 +4561,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -4670,7 +4670,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -4779,7 +4779,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -4888,7 +4888,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -4997,7 +4997,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5106,7 +5106,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5215,7 +5215,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5324,7 +5324,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5433,7 +5433,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5542,7 +5542,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5651,7 +5651,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5760,7 +5760,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5869,7 +5869,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -5978,7 +5978,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6087,7 +6087,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6196,7 +6196,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6305,7 +6305,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6414,7 +6414,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6523,7 +6523,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6632,7 +6632,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6741,7 +6741,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6850,7 +6850,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -6959,7 +6959,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7068,7 +7068,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7177,7 +7177,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7286,7 +7286,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7395,7 +7395,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7504,7 +7504,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7613,7 +7613,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7722,7 +7722,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7825,7 +7825,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -7928,7 +7928,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8031,7 +8031,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8140,7 +8140,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8249,7 +8249,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8358,7 +8358,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8467,7 +8467,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8576,7 +8576,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8685,7 +8685,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8794,7 +8794,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -8903,7 +8903,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9012,7 +9012,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9121,7 +9121,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9230,7 +9230,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9339,7 +9339,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9448,7 +9448,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9557,7 +9557,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9666,7 +9666,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9775,7 +9775,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9884,7 +9884,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -9993,7 +9993,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10102,7 +10102,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10211,7 +10211,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10320,7 +10320,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10429,7 +10429,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10538,7 +10538,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10647,7 +10647,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10756,7 +10756,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10865,7 +10865,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -10974,7 +10974,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11083,7 +11083,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11192,7 +11192,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11301,7 +11301,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11410,7 +11410,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11519,7 +11519,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11628,7 +11628,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11737,7 +11737,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11846,7 +11846,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -11955,7 +11955,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12064,7 +12064,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12173,7 +12173,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12282,7 +12282,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12391,7 +12391,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12500,7 +12500,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12609,7 +12609,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12718,7 +12718,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12827,7 +12827,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -12936,7 +12936,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13045,7 +13045,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13154,7 +13154,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13263,7 +13263,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13372,7 +13372,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13481,7 +13481,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13590,7 +13590,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13699,7 +13699,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13808,7 +13808,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -13917,7 +13917,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -14026,7 +14026,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -14135,7 +14135,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -14244,7 +14244,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">
@@ -14353,7 +14353,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="T1">
                         <EventList>
-                            <SimpleIdentifier Name=":omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                     </SimpleNode>
                     <SimpleNode Name="T2">

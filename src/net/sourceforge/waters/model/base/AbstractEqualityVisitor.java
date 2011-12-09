@@ -183,6 +183,21 @@ public abstract class AbstractEqualityVisitor
   }
 
   /**
+   * Checks whether the given collection contains an item equal to the
+   * given element, using the equality defined by this visitor.
+   */
+  public boolean contains(final Collection<? extends Proxy> collection,
+                          final Proxy element)
+  {
+    for (final Proxy current : collection) {
+      if (equals(element, current)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Gets diagnostics information.
    * @return A string explaining why the last equality test performed by
    *         this equality checker produced a <CODE>false</CODE> result.
