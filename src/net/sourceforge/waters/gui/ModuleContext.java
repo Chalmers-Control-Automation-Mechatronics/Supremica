@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -54,6 +55,7 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.IdentifiedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -98,17 +100,26 @@ public class ModuleContext
     mPropositionFinderVisitor = new PropositionFinderVisitor();
     mPropositionColorCollectorVisitor =
       new PropositionColorCollectorVisitor();
+    mWrapperGetter = new WrapperGetterVisitor();
     if (module instanceof ModuleSubject) {
       final ModuleSubject subject = (ModuleSubject) module;
       mEventDeclListWrapper =
         new ListSubjectWrapper(subject.getEventDeclListModifiable());
       mComponentListWrapper =
         new ListSubjectWrapper(subject.getComponentListModifiable());
+      mEventAliasListWrapper =
+        new ListSubjectWrapper(subject.getEventAliasListModifiable());
+      mConstanAliasListWrapper =
+        new ListSubjectWrapper(subject.getConstantAliasListModifiable());
     } else {
       mEventDeclListWrapper =
         new ListSubjectWrapper(module.getEventDeclList());
       mComponentListWrapper =
         new ListSubjectWrapper(module.getComponentList());
+      mEventAliasListWrapper =
+        new ListSubjectWrapper(module.getEventAliasList());
+      mConstanAliasListWrapper =
+        new ListSubjectWrapper(module.getConstantAliasList());
     }
     mGraphStatusMap = new HashMap<GraphProxy,GraphStatus>();
   }
@@ -404,6 +415,43 @@ public class ModuleContext
       };
       final String newname = getPastedName(name, checker);
       return newname == name ? ident : new SimpleIdentifierSubject(newname);
+    } else {
+      return ident;
+    }
+  }
+
+  /**
+   * Finds a name for a component to be pasted into the module. If the given
+   * name is not used, it is returned. Otherwise, this method constructs an
+   * alternative name that is not yet taken, such that the original name is
+   * still recognisable.
+   *
+   * @param ident
+   *          The identifier representing a component (
+   *          {@link SimpleComponentProxy}, {@link VariableComponentProxy},
+   *          etc.) to be added.
+   */
+  public IdentifierSubject getPastedName(final IdentifiedSubject subject,
+                                         final Set<String> alsoUsed)
+  {
+    final IdentifierSubject ident = subject.getIdentifier();
+    if (ident instanceof SimpleIdentifierProxy) {
+      final ListSubjectWrapper wrapper = mWrapperGetter.getWrapper(subject);
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final String name = simple.getName();
+      final NameChecker checker = new NameChecker() {
+        public boolean isNameTaken(final String name)
+        {
+          return wrapper.get(name) != null || alsoUsed.contains(name);
+        }
+      };
+      final String newname = getPastedName(name, checker);
+      if (newname == name) {
+        return ident;
+      } else {
+        alsoUsed.add(newname);
+        return new SimpleIdentifierSubject(newname);
+      }
     } else {
       return ident;
     }
@@ -1321,6 +1369,54 @@ public class ModuleContext
   }
 
   //#########################################################################
+  //# Inner Class WrapperGetterVisitor
+  private class WrapperGetterVisitor extends
+    AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private ListSubjectWrapper getWrapper(final Proxy proxy)
+    {
+      try {
+        return (ListSubjectWrapper) proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    public ListSubjectWrapper visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public ListSubjectWrapper visitEventDeclProxy(final EventDeclProxy decl)
+    {
+      return mEventDeclListWrapper;
+    }
+
+    public ListSubjectWrapper visitEventAliasProxy(final EventAliasProxy decl)
+    {
+      return mEventAliasListWrapper;
+    }
+
+    public ListSubjectWrapper visitConstantAliasProxy(final ConstantAliasProxy decl)
+    {
+      return mConstanAliasListWrapper;
+    }
+
+    public ListSubjectWrapper visitComponentProxy(final ComponentProxy decl)
+    {
+      return mComponentListWrapper;
+    }
+
+  }
+
+  //#########################################################################
   //# Data Members
   private final ModuleProxy mModule;
   private final CanDropVisitor mCanDropVisitor;
@@ -1330,8 +1426,11 @@ public class ModuleContext
   private final PropositionFinderVisitor mPropositionFinderVisitor;
   private final PropositionColorCollectorVisitor mPropositionColorCollectorVisitor;
 
+  private final WrapperGetterVisitor mWrapperGetter;
   private final ListSubjectWrapper mEventDeclListWrapper;
   private final ListSubjectWrapper mComponentListWrapper;
+  private final ListSubjectWrapper mConstanAliasListWrapper;
+  private final ListSubjectWrapper mEventAliasListWrapper;
   private final Map<GraphProxy,GraphStatus> mGraphStatusMap;
 
   //#########################################################################
