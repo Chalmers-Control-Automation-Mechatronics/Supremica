@@ -13,11 +13,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Formatter;
+import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
@@ -79,6 +86,7 @@ public class CompositionalSynthesizerExperiments
                          ",FinalStateLimit," + finalStateLimit);
     mPrintWriter.println("PreselHeuristic," + mPreselecting +
                          ",SelecHeuristic," + mSelecting);
+    mHasBeenPrinted = false;
   }
 
   @Override
@@ -123,18 +131,30 @@ public class CompositionalSynthesizerExperiments
 
   //#########################################################################
   //# Invocation
-  void runModel(final String group, final String subdir, final String name,
-                final boolean hasBeenPrinted)
+  void runModel(final String group,
+                final String subdir,
+                final String name)
+  throws Exception
+  {
+    runModel(group, subdir, name, null);
+  }
+
+  void runModel(final String group,
+                final String subdir,
+                final String name,
+                final List<ParameterBindingProxy> bindings)
   throws Exception
   {
     System.out.println("Running " + name + " ...");
     final String inputprop = System.getProperty("waters.test.inputdir");
     final File inputRoot = new File(inputprop);
     final File rootdir = new File(inputRoot, "waters");
-    final File groupdir = new File(rootdir, group);
-    final File dir = new File(groupdir, subdir);
+    File dir = new File(rootdir, group);
+    if (subdir != null) {
+      dir = new File(dir, subdir);
+    }
     final File filename = new File(dir, name);
-    final ProductDESProxy des = getCompiledDES(filename, null);
+    final ProductDESProxy des = getCompiledDES(filename, bindings);
     mSynthesizer.setModel(des);
     try {
       mSynthesizer.run();
@@ -143,7 +163,8 @@ public class CompositionalSynthesizerExperiments
     } finally {
       final CompositionalSynthesisResult stats =
         (CompositionalSynthesisResult) mSynthesizer.getAnalysisResult();
-      if (!hasBeenPrinted) {
+      if (!mHasBeenPrinted) {
+        mHasBeenPrinted = true;
         mPrintWriter.print("Model,");
         stats.printCSVHorizontalHeadings(mPrintWriter);
         mPrintWriter.println();
@@ -152,7 +173,6 @@ public class CompositionalSynthesizerExperiments
       mPrintWriter.print(',');
       stats.printCSVHorizontal(mPrintWriter);
       mPrintWriter.println();
-      // TODO Format everything properly.
     }
   }
 
@@ -163,13 +183,10 @@ public class CompositionalSynthesizerExperiments
     if (args.length == 3) {
       try {
         final String filename = args[0];
-        final String outputprop = System.getProperty("waters.test.outputdir");
         final String preselectingHeuristic = args[1];
         final String selectingHeuristic = args[2];
-        final CompositionalSynthesizerExperiments
-          experiment =
-            new CompositionalSynthesizerExperiments
-              (outputprop + filename);
+        final CompositionalSynthesizerExperiments experiment =
+          new CompositionalSynthesizerExperiments(filename);
         experiment.setPreselectingHeuristic(preselectingHeuristic);
         experiment.setSelectingHeuristic(selectingHeuristic);
         experiment.setUp();
@@ -192,7 +209,10 @@ public class CompositionalSynthesizerExperiments
   //# Invocation
   void runAllTests() throws Exception
   {
-
+    synthesisTransferline(100);
+    synthesisTransferline(200);
+    synthesisTransferline(300);
+    /*
 //    synthesiseTbedNoderailB();
 //    synthesiseCentralLockingKoordwspBlock();
     synthesiseCentralLockingVerriegel3b();
@@ -213,7 +233,7 @@ public class CompositionalSynthesizerExperiments
     synthesissFms2003();
     synthesiseIPC();
 //    synthesiseFlexibleManufacturingSystem();
-
+    */
   }
 
 
@@ -223,108 +243,122 @@ public class CompositionalSynthesizerExperiments
   @SuppressWarnings("unused")
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "koordwsp_block.wmod", false);
+    runModel("valid", "synthesis_experiment", "koordwsp_block.wmod");
   }
 
   private void synthesiseCentralLockingVerriegel3b() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "verriegel3b.wmod", false);
+    runModel("valid", "synthesis_experiment", "verriegel3b.wmod");
   }
 
   private void synthesiseVerrigel4B() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "verriegel4b.wmod", true);
+    runModel("valid", "synthesis_experiment", "verriegel4b.wmod");
   }
 
   // AIP
   private void synthesissAip0Alps() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "aip0alps.wmod", true);
+    runModel("valid", "synthesis_experiment", "aip0alps.wmod");
   }
 
   private void synthesissAip0Aip() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "aip0aip.wmod", true);
+    runModel("valid", "synthesis_experiment", "aip0aip.wmod");
   }
 
   private void synthesisFenCaiWon09Synth() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "FenCaiWon09_synth.wmod", true);
+    runModel("valid", "synthesis_experiment", "FenCaiWon09_synth.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesisLargestCoherent() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "largest_coherent.wmod", true);
+    runModel("valid", "synthesis_experiment", "largest_coherent.wmod");
   }
 
   // Train testbed
   private void synthesiseTbedNoderailUncont() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tbed_uncont.wmod", true);
+    runModel("valid", "synthesis_experiment", "tbed_uncont.wmod");
   }
 
   private void synthesiseTbedNoderailB() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod",
-             true);
+    runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tbed_ctct.wmod", true);
+    runModel("valid", "synthesis_experiment", "tbed_ctct.wmod");
   }
 
   //AGV
   private void synthesisAGVB() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "agvb.wmod", true);
+    runModel("valid", "synthesis_experiment", "agvb.wmod");
   }
 
   private void synthesisAGV() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "agv.wmod", true);
+    runModel("valid", "synthesis_experiment", "agv.wmod");
   }
 
   //
   private void synthesiseIPC() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "IPC.wmod", true);
+    runModel("valid", "synthesis_experiment", "IPC.wmod");
   }
 
   private void synthesissRhoneSubPatch0() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "rhone_subsystem1_patch0.wmod",
-                                                                       true);
+    runModel("valid", "synthesis_experiment", "rhone_subsystem1_patch0.wmod");
   }
 
   private void synthesissFms2003() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "fms2003_synth1.wmod", true);
+    runModel("valid", "synthesis_experiment", "fms2003_synth1.wmod");
   }
 
   //flexible production cell
   private void synthesiseFischertechnik() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "ftechnik.wmod", true);
+    runModel("valid", "synthesis_experiment", "ftechnik.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesiseFlexibleManufacturingSystem() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "flexible_man_sys.wmod", true);
+    runModel("valid", "synthesis_experiment", "flexible_man_sys.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesisTip3Bad() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tip3_bad.wmod", true);
+    runModel("valid", "synthesis_experiment", "tip3_bad.wmod");
   }
 
   private void synthesisFenCaiWon09B() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "FenCaiWon09b.wmod", true);
+    runModel("valid", "synthesis_experiment", "FenCaiWon09b.wmod");
+  }
+
+  private void synthesisTransferline(final int n) throws Exception
+  {
+    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+    final IntConstantProxy expr = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy binding =
+      factory.createParameterBindingProxy("N", expr);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    final long start = System.currentTimeMillis();
+    runModel("handwritten", null, "transferline.wmod", bindings);
+    final long stop = System.currentTimeMillis();
+    final Formatter formatter = new Formatter(System.out);
+    final float difftime = 0.001f * (stop - start);
+    formatter.format("%.3f s\n", difftime);
   }
 
 
@@ -333,6 +367,7 @@ public class CompositionalSynthesizerExperiments
   private CompositionalSynthesizer mSynthesizer;
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
+  private boolean mHasBeenPrinted;
 
   private AbstractCompositionalModelAnalyzer.PreselectingMethod
     mPreselecting;

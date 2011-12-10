@@ -13,6 +13,7 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TLongObjectHashMap;
+import gnu.trove.TObjectByteIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -467,8 +468,13 @@ public class CompositionalSynthesizer
         for (final EventProxy event : renaming.keySet()) {
           final EventInfo info = getEventInfo(event);
           if (info != null) {
-            final List<AutomatonProxy> aut = info.getAutomataList();
-            affectedAutomata.addAll(aut);
+            final TObjectByteIterator<AutomatonProxy> iter =
+              info.getAutomataIterator();
+            while (iter.hasNext()) {
+              iter.advance();
+              final AutomatonProxy aut = iter.key();
+              affectedAutomata.add(aut);
+            }
           }
         }
 
