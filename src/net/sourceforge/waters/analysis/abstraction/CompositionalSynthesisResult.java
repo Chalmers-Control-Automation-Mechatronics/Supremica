@@ -162,7 +162,7 @@ public class CompositionalSynthesisResult
   {
     if (isSatisfied()) {
       final Collection<EventProxy> events =
-        Candidate.getAllEvents(mSupervisors);
+        Candidate.getOrderedEvents(mSupervisors);
       if (name == null) {
         name = Candidate.getCompositionName("", mSupervisors);
       }

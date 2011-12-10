@@ -45,6 +45,9 @@ public class CompositionalAnalysisResult
     mTotalCompositionsCount = 0;
     mUnsuccessfulCompositionsCount = 0;
     mRedundantEventsCount = 0;
+    mNumberOfSplitAttempts = 0;
+    mNumberOfSplits = 0;
+    mSplitTime = 0;
     mSimplifierStatistics = null;
     mNumberOfSyncProducts = 0;
     mSynchronousProductStats = null;
@@ -122,6 +125,15 @@ public class CompositionalAnalysisResult
     mUnsuccessfulCompositionsCount++;
   }
 
+  public void addSplitAttempt(final boolean success, final long time)
+  {
+    mNumberOfSplitAttempts++;
+    if (success) {
+      mNumberOfSplits++;
+    }
+    mSplitTime += time;
+  }
+
   public void addRedundantEvents(final int count)
   {
     mRedundantEventsCount += count;
@@ -197,6 +209,9 @@ public class CompositionalAnalysisResult
       (CompositionalAnalysisResult) other;
     mTotalCompositionsCount += result.mTotalCompositionsCount;
     mUnsuccessfulCompositionsCount += result.mUnsuccessfulCompositionsCount;
+    mNumberOfSplitAttempts += result.mNumberOfSplitAttempts;
+    mNumberOfSplits += result.mNumberOfSplits;
+    mSplitTime += result.mSplitTime;
     if (mSimplifierStatistics != null && result.mSimplifierStatistics != null) {
       final Iterator<TRSimplifierStatistics> iter1 =
         mSimplifierStatistics.iterator();
@@ -229,14 +244,22 @@ public class CompositionalAnalysisResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
+    final Formatter formatter = new Formatter(writer);
     writer.print("Total number of compositions: ");
     writer.println(mTotalCompositionsCount);
     writer.print("Number of unsuccessful compositions: ");
     writer.println(mUnsuccessfulCompositionsCount);
+    writer.print("Number of attempts to split off subsystems: ");
+    writer.println(mNumberOfSplitAttempts);
+    writer.print("Number of subsystems split off: ");
+    writer.println(mNumberOfSplits);
+    formatter.format("Time consumed by split attempts: %.3fs\n",
+                     0.001f * mSplitTime);
+    writer.print("Time consumed by split attempts: ");
+    writer.println(mNumberOfSplits);
     writer.print("Number of redundant events: ");
     writer.println(mRedundantEventsCount);
     if (mUnsuccessfulCompositionsCount > 0) {
-      final Formatter formatter = new Formatter(writer);
       final float probability =
         (float) (mTotalCompositionsCount - mUnsuccessfulCompositionsCount) /
         (float) mTotalCompositionsCount;
@@ -270,6 +293,9 @@ public class CompositionalAnalysisResult
     super.printCSVHorizontalHeadings(writer);
     writer.print(",Compositions");
     writer.print(",Overflows");
+    writer.print(",SplitAttempts");
+    writer.print(",Splits");
+    writer.print(",SplitTime");
     writer.print(",RedundantEvents");
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
@@ -294,6 +320,12 @@ public class CompositionalAnalysisResult
     writer.print(mTotalCompositionsCount);
     writer.print(',');
     writer.print(mUnsuccessfulCompositionsCount);
+    writer.print(',');
+    writer.print(mNumberOfSplitAttempts);
+    writer.print(',');
+    writer.print(mNumberOfSplits);
+    writer.print(',');
+    writer.print(mSplitTime);
     writer.print(',');
     writer.print(mRedundantEventsCount);
     if (mSimplifierStatistics != null) {
@@ -320,6 +352,9 @@ public class CompositionalAnalysisResult
   //# Data Members
   private int mTotalCompositionsCount;
   private int mUnsuccessfulCompositionsCount;
+  private int mNumberOfSplitAttempts;
+  private int mNumberOfSplits;
+  private long mSplitTime;
   private int mRedundantEventsCount;
   private List<TRSimplifierStatistics> mSimplifierStatistics;
   private int mNumberOfSyncProducts;

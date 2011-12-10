@@ -1590,7 +1590,7 @@ public class OPConflictChecker
   private HidingStep composeSynchronousProduct(final Candidate candidate)
     throws AnalysisException
   {
-    final List<EventProxy> events = candidate.getAllEvents();
+    final List<EventProxy> events = candidate.getOrderedEvents();
     final List<AutomatonProxy> automata1 = candidate.getAutomata();
     final ProductDESProxy des = createProductDESProxy(events, automata1, true);
     final Collection<EventProxy> local = candidate.getLocalEvents();
@@ -2867,7 +2867,7 @@ public class OPConflictChecker
       final List<EventProxy> empty = Collections.emptyList();
       mCurrentSynchronousProductBuilder.setPropositions(empty);
       for (final Candidate candidate : list) {
-        final List<EventProxy> events = candidate.getAllEvents();
+        final List<EventProxy> events = candidate.getOrderedEvents();
         final List<AutomatonProxy> automata = candidate.getAutomata();
         final ProductDESProxy des =
           createProductDESProxy(events, automata, true);
@@ -2937,7 +2937,7 @@ public class OPConflictChecker
         Collections.singletonList(mPreconditionMarking);
       mCurrentSynchronousProductBuilder.setPropositions(props);
       for (final Candidate candidate : list) {
-        final List<EventProxy> events = candidate.getAllEvents();
+        final List<EventProxy> events = candidate.getOrderedEvents();
         final List<AutomatonProxy> automata = candidate.getAutomata();
         final ProductDESProxy des =
           createProductDESProxy(events, automata, true);

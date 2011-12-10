@@ -289,7 +289,8 @@ public class CompositionalGeneralisedConflictChecker
         final String name = Candidate.getCompositionName(remainingAut);
         final String comment =
           "Simplified initial model for CompositionalGeneralisedConflictChecker";
-        final List<EventProxy> events = Candidate.getAllEvents(remainingAut);
+        final List<EventProxy> events =
+          Candidate.getOrderedEvents(remainingAut);
         model = factory.createProductDESProxy
           (name, comment, null, events, remainingAut);
         mapEventsToAutomata(model);
@@ -326,7 +327,7 @@ public class CompositionalGeneralisedConflictChecker
             final String name = Candidate.getCompositionName(remainingAut);
             final String comment =
               "Intermediate model for CompositionalGeneralisedConflictChecker";
-            final List<EventProxy> events = Candidate.getAllEvents(remainingAut);
+            final List<EventProxy> events = Candidate.getOrderedEvents(remainingAut);
             model = factory.createProductDESProxy
               (name, comment, null, events, remainingAut);
             mapEventsToAutomata(model);
@@ -747,7 +748,7 @@ public class CompositionalGeneralisedConflictChecker
     // synchronous product of
     final ProductDESProxyFactory factory = getFactory();
     final String name = candidate.toString();
-    final List<EventProxy> events = candidate.getAllEvents();
+    final List<EventProxy> events = candidate.getOrderedEvents();
     final List<AutomatonProxy> automata = candidate.getAutomata();
     final ProductDESProxy candidateModel = factory.createProductDESProxy
       (name, "Automatically created from candidate.", null, events, automata);
