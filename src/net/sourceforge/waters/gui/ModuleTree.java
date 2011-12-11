@@ -1107,23 +1107,26 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
 
     @SuppressWarnings("unchecked")
     private List<Proxy> modifyList(final DataFlavor flavor,
-                                               final Proxy parent, final ExpressionProxy exp)
+                                   final Proxy parent,
+                                   final ExpressionProxy expr)
     {
-      List<Proxy> parentsList;
-      if(exp instanceof EventListExpressionProxy){
-        final EventListExpressionProxy event = (EventListExpressionProxy) exp;
-        parentsList = (List<Proxy>) event.getEventList();
-      }else{
-        parentsList = (List<Proxy>) mModel.getChildren(parent);
+      final ListSubject<? extends ProxySubject> parentsList;
+      if (expr instanceof EventListExpressionProxy) {
+        final EventListExpressionSubject event =
+          (EventListExpressionSubject) expr;
+        parentsList = event.getEventListModifiable();
+      } else {
+        parentsList = mModel.getChildren(parent);
       }
       List<Proxy> transferData;
       final List<Proxy> result = new ArrayList<Proxy>();
       try {
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(false);
         transferData = (List<Proxy>) mTransferable.getTransferData(flavor);
         if (flavor == WatersDataFlavor.IDENTIFIER_LIST) {
           for (final Proxy transferredProxy : transferData) {
-            if (!ModuleEqualityVisitor.getInstance(false)
-              .contains(parentsList, transferredProxy)) {
+            if (!eq.contains(parentsList, transferredProxy)) {
               result.add(transferredProxy);
             }
           }
@@ -1135,7 +1138,6 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       } catch (final IOException exception) {
         exception.printStackTrace();
       }
-
       if (result.isEmpty()) {
         return null;
       }
