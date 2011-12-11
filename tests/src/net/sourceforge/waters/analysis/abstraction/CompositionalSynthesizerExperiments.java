@@ -34,6 +34,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  *
  * @author Sahar Mohajerani
  */
+
 public class CompositionalSynthesizerExperiments
   extends AbstractAnalysisTest
 {
@@ -176,6 +177,7 @@ public class CompositionalSynthesizerExperiments
     }
   }
 
+
   //#########################################################################
   //# Main Method
   public static void main(final String[] args)
@@ -197,10 +199,9 @@ public class CompositionalSynthesizerExperiments
         exception.printStackTrace(System.err);
       }
     } else {
-      System.err
-      .println("Usage: CompositionalGeneralisedSynthesizerCheckerExperiments "
-      + "outputFilename preselectingHeuristic selectingHeuristic " +
-      "listOfRulesSelection");
+      System.err.println
+        ("Usage: CompositionalSynthesizerExperiments " +
+         "<outputFilename> <preselectingHeuristic> <selectingHeuristic>");
     }
   }
 
@@ -209,10 +210,11 @@ public class CompositionalSynthesizerExperiments
   //# Invocation
   void runAllTests() throws Exception
   {
+    /*
     synthesisTransferline(100);
     synthesisTransferline(200);
     synthesisTransferline(300);
-    /*
+    */
 //    synthesiseTbedNoderailB();
 //    synthesiseCentralLockingKoordwspBlock();
     synthesiseCentralLockingVerriegel3b();
@@ -233,7 +235,6 @@ public class CompositionalSynthesizerExperiments
     synthesissFms2003();
     synthesiseIPC();
 //    synthesiseFlexibleManufacturingSystem();
-    */
   }
 
 
@@ -345,6 +346,7 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "FenCaiWon09b.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesisTransferline(final int n) throws Exception
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
