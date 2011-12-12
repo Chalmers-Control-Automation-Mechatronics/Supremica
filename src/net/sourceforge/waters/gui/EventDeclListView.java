@@ -14,11 +14,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
@@ -26,19 +21,20 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import javax.swing.Action;
+import javax.swing.DropMode;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
@@ -73,8 +69,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class EventDeclListView
   extends JList
-  implements SelectionOwner, FocusListener,
-             DragGestureListener, ListSelectionListener
+  implements SelectionOwner, FocusListener, ListSelectionListener
 {
 
   //#########################################################################
@@ -104,10 +99,9 @@ public class EventDeclListView
     addMouseListener(handler);
     addListSelectionListener(this);
     manager.installCutCopyPasteActions(this);
-
-    final DragSource dragsource = DragSource.getDefaultDragSource();
-    dragsource.createDefaultDragGestureRecognizer
-      (this, DnDConstants.ACTION_COPY, this);
+    setTransferHandler(new EventDeclListTransferHandler());
+    setDragEnabled(true);
+    setDropMode(DropMode.INSERT);
   }
 
 
@@ -437,30 +431,6 @@ public class EventDeclListView
     }
   }
 
-
-  //#########################################################################
-  //# Interface java.awt.dnd.DragGestureListener
-  public void dragGestureRecognized(final DragGestureEvent event)
-  {
-    final int index = locationToIndex(event.getDragOrigin());
-    final List<EventDeclSubject> data;
-    if (isSelectedIndex(index)) {
-      data = getCurrentSelection();
-    } else if (index >= 0 && index < mModel.getSize()) {
-      final EventDeclSubject decl = mModel.getElementAt(index);
-      data = Collections.singletonList(decl);
-    } else {
-      return;
-    }
-    final Transferable trans = createTransferable(data);
-    try {
-      event.startDrag(DragSource.DefaultCopyDrop, trans);
-    } catch (final InvalidDnDOperationException exception) {
-      throw new IllegalArgumentException(exception);
-    }
-  }
-
-
   //#########################################################################
   //# Interface javax.swing.event.ListSelectionListener
   public void valueChanged(final ListSelectionEvent event)
@@ -588,6 +558,45 @@ public class EventDeclListView
 
   }
 
+  //#########################################################################
+  //# Inner Class EventDeclListTransferHandler
+  private class EventDeclListTransferHandler extends TransferHandler
+  {
+
+    @Override
+    public int getSourceActions(final JComponent c)
+    {
+      return COPY;
+    }
+
+    @Override
+    public Transferable createTransferable(final JComponent c)
+    {
+      return EventDeclListView.this.createTransferable(getCurrentSelection());
+    }
+
+    @Override
+    public void exportDone(final JComponent c, final Transferable t,
+                           final int action)
+    {
+
+    }
+
+    @Override
+    public boolean canImport(final TransferSupport support)
+    {
+      return false;
+    }
+
+    @Override
+    public boolean importData(final TransferSupport support)
+    {
+      return false;
+    }
+
+    private static final long serialVersionUID = 1L;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -595,7 +604,6 @@ public class EventDeclListView
   private final ModuleWindowInterface mRoot;
   private final PopupFactory mPopupFactory;
   private final EventDeclDeleteVisitor mDeleteVisitor;
-
   private List<Observer> mObservers;
 
 

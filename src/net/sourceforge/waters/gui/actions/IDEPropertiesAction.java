@@ -17,25 +17,27 @@ import javax.swing.Action;
 import net.sourceforge.waters.gui.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.EditorEditEdgeDialog;
 import net.sourceforge.waters.gui.EventDeclEditorDialog;
-import net.sourceforge.waters.gui.ForeachComponentEditorDialog;
+import net.sourceforge.waters.gui.ForeachEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
 import net.sourceforge.waters.gui.VariableEditorDialog;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.ConstantAliasSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.ForeachComponentSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 
@@ -96,7 +98,7 @@ public class IDEPropertiesAction
 
 
   //#########################################################################
-  //# Auxilary Methods
+  //# Auxiliary Methods
   private void updateEnabledStatus()
   {
     final Proxy proxy = getActionArgument();
@@ -190,13 +192,14 @@ public class IDEPropertiesAction
       return true;
     }
 
-    public Boolean visitForeachComponentProxy
-      (final ForeachComponentProxy comp)
+    public Boolean visitForeachProxy(final ForeachProxy foreach)
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        final ForeachComponentSubject subject = (ForeachComponentSubject) comp;
-        new ForeachComponentEditorDialog(root, subject);
+        final ForeachSubject subject = (ForeachSubject) foreach;
+        final FocusTracker tracker = getFocusTracker();
+        final SelectionOwner panel = tracker.getWatersSelectionOwner();
+        new ForeachEditorDialog(root, panel, subject);
       }
       return true;
     }

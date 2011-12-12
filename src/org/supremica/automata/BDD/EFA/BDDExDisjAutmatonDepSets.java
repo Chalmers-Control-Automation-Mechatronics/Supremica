@@ -90,72 +90,72 @@ public class BDDExDisjAutmatonDepSets extends BDDExDisjDepSetsDecorator {
 
     @Override
     protected TIntObjectHashMap<TIntIntHashMap> getForwardComponentToInfluencedComponentMap() {
-        
-        if(!bddExAutomata.BDDBitVecSourceVarsMap.isEmpty()){
-           int[] autIndicesAsKeys = autIndex2CaredEventIndices.keys();
-           for(int i = 0; i < autIndicesAsKeys.length; i++){
-               int autIndex = autIndicesAsKeys[i];
-               TIntIntHashMap tmp = new TIntIntHashMap();
-               HashSet<String> updatedVariables = autIndex2UpdatedVariables.get(autIndex);
-               for(int j = 0; j < autIndicesAsKeys.length; j++){
-                   HashSet<String> guardVariables = null;
-                   HashSet<String> differentVariables = null;
-                   if(i != j){
-                       guardVariables = autIndex2GuardVariables.get(autIndicesAsKeys[j]);
-                       differentVariables = new HashSet<String>(guardVariables);
-                       differentVariables.removeAll(updatedVariables);
-                       tmp.put(autIndicesAsKeys[j], guardVariables.size() - differentVariables.size());
-                   }
-               }
-                automaton2ForwardInfluencedAutomata.put(autIndex, tmp);
-           }
-        }else{ // Pure DFAs 
-            int[] autIndicesAsKeys = autIndex2CaredEventIndices.keys();
-            for (int i = 0; i < autIndicesAsKeys.length; i++) {
-                TIntArrayList caredEventIndices_i = autIndex2CaredEventIndices.get(autIndicesAsKeys[i]);
-                TIntIntHashMap tmp = new TIntIntHashMap(autIndicesAsKeys.length);
-                for (int j = 0; j < autIndicesAsKeys.length; j++) {
-                    if (autIndicesAsKeys[i] != autIndicesAsKeys[j]) {
-                        int sharedEventSize = 0;
-                        TIntArrayList caredEventIndices_j = autIndex2CaredEventIndices.get(autIndicesAsKeys[j]);
-                        for (int index_i = 0; index_i < caredEventIndices_i.size(); index_i++) {
-                            for (int index_j = 0; index_j < caredEventIndices_j.size(); index_j++) {
-                                if (caredEventIndices_i.get(index_i) == caredEventIndices_j.get(index_j)) {
-                                    sharedEventSize++;
+
+        if (automaton2ForwardInfluencedAutomata.isEmpty()) {
+            if (!orgAutomata.getVars().isEmpty()) {
+                int[] autIndicesAsKeys = autIndex2CaredEventIndices.keys();
+                for (int i = 0; i < autIndicesAsKeys.length; i++) {
+                    int autIndex = autIndicesAsKeys[i];
+                    TIntIntHashMap tmp = new TIntIntHashMap();
+                    HashSet<String> updatedVariables = autIndex2UpdatedVariables.get(autIndex);
+                    for (int j = 0; j < autIndicesAsKeys.length; j++) {
+                        HashSet<String> guardVariables = null;
+                        if (i != j) {
+                            guardVariables = autIndex2GuardVariables.get(autIndicesAsKeys[j]);
+                            guardVariables.retainAll(updatedVariables);
+                            tmp.put(autIndicesAsKeys[j], guardVariables.size());
+                        }
+                    }
+                    automaton2ForwardInfluencedAutomata.put(autIndex, tmp);
+                }
+            } else { // Pure DFAs
+                int[] autIndicesAsKeys = autIndex2CaredEventIndices.keys();
+                for (int i = 0; i < autIndicesAsKeys.length; i++) {
+                    TIntArrayList caredEventIndices_i = autIndex2CaredEventIndices.get(autIndicesAsKeys[i]);
+                    TIntIntHashMap tmp = new TIntIntHashMap(autIndicesAsKeys.length);
+                    for (int j = 0; j < autIndicesAsKeys.length; j++) {
+                        if (autIndicesAsKeys[i] != autIndicesAsKeys[j]) {
+                            int sharedEventSize = 0;
+                            TIntArrayList caredEventIndices_j = autIndex2CaredEventIndices.get(autIndicesAsKeys[j]);
+                            for (int index_i = 0; index_i < caredEventIndices_i.size(); index_i++) {
+                                for (int index_j = 0; index_j < caredEventIndices_j.size(); index_j++) {
+                                    if (caredEventIndices_i.get(index_i) == caredEventIndices_j.get(index_j)) {
+                                        sharedEventSize++;
+                                    }
                                 }
                             }
+                            tmp.put(autIndicesAsKeys[j], sharedEventSize);
                         }
-                        tmp.put(autIndicesAsKeys[j], sharedEventSize);
                     }
+                    automaton2ForwardInfluencedAutomata.put(autIndicesAsKeys[i], tmp);
                 }
-                automaton2ForwardInfluencedAutomata.put(autIndicesAsKeys[i], tmp);
             }
-            
         }
         return automaton2ForwardInfluencedAutomata;
     }
 
     @Override
     protected TIntObjectHashMap<TIntIntHashMap> getBackwardComponentToInfluencedComponentMap() {
-         if(bddExAutomata.BDDBitVecSourceVarsMap.isEmpty()){
-             automaton2BackwardInfluencedAutomata = getForwardComponentToInfluencedComponentMap();
-        } else {
-            int[] autIndicesAsKeys = autIndex2CaredEventIndices.keys();
-            for (int i = 0; i < autIndicesAsKeys.length; i++) {
-                int autIndex = autIndicesAsKeys[i];
-                TIntIntHashMap tmp = new TIntIntHashMap();
-                HashSet<String> guardVariables = autIndex2GuardVariables.get(autIndex);
-                for (int j = 0; j < autIndicesAsKeys.length; j++) {
-                    HashSet<String> updatedVariables = null;
-                    HashSet<String> differentVariables = null;
-                    if (i != j) {
-                        updatedVariables = autIndex2UpdatedVariables.get(autIndicesAsKeys[j]);
-                        differentVariables = new HashSet<String>(updatedVariables);
-                        differentVariables.removeAll(guardVariables);
-                        tmp.put(autIndicesAsKeys[j], updatedVariables.size() - differentVariables.size());
+
+        if (automaton2BackwardInfluencedAutomata.isEmpty()) {
+            if (orgAutomata.getVars().isEmpty()) {
+                automaton2BackwardInfluencedAutomata = getForwardComponentToInfluencedComponentMap();
+            } else {
+                int[] autIndicesAsKeys = autIndex2CaredEventIndices.keys();
+                for (int i = 0; i < autIndicesAsKeys.length; i++) {
+                    int autIndex = autIndicesAsKeys[i];
+                    TIntIntHashMap tmp = new TIntIntHashMap();
+                    HashSet<String> guardVariables = autIndex2GuardVariables.get(autIndex);
+                    for (int j = 0; j < autIndicesAsKeys.length; j++) {
+                        HashSet<String> updatedVariables = null;
+                        if (i != j) {
+                            updatedVariables = autIndex2UpdatedVariables.get(autIndicesAsKeys[j]);
+                            updatedVariables.retainAll(guardVariables);
+                            tmp.put(autIndicesAsKeys[j], updatedVariables.size());
+                        }
                     }
+                    automaton2BackwardInfluencedAutomata.put(autIndex, tmp);
                 }
-                automaton2BackwardInfluencedAutomata.put(autIndex, tmp);
             }
         }
         return automaton2BackwardInfluencedAutomata;
@@ -217,7 +217,6 @@ public class BDDExDisjAutmatonDepSets extends BDDExDisjDepSetsDecorator {
                         TIntObjectHashMap<BDD> event2BDD = eventParDepSets.getComponentToComponentTransMap();
                             
                         partialForwardTransition = partialForwardTransition.or(event2BDD.get(currCaredEventIndex));
-                        
                         
                         if(eventParDepSets.getInitialComponentCandidates().contains(currCaredEventIndex))
                             initialComponentCandidates.add(myIndex);

@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -39,6 +39,7 @@ import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -342,8 +343,8 @@ public class EventTableModel
                              final List<? extends Proxy> source)
   {
     for (final Proxy proxy : source) {
-      if (proxy instanceof ForeachEventProxy) {
-        final ForeachEventProxy foreach = (ForeachEventProxy) proxy;
+      if (proxy instanceof ForeachProxy) {
+        final ForeachProxy foreach = (ForeachProxy) proxy;
         final List<Proxy> body = foreach.getBody();
         collectEvents(dest, body);
       } else {
@@ -386,6 +387,10 @@ public class EventTableModel
       mEvents.remove(row);
     }
     fireTableRowsDeleted(row0, row1);
+  }
+
+  public ListSubject<? extends ProxySubject> getList(){
+    return mRoot.getModuleSubject().getEventDeclListModifiable();
   }
 
 
@@ -643,7 +648,7 @@ public class EventTableModel
       return ident.acceptVisitor(this);
     }
 
-    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
       final List<? extends Proxy> body = foreach.getBody();
@@ -732,7 +737,7 @@ public class EventTableModel
       }
     }
 
-    public Boolean visitForeachEventProxy(final ForeachEventProxy foreach)
+    public Boolean visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
       final List<? extends Proxy> body = foreach.getBody();

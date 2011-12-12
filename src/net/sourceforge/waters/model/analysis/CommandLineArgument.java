@@ -100,16 +100,31 @@ public abstract class CommandLineArgument
     return mIsRequired;
   }
 
+  protected boolean isUsed()
+  {
+    return mIsUsed;
+  }
+
+  protected void setUsed(final boolean used)
+  {
+    mIsUsed = used;
+  }
+
 
   //#########################################################################
   //# Parsing
   protected abstract void parse(Iterator<String> iter);
 
+  protected void configure(final ModelVerifier verifier)
+  {
+  }
+
   protected void configure(final ModuleCompiler compiler)
   {
   }
 
-  protected void configure(final ModelVerifier verifier)
+  protected void postConfigure(final ModelVerifier verifier)
+    throws AnalysisException
   {
   }
 
@@ -173,6 +188,7 @@ public abstract class CommandLineArgument
   private final String mName;
   private final String mDescription;
   private final boolean mIsRequired;
+  private boolean mIsUsed;
 
 
   //#########################################################################

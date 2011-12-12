@@ -87,16 +87,7 @@ jint PreJavaException::
 throwJavaException(ClassCache& cache)
   const
 {
-  if (mClassCode < UINT32_MAX) {
-    std::cerr << "howdy1" << std::endl;
-    return cache.throwJavaException(mClassCode, mMessage);
-  } else {
-    std::cerr << "howdy2" << std::endl;
-    JNIEnv* env = cache.getEnvironment();
-    jthrowable exception = env->ExceptionOccurred();
-    std::cerr << exception << std::endl;
-    return 0;
-  }
+  return cache.throwJavaException(mClassCode, mMessage);
 }
 
 

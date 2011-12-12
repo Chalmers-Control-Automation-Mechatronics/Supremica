@@ -72,8 +72,8 @@ public class ModuleIntegrityChecker
         // O.K.
       } else if (proxy instanceof InstanceProxy) {
         // O.K.
-      } else if (proxy instanceof ForeachComponentProxy) {
-        final ForeachComponentProxy foreach = (ForeachComponentProxy) proxy;
+      } else if (proxy instanceof ForeachProxy) {
+        final ForeachProxy foreach = (ForeachProxy) proxy;
         final List<Proxy> body = foreach.getBody();
         checkComponentListIntegrity(body);
       } else {

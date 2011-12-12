@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -61,7 +61,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       if (mNamedProxy instanceof SimpleComponentSubject) {
         final SimpleComponentSubject comp =
           (SimpleComponentSubject) mNamedProxy;
-        if (comp.getParent().getParent() instanceof ForeachComponentProxy) {
+        if (comp.getParent().getParent() instanceof ForeachProxy) {
           suffix = "ies";
         }
       }
@@ -215,7 +215,10 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
-      if (mSourceInfo.get(aut).getSourceObject() == mNamedProxy) {
+      final SourceInfo info = mSourceInfo.get(aut);
+      if (info == null) {
+        return super.getComponentKind(aut);
+      } else if (info.getSourceObject() == mNamedProxy) {
         return ComponentKind.SPEC;
       } else if (aut.getKind() == ComponentKind.PROPERTY) {
         return ComponentKind.PROPERTY;
@@ -254,13 +257,13 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       return false;
     }
 
-    public Boolean visitForeachComponentProxy(final ForeachComponentProxy proxy)
+    public Boolean visitForeachProxy(final ForeachProxy foreach)
     throws VisitorException
     {
-      for (final Proxy child : proxy.getBody())
-      {
-        if (isProperty(child))
+      for (final Proxy child : foreach.getBody()) {
+        if (isProperty(child)) {
           return true;
+        }
       }
       return false;
     }

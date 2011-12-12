@@ -20,7 +20,7 @@ public class BDDExDisjPartitioningTypeFactory {
         BDDExDisjAbstractWorkSet workset = null;
 
         if (synType == SynthesisAlgorithm.PARTITIONBDD_Event) {
-            logger.info("Choose the event based paritioning algorithm ...");
+            logger.info("Choose the event based paritioning algorithm.");
             BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);
             //depSets = new BDDExDisjEventDepSets(bddExAutomata);
             depSets = new BDDExDisjEventClusters(bddExAutomata, eventDepSets);
@@ -28,7 +28,7 @@ public class BDDExDisjPartitioningTypeFactory {
             depSets.setWorkSet(workset);
             System.err.println("the number of BDDs is " + depSets.getSize());
         } else if (synType == SynthesisAlgorithm.PARTITIONBDD_Automaton) {
-            logger.info("Choose the automaton based partitioning algorithm ...");
+            logger.info("Choose the automaton based partitioning algorithm.");
             BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);
             depSets = new BDDExDisjAutmatonDepSets(bddExAutomata, eventDepSets);
             workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
@@ -36,16 +36,18 @@ public class BDDExDisjPartitioningTypeFactory {
         } 
         else if (synType == SynthesisAlgorithm.PARTITIONBDD_Variable) {
             BDDExDisjEventDepSets eventDepSets = new BDDExDisjEventDepSets(bddExAutomata);
-            if (bddExAutomata.orgExAutomata.getVars() == null) {
+            if (bddExAutomata.orgExAutomata.getVars().isEmpty()) {
                 logger.info("Not an EFA model. Choose the automaton based partitioning algorithm (default for DFA)");
                 depSets = new BDDExDisjAutmatonDepSets(bddExAutomata, eventDepSets);
                 workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
                 depSets.setWorkSet(workset);
             } else {
-                logger.info("Choose the variable based paritioning algorithm");
-                depSets = new BDDExDisjVariableDepSets(bddExAutomata, eventDepSets);
+                logger.info("Choose the variable based paritioning algorithm.");
+                BDDExDisjVariableDepSets variableDepSets = new BDDExDisjVariableDepSets(bddExAutomata, eventDepSets);
+                depSets = new BDDExDisjVariableClusters(bddExAutomata, eventDepSets, variableDepSets);
                 workset = new BDDExDisjWorkSetImpl(depSets, depSets.getSize());
                 depSets.setWorkSet(workset);
+                System.err.println("the number of BDDs is " + depSets.getSize());
             }
         }
         return depSets;

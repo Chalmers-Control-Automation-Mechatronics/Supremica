@@ -10,15 +10,17 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import java.io.PrintStream;
-import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -38,12 +40,6 @@ public class CompositionalModelVerifierFactory extends AbstractModelVerifierFact
     return SingletonHolder.INSTANCE;
   }
 
-  public static CompositionalModelVerifierFactory getInstance
-    (final List<String> cmdline)
-  {
-    return new CompositionalModelVerifierFactory(cmdline);
-  }
-
   private static class SingletonHolder {
     private static final CompositionalModelVerifierFactory INSTANCE =
       new CompositionalModelVerifierFactory();
@@ -56,9 +52,14 @@ public class CompositionalModelVerifierFactory extends AbstractModelVerifierFact
   {
   }
 
-  private CompositionalModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(new MonolithicStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
     addArgument(new LowerInternalStateLimitArgument());
@@ -69,6 +70,7 @@ public class CompositionalModelVerifierFactory extends AbstractModelVerifierFact
     addArgument(new PreselectingMethodArgument());
     addArgument(new SelectingMethodArgument());
     addArgument(new SubsumptionArgument());
+    addArgument(new SecondaryFactoryArgument());
   }
 
 
@@ -81,6 +83,13 @@ public class CompositionalModelVerifierFactory extends AbstractModelVerifierFact
     final CompositionalConflictChecker.AbstractionMethod method =
       CompositionalConflictChecker.AbstractionMethod.OEQ;
     return new CompositionalConflictChecker(method, factory);
+  }
+
+  @Override
+  public CompositionalLanguageInclusionChecker createLanguageInclusionChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new CompositionalLanguageInclusionChecker(factory);
   }
 
 
@@ -432,6 +441,46 @@ public class CompositionalModelVerifierFactory extends AbstractModelVerifierFact
       final AbstractCompositionalModelVerifier composer =
         (AbstractCompositionalModelVerifier) verifier;
       composer.setSubumptionEnabled(true);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class SecondaryFactoryArgyment
+  private static class SecondaryFactoryArgument
+    extends CommandLineArgumentChain
+  {
+
+    //#######################################################################
+    //# Constructors
+    private SecondaryFactoryArgument()
+    {
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModelVerifier verifier)
+    {
+      final ProductDESProxyFactory desFactory = verifier.getFactory();
+      final ModelVerifierFactory secondaryFactory = getSecondaryFactory();
+      final ModelVerifier secondaryVerifier;
+      if (verifier instanceof CompositionalConflictChecker) {
+        secondaryVerifier = secondaryFactory.createConflictChecker(desFactory);
+      } else if (verifier instanceof CompositionalLanguageInclusionChecker) {
+        secondaryVerifier =
+          secondaryFactory.createLanguageInclusionChecker(desFactory);
+      } else {
+        fail("Unsupported compositional verifier class " +
+             ProxyTools.getShortClassName(verifier) + "!");
+        return;
+      }
+      final AbstractCompositionalModelVerifier composer =
+        (AbstractCompositionalModelVerifier) verifier;
+      composer.setMonolithicVerifier(secondaryVerifier);
+      secondaryFactory.configure(secondaryVerifier);
     }
 
   }

@@ -83,6 +83,14 @@ public class FocusTracker
     return mSwingSelectionOwner;
   }
 
+  public SelectionOwner getSourceOfDragOperation(){
+    return mWatersSelectionOwner;
+  }
+
+  public void setSourceOfDragOperation(final SelectionOwner dragger){
+    mWatersSelectionOwner = dragger;
+  }
+
 
   //#########################################################################
   //# Interface java.beans.PropertyChangeListener

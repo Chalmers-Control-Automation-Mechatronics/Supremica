@@ -178,9 +178,6 @@ public final class Config
     public static final BooleanProperty INCLUDE_INSTANTION =
       new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
 			  "Enable instantiation and other advanced features");
-    public static final BooleanProperty INCLUDE_DEFINITIONS_PANEL =
-      new BooleanProperty(PropertyType.GUI, "includeDefinitionsPanel", false,
-              "Enable Definitions Panel");
     public static final BooleanProperty OPTIMIZING_COMPILER =
       new BooleanProperty(PropertyType.GUI, "optimizingCompiler", true,
 			  "Remove redundant events, transitions, and components " +

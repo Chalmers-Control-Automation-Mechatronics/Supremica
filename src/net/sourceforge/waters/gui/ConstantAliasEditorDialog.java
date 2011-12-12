@@ -235,7 +235,7 @@ public class ConstantAliasEditorDialog
       final SimpleExpressionSubject exp0 =
         (SimpleExpressionSubject) mExpressionInput.getValue();
       final SimpleExpressionSubject exp = makeUnique(exp0);
-      final SelectionOwner panel = mRoot.getAliasesPanel();
+      final SelectionOwner panel = mRoot.getConstantAliasesPanel();
       if (mAlias == null) {
         final ConstantAliasSubject template =
           new ConstantAliasSubject(name, exp);

@@ -231,6 +231,7 @@ public class SICPropertyBuilder
     final ProductDESProxy newModel =
         mFactory.createProductDESProxy(name, comment, null, newEvents,
                                        newAutomata);
+    // MarshallingTools.saveModule(newModel, desname + "_sic5.wmod");
     return newModel;
   }
 
@@ -303,7 +304,7 @@ public class SICPropertyBuilder
     final ProductDESProxy newModel =
         mFactory.createProductDESProxy(name, comment, null, newEvents,
                                        newAutomata);
-    //MarshallingTools.saveModule(newModel, "xxx.wmod");
+    // MarshallingTools.saveModule(newModel, desname + "_sic5.wmod");
     return newModel;
   }
 
@@ -351,8 +352,11 @@ public class SICPropertyBuilder
     final String comment =
       "Automatically generated from '" + desname +
       "' to check SIC Property VI.";
-    return mFactory.createProductDESProxy(name, comment, null,
-                                          newEvents, newAutomata);
+    final ProductDESProxy newModel =
+      mFactory.createProductDESProxy(name, comment, null,
+                                     newEvents, newAutomata);
+    // MarshallingTools.saveModule(newModel, desname + "_sic6.wmod");
+    return newModel;
   }
 
   public ConflictTraceProxy convertTraceToOriginalModel

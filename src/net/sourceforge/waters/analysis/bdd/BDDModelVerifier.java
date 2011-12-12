@@ -115,9 +115,10 @@ public abstract class BDDModelVerifier
     super(model, desfactory, translator);
     mBDDPackage = bddpackage;
     mVariableOrdering = VariableOrdering.FORCE;
-    mInitialSize = 50000;
-    mPartitioningSizeLimit = Integer.MAX_VALUE;
     mIsReorderingEnabled = true;
+    mInitialSize = 50000;
+    mPartitioningStrategy = TransitionPartitioningStrategy.GREEDY;
+    mPartitioningSizeLimit = Integer.MAX_VALUE;
   }
 
 
@@ -143,6 +144,16 @@ public abstract class BDDModelVerifier
     return mVariableOrdering;
   }
 
+  public void setReorderingEnabled(final boolean enable)
+  {
+    mIsReorderingEnabled = enable;
+  }
+
+  public boolean isReorderingEnabled()
+  {
+    return mIsReorderingEnabled;
+  }
+
   public void setInitialSize(final int size)
   {
     mInitialSize = size;
@@ -153,6 +164,17 @@ public abstract class BDDModelVerifier
     return mInitialSize;
   }
 
+  public void setTransitionPartitioningStrategy
+    (final TransitionPartitioningStrategy strategy)
+  {
+    mPartitioningStrategy = strategy;
+  }
+
+  public TransitionPartitioningStrategy getTransitionPartitioningStrategy()
+  {
+    return mPartitioningStrategy;
+  }
+
   public void setPartitioningSizeLimit(final int limit)
   {
     mPartitioningSizeLimit = limit < 0 ? Integer.MAX_VALUE : limit;
@@ -161,16 +183,6 @@ public abstract class BDDModelVerifier
   public int getPartitioningSizeLimit()
   {
     return mPartitioningSizeLimit;
-  }
-
-  public void setReorderingEnabled(final boolean enable)
-  {
-    mIsReorderingEnabled = enable;
-  }
-
-  public boolean isReorderingEnabled()
-  {
-    return mIsReorderingEnabled;
   }
 
 
@@ -235,7 +247,7 @@ public abstract class BDDModelVerifier
     mAutomatonBDDs = null;
     mAutomatonBDDbyVarIndex = null;
     mPeakNodes = 0;
-    mTransitionBDDs = null;
+    mTransitionPartitioning = null;
     mLevels = null;
     mCurrentReorderIndex = mNextReorderIndex = -1;
   }
@@ -339,9 +351,9 @@ public abstract class BDDModelVerifier
         initial.andWith(autinit);
         final AutomatonProxy aut = autBDD.getAutomaton();
         final Collection<EventProxy> localevents = aut.getEvents();
-        for (final EventBDD eventBDD : eventBDDs) {
-          final EventProxy event = eventBDD.getEvent();
-          if (localevents.contains(event)) {
+        for (final EventProxy event : localevents) {
+          if (isProperEvent(event)) {
+            final EventBDD eventBDD = eventmap.get(event);
             eventBDD.startAutomaton(autBDD, mBDDFactory);
           }
         }
@@ -353,8 +365,11 @@ public abstract class BDDModelVerifier
             eventBDD.includeTransition(trans, mBDDFactory);
           }
         }
-        for (final EventBDD eventBDD : eventBDDs) {
-          eventBDD.finishAutomaton(mBDDFactory);
+        for (final EventProxy event : localevents) {
+          if (isProperEvent(event)) {
+            final EventBDD eventBDD = eventmap.get(event);
+            eventBDD.finishAutomaton(mBDDFactory);
+          }
         }
         mIsFullyDeterministic &= autBDD.isDeterministic();
       }
@@ -374,23 +389,22 @@ public abstract class BDDModelVerifier
       }
     }
 
-    final Partitioning<TransitionPartitionBDD> transPartitioning =
-      new Partitioning<TransitionPartitionBDD>(TransitionPartitionBDD.class);
+    mTransitionPartitioning = mPartitioningStrategy.createPartitioning
+        (mBDDFactory, model, mPartitioningSizeLimit);
     int transcount0 = 0;
     for (final EventBDD eventBDD : eventBDDs) {
       final BDD trans = eventBDD.getTransitionsBDD();
       if (trans != null) {
         final TransitionPartitionBDD part =
           new TransitionPartitionBDD(eventBDD);
-        transPartitioning.add(part);
+        mTransitionPartitioning.add(part);
         transcount0++;
       }
     }
-    final Collection<TransitionPartitionBDD> transitions =
-      transPartitioning.mergePartitions(mAutomatonBDDs, mBDDFactory,
-                                        mPartitioningSizeLimit);
-    mTransitionBDDs = new ArrayList<TransitionPartitionBDD>(transitions);
-    final int transcount1 = mTransitionBDDs.size();
+    mTransitionPartitioning.merge(mAutomatonBDDs);
+    final List<TransitionPartitionBDD> bdds =
+      mTransitionPartitioning.getFullPartition();
+    final int transcount1 = bdds.size();
     final Logger logger = getLogger();
     if (logger.isDebugEnabled() && transcount0 > transcount1) {
       logger.debug("Merged transitions: " + transcount0 + " >> " + transcount1);
@@ -435,12 +449,17 @@ public abstract class BDDModelVerifier
     throws OverflowException
   {
     resetReorderIndex();
-    for (final TransitionPartitionBDD trans : mTransitionBDDs) {
-      trans.buildForwardCubes(mAutomatonBDDs, mBDDFactory);
+    final List<TransitionPartitionBDD> partitioning =
+      mTransitionPartitioning.getFullPartition();
+    for (final TransitionPartitionBDD part : partitioning) {
+      part.buildForwardCubes(mAutomatonBDDs, mBDDFactory);
     }
+    mTransitionPartitioning.startIteration();
     final Logger logger = getLogger();
     BDD current = getInitialStateBDD();
-    do {
+    List<TransitionPartitionBDD> group =
+      mTransitionPartitioning.startIteration();
+    while (true) {
       final int numnodes = mBDDFactory.getNodeNum();
       if (logger.isDebugEnabled()) {
         logger.debug("Depth " + mLevels.size() + ", " +
@@ -457,8 +476,11 @@ public abstract class BDDModelVerifier
         current.free();
         return null;
       }
+      if (group == null) {
+        break;
+      }
       final BDD next = current.id();
-      for (final TransitionPartitionBDD part : mTransitionBDDs) {
+      for (final TransitionPartitionBDD part : group) {
         final BDD transpart = part.getBDD();
         final BDDVarSet cube = part.getCurrentStateCube();
         final BDD nextpart = current.relprod(transpart, cube);
@@ -466,13 +488,14 @@ public abstract class BDDModelVerifier
         nextpart.replaceWith(renaming);
         next.orWith(nextpart);
       }
-      if (next.equals(current)) {
-        break;
+      final boolean stable = next.equals(current);
+      if (!stable) {
+        mLevels.add(next);
+        reorder();
       }
-      mLevels.add(next);
       current = next;
-      reorder();
-    } while (true);
+      group = mTransitionPartitioning.nextGroup(stable);
+    }
     recordStateCount(current);
     return current;
   }
@@ -481,8 +504,10 @@ public abstract class BDDModelVerifier
     throws OverflowException
   {
     resetReorderIndex();
-    for (final TransitionPartitionBDD trans : mTransitionBDDs) {
-      trans.buildBackwardCubes(mAutomatonBDDs, mBDDFactory);
+    final List<TransitionPartitionBDD> partitioning =
+      mTransitionPartitioning.getFullPartition();
+    for (final TransitionPartitionBDD part : partitioning) {
+      part.buildBackwardCubes(mAutomatonBDDs, mBDDFactory);
     }
     BDD current;
     if (restriction == null) {
@@ -491,12 +516,14 @@ public abstract class BDDModelVerifier
       current = endset.and(restriction);
       endset.free();
     }
-    int level = 0;
     final Logger logger = getLogger();
-    do {
+    int level = 0;
+    List<TransitionPartitionBDD> group =
+      mTransitionPartitioning.startIteration();
+    while (group != null) {
       final int numnodes = mBDDFactory.getNodeNum();
       if (logger.isDebugEnabled()) {
-        logger.debug("Coreachability " + (level++) + ", " +
+        logger.debug("Coreachability " + level + ", " +
                      numnodes + " nodes ...");
       }
       if (numnodes > mPeakNodes) {
@@ -510,7 +537,7 @@ public abstract class BDDModelVerifier
         return null;
       }
       BDD prev = current.id();
-      for (final TransitionPartitionBDD part : mTransitionBDDs) {
+      for (final TransitionPartitionBDD part : group) {
         final BDDPairing renaming = part.getCurrentToNext();
         final BDD nextpart = current.replace(renaming);
         final BDD transpart = part.getBDD();
@@ -524,14 +551,15 @@ public abstract class BDDModelVerifier
         prev.free();
         prev = tmp;
       }
-      if (prev.equals(current)) {
-        prev.free();
-        break;
-      }
+      final boolean stable = prev.equals(current);
       current.free();
       current = prev;
-      reorder();
-    } while (true);
+      if (!stable) {
+        level++;
+        reorder();
+      }
+      group = mTransitionPartitioning.nextGroup(stable);
+    }
     return current;
   }
 
@@ -567,78 +595,123 @@ public abstract class BDDModelVerifier
 
   List<TraceStepProxy> computeTrace(final BDD target, final int level)
   {
-    for (final TransitionPartitionBDD trans : mTransitionBDDs) {
-      trans.buildBackwardCubes(mAutomatonBDDs, mBDDFactory);
+    final List<TransitionPartitionBDD> partitioning =
+      mTransitionPartitioning.getFullPartition();
+    for (final TransitionPartitionBDD part : partitioning) {
+      part.buildBackwardCubes(mAutomatonBDDs, mBDDFactory);
     }
+    final BDDFactory bddFactory = getBDDFactory();
     BDD current = target;
-    final ProductDESProxyFactory factory = getFactory();
     final Map<AutomatonProxy,StateProxy> statemap =
       new HashMap<AutomatonProxy,StateProxy>(mNumAutomata);
     final List<TraceStepProxy> trace = new LinkedList<TraceStepProxy>();
     final ListIterator<BDD> liter = mLevels.listIterator(level);
     while (liter.hasPrevious()) {
-      final BDD prev = liter.previous();
-      for (final TransitionPartitionBDD part : mTransitionBDDs) {
+      TransitionPartitionBDD foundPart = null;
+      BDD foundPrev = bddFactory.zero();
+      BDD foundPreds = bddFactory.zero();
+      BDD foundPrimed = bddFactory.zero();
+      BDD prev = liter.previous();
+      parts:
+      for (final TransitionPartitionBDD part : partitioning) {
         final BDDPairing renaming = part.getCurrentToNext();
-        BDD currentPrimed = current.id();
+        final BDD currentPrimed = current.id();
         currentPrimed.replaceWith(renaming);
         final BDD transpart = part.getBDD();
         final BDDVarSet cube = part.getNextStateCube();
-        BDD preds = currentPrimed.relprod(transpart, cube);
-        preds.andWith(prev.id());
-        if (preds.isZero()) {
-          currentPrimed.free();
-        } else {
-          final Map<EventProxy,TransitionPartitionBDD> map =
-            part.getTransitionComponents();
-          final Iterator<Map.Entry<EventProxy,TransitionPartitionBDD>> iter =
-            map.entrySet().iterator();
-          Map.Entry<EventProxy,TransitionPartitionBDD> entry = iter.next();
-          if (iter.hasNext()) {
-            while (true) {
-              currentPrimed.free();
-              preds.free();
-              final TransitionPartitionBDD subpart = entry.getValue();
-              final BDDPairing subrenaming = subpart.getCurrentToNext();
-              currentPrimed = current.id();
-              currentPrimed.replaceWith(subrenaming);
-              final BDD subtranspart = subpart.getBDD();
-              final BDDVarSet subcube = subpart.getNextStateCube();
-              preds = currentPrimed.relprod(subtranspart, subcube);
-              preds.andWith(prev.id());
-              if (!preds.isZero()) {
-                break;
+        final BDD preds = currentPrimed.relprod(transpart, cube);
+        BDD intersection = preds.and(prev);
+        if (!intersection.isZero()) {
+          intersection.free();
+          foundPrev.free();
+          foundPreds.free();
+          foundPrimed.free();
+          foundPart = part;
+          foundPrev = prev;
+          foundPreds = preds;
+          foundPrimed = currentPrimed;
+          if (!mTransitionPartitioning.isStrictBFS()) {
+            while (liter.hasPrevious()) {
+              prev = liter.previous();
+              intersection = preds.and(prev);
+              if (intersection.isZero()) {
+                continue parts;
               }
-              entry = iter.next();
+              intersection.free();
+              foundPrev.free();
+              foundPrev = prev;
             }
           }
-          current.free();
-          final EventProxy event = entry.getKey();
-          if (isDeterministic(event)) {
-            currentPrimed.free();
-          } else {
-            preds.free();
-            final TransitionPartitionBDD subpart = entry.getValue();
-            preds = getDeterminisedPredecessorsBDD
-              (currentPrimed, event, subpart, statemap);
-            preds.andWith(prev.id());
-          }
-          final TraceStepProxy step =
-            factory.createTraceStepProxy(event, statemap);
-          trace.add(0, step);
-          statemap.clear();
-          current = preds;
           break;
         }
+        preds.free();
+        currentPrimed.free();
       }
-      prev.free();
+      final BDD preds = createTraceStep(foundPart, foundPrev, current,
+                                        foundPreds, foundPrimed, trace);
+      if (foundPrev != prev) {
+        liter.next();
+      }
+      foundPrev.free();
+      current.free();
+      current = preds;
     }
     if (!isDeterministic(null)) {
       getDeterminisedInitialStateMap(current, statemap);
     }
-    final TraceStepProxy step = factory.createTraceStepProxy(null, statemap);
+    final ProductDESProxyFactory desFactory = getFactory();
+    final TraceStepProxy step = desFactory.createTraceStepProxy(null, statemap);
     trace.add(0, step);
     return trace;
+  }
+
+  BDD createTraceStep(final TransitionPartitionBDD part,
+                      final BDD source,
+                      final BDD target,
+                      BDD preds,
+                      BDD targetPrimed,
+                      final List<TraceStepProxy> trace)
+  {
+    final Map<EventProxy,TransitionPartitionBDD> map =
+      part.getTransitionComponents();
+    final Iterator<Map.Entry<EventProxy,TransitionPartitionBDD>> iter =
+      map.entrySet().iterator();
+    Map.Entry<EventProxy,TransitionPartitionBDD> entry = iter.next();
+    if (iter.hasNext()) {
+      while (true) {
+        preds.free();
+        targetPrimed.free();
+        final TransitionPartitionBDD subpart = entry.getValue();
+        final BDDPairing subrenaming = subpart.getCurrentToNext();
+        targetPrimed = target.id();
+        targetPrimed.replaceWith(subrenaming);
+        final BDD subtranspart = subpart.getBDD();
+        final BDDVarSet subcube = subpart.getNextStateCube();
+        preds = targetPrimed.relprod(subtranspart, subcube);
+        preds.andWith(source.id());
+        if (!preds.isZero()) {
+          break;
+        }
+        entry = iter.next();
+      }
+    }
+    final EventProxy event = entry.getKey();
+    final Map<AutomatonProxy,StateProxy> statemap;
+    if (isDeterministic(event)) {
+      statemap = null;
+      targetPrimed.free();
+    } else {
+      preds.free();
+      final TransitionPartitionBDD subpart = entry.getValue();
+      statemap = new HashMap<AutomatonProxy,StateProxy>(mNumAutomata);
+      preds = getDeterminisedPredecessorsBDD
+        (targetPrimed, event, subpart, statemap);
+      preds.andWith(source.id());
+    }
+    final ProductDESProxyFactory factory = getFactory();
+    final TraceStepProxy step = factory.createTraceStepProxy(event, statemap);
+    trace.add(0, step);
+    return preds;
   }
 
   void resetReorderIndex()
@@ -678,9 +751,9 @@ public abstract class BDDModelVerifier
     return mAutomatonBDDs;
   }
 
-  List<TransitionPartitionBDD> getTransitionBDDs()
+  Partitioning<TransitionPartitionBDD> getTransitionPartitioning()
   {
-    return mTransitionBDDs;
+    return mTransitionPartitioning;
   }
 
   int getDepth()
@@ -857,6 +930,7 @@ public abstract class BDDModelVerifier
   private BDDPackage mBDDPackage;
   private VariableOrdering mVariableOrdering;
   private int mInitialSize;
+  private TransitionPartitioningStrategy mPartitioningStrategy;
   private int mPartitioningSizeLimit;
   private boolean mIsReorderingEnabled;
 
@@ -867,7 +941,7 @@ public abstract class BDDModelVerifier
   private boolean mIsFullyDeterministic;
   private AutomatonBDD[] mAutomatonBDDbyVarIndex;
   private int mPeakNodes;
-  private List<TransitionPartitionBDD> mTransitionBDDs;
+  private Partitioning<TransitionPartitionBDD> mTransitionPartitioning;
   private List<BDD> mLevels;
   private int mCurrentReorderIndex;
   private int mNextReorderIndex;

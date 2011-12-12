@@ -9,15 +9,18 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
+import java.util.PriorityQueue;
+import java.util.Queue;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -40,6 +43,7 @@ abstract class PartitionBDD
   {
     mBDD = bdd;
     mNodeCount = -1;
+    mAveragePosition = Double.NaN;
     mComponents = Collections.singletonMap(event, this);
     mAutomata = automata;
     mNumAutomata = automata.cardinality();
@@ -55,6 +59,7 @@ abstract class PartitionBDD
   {
     mBDD = bdd;
     mNodeCount = -1;
+    mAveragePosition = Double.NaN;
     final Map<EventProxy,PartitionBDD> comp1 = part1.mComponents;
     final Map<EventProxy,PartitionBDD> comp2 = part2.mComponents;
     final int size = comp1.size() + comp2.size();
@@ -110,18 +115,29 @@ abstract class PartitionBDD
   //# Interface java.util.Comparable
   public int compareTo(final PartitionBDD part)
   {
-    if (mNumAutomata != part.mNumAutomata) {
+    final double pos1 = computeAveragePosition();
+    final double pos2 = part.computeAveragePosition();
+    if (pos1 != pos2) {
+      // Start iteration at lower end in variable ordering.
+      return pos1 < pos2 ? 1 : -1;
+    } else if (mNumAutomata != part.mNumAutomata) {
       return mNumAutomata - part.mNumAutomata;
-    } else if (getNodeCount() != part.getNodeCount()) {
-      return getNodeCount() - part.getNodeCount();
     } else if (mComponents.size() != part.mComponents.size()) {
       return mComponents.size() - part.mComponents.size();
+    } else if (getNodeCount() != part.getNodeCount()) {
+      return getNodeCount() - part.getNodeCount();
     } else {
-      final Set<EventProxy> events1 = mComponents.keySet();
-      final EventProxy event1 = Collections.min(events1);
-      final Set<EventProxy> events2 = part.mComponents.keySet();
-      final EventProxy event2 = Collections.min(events2);
-      return event1.compareTo(event2); // event sets should be disjoint ...
+      final Queue<EventProxy> events1 =
+        new PriorityQueue<EventProxy>(mComponents.keySet());
+      final Queue<EventProxy> events2 =
+        new PriorityQueue<EventProxy>(part.mComponents.keySet());
+      EventProxy event1 = null;
+      EventProxy event2 = null;
+      while (event1 == event2 && !events1.isEmpty()) {
+        event1 = events1.remove();
+        event2 = events2.remove();
+      }
+      return event1.compareTo(event2);
     }
   }
 
@@ -192,9 +208,61 @@ abstract class PartitionBDD
 
 
   //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final List<EventProxy> events =
+      new ArrayList<EventProxy>(mComponents.keySet());
+    Collections.sort(events);
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append(ProxyTools.getShortClassName(this));
+    buffer.append('{');
+    boolean first = true;
+    for (final EventProxy event : events) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      buffer.append(event.getName());
+    }
+    buffer.append('}');
+    return buffer.toString();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private double computeAveragePosition()
+  {
+    if (mAveragePosition == Double.NaN) {
+      int sum = 0;
+      int count = 0;
+      for (final PartitionBDD part : mComponents.values()) {
+        final BitSet automata = part.getAutomata();
+        for (int bit = automata.nextSetBit(0);
+             bit >= 0;
+             bit = automata.nextSetBit(bit + 1)) {
+          sum += bit;
+          count++;
+        }
+      }
+      if (count == 0) {
+        mAveragePosition = -1.0;
+      } else {
+        mAveragePosition = (double) sum / (double) count;
+      }
+    }
+    return mAveragePosition;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private BDD mBDD;
   private int mNodeCount;
+  private double mAveragePosition;
   private final Map<EventProxy,PartitionBDD> mComponents;
   private final BitSet mAutomata;
   private final int mNumAutomata;

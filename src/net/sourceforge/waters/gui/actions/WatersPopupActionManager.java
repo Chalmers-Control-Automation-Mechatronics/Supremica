@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
-//# PACKAGE: org.supremica.gui.ide.actions
+//# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersPopupActionManager
 //###########################################################################
 //# $Id$
@@ -51,12 +51,17 @@ public class WatersPopupActionManager
     master.installCutCopyPasteActions(comp);
   }
 
+  public void invokeMouseClickAction(final IDEAction action)
+  {
+    invokeMouseClickAction(action, null);
+  }
+
   public void invokeMouseClickAction(final IDEAction action,
                                      final MouseEvent event)
   {
     if (action.isEnabled()) {
       final String key = (String) action.getValue(Action.ACTION_COMMAND_KEY);
-      final int mods = event.getModifiers();
+      final int mods = event == null ? 0 : event.getModifiers();
       final ActionEvent newevent =
         new ActionEvent(this, ActionEvent.ACTION_PERFORMED, key, mods);
       action.actionPerformed(newevent);
@@ -86,7 +91,12 @@ public class WatersPopupActionManager
 
   public IDEAction getDeleteAction(final Proxy arg)
   {
-    return arg == null ? getDeleteAction() : new IDEDeleteAction(mIDE, arg);
+    if(arg == null || arg instanceof ModuleProxy){
+      return getDeleteAction();
+    }
+    else{
+      return new IDEDeleteAction(mIDE, arg);
+    }
   }
 
   public IDEAction getDeselectAllAction()
@@ -165,7 +175,7 @@ public class WatersPopupActionManager
   public IDEAction getInsertForeachComponentAction()
   {
     final WatersActionManager master = mIDE.getActions();
-    return master.getAction(InsertForeachComponentAction.class);
+    return master.getAction(InsertForeachAction.class);
   }
 
   public IDEAction getInsertSimpleComponentAction()

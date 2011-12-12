@@ -12,6 +12,10 @@ The following changes have been made in order make the model amenable to composi
 These are the numbers of reachable states of this model for some parameters:
 N=3: 1376197836 reachable states, diameter 272.
 N=4: 13637751306 reachable states, diameter 350.
+N=6: 328923401864 reachable states.
+N=8: 2112932274834 reachable states.
+N=10: 5805783408314 reachable states.
+N=10: 18993341765354 reachable states.
 
 Reference:
 Raoguang Song. Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control. Masters Thesis, Department of Computer Science, McMaster University, Hamilton, Canada, 2006.

@@ -13,8 +13,10 @@ import java.util.Collection;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
 
@@ -210,6 +212,20 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   }
 
   /**
+   * Returns whether the given event is a proper event under the current
+   * {@link KindTranslator}. A proper event is controllable or uncontrollable,
+   * not a proposition.
+   * @see #getKindTranslator()
+   * @see EventKind
+   */
+  protected boolean isProperEvent(final EventProxy event)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final EventKind kind = translator.getEventKind(event);
+    return kind == EventKind.CONTROLLABLE || kind == EventKind.UNCONTROLLABLE;
+  }
+
+  /**
    * Creates an analysis result object to store the model analyser's results.
    * This method is called is in {@link #setUp()} to ensure that the
    * analysis result is available throughout the analysis run. It is
@@ -249,8 +265,10 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   protected AnalysisException setExceptionResult
     (final AnalysisException exception)
   {
-    mAnalysisResult.setException(exception);
-    addStatistics();
+    if (mAnalysisResult != null) {
+      mAnalysisResult.setException(exception);
+      addStatistics();
+    }
     return exception;
   }
 

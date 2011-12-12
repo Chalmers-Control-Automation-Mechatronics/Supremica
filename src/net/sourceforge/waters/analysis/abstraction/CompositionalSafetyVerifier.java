@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.abstraction;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectByteHashMap;
+import gnu.trove.TObjectByteIterator;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -40,7 +41,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -206,6 +206,20 @@ public class CompositionalSafetyVerifier
     super.initialiseEventsToAutomata();
   }
 
+  String getPropertyEventsDump()
+  {
+    final StringBuffer buffer = new StringBuffer();
+    final TObjectByteIterator<EventProxy> iter = mPropertyEventsMap.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      buffer.append(iter.key());
+      buffer.append(" = ");
+      buffer.append(iter.value() == REGULAR ? "REGULAR" : "FORBIDDEN");
+      buffer.append("\n");
+    }
+    return buffer.toString();
+  }
+
   @Override
   protected EventInfo createEventInfo(final EventProxy event)
   {
@@ -232,42 +246,18 @@ public class CompositionalSafetyVerifier
   }
 
   @Override
-  protected AbstractionStep removeEvents(final Collection<EventProxy> removed)
+  protected AbstractionStep removeEvents(final Set<EventProxy> removed)
     throws OverflowException
   {
     final AbstractionStep step = super.removeEvents(removed);
     if (step != null) {
-      final ProductDESProxyFactory factory = getFactory();
-      final Set<EventProxy> removedSet = new THashSet<EventProxy>(removed);
       final ListIterator<AutomatonProxy> iter = mProperties.listIterator();
       while (iter.hasNext()) {
         final AutomatonProxy aut = iter.next();
-        final Collection<EventProxy> events = aut.getEvents();
-        boolean found = false;
-        for (final EventProxy event : events) {
-          if (removedSet.contains(event)) {
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
+        final AutomatonProxy newAut = removeEvents(aut, removed);
+        if (newAut == aut) {
           continue;
-        }
-        final int numEvents = events.size();
-        final Collection<EventProxy> newEvents =
-          new ArrayList<EventProxy>(numEvents - 1);
-        for (final EventProxy event : events) {
-          if (!removedSet.contains(event)) {
-            newEvents.add(event);
-          }
-        }
-        final String name = aut.getName();
-        final ComponentKind kind = aut.getKind();
-        final Collection<StateProxy> states = aut.getStates();
-        final Collection<TransitionProxy> transitions = aut.getTransitions();
-        final AutomatonProxy newAut = factory.createAutomatonProxy
-          (name, kind, newEvents, states, transitions);
-        if (isTrivialProperty(newAut)) {
+        } else if (isTrivialProperty(newAut)) {
           iter.remove();
         } else {
           step.addAutomatonPair(newAut, aut);
@@ -411,6 +401,12 @@ public class CompositionalSafetyVerifier
     {
       final EventProxy event = getEvent();
       return mPropertyEventsMap.get(event) != REGULAR;
+    }
+
+    @Override
+    protected boolean isSubjectToSelfloopRemoval()
+    {
+      return isTau();
     }
   }
 

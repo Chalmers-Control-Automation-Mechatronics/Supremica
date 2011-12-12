@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.Proxy;
@@ -34,9 +35,7 @@ import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -243,7 +242,7 @@ public abstract class JAXBAbstractModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.EventListExpression.class, handler);
     handler = new ImportHandler() {
-      public ForeachComponentProxy importElement(final ElementType element)
+      public ForeachProxy importElement(final ElementType element)
         throws WatersUnmarshalException
       {
         final ForeachComponent downcast = (ForeachComponent) element;
@@ -253,7 +252,7 @@ public abstract class JAXBAbstractModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.ForeachComponent.class, handler);
     handler = new ImportHandler() {
-      public ForeachEventAliasProxy importElement(final ElementType element)
+      public ForeachProxy importElement(final ElementType element)
         throws WatersUnmarshalException
       {
         final ForeachEventAlias downcast = (ForeachEventAlias) element;
@@ -263,7 +262,7 @@ public abstract class JAXBAbstractModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.ForeachEventAlias.class, handler);
     handler = new ImportHandler() {
-      public ForeachEventProxy importElement(final ElementType element)
+      public ForeachProxy importElement(final ElementType element)
         throws WatersUnmarshalException
       {
         final ForeachEvent downcast = (ForeachEvent) element;
@@ -739,7 +738,7 @@ public abstract class JAXBAbstractModuleImporter
                                          attribs);
   }
 
-  private ForeachComponentProxy importForeachComponent
+  private ForeachProxy importForeachComponent
     (final ForeachComponent element)
     throws WatersUnmarshalException
   {
@@ -755,10 +754,10 @@ public abstract class JAXBAbstractModuleImporter
     }
     final List<Proxy> body = new LinkedList<Proxy>();
     mForeachComponentListHandler.fromJAXB(this, element, body);
-    return mFactory.createForeachComponentProxy(name, range, guard, body);
+    return mFactory.createForeachProxy(name, range, guard, body);
   }
 
-  private ForeachEventAliasProxy importForeachEventAlias
+  private ForeachProxy importForeachEventAlias
     (final ForeachEventAlias element)
     throws WatersUnmarshalException
   {
@@ -774,10 +773,10 @@ public abstract class JAXBAbstractModuleImporter
     }
     final List<Proxy> body = new LinkedList<Proxy>();
     mForeachEventAliasListHandler.fromJAXB(this, element, body);
-    return mFactory.createForeachEventAliasProxy(name, range, guard, body);
+    return mFactory.createForeachProxy(name, range, guard, body);
   }
 
-  private ForeachEventProxy importForeachEvent(final ForeachEvent element)
+  private ForeachProxy importForeachEvent(final ForeachEvent element)
     throws WatersUnmarshalException
   {
     final String name = element.getName();
@@ -792,7 +791,7 @@ public abstract class JAXBAbstractModuleImporter
     }
     final List<Proxy> body = new LinkedList<Proxy>();
     mForeachEventListHandler.fromJAXB(this, element, body);
-    return mFactory.createForeachEventProxy(name, range, guard, body);
+    return mFactory.createForeachProxy(name, range, guard, body);
   }
 
 

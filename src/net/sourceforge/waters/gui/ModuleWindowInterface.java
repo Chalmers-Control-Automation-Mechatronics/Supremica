@@ -9,14 +9,14 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Frame;
-
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -58,7 +58,7 @@ public interface ModuleWindowInterface
    * Gets the root window of this GUI.
    * Dialogs will use this as their owner.
    */
-  public Frame getRootWindow();
+  public IDE getRootWindow();
 
   /**
    * Gets the components panel for the module edited by this GUI.
@@ -73,7 +73,7 @@ public interface ModuleWindowInterface
   /**
    * Gets the alias panel for the module edited by this GUI.
    */
-  public SelectionOwner getAliasesPanel();
+  public SelectionOwner getConstantAliasesPanel();
 
   /**
    * Shows the list of components of the module so the user can edit it.

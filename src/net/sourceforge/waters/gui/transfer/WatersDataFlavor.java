@@ -25,8 +25,11 @@ public class WatersDataFlavor
   /**
    * The data flavour for a constant alias
    */
-  public static final DataFlavor MODULE_ALIAS_LIST =
-    new DataFlavor(AliasTransferable.class, "List<AliasProxy>");
+  public static final DataFlavor CONSTANT_ALIAS_LIST =
+    new DataFlavor(ConstantAliasTransferable.class, "List<ConstantAliasProxy>");
+
+  public static final DataFlavor EVENT_ALIAS_LIST =
+    new DataFlavor(EventAliasTransferable.class, "List<EventAliasProxy>");
 
   public static final DataFlavor EVENTDECL_LIST =
     new DataFlavor(EventDeclTransferable.class, "List<EventDeclProxy>");
@@ -82,5 +85,8 @@ public class WatersDataFlavor
 
   public static final DataFlavor PRODUCT_DES =
     new DataFlavor(ProductDESTransferable.class, "ProductDESProxy");
+
+  public static final DataFlavor TYPELESS_FOREACH =
+    new DataFlavor(TypelessForeachTransferable.class, "List<Proxy>");
 
 }

@@ -146,12 +146,28 @@ public abstract class AbstractSynthesizerTest
 
 
   //#########################################################################
-  //# Test Cases --- synthesis  private void synthesiseTbedNoderailB() throws Exception
+  //# Test Cases --- synthesis
+  public void testBallProcess() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "ball_Process";
+    runSynthesizer(group, subdir, name, false);
+  }
+
   public void testBigFactory() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "big_factory";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testCatMouse() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "cat_mouse";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -163,11 +179,59 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
-  public void testPlantify() throws Exception
+  public void testCoffeeMachine() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
-    final String name = "plantify";
+    final String name = "coffee_machine";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testDebounce() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "debounce";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testDosingUnit() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "dosing_unit";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testFalko() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "falko";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testIPC() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "IPC";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testManufacturingSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "manufacturing_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testManWolf() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "man_wolf";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -176,6 +240,62 @@ public abstract class AbstractSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "no_plant";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testParrow() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "parrow";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testPathFinder() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "path_finder";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testPlantify() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "plantify";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testProductionSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "production_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testProfessorPen() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "professor_pen";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testPV35() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "pv35";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testRobotAssemblyCell() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "robot_assembly_cell";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -192,6 +312,30 @@ public abstract class AbstractSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "small_factory_2";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testSimpleManufacturingSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "simple_manufacturing_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testTankProcess() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tank_process";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testTeleNetwork() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tele_network";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -219,155 +363,11 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
-  public void testCatMouse() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "cat_mouse";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testProductionSystem() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "production_system";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testManufacturingSystem() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "manufacturing_system";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testDosingUnit() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "dosing_unit";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testIPC() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "IPC";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testRobotAssemblyCell() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "robot_assembly_cell";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testTankProcess() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "tank_process";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testParrow() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "parrow";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testManWolf() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "man_wolf";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testProfessorPen() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "professor_pen";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testteleNetwork() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "tele_network";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testPV35() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "pv35";
-    runSynthesizer(group, subdir, name, true);
-  }
-
   public void testThreeRobot() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "three_robot";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testPathFinder() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "path_finder";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testCofeeMachine() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "cofee_machine";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testBallProcess() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "ball_Process";
-    runSynthesizer(group, subdir, name, false);
-  }
-
-  public void testSimpleManufacturingSystem() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "simple_manufacturing_system";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testDebounce() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "debounce";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testFalko() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "falko";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -379,6 +379,9 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, false);
   }
 
+
+  //#########################################################################
+  //# Test Cases --- BIG
   public void testKoordWspSynth() throws Exception
   {
     final String group = "tests";
@@ -386,6 +389,7 @@ public abstract class AbstractSynthesizerTest
     final String name = "koordwsp_synth";
     runSynthesizer(group, subdir, name, true);
   }
+
 
   //#########################################################################
   //# Instantiating and Checking Modules

@@ -13,6 +13,7 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TLongObjectHashMap;
+import gnu.trove.TObjectByteIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -198,6 +199,7 @@ public class CompositionalSynthesizer
   }
 
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
   public ProductDESProxy getComputedProductDES()
@@ -220,6 +222,8 @@ public class CompositionalSynthesizer
   }
 
 
+
+
   //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException
@@ -227,6 +231,12 @@ public class CompositionalSynthesizer
     try {
       setUp();
       final CompositionalSynthesisResult result = getAnalysisResult();
+//      int size = 0;
+//      final Iterator<AutomatonProxy> iter = result.getComputedAutomata().iterator();
+//      while (iter.hasNext()) {
+//        final AutomatonProxy aut = iter.next();
+//        size = aut.getStates().size();
+//      }
       if (!result.isFinished()) {
         runCompositionalMinimisation();
       }
@@ -239,6 +249,7 @@ public class CompositionalSynthesizer
       }
       final Logger logger = getLogger();
       logger.debug("CompositionalSynthesizer done.");
+      result.setRenamingIsUsed(mDistinguisherInfoList.size());
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -457,8 +468,13 @@ public class CompositionalSynthesizer
         for (final EventProxy event : renaming.keySet()) {
           final EventInfo info = getEventInfo(event);
           if (info != null) {
-            final List<AutomatonProxy> aut = info.getAutomataList();
-            affectedAutomata.addAll(aut);
+            final TObjectByteIterator<AutomatonProxy> iter =
+              info.getAutomataIterator();
+            while (iter.hasNext()) {
+              iter.advance();
+              final AutomatonProxy aut = iter.key();
+              affectedAutomata.add(aut);
+            }
           }
         }
 
@@ -881,18 +897,18 @@ public class CompositionalSynthesizer
   }
 
   private ListBufferTransitionRelation synthesise
-    (final AutomatonProxy automaton, final EventEncoding eventEnc)
+    (final AutomatonProxy automaton, final EventEncoding encoding)
     throws AnalysisException
   {
     final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
-      (automaton, eventEnc, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final HalfWaySynthesisTRSimplifier synthesis =
+      (automaton, encoding, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final HalfWaySynthesisTRSimplifier synthesiser =
       new HalfWaySynthesisTRSimplifier(rel);
     final KindTranslator translator = getKindTranslator ();
-    final int numEvents = eventEnc.getNumberOfProperEvents();
+    final int numEvents = encoding.getNumberOfProperEvents();
     int numUncontrollables = 1;
     for (int event = EventEncoding.NONTAU; event< numEvents; event++) {
-      final EventProxy proxy = eventEnc.getProperEvent(event);
+      final EventProxy proxy = encoding.getProperEvent(event);
       final EventKind kind = translator.getEventKind(proxy);
       if (EventKind.CONTROLLABLE == kind) {
         break;
@@ -900,15 +916,31 @@ public class CompositionalSynthesizer
         numUncontrollables++;
       }
     }
-    synthesis.setLastLocalControllableEvent(numEvents);
-    synthesis.setLastLocalUncontrollableEvent(numUncontrollables - 1);
-    synthesis.setLastSharedUncontrollableEvent(numEvents);
-    final int defaultID = eventEnc.getEventCode(mUsedDefaultMarking);
-    synthesis.setDefaultMarkingID(defaultID);
-    synthesis.run();
-    return synthesis.getSupervisor();
+    synthesiser.setLastLocalControllableEvent(numEvents);
+    synthesiser.setLastLocalUncontrollableEvent(numUncontrollables - 1);
+    synthesiser.setLastSharedUncontrollableEvent(numEvents);
+    final int defaultID = encoding.getEventCode(mUsedDefaultMarking);
+    synthesiser.setDefaultMarkingID(defaultID);
+    final TIntHashSet renamed = getRenamedControllables(encoding);
+    synthesiser.setRenamedEvents(renamed);
+    synthesiser.run();
+    return synthesiser.getPseudoSupervisor();
   }
 
+  private TIntHashSet getRenamedControllables(final EventEncoding encoding)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final int numEvents = encoding.getNumberOfProperEvents();
+    final TIntHashSet result = new TIntHashSet(numEvents);
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final EventProxy event = encoding.getProperEvent(e);
+      if (translator.getEventKind(event) == EventKind.CONTROLLABLE &&
+        mRenamedEvents.contains(event)) {
+        result.add(e);
+      }
+    }
+    return result;
+  }
 
   private AutomatonProxy createRenamedSupervisor
     (final ListBufferTransitionRelation rel, final EventEncoding encoding)
@@ -925,6 +957,7 @@ public class CompositionalSynthesizer
      final ListIterator<DistinguisherInfo> listIter)
     throws AnalysisException
   {
+
     if (!listIter.hasPrevious()) {
       return removeDumpStates(rel, encoding);
     }
@@ -1001,11 +1034,11 @@ public class CompositionalSynthesizer
         final Iterator<EventProxy> iter = replacement.iterator();
         final EventProxy firstReplacement = iter.next();
         final int firstCode = encoding.getEventCode(firstReplacement);
+        if (!events.contains(original))
         events.set(firstCode, original);
         while (iter.hasNext()) {
           final EventProxy nextReplacement = iter.next();
           final int nextCode = encoding.getEventCode(nextReplacement);
-          // TODO Is it correct to skip events not in the encoding?
           if (nextCode >= 0) {
             for (int sourceState = 0; sourceState<numOfStates; sourceState++) {
               modifyingIter.reset(sourceState, nextCode);
@@ -1050,9 +1083,9 @@ public class CompositionalSynthesizer
       final EventEncoding newEncoding =
         new EventEncoding(newSupervisor, translator);
       final ListBufferTransitionRelation newRel =
-        new ListBufferTransitionRelation (newSupervisor, newEncoding,
-                                          ListBufferTransitionRelation.
-                                          CONFIG_SUCCESSORS);
+        new ListBufferTransitionRelation(newSupervisor, newEncoding,
+                                         ListBufferTransitionRelation.
+                                         CONFIG_SUCCESSORS);
       return createRenamedSupervisor(newRel, newEncoding, listIter);
     }
   }
@@ -1062,16 +1095,15 @@ public class CompositionalSynthesizer
     throws OverflowException
   {
     final int marking = coding.getEventCode(mUsedDefaultMarking);
+    final boolean usesMarking = rel.isUsedProposition(marking);
     final int numOfStates = rel.getNumberOfStates();
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     for (int sourceState = 0; sourceState<numOfStates; sourceState++) {
       iter.resetState(sourceState);
       if (iter.advance()) {
         //nothing
-      } else {
-        if (marking >= 0 && !rel.isMarked(sourceState, marking)) {
-          rel.setReachable(sourceState, false);
-        }
+      } else if (usesMarking && !rel.isMarked(sourceState, marking)) {
+        rel.setReachable(sourceState, false);
       }
     }
     final ProductDESProxyFactory factory = getFactory();
@@ -1154,7 +1186,7 @@ public class CompositionalSynthesizer
           final ListBufferTransitionRelation original =
             mSynthesisAbstraction.getOriginalTransitionRelation();
           final ListBufferTransitionRelation supervisor =
-            mHalfWaySynthesisSimplifier.getSupervisor();
+            mHalfWaySynthesisSimplifier.getPseudoSupervisor();
           if (original == null) {
             final ProductDESProxyFactory factory = getFactory();
             final StateEncoding outputStateEnc = new StateEncoding();
@@ -1284,15 +1316,8 @@ public class CompositionalSynthesizer
         setDefaultMarkingID(encoding.getEventCode(mUsedDefaultMarking));
       mSynthesisAbstraction.
         setDefaultMarkingID(encoding.getEventCode(mUsedDefaultMarking));
-      final TIntHashSet renamedEventIndexes = new TIntHashSet();
-      for (final EventProxy event: encodedEvents) {
-        if (translator.getEventKind(event) == EventKind.CONTROLLABLE &&
-            mRenamedEvents.contains(event)) {
-          final int code = encoding.getEventCode(event);
-          renamedEventIndexes.add(code);
-        }
-      }
-      mHalfWaySynthesisSimplifier.setRenamedEvents(renamedEventIndexes);
+      final TIntHashSet renamed = getRenamedControllables(encoding);
+      mHalfWaySynthesisSimplifier.setRenamedEvents(renamed);
       return encoding;
     }
 
@@ -1362,6 +1387,7 @@ public class CompositionalSynthesizer
     {
       return mEventEncoding;
     }
+
 
     //#######################################################################
     //# Data Members
@@ -1457,5 +1483,5 @@ public class CompositionalSynthesizer
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
-
+  static int mRenamingIsUsed;
 }

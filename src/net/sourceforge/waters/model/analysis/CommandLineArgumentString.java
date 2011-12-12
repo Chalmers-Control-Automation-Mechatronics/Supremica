@@ -74,10 +74,13 @@ public abstract class CommandLineArgumentString
 
   //#######################################################################
   //# Parsing
+  @Override
   protected void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
       mValue = iter.next();
+      iter.remove();
+      setUsed(true);
     } else {
       failMissingValue();
     }

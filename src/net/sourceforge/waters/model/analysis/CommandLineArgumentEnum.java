@@ -87,6 +87,7 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
 
   //#########################################################################
   //# Parsing
+  @Override
   protected void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
@@ -97,6 +98,8 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
         mEnumFactory.dumpEnumeration(System.err, 0);
         System.exit(1);
       }
+      iter.remove();
+      setUsed(true);
     } else {
       failMissingValue();
     }

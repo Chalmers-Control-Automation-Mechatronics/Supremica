@@ -78,6 +78,20 @@ import net.sourceforge.waters.model.base.Proxy;
  * context in which they can occur, and on the types of entries their
  * bodies can contain.</P>
  *
+ * <UL>
+ * <LI><I>Foreach-component</I> constructs occur in the <I>component list</I>
+ * of a module. Their body entries can be of type {@link SimpleComponentProxy},
+ * {@link VariableComponentProxy}, {@link InstanceProxy}, or
+ * {@link ForeachProxy}.</LI>
+ * <LI><I>Foreach-event</I> constructs occur in <I>event lists</I> ({@link
+ * EventListExpressionProxy}), which may occur on a graph's edge, in an alias
+ * definition, or in the actual parameter of an instance. Their body entries
+ * can be of type {@link IdentifierProxy} or {@link ForeachProxy}.</LI>
+ * <LI><I>Foreach-event-alias</I> constructs occur in the <I>event alias
+ * list</I> of a module. Their body entres can be of type
+ * {@link EventAliasProxy} or {@link ForeachProxy}.</LI>
+ * </UL>
+ *
  * @author Robi Malik
  */
 // @short foreach construct

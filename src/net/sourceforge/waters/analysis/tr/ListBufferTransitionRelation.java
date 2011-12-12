@@ -1572,7 +1572,6 @@ public class ListBufferTransitionRelation
   public void moveIncomingTransitions(final int from, final int to)
   {
     copyIncomingTransitions(from, to);
-    removeIncomingTransitions(to);
     setReachable(from, false);
   }
 

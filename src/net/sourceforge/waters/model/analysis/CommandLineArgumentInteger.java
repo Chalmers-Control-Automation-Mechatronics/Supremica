@@ -75,6 +75,7 @@ public abstract class CommandLineArgumentInteger
 
   //#######################################################################
   //# Simple Access
+  @Override
   protected String getArgumentTemplate()
   {
     return "<n>";
@@ -88,11 +89,14 @@ public abstract class CommandLineArgumentInteger
 
   //#######################################################################
   //# Parsing
+  @Override
   protected void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
       final String value = iter.next();
       mValue = Integer.parseInt(value);
+      iter.remove();
+      setUsed(true);
     } else {
       failMissingValue();
     }

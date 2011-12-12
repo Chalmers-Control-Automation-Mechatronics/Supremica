@@ -215,64 +215,24 @@ public class ModuleSubjectFactory
                                 kind);
   }
 
-  public ForeachComponentSubject createForeachComponentProxy
+  public ForeachSubject createForeachProxy
       (final String name,
        final SimpleExpressionProxy range,
        final SimpleExpressionProxy guard,
        final Collection<? extends Proxy> body)
   {
-    return new ForeachComponentSubject(name,
-                                       range,
-                                       guard,
-                                       body);
+    return new ForeachSubject(name,
+                              range,
+                              guard,
+                              body);
   }
 
-  public ForeachComponentSubject createForeachComponentProxy
+  public ForeachSubject createForeachProxy
       (final String name,
        final SimpleExpressionProxy range)
   {
-    return new ForeachComponentSubject(name,
-                                       range);
-  }
-
-  public ForeachEventAliasSubject createForeachEventAliasProxy
-      (final String name,
-       final SimpleExpressionProxy range,
-       final SimpleExpressionProxy guard,
-       final Collection<? extends Proxy> body)
-  {
-    return new ForeachEventAliasSubject(name,
-                                        range,
-                                        guard,
-                                        body);
-  }
-
-  public ForeachEventAliasSubject createForeachEventAliasProxy
-      (final String name,
-       final SimpleExpressionProxy range)
-  {
-    return new ForeachEventAliasSubject(name,
-                                        range);
-  }
-
-  public ForeachEventSubject createForeachEventProxy
-      (final String name,
-       final SimpleExpressionProxy range,
-       final SimpleExpressionProxy guard,
-       final Collection<? extends Proxy> body)
-  {
-    return new ForeachEventSubject(name,
-                                   range,
-                                   guard,
-                                   body);
-  }
-
-  public ForeachEventSubject createForeachEventProxy
-      (final String name,
-       final SimpleExpressionProxy range)
-  {
-    return new ForeachEventSubject(name,
-                                   range);
+    return new ForeachSubject(name,
+                              range);
   }
 
   public GraphSubject createGraphProxy

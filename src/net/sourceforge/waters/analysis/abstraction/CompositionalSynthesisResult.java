@@ -81,6 +81,13 @@ public class CompositionalSynthesisResult
     setComputedProxy(des);
   }
 
+  void setRenamingIsUsed (final int renaming) {
+    mRenamingIsUsed = renaming;
+  }
+
+   int getRenamingIsUsed() {
+    return mRenamingIsUsed;
+  }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.DefaultAnalysisResult
@@ -108,6 +115,8 @@ public class CompositionalSynthesisResult
   {
     super.printCSVHorizontalHeadings(writer);
     writer.print(',');
+    writer.print("RenamingIsUsed");
+    writer.print(',');
     writer.print("NumberOfSupervisors");
     writer.print(',');
     writer.print("LargestSupervisor");
@@ -118,6 +127,8 @@ public class CompositionalSynthesisResult
   public void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
+    writer.print(",");
+    writer.print(getRenamingIsUsed());
     writer.print(",");
     writer.print(mSupervisors.size());
     writer.print(",");
@@ -151,7 +162,7 @@ public class CompositionalSynthesisResult
   {
     if (isSatisfied()) {
       final Collection<EventProxy> events =
-        Candidate.getAllEvents(mSupervisors);
+        Candidate.getOrderedEvents(mSupervisors);
       if (name == null) {
         name = Candidate.getCompositionName("", mSupervisors);
       }
@@ -161,10 +172,10 @@ public class CompositionalSynthesisResult
     }
   }
 
-
   //#########################################################################
   //# Data Members
   private ProductDESProxy mProductDES;
   private final List<AutomatonProxy> mSupervisors;
+  private int mRenamingIsUsed;
 
 }

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   ForeachComponentEditorDialog
+//# CLASS:   ForeachEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -33,24 +33,35 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.subject.module.ForeachComponentSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
-public class ForeachComponentEditorDialog
+/**
+ * <P>A dialog to enter and edit foreach blocks.</P>
+ *
+ * <P>This dialog consists of three text fields to enter the name of the
+ * guard variable, the index range, and the optional guard expression.
+ * Input validation is performed using an {@link ExpressionParser}.</P>
+ *
+ * @see net.sourceforge.waters.model.module.ForeachProxy ForeachProxy
+ * @author Robi Malik
+ */
+
+public class ForeachEditorDialog
   extends JDialog
 {
 
   //#########################################################################
   //# Constructors
-  public ForeachComponentEditorDialog(final ModuleWindowInterface root)
+  public ForeachEditorDialog(final ModuleWindowInterface root, final SelectionOwner panel)
   {
-    this(root, null);
+    this(root, panel, null);
   }
 
-  public ForeachComponentEditorDialog(final ModuleWindowInterface root,
-                                      final ForeachComponentSubject foreach)
+  public ForeachEditorDialog(final ModuleWindowInterface root, final SelectionOwner panel,
+                             final ForeachSubject foreach)
   {
     super(root.getRootWindow());
     if (foreach == null) {
@@ -59,6 +70,7 @@ public class ForeachComponentEditorDialog
       setTitle("Editing foreach block");
     }
     mRoot = root;
+    mPanel = panel;
     mForeach = foreach;
     createComponents();
     layoutComponents();
@@ -72,9 +84,9 @@ public class ForeachComponentEditorDialog
   //# Access to Created Item
   /**
    * Gets the Waters subject edited by this dialog.
-   * @return A reference to the foreach component being edited by this dialog.
+   * @return A reference to the foreach block being edited by this dialog.
    */
-  public ForeachComponentSubject getEditedItem()
+  public ForeachSubject getEditedItem()
   {
     return mForeach;
   }
@@ -87,7 +99,7 @@ public class ForeachComponentEditorDialog
    */
   private void createComponents()
   {
-    final ForeachComponentSubject template =
+    final ForeachSubject template =
       mForeach == null ? TEMPLATE : mForeach;
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
@@ -114,7 +126,7 @@ public class ForeachComponentEditorDialog
       new SimpleExpressionCell(oldrange, Operator.TYPE_RANGE, parser);
     mRangeInput.addActionListener(commithandler);
     mRangeInput.setToolTipText
-      ("Enter the index range, e.g., 1..10 or {a,b,c}");
+      ("Enter the index range, e.g., 1..10 or [a,b,c]");
     mGuardLabel = new JLabel("Guard:");
     final SimpleExpressionProxy oldguard = template.getGuard();
     mGuardInput =
@@ -258,10 +270,11 @@ public class ForeachComponentEditorDialog
         (SimpleExpressionSubject) mGuardInput.getValue();
       final SimpleExpressionSubject guard = makeUnique(guard0);
       if (mForeach == null) {
-        final ForeachComponentSubject template =
-          new ForeachComponentSubject(name, range, guard, null);
-        final SelectionOwner panel = mRoot.getComponentsPanel();
-        final Command command = new InsertCommand(template, panel);
+        final ForeachSubject template = TEMPLATE.clone();
+        template.setName(name);
+        template.setRange(range);
+        template.setGuard(guard);
+        final Command command = new InsertCommand(template, mPanel);
         mForeach = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
@@ -274,7 +287,7 @@ public class ForeachComponentEditorDialog
         final SimpleExpressionSubject oldguard = mForeach.getGuard();
         final boolean guardchange = !eq.equals(guard, oldguard);
         if (namechange || rangechange || guardchange) {
-          final ForeachComponentSubject template = mForeach.clone();
+          final ForeachSubject template = mForeach.clone();
           if (namechange) {
             template.setName(name);
           }
@@ -284,8 +297,7 @@ public class ForeachComponentEditorDialog
           if (guardchange) {
             template.setGuard(guard);
           }
-          final SelectionOwner panel = mRoot.getComponentsPanel();
-          final Command command = new EditCommand(mForeach, template, panel);
+          final Command command = new EditCommand(mForeach, template, mPanel);
           mRoot.getUndoInterface().executeCommand(command);
         }
       }
@@ -329,6 +341,7 @@ public class ForeachComponentEditorDialog
   //# Data Members
   // Dialog state
   private final ModuleWindowInterface mRoot;
+  private final SelectionOwner mPanel;
 
   // Swing components
   private JPanel mMainPanel;
@@ -345,24 +358,24 @@ public class ForeachComponentEditorDialog
 
   // Created Item
   /**
-   * <P>The Waters component subject edited by this dialog.</P>
+   * <P>The foreach block subject edited by this dialog.</P>
    *
    * <P>This is a reference to the actual object that is being edited. If
    * a new component is being created, it is <CODE>null</CODE>
-   * until the dialog is commited and the actually created subject is
+   * until the dialog is committed and the actually created subject is
    * assigned.</P>
    *
    * <P>The edited state is stored only in the dialog. Changes are only
    * committed to the model when the OK button is pressed.</P>
    */
-  private ForeachComponentSubject mForeach;
+  private ForeachSubject mForeach;
 
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+  private static final ForeachSubject TEMPLATE =
+    new ForeachSubject("", new SimpleIdentifierSubject(""));
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final ForeachComponentSubject TEMPLATE =
-    new ForeachComponentSubject("", new SimpleIdentifierSubject(""));
 
 }

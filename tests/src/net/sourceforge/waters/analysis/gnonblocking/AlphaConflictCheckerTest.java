@@ -7,7 +7,7 @@
 //# $Id: MonolithicConflictCheckerTest.java 4630 2009-03-10 01:42:07Z robi $
 //###########################################################################
 
-package net.sourceforge.waters.analysis;
+package net.sourceforge.waters.analysis.gnonblocking;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -17,8 +17,6 @@ import net.sourceforge.waters.analysis.annotation.ProjectingNonBlockingChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.analysis.annotation.AlphaNonBlockingChecker;
-
 
 public class AlphaConflictCheckerTest
   extends AbstractStandardConflictCheckerTest

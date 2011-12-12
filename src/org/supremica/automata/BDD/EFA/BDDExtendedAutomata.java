@@ -248,14 +248,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         }
 
 //        System.out.println("domain: "+orgExAutomata.getDomain());
-        //setVariableOrdering();
+        setVariableOrdering();
         // Set after the IDD bug is fixed.
-        if(synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
-            setVariableOrdering();
-        else{
-            FORCEAutomatonVariableSorter forceSorter = new FORCEAutomatonVariableSorter(orgExAutomata);
+        if(!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
+        {
+            FORCEAutomatonVariableSorter forceSorter = new FORCEAutomatonVariableSorter(orgExAutomata, variableOrderingNames);
             forceSorter.sort();
 
+            variableOrdering.clear();
+            variableOrderingNames.clear();
+            
             variableOrdering.addAll(forceSorter.getVariableOrdering());
             variableOrdering.add(unionAlphabet);
 
@@ -851,8 +853,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         {
             if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
             {
-                //coreachableStatesBDD = getDepSets().reachableBackwardWorkSetAlgorithm(getMarkedStates(), getReachableStates()); 
-                coreachableStatesBDD = getDepSets().backwardWorkSetAlgorithm(getMarkedStates());
+                coreachableStatesBDD = getDepSets().reachableBackwardWorkSetAlgorithm(getMarkedStates(), getReachableStates()); 
+                //coreachableStatesBDD = getDepSets().backwardWorkSetAlgorithm(getMarkedStates());
             }
             else
             {
@@ -949,7 +951,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             }
             else
             {
-                nonblockingStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
+                nonblockingStatesBDD = coreachableStatesBDD;
 //                final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
 //                nbrOfNonblockingStates = nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).longValue();
             }

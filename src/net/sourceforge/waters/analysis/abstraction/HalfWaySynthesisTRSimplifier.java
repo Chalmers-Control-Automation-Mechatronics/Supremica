@@ -18,6 +18,9 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -152,8 +155,20 @@ public class HalfWaySynthesisTRSimplifier
     return mRenamedEvents;
   }
 
-  public ListBufferTransitionRelation getSupervisor(){
-    return mSupervisor;
+  /**
+   * Gets the supervisor computed by the last run of this simplifier.
+   * The supervisor returned may contain transitions to a dump state,
+   * and therefore is referred to as a pseudo-supervisor. Transitions
+   * with <I>renamed</I> controllable events leading to blocking states
+   * are not removed from the supervisor to facilitate composition with
+   * distinguishers.
+   * @return Transition relation representing supervisor, or <CODE>null</CODE>
+   *         if no controllable events need to be disabled.
+   * @see #setRenamedEvents(TIntHashSet) setRenamedEvents()
+   */
+  public ListBufferTransitionRelation getPseudoSupervisor()
+  {
+    return mPseudoSupervisor;
   }
 
 
@@ -162,13 +177,13 @@ public class HalfWaySynthesisTRSimplifier
   @Override
   public void reset(){
     super.reset();
-    mSupervisor = null;
+    mPseudoSupervisor = null;
   }
 
   @Override
   protected void setUp() throws AnalysisException{
     super.setUp();
-    mSupervisor = null;
+    mPseudoSupervisor = null;
   }
 
   @Override
@@ -181,112 +196,106 @@ public class HalfWaySynthesisTRSimplifier
     }
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-    boolean hasAdded;
+
+    // 1. Do synthesis --- find bad states
     BitSet badStates = new BitSet(numStates);
     do {
       final BitSet newBadStates = new BitSet(numStates);
       findCoreachableStates(newBadStates, badStates);
       newBadStates.flip(0, numStates);
       badStates = newBadStates;
-      hasAdded = findMoreBadStates(badStates);
-    } while (hasAdded);
-
+    } while (findMoreBadStates(badStates));
+    // If there are no bad states, no need to synthesise
     final int dumpState = badStates.nextSetBit(0);
     if (dumpState < 0) {
       return false;
     }
 
+    // 2. Check transitions from safe states to bad states.
+    //  If there are controllable transitions, we need to construct
+    //  an abstraction and a supervisor.
+    //  If there are only uncontrollable transitions, we do not need a
+    //  supervisor; we may need an abstraction if states are merged or
+    //  transitions deleted.
+    //  While testing, merge bad states into dump state and delete outgoing
+    //  transitions from bad states,
+    boolean needAbstraction = false;
+    boolean needSupervisor = false;
     final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
-    boolean changed = false;
-    boolean addSupervisor = false;
     for (int state = badStates.nextSetBit(0); state >= 0;
          state = badStates.nextSetBit(state+1)) {
-      if (rel.isReachable(state)) {
+      if (rel.isInitial(state)) {
+        // some initial state is bad --- supervisor cannot exist.
+        setAllStatesUnreachable();
+        return true;
+      } else if (rel.isReachable(state)) {
         iter.resetState(state);
         while (iter.advance()) {
           final int source = iter.getCurrentSourceState();
-          final int event = iter.getCurrentEvent();
           if (badStates.get(source)) {
+            needAbstraction = true;
             iter.remove();
-            changed = true;
-          } else if (mLastLocalControllableEvent < event &&
-                     event <= mLastSharedUncontrollableEvent) {
-            // shared uncontrollable
-            if (state != dumpState) {
-              iter.remove();
-              rel.addTransition(source, event, dumpState);
-              changed = true;
-            }
-          } else if (mRenamedEvents != null &&
-                     mRenamedEvents.contains(event)) {
-            // local or shared controllable, renamed
-            if (state != dumpState) {
-              iter.remove();
-              rel.addTransition(source, event, dumpState);
-              changed = true;
-            }
-            addSupervisor = true;
-          } else {
-            // local or shared controllable, not renamed
-            // (cannot be local uncontrollable, otherwise source would be bad)
-            iter.remove();
-            changed = true;
-            addSupervisor = true;
+            continue;
+          }
+          final int event = iter.getCurrentEvent();
+          if (isControllable(event)) {
+            needAbstraction = needSupervisor = true;
           }
         }
         if (state != dumpState) {
-          rel.setReachable(state, false);
-          changed = true;
+          needAbstraction = true;
+          rel.moveIncomingTransitions(state, dumpState);
         }
-        if (rel.isInitial(state)) {
-          rel.setReachable(state, false);
-          changed = true;
-          addSupervisor = true;
-        }
-
       }
     }
-
-    if (addSupervisor) {
-      mSupervisor = new ListBufferTransitionRelation
-          (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      mSupervisor.removeOutgoingTransitions(dumpState);
-      mSupervisor.checkReachability();
-      mSupervisor.removeProperSelfLoopEvents();
+    if (!needAbstraction) {
+      return false;
     }
+    rel.setMarked(dumpState, defaultID, false);
 
-    if (mRenamedEvents != null) {
+    // 3. Create the pseudo-supervisor.
+    //  The supervisor is obtained by redirecting all renamed controllable
+    //  transitions that lead to a bad state to the dump state.
+    //  Other transitions leading to a bad state are deleted.
+    if (needSupervisor) {
+      mPseudoSupervisor = new ListBufferTransitionRelation
+        (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      mPseudoSupervisor.removeOutgoingTransitions(dumpState);
       iter.resetState(dumpState);
       while (iter.advance()) {
         final int event = iter.getCurrentEvent();
-        if ((event > mLastLocalUncontrollableEvent &&
-            event <= mLastLocalControllableEvent) ||
-            (event > mLastSharedUncontrollableEvent)) {
-          iter.remove();
-          changed = true;
+        if (!isRenamedControllable(event)) {
+          final int source = iter.getCurrentSourceState();
+          mPseudoSupervisor.removeTransition(source, event, dumpState);
         }
       }
+      mPseudoSupervisor.checkReachability();
+      mPseudoSupervisor.removeProperSelfLoopEvents();
+      mPseudoSupervisor.removeRedundantPropositions();
     }
 
+    // 4. Create the abstraction.
+    //  The abstraction is obtained by redirecting all uncontrollable
+    //  transitions that lead to a bad state to the dump state.
+    //  Controllable transitions leading to a bad state are deleted.
+    iter.resetState(dumpState);
+    while (iter.advance()) {
+      final int event = iter.getCurrentEvent();
+      if (isControllable(event)) {
+        iter.remove();
+      }
+    }
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    changed |= rel.removeOutgoingTransitions(dumpState);
-    changed |= rel.checkReachability();
-    changed |= rel.removeProperSelfLoopEvents();
-
-    return changed;
-  }
-
-  @Override
-  protected void applyResultPartition()
-  throws AnalysisException
-  {
-    super.applyResultPartition();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    rel.removeUnreachableTransitions();
-    rel.removeTauSelfLoops();
+    rel.removeOutgoingTransitions(dumpState);
+    rel.checkReachability();
     rel.removeProperSelfLoopEvents();
+    rel.removeRedundantPropositions();
+    return true;
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void findCoreachableStates(final BitSet coreachable,
                                      final BitSet badStates)
     throws AbortException
@@ -348,6 +357,52 @@ public class HalfWaySynthesisTRSimplifier
     return hasAdded;
   }
 
+  private void setAllStatesUnreachable()
+  {
+    try {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final String name = rel.getName();
+      final int numStates = rel.getNumberOfStates();
+      for (int state = 0; state < numStates; state++) {
+        rel.setReachable(state, false);
+      }
+      final int numEvents = rel.getNumberOfProperEvents();
+      for (int event = 0; event < numEvents; event++) {
+        rel.setUsedEvent(event, false);
+      }
+      rel.removeRedundantPropositions();
+      final ComponentKind kind = rel.getKind();
+      final ListBufferTransitionRelation abstraction =
+        new ListBufferTransitionRelation(name, kind, 0, 0, 0,
+                                         ListBufferTransitionRelation.
+                                         CONFIG_SUCCESSORS);
+      setTransitionRelation(abstraction);
+      mPseudoSupervisor =
+        new ListBufferTransitionRelation(name, ComponentKind.SUPERVISOR,
+                                         0, 0, 0,
+                                         ListBufferTransitionRelation.
+                                         CONFIG_SUCCESSORS);
+    } catch (final OverflowException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+  private boolean isRenamedControllable(final int event)
+  {
+    return
+      isControllable(event) &&
+      mRenamedEvents != null &&
+      mRenamedEvents.contains(event);
+  }
+
+  private boolean isControllable(final int event)
+  {
+    return
+      event > mLastLocalUncontrollableEvent &&
+      event <= mLastLocalControllableEvent ||
+      event > mLastSharedUncontrollableEvent;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -356,6 +411,6 @@ public class HalfWaySynthesisTRSimplifier
   private int mLastSharedUncontrollableEvent;
   private TIntHashSet mRenamedEvents;
 
-  private ListBufferTransitionRelation mSupervisor;
+  private ListBufferTransitionRelation mPseudoSupervisor;
 
 }

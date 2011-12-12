@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="fms2003_synth1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Large-scale flexible manufacturing system modelled by Max Hering de Queiroz in 2003. This model is based on a production cell at Rensselear that was first modelled using Petri nets in the paper "Design and Implementation of a Petri Net Based Supervisor for a Flexible Manufacturing System" by Meng Chu Zhou, Frank Dicesare, and Daryl L. Rudolph in Automatica 28(6), 1199-1208, 1992.
-This model has been modified from the original model by synthesising a coordinator for plants gs and gc4 and the associated specifications. It is still blocking.</ns2:Comment>
+This model has been modified from the original model by synthesising a coordinator for plants gs and gc4 and the associated specifications.
+The model is controllable but remains blocking. The number of reachable states is 14298906 and the diameter is 169.
+</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="c111"/>
         <EventDecl Kind="CONTROLLABLE" Name="c113"/>

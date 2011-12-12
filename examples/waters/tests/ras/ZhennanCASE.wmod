@@ -1,0 +1,2241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="ZhennanCASE" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>File path: Z:\RAS_assembly\Excel files for RAS models\
+Excel file name: Benchmark2_RAS.xls
+File originally created: Thu Dec 08 12:35:45 CET 2011
+
+The model is trivially controllable, and blocking.
+It has 526500 reachable states and a diameter of 39.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p1_13_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p2_25_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p5_53_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p4_45_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p2_24_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p3_33_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p2_25_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p3_33_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p3_31_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p3_32_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p5_51_0"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="uc_e_p2_24_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p1_16_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p1_14_0"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="uc_e_p4_44_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p5_52_0"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="uc_e_p2_23_0"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="uc_e_p4_42_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p1_14_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p1_11_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p4_42_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p4_45_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p1_12_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p2_22_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p4_44_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p2_23_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p2_21_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p1_15_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p4_41_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p4_43_0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e_p3_34_0"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="MartinFabian">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="pm">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="161" X="161"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p1_13_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="258" X="224"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r7&gt;=1 &amp; Vop_p1_11&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p1_11"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_11"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p1_11"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_13"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p1_13"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r7"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p2_25_1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="195" X="269"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p2_24&gt;0 &amp; Vr_r3&gt;=1">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p2_24"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r6"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r6"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_24"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p2_24"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p5_53_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="269" X="184"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p5_52&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p5_52"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p5_52"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p5_52"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r9"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r9"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p4_45_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="228" X="201"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p4_43&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p4_43"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_43"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p4_43"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r7"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r3"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p2_24_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="226" X="249"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r6&gt;=2 &amp; Vop_p2_24_uc&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r6"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p2_24_uc"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r6"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r6"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_24_uc"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p2_24_uc"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r4"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_24"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p2_24"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p3_33_1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="153" X="275"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p3_34&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p3_34"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p3_34"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p3_34"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r7"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p2_25_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="135" X="220"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p2_23&gt;0 &amp; Vr_r3&gt;=1">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p2_23"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r5"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r5"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_23"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p2_23"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p3_33_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="276" X="145"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p3_32&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p3_32"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r5"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r5"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p3_32"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p3_32"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p3_31_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="241" X="132"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p3_31"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p3_31"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p3_32_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="224" X="165"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p3_31&gt;0 &amp; Vr_r5&gt;=1">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p3_31"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r5"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r5"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r5"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p3_32"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p3_32"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p3_31"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p3_31"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p5_51_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="118" X="262"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="Vr_r8"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r8"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r8"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p5_51"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p5_51"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="uc_e_p2_24_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="167" X="238"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="Vop_p2_22"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_22"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p2_22"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_24_uc"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p2_24_uc"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p1_16_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="90" X="168"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p1_15&gt;0 &amp; Vr_r3&gt;=1">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p1_15"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_15"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p1_15"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r7"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p1_14_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="259" X="99"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p1_12&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p1_12"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_12"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p1_12"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_14"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p1_14"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r4"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r2"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="uc_e_p4_44_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="194" X="214"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="Vop_p4_41"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_44_uc"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p4_44_uc"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_41"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p4_41"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p5_52_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="104" X="202"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p5_51&gt;0 &amp; Vr_r9&gt;=1">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p5_51"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r9"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r8"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r8"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p5_52"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p5_52"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r9"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r9"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p5_51"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p5_51"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="uc_e_p2_23_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="206" X="117"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="Vop_p2_22"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_22"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p2_22"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_23_uc"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p2_23_uc"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="uc_e_p4_42_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="151" X="97"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="Vop_p4_41"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_42_uc"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p4_42_uc"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_41"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p4_41"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p1_14_1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="86" X="244"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p1_13&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p1_13"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_14"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p1_14"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_13"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p1_13"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r7"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r2"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p1_11_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="187" X="87"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_11"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p1_11"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p4_42_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="63" X="215"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p4_42_uc&gt;0 &amp; Vr_r1&gt;=1">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p4_42_uc"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_42"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p4_42"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_42_uc"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p4_42_uc"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r2"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p4_45_1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="229" X="73"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p4_44&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p4_44"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r6"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r6"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_44"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p4_44"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p1_12_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="101" X="134"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p1_11&gt;0 &amp; Vr_r4&gt;=2">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p1_11"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_11"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p1_11"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_12"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p1_12"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r4"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p2_22_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="64" X="108"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p2_21&gt;0 &amp; Vr_r4&gt;=2">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p2_21"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_21"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p2_21"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_22"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p2_22"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r4"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p4_44_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="155" X="50"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p4_44_uc&gt;0 &amp; Vr_r6&gt;=2">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p4_44_uc"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r6"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r6"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r6"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_44"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p4_44"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r2"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_44_uc"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p4_44_uc"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p2_23_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="50" X="179"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r5&gt;=2 &amp; Vop_p2_23_uc&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r5"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p2_23_uc"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_23_uc"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p2_23_uc"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r4"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r5"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r5"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_23"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p2_23"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p2_21_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="195" X="50"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p2_21"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p2_21"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p1_15_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="51" X="142"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p1_14&gt;0 &amp; Vr_r7&gt;=1">
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p1_14"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r2"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_15"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p1_15"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r7"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p1_14"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p1_14"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p4_41_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="115" X="100"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="Vr_r2"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_41"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p4_41"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r2"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r2"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p4_43_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="119" X="57"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vop_p4_42&gt;0 &amp; Vr_r7&gt;=1 &amp; Vr_r3&gt;=1">
+                                    <BinaryExpression Operator="&amp;">
+                                        <BinaryExpression Operator="&gt;">
+                                            <SimpleIdentifier Name="Vop_p4_42"/>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="&gt;=">
+                                            <SimpleIdentifier Name="Vr_r7"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r3"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r7"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_43"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p4_43"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p4_42"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p4_42"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="pm" Source="pm">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e_p3_34_0"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="84" X="76"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="Vr_r7&gt;=2 &amp; Vop_p3_31&gt;0">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;">
+                                        <SimpleIdentifier Name="Vop_p3_31"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r7"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vr_r7"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p3_31"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="Vop_p3_31"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vr_r1"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vr_r1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="Vop_p3_34"/>
+                                    <BinaryExpression Operator="+">
+                                        <SimpleIdentifier Name="Vop_p3_34"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="Vr_r9">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r9"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r9"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vr_r8">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r8"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r8"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p4_42">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_42"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_42"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p2_23">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_23"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_23"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vr_r7">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r7"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r7"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p1_14">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_14"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_14"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p2_21">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_21"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_21"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vr_r1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r1"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r1"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p3_32">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p3_32"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p3_32"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p2_22">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_22"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_22"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p5_51">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p5_51"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p5_51"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p2_24_uc">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_24_uc"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_24_uc"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p2_23_uc">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_23_uc"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_23_uc"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vr_r3">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r3"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r3"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p4_43">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_43"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_43"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vr_r5">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r5"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r5"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vr_r4">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r4"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r4"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p1_11">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_11"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_11"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p4_41">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_41"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_41"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p1_13">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_13"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_13"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p4_44_uc">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_44_uc"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_44_uc"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p1_12">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_12"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_12"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vr_r6">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r6"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r6"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p4_42_uc">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_42_uc"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_42_uc"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vr_r2">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r2"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vr_r2"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p3_34">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p3_34"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p3_34"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p5_52">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p5_52"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p5_52"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p4_44">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_44"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p4_44"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p3_31">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p3_31"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p3_31"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p2_24">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_24"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p2_24"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="Vop_p1_15">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_15"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="Vop_p1_15"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+    </ComponentList>
+</Module>

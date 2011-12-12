@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tbed_uncont" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>Model of a train testbed described in R. J. Leduc, PLC Implementation of a DES Supervisor for a Manufacturing Testbed: An Implementation Perspective, Masters Thesis, Department of Electrical Engineering, University of Toronto, 1996.
+This is not the original model. This model was created according to the original specifications using VALID and later converted to Waters.
+This broken version is not controllable and nonblocking. The number of reachable states is 3663278608864, and the diamater is 577. The shortest controllability counterexample has 187 steps.</ns2:Comment>
 <ConstantAliasList>
-<ConstantAlias>
-<SimpleIdentifier Name="CRANES"/>
+<ConstantAlias Name="CRANES">
 <ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
@@ -10,8 +12,7 @@
 </BinaryExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="SECTIONS"/>
+<ConstantAlias Name="SECTIONS">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="t0"/>
@@ -43,8 +44,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="TRAINS"/>
+<ConstantAlias Name="TRAINS">
 <ConstantAliasExpression>
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
@@ -52,8 +52,7 @@
 </BinaryExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="SWITCHES_A"/>
+<ConstantAlias Name="SWITCHES_A">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
@@ -63,8 +62,7 @@
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias>
-<SimpleIdentifier Name="SWITCHES_B"/>
+<ConstantAlias Name="SWITCHES_B">
 <ConstantAliasExpression>
 <EnumSetExpression>
 <SimpleIdentifier Name="t3"/>
@@ -1608,8 +1606,7 @@
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="sensor_sensor_intd_t1"/>
+<SimpleComponent Kind="PLANT" Name="sensor_sensor_intd_t1">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="at">
@@ -2196,8 +2193,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="sensor_sensor_intd_t2"/>
+<SimpleComponent Kind="PLANT" Name="sensor_sensor_intd_t2">
 <Graph>
 <LabelBlock>
 <IndexedIdentifier Name="at">
@@ -12771,4 +12767,3 @@
 </ForeachComponent>
 </ComponentList>
 </Module>
-

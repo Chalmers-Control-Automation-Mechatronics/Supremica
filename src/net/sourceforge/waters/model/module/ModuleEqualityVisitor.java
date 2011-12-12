@@ -378,27 +378,6 @@ public class ModuleEqualityVisitor
     return visitProxy(proxy);
   }
 
-  public Boolean visitForeachComponentProxy
-    (final ForeachComponentProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
-  public Boolean visitForeachEventAliasProxy
-    (final ForeachEventAliasProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
-  public Boolean visitForeachEventProxy
-    (final ForeachEventProxy proxy)
-    throws VisitorException
-  {
-    return visitForeachProxy(proxy);
-  }
-
   public Boolean visitForeachProxy
     (final ForeachProxy proxy)
     throws VisitorException
@@ -420,7 +399,6 @@ public class ModuleEqualityVisitor
       if (!compareLists(body1, body2)) {
         return false;
       }
-      setSecondProxy(expected);
       return true;
     } else {
       return false;
@@ -661,7 +639,7 @@ public class ModuleEqualityVisitor
       }
       final List<EventDeclProxy> eventDeclList1 = proxy.getEventDeclList();
       final List<EventDeclProxy> eventDeclList2 = expected.getEventDeclList();
-      if (!compareSets(eventDeclList1, eventDeclList2)) {
+      if (!compareNamedSets(eventDeclList1, eventDeclList2)) {
         return false;
       }
       final List<Proxy> eventAliasList1 = proxy.getEventAliasList();
