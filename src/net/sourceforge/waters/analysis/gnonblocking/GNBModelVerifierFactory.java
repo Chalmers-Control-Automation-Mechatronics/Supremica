@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.List;
 
+//import net.sourceforge.waters.analysis.annotation.AlphaNonBlockingChecker;
 import net.sourceforge.waters.analysis.composing.ComposingControllabilityChecker;
 import net.sourceforge.waters.analysis.composing.ComposingLanguageInclusionChecker;
 import net.sourceforge.waters.analysis.composing.ComposingSafetyVerifier;
@@ -80,11 +81,23 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     return new ComposingControllabilityChecker(factory);
   }
 
-  public CompositionalGeneralisedConflictChecker createConflictChecker
+  /*public CompositionalGeneralisedConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
     return new CompositionalGeneralisedConflictChecker(null, factory);
+  }*/
+
+  public AlphaNonBlockingChecker createConflictChecker
+    (final ProductDESProxyFactory factory)   
+  {
+    return new AlphaNonBlockingChecker(null, factory);
   }
+
+  /*public CanonicalGeneralisedConflictChecker createConflictChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new CanonicalGeneralisedConflictChecker(null, factory);
+  }*/
 
   public ComposingLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)

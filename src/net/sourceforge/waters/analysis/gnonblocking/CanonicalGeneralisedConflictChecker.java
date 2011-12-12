@@ -63,8 +63,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.gnonblocking.Canonize;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.monolithic.GeneralisedCanonicalSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.annotation.TransitionRelation;
+cimport net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.analysis.annotation.CertainConflictException;
 import net.sourceforge.waters.analysis.composing.AutomataStats;
 

@@ -56,7 +56,6 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.analysis.monolithic.GeneralisedCanonicalSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 
 import org.supremica.log.Logger;

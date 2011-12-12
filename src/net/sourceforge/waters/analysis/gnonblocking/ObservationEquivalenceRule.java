@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -135,8 +136,8 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
       final boolean modified = bisimulator.run();
       if (modified) {
         mPartition = bisimulator.getResultPartition();
-        rel.removeRedundantPropositions();
         final ProductDESProxyFactory factory = getFactory();
+        rel.removeRedundantPropositions();
         mOutputEncoding = new StateEncoding();
         return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
       } else {

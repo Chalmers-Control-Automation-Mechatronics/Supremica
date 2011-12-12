@@ -360,6 +360,7 @@ public class CompositionalGeneralisedConflictChecker
         final ConflictTraceProxy counterexample = checker.getCounterExample();
         final int size = modifyingSteps.size();
         ConflictTraceProxy convertedTrace = counterexample;
+        /*ConflictTraceProxy convertedTrace = counterexample;
         convertedTrace = saturateTrace(counterexample);
         TraceChecker.checkCounterExample(convertedTrace, true);
         final ListIterator<Step> iter = modifyingSteps.listIterator(size);
@@ -368,7 +369,7 @@ public class CompositionalGeneralisedConflictChecker
           final ConflictTraceProxy newTrace = step.convertTrace(convertedTrace);
           TraceChecker.checkCounterExample(newTrace, true);
           convertedTrace = newTrace;
-        }
+        }*/
         setFailedResult(convertedTrace);
       }
       return result;
