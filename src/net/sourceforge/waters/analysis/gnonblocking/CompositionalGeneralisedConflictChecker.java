@@ -41,7 +41,6 @@ import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
-import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -361,16 +360,15 @@ public class CompositionalGeneralisedConflictChecker
         final ConflictTraceProxy counterexample = checker.getCounterExample();
         final int size = modifyingSteps.size();
         ConflictTraceProxy convertedTrace = counterexample;
-        /*ConflictTraceProxy convertedTrace = counterexample;
         convertedTrace = saturateTrace(counterexample);
-        TraceChecker.checkCounterExample(convertedTrace, true);
+        // TraceChecker.checkCounterExample(convertedTrace, true);
         final ListIterator<Step> iter = modifyingSteps.listIterator(size);
         while (iter.hasPrevious()) {
           final Step step = iter.previous();
           final ConflictTraceProxy newTrace = step.convertTrace(convertedTrace);
-          TraceChecker.checkCounterExample(newTrace, true);
+          // TraceChecker.checkCounterExample(newTrace, true);
           convertedTrace = newTrace;
-        }*/
+        }
         setFailedResult(convertedTrace);
       }
       return result;

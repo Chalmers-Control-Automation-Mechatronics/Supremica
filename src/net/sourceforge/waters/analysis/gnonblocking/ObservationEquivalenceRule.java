@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
 //# CLASS:   ObservationEquivalenceRule
 //###########################################################################
@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 

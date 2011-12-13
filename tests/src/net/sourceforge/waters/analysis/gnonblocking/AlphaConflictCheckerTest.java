@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   MonolithicConflictCheckerTest
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
+//# CLASS:   AlphaConflictCheckerTest
 //###########################################################################
-//# $Id: MonolithicConflictCheckerTest.java 4630 2009-03-10 01:42:07Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.gnonblocking;
@@ -13,10 +13,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
-import net.sourceforge.waters.analysis.annotation.ProjectingNonBlockingChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 public class AlphaConflictCheckerTest
   extends AbstractStandardConflictCheckerTest
@@ -25,7 +24,7 @@ public class AlphaConflictCheckerTest
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
-    TestSuite testSuite =
+    final TestSuite testSuite =
       new TestSuite(AlphaConflictCheckerTest.class);
     return testSuite;
   }
@@ -56,8 +55,8 @@ public class AlphaConflictCheckerTest
     getLogger().info("Done " + des.getName());
   }
 
-  
-  
+
+
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest

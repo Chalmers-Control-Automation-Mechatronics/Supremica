@@ -1,23 +1,21 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.modular
-//# CLASS:   ProjectingControllabilityChecker
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
+//# CLASS:   CanonicalGeneralisedConflictChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java 4468 2008-11-01 21:54:58Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashMap;
 import gnu.trove.THashSet;
 import gnu.trove.TObjectIntHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;                                                
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,11 +32,13 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.modular.BiSimulator;
+import net.sourceforge.waters.analysis.annotation.CertainConflictException;
+import net.sourceforge.waters.analysis.annotation.TransitionRelation;
+import net.sourceforge.waters.analysis.composing.AutomataStats;
 import net.sourceforge.waters.analysis.modular.BlockedEvents;
-import net.sourceforge.waters.analysis.modular.ConfRevBiSimulator;
-import net.sourceforge.waters.analysis.modular.NonDeterministicComposer;
-import net.sourceforge.waters.analysis.modular.TransBiSimulator;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -56,16 +56,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.gnonblocking.Canonize;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.annotation.TransitionRelation;
-import net.sourceforge.waters.analysis.annotation.CertainConflictException;
-import net.sourceforge.waters.analysis.composing.AutomataStats;
 
 
 /**
@@ -84,7 +76,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
   {
     this(null, factory);
   }
-  
+
   public CanonicalGeneralisedConflictChecker(final ProductDESProxy model,
                                              final ProductDESProxyFactory factory)
   {
@@ -123,7 +115,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       }
     }*/
   }
-  
+
   // #########################################################################
   // # Invocation
   public boolean run() throws AnalysisException
@@ -143,7 +135,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     }
     Runtime.getRuntime().traceMethodCalls(true);
     boolean result = false;
-    double checkerstates = 0;
+    final double checkerstates = 0;
 
     try {
       final ProjectionList list = project(getModel());
@@ -456,7 +448,6 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     return possible;
   }*/
 
-  @SuppressWarnings("unused")
   private List<Set<AutomatonProxy>> getMinTransitions(final ProductDESProxy model, final SortedSet<AutomatonProxy> automata)
   {
     final TObjectIntHashMap<Set<AutomatonProxy>> common =
@@ -521,7 +512,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     //mNumOccurinng = numoccuring;
     return pairs;
   }
-  
+
   @SuppressWarnings("unused")
   private List<Set<AutomatonProxy>> getAlpha(final ProductDESProxy model, final SortedSet<AutomatonProxy> automata)
   {
@@ -534,7 +525,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
         if (minaut == null) {
           minaut = aut;
         } else {
-          Set<AutomatonProxy> set = new THashSet<AutomatonProxy>();
+          final Set<AutomatonProxy> set = new THashSet<AutomatonProxy>();
           set.add(minaut); set.add(aut);
           pairs.add(set);
           return pairs;
@@ -684,6 +675,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     }
   }
 
+  @SuppressWarnings("unused")
   private Set<AutomatonProxy> getFromReader(final Set<AutomatonProxy> automata,
                                             final BufferedReader reader)
   {
@@ -757,7 +749,6 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     eventscheck(model);
     //mRIT = new RemoveImpossibleTransitions(getMarkingProposition());
     //mME = new MergeEvents(getMarkingProposition(), model.getEvents());
-    maxsize = 10000;
     mChecked.clear();
     SortedSet<AutomatonProxy> automata = new TreeSet<AutomatonProxy>();
     final Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
@@ -778,8 +769,8 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     }*/
     //mRIT.addAutomata(automata);
     ProjectionList p = null;
-    Collection<AutomatonProxy> tautomata = automata;
-    for (AutomatonProxy automaton : tautomata) {
+    final Collection<AutomatonProxy> tautomata = automata;
+    for (final AutomatonProxy automaton : tautomata) {
       p = new ProjectionList(p, automata,
                              new TreeSet<AutomatonProxy>(Collections.singleton(automaton)));
       automata = new TreeSet<AutomatonProxy>(p.getAutomata());
@@ -790,18 +781,15 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       //Set<Tuple> possible = getTuples(model, automata);
       //Collection<Set<AutomatonProxy>> possible = getAlpha(model, automata);
       System.out.println("numautomata: " + automata.size());
-      Collection<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
+      final Collection<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
       //final Set<AutomatonProxy> set = getFromReader(automata, reader);
       //if (set == null) {break;}
-      boolean stop = true;                  
-      int overflows = 0;
+      boolean stop = true;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
       System.out.println("Automata: " +automata.size());
-      //System.out.println("possible: " + possible.size());
-      int num = 0;
       //for (Tuple tup : possible) {
-      for (Set<AutomatonProxy> set : possible) {
+      for (final Set<AutomatonProxy> set : possible) {
         //if (num > 3) {break;}
         try {
           /*
@@ -815,7 +803,6 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
           System.out.println(imaxsize);*/
           final ProjectionList t =
             new ProjectionList(p, automata, set);
-          num++;
           if (minSize >= t.getNew().getStates().size()) {
             minlist = t;
             minSize = t.getNew().getStates().size();
@@ -824,7 +811,6 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
         } catch (final AnalysisException exception) {
           //exception.printStackTrace();
           System.out.println("over");
-          overflows++;
         }
       }
       if (minlist != null) {
@@ -1162,7 +1148,9 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       //  new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
       //mChecked.add(ah);
       AutomatonProxy minAutomaton;
+      @SuppressWarnings("unused")
       Collection<EventProxy> allwaysenabled = null;
+      @SuppressWarnings("unused")
       Collection<EventProxy> allselflooped = null;
       //mMinAutMap.remove(ah);
       /*if (mMinAutMap.containsKey(ah)) {
@@ -1175,7 +1163,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
         //System.out.println("marking: " + getMarkingProposition());
         try {
           if (mCompautomata.size() > 1) {
-            ProductDESProxy compmodel = getFactory().createProductDESProxy("temp",
+            final ProductDESProxy compmodel = getFactory().createProductDESProxy("temp",
                                                                            mOriginalAlphabet,
                                                                            mCompautomata);
 /*            System.out.println("comp");
@@ -1184,20 +1172,17 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
             }*/
             //GeneralisedCanonicalSynchronousProductBuilder composer =
             //  new GeneralisedCanonicalSynchronousProductBuilder(compmodel, getFactory(), mAlpha);
-            MonolithicSynchronousProductBuilder composer =
+            final MonolithicSynchronousProductBuilder composer =
               new MonolithicSynchronousProductBuilder(compmodel, getFactory());
-            List<EventProxy> propositions = new ArrayList<EventProxy>();
+            final List<EventProxy> propositions = new ArrayList<EventProxy>();
             propositions.add(getMarkingProposition());
             propositions.add(mAlpha);
             composer.setPropositions(propositions);
-            maxsize = 5000;
-            final int size = maxsize;
             //System.out.println(size);
             //composer.setTransitionLimit(maxsize * maxsize);
             composer.setNodeLimit(6500);
             composer.setTransitionLimit(300000000);
             System.out.println("attempt");
-            mCompTime -= System.currentTimeMillis();
             composer.run();
             System.out.println("finish comp");
             minAutomaton = composer.getComputedAutomaton();
@@ -1211,12 +1196,9 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
           mStats.output(minAutomaton);
           //System.out.println(mCompautomata);
           //System.out.println(minAutomaton);
-          mCompTime += System.currentTimeMillis();
           final int compsize = minAutomaton.getStates().size();
           //System.out.println(minAutomaton);
           final int comptransitions = minAutomaton.getTransitions().size();
-          mAggComposition += compsize;
-          mAggTransitions += comptransitions;
           mLargestTransitions = mLargestTransitions > comptransitions ? mLargestTransitions :
                                 comptransitions;
           mLargestComposition = mLargestComposition > minAutomaton.getStates().size() ? mLargestComposition :
@@ -1241,16 +1223,16 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
           }*/
           if (true) {
             //System.out.println("hiding:" + mHidden.size());
-            EventProxy tauproxy =
+            final EventProxy tauproxy =
               getFactory().createEventProxy("tau:" + minAutomaton.getName(),
                                             EventKind.UNCONTROLLABLE);
-            EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(),tauproxy);
-            ListBufferTransitionRelation tr = 
+            final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(),tauproxy);
+            final ListBufferTransitionRelation tr =
               new ListBufferTransitionRelation(minAutomaton, ee,
                                                ListBufferTransitionRelation.CONFIG_SUCCESSORS);
             if (!minAutomaton.getEvents().contains(mAlpha)) {
               ee.addEvent(mAlpha, getKindTranslator(), true);
-              int alpha = ee.getEventCode(mAlpha);
+              final int alpha = ee.getEventCode(mAlpha);
               for (int s = 0; s < tr.getNumberOfStates(); s++) {
                 tr.setMarked(s, alpha, true);
               }
@@ -1261,16 +1243,13 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
                 tr.removeAllTransitionsWithEvent(tr.eventToInt(event));
               }
             }*/
-            int tau = EventEncoding.TAU;
-            //System.out.println("alpha: " + mAlpha);
-            int removed = 0;
-            for (EventProxy event : mHidden) {
+            final int tau = EventEncoding.TAU;
+            for (final EventProxy event : mHidden) {
               //System.out.println(event);
-              int evcode = ee.getEventCode(event);
+              final int evcode = ee.getEventCode(event);
               if (evcode == -1) {System.out.println("no: " + event); continue;}
               tr.replaceEvent(evcode, tau);
               tr.removeEvent(evcode);
-              removed++;
             }
             if (mCompautomata.size() == 1) {
               ee.addEvent(mCont, getKindTranslator(), false);
@@ -1279,9 +1258,9 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
   //          System.out.println("hidden ; "+ mHidden);
             // System.out.println(minAutomaton);
             // System.out.println(mCompautomata);
-            int marking = ee.getEventCode(getMarkingProposition());
-            int alpha = ee.getEventCode(mAlpha);
-            int cont = ee.getEventCode(mCont);
+            final int marking = ee.getEventCode(getMarkingProposition());
+            final int alpha = ee.getEventCode(mAlpha);
+            final int cont = ee.getEventCode(mCont);
             tr.replaceEvent(cont, tau);
             /*CertainConflictListBuffer cc = new CertainConflictListBuffer(tr,
                                                                          tau, marking); cc.run();
@@ -1289,8 +1268,8 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
               tr.setMarked(cc.getDumpState(), alpha, true);
             }*/
             //System.out.println(tr.createAutomaton(getFactory(), ee));
-            Canonize canonizer = new Canonize(tr, ee, marking, alpha, cont);
-            ListBufferTransitionRelation canon = canonizer.run(getFactory());
+            final Canonize canonizer = new Canonize(tr, ee, marking, alpha, cont);
+            final ListBufferTransitionRelation canon = canonizer.run(getFactory());
             /*cc = new CertainConflictListBuffer(canon, tau, marking); cc.run();
             if (cc.getDumpState() != -1) {
               canon.setMarked(cc.getDumpState(), alpha, true);
@@ -1369,7 +1348,6 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
           allselflooped = tr.getAllSelfLoops();
           // mMinAutMap.put(ah, minAutomaton);
         } catch (final AnalysisException exception) {
-          mCompTime += System.currentTimeMillis();
           mStates += mMaxProjStates;
           //mMinAutMap.put(ah, null);
           throw exception;
@@ -1699,42 +1677,27 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       new HashMap<AutomataHidden,AutomatonProxy>();
   private final Set<AutomataHidden> mChecked = new HashSet<AutomataHidden>();
   private final Set<AutomatonProxy> mDontOnOwn = new HashSet<AutomatonProxy>();
-  private final Map<EventProxy,Set<AutomatonProxy>> mAllSelfLoops =
-      new THashMap<EventProxy,Set<AutomatonProxy>>();
-  private final Map<EventProxy,Set<AutomatonProxy>> mAllwaysEnabled =
-      new THashMap<EventProxy,Set<AutomatonProxy>>();
   private int mLargestComposition = 0;
   private int mLargestTransitions = 0;
-  private int mAggComposition = 0;
-  private int mAggTransitions = 0;
   private TObjectIntHashMap<Set<AutomatonProxy>> mNumOccurinng = null;
   private TObjectIntHashMap<Set<AutomatonProxy>> mCommon = null;
 
-  private int mAnnotatedBISIMulation = 0;
-  private int mBISIMulation = 0;
-  private int mCompTime = 0;
-  private int mAnnBITIME = 0;
-  private int mBITIME = 0;
-  private int mSmallestDiff = Integer.MAX_VALUE;
-  private int mLargestDiff = Integer.MIN_VALUE;
-  private int mAggDiff = 0;
-  private int maxsize = 1000;
   private int mTime = 0;
-  private int mPeakstates = 0;
-  private int mTotalstates = 0;
-  private int mPeakTransitions = 0;
-  private int mTotalTransitions = 0;
+  private final int mPeakstates = 0;
+  private final int mTotalstates = 0;
+  private final int mPeakTransitions = 0;
+  private final int mTotalTransitions = 0;
   private double mFinalStates = 0;
   private double mFinalTrans = 0;
   private double mPeakFinalStates = 0;
   private double mPeakFinalTransitions = 0;
-  
+
   private final EventProxy mCont;
 
   private EventProxy mAlpha;
 
   private BufferedWriter mWriter = null;
-  
+
   private AutomataStats mStats;
 
 

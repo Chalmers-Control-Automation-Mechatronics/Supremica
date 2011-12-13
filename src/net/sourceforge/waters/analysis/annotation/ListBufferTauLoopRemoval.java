@@ -1,16 +1,14 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntStack;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import java.util.List;
-import gnu.trove.TIntArrayList;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 
 
 public class ListBufferTauLoopRemoval
@@ -23,23 +21,23 @@ public class ListBufferTauLoopRemoval
   private final boolean[] mOnstack;
   private final TIntStack mStack;
   private final List<int[]> mToBeMerged;
-  
+
   public static int STATESMERGED = 0;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     STATESMERGED = 0;
     TIME = 0;
   }
-  
+
   public static String stats()
   {
     return "TauLoopRemoval: STATESMERGED = " + STATESMERGED +
             " TIME = " + TIME;
   }
-  
-  public ListBufferTauLoopRemoval(ListBufferTransitionRelation transitionrelation)
+
+  public ListBufferTauLoopRemoval(final ListBufferTransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
     mTau = EventEncoding.TAU;
@@ -50,17 +48,17 @@ public class ListBufferTauLoopRemoval
     mStack = new TIntStack();
     mToBeMerged = new ArrayList<int[]>();
   }
-  
-  private void tarjan(int state)
+
+  private void tarjan(final int state)
   {
     mTarjan[state] = mIndex;
     mLowLink[state] = mIndex;
     mIndex++;
     mOnstack[state] = true;
     mStack.push(state);
-    TransitionIterator targets = mTransitionRelation.createSuccessorsReadOnlyIterator(state, mTau);
+    final TransitionIterator targets = mTransitionRelation.createSuccessorsReadOnlyIterator(state, mTau);
     while (targets.advance()) {
-      int suc = targets.getCurrentTargetState();
+      final int suc = targets.getCurrentTargetState();
       if(mOnstack[suc]) {
         mLowLink[state] = mTarjan[suc] < mLowLink[state] ? mTarjan[suc]
                                                          : mLowLink[state];
@@ -71,9 +69,9 @@ public class ListBufferTauLoopRemoval
       }
     }
     if (mTarjan[state] == mLowLink[state]) {
-      TIntArrayList merge = new TIntArrayList();
+      final TIntArrayList merge = new TIntArrayList();
       while (true) {
-        int pop = mStack.pop();
+        final int pop = mStack.pop();
         merge.add(pop);
         mOnstack[pop] = false;
         if (pop == state) {
@@ -83,7 +81,7 @@ public class ListBufferTauLoopRemoval
       mToBeMerged.add(merge.toNativeArray());
     }
   }
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
