@@ -442,7 +442,9 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       }
     }
     List<InsertInfo> result = new ArrayList<InsertInfo>(pos);
-    result = getInsertInfo(transferable, flavor, listInModule, parent ==null ? anchor: parent, pos);
+    result =
+      getInsertInfo(transferable, flavor, listInModule,
+                    parent == null ? anchor : parent, pos);
 
     return result;
   }
@@ -658,15 +660,14 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   public List<InsertInfo> getInsertInfo(final Transferable transferable,
                                         final DataFlavor flavor,
                                         final ListSubject<? extends ProxySubject> list,
-                                        final Proxy dropTarget,
-                                        int index) throws IOException,
-    UnsupportedFlavorException
+                                        final Proxy dropTarget, int index)
+    throws IOException, UnsupportedFlavorException
   {
     final List<InsertInfo> result = new ArrayList<InsertInfo>(index);
-    @SuppressWarnings("unchecked")
     final List<Proxy> transferData =
-      (List<Proxy>) transferable.getTransferData(flavor);
-      //(List<Proxy>) mListVisitor.getListOfAcceptedItems(dropTarget, transferable);
+    //(List<Proxy>) transferable.getTransferData(flavor);
+      (List<Proxy>) mListVisitor.getListOfAcceptedItems(dropTarget,
+                                                        transferable);
     final ModuleProxyCloner cloner =
       ModuleSubjectFactory.getCloningInstance();
     Set<String> names;
@@ -985,7 +986,8 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
               .getFlavorIfDropAllowed(parentOfDropLoc, transferable);
           try {
             final List<InsertInfo> inserts =
-              getInsertInfo(transferable, flavor, mDropList, parentOfDropLoc, mDropIndex);
+              getInsertInfo(transferable, flavor, mDropList, parentOfDropLoc,
+                            mDropIndex);
             final InsertCommand allCopies =
               new InsertCommand(inserts, ModuleTree.this);
             mRoot.getUndoInterface().executeCommand(allCopies);
@@ -1084,18 +1086,19 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     }
   }
 
-//#########################################################################
+
+  //#########################################################################
   //# Inner Class GetListVisitor
   private class GetListVisitor extends AbstractModuleProxyVisitor
   {
-  //#######################################################################
+    //#######################################################################
     //# Invocation
-    @SuppressWarnings({"unchecked", "unused"})
     private List<Proxy> getListOfAcceptedItems(final Proxy dropTarget,
-                                              final Transferable transferable)
+                                               final Transferable transferable)
     {
       mTransferable = transferable;
       try {
+        @SuppressWarnings("unchecked")
         final List<Proxy> list = (List<Proxy>) dropTarget.acceptVisitor(this);
         return list;
       } catch (final VisitorException exception) {
@@ -1106,32 +1109,20 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     }
 
     @SuppressWarnings("unchecked")
-    private List<Proxy> modifyList(final DataFlavor flavor,
-                                   final Proxy parent,
-                                   final ExpressionProxy expr)
+    private List<Proxy> modifyList(final ListSubject<? extends ProxySubject> parentsList)
     {
-      final ListSubject<? extends ProxySubject> parentsList;
-      if (expr instanceof EventListExpressionProxy) {
-        final EventListExpressionSubject event =
-          (EventListExpressionSubject) expr;
-        parentsList = event.getEventListModifiable();
-      } else {
-        parentsList = mModel.getChildren(parent);
-      }
       List<Proxy> transferData;
       final List<Proxy> result = new ArrayList<Proxy>();
       try {
         final ModuleEqualityVisitor eq =
           ModuleEqualityVisitor.getInstance(false);
-        transferData = (List<Proxy>) mTransferable.getTransferData(flavor);
-        if (flavor == WatersDataFlavor.IDENTIFIER_LIST) {
-          for (final Proxy transferredProxy : transferData) {
-            if (!eq.contains(parentsList, transferredProxy)) {
-              result.add(transferredProxy);
-            }
+        transferData =
+          (List<Proxy>) mTransferable
+            .getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+        for (final Proxy transferredProxy : transferData) {
+          if (!eq.contains(parentsList, transferredProxy)) {
+            result.add(transferredProxy);
           }
-        } else {
-          return transferData;
         }
       } catch (final UnsupportedFlavorException exception) {
         exception.printStackTrace();
@@ -1158,8 +1149,9 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     public List<Proxy> visitEventAliasProxy(final EventAliasProxy alias)
     {
       final EventAliasSubject event = (EventAliasSubject) alias;
-      final ExpressionProxy exp = event.getExpression();
-      return modifyList(WatersDataFlavor.IDENTIFIER_LIST, alias, exp);
+      final EventListExpressionSubject exp =
+        (EventListExpressionSubject) event.getExpression();
+      return modifyList(exp.getEventListModifiable());
     }
 
     @SuppressWarnings("unchecked")
@@ -1167,10 +1159,10 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     public List<Proxy> visitForeachProxy(final ForeachProxy foreach)
     {
       try {
-        final Subject subject = (Subject) foreach;
-        if (SubjectTools.getAncestor(subject, EventAliasSubject.class) != null) {
-          return (List<Proxy>) mTransferable
-            .getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+        final ForeachSubject subject = (ForeachSubject) foreach;
+        if (SubjectTools.getAncestor(subject, EventAliasSubject.class,
+                                     ParameterBindingSubject.class) != null) {
+          return modifyList(subject.getBodyModifiable());
         } else {
           return (List<Proxy>) mTransferable
             .getTransferData(getSupportedDataFlavor());
@@ -1188,7 +1180,8 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     public List<Proxy> visitModuleProxy(final ModuleProxy proxy)
     {
       try {
-        return (List<Proxy>) mTransferable.getTransferData(getSupportedDataFlavor());
+        return (List<Proxy>) mTransferable
+          .getTransferData(getSupportedDataFlavor());
       } catch (final UnsupportedFlavorException exception) {
         exception.printStackTrace();
       } catch (final IOException exception) {
@@ -1202,7 +1195,8 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     public List<Proxy> visitInstanceProxy(final InstanceProxy inst)
     {
       try {
-        return (List<Proxy>) mTransferable.getTransferData(WatersDataFlavor.PARAMETER_BINDING_LIST);
+        return (List<Proxy>) mTransferable
+          .getTransferData(WatersDataFlavor.PARAMETER_BINDING_LIST);
       } catch (final UnsupportedFlavorException exception) {
         exception.printStackTrace();
       } catch (final IOException exception) {
@@ -1214,12 +1208,14 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     public List<Proxy> visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
       final ParameterBindingSubject event = (ParameterBindingSubject) binding;
-      final ExpressionProxy exp = event.getExpression();
-      return modifyList(WatersDataFlavor.IDENTIFIER_LIST, binding, exp);
+      final EventListExpressionSubject exp =
+        (EventListExpressionSubject) event.getExpression();
+      return modifyList(exp.getEventListModifiable());
     }
 
     private Transferable mTransferable;
   }
+
 
   //#########################################################################
   //# Inner Class AcceptedDataFlavorVisitor
@@ -1244,13 +1240,10 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       }
     }
 
-    private boolean isInExpressionList(final ExpressionProxy expression){
-
-      if(expression instanceof EventListExpressionProxy &&
-        mTransferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)){
-        final EventListExpressionSubject subject =
-          (EventListExpressionSubject) expression;
-        final List<Proxy> listOfEvents = subject.getEventList();
+    private boolean isInList(final List<Proxy> listOfEvents)
+    {
+      if (mTransferable
+        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)) {
         try {
           @SuppressWarnings("unchecked")
           final List<Proxy> transferData =
@@ -1272,7 +1265,6 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       return true;
     }
 
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     @Override
@@ -1288,9 +1280,12 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     {
       final EventAliasSubject event = (EventAliasSubject) alias;
       final ExpressionProxy exp = event.getExpression();
-      if (!isInExpressionList(exp)) {
-        return WatersDataFlavor.IDENTIFIER_LIST;
+      if (exp instanceof EventListExpressionProxy) {
+        if (!isInList(((EventListExpressionProxy) exp).getEventList())) {
+          return WatersDataFlavor.IDENTIFIER_LIST;
+        }
       }
+
       return null;
     }
 
@@ -1298,8 +1293,12 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     public DataFlavor visitForeachProxy(final ForeachProxy foreach)
     {
       final Subject subject = (Subject) foreach;
-      if (SubjectTools.getAncestor(subject, EventAliasSubject.class) != null) {
-        return WatersDataFlavor.IDENTIFIER_LIST;
+      if (SubjectTools.getAncestor(subject, EventAliasSubject.class,
+                                   ParameterBindingSubject.class) != null) {
+        if (!isInList(foreach.getBody())) {
+          return WatersDataFlavor.IDENTIFIER_LIST;
+        }
+        return null;
       } else {
         return getSupportedDataFlavor();
       }
@@ -1321,8 +1320,13 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     {
       final ParameterBindingSubject event = (ParameterBindingSubject) binding;
       final ExpressionProxy exp = event.getExpression();
-      if (!isInExpressionList(exp) && !(exp instanceof SimpleExpressionProxy)) {
-        return WatersDataFlavor.IDENTIFIER_LIST;
+      EventListExpressionProxy list;
+      if (exp instanceof EventListExpressionProxy) {
+        list = (EventListExpressionProxy) exp;
+        if (!isInList(list.getEventList())
+            && !(exp instanceof SimpleExpressionProxy)) {
+          return WatersDataFlavor.IDENTIFIER_LIST;
+        }
       }
       return null;
     }
@@ -1442,7 +1446,6 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   private boolean mIsPermanentFocusOwner;
   private final DoubleClickVisitor mDoubleClickVisitor;
   private final AcceptTransferableVisitor mAcceptTransferableVisitor;
-  @SuppressWarnings("unused")
   private final GetListVisitor mListVisitor;
 
   //#########################################################################
