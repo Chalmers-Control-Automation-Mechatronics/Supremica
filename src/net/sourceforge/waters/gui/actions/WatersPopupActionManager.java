@@ -166,6 +166,12 @@ public class WatersPopupActionManager
     return master.getAction(InsertConstantAliasAction.class);
   }
 
+  public IDEAction getInsertEventAliasAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertEventAliasAction.class);
+  }
+
   public IDEAction getInsertEventDeclAction()
   {
     final WatersActionManager master = mIDE.getActions();

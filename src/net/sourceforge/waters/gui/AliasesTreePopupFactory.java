@@ -53,6 +53,8 @@ class AliasesTreePopupFactory
     popup.addSeparator();
     final IDEAction showalias = master.getInsertConstantAliasAction();
     popup.add(showalias);
+    final IDEAction showeventalias = master.getInsertEventAliasAction();
+    popup.add(showeventalias);
     final IDEAction newfor = master.getInsertForeachComponentAction();
     if(newfor.isEnabled()){
       popup.add(newfor);

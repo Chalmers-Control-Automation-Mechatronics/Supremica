@@ -76,6 +76,11 @@ public interface ModuleWindowInterface
   public SelectionOwner getConstantAliasesPanel();
 
   /**
+   * Gets the event alias panel for the module edited by this GUI.
+   */
+  public SelectionOwner getEventAliasesPanel();
+
+  /**
    * Shows the list of components of the module so the user can edit it.
    */
   public void showComponents();

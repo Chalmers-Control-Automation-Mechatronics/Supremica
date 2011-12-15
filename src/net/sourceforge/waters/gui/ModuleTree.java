@@ -903,13 +903,16 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
               return;
             }
           }
+          final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
           for (final InsertInfo delete : deletes) {
             final Proxy proxy = delete.getProxy();
-            final InsertInfo insert =
+            if(!eq.contains(mDropList, proxy)) {
+              final InsertInfo insert =
               new InsertInfo(proxy, new ListInsertPosition(mDropList,
                                                            mDropIndex));
             inserts.add(insert);
             mDropIndex++;
+            }
           }
           final RearrangeTreeCommand allMoves =
             new RearrangeTreeCommand(inserts, deletes, ModuleTree.this);

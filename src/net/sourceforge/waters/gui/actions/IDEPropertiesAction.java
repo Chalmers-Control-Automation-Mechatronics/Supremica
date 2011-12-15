@@ -16,6 +16,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.EditorEditEdgeDialog;
+import net.sourceforge.waters.gui.EventAliasEditorDialog;
 import net.sourceforge.waters.gui.EventDeclEditorDialog;
 import net.sourceforge.waters.gui.ForeachEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
@@ -30,12 +31,14 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.ConstantAliasSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -178,6 +181,16 @@ public class IDEPropertiesAction
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final EdgeSubject subject = (EdgeSubject) edge;
         EditorEditEdgeDialog.showDialog(subject, root);
+      }
+      return true;
+    }
+
+    public Boolean visitEventAliasProxy(final EventAliasProxy alias)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final EventAliasSubject subject = (EventAliasSubject) alias;
+        new EventAliasEditorDialog(root, subject);
       }
       return true;
     }
