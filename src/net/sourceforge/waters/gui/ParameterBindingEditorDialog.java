@@ -14,8 +14,13 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -26,7 +31,9 @@ import javax.swing.JRootPane;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -34,32 +41,31 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
-public class EventAliasEditorDialog extends JDialog
+public class ParameterBindingEditorDialog extends JDialog
 {
 
   //#########################################################################
   //# Constructors
-  public EventAliasEditorDialog(final ModuleWindowInterface root)
+  public ParameterBindingEditorDialog(final ModuleWindowInterface root)
   {
     this(root, null);
   }
 
-  public EventAliasEditorDialog(final ModuleWindowInterface root,
-                                final EventAliasSubject alias)
+  public ParameterBindingEditorDialog(final ModuleWindowInterface root,
+                                      final ParameterBindingSubject alias)
   {
     super(root.getRootWindow());
     if (alias == null) {
-      setTitle("Creating new Event Alias");
+      setTitle("Creating new Parameter Binding");
     } else {
-      setTitle("Editing Event Alias");
+      setTitle("Editing Parameter Binding");
     }
     mRoot = root;
     mAlias = alias;
@@ -77,7 +83,7 @@ public class EventAliasEditorDialog extends JDialog
    *
    * @return A reference to the foreach component being edited by this dialog.
    */
-  public EventAliasSubject getEditedItem()
+  public ParameterBindingSubject getEditedItem()
   {
     return mAlias;
   }
@@ -89,7 +95,22 @@ public class EventAliasEditorDialog extends JDialog
    */
   private void createComponents()
   {
-    final EventAliasSubject template = mAlias == null ? TEMPLATE : mAlias;
+    final ParameterBindingSubject template;
+    if(mAlias == null){
+      template = TEMPLATE;
+      try {
+        mInsertPosition =
+          mRoot.getComponentsPanel()
+            .getInsertInfo(WatersDataFlavor.createTransferable(template))
+            .get(0).getInsertPosition();
+      } catch (final IOException exception) {
+        exception.printStackTrace();
+      } catch (final UnsupportedFlavorException exception) {
+        exception.printStackTrace();
+      }
+    } else {
+      template = mAlias;
+    }
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
       public void actionPerformed(final ActionEvent event)
@@ -116,7 +137,7 @@ public class EventAliasEditorDialog extends JDialog
       oldexp = (SimpleExpressionProxy) mAlias.getExpression();
     }
     mExpressionInput =
-      new SimpleExpressionCell(oldexp, Operator.TYPE_NAME, parser);
+      new SimpleExpressionCell(oldexp, Operator.TYPE_ANY, parser);
     mExpressionInput.addActionListener(commithandler);
     mExpressionInput.setToolTipText("Enter the expression");
     mExpressionInput.setAllowNull(false);
@@ -128,7 +149,7 @@ public class EventAliasEditorDialog extends JDialog
     mIsSimpleExpCheckBox.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent event)
       {
-        updateExpressionEnabled();
+        updateRequiredEnabled();
       }
     });
 
@@ -158,7 +179,7 @@ public class EventAliasEditorDialog extends JDialog
     final JRootPane root = getRootPane();
     root.setDefaultButton(okButton);
     DialogCancelAction.register(this);
-    updateExpressionEnabled();
+    updateRequiredEnabled();
   }
 
   /**
@@ -247,15 +268,17 @@ public class EventAliasEditorDialog extends JDialog
     if (isInputLocked()) {
       // nothing
     } else if (mIsSimpleExpCheckBox.isSelected()) {
-      final IdentifierSubject name =
-        (IdentifierSubject) mNameInput.getValue();
+      final String name = mNameInput.getText();
       final SimpleExpressionSubject exp0 =
         (SimpleExpressionSubject) mExpressionInput.getValue();
       final SimpleExpressionSubject exp = makeUnique(exp0);
-      final SelectionOwner panel = mRoot.getEventAliasesPanel();
+      final SelectionOwner panel = mRoot.getComponentsPanel();
       if (mAlias == null) {
-        final EventAliasSubject template = new EventAliasSubject(name, exp);
-        final Command command = new InsertCommand(template, panel);
+        final ParameterBindingSubject template =
+          new ParameterBindingSubject(name, exp);
+        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
+        final List<InsertInfo> list = Collections.singletonList(insert);
+        final Command command = new InsertCommand(list, panel);
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
@@ -267,9 +290,9 @@ public class EventAliasEditorDialog extends JDialog
           ModuleEqualityVisitor.getInstance(true);
         final boolean expchange = !eq.equals(exp, oldExp);
         if (namechange || expchange) {
-          final EventAliasSubject template = mAlias.clone();
+          final ParameterBindingSubject template = mAlias.clone();
           if (namechange) {
-            template.setIdentifier(name);
+            template.setName(name);
           }
           if (expchange) {
             template.setExpression(exp);
@@ -280,12 +303,14 @@ public class EventAliasEditorDialog extends JDialog
       }
       dispose();
     } else if (!mIsSimpleExpCheckBox.isSelected()) {
-      final IdentifierSubject name =
-        (IdentifierSubject) mNameInput.getValue();
-      final SelectionOwner panel = mRoot.getEventAliasesPanel();
+      final String name = mNameInput.getText();
+      final SelectionOwner panel = mRoot.getComponentsPanel();
       if (mAlias == null) {
-        final EventAliasSubject template = new EventAliasSubject(name, new PlainEventListSubject());
-        final Command command = new InsertCommand(template, panel);
+        final ParameterBindingSubject template =
+          new ParameterBindingSubject(name, new PlainEventListSubject());
+        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
+        final List<InsertInfo> list = Collections.singletonList(insert);
+        final Command command = new InsertCommand(list, panel);
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
@@ -298,9 +323,9 @@ public class EventAliasEditorDialog extends JDialog
           expchange = true;
         }
         if (namechange || expchange) {
-          final EventAliasSubject template = mAlias.clone();
+          final ParameterBindingSubject template = mAlias.clone();
           if (namechange) {
-            template.setIdentifier(name);
+            template.setName(name);
           }
           if (expchange) {
             template.setExpression(exp);
@@ -345,12 +370,12 @@ public class EventAliasEditorDialog extends JDialog
    * action listeners in response to the selection or deselection of the
    * 'parameter' checkbox.
    */
-  private void updateExpressionEnabled()
+  private void updateRequiredEnabled()
   {
     final boolean enable = mIsSimpleExpCheckBox.isSelected();
     mExpressionInput.setEnabled(enable);
     mExpressionLabel.setEnabled(enable);
-    if(!enable){
+    if (!enable) {
       mErrorLabel.clearDisplay();
     }
   }
@@ -372,14 +397,14 @@ public class EventAliasEditorDialog extends JDialog
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
-  private EventAliasSubject mAlias;
+  private ParameterBindingSubject mAlias;
+  private Object mInsertPosition;
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final EventAliasSubject TEMPLATE =
-    new EventAliasSubject(new SimpleIdentifierSubject(""),
-                          new SimpleIdentifierSubject(""));
+  private static final ParameterBindingSubject TEMPLATE =
+    new ParameterBindingSubject("", new SimpleIdentifierSubject(""));
 
 }

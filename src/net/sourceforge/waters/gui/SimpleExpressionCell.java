@@ -178,7 +178,12 @@ public class SimpleExpressionCell
    */
   public boolean shouldYieldFocus()
   {
-    return mVerifier.shouldYieldFocus(this);
+    if(isEnabled()){
+      return mVerifier.shouldYieldFocus(this);
+    }
+    else{
+      return true;
+    }
   }
 
   /**

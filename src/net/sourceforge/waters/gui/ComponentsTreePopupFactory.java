@@ -91,6 +91,8 @@ class ComponentsTreePopupFactory
       final ModuleProxy module = mContext.getModule();
       final IDEAction gotomod = master.getGotoModuleAction(module, name);
       popup.add(gotomod);
+      final IDEAction param = master.getInsertParameterBindingAction();
+      popup.add(param);
       return null;
     }
 

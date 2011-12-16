@@ -188,7 +188,7 @@ class ModuleTreeModel
           final TreePath path = createPath(ancestor);
           final TreeModelEvent newevent =
             new TreeModelEvent(this, path, null, null);
-          fireNodesChanged(newevent);
+          fireStructureChanged(newevent);
         }
         break;
       default:
@@ -327,6 +327,7 @@ class ModuleTreeModel
     }
   }
 
+  @SuppressWarnings("unused")
   private void fireNodesChanged(final TreeModelEvent event)
   {
     if (mListeners != null) {

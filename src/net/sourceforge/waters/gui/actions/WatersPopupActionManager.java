@@ -184,6 +184,12 @@ public class WatersPopupActionManager
     return master.getAction(InsertForeachAction.class);
   }
 
+  public IDEAction getInsertParameterBindingAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertParameterBindingAction.class);
+  }
+
   public IDEAction getInsertSimpleComponentAction()
   {
     final WatersActionManager master = mIDE.getActions();
