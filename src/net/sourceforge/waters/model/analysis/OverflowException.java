@@ -79,6 +79,26 @@ public class OverflowException extends AnalysisException {
     mLimit = -1;
   }
 
+  /**
+   * Constructs a new exception indicating out of memory.
+   */
+  public OverflowException(final OutOfMemoryError cause)
+  {
+    super(cause);
+    mKind = OverflowKind.MEMORY;
+    mLimit = -1;
+  }
+
+  /**
+   * Constructs a new exception indicating stack overflow.
+   */
+  public OverflowException(final StackOverflowError cause)
+  {
+    super(cause);
+    mKind = OverflowKind.MEMORY;
+    mLimit = -1;
+  }
+
 
   //#########################################################################
   //# Overrides for Base Class java.lang.Exception

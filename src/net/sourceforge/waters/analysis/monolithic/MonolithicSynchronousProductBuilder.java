@@ -242,6 +242,9 @@ public class MonolithicSynchronousProductBuilder
       logger.debug("<out of memory>");
       final OverflowException exception = new OverflowException(error);
       throw setExceptionResult(exception);
+    } catch (final StackOverflowError error) {
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }

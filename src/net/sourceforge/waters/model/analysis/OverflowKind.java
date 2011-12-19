@@ -39,7 +39,11 @@ public enum OverflowKind {
   /**
    * Overflow after catching {@link OutOfMemoryError}.
    */
-  MEMORY;
+  MEMORY,
+  /**
+   * Overflow after catching {@link StackOverflowError}.
+   */
+  STACK;
 
 
   //#########################################################################
