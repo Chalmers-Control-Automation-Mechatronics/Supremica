@@ -30,12 +30,10 @@ import javax.swing.JRootPane;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -310,14 +308,9 @@ public class SimpleComponentEditorDialog
         final SimpleComponentSubject template =
           new SimpleComponentSubject(ident, kind, graph, attribs);
         final SelectionOwner panel = mRoot.getComponentsPanel();
-        final Command command = new InsertCommand(template, panel);
+        final Command command = new InsertCommand(template, panel, mRoot);
         mComponent = template;
         mRoot.getUndoInterface().executeCommand(command);
-        try {
-          mRoot.showEditor(mComponent);
-        } catch (final GeometryAbsentException exception) {
-          throw new WatersRuntimeException(exception);
-        }
       } else {
         final ModuleEqualityVisitor eq =
           ModuleEqualityVisitor.getInstance(true);

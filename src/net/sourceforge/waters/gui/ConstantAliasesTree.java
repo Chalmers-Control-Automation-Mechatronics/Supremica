@@ -36,7 +36,7 @@ public class ConstantAliasesTree extends ModuleTree
 
   DataFlavor getSupportedDataFlavor()
   {
-    return WatersDataFlavor.CONSTANT_ALIAS_LIST;
+    return WatersDataFlavor.CONSTANT_ALIAS;
   }
 
   PopupFactory getPopupFactory()

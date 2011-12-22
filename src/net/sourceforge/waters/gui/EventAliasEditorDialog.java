@@ -255,7 +255,7 @@ public class EventAliasEditorDialog extends JDialog
       final SelectionOwner panel = mRoot.getEventAliasesPanel();
       if (mAlias == null) {
         final EventAliasSubject template = new EventAliasSubject(name, exp);
-        final Command command = new InsertCommand(template, panel);
+        final Command command = new InsertCommand(template, panel, mRoot);
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
@@ -284,8 +284,9 @@ public class EventAliasEditorDialog extends JDialog
         (IdentifierSubject) mNameInput.getValue();
       final SelectionOwner panel = mRoot.getEventAliasesPanel();
       if (mAlias == null) {
-        final EventAliasSubject template = new EventAliasSubject(name, new PlainEventListSubject());
-        final Command command = new InsertCommand(template, panel);
+        final EventAliasSubject template =
+          new EventAliasSubject(name, new PlainEventListSubject());
+        final Command command = new InsertCommand(template, panel, mRoot);
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {

@@ -59,7 +59,7 @@ public class InsertNodeSelfloopAction
     final EdgeSubject edge =
       GraphTools.getCreatedEdge(graph, node, node, null, null);
     final SelectionOwner panel = getCurrentSelectionOwner();
-    final Command cmd = new InsertCommand(edge, panel);
+    final Command cmd = new InsertCommand(edge, panel, null);
     final UndoInterface undoer = getActiveUndoInterface();
     undoer.executeCommand(cmd);
   }

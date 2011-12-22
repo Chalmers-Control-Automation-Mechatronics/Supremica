@@ -19,67 +19,47 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
- * <P>A transferable that can copy and paste one or more WATERS
+ * <P>A transferable that can hold an arbitrary collection of WATERS
  * objects.</P>
  *
- * <P>In addition to a type-specific data flavour as defined in class
+ * <P>This general class is not intended for direct use. To create a
+ * transferable, please use the methods {@link
+ * WatersDataFlavor#createTransferable(java.util.Collection)
+ * createTransferable()} in class {@link WatersDataFlavor}, which can
+ * automatically determine the correct data flavours and transferable
+ * class for a given list of {@link Proxy} objects.</P>
+ *
+ * <P>In addition to type-specific data flavours as defined in class
  * {@link WatersDataFlavor}, this class also supports Java's string
  * data flavour ({@link DataFlavor#stringFlavor}): when requested, the
  * data is converted to text form using a {@link ProxyPrinter}.</P>
  *
- * <P>When creating the transferable, the transferred objects are cloned
- * as plain elements. When extracting the data, the user needs to clone
- * them once again into subjects.</P>
- *
  * @author Robi Malik
  */
 
-public class ProxyTransferable<P extends Proxy> implements Transferable
+public class ProxyTransferable implements Transferable
 {
 
   //#########################################################################
   //# Constructor
   /**
-   * Creates a transferable that holds a single item.
+   * Creates a transferable that holds a list of items.
+   * @param  flavors  The data flavours to be supported by the transferable,
+   *                  in order of preference.
+   * @param  data     The list of objects to be stored in the transferable,
+   *                  already cloned and distinct from other objects used
+   *                  by the transferable's creator.
    */
-  ProxyTransferable(final DataFlavor flavor, final P data)
+  ProxyTransferable(final DataFlavor[] flavors, final List<Proxy> data)
   {
-    this(flavor, Collections.singletonList(data));
-  }
-
-  /**
-   * Creates a transferable that holds a single item.
-   */
-  ProxyTransferable(final DataFlavor[] flavors, final P data)
-  {
-    this(flavors, Collections.singletonList(data));
-  }
-
-  /**
-   * Creates a transferable that holds a whole list of items.
-   */
-  ProxyTransferable(final DataFlavor flavor, final List<? extends P> data)
-  {
-    this(new DataFlavor[] {flavor, DataFlavor.stringFlavor}, data);
-  }
-
-  /**
-   * Creates a transferable that holds a whole list of items.
-   */
-  ProxyTransferable(final DataFlavor[] flavors, final List<? extends P> data)
-  {
+    mData = data;
     mFlavors = flavors;
-    // *** BUG ***
-    // This is not good enough for ProductDESProxy ...
-    // ***
-    final ProxyCloner cloner = ModuleElementFactory.getCloningInstance();
-    mData = cloner.getClonedList(data);
   }
 
 
@@ -88,12 +68,14 @@ public class ProxyTransferable<P extends Proxy> implements Transferable
   public Object getTransferData(final DataFlavor flavor)
     throws IOException, UnsupportedFlavorException
   {
-    if (mFlavors[0].equals(flavor)) {
-      return mData;
+    if (flavor instanceof WatersDataFlavor) {
+      final WatersDataFlavor wflavor = (WatersDataFlavor) flavor;
+      final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+      return wflavor.createImportData(mData, factory);
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter writer = new StringWriter();
       for (final Proxy proxy : mData) {
-	ProxyPrinter.printProxy(writer, proxy);
+        ProxyPrinter.printProxy(writer, proxy);
         writer.write('\n');
       }
       return writer.toString();
@@ -109,8 +91,9 @@ public class ProxyTransferable<P extends Proxy> implements Transferable
 
   public boolean isDataFlavorSupported(final DataFlavor flavor)
   {
-    for (int i = 0; i < mFlavors.length; i++) {
-      if (mFlavors[i].equals(flavor)) {
+    final DataFlavor[] flavors = getTransferDataFlavors();
+    for (int i = 0; i < flavors.length; i++) {
+      if (flavors[i].equals(flavor)) {
         return true;
       }
     }
@@ -120,15 +103,21 @@ public class ProxyTransferable<P extends Proxy> implements Transferable
 
   //#########################################################################
   //# Simple Access
-  List<P> getRawData()
+  /**
+   * Retrieves the data contained in this transferable.
+   * This method directly returns the list of objects stored in the
+   * transferable, without any copying.
+   * @return An unmodifiable list.
+   */
+  public List<Proxy> getRawData()
   {
-    return mData;
+    return Collections.unmodifiableList(mData);
   }
 
 
   //#########################################################################
   //# Data Members
+  private final List<Proxy> mData;
   private final DataFlavor[] mFlavors;
-  private final List<P> mData;
 
 }

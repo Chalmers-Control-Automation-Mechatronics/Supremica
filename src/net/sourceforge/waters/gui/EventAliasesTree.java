@@ -35,7 +35,7 @@ public class EventAliasesTree extends ModuleTree
 
   DataFlavor getSupportedDataFlavor()
   {
-    return WatersDataFlavor.EVENT_ALIAS_LIST;
+    return WatersDataFlavor.EVENT_ALIAS;
   }
 
   private static final long serialVersionUID = 1L;

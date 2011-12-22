@@ -47,7 +47,7 @@ public class ComponentsTree extends ModuleTree
 
   DataFlavor getSupportedDataFlavor()
   {
-    return WatersDataFlavor.MODULE_COMPONENT_LIST;
+    return WatersDataFlavor.COMPONENT;
   }
 
   private static final long serialVersionUID = 1L;

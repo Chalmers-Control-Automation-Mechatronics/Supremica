@@ -986,7 +986,7 @@ public class EventDeclEditorDialog
         new EventDeclSubject(ident, kind, observable,
                              scope, ranges, geo, attribs);
       if (mEventDecl == null) {
-        final Command command = new InsertCommand(template, panel);
+        final Command command = new InsertCommand(template, panel, mRoot);
         mEventDecl = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!eq.equals(mEventDecl, template)) {

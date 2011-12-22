@@ -93,26 +93,6 @@ public abstract class WatersAction
   }
 
   /**
-   * Retrieves a references to the active editor panel.
-   * @return  A module window interface to access the active editor panel,
-   *          or <CODE>null</CODE> if no editor panel is currently active.
-   */
-  ModuleWindowInterface getActiveModuleWindowInterface()
-  {
-    final IDE ide = getIDE();
-    final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container == null || !(container instanceof ModuleContainer)) {
-      return null;
-    }
-    final Component panel = container.getActivePanel();
-    if (panel instanceof EditorPanel) {
-      return (ModuleWindowInterface) panel;
-    } else {
-      return null;
-    }
-  }
-
-  /**
    * Retrieves a references to the current module context.
    * @return  A module context object providing access to the module
    *          being edited, or <CODE>null</CODE> if no module is currently

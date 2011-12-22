@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,6 +37,7 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.ExpressionProxy;
@@ -59,22 +61,23 @@ public class ParameterBindingEditorDialog extends JDialog
   }
 
   public ParameterBindingEditorDialog(final ModuleWindowInterface root,
-                                      final ParameterBindingSubject alias)
+                                      final ParameterBindingSubject binding)
   {
     super(root.getRootWindow());
-    if (alias == null) {
+    if (binding == null) {
       setTitle("Creating new Parameter Binding");
     } else {
       setTitle("Editing Parameter Binding");
     }
     mRoot = root;
-    mAlias = alias;
+    mBinding = binding;
     createComponents();
     layoutComponents();
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
   }
+
 
   //#########################################################################
   //# Access to Created Item
@@ -85,8 +88,9 @@ public class ParameterBindingEditorDialog extends JDialog
    */
   public ParameterBindingSubject getEditedItem()
   {
-    return mAlias;
+    return mBinding;
   }
+
 
   //#########################################################################
   //# Initialisation and Layout of Components
@@ -96,21 +100,22 @@ public class ParameterBindingEditorDialog extends JDialog
   private void createComponents()
   {
     final ParameterBindingSubject template;
-    if(mAlias == null){
-      template = TEMPLATE;
+    if (mBinding == null) {
       try {
-        mInsertPosition =
-          mRoot.getComponentsPanel()
-            .getInsertInfo(WatersDataFlavor.createTransferable(template))
-            .get(0).getInsertPosition();
+        template = TEMPLATE;
+        final SelectionOwner panel = mRoot.getComponentsPanel();
+        final List<InsertInfo> inserts = panel.getInsertInfo(TRANSFERABLE);
+        final InsertInfo insert = inserts.get(0);
+        mInsertPosition = insert.getInsertPosition();
       } catch (final IOException exception) {
-        exception.printStackTrace();
+        throw new WatersRuntimeException(exception);
       } catch (final UnsupportedFlavorException exception) {
-        exception.printStackTrace();
+        throw new WatersRuntimeException(exception);
       }
     } else {
-      template = mAlias;
+      template = mBinding;
     }
+
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
       public void actionPerformed(final ActionEvent event)
@@ -132,9 +137,9 @@ public class ParameterBindingEditorDialog extends JDialog
     mNameInput.setToolTipText("Enter the name");
     mExpressionLabel = new JLabel("Expression:");
     SimpleExpressionProxy oldexp = null;
-    if (mAlias != null
-        && mAlias.getExpression() instanceof SimpleExpressionProxy) {
-      oldexp = (SimpleExpressionProxy) mAlias.getExpression();
+    if (mBinding != null
+        && mBinding.getExpression() instanceof SimpleExpressionProxy) {
+      oldexp = (SimpleExpressionProxy) mBinding.getExpression();
     }
     mExpressionInput =
       new SimpleExpressionCell(oldexp, Operator.TYPE_ANY, parser);
@@ -273,31 +278,31 @@ public class ParameterBindingEditorDialog extends JDialog
         (SimpleExpressionSubject) mExpressionInput.getValue();
       final SimpleExpressionSubject exp = makeUnique(exp0);
       final SelectionOwner panel = mRoot.getComponentsPanel();
-      if (mAlias == null) {
+      if (mBinding == null) {
         final ParameterBindingSubject template =
           new ParameterBindingSubject(name, exp);
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);
         final List<InsertInfo> list = Collections.singletonList(insert);
-        final Command command = new InsertCommand(list, panel);
-        mAlias = template;
+        final Command command = new InsertCommand(list, panel, mRoot);
+        mBinding = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
-        final String oldname = mAlias.getName();
+        final String oldname = mBinding.getName();
         final boolean namechange = !name.equals(oldname);
-        final ExpressionProxy oldExp = mAlias.getExpression();
+        final ExpressionProxy oldExp = mBinding.getExpression();
 
         final ModuleEqualityVisitor eq =
           ModuleEqualityVisitor.getInstance(true);
         final boolean expchange = !eq.equals(exp, oldExp);
         if (namechange || expchange) {
-          final ParameterBindingSubject template = mAlias.clone();
+          final ParameterBindingSubject template = mBinding.clone();
           if (namechange) {
             template.setName(name);
           }
           if (expchange) {
             template.setExpression(exp);
           }
-          final Command command = new EditCommand(mAlias, template, panel);
+          final Command command = new EditCommand(mBinding, template, panel);
           mRoot.getUndoInterface().executeCommand(command);
         }
       }
@@ -305,32 +310,32 @@ public class ParameterBindingEditorDialog extends JDialog
     } else if (!mIsSimpleExpCheckBox.isSelected()) {
       final String name = mNameInput.getText();
       final SelectionOwner panel = mRoot.getComponentsPanel();
-      if (mAlias == null) {
+      if (mBinding == null) {
         final ParameterBindingSubject template =
           new ParameterBindingSubject(name, new PlainEventListSubject());
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);
         final List<InsertInfo> list = Collections.singletonList(insert);
-        final Command command = new InsertCommand(list, panel);
-        mAlias = template;
+        final Command command = new InsertCommand(list, panel, mRoot);
+        mBinding = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
-        final String oldname = mAlias.getName();
+        final String oldname = mBinding.getName();
         final boolean namechange = !name.equals(oldname);
         boolean expchange = false;
-        ExpressionSubject exp = mAlias.getExpression();
+        ExpressionSubject exp = mBinding.getExpression();
         if (exp instanceof SimpleExpressionProxy) {
           exp = new PlainEventListSubject();
           expchange = true;
         }
         if (namechange || expchange) {
-          final ParameterBindingSubject template = mAlias.clone();
+          final ParameterBindingSubject template = mBinding.clone();
           if (namechange) {
             template.setName(name);
           }
           if (expchange) {
             template.setExpression(exp);
           }
-          final Command command = new EditCommand(mAlias, template, panel);
+          final Command command = new EditCommand(mBinding, template, panel);
           mRoot.getUndoInterface().executeCommand(command);
         }
       }
@@ -351,9 +356,9 @@ public class ParameterBindingEditorDialog extends JDialog
    */
   private boolean isInputLocked()
   {
-    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()
-           || mExpressionInput.isFocusOwner()
-           && !mExpressionInput.shouldYieldFocus();
+    return
+      mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()||
+      mExpressionInput.isFocusOwner() && !mExpressionInput.shouldYieldFocus();
   }
 
   private SimpleExpressionSubject makeUnique(final SimpleExpressionSubject subject)
@@ -380,12 +385,12 @@ public class ParameterBindingEditorDialog extends JDialog
     }
   }
 
+
   //#########################################################################
   //# Data Members
-  // Dialog state
+  // Swing components
   private final ModuleWindowInterface mRoot;
 
-  // Swing components
   private JPanel mMainPanel;
   private JLabel mNameLabel;
   private SimpleExpressionCell mNameInput;
@@ -397,14 +402,19 @@ public class ParameterBindingEditorDialog extends JDialog
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
-  private ParameterBindingSubject mAlias;
+  // Dialog state
+  private ParameterBindingSubject mBinding;
   private Object mInsertPosition;
+
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final ParameterBindingSubject TEMPLATE =
     new ParameterBindingSubject("", new SimpleIdentifierSubject(""));
+  private static final Transferable TRANSFERABLE =
+    WatersDataFlavor.createTransferable(TEMPLATE);
 
 }

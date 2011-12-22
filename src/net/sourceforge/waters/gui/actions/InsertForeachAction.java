@@ -10,6 +10,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
@@ -18,10 +19,10 @@ import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.transfer.TypelessForeachTransferable;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.plain.module.ForeachElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
-
 import org.supremica.gui.ide.IDE;
 
 
@@ -65,6 +66,7 @@ public class InsertForeachAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
@@ -82,22 +84,23 @@ public class InsertForeachAction
   private void updateEnabledStatus()
   {
     final FocusTracker tracker = getFocusTracker();
-    final SelectionOwner watersOwner = tracker.getWatersSelectionOwner();
-    final boolean enabled;
-    if (watersOwner != null) {
-      enabled = watersOwner.canPaste(TEMPLATE_TRANSFERABLE);
+    final SelectionOwner panel = tracker.getWatersSelectionOwner();
+    if (panel != null) {
+      final boolean enabled = panel.canPaste(TRANSFERABLE);
+      setEnabled(enabled);
     } else {
-      enabled = false;
+      setEnabled(false);
     }
-    setEnabled(enabled);
   }
 
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-  private static final TypelessForeachTransferable TEMPLATE_TRANSFERABLE =
-    new TypelessForeachTransferable(new ForeachElement
-      (":dummy", new SimpleIdentifierElement(":dummy")));
+
+  private static final ForeachProxy TEMPLATE =
+    new ForeachElement(":dummy", new SimpleIdentifierElement(":dummy"));
+  private static final Transferable TRANSFERABLE =
+    WatersDataFlavor.createTransferable(TEMPLATE);
 
 }

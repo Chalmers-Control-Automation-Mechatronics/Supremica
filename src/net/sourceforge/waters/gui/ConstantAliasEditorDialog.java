@@ -53,7 +53,7 @@ public class ConstantAliasEditorDialog
   }
 
   public ConstantAliasEditorDialog(final ModuleWindowInterface root,
-                                      final ConstantAliasSubject alias)
+                                   final ConstantAliasSubject alias)
   {
     super(root.getRootWindow());
     if (alias == null) {
@@ -275,7 +275,7 @@ public class ConstantAliasEditorDialog
         final ConstantAliasSubject template =
           new ConstantAliasSubject(name, exp);
         template.setScope(scope);
-        final Command command = new InsertCommand(template, panel);
+        final Command command = new InsertCommand(template, panel, mRoot);
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {

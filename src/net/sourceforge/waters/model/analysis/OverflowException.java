@@ -95,7 +95,7 @@ public class OverflowException extends AnalysisException {
   public OverflowException(final StackOverflowError cause)
   {
     super(cause);
-    mKind = OverflowKind.MEMORY;
+    mKind = OverflowKind.STACK;
     mLimit = -1;
   }
 

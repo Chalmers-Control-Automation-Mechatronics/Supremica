@@ -10,6 +10,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
@@ -17,8 +18,9 @@ import net.sourceforge.waters.gui.EventAliasEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.ParameterBindingEditorDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.transfer.ParameterBindingTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.module.ParameterBindingElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
 
@@ -58,8 +60,9 @@ public class InsertParameterBindingAction
     }
   }
 
-//#########################################################################
+  //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
@@ -77,22 +80,23 @@ public class InsertParameterBindingAction
   private void updateEnabledStatus()
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();
-    if(root != null){
-    final SelectionOwner watersOwner = root.getComponentsPanel();
-      setEnabled(watersOwner.canPaste(TEMPLATE_TRANSFERABLE));
-    }
-    else{
+    if (root != null) {
+      final SelectionOwner panel = root.getComponentsPanel();
+      final boolean enabled = panel.canPaste(TRANSFERABLE);
+      setEnabled(enabled);
+    } else {
       setEnabled(false);
     }
   }
 
 
-
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-  private static ParameterBindingTransferable TEMPLATE_TRANSFERABLE =
-    new ParameterBindingTransferable(new ParameterBindingElement(":dummy",
-                                     new SimpleIdentifierElement(":dummy")));
+  private static ParameterBindingProxy TEMPLATE =
+    new ParameterBindingElement(":dummy",
+                                new SimpleIdentifierElement(":dummy"));
+  private static Transferable TRANSFERABLE =
+    WatersDataFlavor.createTransferable(TEMPLATE);
 
 }

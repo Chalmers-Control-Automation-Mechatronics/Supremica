@@ -9,13 +9,22 @@
 
 package net.sourceforge.waters.gui.command;
 
-import java.util.Collections;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.List;
 
+import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.language.ProxyNamer;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 
 /**
@@ -41,11 +50,16 @@ public class InsertCommand
    * @param  proxy             The item to be inserted.
    * @param  panel             The panel that receives the item
    *                           and controls the insertion.
+   * @param  root              The module editor containing the panel.
+   *                           Used to display an inserted automaton&nbsp-
+   *                           disable this feature by
+   *                           passing&nbsp;<CODE>null</CODE>.
    */
   public InsertCommand(final Proxy proxy,
-                       final SelectionOwner panel)
+                       final SelectionOwner panel,
+                       final ModuleWindowInterface root)
   {
-    this(proxy, panel, true);
+    this(proxy, panel, root, true);
   }
 
   /**
@@ -53,38 +67,66 @@ public class InsertCommand
    * @param  proxy             The item to be inserted.
    * @param  panel             The panel that receives the item
    *                           and controls the insertion.
+   * @param  root              The module editor containing the panel.
+   *                           Used to display an inserted automaton&nbsp-
+   *                           disable this feature by
+   *                           passing&nbsp;<CODE>null</CODE>.
    * @param  updatesSelection  A flag, indicating whether this command should
    *                           update the selection of the panel when
    *                           executed.
    */
   public InsertCommand(final Proxy proxy,
                        final SelectionOwner panel,
+                       final ModuleWindowInterface root,
                        final boolean updatesSelection)
   {
-    super(panel, updatesSelection);
-    final Object inspos = panel.getInsertPosition(proxy);
-    final InsertInfo insert = new InsertInfo(proxy, inspos);
-    mInserts = Collections.singletonList(insert);
-    final String name = ProxyNamer.getItemClassName(proxy) + " Creation";
-    setName(name);
+    this(getInserts(proxy, panel), panel, root, updatesSelection);
+ }
+
+  /**
+   * Creates a command to insert the given list of items.
+   * @param  inserts           A list items to be inserted.
+   * @param  panel             The panel that receives the items
+   * @param  root              The module editor containing the panel.
+   *                           Used to display an inserted automaton&nbsp-
+   *                           disable this feature by
+   *                           passing&nbsp;<CODE>null</CODE>.
+   *                           and controls the insertion.
+   */
+  public InsertCommand(final List<InsertInfo> inserts,
+                       final SelectionOwner panel,
+                       final ModuleWindowInterface root)
+  {
+    this(inserts, panel, root, true);
   }
 
   /**
    * Creates a command to insert the given list of items.
-   * @param  inserts   A list items to be inserted.
-   * @param  panel     The panel that receives the items
-   *                   and controls the insertion.
+   * @param  inserts           A list items to be inserted.
+   * @param  panel             The panel that receives the items
+   *                           and controls the insertion.
+   * @param  root              The module editor containing the panel.
+   *                           Used to display an inserted automaton&nbsp-
+   *                           disable this feature by
+   *                           passing&nbsp;<CODE>null</CODE>.
+   * @param  updatesSelection  A flag, indicating whether this command should
+   *                           update the selection of the panel when
+   *                           executed.
    */
   public InsertCommand(final List<InsertInfo> inserts,
-                       final SelectionOwner panel)
+                       final SelectionOwner panel,
+                       final ModuleWindowInterface root,
+                       final boolean updatesSelection)
   {
-    super(panel, "Insertion");
+    super(panel, "Insertion", updatesSelection);
+    mRoot = root;
     mInserts = inserts;
     final List<Proxy> proxies = InsertInfo.getProxies(mInserts);
     final String named = ProxyNamer.getCollectionClassName(proxies);
     if (named != null) {
       setName(named + " Insertion");
     }
+    mHasBeenExecuted = false;
   }
 
 
@@ -95,6 +137,7 @@ public class InsertCommand
     final SelectionOwner panel = getPanel();
     panel.insertItems(mInserts);
     if (getUpdatesSelection()) {
+      showAutomaton();
       final List<Proxy> selection = getSelectionAfterInsert(mInserts);
       panel.replaceSelection(selection);
       panel.scrollToVisible(selection);
@@ -122,7 +165,62 @@ public class InsertCommand
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private static List<InsertInfo> getInserts(final Proxy proxy,
+                                             final SelectionOwner panel)
+  {
+    try {
+      final Transferable transferable =
+        WatersDataFlavor.createTransferable(proxy);
+      return panel.getInsertInfo(transferable);
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    } catch (final UnsupportedFlavorException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+  /**
+   * Displays an inserted automaton.
+   * This method is used to make sure an automaton that has just been
+   * created or pasted is displayed, under the following conditions:
+   * <UL>
+   * <LI>A non-<CODE>null</CODE> root panel has been specified.</LI>
+   * <LI>The command is executed for the first time (no redo).</LI>
+   * <LI>The list of inserted items contains a single automaton.</LI>
+   * </UL>
+   */
+  private void showAutomaton()
+  {
+    if (mRoot == null || mHasBeenExecuted) {
+      return;
+    }
+    mHasBeenExecuted = true;
+    if (mInserts.size() != 1) {
+      return;
+    }
+    final InsertInfo info = mInserts.get(0);
+    final Proxy proxy = info.getProxy();
+    if (!(proxy instanceof SimpleComponentProxy)) {
+      return;
+    }
+    try {
+      final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
+      final String name = comp.getName();
+      final ModuleContext context = mRoot.getModuleContext();
+      final SimpleComponentSubject subject =
+        (SimpleComponentSubject) context.getComponent(name);
+      mRoot.showEditor(subject);
+    } catch (final GeometryAbsentException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private final ModuleWindowInterface mRoot;
   private final List<InsertInfo> mInserts;
+  private boolean mHasBeenExecuted;
 
 }

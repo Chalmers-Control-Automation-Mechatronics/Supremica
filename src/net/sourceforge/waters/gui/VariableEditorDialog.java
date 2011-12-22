@@ -666,7 +666,7 @@ public class VariableEditorDialog
         ModuleEqualityVisitor.getInstance(true);
       if (mVariable == null) {
         final SelectionOwner panel = mRoot.getComponentsPanel();
-        final Command command = new InsertCommand(template, panel);
+        final Command command = new InsertCommand(template, panel, mRoot);
         mVariable = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!eq.equals(mVariable, template)) {

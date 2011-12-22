@@ -10,13 +10,14 @@
 
 package net.sourceforge.waters.gui;
 
+import gnu.trove.THashSet;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
@@ -46,9 +47,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -81,12 +80,8 @@ import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
-import net.sourceforge.waters.gui.transfer.GraphTransferable;
-import net.sourceforge.waters.gui.transfer.GuardActionBlockTransferable;
-import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
-import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
@@ -94,6 +89,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -111,7 +107,6 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.plain.module.GraphElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
@@ -380,56 +375,13 @@ public class GraphEditorPanel
     }
   }
 
-  public GraphInsertPosition getInsertPosition(final Proxy item)
-  {
-    final GraphSubject graph = getGraph();
-    return new GraphInsertPosition(graph, null);
-  }
-
-  public void insertCreatedItem(final Proxy proxy, final Object insobj)
-  {
-    throw new UnsupportedOperationException
-      ("ControlledSurface does not support generic insert!");
-  }
-
-  public boolean canCopy(final List<? extends Proxy> items)
-  {
-    final DataFlavor flavor = mDataFlavorVisitor.getDataFlavor(items);
-    return flavor != null;
-  }
-
-  public Transferable createTransferable(final List<? extends Proxy> items)
-  {
-    final DataFlavor flavor = mDataFlavorVisitor.getDataFlavor(items);
-    if (flavor == null) {
-      throw new IllegalArgumentException("No data flavour found!");
-    } else if (WatersDataFlavor.GRAPH.equals(flavor)) {
-      return mGraphTransferableVisitor.createTransferable(items);
-    } else if (WatersDataFlavor.IDENTIFIER_LIST.equals(flavor)) {
-      return mIdentifierListTransferableVisitor.createTransferable(items);
-    } else if (WatersDataFlavor.GUARD_ACTION_BLOCK.equals(flavor)) {
-      final GuardActionBlockProxy block =
-        findFirst(items, GuardActionBlockProxy.class);
-      return new GuardActionBlockTransferable(block);
-    } else if (DataFlavor.stringFlavor.equals(flavor)) {
-      // *** BUG *** Parse it also !!!
-      final LabelGeometrySubject geo =
-        findFirst(items, LabelGeometrySubject.class);
-      final NodeSubject node = (NodeSubject) geo.getParent();
-      final String text = node.getName();
-      return new StringSelection(text);
-    } else {
-      throw new IllegalArgumentException
-        ("Unexpected data flavour: " + flavor.getHumanPresentableName() + "!");
-    }
-  }
-
+  @Override
   public boolean canPaste(final Transferable transferable)
   {
     if (transferable.isDataFlavorSupported(WatersDataFlavor.GRAPH)) {
       return true;
     } else if (transferable.isDataFlavorSupported
-                 (WatersDataFlavor.IDENTIFIER_LIST)) {
+                 (WatersDataFlavor.IDENTIFIER)) {
       final Proxy target = getPasteTarget();
       return mIdentifierPasteVisitor.canPaste(target, transferable);
     } else if (transferable.isDataFlavorSupported
@@ -440,25 +392,40 @@ public class GraphEditorPanel
         (target instanceof EdgeProxy ||
          target instanceof GuardActionBlockProxy);
     } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-      final Proxy target = getPasteTarget();
-      return target instanceof NodeProxy;
+      if (getPasteTarget() instanceof NodeProxy) {
+        try {
+          final ExpressionParser parser =
+            mRoot.getModuleWindowInterface().getExpressionParser();
+          final String data =
+            (String) transferable.getTransferData(DataFlavor.stringFlavor);
+          parser.parseSimpleIdentifier(data);
+          return true;
+        } catch (final ParseException exception) {
+          return false;
+        } catch (final UnsupportedFlavorException exception) {
+          throw new WatersRuntimeException(exception);
+        } catch (final IOException exception) {
+          throw new WatersRuntimeException(exception);
+        }
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
-    final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
     final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
     if (transferable.isDataFlavorSupported(WatersDataFlavor.GRAPH)) {
       final GraphSubject graph = getGraph();
-      final List<Proxy> list =
-        (List<Proxy>) transferable.getTransferData(WatersDataFlavor.GRAPH);
-      final Proxy data = list.iterator().next();
-      final GraphSubject newgraph = (GraphSubject) cloner.getClone(data);
+      final List<GraphSubject> list = (List<GraphSubject>)
+        transferable.getTransferData(WatersDataFlavor.GRAPH);
+      final GraphSubject newgraph = list.iterator().next();
       final LabelBlockSubject newblocked = newgraph.getBlockedEvents();
       final Collection<NodeSubject> newnodes = newgraph.getNodesModifiable();
       final Collection<EdgeSubject> newedges = newgraph.getEdgesModifiable();
@@ -488,7 +455,7 @@ public class GraphEditorPanel
       }
       final IndexedSetSubject<NodeSubject> existing =
         graph.getNodesModifiable();
-      final Set<String> newnames = new HashSet<String>(newnodes.size());
+      final Set<String> newnames = new THashSet<String>(newnodes.size());
       for (final NodeSubject newnode : newnodes) {
         String name = newnode.getName();
         if (existing.containsName(name) || newnames.contains(name)) {
@@ -499,23 +466,27 @@ public class GraphEditorPanel
         GeometryTools.translate(newnode, delta);
         addInsertInfo(inserts, newnode, graph);
       }
-      newnodes.clear();
       for (final EdgeSubject newedge : newedges) {
         GeometryTools.translate(newedge, delta);
         addInsertInfo(inserts, newedge, graph);
       }
-      newedges.clear();
+    } else if (transferable.isDataFlavorSupported(WatersDataFlavor.EDGE)) {
+      final GraphSubject graph = getGraph();
+      final List<EdgeSubject> edges = (List<EdgeSubject>)
+        transferable.getTransferData(WatersDataFlavor.GRAPH);
+      for (final EdgeSubject edge : edges) {
+        addInsertInfo(inserts, edge, graph);
+      }
     } else if (transferable.isDataFlavorSupported
-                 (WatersDataFlavor.IDENTIFIER_LIST)) {
+                 (WatersDataFlavor.IDENTIFIER)) {
       final ProxySubject target = getPasteTarget();
       mIdentifierPasteVisitor.addInsertInfo(target, -1, transferable, inserts);
     } else if (transferable.isDataFlavorSupported
                  (WatersDataFlavor.GUARD_ACTION_BLOCK)) {
-      final List<Proxy> list =
-        (List<Proxy>) transferable.getTransferData(WatersDataFlavor.GRAPH);
-      final Proxy data = list.iterator().next();
-      final GuardActionBlockSubject newblock =
-        (GuardActionBlockSubject) cloner.getClone(data);
+      final List<GuardActionBlockSubject> list =
+        (List<GuardActionBlockSubject>) transferable.getTransferData
+                                               (WatersDataFlavor.GRAPH);
+      final GuardActionBlockSubject newblock = list.iterator().next();
       final ProxySubject target = getPasteTarget();
       if (target instanceof EdgeSubject) {
         final EdgeSubject edge = (EdgeSubject) target;
@@ -570,7 +541,7 @@ public class GraphEditorPanel
       }
     }
     final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
-    final Set<Proxy> lookup = new HashSet<Proxy>(items);
+    final Set<Proxy> lookup = new THashSet<Proxy>(items);
     if (!eventlists.isEmpty()) {
       // Deleting event labels: visit all label blocks, and add deleted items
       // in order of appearance to undo list ...
@@ -726,7 +697,7 @@ public class GraphEditorPanel
     if (!list.isEmpty()) {
       // Beware---the list may contain identifiers, but the proxy
       // shape producer does not support them :-(
-      final Set<Proxy> scrollable = new HashSet<Proxy>();
+      final Set<Proxy> scrollable = new THashSet<Proxy>();
       for (final Proxy proxy : list) {
         if (proxy instanceof IdentifierSubject ||
             proxy instanceof ForeachSubject) {
@@ -900,7 +871,8 @@ public class GraphEditorPanel
         (InternalDragActionDND) mInternalDragAction;
       final List<IdentifierSubject> toBeDragged =
         action.getIdentifiersToBeDragged();
-      final Transferable trans = new IdentifierTransferable(toBeDragged);
+      final Transferable trans =
+        WatersDataFlavor.createTransferable(toBeDragged);
       try {
         event.startDrag(DragSource.DefaultCopyDrop, trans);
       } catch (final InvalidDnDOperationException exception) {
@@ -912,6 +884,7 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Repainting
+  @Override
   protected void paintComponent(final Graphics graphics)
   {
     super.paintComponent(graphics);
@@ -932,6 +905,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   protected Dimension calculatePreferredSize()
   {
     final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
@@ -1021,7 +995,10 @@ public class GraphEditorPanel
   {
     final GraphSubject graph = getGraph();
     final SimpleNodeSubject node = GraphTools.getCreatedSimpleNode(graph, pos);
-    final Command cmd = new InsertCommand(node, this);
+    final GraphInsertPosition inspos = new GraphInsertPosition(graph, null);
+    final InsertInfo insert = new InsertInfo(node, inspos);
+    final List<InsertInfo> inserts = Collections.singletonList(insert);
+    final Command cmd = new InsertCommand(inserts, this, null);
     getUndoInterface().executeCommand(cmd);
   }
 
@@ -1035,7 +1012,10 @@ public class GraphEditorPanel
   {
     final GraphSubject graph = getGraph();
     final GroupNodeSubject group = GraphTools.getCreatedGroupNode(graph, rect);
-    final Command cmd = new InsertCommand(group, this);
+    final GraphInsertPosition inspos = new GraphInsertPosition(graph, null);
+    final InsertInfo insert = new InsertInfo(group, inspos);
+    final List<InsertInfo> inserts = Collections.singletonList(insert);
+    final Command cmd = new InsertCommand(inserts, this, null);
     getUndoInterface().executeCommand(cmd);
   }
 
@@ -1058,7 +1038,7 @@ public class GraphEditorPanel
     final GraphSubject graph = getGraph();
     final EdgeSubject edge =
       GraphTools.getCreatedEdge(graph, source, target, start, end);
-    final Command cmd = new InsertCommand(edge, this);
+    final Command cmd = new InsertCommand(edge, this, null);
     getUndoInterface().executeCommand(cmd);
   }
 
@@ -1523,22 +1503,6 @@ public class GraphEditorPanel
     final ListInsertPosition inspos = new ListInsertPosition(list, pos);
     final InsertInfo insert = new InsertInfo(item, inspos);
     inserts.add(insert);
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Static Methods
-  private static <T extends Proxy>
-    T findFirst(final List<? extends Proxy> items,
-                final Class<T> clazz)
-  {
-    for (final Proxy proxy : items) {
-      final Class<? extends Proxy> pclazz = proxy.getClass();
-      if (clazz.isAssignableFrom(pclazz)) {
-        return clazz.cast(proxy);
-      }
-    }
-    return null;
   }
 
 
@@ -2855,7 +2819,7 @@ public class GraphEditorPanel
           mIdentifierPasteVisitor.addInsertInfo
             (mFocusedObject, mDropIndex, transferable, inserts);
           final Command cmd =
-            new InsertCommand(inserts, GraphEditorPanel.this);
+            new InsertCommand(inserts, GraphEditorPanel.this, null);
           getUndoInterface().executeCommand(cmd);
           event.dropComplete(true);
         } else {
@@ -3457,7 +3421,7 @@ public class GraphEditorPanel
     //# Constructors
     private MoveVisitor()
     {
-      mMovedTypes = new HashSet<Class<? extends Proxy>>(8);
+      mMovedTypes = new THashSet<Class<? extends Proxy>>(8);
       for (final ProxySubject item : mSelectedList) {
         final Class<? extends Proxy> iface = item.getProxyInterface();
         mMovedTypes.add(iface);
@@ -3972,108 +3936,6 @@ public class GraphEditorPanel
 
 
   //#########################################################################
-  //# Inner Class DataFlavorVisitor
-  private class DataFlavorVisitor
-    extends AbstractModuleProxyVisitor
-  {
-
-    //#######################################################################
-    //# Invocation
-    private DataFlavor getDataFlavor(final List<? extends Proxy> list)
-    {
-      mHasGraph = false;
-      mHasIdentifiers = false;
-      mNumGuardActionBlocks = 0;
-      mNumNodeLabels = 0;
-      for (final Proxy proxy : list) {
-        try {
-          proxy.acceptVisitor(this);
-        } catch (final VisitorException exception) {
-          throw exception.getRuntimeException();
-        }
-        if (mHasGraph) {
-          break;
-        }
-      }
-      if (mHasGraph) {
-        return WatersDataFlavor.GRAPH;
-      } else if (mHasIdentifiers) {
-        return WatersDataFlavor.IDENTIFIER_LIST;
-      } else if (mNumGuardActionBlocks == 1 && mNumNodeLabels == 0) {
-        return WatersDataFlavor.GUARD_ACTION_BLOCK;
-      } else if (mNumGuardActionBlocks == 0 && mNumNodeLabels == 1) {
-        return DataFlavor.stringFlavor;
-      } else {
-        return null;
-      }
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Object visitEdgeProxy(final EdgeProxy edge)
-    {
-      final LabelBlockProxy block = edge.getLabelBlock();
-      if (block != null) {
-        return visitLabelBlockProxy(block);
-      } else {
-        return null;
-      }
-    }
-
-    public DataFlavor visitForeachProxy(final ForeachProxy foreach)
-    {
-      mHasIdentifiers = true;
-      return null;
-    }
-
-    public DataFlavor visitGuardActionBlockProxy
-      (final GuardActionBlockProxy block)
-    {
-      mNumGuardActionBlocks++;
-      return null;
-    }
-
-    public DataFlavor visitIdentifierProxy(final IdentifierProxy ident)
-    {
-      mHasIdentifiers = true;
-      return null;
-    }
-
-    public DataFlavor visitLabelBlockProxy(final LabelBlockProxy block)
-    {
-      if (block.getEventList().isEmpty()) {
-        final LabelBlockSubject subject = (LabelBlockSubject) block;
-        if (subject.getParent() instanceof GraphProxy) {
-          mHasGraph = true;
-        }
-      } else {
-        mHasIdentifiers |= true;
-      }
-      return null;
-    }
-
-    public DataFlavor visitLabelGeometryProxy(final LabelGeometryProxy geo)
-    {
-      mNumNodeLabels++;
-      return null;
-    }
-
-    public DataFlavor visitNodeProxy(final NodeProxy node)
-    {
-      mHasGraph = true;
-      return null;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private boolean mHasGraph;
-    private boolean mHasIdentifiers;
-    private int mNumGuardActionBlocks;
-    private int mNumNodeLabels;
-  }
-
-
-  //#########################################################################
   //# Inner Class SelectableVisitor
   private class SelectableVisitor
     extends AbstractModuleProxyVisitor
@@ -4106,7 +3968,11 @@ public class GraphEditorPanel
     private ProxySubject getSelectableAncestor(final Proxy proxy)
     {
       try {
-        return (ProxySubject) proxy.acceptVisitor(this);
+        if (proxy instanceof Subject) {
+          return (ProxySubject) proxy.acceptVisitor(this);
+        } else {
+          return null;
+        }
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
@@ -4183,152 +4049,6 @@ public class GraphEditorPanel
         return subject;
       }
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class GraphTransferableVisitor
-  private class GraphTransferableVisitor
-    extends AbstractModuleProxyVisitor
-  {
-
-    //#######################################################################
-    //# Invocation
-    private ProxyTransferable<?> createTransferable
-      (final List<? extends Proxy> list)
-    {
-      mTransferredBlock = null;
-      mTransferredNodes = new HashSet<NodeProxy>();
-      mTransferredEdges = new LinkedList<EdgeProxy>();
-      for (final Proxy proxy : list) {
-        try {
-          proxy.acceptVisitor(this);
-        } catch (final VisitorException exception) {
-          throw exception.getRuntimeException();
-        }
-      }
-      final Iterator<EdgeProxy> iter = mTransferredEdges.iterator();
-      while (iter.hasNext()) {
-        final EdgeProxy edge = iter.next();
-        final NodeProxy source = edge.getSource();
-        final NodeProxy target = edge.getTarget();
-        if (!mTransferredNodes.contains(source) ||
-            !mTransferredNodes.contains(target)) {
-          iter.remove();
-        }
-      }
-      final GraphProxy graph = new GraphElement
-        (false, mTransferredBlock, mTransferredNodes, mTransferredEdges);
-      final ProxyTransferable<?> transferable = new GraphTransferable(graph);
-      mTransferredBlock = null;
-      mTransferredNodes = null;
-      mTransferredEdges = null;
-      return transferable;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
-    public Object visitProxy(final Proxy proxy)
-    {
-      return null;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Object visitEdgeProxy(final EdgeProxy edge)
-    {
-      mTransferredEdges.add(edge);
-      return null;
-    }
-
-    public Object visitLabelBlockProxy(final LabelBlockProxy block)
-    {
-      final LabelBlockSubject subject = (LabelBlockSubject) block;
-      if (subject.getParent() instanceof GraphProxy) {
-        mTransferredBlock = block;
-      }
-      return null;
-    }
-
-    public Object visitNodeProxy(final NodeProxy node)
-    {
-      mTransferredNodes.add(node);
-      return null;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private LabelBlockProxy mTransferredBlock;
-    private Collection<NodeProxy> mTransferredNodes;
-    private Collection<EdgeProxy> mTransferredEdges;
-  }
-
-
-  //#########################################################################
-  //# Inner Class IdentifierListTransferableVisitor
-  private class IdentifierListTransferableVisitor
-    extends AbstractModuleProxyVisitor
-  {
-
-    //#######################################################################
-    //# Invocation
-    private ProxyTransferable<? extends Proxy> createTransferable
-      (final List<? extends Proxy> list)
-    {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
-      final int size = list.size();
-      mTransferredItems = new ProxyAccessorHashSet<Proxy>(eq, size);
-      for (final Proxy proxy : list) {
-        try {
-          proxy.acceptVisitor(this);
-        } catch (final VisitorException exception) {
-          throw exception.getRuntimeException();
-        }
-      }
-      final List<Proxy> transferlist =
-        new ArrayList<Proxy>(mTransferredItems.values());
-      final ProxyTransferable<? extends Proxy> transferable =
-        new IdentifierTransferable(transferlist);
-      mTransferredItems = null;
-      return transferable;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
-    public Object visitProxy(final Proxy proxy)
-    {
-      return null;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Object visitEdgeProxy(final EdgeProxy edge)
-      throws VisitorException
-    {
-      final LabelBlockProxy block = edge.getLabelBlock();
-      if (block != null) {
-        visitLabelBlockProxy(block);
-      }
-      return null;
-    }
-
-    public Object visitIdentifierProxy(final IdentifierProxy ident)
-    {
-      mTransferredItems.addProxy(ident);
-      return null;
-    }
-
-    public Object visitLabelBlockProxy(final LabelBlockProxy block)
-      throws VisitorException
-    {
-      final List<Proxy> eventlist = block.getEventList();
-      return visitCollection(eventlist);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private ProxyAccessorSet<Proxy> mTransferredItems;
   }
 
 
@@ -4468,7 +4188,7 @@ public class GraphEditorPanel
       throws IOException, UnsupportedFlavorException
     {
       return (List<Proxy>) transferable.getTransferData
-        (WatersDataFlavor.IDENTIFIER_LIST);
+        (WatersDataFlavor.IDENTIFIER);
     }
 
 	private boolean isContainingAll(final EventListExpressionProxy elist)
@@ -4531,16 +4251,16 @@ public class GraphEditorPanel
    * Set of currently selected items. This holds the same contents as
    * {@link #mSelectedList} in hash set, for faster lookup.
    */
-  private final Set<ProxySubject> mSelectedSet = new HashSet<ProxySubject>();
+  private final Set<ProxySubject> mSelectedSet = new THashSet<ProxySubject>();
   /**
    * Set of items not to be drawn, because they are being dragged and
    * displayed through alternative means.
    */
-  private final Set<ProxySubject> mDontDraw = new HashSet<ProxySubject>();
+  private final Set<ProxySubject> mDontDraw = new THashSet<ProxySubject>();
   /**
    * Set of items to be highlighted as erroneous.
    */
-  private final Set<ProxySubject> mError = new HashSet<ProxySubject>();
+  private final Set<ProxySubject> mError = new THashSet<ProxySubject>();
   /**
    * The currently highlighted item (under the mouse pointer).
    */
@@ -4595,12 +4315,6 @@ public class GraphEditorPanel
   private final EventDeclListModelObserver mEventDeclListModelObserver =
     new EventDeclListModelObserver();
   private final SelectableVisitor mSelectableVisitor = new SelectableVisitor();
-  private final DataFlavorVisitor mDataFlavorVisitor = new DataFlavorVisitor();
-  private final GraphTransferableVisitor mGraphTransferableVisitor =
-    new GraphTransferableVisitor();
-  private final IdentifierListTransferableVisitor
-    mIdentifierListTransferableVisitor =
-    new IdentifierListTransferableVisitor();
   private final IdentifierPasteVisitor mIdentifierPasteVisitor =
     new IdentifierPasteVisitor();
   private final HighlightComparator mComparator = new HighlightComparator();

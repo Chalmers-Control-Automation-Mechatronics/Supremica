@@ -57,7 +57,6 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
-import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.ReplaceInfo;
@@ -224,7 +223,9 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     while (count > 0) {
       if (isRowSelected(row)) {
         final IdentifierSubject ident = model.getIdentifier(row);
-        list.add(ident);
+        if (ident != null) {
+          list.add(ident);
+        }
         count--;
       }
       row++;
@@ -339,37 +340,15 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     surface.removeFromSelection(others);
   }
 
-  public Object getInsertPosition(final Proxy item)
-  {
-    return null;
-  }
-
-  public void insertCreatedItem(final Proxy item, final Object inspos)
-  {
-    final IdentifierSubject ident = (IdentifierSubject) item;
-    final EventTableModel model = (EventTableModel) getModel();
-    model.addIdentifier(ident);
-  }
-
-  public boolean canCopy(final List<? extends Proxy> items)
-  {
-    return hasNonEmptySelection();
-  }
-
-  public Transferable createTransferable(final List<? extends Proxy> items)
-  {
-    return new IdentifierTransferable(items);
-  }
-
   public boolean canPaste(final Transferable transferable)
   {
     try {
       if (transferable
-        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)) {
+        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
         @SuppressWarnings("unchecked")
         final List<Proxy> data =
           (List<Proxy>) transferable
-            .getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+            .getTransferData(WatersDataFlavor.IDENTIFIER);
         for (final Proxy proxy : data) {
           if (!containsEqualIdentifier(proxy)) {
             return true;
@@ -402,13 +381,13 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     throws IOException, UnsupportedFlavorException
   {
     final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
-    if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)) {
+    if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
       @SuppressWarnings("unchecked")
       final List<Proxy> data =
         (List<Proxy>) transferable
-          .getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+          .getTransferData(WatersDataFlavor.IDENTIFIER);
       for (final Proxy proxy : data) {
         if (!containsEqualIdentifier(proxy)) {
           final Proxy cloned = cloner.getClone(proxy);
@@ -992,7 +971,8 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
           }
         });
       } else {
-        final Command cmd = new InsertCommand(neo, GraphEventPanel.this);
+        final Command cmd =
+          new InsertCommand(neo, GraphEventPanel.this, null);
         cmd.execute();
       }
     }
@@ -1320,8 +1300,9 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     @Override
     public Transferable createTransferable(final JComponent c)
     {
-     getFocusTracker().setSourceOfDragOperation(GraphEventPanel.this);
-      return GraphEventPanel.this.createTransferable(getCurrentSelection());
+      getFocusTracker().setSourceOfDragOperation(GraphEventPanel.this);
+      final List<? extends Proxy> selection = getCurrentSelection();
+      return WatersDataFlavor.createTransferable(selection);
     }
 
     @Override
@@ -1337,7 +1318,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       if(getFocusTracker().getSourceOfDragOperation() == GraphEventPanel.this){
         return false;
       }
-      final DataFlavor flavor = WatersDataFlavor.IDENTIFIER_LIST;
+      final DataFlavor flavor = WatersDataFlavor.IDENTIFIER;
       if (support.getTransferable().isDataFlavorSupported(flavor)) {
         support.setDropAction(COPY);
         support.setShowDropLocation(false);
@@ -1356,7 +1337,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
           final Transferable transferable = support.getTransferable();
           final List<InsertInfo> info = getInsertInfo(transferable);
           final InsertCommand allCopies =
-            new InsertCommand(info, GraphEventPanel.this);
+            new InsertCommand(info, GraphEventPanel.this, null);
           mRoot.getUndoInterface().executeCommand(allCopies);
         } catch (final IOException exception) {
           throw new WatersRuntimeException(exception);

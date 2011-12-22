@@ -274,7 +274,7 @@ public class ForeachEditorDialog
         template.setName(name);
         template.setRange(range);
         template.setGuard(guard);
-        final Command command = new InsertCommand(template, mPanel);
+        final Command command = new InsertCommand(template, mPanel, mRoot);
         mForeach = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {

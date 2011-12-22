@@ -77,7 +77,7 @@ public class InsertBlockedEventListAction
     final Point point = mPoint == null ? surface.getPastePosition() : mPoint;
     final LabelGeometrySubject geo = new LabelGeometrySubject(point);
     final LabelBlockSubject blocked = new LabelBlockSubject(null, geo);
-    final InsertCommand cmd = new InsertCommand(blocked, surface);
+    final InsertCommand cmd = new InsertCommand(blocked, surface, null);
     cmd.setName("Blocked Event List Creation");
     final UndoInterface undoer = getActiveUndoInterface();
     undoer.executeCommand(cmd);

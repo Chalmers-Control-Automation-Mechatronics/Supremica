@@ -36,7 +36,6 @@ import net.sourceforge.waters.gui.observer.SubPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -279,14 +278,6 @@ public class EditorPanel
         } else {
             return false;
         }
-    }
-
-    @Deprecated
-    public void addComponent(final Proxy proxy)
-    {
-      final SelectionOwner panel = getComponentsPanel();
-      final Object inspos = panel.getInsertPosition(proxy);
-      panel.insertCreatedItem(proxy, inspos);
     }
 
 
