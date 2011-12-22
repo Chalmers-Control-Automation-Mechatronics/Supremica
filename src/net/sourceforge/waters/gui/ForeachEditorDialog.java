@@ -14,8 +14,13 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -26,9 +31,12 @@ import javax.swing.JRootPane;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -99,8 +107,21 @@ public class ForeachEditorDialog
    */
   private void createComponents()
   {
-    final ForeachSubject template =
-      mForeach == null ? TEMPLATE : mForeach;
+    final ForeachSubject template;
+    if (mForeach == null) {
+      try {
+        template = TEMPLATE;
+        final List<InsertInfo> inserts = mPanel.getInsertInfo(TRANSFERABLE);
+        final InsertInfo insert = inserts.get(0);
+        mInsertPosition = insert.getInsertPosition();
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      } catch (final UnsupportedFlavorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    } else {
+      template = mForeach;
+    }
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
         public void actionPerformed(final ActionEvent event)
@@ -274,7 +295,9 @@ public class ForeachEditorDialog
         template.setName(name);
         template.setRange(range);
         template.setGuard(guard);
-        final Command command = new InsertCommand(template, mPanel, mRoot);
+        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
+        final List<InsertInfo> list = Collections.singletonList(insert);
+        final Command command = new InsertCommand(list, mPanel, mRoot);
         mForeach = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
@@ -369,6 +392,7 @@ public class ForeachEditorDialog
    * committed to the model when the OK button is pressed.</P>
    */
   private ForeachSubject mForeach;
+  private Object mInsertPosition;
 
 
   //#########################################################################
@@ -377,5 +401,7 @@ public class ForeachEditorDialog
   private static final ForeachSubject TEMPLATE =
     new ForeachSubject("", new SimpleIdentifierSubject(""));
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  private static final Transferable TRANSFERABLE =
+    WatersDataFlavor.createTransferable(TEMPLATE);
 
 }

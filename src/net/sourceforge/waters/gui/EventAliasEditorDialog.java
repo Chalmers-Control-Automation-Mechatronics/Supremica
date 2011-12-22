@@ -14,8 +14,14 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -26,9 +32,12 @@ import javax.swing.JRootPane;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.ExpressionProxy;
@@ -89,7 +98,22 @@ public class EventAliasEditorDialog extends JDialog
    */
   private void createComponents()
   {
-    final EventAliasSubject template = mAlias == null ? TEMPLATE : mAlias;
+    EventAliasSubject template;
+    if (mAlias == null) {
+      try {
+        template = TEMPLATE;
+        final SelectionOwner panel = mRoot.getEventAliasesPanel();
+        final List<InsertInfo> inserts = panel.getInsertInfo(TRANSFERABLE);
+        final InsertInfo insert = inserts.get(0);
+        mInsertPosition = insert.getInsertPosition();
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      } catch (final UnsupportedFlavorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    } else {
+      template = mAlias;
+    }
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
       public void actionPerformed(final ActionEvent event)
@@ -255,7 +279,9 @@ public class EventAliasEditorDialog extends JDialog
       final SelectionOwner panel = mRoot.getEventAliasesPanel();
       if (mAlias == null) {
         final EventAliasSubject template = new EventAliasSubject(name, exp);
-        final Command command = new InsertCommand(template, panel, mRoot);
+        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
+        final List<InsertInfo> list = Collections.singletonList(insert);
+        final Command command = new InsertCommand(list, panel, mRoot);
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
@@ -286,7 +312,9 @@ public class EventAliasEditorDialog extends JDialog
       if (mAlias == null) {
         final EventAliasSubject template =
           new EventAliasSubject(name, new PlainEventListSubject());
-        final Command command = new InsertCommand(template, panel, mRoot);
+        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
+        final List<InsertInfo> list = Collections.singletonList(insert);
+        final Command command = new InsertCommand(list, panel, mRoot);
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
@@ -374,6 +402,7 @@ public class EventAliasEditorDialog extends JDialog
   private JPanel mButtonsPanel;
 
   private EventAliasSubject mAlias;
+  private Object mInsertPosition;
 
   //#########################################################################
   //# Class Constants
@@ -382,5 +411,7 @@ public class EventAliasEditorDialog extends JDialog
   private static final EventAliasSubject TEMPLATE =
     new EventAliasSubject(new SimpleIdentifierSubject(""),
                           new SimpleIdentifierSubject(""));
+  private static final Transferable TRANSFERABLE =
+    WatersDataFlavor.createTransferable(TEMPLATE);
 
 }

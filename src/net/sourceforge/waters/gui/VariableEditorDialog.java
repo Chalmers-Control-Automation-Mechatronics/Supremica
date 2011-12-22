@@ -20,13 +20,17 @@ import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -58,10 +62,13 @@ import javax.swing.text.DocumentFilter;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -72,11 +79,9 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.IntConstantElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
-import net.sourceforge.waters.plain.module.VariableComponentElement;
 import net.sourceforge.waters.plain.module.VariableMarkingElement;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -138,8 +143,22 @@ public class VariableEditorDialog
    */
   private void createComponents()
   {
-    final VariableComponentSubject template =
-      mVariable == null ? getVariableTemplate() : mVariable;
+    final VariableComponentSubject template;
+    if (mVariable == null) {
+      try {
+        template = VARIABLE_TEMPLATE;
+        final SelectionOwner panel = mRoot.getComponentsPanel();
+        final List<InsertInfo> inserts = panel.getInsertInfo(TRANSFERABLE);
+        final InsertInfo insert = inserts.get(0);
+        mInsertPosition = insert.getInsertPosition();
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      } catch (final UnsupportedFlavorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    } else {
+      template = mVariable;
+    }
     final ModuleContext context = mRoot.getModuleContext();
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
@@ -666,7 +685,9 @@ public class VariableEditorDialog
         ModuleEqualityVisitor.getInstance(true);
       if (mVariable == null) {
         final SelectionOwner panel = mRoot.getComponentsPanel();
-        final Command command = new InsertCommand(template, panel, mRoot);
+        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
+        final List<InsertInfo> list = Collections.singletonList(insert);
+        final Command command = new InsertCommand(list, panel, mRoot);
         mVariable = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!eq.equals(mVariable, template)) {
@@ -736,6 +757,7 @@ public class VariableEditorDialog
 
   //#########################################################################
   //# Auxiliary Static Methods
+  @SuppressWarnings("unused")
   private static VariableComponentSubject getVariableTemplate()
   {
     final ModuleProxyCloner cloner =
@@ -1187,20 +1209,23 @@ public class VariableEditorDialog
    * committed to the model when the OK button is pressed.</P>
    */
   private VariableComponentSubject mVariable;
+  private Object mInsertPosition;
+
 
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final VariableComponentProxy VARIABLE_TEMPLATE =
-    new VariableComponentElement(new SimpleIdentifierElement(""),
-                                 new SimpleIdentifierElement(""),
+  private static final VariableComponentSubject VARIABLE_TEMPLATE =
+    new VariableComponentSubject(new SimpleIdentifierSubject(""),
+                                 new SimpleIdentifierSubject(""),
                                  true,
-                                 new SimpleIdentifierElement(""));
+                                 new SimpleIdentifierSubject(""));
   private static final VariableMarkingProxy MARKING_TEMPLATE =
     new VariableMarkingElement
       (new SimpleIdentifierElement(EventDeclProxy.DEFAULT_MARKING_NAME),
        new IntConstantElement(1));
-
+  private static final Transferable TRANSFERABLE =
+    WatersDataFlavor.createTransferable(VARIABLE_TEMPLATE);
 }

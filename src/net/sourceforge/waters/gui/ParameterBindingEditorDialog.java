@@ -115,7 +115,6 @@ public class ParameterBindingEditorDialog extends JDialog
     } else {
       template = mBinding;
     }
-
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
       public void actionPerformed(final ActionEvent event)
