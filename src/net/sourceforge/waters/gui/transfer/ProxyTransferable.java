@@ -25,8 +25,10 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
- * <P>A transferable that can hold an arbitrary collection of WATERS
- * objects.</P>
+ * <P>A {@link Transferable} that can hold an arbitrary collection of WATERS
+ * objects. Transferables are used to hold data during copy/paste and
+ * drag/drop operations. All transferables created by the GUI are instances of
+ * this class.</P>
  *
  * <P>This general class is not intended for direct use. To create a
  * transferable, please use the methods {@link
@@ -35,11 +37,15 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
  * automatically determine the correct data flavours and transferable
  * class for a given list of {@link Proxy} objects.</P>
  *
- * <P>In addition to type-specific data flavours as defined in class
- * {@link WatersDataFlavor}, this class also supports Java's string
- * data flavour ({@link DataFlavor#stringFlavor}): when requested, the
- * data is converted to text form using a {@link ProxyPrinter}.</P>
+ * <P>A proxy transferable is created using an array of data flavours
+ * and the data. The first data flavour is the <I>primary flavour</I>,
+ * which determines how the transferable is initialised. Many transferables
+ * will support more data flavours, providing alternative ways of retrieving
+ * the data. All transferables also support Java's string data flavour
+ * ({@link DataFlavor#stringFlavor}): when requested, the data is converted
+ * to text form using a {@link ProxyPrinter}.</P>
  *
+ * @see WatersDataFlavor
  * @author Robi Malik
  */
 

@@ -68,18 +68,18 @@ import net.sourceforge.waters.subject.base.SubjectTools;
  *     reduceDataFlavorList()}.</LI>
  * <LI>The data stored in the transferable is copied from the input data by
  *     a call to the primary data flavour's {@link
- *     #createImportData(Collection,ModuleProxyFactory) createImportData()}
- *     method.</LI>
+ *     #createExportData(Collection) createExportData()} method.</LI>
  * <LI>Using the data flavours and the copied data, an instance of
  *     {@link ProxyTransferable} is created and returned as the
  *     transferable.</LI>
  * </OL>
  *
- * <P>When data is retrieved from a transferable by the
- * {@link Transferable#getTransferData(DataFlavor) getTransferData()} method,
- * the transferable calls the primary data flavour's {@link
- * #createImportData(Collection,ModuleProxyFactory) createImportData()}
- * method, which copies the data back for use by the GUI.</P>
+ * <P>When data is retrieved from a transferable by the {@link
+ * Transferable#getTransferData(DataFlavor) getTransferData()} method, the
+ * transferable calls the {@link
+ * #createImportData(Collection,ModuleProxyFactory) createImportData()} method
+ * of the requested data flavour, which copies the data back for use by the
+ * GUI.</P>
  *
  * @author Robi Malik
  */
