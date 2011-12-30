@@ -9,49 +9,17 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-
-import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.EditCommand;
-import net.sourceforge.waters.gui.command.InsertCommand;
-import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.RaisedDialogPanel;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.PlainEventListSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
-public class EventAliasEditorDialog extends JDialog
+public class EventAliasEditorDialog extends AbstractBindingEditorDialog
 {
 
   //#########################################################################
@@ -64,354 +32,108 @@ public class EventAliasEditorDialog extends JDialog
   public EventAliasEditorDialog(final ModuleWindowInterface root,
                                 final EventAliasSubject alias)
   {
-    super(root.getRootWindow());
+    super(root);
+    mRoot = root;
+    mAlias = alias;
     if (alias == null) {
       setTitle("Creating new Event Alias");
     } else {
       setTitle("Editing Event Alias");
     }
-    mRoot = root;
-    mAlias = alias;
-    createComponents();
-    layoutComponents();
-    setLocationRelativeTo(mRoot.getRootWindow());
-    mNameInput.requestFocusInWindow();
-    setVisible(true);
+    run();
   }
 
-  //#########################################################################
-  //# Access to Created Item
-  /**
-   * Gets the Waters subject edited by this dialog.
-   *
-   * @return A reference to the foreach component being edited by this dialog.
-   */
-  public EventAliasSubject getEditedItem()
+
+  public SelectionOwner getSelectionOwner(){
+    return mRoot.getEventAliasesPanel();
+  }
+
+    public ProxySubject getProxySubject()
   {
     return mAlias;
   }
 
-  //#########################################################################
-  //# Initialisation and Layout of Components
-  /**
-   * Initialise buttons and components.
-   */
-  private void createComponents()
+  public void setProxySubject(final ProxySubject template)
   {
-    EventAliasSubject template;
-    if (mAlias == null) {
-      try {
-        template = TEMPLATE;
-        final SelectionOwner panel = mRoot.getEventAliasesPanel();
-        final List<InsertInfo> inserts = panel.getInsertInfo(TRANSFERABLE);
-        final InsertInfo insert = inserts.get(0);
-        mInsertPosition = insert.getInsertPosition();
-      } catch (final IOException exception) {
-        throw new WatersRuntimeException(exception);
-      } catch (final UnsupportedFlavorException exception) {
-        throw new WatersRuntimeException(exception);
-      }
-    } else {
-      template = mAlias;
-    }
-    final ExpressionParser parser = mRoot.getExpressionParser();
-    final ActionListener commithandler = new ActionListener() {
-      public void actionPerformed(final ActionEvent event)
-      {
-        commitDialog();
-      }
-    };
-
-    // Main panel ...
-    mMainPanel = new RaisedDialogPanel();
-    mNameLabel = new JLabel("Name:");
-    final String oldname = template.getName();
-    final SimpleIdentifierSubject ident =
-      new SimpleIdentifierSubject(oldname);
-    final SimpleIdentifierInputParser nameparser =
-      new SimpleIdentifierInputParser(ident, parser);
-    mNameInput = new SimpleExpressionCell(ident, nameparser);
-    mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter the name");
-    mExpressionLabel = new JLabel("Expression:");
-    SimpleExpressionProxy oldexp = null;
-    if (mAlias != null
-        && mAlias.getExpression() instanceof SimpleExpressionProxy) {
-      oldexp = (SimpleExpressionProxy) mAlias.getExpression();
-    }
-    mExpressionInput =
-      new SimpleExpressionCell(oldexp, Operator.TYPE_NAME, parser);
-    mExpressionInput.addActionListener(commithandler);
-    mExpressionInput.setToolTipText("Enter the expression");
-    mExpressionInput.setAllowNull(false);
-
-    final ExpressionProxy exp = template.getExpression();
-    mIsSimpleExpCheckBox = new JCheckBox("Use Simple Expression");
-    mIsSimpleExpCheckBox.setRequestFocusEnabled(false);
-    mIsSimpleExpCheckBox.setSelected(exp instanceof SimpleExpressionProxy);
-    mIsSimpleExpCheckBox.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent event)
-      {
-        updateExpressionEnabled();
-      }
-    });
-
-    // Error panel ...
-    mErrorPanel = new RaisedDialogPanel();
-    mErrorLabel = new ErrorLabel();
-    mErrorPanel.add(mErrorLabel);
-    mNameInput.setErrorDisplay(mErrorLabel);
-    mExpressionInput.setErrorDisplay(mErrorLabel);
-
-    // Buttons panel ...
-    mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
-    final JButton cancelButton = new JButton("Cancel");
-    cancelButton.setRequestFocusEnabled(false);
-    cancelButton.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent event)
-      {
-        dispose();
-      }
-    });
-    mButtonsPanel.add(cancelButton);
-
-    final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
-    DialogCancelAction.register(this);
-    updateExpressionEnabled();
+    mAlias = (EventAliasSubject)template;
   }
 
-  /**
-   * Fill the panels and layout all buttons and components. It is assumed that
-   * all needed components have been created by a call to
-   * {@link #createComponents()} before.
-   */
-  private void layoutComponents()
+  public ProxySubject createNewProxySubject(final Object id,
+                                            final ExpressionSubject exp)
   {
-    final GridBagConstraints constraints = new GridBagConstraints();
-    constraints.weightx = 1.0;
-    constraints.weighty = 1.0;
-    constraints.insets = INSETS;
-
-    final GridBagLayout mainlayout = new GridBagLayout();
-    mMainPanel.setLayout(mainlayout);
-
-    constraints.gridx = 0;
-    constraints.gridy = 0;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mNameLabel, constraints);
-    mMainPanel.add(mNameLabel);
-
-    mNameInput.setColumns(20);
-    constraints.gridx++;
-    constraints.gridwidth = 1;
-    constraints.weightx = 1.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mNameInput, constraints);
-    mMainPanel.add(mNameInput);
-    mNameInput.setColumns(20);
-
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mIsSimpleExpCheckBox, constraints);
-    mMainPanel.add(mIsSimpleExpCheckBox);
-
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    mainlayout.setConstraints(mExpressionLabel, constraints);
-    mMainPanel.add(mExpressionLabel);
-
-    constraints.gridx++;
-    constraints.gridwidth = 1;
-    constraints.weightx = 1.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mExpressionInput, constraints);
-    mMainPanel.add(mExpressionInput);
-
-    // Error and buttons panel do not need layouting.
-
-    // Finally, build the full dialog ...
-    final Container contents = getContentPane();
-    final GridBagLayout layout = new GridBagLayout();
-    contents.setLayout(layout);
-    constraints.gridx = 0;
-    constraints.gridy = GridBagConstraints.RELATIVE;
-    constraints.gridwidth = GridBagConstraints.REMAINDER;
-    constraints.weightx = 1.0;
-    constraints.weighty = 1.0;
-    constraints.fill = GridBagConstraints.BOTH;
-    constraints.insets = new Insets(0, 0, 0, 0);
-    layout.setConstraints(mMainPanel, constraints);
-    contents.add(mMainPanel);
-    layout.setConstraints(mErrorPanel, constraints);
-    contents.add(mErrorPanel);
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    layout.setConstraints(mButtonsPanel, constraints);
-    contents.add(mButtonsPanel);
-    pack();
-    final Dimension size = getSize();
-    setMinimumSize(size);
+    return new EventAliasSubject((IdentifierProxy) id, exp);
   }
 
-  //#########################################################################
-  //# Action Listeners
-  /**
-   * Commits the contents of this dialog to the model. This method is attached
-   * to action listener of the 'OK' button of the event editor dialog.
-   */
-  public void commitDialog()
+  public ExpressionSubject getExpression()
   {
-    if (isInputLocked()) {
-      // nothing
-    } else if (mIsSimpleExpCheckBox.isSelected()) {
-      final IdentifierSubject name =
-        (IdentifierSubject) mNameInput.getValue();
-      final SimpleExpressionSubject exp0 =
-        (SimpleExpressionSubject) mExpressionInput.getValue();
-      final SimpleExpressionSubject exp = makeUnique(exp0);
-      final SelectionOwner panel = mRoot.getEventAliasesPanel();
-      if (mAlias == null) {
-        final EventAliasSubject template = new EventAliasSubject(name, exp);
-        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
-        final List<InsertInfo> list = Collections.singletonList(insert);
-        final Command command = new InsertCommand(list, panel, mRoot);
-        mAlias = template;
-        mRoot.getUndoInterface().executeCommand(command);
-      } else {
-        final String oldname = mAlias.getName();
-        final boolean namechange = !name.equals(oldname);
-        final ExpressionProxy oldExp = mAlias.getExpression();
+    return mAlias.getExpression();
+  }
 
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
-        final boolean expchange = !eq.equals(exp, oldExp);
-        if (namechange || expchange) {
-          final EventAliasSubject template = mAlias.clone();
-          if (namechange) {
-            template.setIdentifier(name);
-          }
-          if (expchange) {
-            template.setExpression(exp);
-          }
-          final Command command = new EditCommand(mAlias, template, panel);
-          mRoot.getUndoInterface().executeCommand(command);
-        }
-      }
-      dispose();
-    } else if (!mIsSimpleExpCheckBox.isSelected()) {
-      final IdentifierSubject name =
-        (IdentifierSubject) mNameInput.getValue();
-      final SelectionOwner panel = mRoot.getEventAliasesPanel();
-      if (mAlias == null) {
-        final EventAliasSubject template =
-          new EventAliasSubject(name, new PlainEventListSubject());
-        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
-        final List<InsertInfo> list = Collections.singletonList(insert);
-        final Command command = new InsertCommand(list, panel, mRoot);
-        mAlias = template;
-        mRoot.getUndoInterface().executeCommand(command);
-      } else {
-        final String oldname = mAlias.getName();
-        final boolean namechange = !name.equals(oldname);
-        boolean expchange = false;
-        ExpressionSubject exp = mAlias.getExpression();
-        if (exp instanceof SimpleExpressionProxy) {
-          exp = new PlainEventListSubject();
-          expchange = true;
-        }
-        if (namechange || expchange) {
-          final EventAliasSubject template = mAlias.clone();
-          if (namechange) {
-            template.setIdentifier(name);
-          }
-          if (expchange) {
-            template.setExpression(exp);
-          }
-          final Command command = new EditCommand(mAlias, template, panel);
-          mRoot.getUndoInterface().executeCommand(command);
-        }
-      }
-      dispose();
+  public ExpressionSubject getExpression(final ProxySubject template)
+  {
+    final EventAliasSubject temp = (EventAliasSubject)template;
+    return temp.getExpression();
+  }
+
+  public String getName()
+  {
+    if(mAlias == null){
+      return null;
     }
+    return mAlias.getName();
   }
 
-  //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Checks whether it is unsafe to commit the currently edited text field. If
-   * this method returns <CODE>true</CODE>, it is unsafe to commit the current
-   * dialog contents, and shifting the focus is to be avoided.
-   *
-   * @return <CODE>true</CODE> if the component currently owning the focus is
-   *         to be parsed and has been found to contain invalid information,
-   *         <CODE>false</CODE> otherwise.
-   */
-  private boolean isInputLocked()
+  public String getName(final ProxySubject template)
   {
-    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()
-           || mExpressionInput.isFocusOwner()
-           && !mExpressionInput.shouldYieldFocus();
+    final EventAliasSubject temp = (EventAliasSubject)template;
+    return temp.getName();
   }
 
-  private SimpleExpressionSubject makeUnique(final SimpleExpressionSubject subject)
+  public int getOperatorMask()
   {
-    if (subject == null || subject.getParent() == null) {
-      return subject;
-    } else {
-      return subject.clone();
-    }
+    return Operator.TYPE_NAME;
   }
 
-  /**
-   * Enables or disables the 'required' checkbox. This method is attached to
-   * action listeners in response to the selection or deselection of the
-   * 'parameter' checkbox.
-   */
-  private void updateExpressionEnabled()
+  public ProxySubject createTemplate()
   {
-    final boolean enable = mIsSimpleExpCheckBox.isSelected();
-    mExpressionInput.setEnabled(enable);
-    mExpressionLabel.setEnabled(enable);
-    if(!enable){
-      mErrorLabel.clearDisplay();
-    }
+    return new EventAliasSubject(new SimpleIdentifierSubject(""),
+                                 new SimpleIdentifierSubject(""));
+  }
+
+  public ProxySubject getClone()
+  {
+    return mAlias.clone();
+  }
+
+  public void setIdentifier(final ProxySubject template, final Object id)
+  {
+    final EventAliasSubject temp = (EventAliasSubject)template;
+    temp.setIdentifier((IdentifierSubject) id);
+  }
+
+  public void setExpression(final ProxySubject template, final ExpressionSubject exp)
+  {
+    final EventAliasSubject temp = (EventAliasSubject)template;
+    temp.setExpression(exp);
+  }
+
+  public Object getInput(final SimpleExpressionCell name)
+  {
+    return name.getValue();
   }
 
   //#########################################################################
   //# Data Members
-  // Dialog state
   private final ModuleWindowInterface mRoot;
-
-  // Swing components
-  private JPanel mMainPanel;
-  private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
-  private JLabel mExpressionLabel;
-  private SimpleExpressionCell mExpressionInput;
-  private JCheckBox mIsSimpleExpCheckBox;
-
-  private JPanel mErrorPanel;
-  private ErrorLabel mErrorLabel;
-  private JPanel mButtonsPanel;
-
   private EventAliasSubject mAlias;
-  private Object mInsertPosition;
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-  private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final EventAliasSubject TEMPLATE =
-    new EventAliasSubject(new SimpleIdentifierSubject(""),
-                          new SimpleIdentifierSubject(""));
-  private static final Transferable TRANSFERABLE =
-    WatersDataFlavor.createTransferable(TEMPLATE);
+
+
+
+
+
 
 }
