@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   ForeachComponentEditorDialog
+//# CLASS:   ParameterBindingEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -31,90 +31,100 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
                                       final ParameterBindingSubject binding)
   {
     super(root);
-    mRoot = root;
     mBinding = binding;
     if (binding == null) {
       setTitle("Creating new Parameter Binding");
     } else {
       setTitle("Editing Parameter Binding");
     }
-    run();
+    initialize();
   }
 
-  public SelectionOwner getSelectionOwner()
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.AbstractBindingEditorDialog
+  @Override
+  SelectionOwner getSelectionOwner()
   {
-    return mRoot.getComponentsPanel();
+    final ModuleWindowInterface root = getRoot();
+    return root.getComponentsPanel();
   }
 
-  public ProxySubject getProxySubject()
+  @Override
+  ProxySubject getProxySubject()
   {
     return mBinding;
   }
 
-  public void setProxySubject(final ProxySubject template)
+  @Override
+  void setProxySubject(final ProxySubject template)
   {
-    mBinding = (ParameterBindingSubject)template;
+    mBinding = (ParameterBindingSubject) template;
   }
 
-  public ProxySubject createNewProxySubject(final Object id,
-                                            final ExpressionSubject exp)
+  @Override
+  ProxySubject createNewProxySubject(final Object id,
+                                     final ExpressionSubject exp)
   {
     return new ParameterBindingSubject((String) id, exp);
   }
 
-  public ExpressionSubject getExpression()
+  @Override
+  ExpressionSubject getExpression()
   {
     return mBinding.getExpression();
   }
 
-  public ExpressionSubject getExpression(final ProxySubject template)
+  @Override
+  ExpressionSubject getExpression(final ProxySubject template)
   {
-    final ParameterBindingSubject para = (ParameterBindingSubject)template;
+    final ParameterBindingSubject para = (ParameterBindingSubject) template;
     return para.getExpression();
   }
 
-  public String getName()
+  @Override
+  String getProxyName()
   {
-    if(mBinding == null){
+    if (mBinding == null) {
       return null;
     }
     return mBinding.getName();
   }
 
-  public String getName(final ProxySubject template)
+  @Override
+  String getProxyName(final ProxySubject template)
   {
-    final ParameterBindingSubject para = (ParameterBindingSubject)template;
+    final ParameterBindingSubject para = (ParameterBindingSubject) template;
     return para.getName();
   }
 
-  public int getOperatorMask()
+  @Override
+  int getOperatorMask()
   {
     return Operator.TYPE_ANY;
   }
 
-  public ProxySubject createTemplate()
+  @Override
+  ProxySubject createTemplate()
   {
     return new ParameterBindingSubject("", new SimpleIdentifierSubject(""));
   }
 
-  public ProxySubject getClone()
+  @Override
+  void setIdentifier(final ProxySubject template, final Object id)
   {
-    return mBinding.clone();
+    final ParameterBindingSubject para = (ParameterBindingSubject) template;
+    para.setName((String) id);
   }
 
-  public void setIdentifier(final ProxySubject template, final Object id)
+  @Override
+  void setExpression(final ProxySubject template, final ExpressionSubject exp)
   {
-    final ParameterBindingSubject para = (ParameterBindingSubject)template;
-    para.setName((String)id);
-  }
-
-  public void setExpression(final ProxySubject template, final ExpressionSubject exp)
-  {
-    final ParameterBindingSubject para = (ParameterBindingSubject)template;
+    final ParameterBindingSubject para = (ParameterBindingSubject) template;
     para.setExpression(exp);
   }
 
-  public Object getInput(final SimpleExpressionCell name)
+  @Override
+  Object getInput(final SimpleExpressionCell name)
   {
     return name.getText();
   }
@@ -122,9 +132,8 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
 
   //#########################################################################
   //# Data Members
-  // Swing components
-  private final ModuleWindowInterface mRoot;
   private ParameterBindingSubject mBinding;
+
 
   //#########################################################################
   //# Class Constants

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   ForeachComponentEditorDialog
+//# CLASS:   EventAliasEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -33,107 +33,114 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
                                 final EventAliasSubject alias)
   {
     super(root);
-    mRoot = root;
     mAlias = alias;
     if (alias == null) {
       setTitle("Creating new Event Alias");
     } else {
       setTitle("Editing Event Alias");
     }
-    run();
+    initialize();
   }
 
 
-  public SelectionOwner getSelectionOwner(){
-    return mRoot.getEventAliasesPanel();
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.AbstractBindingEditorDialog
+  @Override
+  SelectionOwner getSelectionOwner()
+  {
+    final ModuleWindowInterface root = getRoot();
+    return root.getEventAliasesPanel();
   }
 
-    public ProxySubject getProxySubject()
+  @Override
+  ProxySubject getProxySubject()
   {
     return mAlias;
   }
 
-  public void setProxySubject(final ProxySubject template)
+  @Override
+  void setProxySubject(final ProxySubject template)
   {
-    mAlias = (EventAliasSubject)template;
+    mAlias = (EventAliasSubject) template;
   }
 
-  public ProxySubject createNewProxySubject(final Object id,
-                                            final ExpressionSubject exp)
+  @Override
+  ProxySubject createNewProxySubject(final Object id,
+                                     final ExpressionSubject exp)
   {
     return new EventAliasSubject((IdentifierProxy) id, exp);
   }
 
-  public ExpressionSubject getExpression()
+  @Override
+  ExpressionSubject getExpression()
   {
     return mAlias.getExpression();
   }
 
-  public ExpressionSubject getExpression(final ProxySubject template)
+  @Override
+  ExpressionSubject getExpression(final ProxySubject template)
   {
-    final EventAliasSubject temp = (EventAliasSubject)template;
+    final EventAliasSubject temp = (EventAliasSubject) template;
     return temp.getExpression();
   }
 
-  public String getName()
+  @Override
+  String getProxyName()
   {
-    if(mAlias == null){
+    if (mAlias == null) {
       return null;
     }
     return mAlias.getName();
   }
 
-  public String getName(final ProxySubject template)
+  @Override
+  String getProxyName(final ProxySubject template)
   {
-    final EventAliasSubject temp = (EventAliasSubject)template;
+    final EventAliasSubject temp = (EventAliasSubject) template;
     return temp.getName();
   }
 
-  public int getOperatorMask()
+  @Override
+  int getOperatorMask()
   {
     return Operator.TYPE_NAME;
   }
 
-  public ProxySubject createTemplate()
+  @Override
+  ProxySubject createTemplate()
   {
     return new EventAliasSubject(new SimpleIdentifierSubject(""),
                                  new SimpleIdentifierSubject(""));
   }
 
-  public ProxySubject getClone()
+  @Override
+  void setIdentifier(final ProxySubject template, final Object id)
   {
-    return mAlias.clone();
-  }
-
-  public void setIdentifier(final ProxySubject template, final Object id)
-  {
-    final EventAliasSubject temp = (EventAliasSubject)template;
+    final EventAliasSubject temp = (EventAliasSubject) template;
     temp.setIdentifier((IdentifierSubject) id);
   }
 
-  public void setExpression(final ProxySubject template, final ExpressionSubject exp)
+  @Override
+  void setExpression(final ProxySubject template, final ExpressionSubject exp)
   {
-    final EventAliasSubject temp = (EventAliasSubject)template;
+    final EventAliasSubject temp = (EventAliasSubject) template;
     temp.setExpression(exp);
   }
 
-  public Object getInput(final SimpleExpressionCell name)
+  @Override
+  Object getInput(final SimpleExpressionCell name)
   {
     return name.getValue();
   }
 
+
   //#########################################################################
   //# Data Members
-  private final ModuleWindowInterface mRoot;
   private EventAliasSubject mAlias;
+
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-
-
-
-
-
 
 }

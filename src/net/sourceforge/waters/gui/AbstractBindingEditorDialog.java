@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   ForeachComponentEditorDialog
+//# CLASS:   AbstractBindingEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -41,9 +41,11 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -60,25 +62,10 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     mRoot = root;
   }
 
-  public abstract SelectionOwner getSelectionOwner();
-  public abstract ProxySubject getProxySubject();
-  public abstract void setProxySubject(ProxySubject template);
-  public abstract ProxySubject createNewProxySubject(Object id, ExpressionSubject exp);
-  public abstract ExpressionSubject getExpression();
-  public abstract ExpressionSubject getExpression(ProxySubject template);
-  public abstract String getName();
-  public abstract String getName(ProxySubject template);
-  public abstract int getOperatorMask();
-  public abstract ProxySubject createTemplate();
-  public abstract ProxySubject getClone();
-  public abstract void setIdentifier(ProxySubject template, Object id);
-  public abstract void setExpression(ProxySubject template, ExpressionSubject exp);
-  public abstract Object getInput(SimpleExpressionCell name);
-
-  //###################################################################################
-  //I had to use this method otherwise the abstract methods would be used before
-  //they are implemented
-  public void run(){
+  // Have to use this method otherwise the abstract methods would be used
+  // before they are available.
+  void initialize()
+  {
     createComponents();
     layoutComponents();
     setLocationRelativeTo(mRoot.getRootWindow());
@@ -86,10 +73,36 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     setVisible(true);
   }
 
-  public Transferable createBlankTransferable()
+
+  //#########################################################################
+  //# Simple Access
+  ModuleWindowInterface getRoot()
+  {
+    return mRoot;
+  }
+
+
+  //#########################################################################
+  //# Abstract Methods
+  abstract SelectionOwner getSelectionOwner();
+  abstract ProxySubject getProxySubject();
+  abstract void setProxySubject(ProxySubject template);
+  abstract ProxySubject createNewProxySubject(Object id, ExpressionSubject exp);
+  abstract ExpressionSubject getExpression();
+  abstract ExpressionSubject getExpression(ProxySubject template);
+  abstract String getProxyName();
+  abstract String getProxyName(ProxySubject template);
+  abstract int getOperatorMask();
+  abstract ProxySubject createTemplate();
+  abstract void setIdentifier(ProxySubject template, Object id);
+  abstract void setExpression(ProxySubject template, ExpressionSubject exp);
+  abstract Object getInput(SimpleExpressionCell name);
+
+  Transferable createBlankTransferable()
   {
     return WatersDataFlavor.createTransferable(createTemplate());
   }
+
 
   //#########################################################################
   //# Initialisation and Layout of Components
@@ -125,7 +138,7 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
-    final String oldname = getName(template);
+    final String oldname = getProxyName(template);
     final SimpleIdentifierSubject ident =
       new SimpleIdentifierSubject(oldname);
     final SimpleIdentifierInputParser nameparser =
@@ -284,15 +297,18 @@ public abstract class AbstractBindingEditorDialog extends JDialog
         setProxySubject(template);
         mRoot.getUndoInterface().executeCommand(command);
       } else {
-        final String oldname = getName();
+        final String oldname = getProxyName();
         final boolean namechange = !name.equals(oldname);
         final ExpressionProxy oldExp = getExpression();
-
         final ModuleEqualityVisitor eq =
           ModuleEqualityVisitor.getInstance(true);
         final boolean expchange = !eq.equals(exp, oldExp);
         if (namechange || expchange) {
-          final ProxySubject template = getClone();
+          final ModuleProxyCloner cloner =
+            ModuleSubjectFactory.getCloningInstance();
+          final ProxySubject subject = getProxySubject();
+          final ProxySubject template =
+            (ProxySubject) cloner.getClone(subject);
           if (namechange) {
             setIdentifier(template,name);
           }
@@ -308,14 +324,15 @@ public abstract class AbstractBindingEditorDialog extends JDialog
       final Object name = getInput(mNameInput);
       final SelectionOwner panel = getSelectionOwner();
       if (getProxySubject() == null) {
-        final ProxySubject template = createNewProxySubject(name, new PlainEventListSubject());
+        final ProxySubject template =
+          createNewProxySubject(name, new PlainEventListSubject());
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);
         final List<InsertInfo> list = Collections.singletonList(insert);
         final Command command = new InsertCommand(list, panel, mRoot);
         setProxySubject(template);
         mRoot.getUndoInterface().executeCommand(command);
       } else {
-        final String oldname = getName();
+        final String oldname = getProxyName();
         final boolean namechange = !name.equals(oldname);
         boolean expchange = false;
         ExpressionSubject exp = getExpression();
@@ -324,14 +341,19 @@ public abstract class AbstractBindingEditorDialog extends JDialog
           expchange = true;
         }
         if (namechange || expchange) {
-          final ProxySubject template = getClone();
+          final ModuleProxyCloner cloner =
+            ModuleSubjectFactory.getCloningInstance();
+          final ProxySubject subject = getProxySubject();
+          final ProxySubject template =
+            (ProxySubject) cloner.getClone(subject);
           if (namechange) {
             setIdentifier(template,name);
           }
           if (expchange) {
             setExpression(template,exp);
           }
-          final Command command = new EditCommand(getProxySubject(), template, panel);
+          final Command command =
+            new EditCommand(getProxySubject(), template, panel);
           mRoot.getUndoInterface().executeCommand(command);
         }
       }
