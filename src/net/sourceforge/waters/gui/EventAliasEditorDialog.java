@@ -16,6 +16,7 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
@@ -66,8 +67,11 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
 
   @Override
   ProxySubject createNewProxySubject(final Object id,
-                                     final ExpressionSubject exp)
+                                     ExpressionSubject exp)
   {
+    if(exp == null){
+      exp = new PlainEventListSubject();
+    }
     return new EventAliasSubject((IdentifierProxy) id, exp);
   }
 

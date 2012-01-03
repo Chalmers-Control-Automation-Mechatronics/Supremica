@@ -284,28 +284,22 @@ public abstract class AbstractBindingEditorDialog extends JDialog
   {
     if (isInputLocked()) {
       // nothing
-    } else if (mIsSimpleExpCheckBox.isSelected()) {
+    } else {
+      SimpleExpressionSubject exp;
+      if (mIsSimpleExpCheckBox.isSelected()) {
+        final SimpleExpressionSubject exp0 =
+          (SimpleExpressionSubject) mExpressionInput.getValue();
+        exp = makeUnique(exp0);
+      } else{
+        exp = null;
+      }
       final Object name = getInput(mNameInput);
-      final SimpleExpressionSubject exp0 =
-        (SimpleExpressionSubject) mExpressionInput.getValue();
-      final SimpleExpressionSubject exp = makeUnique(exp0);
       ProxySubject template;
       if (getProxySubject() == null) {
         template = createNewProxySubject(name, exp);
         createInsertCommand(template);
       } else {
         template = updateProxySubject(name, exp);
-        createEditCommand(template);
-      }
-      dispose();
-    } else if (!mIsSimpleExpCheckBox.isSelected()) {
-      final Object name = getInput(mNameInput);
-      ProxySubject template;
-      if (getProxySubject() == null) {
-        template = createNewProxySubject(name, new PlainEventListSubject());
-        createInsertCommand(template);
-      } else {
-        template = updateProxySubject(name, null);
         createEditCommand(template);
       }
       dispose();
@@ -375,9 +369,9 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     }
   }
 
-  private ProxySubject updateProxySubject(final Object name, ExpressionSubject expInput){
+  private ProxySubject updateProxySubject(final Object nameInput, ExpressionSubject expInput){
     final String oldname = getProxyName();
-    final boolean namechange = !name.equals(oldname);
+    final boolean namechange = !nameInput.equals(oldname);
     final ExpressionSubject oldExp = getExpression();
     boolean expchange = false;
 
@@ -399,7 +393,7 @@ public abstract class AbstractBindingEditorDialog extends JDialog
       final ProxySubject template =
         (ProxySubject) cloner.getClone(getProxySubject());
       if (namechange) {
-        setIdentifier(template,name);
+        setIdentifier(template,nameInput);
       }
       if (expchange) {
         setExpression(template,expInput);

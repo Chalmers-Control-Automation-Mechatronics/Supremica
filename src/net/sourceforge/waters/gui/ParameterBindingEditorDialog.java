@@ -14,6 +14,7 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
@@ -63,8 +64,11 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
 
   @Override
   ProxySubject createNewProxySubject(final Object id,
-                                     final ExpressionSubject exp)
+                                     ExpressionSubject exp)
   {
+    if(exp == null){
+      exp = new PlainEventListSubject();
+    }
     return new ParameterBindingSubject((String) id, exp);
   }
 
