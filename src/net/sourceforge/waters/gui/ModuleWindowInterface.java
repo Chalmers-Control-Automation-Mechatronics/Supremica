@@ -81,6 +81,11 @@ public interface ModuleWindowInterface
   public SelectionOwner getEventAliasesPanel();
 
   /**
+   * Gets the instance panel for the module edited by this GUI.
+   */
+  public SelectionOwner getInstancePanel();
+
+  /**
    * Shows the list of components of the module so the user can edit it.
    */
   public void showComponents();

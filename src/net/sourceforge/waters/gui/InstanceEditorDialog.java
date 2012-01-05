@@ -34,7 +34,7 @@ public class InstanceEditorDialog
 
 	//#######################################################################
 	//# Constructor
-	public InstanceEditorDialog(ModuleWindowInterface root)
+	public InstanceEditorDialog(final ModuleWindowInterface root)
 	{
 		setTitle("Instance Component Editor");
 		mRoot = root;
@@ -46,32 +46,32 @@ public class InstanceEditorDialog
 		setModal(true);
 		setLocationRelativeTo(null);
 
-		JButton cancelButton = new JButton("Cancel");
+		final JButton cancelButton = new JButton("Cancel");
 
 		okButton.setActionCommand("OK");
 		cancelButton.setActionCommand("Cancel");
 		okButton.addActionListener(this);
 		cancelButton.addActionListener(this);
 
-		JPanel contentPanel = new JPanel();
-		Box b = new Box(BoxLayout.PAGE_AXIS);
+		final JPanel contentPanel = new JPanel();
+		final Box b = new Box(BoxLayout.PAGE_AXIS);
 
 		contentPanel.add(b);
 
-		JPanel r1 = new JPanel();
+		final JPanel r1 = new JPanel();
 
 		b.add(r1);
 		r1.add(new JLabel("Name: "));
 		r1.add(mNameInput);
 
 		//TODO: Make this a file selector
-		JPanel r2 = new JPanel();
+		final JPanel r2 = new JPanel();
 
 		b.add(r2);
 		r2.add(new JLabel("Module Name: "));
 		r2.add(mModuleInput);
 
-		JPanel r3 = new JPanel();
+		final JPanel r3 = new JPanel();
 
 		b.add(r3);
 		r3.add(okButton);
@@ -84,7 +84,7 @@ public class InstanceEditorDialog
 
 	//#######################################################################
 	//# Interface java.awt.event.ActionListener
-	public void actionPerformed(ActionEvent e)
+	public void actionPerformed(final ActionEvent e)
 	{
 		if ("OK".equals(e.getActionCommand()))
 		{

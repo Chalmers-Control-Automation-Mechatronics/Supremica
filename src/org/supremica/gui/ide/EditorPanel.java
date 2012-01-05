@@ -161,6 +161,12 @@ public class EditorPanel
       return panel.getEventAliasesPanel();
     }
 
+    public SelectionOwner getInstancePanel()
+    {
+      // TODO Auto-generated method stub
+      return (SelectionOwner) mComponentsTab.getPanel();
+    }
+
     public void showComponents()
     {
         mComponentsTab.activate();
@@ -356,6 +362,8 @@ public class EditorPanel
     //#########################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+
+
 
 
 }

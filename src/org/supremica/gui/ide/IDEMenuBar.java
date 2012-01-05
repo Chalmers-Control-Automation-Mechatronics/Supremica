@@ -42,6 +42,7 @@ import net.sourceforge.waters.gui.actions.InsertConstantAliasAction;
 import net.sourceforge.waters.gui.actions.InsertEventAliasAction;
 import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
 import net.sourceforge.waters.gui.actions.InsertForeachAction;
+import net.sourceforge.waters.gui.actions.InsertInstanceAction;
 import net.sourceforge.waters.gui.actions.InsertParameterBindingAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
@@ -318,6 +319,10 @@ public class IDEMenuBar extends JMenuBar
           final Action inseventalias =
             actions.getAction(InsertEventAliasAction.class);
           mCreateMenu.add(inseventalias);
+       // TODO Auto-generated method stub
+          final Action insinstance =
+            actions.getAction(InsertInstanceAction.class);
+          mCreateMenu.add(insinstance);
           final Action inparam =
             actions.getAction(InsertParameterBindingAction.class);
           mCreateMenu.add(inparam);

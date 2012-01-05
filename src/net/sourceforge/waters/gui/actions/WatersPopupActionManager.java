@@ -184,6 +184,13 @@ public class WatersPopupActionManager
     return master.getAction(InsertForeachAction.class);
   }
 
+  //TODO Auto-generated method stub
+  public IDEAction getInsertInstanceAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertInstanceAction.class);
+  }
+
   public IDEAction getInsertParameterBindingAction()
   {
     final WatersActionManager master = mIDE.getActions();
