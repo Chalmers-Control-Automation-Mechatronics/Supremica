@@ -285,22 +285,52 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     if (isInputLocked()) {
       // nothing
     } else {
-      SimpleExpressionSubject exp;
+      ExpressionSubject exp = null;
       if (mIsSimpleExpCheckBox.isSelected()) {
         final SimpleExpressionSubject exp0 =
           (SimpleExpressionSubject) mExpressionInput.getValue();
         exp = makeUnique(exp0);
-      } else{
-        exp = null;
       }
       final Object name = getInput(mNameInput);
-      ProxySubject template;
-      if (getProxySubject() == null) {
+      final SelectionOwner panel = getSelectionOwner();
+      final ProxySubject subject = getProxySubject();
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      ProxySubject template = (ProxySubject) cloner.getClone(subject);
+      if (subject == null) {
         template = createNewProxySubject(name, exp);
-        createInsertCommand(template);
+        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
+        final List<InsertInfo> list = Collections.singletonList(insert);
+        final Command command = new InsertCommand(list, panel, mRoot);
+        setProxySubject(template);
+        mRoot.getUndoInterface().executeCommand(command);
       } else {
-        template = updateProxySubject(name, exp);
-        createEditCommand(template);
+        final String oldname = getProxyName();
+        final boolean namechange = !name.equals(oldname);
+        final ExpressionSubject oldExp = getExpression();
+        boolean expchange = false;
+        if (exp == null){
+          if(oldExp instanceof SimpleExpressionProxy) {
+            exp = new PlainEventListSubject();
+            expchange = true;
+          }
+        } else {
+          final ModuleEqualityVisitor eq =
+            ModuleEqualityVisitor.getInstance(true);
+          expchange = !eq.equals(exp, oldExp);
+        }
+        if (namechange) {
+          setIdentifier(template, name);
+        }
+        if (expchange) {
+          setExpression(template, exp);
+        }
+        final ModuleEqualityVisitor equalityChecker =
+          ModuleEqualityVisitor.getInstance(true);
+        if (!equalityChecker.equals(subject, template)) {
+          final Command command = new EditCommand(subject, template, panel);
+          mRoot.getUndoInterface().executeCommand(command);
+        }
       }
       dispose();
     }
@@ -347,60 +377,6 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     if(!enable){
       mErrorLabel.clearDisplay();
     }
-  }
-
-
-  private void createInsertCommand(final ProxySubject template){
-    final InsertInfo insert = new InsertInfo(template, mInsertPosition);
-    final List<InsertInfo> list = Collections.singletonList(insert);
-    final Command command = new InsertCommand(list, getSelectionOwner(), mRoot);
-    setProxySubject(template);
-    mRoot.getUndoInterface().executeCommand(command);
-  }
-
-  private void createEditCommand(final ProxySubject template){
-    final ProxySubject subject = getProxySubject();
-    final ModuleEqualityVisitor equalityChecker =
-      ModuleEqualityVisitor.getInstance(true);
-    if (!equalityChecker.equals(subject, template)) {
-      final Command command =
-        new EditCommand(subject, template, getSelectionOwner());
-      mRoot.getUndoInterface().executeCommand(command);
-    }
-  }
-
-  private ProxySubject updateProxySubject(final Object nameInput, ExpressionSubject expInput){
-    final String oldname = getProxyName();
-    final boolean namechange = !nameInput.equals(oldname);
-    final ExpressionSubject oldExp = getExpression();
-    boolean expchange = false;
-
-    if (expInput == null) {
-      if (oldExp instanceof SimpleExpressionProxy) {
-        expInput = new PlainEventListSubject();
-        expchange = true;
-      }
-    }
-    else{
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(true);
-      expchange = !eq.equals(expInput, oldExp);
-    }
-
-    if (namechange || expchange) {
-      final ModuleProxyCloner cloner =
-        ModuleSubjectFactory.getCloningInstance();
-      final ProxySubject template =
-        (ProxySubject) cloner.getClone(getProxySubject());
-      if (namechange) {
-        setIdentifier(template,nameInput);
-      }
-      if (expchange) {
-        setExpression(template,expInput);
-      }
-      return template;
-    }
-    return getProxySubject();
   }
 
 
