@@ -538,8 +538,8 @@ class EPSPrinterVisitor
     /**
      * Visit the children of foreach constructs in the component list.
      */
-    public Object visitForeachComponentProxy
-        (final ForeachProxy foreach)
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
         throws VisitorException
     {
         final Collection<Proxy> body = foreach.getBody();
@@ -551,6 +551,7 @@ class EPSPrinterVisitor
      * The only reason that visitGraphProxy is not used instead is that we
      * need the name ...
      */
+    @Override
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
         throws VisitorException
     {
