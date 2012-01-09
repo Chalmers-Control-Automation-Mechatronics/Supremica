@@ -279,8 +279,8 @@ public class InstanceEditorDialog extends JDialog
       } else {
         final String oldname = mNameInput.getText();
         final boolean namechange = !name.equals(oldname);
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
+        //final ModuleEqualityVisitor eq =
+        //  ModuleEqualityVisitor.getInstance(true);
         //TODO
         template.setModuleName(moduleName);
         if (namechange) {
