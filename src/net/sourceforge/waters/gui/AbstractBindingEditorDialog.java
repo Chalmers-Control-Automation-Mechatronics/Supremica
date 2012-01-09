@@ -373,9 +373,11 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     final boolean enable = mIsSimpleExpCheckBox.isSelected();
     mExpressionInput.setEnabled(enable);
     mExpressionLabel.setEnabled(enable);
-    //mExpressionInput.setAllowNull(!enable);
     if(!enable){
       mErrorLabel.clearDisplay();
+    }
+    else{
+      mExpressionInput.requestFocusInWindow();
     }
   }
 

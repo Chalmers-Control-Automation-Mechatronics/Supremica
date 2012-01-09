@@ -45,6 +45,7 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
+import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
@@ -226,8 +227,8 @@ public class IDEPropertiesAction
     public Boolean visitInstanceProxy(final InstanceProxy instance){
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        //final InstanceSubject subject = (InstanceSubject) instance;
-        new InstanceEditorDialog(root); //, subject);
+        final InstanceSubject subject = (InstanceSubject) instance;
+        new InstanceEditorDialog(root, subject);
       }
       return true;
     }
