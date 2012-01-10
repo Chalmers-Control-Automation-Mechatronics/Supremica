@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,14 +42,22 @@ import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.ParameterBindingSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 public class InstanceEditorDialog extends JDialog
@@ -117,10 +126,6 @@ public class InstanceEditorDialog extends JDialog
 
     mModuleLabel = new JLabel("Module:");
     mModuleInput = new JTextField(16);
-//TODO
-    //final ModuleSubject module = mRoot.getModuleSubject();
-    //URI uri = module.getLocation();
-    //uri = uri.resolve(template.getModuleName());
     mModuleInput.setText(template.getModuleName());
     mModuleInput.addActionListener(commithandler);
 
@@ -233,10 +238,8 @@ public class InstanceEditorDialog extends JDialog
     fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
     fileChooser.setMultiSelectionEnabled(false);
     final String text = mModuleInput.getText();
-    if (!text.equals("")) {
-      final File file = new File(text);
-      fileChooser.setSelectedFile(file);
-    }
+    final File userInput = new File(text);
+    fileChooser.setSelectedFile(userInput);
     fileChooser.resetChoosableFileFilters();
 
     // Show the dialog ...
@@ -244,14 +247,11 @@ public class InstanceEditorDialog extends JDialog
     // Get the filename ...
     if (choice == JFileChooser.APPROVE_OPTION) {
       final File file = fileChooser.getSelectedFile();
-      //TODO
-      URI fileName = file.toURI();
-
+      final URI fileUri = file.toURI();
       final ModuleSubject module = mRoot.getModuleSubject();
       final URI moduleUri = module.getLocation();
-      fileName = moduleUri.relativize(fileName);
-      final String name = fileName.getPath();
-
+      final URI relativePath = relativise(fileUri, moduleUri);
+      final String name = relativePath.getPath();
       mModuleInput.setText(name.substring(0, name.length() - 5));
       mModuleInput.setCaretPosition(0);
     }
@@ -262,7 +262,7 @@ public class InstanceEditorDialog extends JDialog
     if (isInputLocked()) {
       // nothing
     } else {
-      final IdentifierProxy name = (IdentifierProxy) mNameInput.getValue();
+      final IdentifierProxy newName = (IdentifierProxy) mNameInput.getValue();
       final String moduleName = mModuleInput.getText();
 
       final SelectionOwner panel = mRoot.getComponentsPanel();
@@ -270,38 +270,104 @@ public class InstanceEditorDialog extends JDialog
         ModuleSubjectFactory.getCloningInstance();
       InstanceSubject template = (InstanceSubject) cloner.getClone(mInstance);
       if (mInstance == null) {
-        template = new InstanceSubject(name, moduleName);
+        template = new InstanceSubject(newName, moduleName);
+        final ModuleSubject module = mRoot.getModuleSubject();
+        final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
+        URI uri;
+        try {
+          uri = docman.resolve(module, moduleName, ModuleProxy.class);
+        } catch (final WatersUnmarshalException exception1) {
+          throw new WatersRuntimeException(exception1);
+        }
+        final File filename = new File(uri);
+        final DocumentManager manager =
+          mRoot.getRootWindow().getDocumentManager();
+        ModuleProxy proxy = null;
+        try {
+          proxy = (ModuleProxy) manager.load(filename);
+        } catch (final WatersUnmarshalException exception) {
+          throw new WatersRuntimeException(exception);
+        } catch (final IOException exception) {
+          throw new WatersRuntimeException(exception);
+        }
+        final List<ParameterBindingSubject> listOfParameterBindings =
+          template.getBindingListModifiable();
+        final List<ConstantAliasProxy> listOfConstantAliases =
+          proxy.getConstantAliasList();
+        for (final ConstantAliasProxy alias : listOfConstantAliases) {
+          if (alias.getScope() != ScopeKind.LOCAL) {
+            final ParameterBindingSubject para =
+              new ParameterBindingSubject(alias.getName(),
+                   (ExpressionProxy) cloner.getClone(alias.getExpression()));
+            listOfParameterBindings.add(para);
+          }
+        }
+
+        final List<EventDeclProxy> listOfEventDecl = proxy.getEventDeclList();
+        for (final EventDeclProxy alias : listOfEventDecl) {
+          if (alias.getScope() != ScopeKind.LOCAL) {
+            final ParameterBindingSubject para =
+              new ParameterBindingSubject(alias.getName(),
+                                          new PlainEventListSubject());
+            listOfParameterBindings.add(para);
+          }
+        }
+
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);
         final List<InsertInfo> list = Collections.singletonList(insert);
         final Command command = new InsertCommand(list, panel, mRoot);
         mInstance = template;
         mRoot.getUndoInterface().executeCommand(command);
+
       } else {
-        final String oldname = mNameInput.getText();
-        final boolean namechange = !name.equals(oldname);
-        //final ModuleEqualityVisitor eq =
-        //  ModuleEqualityVisitor.getInstance(true);
-        //TODO
-        template.setModuleName(moduleName);
-        if (namechange) {
-          template.setIdentifier((IdentifierSubject) name);
-        }
-        final ModuleEqualityVisitor equalityChecker =
-          ModuleEqualityVisitor.getInstance(true);
-        if (!equalityChecker.equals(mInstance, template)) {
+        final String oldname = mInstance.getName();
+        final boolean nameChange = !newName.toString().equals(oldname);
+        final boolean moduleChange =
+          !moduleName.equals(template.getModuleName());
+        //TODO check for valid URI
+        if (nameChange || moduleChange) {
+          template.setModuleName(moduleName);
+          template.setIdentifier((IdentifierSubject) newName);
           final Command command = new EditCommand(mInstance, template, panel);
           mRoot.getUndoInterface().executeCommand(command);
         }
       }
       dispose();
     }
-
   }
 
   private boolean isInputLocked()
   {
     // TODO
     return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
+  }
+
+  private URI relativise(final URI file, final URI module)
+  {
+    String product = file.toString();
+    final String filePath = product;
+    final String modulePath = module.toString();
+    final String[] fileArray = filePath.split("/");
+    final String[] moduleArray = modulePath.split("/");
+    int i = 0;
+    while (i < moduleArray.length && i < fileArray.length) {
+      if (moduleArray[i].compareTo(fileArray[i]) != 0) {
+        i++;
+        int dotSets = moduleArray.length - i;
+        product = filePath.split("/", i)[i - 1];
+        while (dotSets > 0) {
+          product = "../" + product;
+          dotSets--;
+        }
+        try {
+          return new URI(product);
+        } catch (final URISyntaxException exception) {
+          throw new WatersRuntimeException(exception);
+        }
+      }
+      i++;
+    }
+    return file;
   }
 
   //#######################################################################
