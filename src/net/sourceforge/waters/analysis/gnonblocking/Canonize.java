@@ -24,7 +24,6 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.annotation.ListBufferTauLoopRemoval;
-import net.sourceforge.waters.analysis.tr.Determinizer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -37,6 +36,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Simon Ware
  */
 
+@SuppressWarnings("deprecation")
 public class Canonize
 {
   // #######################################################################

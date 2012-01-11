@@ -34,7 +34,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * simple identifiers ({@link SimpleIdentifierProxy}) that are just
  * names or indexed identifiers ({@link IndexedIdentifierProxy}) that can have
  * one or more array indexes.</DD>
- * <DT>{@link ForeachEventProxy}</DT>
+ * <DT>{@link ForeachProxy}</DT>
  * <DD>This construct can be used to include several events by processing a
  * loop.</DD>
   *
@@ -48,7 +48,7 @@ public interface EventListExpressionProxy extends ExpressionProxy {
   /**
    * Gets the list of events consituting this event list expression.
    * @return The list of components, each element is of type
-   *         {@link IdentifierProxy} or {@link ForeachEventProxy}.
+   *         {@link IdentifierProxy} or {@link ForeachProxy}.
    */
   public List<Proxy> getEventList();
 

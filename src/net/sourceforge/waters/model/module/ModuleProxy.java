@@ -108,7 +108,7 @@ public interface ModuleProxy
    * Gets the event alias list of this module.
    * @return The list event aliases.
    *         Each element is of type {@link AliasProxy}
-   *         or {@link ForeachEventAliasProxy}.
+   *         or {@link ForeachProxy}.
    */
   public List<Proxy> getEventAliasList();
 
@@ -117,11 +117,11 @@ public interface ModuleProxy
    * This list does not only contain the automata ({@link
    * SimpleComponentProxy}) of the module, but also all EFA variables
    * ({@link VariableComponentProxy}) and module instances ({@link
-   * InstanceProxy}). All these items can be nested in forach blocks
-   * ({@link ForeachComponentProxy}).
+   * InstanceProxy}). All these items can be nested in foreach blocks
+   * ({@link ForeachProxy}).
    * @return The component list.
    *         Each element is of type {@link ComponentProxy}
-   *         or {@link ForeachComponentProxy}.
+   *         or {@link ForeachProxy}.
    */
   public List<Proxy> getComponentList();
 }

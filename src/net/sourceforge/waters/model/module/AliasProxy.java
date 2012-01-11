@@ -26,7 +26,7 @@ package net.sourceforge.waters.model.module;
  * <P>Each alias has a name and a value bound to the name. The name can be
  * an arbitrary identifier. In particular, it can be indexed, as aliases
  * can also be defined iteratively in a <I>foreach</I> construct ({@link
- * ForeachEventAliasProxy}). The value is an arbitrary expression, its type
+ * ForeachProxy}). The value is an arbitrary expression, its type
  * can vary depending on the particular kind of alias.</P>
  *
  * @see ModuleProxy
