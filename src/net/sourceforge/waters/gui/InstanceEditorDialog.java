@@ -28,10 +28,10 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
-import javax.swing.JTextField;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
@@ -125,9 +125,10 @@ public class InstanceEditorDialog extends JDialog
     mNameInput.setToolTipText("Enter the name");
 
     mModuleLabel = new JLabel("Module:");
-    mModuleInput = new JTextField(16);
+    mModuleInput = new JFormattedTextField(16);
     mModuleInput.setText(template.getModuleName());
     mModuleInput.addActionListener(commithandler);
+    mModuleInput.setToolTipText("Enter or select module");
 
     mFileChooserButton = new JButton(" ... ");
     mFileChooserButton.addActionListener(new ActionListener() {
@@ -257,6 +258,38 @@ public class InstanceEditorDialog extends JDialog
     }
   }
 
+  private boolean moduleExists(final String moduleName){
+    final ModuleSubject module = mRoot.getModuleSubject();
+    final URI moduleUri = module.getLocation();
+    final String moduleUriName = moduleUri.toString();
+    final String[] moduleArray = moduleUriName.split("/");
+    final String[] array = moduleName.split("/");
+    String fileName = "";
+    int numDir = moduleArray.length -1;
+    int i = 0;
+    while(i < array.length){
+      if(array[i].equals("..")){
+        i++;
+      }else{
+        break;
+      }
+    }
+    numDir -= i;
+    int x = 1;
+    while(x < numDir){
+      fileName += "/" + moduleArray[x];
+      x++;
+    }
+    while(i < array.length){
+      fileName += "/" + array[i];
+      i++;
+    }
+    fileName += ".wmod";
+    final File file = new File(fileName);
+    return file.exists();
+  }
+
+
   public void commitDialog()
   {
     if (isInputLocked()) {
@@ -264,6 +297,11 @@ public class InstanceEditorDialog extends JDialog
     } else {
       final IdentifierProxy newName = (IdentifierProxy) mNameInput.getValue();
       final String moduleName = mModuleInput.getText();
+
+      if(!moduleExists(moduleName)){
+        mNameInput.getErrorDisplay().displayError("File does not exist");
+        return;
+      }
 
       final SelectionOwner panel = mRoot.getComponentsPanel();
       final ModuleProxyCloner cloner =
@@ -324,7 +362,6 @@ public class InstanceEditorDialog extends JDialog
         final boolean nameChange = !newName.toString().equals(oldname);
         final boolean moduleChange =
           !moduleName.equals(template.getModuleName());
-        //TODO check for valid URI
         if (nameChange || moduleChange) {
           template.setModuleName(moduleName);
           template.setIdentifier((IdentifierSubject) newName);
@@ -376,7 +413,7 @@ public class InstanceEditorDialog extends JDialog
   private JLabel mNameLabel;
   private SimpleExpressionCell mNameInput;
   private JLabel mModuleLabel;
-  private JTextField mModuleInput;
+  private JFormattedTextField mModuleInput;
   private JButton mFileChooserButton;
   private JPanel mMainPanel;
 
