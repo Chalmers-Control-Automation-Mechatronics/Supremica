@@ -496,7 +496,8 @@ public abstract class ModuleTree
       final int y = lastrect.y + lastrect.height;
       rect.height = y - rect.y;
     }
-    scrollRectToVisible(rect);
+   // if(rect != null)
+      scrollRectToVisible(rect);
   }
 
   public void activate()
@@ -924,6 +925,7 @@ public abstract class ModuleTree
             final List<InsertInfo> inserts =
               getInsertInfo(transferable, flavor, mDropList, parentOfDropLoc,
                             mDropIndex);
+            System.out.println(mDropList);
             final InsertCommand allCopies =
               new InsertCommand(inserts, ModuleTree.this, mRoot);
             mRoot.getUndoInterface().executeCommand(allCopies);

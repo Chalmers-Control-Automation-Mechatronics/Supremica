@@ -25,13 +25,17 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.InputVerifier;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.text.DefaultFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
@@ -78,6 +82,7 @@ public class InstanceEditorDialog extends JDialog
     mInstance = inst;
     createComponents();
     layoutComponents();
+
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
@@ -125,10 +130,17 @@ public class InstanceEditorDialog extends JDialog
     mNameInput.setToolTipText("Enter the name");
 
     mModuleLabel = new JLabel("Module:");
-    mModuleInput = new JFormattedTextField(16);
-    mModuleInput.setText(template.getModuleName());
+    mModuleInput = new JFormattedTextField();
     mModuleInput.addActionListener(commithandler);
     mModuleInput.setToolTipText("Enter or select module");
+    mVerifier = new ModuleVerifier();
+    final JFormattedTextField.AbstractFormatter formatter =
+      new ModuleFormatter();
+    final DefaultFormatterFactory factory =
+      new DefaultFormatterFactory(formatter);
+    mModuleInput.setFormatterFactory(factory);
+    mModuleInput.setInputVerifier(mVerifier);
+    mModuleInput.setText(template.getModuleName());
 
     mFileChooserButton = new JButton(" ... ");
     mFileChooserButton.addActionListener(new ActionListener() {
@@ -146,10 +158,10 @@ public class InstanceEditorDialog extends JDialog
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
+    mOkButton = new JButton("OK");
+    mOkButton.setRequestFocusEnabled(false);
+    mOkButton.addActionListener(commithandler);
+    mButtonsPanel.add(mOkButton);
 
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
@@ -162,9 +174,8 @@ public class InstanceEditorDialog extends JDialog
     mButtonsPanel.add(cancelButton);
 
     final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
+    root.setDefaultButton(mOkButton);
     DialogCancelAction.register(this);
-    //updateExpressionEnabled();
   }
 
   private void layoutComponents()
@@ -233,7 +244,7 @@ public class InstanceEditorDialog extends JDialog
     setMinimumSize(size);
   }
 
-  public void chooseFile()
+  private void chooseFile()
   {
     final JFileChooser fileChooser = mRoot.getRootWindow().getFileChooser();
     fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
@@ -256,52 +267,17 @@ public class InstanceEditorDialog extends JDialog
       mModuleInput.setText(name.substring(0, name.length() - 5));
       mModuleInput.setCaretPosition(0);
     }
-  }
-
-  private boolean moduleExists(final String moduleName){
-    final ModuleSubject module = mRoot.getModuleSubject();
-    final URI moduleUri = module.getLocation();
-    final String moduleUriName = moduleUri.toString();
-    final String[] moduleArray = moduleUriName.split("/");
-    final String[] array = moduleName.split("/");
-    String fileName = "";
-    int numDir = moduleArray.length -1;
-    int i = 0;
-    while(i < array.length){
-      if(array[i].equals("..")){
-        i++;
-      }else{
-        break;
-      }
-    }
-    numDir -= i;
-    int x = 1;
-    while(x < numDir){
-      fileName += "/" + moduleArray[x];
-      x++;
-    }
-    while(i < array.length){
-      fileName += "/" + array[i];
-      i++;
-    }
-    fileName += ".wmod";
-    final File file = new File(fileName);
-    return file.exists();
+    mModuleInput.requestFocusInWindow();
   }
 
 
-  public void commitDialog()
+  private void commitDialog()
   {
     if (isInputLocked()) {
       // nothing
     } else {
       final IdentifierProxy newName = (IdentifierProxy) mNameInput.getValue();
       final String moduleName = mModuleInput.getText();
-
-      if(!moduleExists(moduleName)){
-        mNameInput.getErrorDisplay().displayError("File does not exist");
-        return;
-      }
 
       final SelectionOwner panel = mRoot.getComponentsPanel();
       final ModuleProxyCloner cloner =
@@ -340,7 +316,6 @@ public class InstanceEditorDialog extends JDialog
             listOfParameterBindings.add(para);
           }
         }
-
         final List<EventDeclProxy> listOfEventDecl = proxy.getEventDeclList();
         for (final EventDeclProxy alias : listOfEventDecl) {
           if (alias.getScope() != ScopeKind.LOCAL) {
@@ -350,7 +325,6 @@ public class InstanceEditorDialog extends JDialog
             listOfParameterBindings.add(para);
           }
         }
-
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);
         final List<InsertInfo> list = Collections.singletonList(insert);
         final Command command = new InsertCommand(list, panel, mRoot);
@@ -375,8 +349,8 @@ public class InstanceEditorDialog extends JDialog
 
   private boolean isInputLocked()
   {
-    // TODO
-    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
+    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus() ||
+      mModuleInput.isFocusOwner() && !mVerifier.shouldYieldFocus(mModuleInput);
   }
 
   private URI relativise(final URI file, final URI module)
@@ -386,25 +360,129 @@ public class InstanceEditorDialog extends JDialog
     final String modulePath = module.toString();
     final String[] fileArray = filePath.split("/");
     final String[] moduleArray = modulePath.split("/");
-    int i = 0;
-    while (i < moduleArray.length && i < fileArray.length) {
-      if (moduleArray[i].compareTo(fileArray[i]) != 0) {
+    if (file.compareTo(module) == 0) {
+      product = fileArray[fileArray.length - 1];
+    } else {
+      int i = 0;
+      while (i < moduleArray.length && i < fileArray.length) {
+        if (moduleArray[i].compareTo(fileArray[i]) != 0) {
+          i++;
+          int dotSets = moduleArray.length - i;
+          product = filePath.split("/", i)[i - 1];
+          while (dotSets > 0) {
+            product = "../" + product;
+            dotSets--;
+          }
+        }
         i++;
-        int dotSets = moduleArray.length - i;
-        product = filePath.split("/", i)[i - 1];
-        while (dotSets > 0) {
-          product = "../" + product;
-          dotSets--;
-        }
-        try {
-          return new URI(product);
-        } catch (final URISyntaxException exception) {
-          throw new WatersRuntimeException(exception);
-        }
       }
-      i++;
     }
-    return file;
+    try {
+      return new URI(product);
+    } catch (final URISyntaxException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+
+//#########################################################################
+  //# Inner Class SimpleExpressionFormatter
+  private class ModuleFormatter extends DefaultFormatter
+  {
+
+    //#######################################################################
+    //# Constructors
+    private ModuleFormatter()
+    {
+      setCommitsOnValidEdit(false);
+      mMessage = "";
+    }
+
+
+    //#######################################################################
+    //# Overrides for class javax.swing.text.DefaultFormatter
+    public Object stringToValue(final String text)
+      throws java.text.ParseException
+    {
+      mNameInput.clearErrorMessage();
+      if (text.length() != 0) {
+        try {
+          final ModuleSubject module = mRoot.getModuleSubject();
+          final URI moduleUri = module.getLocation();
+          final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
+          final Object value = docman.load(moduleUri, text, ModuleProxy.class);
+          if(value.equals(module)){
+            mMessage = "Cannot recursively refer to a module!";
+            throw new java.text.ParseException(mMessage, 0);
+          }
+          return value;
+        } catch (final WatersUnmarshalException exception) {
+          mMessage = "File or directory does not exist!";
+          throw new java.text.ParseException(mMessage, 0);
+        } catch (final IOException exception) {
+          mNameInput.setErrorMessage(exception.getMessage());
+        }
+      } else {
+        mMessage = "Empty input!";
+        throw new java.text.ParseException(mMessage, 0);
+      }
+      return mModuleInput.getValue();
+    }
+
+    public String valueToString(final Object value)
+    {
+      if (value == null) {
+        return "";
+      } else {
+        final ModuleSubject mod = (ModuleSubject)value;
+        return mod.getName();
+      }
+    }
+
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SimpleExpressionVerifier
+  private class ModuleVerifier
+    extends InputVerifier
+  {
+
+    //#######################################################################
+    //# Overrides for class javax.swing.InputVerifier
+    public boolean verify(final JComponent input)
+    {
+      //TODO
+      try {
+        final JFormattedTextField textfield = (JFormattedTextField) input;
+        final JFormattedTextField.AbstractFormatter formatter =
+          textfield.getFormatter();
+        final String text = textfield.getText();
+        formatter.stringToValue(text);
+        return true;
+      } catch (final Exception exception) {
+        return false;
+      }
+    }
+
+    public boolean shouldYieldFocus(final JComponent input)
+    {
+      final JFormattedTextField textfield = (JFormattedTextField) input;
+      try {
+        textfield.commitEdit();
+        return true;
+      } catch (final java.text.ParseException exception) {
+        mNameInput.setErrorMessage(mMessage);
+        final int pos = exception.getErrorOffset();
+        textfield.setCaretPosition(pos);
+        return false;
+      }
+    }
+
   }
 
   //#######################################################################
@@ -415,11 +493,14 @@ public class InstanceEditorDialog extends JDialog
   private JLabel mModuleLabel;
   private JFormattedTextField mModuleInput;
   private JButton mFileChooserButton;
+  private JButton mOkButton;
   private JPanel mMainPanel;
+  private ModuleVerifier mVerifier;
 
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private String mMessage;
 
   private InstanceSubject mInstance;
   private Object mInsertPosition;
