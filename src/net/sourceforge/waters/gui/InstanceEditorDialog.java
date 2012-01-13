@@ -136,7 +136,7 @@ public class InstanceEditorDialog extends JDialog
     mModuleLabel = new JLabel("Module:");
     mModuleInput = new JFormattedTextField();
     mModuleInput.addActionListener(commithandler);
-    mModuleInput.setToolTipText("Enter or select module");
+    mModuleInput.setToolTipText("Enter or select a .wmod file");
     mVerifier = new ModuleVerifier();
     final JFormattedTextField.AbstractFormatter formatter =
       new ModuleFormatter();
@@ -273,6 +273,7 @@ public class InstanceEditorDialog extends JDialog
     final int choice = fileChooser.showOpenDialog(InstanceEditorDialog.this);
     // Get the filename ...
     if (choice == JFileChooser.APPROVE_OPTION) {
+      mNameInput.clearErrorMessage();
       final File file = fileChooser.getSelectedFile();
       final URI fileUri = file.toURI();
       final ModuleSubject module = mRoot.getModuleSubject();
@@ -287,7 +288,6 @@ public class InstanceEditorDialog extends JDialog
 
   private void commitDialog()
   {
-    mNameInput.clearErrorMessage();
     if (isInputLocked()) {
       // nothing
     } else {
@@ -420,14 +420,22 @@ public class InstanceEditorDialog extends JDialog
       throws java.text.ParseException
     {
       if (text.length() != 0) {
-        try {
           final ModuleSubject module = mRoot.getModuleSubject();
           final URI moduleUri = module.getLocation();
+        try {
           final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
           final Object value = docman.load(moduleUri, text, ModuleProxy.class);
           return value;
         } catch (final WatersUnmarshalException exception) {
-          mMessage = "File or directory does not exist!";
+          mMessage = "File or directory does not exist in .wmod format!";
+          //TODO if <enter> was pressed, we have to make sure the message is displayed
+          String mod = moduleUri.getPath();
+          mod = mod.substring(0, mod.lastIndexOf("/") + 1);
+          mod += text + ".wmod";
+          final File file = new File(mod);
+          if(file.exists()){
+            mMessage = "File is not a correctly formatted .wmod file!";
+          }
           throw new java.text.ParseException(mMessage, 0);
         } catch (final IOException exception) {
           mNameInput.setErrorMessage(exception.getMessage());
@@ -481,6 +489,7 @@ public class InstanceEditorDialog extends JDialog
 
     public boolean shouldYieldFocus(final JComponent input)
     {
+      mNameInput.clearErrorMessage();
       final JFormattedTextField textfield = (JFormattedTextField) input;
       try {
         textfield.commitEdit();
@@ -501,6 +510,9 @@ public class InstanceEditorDialog extends JDialog
     {
       final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
       try {
+        if(file.isDirectory()){
+          return true;
+        }
         final ModuleSubject module = mRoot.getModuleSubject();
         final Object value = docman.load(file);
         if(value.equals(module)){
