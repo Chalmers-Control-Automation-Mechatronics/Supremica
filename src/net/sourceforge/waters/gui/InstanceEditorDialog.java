@@ -25,6 +25,8 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -34,6 +36,8 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import net.sourceforge.waters.gui.command.Command;
@@ -161,6 +165,15 @@ public class InstanceEditorDialog extends JDialog
     mOkButton = new JButton("OK");
     mOkButton.setRequestFocusEnabled(false);
     mOkButton.addActionListener(commithandler);
+    final Action pressOK = new AbstractAction() {
+      private static final long serialVersionUID = 1L;
+      public void actionPerformed(final ActionEvent e)
+      {
+        commitDialog();
+      }
+    };
+    mOkButton.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "pressOK");
+    mOkButton.getActionMap().put("pressOK", pressOK);
     mButtonsPanel.add(mOkButton);
 
     final JButton cancelButton = new JButton("Cancel");
@@ -253,6 +266,8 @@ public class InstanceEditorDialog extends JDialog
     final File userInput = new File(text);
     fileChooser.setSelectedFile(userInput);
     fileChooser.resetChoosableFileFilters();
+    fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
+    fileChooser.setFileFilter(new ModuleFileFilter());
 
     // Show the dialog ...
     final int choice = fileChooser.showOpenDialog(InstanceEditorDialog.this);
@@ -265,7 +280,6 @@ public class InstanceEditorDialog extends JDialog
       final URI relativePath = relativise(fileUri, moduleUri);
       final String name = relativePath.getPath();
       mModuleInput.setText(name.substring(0, name.length() - 5));
-      mModuleInput.setCaretPosition(0);
     }
     mModuleInput.requestFocusInWindow();
   }
@@ -273,6 +287,7 @@ public class InstanceEditorDialog extends JDialog
 
   private void commitDialog()
   {
+    mNameInput.clearErrorMessage();
     if (isInputLocked()) {
       // nothing
     } else {
@@ -385,8 +400,8 @@ public class InstanceEditorDialog extends JDialog
   }
 
 
-//#########################################################################
-  //# Inner Class SimpleExpressionFormatter
+  //#########################################################################
+  //# Inner Class ModuleFormatterFormatter
   private class ModuleFormatter extends DefaultFormatter
   {
 
@@ -404,17 +419,12 @@ public class InstanceEditorDialog extends JDialog
     public Object stringToValue(final String text)
       throws java.text.ParseException
     {
-      mNameInput.clearErrorMessage();
       if (text.length() != 0) {
         try {
           final ModuleSubject module = mRoot.getModuleSubject();
           final URI moduleUri = module.getLocation();
           final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
           final Object value = docman.load(moduleUri, text, ModuleProxy.class);
-          if(value.equals(module)){
-            mMessage = "Cannot recursively refer to a module!";
-            throw new java.text.ParseException(mMessage, 0);
-          }
           return value;
         } catch (final WatersUnmarshalException exception) {
           mMessage = "File or directory does not exist!";
@@ -447,7 +457,7 @@ public class InstanceEditorDialog extends JDialog
 
 
   //#########################################################################
-  //# Inner Class SimpleExpressionVerifier
+  //# Inner Class ModuleVerifierVerifier
   private class ModuleVerifier
     extends InputVerifier
   {
@@ -456,7 +466,7 @@ public class InstanceEditorDialog extends JDialog
     //# Overrides for class javax.swing.InputVerifier
     public boolean verify(final JComponent input)
     {
-      //TODO
+      //TODO documentation says this has to be called from shouldYieldFocus but is it even needed?
       try {
         final JFormattedTextField textfield = (JFormattedTextField) input;
         final JFormattedTextField.AbstractFormatter formatter =
@@ -477,10 +487,36 @@ public class InstanceEditorDialog extends JDialog
         return true;
       } catch (final java.text.ParseException exception) {
         mNameInput.setErrorMessage(mMessage);
-        final int pos = exception.getErrorOffset();
-        textfield.setCaretPosition(pos);
         return false;
       }
+    }
+
+  }
+
+  //#########################################################################
+  //# Inner Class ModuleFileFilter
+  private class ModuleFileFilter extends FileFilter{
+
+    public boolean accept(final File file)
+    {
+      final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
+      try {
+        final ModuleSubject module = mRoot.getModuleSubject();
+        final Object value = docman.load(file);
+        if(value.equals(module)){
+          return false;
+        }
+        return true;
+      } catch (final WatersUnmarshalException exception) {
+        return false;
+      } catch (final IOException exception) {
+        return false;
+      }
+    }
+
+    public String getDescription()
+    {
+      return "Waters Module Files [*.wmod]";
     }
 
   }
