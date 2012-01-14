@@ -18,6 +18,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -40,6 +41,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
+
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
@@ -139,7 +141,7 @@ public class InstanceEditorDialog extends JDialog
     mModuleInput.setToolTipText("Enter or select a .wmod file");
     mVerifier = new ModuleVerifier();
     final JFormattedTextField.AbstractFormatter formatter =
-      new ModuleFormatter();
+      new DefaultFormatter();
     final DefaultFormatterFactory factory =
       new DefaultFormatterFactory(formatter);
     mModuleInput.setFormatterFactory(factory);
@@ -165,16 +167,19 @@ public class InstanceEditorDialog extends JDialog
     mOkButton = new JButton("OK");
     mOkButton.setRequestFocusEnabled(false);
     mOkButton.addActionListener(commithandler);
+    mButtonsPanel.add(mOkButton);
+
     final Action pressOK = new AbstractAction() {
       private static final long serialVersionUID = 1L;
       public void actionPerformed(final ActionEvent e)
       {
-        commitDialog();
+        mOkButton.doClick();
       }
     };
-    mOkButton.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "pressOK");
-    mOkButton.getActionMap().put("pressOK", pressOK);
-    mButtonsPanel.add(mOkButton);
+    final KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+    final String name = (String) pressOK.getValue(Action.NAME);
+    mModuleInput.getInputMap().put(stroke, name);
+    mModuleInput.getActionMap().put(name, pressOK);
 
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
@@ -294,6 +299,12 @@ public class InstanceEditorDialog extends JDialog
       final IdentifierProxy newName = (IdentifierProxy) mNameInput.getValue();
       final String moduleName = mModuleInput.getText();
 
+      if(moduleName.compareTo("") == 0){
+        mModuleInput.requestFocusInWindow();
+        mNameInput.setErrorMessage("Enter or select a .wmod file!");
+        return;
+      }
+
       final SelectionOwner panel = mRoot.getComponentsPanel();
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
@@ -401,70 +412,6 @@ public class InstanceEditorDialog extends JDialog
 
 
   //#########################################################################
-  //# Inner Class ModuleFormatterFormatter
-  private class ModuleFormatter extends DefaultFormatter
-  {
-
-    //#######################################################################
-    //# Constructors
-    private ModuleFormatter()
-    {
-      setCommitsOnValidEdit(false);
-      mMessage = "";
-    }
-
-
-    //#######################################################################
-    //# Overrides for class javax.swing.text.DefaultFormatter
-    public Object stringToValue(final String text)
-      throws java.text.ParseException
-    {
-      if (text.length() != 0) {
-          final ModuleSubject module = mRoot.getModuleSubject();
-          final URI moduleUri = module.getLocation();
-        try {
-          final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
-          final Object value = docman.load(moduleUri, text, ModuleProxy.class);
-          return value;
-        } catch (final WatersUnmarshalException exception) {
-          mMessage = "File or directory does not exist in .wmod format!";
-          //TODO if <enter> was pressed, we have to make sure the message is displayed
-          String mod = moduleUri.getPath();
-          mod = mod.substring(0, mod.lastIndexOf("/") + 1);
-          mod += text + ".wmod";
-          final File file = new File(mod);
-          if(file.exists()){
-            mMessage = "File is not a correctly formatted .wmod file!";
-          }
-          throw new java.text.ParseException(mMessage, 0);
-        } catch (final IOException exception) {
-          mNameInput.setErrorMessage(exception.getMessage());
-        }
-      } else {
-        mMessage = "Empty input!";
-        throw new java.text.ParseException(mMessage, 0);
-      }
-      return mModuleInput.getValue();
-    }
-
-    public String valueToString(final Object value)
-    {
-      if (value == null) {
-        return "";
-      } else {
-        final ModuleSubject mod = (ModuleSubject)value;
-        return mod.getName();
-      }
-    }
-
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 1L;
-  }
-
-
-  //#########################################################################
   //# Inner Class ModuleVerifierVerifier
   private class ModuleVerifier
     extends InputVerifier
@@ -474,15 +421,39 @@ public class InstanceEditorDialog extends JDialog
     //# Overrides for class javax.swing.InputVerifier
     public boolean verify(final JComponent input)
     {
-      //TODO documentation says this has to be called from shouldYieldFocus but is it even needed?
+      final ModuleSubject module = mRoot.getModuleSubject();
+      final URI moduleUri = module.getLocation();
+      final JFormattedTextField textfield = (JFormattedTextField) input;
+      final String text = textfield.getText();
+        String mod = moduleUri.getPath();
+        mod = mod.substring(0, mod.lastIndexOf("/") + 1);
+        mod += text + ".wmod";
+        final File file = new File(mod);
       try {
-        final JFormattedTextField textfield = (JFormattedTextField) input;
         final JFormattedTextField.AbstractFormatter formatter =
           textfield.getFormatter();
-        final String text = textfield.getText();
         formatter.stringToValue(text);
+        if(moduleUri.getPath().compareTo(file.getAbsolutePath()) == 0){
+          mMessage = "Cannot make recursive instantiations of the module!";
+          return false;
+        }
+        if (text.length() != 0) {
+          final DocumentManager docman =
+            mRoot.getRootWindow().getDocumentManager();
+          docman.load(moduleUri, text, ModuleProxy.class);
+        } else {
+          mMessage = "Enter or select a .wmod file!";
+          return false;
+        }
         return true;
+      } catch (final WatersUnmarshalException exception) {
+        mMessage = "File or directory does not exist in .wmod format!";
+        if (file.exists()) {
+          mMessage = "File is not a correctly formatted .wmod file!";
+        }
+        return false;
       } catch (final Exception exception) {
+        mMessage = exception.getMessage();
         return false;
       }
     }
@@ -490,14 +461,11 @@ public class InstanceEditorDialog extends JDialog
     public boolean shouldYieldFocus(final JComponent input)
     {
       mNameInput.clearErrorMessage();
-      final JFormattedTextField textfield = (JFormattedTextField) input;
-      try {
-        textfield.commitEdit();
+      if (verify(input)) {
         return true;
-      } catch (final java.text.ParseException exception) {
-        mNameInput.setErrorMessage(mMessage);
-        return false;
       }
+      mNameInput.setErrorMessage(mMessage);
+      return false;
     }
 
   }
@@ -508,22 +476,16 @@ public class InstanceEditorDialog extends JDialog
 
     public boolean accept(final File file)
     {
-      final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
-      try {
-        if(file.isDirectory()){
-          return true;
-        }
-        final ModuleSubject module = mRoot.getModuleSubject();
-        final Object value = docman.load(file);
-        if(value.equals(module)){
-          return false;
-        }
-        return true;
-      } catch (final WatersUnmarshalException exception) {
-        return false;
-      } catch (final IOException exception) {
+      final ModuleSubject module = mRoot.getModuleSubject();
+      //filter out the current module
+      if (file.getAbsolutePath().compareTo(module.getLocation().getPath()) == 0) {
         return false;
       }
+      //filter out files that aren't .wmod
+      if(file.isFile() && !file.getName().endsWith(".wmod")){
+        return false;
+      }
+      return true;
     }
 
     public String getDescription()
