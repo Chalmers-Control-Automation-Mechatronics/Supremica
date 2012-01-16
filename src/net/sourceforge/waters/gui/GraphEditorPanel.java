@@ -20,16 +20,6 @@ import java.awt.Shape;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetListener;
-import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -55,7 +45,10 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.TransferHandler;
+import javax.swing.TransferHandler.TransferSupport;
 
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
@@ -148,7 +141,7 @@ import org.supremica.properties.Config;
 
 public class GraphEditorPanel
   extends BackupGraphPanel
-  implements SelectionOwner, Observer, FocusListener, DragGestureListener
+  implements SelectionOwner, Observer, FocusListener
 {
   //#########################################################################
   //# Constructors
@@ -169,8 +162,8 @@ public class GraphEditorPanel
     mPopupFactory =
       manager == null ? null : new GraphPopupFactory(manager, root);
     setFocusable(true);
-    final DropTargetListener dtListener = new DTListener();
-    new DropTarget(this, dtListener);
+    //final DropTargetListener dtListener = new DTListener();
+    //new DropTarget(this, dtListener);
     addKeyListener(new KeySpy());
     updateTool();
     ensureGeometryExists();
@@ -190,6 +183,7 @@ public class GraphEditorPanel
       final UndoInterface undoer = root.getUndoInterface();
       undoer.attach(this);
     }
+    setTransferHandler(new GraphEditorPanelTransferHandler());
   }
 
   /**
@@ -863,26 +857,6 @@ public class GraphEditorPanel
 
 
   //#########################################################################
-  //# Interface java.awt.dnd.DragGestureListener
-  public void dragGestureRecognized(final DragGestureEvent event)
-  {
-    if (mInternalDragAction instanceof InternalDragActionDND) {
-      final InternalDragActionDND action =
-        (InternalDragActionDND) mInternalDragAction;
-      final List<IdentifierSubject> toBeDragged =
-        action.getIdentifiersToBeDragged();
-      final Transferable trans =
-        WatersDataFlavor.createTransferable(toBeDragged);
-      try {
-        event.startDrag(DragSource.DefaultCopyDrop, trans);
-      } catch (final InvalidDnDOperationException exception) {
-        throw new IllegalArgumentException(exception);
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Repainting
   @Override
   protected void paintComponent(final Graphics graphics)
@@ -965,9 +939,6 @@ public class GraphEditorPanel
       mController = controller;
       addMouseListener(mController);
       addMouseMotionListener(mController);
-      final DragSource source = DragSource.getDefaultDragSource();
-      source.createDefaultDragGestureRecognizer
-        (this, DnDConstants.ACTION_COPY, this);
       mController.installed();
     }
   }
@@ -1583,45 +1554,6 @@ public class GraphEditorPanel
   }
 
 
-  //#########################################################################
-  //# Inner Class DTListener
-  private class DTListener extends DropTargetAdapter
-  {
-
-    //#######################################################################
-    //# Interface java.awt.dnd.DropTargetAdapter
-    public void dragOver(final DropTargetDragEvent event)
-    {
-      final Point point = event.getLocation();
-      final InternalDragActionDND action = getInternalDragAction(point);
-      action.continueDrag(event);
-    }
-
-    public void drop(final DropTargetDropEvent event)
-    {
-      final Point point = event.getLocation();
-      final InternalDragActionDND action = getInternalDragAction(point);
-      action.commitDrag(event);
-      mInternalDragAction = null;
-      fireSelectionChanged();
-      mController.updateHighlighting(point);
-    }
-
-    //###################################################################
-    //# Auxiliary Methods
-    private InternalDragActionDND getInternalDragAction(final Point point)
-    {
-      if (mInternalDragAction == null) {
-        final InternalDragActionDND action = new InternalDragActionDND(point);
-        mInternalDragAction = action;
-        return action;
-      } else {
-        return (InternalDragActionDND) mInternalDragAction;
-      }
-    }
-
-  }
-
 
   //#########################################################################
   //# Inner Class ToolController
@@ -1744,7 +1676,7 @@ public class GraphEditorPanel
       final Point point = event.getPoint();
       updateHighlighting(point);
       if (mInternalDragAction != null) {
-        mInternalDragAction.continueDrag(point);
+        mInternalDragAction.continueDrag(event);
       }
     }
 
@@ -2272,7 +2204,7 @@ public class GraphEditorPanel
     }
 
     //#######################################################################
-    //# Temporrary Selection
+    //# Temporary Selection
     void copyCurrentSelection()
     {
       mPreviousSelection = new ArrayList<ProxySubject>(mSelectedList);
@@ -2288,7 +2220,7 @@ public class GraphEditorPanel
     /**
      * Continues this internal dragging operation. This method updates the
      * mouse pointer positions {@link #mDragCurrent} and {@link
-     * #mDragCurrentOnGrid}. This method is overriden to perform additional
+     * #mDragCurrentOnGrid}. This method is overridden to perform additional
      * changes that need to be displayed. Subclasses must call the
      * superclass method also.
      * @param  point    The position of the mouse pointer.
@@ -2315,6 +2247,13 @@ public class GraphEditorPanel
       repaint();
       return true;
     }
+
+
+    boolean continueDrag(final MouseEvent event)
+    {
+      return continueDrag(event.getPoint());
+    }
+
 
     /**
      * Completes this internal dragging operation. This method is overriden
@@ -2753,12 +2692,43 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Dragging
-    boolean continueDrag(final DropTargetDragEvent event)
+    @Override
+    boolean continueDrag(final MouseEvent event)
     {
-      final Point point = event.getLocation();
-      continueDrag(point);
+      final boolean draggedBefore = hasDragged();
+      final boolean draggedNow = super.continueDrag(event.getPoint());
+      if(!draggedBefore && draggedNow){
+        if(event.isControlDown()){
+          getTransferHandler().exportAsDrag(GraphEditorPanel.this, event,
+                                          TransferHandler.COPY);
+        }
+        else{
+          getTransferHandler().exportAsDrag(GraphEditorPanel.this, event,
+                                            TransferHandler.MOVE);
+        }
+
+      }
+      return draggedNow;
+    }
+
+
+    void cancelDrag(final Point point)
+    {
+      super.cancelDrag(point);
+      if (mClickedLabel != null) {
+        if (wasControlDown()) {
+          toggleSelection(mClickedLabel);
+        } else {
+          replaceLabelSelection(mClickedLabel);
+        }
+      }
+    }
+
+    boolean canImport(final TransferSupport support){
+      final Point point = support.getDropLocation().getDropPoint();
+      super.continueDrag(point);
       mController.updateHighlighting(point);
-      final Transferable transferable = event.getTransferable();
+      final Transferable transferable = support.getTransferable();
       final EventListExpressionSubject elist =
         mIdentifierPasteVisitor.getIdentifierPasteTarget
           (mFocusedObject, transferable);
@@ -2796,10 +2766,8 @@ public class GraphEditorPanel
       }
       if (elist == null) {
         mExternalDragStatus = DragOverStatus.CANTDROP;
-        event.acceptDrag(0);
       } else {
         mExternalDragStatus = DragOverStatus.CANDROP;
-        event.acceptDrag(DnDConstants.ACTION_COPY);
       }
       if (line == null ? mLine != null : !line.equals(mLine)) {
         mLine = line;
@@ -2808,22 +2776,22 @@ public class GraphEditorPanel
       return true;
     }
 
-    void commitDrag(final DropTargetDropEvent event)
-    {
-      final Point point = event.getLocation();
+    boolean importData(final TransferSupport support){
+      final Point point = support.getDropLocation().getDropPoint();
       commitDrag(point);
+      boolean finished = false;
       try {
         if (mExternalDragStatus == DragOverStatus.CANDROP) {
-          final Transferable transferable = event.getTransferable();
+          final Transferable transferable = support.getTransferable();
           final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
           mIdentifierPasteVisitor.addInsertInfo
             (mFocusedObject, mDropIndex, transferable, inserts);
           final Command cmd =
             new InsertCommand(inserts, GraphEditorPanel.this, null);
           getUndoInterface().executeCommand(cmd);
-          event.dropComplete(true);
+          finished = true;
         } else {
-          event.dropComplete(false);
+          finished = true;
         }
         mExternalDragStatus = DragOverStatus.NOTDRAG;
       } catch (final UnsupportedFlavorException exception) {
@@ -2831,18 +2799,10 @@ public class GraphEditorPanel
       } catch (final IOException exception) {
         throw new IllegalArgumentException(exception);
       }
-    }
-
-    void cancelDrag(final Point point)
-    {
-      super.cancelDrag(point);
-      if (mClickedLabel != null) {
-        if (wasControlDown()) {
-          toggleSelection(mClickedLabel);
-        } else {
-          replaceLabelSelection(mClickedLabel);
-        }
-      }
+      mInternalDragAction = null;
+      fireSelectionChanged();
+      mController.updateHighlighting(point);
+      return finished;
     }
 
     //#######################################################################
@@ -4235,6 +4195,62 @@ public class GraphEditorPanel
     //# Data Members
     private final ProxySubject mParent;
     private final Object mOldValue;
+  }
+
+
+//#########################################################################
+  //# Inner Class GraphEditorPanelTransferHandler
+  private class GraphEditorPanelTransferHandler extends TransferHandler
+  {
+    @Override
+    public int getSourceActions(final JComponent c)
+    {
+      return COPY_OR_MOVE;
+    }
+
+    @Override
+    public Transferable createTransferable(final JComponent c)
+    {
+      final InternalDragActionDND action =
+        (InternalDragActionDND) mInternalDragAction;
+      final List<IdentifierSubject> toBeDragged =
+        action.getIdentifiersToBeDragged();
+      final Transferable trans =
+        WatersDataFlavor.createTransferable(toBeDragged);
+      return trans;
+    }
+
+    @Override
+    public void exportDone(final JComponent c, final Transferable t,
+                           final int action)
+    {
+
+    }
+
+    @Override
+    public boolean canImport(final TransferSupport support)
+    {
+      if(!(mInternalDragAction instanceof InternalDragActionDND)){
+        mInternalDragAction =
+          new InternalDragActionDND(support.getDropLocation().getDropPoint());
+      }
+      final InternalDragActionDND dragAction = (InternalDragActionDND)mInternalDragAction;
+      return dragAction.canImport(support);
+    }
+
+    @Override
+    public boolean importData(final TransferSupport support)
+    {
+      if(!(mInternalDragAction instanceof InternalDragActionDND)){
+        mInternalDragAction =
+          new InternalDragActionDND(support.getDropLocation().getDropPoint());
+      }
+      final InternalDragActionDND dragAction = (InternalDragActionDND)mInternalDragAction;
+      return dragAction.importData(support);
+    }
+
+    private static final long serialVersionUID = 1L;
+
   }
 
 
