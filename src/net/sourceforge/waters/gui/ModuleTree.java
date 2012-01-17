@@ -151,6 +151,10 @@ public abstract class ModuleTree
     return mRoot.getRootWindow().getFocusTracker();
   }
 
+  private boolean isSourceOfDrag(){
+    return getFocusTracker().getSourceOfDragOperation() == ModuleTree.this;
+  }
+
 
   //#########################################################################
   //# Abstract Methods
@@ -782,7 +786,7 @@ public abstract class ModuleTree
     public void exportDone(final JComponent c, final Transferable t,
                            final int action)
     {
-      if (getFocusTracker().getSourceOfDragOperation() == ModuleTree.this) {
+      if (isSourceOfDrag() && mDropList != null) {
         final int count = getSelectionCount();
         final List<InsertInfo> inserts = new ArrayList<InsertInfo>(count);
         final List<Proxy> proxies = new ArrayList<Proxy>();
@@ -853,6 +857,7 @@ public abstract class ModuleTree
           mRoot.getUndoInterface().executeCommand(allMoves);
         }
       }
+      mDropList = null;
     }
 
     @Override
@@ -863,6 +868,9 @@ public abstract class ModuleTree
         if (transferable
           .isDataFlavorSupported(WatersDataFlavor.PARAMETER_BINDING)) {
           return false;
+        }
+        if (!isSourceOfDrag() && support.getDropAction() == MOVE) {
+          support.setDropAction(COPY);
         }
         final JTree.DropLocation drop =
           (JTree.DropLocation) support.getDropLocation();
@@ -925,7 +933,6 @@ public abstract class ModuleTree
             final List<InsertInfo> inserts =
               getInsertInfo(transferable, flavor, mDropList, parentOfDropLoc,
                             mDropIndex);
-            System.out.println(mDropList);
             final InsertCommand allCopies =
               new InsertCommand(inserts, ModuleTree.this, mRoot);
             mRoot.getUndoInterface().executeCommand(allCopies);

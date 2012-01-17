@@ -1104,6 +1104,11 @@ public class GraphEditorPanel
     }
   }
 
+  private boolean isSourceOfDrag(){
+    return mRoot.getModuleWindowInterface().getRootWindow().getFocusTracker()
+    .getSourceOfDragOperation() == GraphEditorPanel.this;
+  }
+
 
   //#########################################################################
   //# Low-level Selection Handling
@@ -2706,7 +2711,6 @@ public class GraphEditorPanel
           getTransferHandler().exportAsDrag(GraphEditorPanel.this, event,
                                             TransferHandler.MOVE);
         }
-
       }
       return draggedNow;
     }
@@ -2784,15 +2788,26 @@ public class GraphEditorPanel
         if (mExternalDragStatus == DragOverStatus.CANDROP) {
           final Transferable transferable = support.getTransferable();
           final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
-          mIdentifierPasteVisitor.addInsertInfo
-            (mFocusedObject, mDropIndex, transferable, inserts);
-          final Command cmd =
+          mIdentifierPasteVisitor.addInsertInfo(mFocusedObject, mDropIndex,
+                                                transferable, inserts);
+          final Command ins =
             new InsertCommand(inserts, GraphEditorPanel.this, null);
-          getUndoInterface().executeCommand(cmd);
-          finished = true;
-        } else {
-          finished = true;
+          if (support.getDropAction() == GraphEditorPanelTransferHandler.MOVE) {
+            List<InsertInfo> deletes = new LinkedList<InsertInfo>();
+            deletes = getDeletionVictims(getCurrentSelection());
+            final Command del =
+              new DeleteCommand(deletes, GraphEditorPanel.this, false);
+            final CompoundCommand compound =
+              new CompoundCommand("Move Commands");
+            compound.addCommand(ins);
+            compound.addCommand(del);
+            getUndoInterface().executeCommand(compound);
+          }
+          else{
+            getUndoInterface().executeCommand(ins);
+          }
         }
+        finished = true;
         mExternalDragStatus = DragOverStatus.NOTDRAG;
       } catch (final UnsupportedFlavorException exception) {
         throw new IllegalArgumentException(exception);
@@ -4235,6 +4250,11 @@ public class GraphEditorPanel
           new InternalDragActionDND(support.getDropLocation().getDropPoint());
       }
       final InternalDragActionDND dragAction = (InternalDragActionDND)mInternalDragAction;
+
+      if(support.getDropAction() == MOVE && !isSourceOfDrag()){
+        support.setDropAction(COPY);
+      }
+
       return dragAction.canImport(support);
     }
 
