@@ -152,7 +152,7 @@ public abstract class ModuleTree
   }
 
   private boolean isSourceOfDrag(){
-    return getFocusTracker().getSourceOfDragOperation() == ModuleTree.this;
+    return getFocusTracker().getWatersSelectionOwner() == ModuleTree.this;
   }
 
 
@@ -777,7 +777,6 @@ public abstract class ModuleTree
     @Override
     public Transferable createTransferable(final JComponent c)
     {
-      getFocusTracker().setSourceOfDragOperation(ModuleTree.this);
       final List<? extends Proxy> selection = getCurrentSelection();
       return WatersDataFlavor.createTransferable(selection);
     }

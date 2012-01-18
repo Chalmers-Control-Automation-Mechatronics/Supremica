@@ -81,17 +81,17 @@ public class Renderer
               new RenderingInformation(false, false, EditorColor.ACTIONCOLOR,
                   EditorColor.ACTIONCOLOR, 0)));
         }
-        List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
+        final List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
         // A naive solution for showing the added guards(after synthesis) with different color.
         if(guards.size() == 1)
         {
-            SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
+            final SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
             queue.offer(new ShapeToRender(producer.getShape(guard),
                 new RenderingInformation(false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
         }
         else if(guards.size() == 2)
         {
-            SimpleExpressionProxy guard = guards.get(0);
+            final SimpleExpressionProxy guard = guards.get(0);
             queue.offer(new ShapeToRender(producer.getShape(guard),
                 new RenderingInformation(false, false, EditorColor.ADDEDGUARDCOLOR, EditorColor.ADDEDGUARDCOLOR, 0)));
         }
@@ -103,7 +103,7 @@ public class Renderer
                 if(i==2)
                     guardColor = EditorColor.ADDEDGUARDCOLOR;
 
-                SimpleExpressionProxy guard = guards.get(i); //Change color
+                final SimpleExpressionProxy guard = guards.get(i); //Change color
                 queue.offer(new ShapeToRender(producer.getShape(guard),
                     new RenderingInformation(false, false, guardColor, guardColor, 0)));
             }

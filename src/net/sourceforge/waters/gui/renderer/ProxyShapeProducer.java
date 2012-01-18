@@ -323,14 +323,15 @@ public class ProxyShapeProducer
       final int lx = (int) Math.round(x) + 1;
       for (final Proxy proxy : block.getEventList()) {
         // Use different font for different event kinds.
+        final int ly = (int) Math.round(y + height);
         Font font = EditorColor.DEFAULT_FONT;
         if (proxy instanceof IdentifierProxy) {
           final IdentifierProxy ident = (IdentifierProxy) proxy;
           font = mRenderingContext.getFont(ident);
         }
-        final int ly = (int) Math.round(y + height);
         final LabelShape lshape = createEdgeLabelShape(proxy, lx, ly, font);
         mMap.put(proxy, lshape);
+
         final RoundRectangle2D lrect = lshape.getShape();
         height += lrect.getHeight();
         if (width < lrect.getWidth()) {
@@ -353,6 +354,7 @@ public class ProxyShapeProducer
     }
     return shape;
   }
+
 
   GuardActionBlockProxyShape createGuardActionBlockShape
     (final GuardActionBlockProxy block,
@@ -450,6 +452,7 @@ public class ProxyShapeProducer
     final String text = mPrinter.toString(shown);
     return new LabelShape(label, x, y, font, text);
   }
+
 
 
   //#########################################################################

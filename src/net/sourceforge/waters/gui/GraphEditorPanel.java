@@ -162,8 +162,6 @@ public class GraphEditorPanel
     mPopupFactory =
       manager == null ? null : new GraphPopupFactory(manager, root);
     setFocusable(true);
-    //final DropTargetListener dtListener = new DTListener();
-    //new DropTarget(this, dtListener);
     addKeyListener(new KeySpy());
     updateTool();
     ensureGeometryExists();
@@ -1106,7 +1104,7 @@ public class GraphEditorPanel
 
   private boolean isSourceOfDrag(){
     return mRoot.getModuleWindowInterface().getRootWindow().getFocusTracker()
-    .getSourceOfDragOperation() == GraphEditorPanel.this;
+      .getWatersSelectionOwner() == GraphEditorPanel.this;
   }
 
 
@@ -2792,6 +2790,7 @@ public class GraphEditorPanel
                                                 transferable, inserts);
           final Command ins =
             new InsertCommand(inserts, GraphEditorPanel.this, null);
+
           if (support.getDropAction() == GraphEditorPanelTransferHandler.MOVE) {
             List<InsertInfo> deletes = new LinkedList<InsertInfo>();
             deletes = getDeletionVictims(getCurrentSelection());
@@ -4081,12 +4080,18 @@ public class GraphEditorPanel
       final EventListExpressionSubject elist =
         getIdentifierPasteTarget(focussed, data);
       if (elist != null) {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
         final ListSubject<AbstractSubject> list =
           elist.getEventListModifiable();
         int pos = startpos < 0 ? list.size() : startpos;
         for (final Proxy proxy : data) {
-          final ProxySubject newident = (ProxySubject) cloner.getClone(proxy);
-          GraphEditorPanel.this.addInsertInfo(inserts, newident, list, pos++);
+          if (!eq.contains(list, proxy)) {
+            final ProxySubject newident =
+              (ProxySubject) cloner.getClone(proxy);
+            GraphEditorPanel.this.addInsertInfo(inserts, newident, list,
+                                                pos++);
+          }
         }
       }
     }

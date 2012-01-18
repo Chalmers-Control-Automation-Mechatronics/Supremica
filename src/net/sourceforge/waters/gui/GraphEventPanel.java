@@ -1300,7 +1300,6 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     @Override
     public Transferable createTransferable(final JComponent c)
     {
-      getFocusTracker().setSourceOfDragOperation(GraphEventPanel.this);
       final List<? extends Proxy> selection = getCurrentSelection();
       return WatersDataFlavor.createTransferable(selection);
     }
@@ -1315,7 +1314,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     @Override
     public boolean canImport(final TransferSupport support)
     {
-      if(getFocusTracker().getSourceOfDragOperation() == GraphEventPanel.this){
+      if(getFocusTracker().getWatersSelectionOwner() == GraphEventPanel.this){
         return false;
       }
       final DataFlavor flavor = WatersDataFlavor.IDENTIFIER;
