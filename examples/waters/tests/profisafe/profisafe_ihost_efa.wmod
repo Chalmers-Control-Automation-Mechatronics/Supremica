@@ -1781,8 +1781,8 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="OFF"/>
                         <NodeRef Name="DELAY"/>
+                        <NodeRef Name="OFF"/>
                         <NodeRef Name="HOST"/>
                         <BoxGeometry>
                             <Box Y="32" X="48" Width="288" Height="224"/>
@@ -3218,10 +3218,10 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="init0nok"/>
                         <NodeRef Name="init_nok"/>
-                        <NodeRef Name="init0ok"/>
                         <NodeRef Name="init_ok"/>
+                        <NodeRef Name="init0nok"/>
+                        <NodeRef Name="init0ok"/>
                         <BoxGeometry>
                             <Box Y="160" X="112" Width="416" Height="80"/>
                         </BoxGeometry>
@@ -3233,10 +3233,10 @@
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G2">
-                        <NodeRef Name="pre0nok"/>
-                        <NodeRef Name="pre0ok"/>
                         <NodeRef Name="pre_ok"/>
                         <NodeRef Name="pre_nok"/>
+                        <NodeRef Name="pre0ok"/>
+                        <NodeRef Name="pre0nok"/>
                         <BoxGeometry>
                             <Box Y="32" X="112" Width="416" Height="80"/>
                         </BoxGeometry>
@@ -4119,8 +4119,8 @@
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G4">
-                        <NodeRef Name="ack_fault"/>
                         <NodeRef Name="ack_ok"/>
+                        <NodeRef Name="ack_fault"/>
                         <BoxGeometry>
                             <Box Y="656" X="128" Width="288" Height="80"/>
                         </BoxGeometry>
@@ -4980,8 +4980,8 @@
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G4">
-                                <NodeRef Name="ack_fault"/>
                                 <NodeRef Name="ack_ok"/>
+                                <NodeRef Name="ack_fault"/>
                                 <BoxGeometry>
                                     <Box Y="560" X="128" Width="288" Height="96"/>
                                 </BoxGeometry>
@@ -5000,9 +5000,9 @@
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G7">
+                                <NodeRef Name="init_0"/>
                                 <NodeRef Name="init_fault"/>
                                 <NodeRef Name="init_other"/>
-                                <NodeRef Name="init_0"/>
                                 <BoxGeometry>
                                     <Box Y="160" X="128" Width="400" Height="80"/>
                                 </BoxGeometry>

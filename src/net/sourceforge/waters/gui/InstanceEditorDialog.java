@@ -140,8 +140,9 @@ public class InstanceEditorDialog extends JDialog
     mModuleInput.addActionListener(commithandler);
     mModuleInput.setToolTipText("Enter or select a .wmod file");
     mVerifier = new ModuleVerifier();
-    final JFormattedTextField.AbstractFormatter formatter =
+    final DefaultFormatter formatter =
       new DefaultFormatter();
+    formatter.setOverwriteMode(false);
     final DefaultFormatterFactory factory =
       new DefaultFormatterFactory(formatter);
     mModuleInput.setFormatterFactory(factory);

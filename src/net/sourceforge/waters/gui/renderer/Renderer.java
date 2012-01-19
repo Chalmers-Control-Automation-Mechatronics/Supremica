@@ -19,6 +19,7 @@ import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -44,10 +45,8 @@ public class Renderer
       final RenderingInformation info =
         context.getRenderingInformation(blocked);
       queue.offer(new ShapeToRender(shape, info));
-      for (final Proxy proxy : blocked.getEventList()) {
-        queue.offer(new ShapeToRender(producer.getShape(proxy),
-                                      context.getRenderingInformation(proxy)));
-      }
+
+      listToRender(blocked.getEventList(), queue, producer);
     }
 
     // Nodes
@@ -68,10 +67,9 @@ public class Renderer
           .getRenderingInformation(edge)));
       queue.offer(new ShapeToRender(producer.getShape(edge.getLabelBlock()),
           context.getRenderingInformation(edge.getLabelBlock())));
-      for (final Proxy p : edge.getLabelBlock().getEventList()) {
-        queue.offer(new ShapeToRender(producer.getShape(p), context
-            .getRenderingInformation(p)));
-      }
+
+      listToRender(edge.getLabelBlock().getEventList(), queue, producer);
+
       if (edge.getGuardActionBlock() != null) {
         queue.offer(new ShapeToRender(producer.getShape(edge
             .getGuardActionBlock()), context.getRenderingInformation(edge
@@ -160,5 +158,18 @@ public class Renderer
             return mStatus.getPriority() - o.mStatus.getPriority();
         }
 
+    }
+
+    private void listToRender(final List<Proxy> list,
+                              final PriorityQueue<ShapeToRender> queue,
+                              final ProxyShapeProducer producer){
+      for (final Proxy proxy : list) {
+        queue.offer(new ShapeToRender(producer.getShape(proxy),
+             producer.getRenderingContext().getRenderingInformation(proxy)));
+        if(proxy instanceof ForeachProxy){
+          final ForeachProxy foreach = (ForeachProxy)proxy;
+          listToRender(foreach.getBody(), queue, producer);
+        }
+      }
     }
 }

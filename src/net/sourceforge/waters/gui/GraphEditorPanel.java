@@ -1390,8 +1390,7 @@ public class GraphEditorPanel
    * Determines which item is in focus for selection or dragging.
    * If the item currently in focus is a selected label block,
    * the item really to be selected may be a label under the cursor,
-   * otherwise thos method returns the item in focus.
-   * lead to a drag-move or drag-and-drop operation. A drag-move or
+   * otherwise this method returns the item in focus.
    * @param  event  The mouse event being processed.
    * @return The item to be dragged or <CODE>null</CODE>
    */
@@ -2775,7 +2774,7 @@ public class GraphEditorPanel
         mLine = line;
         repaint();
       }
-      return true;
+      return mExternalDragStatus == DragOverStatus.CANDROP;
     }
 
     boolean importData(final TransferSupport support){
