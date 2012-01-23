@@ -28,7 +28,9 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
@@ -142,6 +144,9 @@ public class SubjectShapeProducer
         removeMapping((GuardActionBlockProxy) parent);
       } else if (parent instanceof GraphProxy) {
         removeMapping((Subject) event.getValue());
+      }else if(parent instanceof ForeachSubject){
+        removeMapping((LabelBlockProxy)SubjectTools.
+                      getAncestor(parent, LabelBlockSubject.class));
       }
       break;
     case ModelChangeEvent.NAME_CHANGED:

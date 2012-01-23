@@ -345,9 +345,6 @@ public class ProxyShapeProducer
     return shape;
   }
 
-  private double mHeight;
-  private double mWidth;
-
   private void createListShape(final List<Proxy> list, final int x,
                                final double y, final int indent)
   {
@@ -511,6 +508,8 @@ public class ProxyShapeProducer
   private final ModuleProxyPrinter mPrinter;
   private final SimpleExpressionCompiler mCompiler;
   private final BindingContext mBindings;
+  private double mHeight;
+  private double mWidth;
 
 
   //#########################################################################
