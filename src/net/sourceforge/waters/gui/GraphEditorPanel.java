@@ -122,6 +122,7 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -2756,54 +2757,60 @@ public class GraphEditorPanel
       }
     }
 
-    boolean canImport(final TransferSupport support){
+    boolean canImport(final TransferSupport support)
+    {
       final Point point = support.getDropLocation().getDropPoint();
       super.continueDrag(point);
       mController.updateHighlighting(point);
       final Transferable transferable = support.getTransferable();
       final EventListExpressionSubject elist =
-        mIdentifierPasteVisitor.getIdentifierPasteTarget
-          (mFocusedObject, transferable);
-      final Line2D line;
-      if (elist != null &&
-          elist instanceof LabelBlockSubject) {
-        final Rectangle2D bounds =
-          getShapeProducer().getShape(elist).getShape().getBounds();
-        final double x1 = bounds.getMinX();
-        final double x2 = bounds.getMaxX();
-        if (elist == mFocusedObject || mFocusedObject instanceof EdgeProxy) {
-          mY = bounds.getMinY();
-          mDropIndex = 0;
-          mDropList = elist.getEventListModifiable();
-          for (final ProxySubject item : elist.getEventListModifiable()) {
-            final ProxyShape shape = getShapeProducer().getShape(item);
-            final Rectangle2D rect = shape.getShape().getBounds();
-            if (point.getY() < rect.getCenterY()) {
-              mY = rect.getMinY();
-              break;
-            } else {
-              mY = rect.getMaxY();
-              mDropIndex++;
-            }
-            if(item instanceof ForeachSubject){
-              if(descendForeachBlock((ForeachSubject) item, point)){
+        mIdentifierPasteVisitor.getIdentifierPasteTarget(mFocusedObject,
+                                                         transferable);
+      Line2D line = null;
+      if (elist != null) {
+        if (elist instanceof LabelBlockSubject) {
+          final Rectangle2D bounds =
+            getShapeProducer().getShape(elist).getShape().getBounds();
+          final double x1 = bounds.getMinX();
+          final double x2 = bounds.getMaxX();
+          if (elist == mFocusedObject || mFocusedObject instanceof EdgeProxy) {
+            mY = bounds.getMinY();
+            mDropIndex = 0;
+            mDropList = elist.getEventListModifiable();
+            mRect = null;
+            for (final ProxySubject item : elist.getEventListModifiable()) {
+              final ProxyShape shape = getShapeProducer().getShape(item);
+              final Rectangle2D rect = shape.getShape().getBounds();
+              if (point.getY() < rect.getCenterY()) {
+                mY = rect.getMinY();
                 break;
+              } else {
+                mY = rect.getMaxY();
+                mDropIndex++;
+              }
+              if (item instanceof ForeachSubject) {
+                if (descendForeachBlock((ForeachSubject) item, rect, point)) {
+                  break;
+                }
               }
             }
+          } else {
+            mY = bounds.getMaxY();
+            mDropIndex = -1;
           }
-        } else {
-          mY = bounds.getMaxY();
+          line = new Line2D.Double(x1, mY, x2, mY);
+        } else if (elist instanceof PlainEventListSubject) {
+          final PlainEventListSubject plain = (PlainEventListSubject) elist;
+          mDropList = plain.getEventListModifiable();
           mDropIndex = -1;
+          line = null;
         }
-        line = new Line2D.Double(x1, mY, x2, mY);
+        mExternalDragStatus = DragOverStatus.CANDROP;
       } else {
         line = null;
+        mRect = null;
         mDropIndex = -1;
-      }
-      if (elist == null) {
         mExternalDragStatus = DragOverStatus.CANTDROP;
-      } else {
-        mExternalDragStatus = DragOverStatus.CANDROP;
       }
       if (line == null ? mLine != null : !line.equals(mLine)) {
         mLine = line;
@@ -2889,7 +2896,9 @@ public class GraphEditorPanel
         }
         else if(selected instanceof ForeachSubject){
           final ForeachSubject foreach = (ForeachSubject) selected;
-          result.add(foreach);
+          if(!result.contains(foreach)){
+            result.add(foreach);
+          }
           result = getSelections(foreach.getBodyModifiable(), result);
         }
         else if(selected.getParent().getParent() instanceof ForeachSubject){
@@ -2919,8 +2928,20 @@ public class GraphEditorPanel
     }
 
     private boolean descendForeachBlock(final ForeachSubject foreach,
-                                            final Point point){
+                                        final Rectangle2D rect,
+                                        final Point point)
+    {
       int drop = 0;
+      if (point.getY() < rect.getCenterY() + 5
+          && point.getY() > rect.getCenterY() - 5) {
+        mY = 0;
+        mDropIndex = foreach.getBody().size();
+        mRect = rect;
+        mDropList = foreach.getBodyModifiable();
+        return true;
+      } else {
+        mRect = null;
+      }
       for (final Proxy proxy : foreach.getBody()) {
         final ProxyShape shape2 = getShapeProducer().getShape(proxy);
         final Rectangle2D rect2 = shape2.getShape().getBounds();
@@ -2933,8 +2954,9 @@ public class GraphEditorPanel
           drop++;
           mY = rect2.getMaxY();
         }
-        if(proxy instanceof ForeachSubject){
-          if(descendForeachBlock((ForeachSubject) proxy, point)){
+        mRect = null;
+        if (proxy instanceof ForeachSubject) {
+          if (descendForeachBlock((ForeachSubject) proxy, rect2, point)) {
             return true;
           }
         }
@@ -2946,18 +2968,28 @@ public class GraphEditorPanel
     //# Rendering
     List<MiscShape> getDrawnObjects()
     {
-      if (mLine == null) {
+      if (mLine == null && mRect == null) {
         return Collections.emptyList();
       } else {
-        final MiscShape shape =
-          new GeneralShape(mLine, EditorColor.GRAPH_SELECTED_FOCUSSED, null);
-        return Collections.singletonList(shape);
+        final List<MiscShape> list = new ArrayList<MiscShape>();
+        if (mLine != null) {
+          final MiscShape shape =
+            new GeneralShape(mLine, EditorColor.GRAPH_SELECTED_FOCUSSED, null);
+          list.add(shape);
+        }
+        if (mRect != null) {
+          final MiscShape shape =
+            new GeneralShape(mRect, EditorColor.GRAPH_SELECTED_FOCUSSED, null);
+          list.add(shape);
+        }
+        return list;
       }
     }
 
     private double mY;
     private final ProxySubject mClickedLabel;
     private Line2D mLine;
+    private Rectangle2D mRect;
     private int mDropIndex;
     private ListSubject<AbstractSubject> mDropList;
     private DragOverStatus mExternalDragStatus;
