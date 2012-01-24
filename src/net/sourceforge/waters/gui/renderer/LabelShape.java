@@ -57,15 +57,15 @@ public class LabelShape extends AbstractProxyShape
 
   public void draw(final Graphics2D graphics,final RenderingInformation status)
   {
-        if (status.isFocused()) {
-          graphics.setColor(status.getShadowColor());
-          graphics.fill(getShape());
-        }
-        graphics.setFont(mFont);
-        graphics.setColor(status.getColor());
-        final int x = (int) Math.round(mPoint.getX());
-        final int y = (int) Math.round(mPoint.getY());
-        graphics.drawString(mName, x, y);
+    if (status.isFocused()) {
+      graphics.setColor(status.getShadowColor());
+      graphics.fill(getShape());
+    }
+    graphics.setFont(mFont);
+    graphics.setColor(status.getColor());
+    final int x = (int) Math.round(mPoint.getX());
+    final int y = (int) Math.round(mPoint.getY());
+    graphics.drawString(mName, x, y);
   }
 
 

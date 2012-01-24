@@ -112,8 +112,9 @@ public class GraphDataFlavor extends ModuleDataFlavor
     @Override
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
     {
+      final List<Proxy> list = block.getEventList();
       final LabelBlockSubject subject = (LabelBlockSubject) block;
-      if (subject.getParent() instanceof GraphProxy) {
+      if (list.isEmpty() || subject.getParent() instanceof GraphProxy) {
         mTransferredBlock = block;
       }
       return null;

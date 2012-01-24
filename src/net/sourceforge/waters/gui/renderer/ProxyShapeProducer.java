@@ -302,6 +302,7 @@ public class ProxyShapeProducer
     if (shape == null) {
       mWidth = 0;
       mHeight = 1;
+      mMaxHeight = 1;
       double x;
       double y;
       final LabelGeometryProxy geo = block.getGeometry();
@@ -371,7 +372,14 @@ public class ProxyShapeProducer
   private void adjustHeightAndWidth(final LabelShape shape, final int indent)
   {
     final RoundRectangle2D lrect = shape.getShape();
-    mHeight += lrect.getHeight();
+    if(lrect.getHeight() > mMaxHeight){
+      mMaxHeight = (int) lrect.getHeight();
+    }
+    else{
+      lrect.setRoundRect(lrect.getX(), lrect.getY(), lrect.getWidth(),
+                         mMaxHeight, lrect.getArcWidth(), lrect.getArcHeight());
+    }
+    mHeight += mMaxHeight;
     if (mWidth < lrect.getWidth() + indent) {
       mWidth = (int) lrect.getWidth() + indent;
     }
@@ -510,6 +518,7 @@ public class ProxyShapeProducer
   private final BindingContext mBindings;
   private double mHeight;
   private double mWidth;
+  private int mMaxHeight;
 
 
   //#########################################################################

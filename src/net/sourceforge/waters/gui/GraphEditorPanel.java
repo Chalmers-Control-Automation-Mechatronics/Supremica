@@ -531,6 +531,18 @@ public class GraphEditorPanel
           (ListSubject<AbstractSubject>) subject.getParent();
         eventlists.put(eventlist, true);
       }
+      else if(subject instanceof ForeachSubject){
+        final ForeachSubject foreach = (ForeachSubject)subject;
+        final ListSubject<AbstractSubject> eventlist =
+          (ListSubject<AbstractSubject>) foreach.getParent();
+        eventlists.put(eventlist, true);
+      }
+      else if(subject.getParent().getParent() instanceof ForeachSubject){
+        final ForeachSubject foreach = (ForeachSubject)subject.getParent().getParent();
+        final ListSubject<AbstractSubject> eventlist =
+          (ListSubject<AbstractSubject>) foreach.getBodyModifiable();
+        eventlists.put(eventlist, true);
+      }
     }
     final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
     final Set<Proxy> lookup = new THashSet<Proxy>(items);
@@ -607,8 +619,6 @@ public class GraphEditorPanel
         @SuppressWarnings("unchecked")
         final List<Proxy> eventlist = (List<Proxy>) untyped;
         final int pos = inspos.getPosition();
-
-
         eventlist.add(pos, proxy);
       } else if (proxy instanceof GuardActionBlockSubject) {
         final GuardActionBlockSubject block = (GuardActionBlockSubject) proxy;
@@ -2756,13 +2766,12 @@ public class GraphEditorPanel
           (mFocusedObject, transferable);
       final Line2D line;
       if (elist != null &&
-          elist instanceof LabelBlockSubject &&
-          !elist.getEventList().isEmpty()) {
+          elist instanceof LabelBlockSubject) {
         final Rectangle2D bounds =
           getShapeProducer().getShape(elist).getShape().getBounds();
         final double x1 = bounds.getMinX();
         final double x2 = bounds.getMaxX();
-        if (elist == mFocusedObject) {
+        if (elist == mFocusedObject || mFocusedObject instanceof EdgeProxy) {
           mY = bounds.getMinY();
           mDropIndex = 0;
           mDropList = elist.getEventListModifiable();
@@ -2818,8 +2827,8 @@ public class GraphEditorPanel
 
           if (support.getDropAction() == GraphEditorPanelTransferHandler.MOVE) {
             List<InsertInfo> deletes = new LinkedList<InsertInfo>();
-            //change so the labelblock isnt removed when its not supposed to
-            deletes = getDeletionVictims(getCurrentSelection());
+            final List<ProxySubject> list = getCurrentSelection();
+            deletes = getDeletionVictims(list);
             final Command del =
               new DeleteCommand(deletes, GraphEditorPanel.this, false);
             final CompoundCommand compound =
@@ -2881,6 +2890,10 @@ public class GraphEditorPanel
         else if(selected instanceof ForeachSubject){
           final ForeachSubject foreach = (ForeachSubject) selected;
           result.add(foreach);
+          result = getSelections(foreach.getBodyModifiable(), result);
+        }
+        else if(selected.getParent().getParent() instanceof ForeachSubject){
+          final ForeachSubject foreach = (ForeachSubject)selected.getParent().getParent();
           result = getSelections(foreach.getBodyModifiable(), result);
         }
       }
