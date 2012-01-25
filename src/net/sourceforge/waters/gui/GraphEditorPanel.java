@@ -2757,12 +2757,21 @@ public class GraphEditorPanel
       }
     }
 
+    @SuppressWarnings("unchecked")
     boolean canImport(final TransferSupport support)
     {
       final Point point = support.getDropLocation().getDropPoint();
       super.continueDrag(point);
       mController.updateHighlighting(point);
       final Transferable transferable = support.getTransferable();
+      try {
+        mDraggedList = (List<ProxySubject>) transferable
+            .getTransferData(WatersDataFlavor.IDENTIFIER);
+      } catch (final UnsupportedFlavorException exception) {
+        throw new WatersRuntimeException(exception);
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      }
       final EventListExpressionSubject elist =
         mIdentifierPasteVisitor.getIdentifierPasteTarget(mFocusedObject,
                                                          transferable);
@@ -2783,8 +2792,16 @@ public class GraphEditorPanel
               final Rectangle2D rect = shape.getShape().getBounds();
               if (point.getY() < rect.getCenterY()) {
                 mY = rect.getMinY();
+                setExternalDragStatus();
                 break;
               } else {
+                if(item == mDropList.get(mDropList.size()-1)){
+                  mExternalDragStatus = DragOverStatus.CANTDROP;
+                  setExternalDragStatus();
+                }
+                else{
+                  mExternalDragStatus = DragOverStatus.CANDROP;
+                }
                 mY = rect.getMaxY();
                 mDropIndex++;
               }
@@ -2798,14 +2815,19 @@ public class GraphEditorPanel
             mY = bounds.getMaxY();
             mDropIndex = -1;
           }
-          line = new Line2D.Double(x1, mY, x2, mY);
+          if(mY == 0){
+            line = null;
+          }
+          else{
+            line = new Line2D.Double(x1, mY, x2, mY);
+          }
         } else if (elist instanceof PlainEventListSubject) {
           final PlainEventListSubject plain = (PlainEventListSubject) elist;
           mDropList = plain.getEventListModifiable();
+          //TODO drop at index -1 or 0 ?? does it even matter?
           mDropIndex = -1;
           line = null;
         }
-        mExternalDragStatus = DragOverStatus.CANDROP;
       } else {
         line = null;
         mRect = null;
@@ -2915,11 +2937,15 @@ public class GraphEditorPanel
         if (isSelected(item)) {
           if(item instanceof IdentifierSubject){
             final IdentifierSubject ident = (IdentifierSubject) item;
-            result.add(ident);
+            if(!result.contains(ident)){
+              result.add(ident);
+            }
           }
           else if(item instanceof ForeachSubject){
             final ForeachSubject foreach = (ForeachSubject) item;
-            result.add(foreach);
+            if(!result.contains(foreach)){
+              result.add(foreach);
+            }
             result = getSelections(foreach.getBodyModifiable(), result);
           }
         }
@@ -2938,6 +2964,7 @@ public class GraphEditorPanel
         mDropIndex = foreach.getBody().size();
         mRect = rect;
         mDropList = foreach.getBodyModifiable();
+        setExternalDragStatus();
         return true;
       } else {
         mRect = null;
@@ -2949,6 +2976,7 @@ public class GraphEditorPanel
           mY = rect2.getMinY();
           mDropIndex = drop;
           mDropList = foreach.getBodyModifiable();
+          setExternalDragStatus();
           return true;
         } else {
           drop++;
@@ -2962,6 +2990,21 @@ public class GraphEditorPanel
         }
       }
       return false;
+    }
+
+    private void setExternalDragStatus(){
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      for (final ProxySubject item : mDraggedList) {
+        //TODO need some sort of check to see if the droplist == the list that
+        //the item came from, & whether CTRL is pressed
+        if (eq.contains(mDropList, item)) {
+          mExternalDragStatus = DragOverStatus.CANTDROP;
+        } else {
+          mExternalDragStatus = DragOverStatus.CANDROP;
+          return;
+        }
+      }
     }
 
     //#######################################################################
@@ -2992,6 +3035,7 @@ public class GraphEditorPanel
     private Rectangle2D mRect;
     private int mDropIndex;
     private ListSubject<AbstractSubject> mDropList;
+    private List<ProxySubject> mDraggedList;
     private DragOverStatus mExternalDragStatus;
 
   }
@@ -4270,11 +4314,13 @@ public class GraphEditorPanel
         // Any event can be dropped on the blocked events list.
         return isContainingAll(block) ? null : block;
       } else {
-        final ModuleContext context =
+        //TODO maybe dont need the getIdentifierPasteTarget() method ??
+        return block;
+        /*final ModuleContext context =
           mRoot.getModuleWindowInterface().getModuleContext();
         return
           context.canDropOnEdge(mTransferData) && !isContainingAll(block) ?
-            block : null;
+            block : null;*/
       }
     }
 
