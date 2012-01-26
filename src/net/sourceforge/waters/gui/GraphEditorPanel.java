@@ -2776,20 +2776,21 @@ public class GraphEditorPanel
       final EventListExpressionSubject elist =
         mIdentifierPasteVisitor.getIdentifierPasteTarget(mFocusedObject,
                                                          transferable);
-      //System.out.println(mDraggedList.get(0));
+      final int dropAction = support.getDropAction();
       Line2D line = null;
       if (elist != null) {
         if (elist instanceof LabelBlockSubject) {
           final Rectangle2D bounds =
             getShapeProducer().getShape(elist).getShape().getBounds();
-          final double x1 = bounds.getMinX();
+          mX = bounds.getMinX();
           final double x2 = bounds.getMaxX();
           if(mFocusedObject instanceof EdgeProxy){
             mY = 0;
+            mX = 0;
             mDropIndex = -1;
             mRect = null;
             mDropList = elist.getEventListModifiable();
-            setExternalDragStatus(support);
+            setExternalDragStatus(dropAction);
           }
           else if (elist == mFocusedObject) {
             mY = bounds.getMinY();
@@ -2799,14 +2800,15 @@ public class GraphEditorPanel
             for (final ProxySubject item : elist.getEventListModifiable()) {
               final ProxyShape shape = getShapeProducer().getShape(item);
               final Rectangle2D rect = shape.getShape().getBounds();
+              mX = rect.getMinX();
               if (point.getY() < rect.getCenterY()) {
                 mY = rect.getMinY();
-                setExternalDragStatus(support);
+                setExternalDragStatus(dropAction);
                 break;
               } else {
                 if(item == mDropList.get(mDropList.size()-1)){
                   mExternalDragStatus = DragOverStatus.CANTDROP;
-                  setExternalDragStatus(support);
+                  setExternalDragStatus(dropAction);
                 }
                 else{
                   mExternalDragStatus = DragOverStatus.CANDROP;
@@ -2815,7 +2817,7 @@ public class GraphEditorPanel
                 mDropIndex++;
               }
               if (item instanceof ForeachSubject) {
-                if (descendForeachBlock((ForeachSubject) item, rect, point, support)) {
+                if (descendForeachBlock((ForeachSubject) item, rect, point, dropAction)) {
                   break;
                 }
               }
@@ -2824,16 +2826,15 @@ public class GraphEditorPanel
             mY = bounds.getMaxY();
             mDropIndex = -1;
           }
-          if(mY == 0){
+          if(mY == 0 || mX == 0){
             line = null;
           }
           else{
-            line = new Line2D.Double(x1, mY, x2, mY);
+            line = new Line2D.Double(mX, mY, x2, mY);
           }
         } else if (elist instanceof PlainEventListSubject) {
           final PlainEventListSubject plain = (PlainEventListSubject) elist;
           mDropList = plain.getEventListModifiable();
-          //TODO drop at index -1 or 0 ?? does it even matter?
           mDropIndex = -1;
           line = null;
           mExternalDragStatus = DragOverStatus.CANDROP;
@@ -2860,10 +2861,9 @@ public class GraphEditorPanel
           final Transferable transferable = support.getTransferable();
           final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
           mIdentifierPasteVisitor.addInsertInfo(mFocusedObject, mDropIndex, mDropList,
-                                                transferable, inserts);
+                                                transferable, inserts, support.getDropAction());
           final Command ins =
             new InsertCommand(inserts, GraphEditorPanel.this, null);
-
           if (support.getDropAction() == GraphEditorPanelTransferHandler.MOVE) {
             List<InsertInfo> deletes = new LinkedList<InsertInfo>();
             final List<ProxySubject> list = getCurrentSelection();
@@ -2963,19 +2963,34 @@ public class GraphEditorPanel
       return result;
     }
 
+    private void setLineAtEnd(final List<Proxy> list){
+      final int index = list.size() -1;
+      final Proxy p = list.get(index);
+      final ProxyShape shape = getShapeProducer().getShape(p);
+      final Rectangle2D rect = shape.getShape().getBounds();
+      if(p instanceof ForeachSubject){
+        final ForeachSubject f = (ForeachSubject)p;
+        setLineAtEnd(f.getBody());
+      }
+      else{
+        mY = rect.getMaxY();
+      }
+      mX = rect.getMinX();
+    }
+
     private boolean descendForeachBlock(final ForeachSubject foreach,
                                         final Rectangle2D rect,
                                         final Point point,
-                                        final TransferSupport support)
+                                        final int dropAction)
     {
       int drop = 0;
       if (point.getY() < rect.getCenterY() + 5
           && point.getY() > rect.getCenterY() - 5) {
-        mY = 0;
         mDropIndex = foreach.getBody().size();
         mRect = rect;
         mDropList = foreach.getBodyModifiable();
-        setExternalDragStatus(support);
+        setLineAtEnd(foreach.getBody());
+        setExternalDragStatus(dropAction);
         return true;
       } else {
         mRect = null;
@@ -2985,9 +3000,10 @@ public class GraphEditorPanel
         final Rectangle2D rect2 = shape2.getShape().getBounds();
         if (point.getY() < rect2.getCenterY()) {
           mY = rect2.getMinY();
+          mX = rect2.getMinX();
           mDropIndex = drop;
           mDropList = foreach.getBodyModifiable();
-          setExternalDragStatus(support);
+          setExternalDragStatus(dropAction);
           return true;
         } else {
           drop++;
@@ -2995,7 +3011,7 @@ public class GraphEditorPanel
         }
         mRect = null;
         if (proxy instanceof ForeachSubject) {
-          if (descendForeachBlock((ForeachSubject) proxy, rect2, point, support)) {
+          if (descendForeachBlock((ForeachSubject) proxy, rect2, point, dropAction)) {
             return true;
           }
         }
@@ -3003,24 +3019,35 @@ public class GraphEditorPanel
       return false;
     }
 
-    private void setExternalDragStatus(final TransferSupport support){
+    private void setExternalDragStatus(final int dropAction)
+    {
+      final List<? extends Proxy> selected =
+        GraphEditorPanel.this.getCurrentSelection();
+      if (isSourceOfDrag()) {
+        for (final Proxy p : selected) {
+          if (!(p instanceof LabelBlockSubject) &&
+            SubjectTools.isAncestor((Subject) p, mDropList)) {
+            mExternalDragStatus = DragOverStatus.CANTDROP;
+            return;
+          }
+        }
+      }
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
       for (final ProxySubject item : mDraggedList) {
         if (eq.contains(mDropList, item)) {
-          final List<? extends Proxy> selected = GraphEditorPanel.this.getCurrentSelection();
           //TODO better check constraints
           for (final Proxy proxy : selected) {
             final ProxySubject sub = (ProxySubject) proxy;
             if (sub.getParent().equals(mDropList)) {
-              if (support.getDropAction() == DnDConstants.ACTION_MOVE) {
+              if (dropAction == DnDConstants.ACTION_MOVE) {
                 mExternalDragStatus = DragOverStatus.CANDROP;
                 return;
               }
             }
           }
           mExternalDragStatus = DragOverStatus.CANTDROP;
-        } else {
+        }else {
           mExternalDragStatus = DragOverStatus.CANDROP;
           return;
         }
@@ -3050,6 +3077,7 @@ public class GraphEditorPanel
     }
 
     private double mY;
+    private double mX;
     private final ProxySubject mClickedLabel;
     private Line2D mLine;
     private Rectangle2D mRect;
@@ -4275,19 +4303,45 @@ public class GraphEditorPanel
     private void addInsertInfo(final Proxy focussed, final int startpos,
                                final ListSubject<AbstractSubject> dropList,
                                final Transferable transferable,
-                               final List<InsertInfo> inserts)
+                               final List<InsertInfo> inserts,
+                               final int dropAction)
       throws IOException, UnsupportedFlavorException
     {
+      //TODO tidy up this method
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
       final List<? extends Proxy> data = getTransferData(transferable);
       final EventListExpressionSubject elist =
         getIdentifierPasteTarget(focussed, data);
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       if (elist != null) {
         final ListSubject<AbstractSubject> list =
           elist.getEventListModifiable();
         int pos = startpos < 0 ? list.size() : startpos;
-
+        final List<? extends Proxy> selected;
+       if(isSourceOfDrag()){
+         selected = GraphEditorPanel.this.getCurrentSelection();
+       }
+       else{
+         selected = dropList;
+       }
+        for (final Proxy proxy : selected) {
+          final ProxySubject sub = (ProxySubject) proxy;
+          for (int i = 0; i < data.size(); i++) {
+            if(eq.equals(data.get(i), proxy)){
+              if (sub.getParent().equals(dropList)) {
+                if (dropAction != DnDConstants.ACTION_MOVE) {
+                  data.remove(i);
+                }
+              } else {
+                if (eq.contains(dropList, proxy)) {
+                  data.remove(i);
+                }
+              }
+            }
+          }
+        }
         for (final Proxy proxy : data) {
           final ProxySubject newident = (ProxySubject) cloner.getClone(proxy);
           GraphEditorPanel.this.addInsertInfo(inserts, newident, dropList,

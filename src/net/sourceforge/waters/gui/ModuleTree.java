@@ -936,9 +936,9 @@ public abstract class ModuleTree
               new InsertCommand(inserts, ModuleTree.this, mRoot);
             mRoot.getUndoInterface().executeCommand(allCopies);
           } catch (final IOException exception) {
-            exception.printStackTrace();
+            throw new WatersRuntimeException(exception);
           } catch (final UnsupportedFlavorException exception) {
-            exception.printStackTrace();
+            throw new WatersRuntimeException(exception);
           }
         }
       }
