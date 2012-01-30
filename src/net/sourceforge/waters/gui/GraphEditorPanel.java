@@ -2963,16 +2963,21 @@ public class GraphEditorPanel
       return result;
     }
 
-    private void setLineAtEnd(final List<Proxy> list){
-      final int index = list.size() -1;
-      final Proxy p = list.get(index);
-      final ProxyShape shape = getShapeProducer().getShape(p);
-      final Rectangle2D rect = shape.getShape().getBounds();
-      if(p instanceof ForeachSubject){
-        final ForeachSubject f = (ForeachSubject)p;
-        setLineAtEnd(f.getBody());
+    private void setLineAtEnd(final ForeachSubject foreach)
+    {
+      final List<Proxy> list = foreach.getBody();
+      Proxy proxy = null;
+      if (list.size() == 0) {
+        proxy = foreach;
+      } else {
+        proxy = list.get(list.size() - 1);
       }
-      else{
+      final ProxyShape shape = getShapeProducer().getShape(proxy);
+      final Rectangle2D rect = shape.getShape().getBounds();
+      if (proxy instanceof ForeachSubject && list.size() > 0) {
+        final ForeachSubject nextForeach = (ForeachSubject) proxy;
+        setLineAtEnd(nextForeach);
+      } else {
         mY = rect.getMaxY();
       }
       mX = rect.getMinX();
@@ -2989,7 +2994,7 @@ public class GraphEditorPanel
         mDropIndex = foreach.getBody().size();
         mRect = rect;
         mDropList = foreach.getBodyModifiable();
-        setLineAtEnd(foreach.getBody());
+        setLineAtEnd(foreach);
         setExternalDragStatus(dropAction);
         return true;
       } else {
@@ -4331,6 +4336,7 @@ public class GraphEditorPanel
           for (int i = 0; i < data.size(); i++) {
             if(eq.equals(data.get(i), proxy)){
               if (sub.getParent().equals(dropList)) {
+                System.out.println(pos == 1);
                 if (dropAction != DnDConstants.ACTION_MOVE) {
                   data.remove(i);
                 }

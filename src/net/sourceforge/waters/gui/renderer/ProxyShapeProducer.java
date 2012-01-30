@@ -302,7 +302,6 @@ public class ProxyShapeProducer
     if (shape == null) {
       mWidth = 0;
       mHeight = 1;
-      mMaxHeight = 1;
       double x;
       double y;
       final LabelGeometryProxy geo = block.getGeometry();
@@ -358,28 +357,23 @@ public class ProxyShapeProducer
         font = mRenderingContext.getFont(ident);
         lshape = createEdgeLabelShape(proxy, x + indent, ly, font);
         mMap.put(proxy, lshape);
-        adjustHeightAndWidth(lshape, indent);
+        adjustRect(lshape, indent);
       } else if (proxy instanceof ForeachProxy) {
         final ForeachProxy foreach = (ForeachProxy) proxy;
         lshape = createForeachLabelShape(foreach, x + indent, ly);
         mMap.put(proxy, lshape);
-        adjustHeightAndWidth(lshape, indent);
+        adjustRect(lshape, indent);
         createListShape(foreach.getBody(), x, y, indent + 10);
       }
     }
   }
 
-  private void adjustHeightAndWidth(final LabelShape shape, final int indent)
+  private void adjustRect(final LabelShape shape, final int indent)
   {
     final RoundRectangle2D lrect = shape.getShape();
-    if(lrect.getHeight() > mMaxHeight){
-      mMaxHeight = (int) lrect.getHeight();
-    }
-    else{
       lrect.setRoundRect(lrect.getX(), lrect.getY(), lrect.getWidth(),
-                         mMaxHeight, lrect.getArcWidth(), lrect.getArcHeight());
-    }
-    mHeight += mMaxHeight;
+                         RECT_HEIGHT, lrect.getArcWidth(), lrect.getArcHeight());
+    mHeight += RECT_HEIGHT;
     if (mWidth < lrect.getWidth() + indent) {
       mWidth = (int) lrect.getWidth() + indent;
     }
@@ -518,11 +512,11 @@ public class ProxyShapeProducer
   private final BindingContext mBindings;
   private double mHeight;
   private double mWidth;
-  private int mMaxHeight;
 
 
   //#########################################################################
   //# Class Constants
   private static final String BLOCKED_HEADER = "BLOCKED:";
   private static final double BORDER = 5;
+  private static final int RECT_HEIGHT = 16;
 }
