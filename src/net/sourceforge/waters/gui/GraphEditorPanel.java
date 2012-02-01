@@ -58,7 +58,6 @@ import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
-import net.sourceforge.waters.gui.command.ReorganizeListCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -138,7 +137,7 @@ import org.supremica.properties.Config;
  * handlers to support the various editing tools, cut-copy-paste, as
  * well as drag-and-drop.
  *
- * @author Robi Malik, Gian Perrone
+ * @author Robi Malik, Gian Perrone, Carly Hona
  */
 
 public class GraphEditorPanel
@@ -1159,16 +1158,6 @@ public class GraphEditorPanel
     } else {
       return false;
     }
-  }
-
-  private boolean hasSelected(final EventListExpressionSubject expr)
-  {
-    for (final Proxy proxy : expr.getEventList()) {
-      if (isSelected(proxy)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private boolean isRenderedFocused(final ProxySubject item)
@@ -2860,24 +2849,30 @@ public class GraphEditorPanel
         if (mExternalDragStatus == DragOverStatus.CANDROP) {
           final Transferable transferable = support.getTransferable();
           final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
-          mIdentifierPasteVisitor.addInsertInfo(mFocusedObject, mDropIndex, mDropList,
-                                                transferable, inserts, support.getDropAction());
-          final Command ins =
-            new InsertCommand(inserts, GraphEditorPanel.this, null);
-          if (support.getDropAction() == GraphEditorPanelTransferHandler.MOVE) {
-            List<InsertInfo> deletes = new LinkedList<InsertInfo>();
-            final List<ProxySubject> list = getCurrentSelection();
-            deletes = getDeletionVictims(list);
-            final Command del =
-              new DeleteCommand(deletes, GraphEditorPanel.this, false);
-            final CompoundCommand compound =
-              new CompoundCommand("Move Commands");
-            compound.addCommand(ins);
-            compound.addCommand(del);
-            getUndoInterface().executeCommand(compound);
-          }
-          else{
-            getUndoInterface().executeCommand(ins);
+          mIdentifierPasteVisitor.addInsertInfo(mFocusedObject, mDropIndex,
+                                                mDropList, transferable,
+                                                inserts,
+                                                support.getDropAction());
+          if (!inserts.isEmpty()) {
+            final Command ins =
+              new InsertCommand(inserts, GraphEditorPanel.this, null);
+            if (support.getDropAction() == GraphEditorPanelTransferHandler.MOVE) {
+              List<InsertInfo> deletes = new LinkedList<InsertInfo>();
+              final List<ProxySubject> list = getCurrentSelection();
+
+              //delete items not in the inserts list??
+
+              deletes = getDeletionVictims(list);
+              final Command del =
+                new DeleteCommand(deletes, GraphEditorPanel.this, true);
+              final CompoundCommand compound =
+                new CompoundCommand("Move Commands");
+              compound.addCommand(ins);
+              compound.addCommand(del);
+              getUndoInterface().executeCommand(compound);
+            } else {
+              getUndoInterface().executeCommand(ins);
+            }
           }
         }
         finished = true;
@@ -3041,7 +3036,6 @@ public class GraphEditorPanel
         ModuleEqualityVisitor.getInstance(false);
       for (final ProxySubject item : mDraggedList) {
         if (eq.contains(mDropList, item)) {
-          //TODO better check constraints
           for (final Proxy proxy : selected) {
             final ProxySubject sub = (ProxySubject) proxy;
             if (sub.getParent().equals(mDropList)) {
@@ -3866,95 +3860,108 @@ public class GraphEditorPanel
   {
     public void keyPressed(final KeyEvent e)
     {
-      // to be reimplemented
-      if (e.getKeyCode() == KeyEvent.VK_UP ||
-          e.getKeyCode() == KeyEvent.VK_KP_UP)
-        {
-          //System.err.println("UP");
-          boolean hasMoved = false;
-          final CompoundCommand upMove = new CompoundCommand("Move Event");
-          for (final ProxySubject o : mSelectedList)
-            {
-              if (o instanceof LabelBlockSubject)
-                {
-                  final LabelBlockSubject l = (LabelBlockSubject)o;
-                  if (hasSelected(l))
-                    {
-                      final List<AbstractSubject> labels =
-                        new ArrayList<AbstractSubject>(l.getEventListModifiable());
-                      labels.retainAll(mSelectedList);
-                      //System.err.println(labels);
-                      int index = l.getEventList().size();
-                      for (final AbstractSubject i : labels)
-                        {
-                          final int index2 = l.getEventList().indexOf(i);
-                          if (index2 < index)
-                            {
-                              index = index2;
-                            }
-                        }
-                      if (index > 0)
-                        {
-                          index--;
-                        }
-                      hasMoved = true;
-                      final Command c =
-                        new ReorganizeListCommand(l, labels, index);
-                      upMove.addCommand(c);
-                    }
+      boolean up = false;
+      boolean down = false;
+      if (e.getKeyCode() == KeyEvent.VK_UP
+          || e.getKeyCode() == KeyEvent.VK_KP_UP) {
+        up = true;
+      } else if (e.getKeyCode() == KeyEvent.VK_DOWN
+                 || e.getKeyCode() == KeyEvent.VK_KP_DOWN) {
+        down = true;
+      }
+      if (up || down) {
+        boolean hasMoved = false;
+        final CompoundCommand upMove = new CompoundCommand("Move Event");
+        for (int i = 0; i < mSelectedList.size(); i++) {
+          final ProxySubject proxy = mSelectedList.get(i);
+          if (!(proxy instanceof LabelBlockSubject)) {
+            ListSubject<? extends ProxySubject> initialList;
+            final ProxySubject parent = SubjectTools.getProxyParent(proxy);
+            if (parent instanceof ForeachSubject) {
+              initialList = ((ForeachSubject) parent).getBodyModifiable();
+            } else {
+              initialList =
+                ((LabelBlockSubject) parent).getEventListModifiable();
+            }
+            int index = initialList.indexOf(proxy);
+            final List<InsertInfo> deletes = new LinkedList<InsertInfo>();
+            final ListInsertPosition delpos =
+              new ListInsertPosition(initialList, index);
+            final InsertInfo delete = new InsertInfo(proxy, delpos);
+            deletes.add(delete);
+            boolean canMove = true;
+            ListSubject<? extends ProxySubject> newList = null;
+            final ProxySubject grandParent =
+              SubjectTools.getProxyParent(parent);
+            if (up) {
+              if (index == 0) {
+                if (grandParent instanceof EdgeSubject) {
+                  canMove = false;
+                } else if (grandParent instanceof ForeachSubject) {
+                  newList =
+                    ((ForeachSubject) grandParent).getBodyModifiable();
+                  index = newList.indexOf(parent);
+                } else {
+                  newList =
+                    ((LabelBlockSubject) grandParent)
+                      .getEventListModifiable();
+                  index = newList.indexOf(parent);
                 }
-            }
-          upMove.end();
-          if (hasMoved)
-            {
-              e.consume();
-              getUndoInterface().executeCommand(upMove);
-            }
-        }
-      if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_KP_DOWN)
-        {
-          //System.err.println("Down");
-          boolean hasMoved = false;
-          final CompoundCommand downMove = new CompoundCommand("Move Event");
-          for (final ProxySubject o : mSelectedList)
-            {
-              if (o instanceof LabelBlockSubject)
-                {
-                  final LabelBlockSubject l = (LabelBlockSubject)o;
-                  if (hasSelected(l))
-                    {
-                      final List<AbstractSubject> labels =
-                        new ArrayList<AbstractSubject>(l.getEventListModifiable());
-                      labels.retainAll(mSelectedList);
-                      //System.err.println(labels);
-                      int index = 0;
-                      for (final AbstractSubject i : labels)
-                        {
-                          final int index2 = l.getEventList().indexOf(i);
-                          if (index2 > index)
-                            {
-                              index = index2;
-                            }
-                        }
-                      if (index < l.getEventList().size() - 1)
-                        {
-                          index = index + 2 - labels.size();
-                        }
-
-                      hasMoved = true;
-                      final Command c =
-                        new ReorganizeListCommand(l, labels, index);
-                      downMove.addCommand(c);
-                    }
+              } else if (initialList.get(index - 1) instanceof ForeachSubject) {
+                final ForeachSubject sibling =
+                  (ForeachSubject) initialList.get(index - 1);
+                newList = sibling.getBodyModifiable();
+                index = newList.size();
+              } else {
+                newList = initialList;
+                index--;
+              }
+            } else if (down) {
+              if (index == initialList.size() - 1) {
+                if (grandParent instanceof EdgeSubject) {
+                  canMove = false;
+                } else if (grandParent instanceof ForeachSubject) {
+                  newList =((ForeachSubject) grandParent).getBodyModifiable();
+                  index = newList.indexOf(parent) + 1;
+                } else {
+                  newList =
+                    ((LabelBlockSubject) grandParent)
+                      .getEventListModifiable();
+                  index = newList.indexOf(parent) + 1;
                 }
+              } else if (initialList.get(index + 1) instanceof ForeachSubject) {
+                final ForeachSubject sibling =
+                  (ForeachSubject) initialList.get(index + 1);
+                newList = sibling.getBodyModifiable();
+                index = 0;
+              } else {
+                newList = initialList;
+                index++;
+              }
             }
-          downMove.end();
-          if (hasMoved)
-            {
-              e.consume();
-              getUndoInterface().executeCommand(downMove);
+            if (canMove) {
+              //TODO move out of loop
+              final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
+              final ListInsertPosition inspos =
+                new ListInsertPosition(newList, index);
+              final InsertInfo insert = new InsertInfo(proxy, inspos);
+              inserts.add(insert);
+              final Command del =
+                new DeleteCommand(deletes, GraphEditorPanel.this, true);
+              final Command ins =
+                new InsertCommand(inserts, GraphEditorPanel.this, null);
+              upMove.addCommand(del);
+              upMove.addCommand(ins);
+              hasMoved = true;
             }
+          }
         }
+        upMove.end();
+        if (hasMoved) {
+          e.consume();
+          getUndoInterface().executeCommand(upMove);
+        }
+      }
     }
   }
 
@@ -4312,7 +4319,6 @@ public class GraphEditorPanel
                                final int dropAction)
       throws IOException, UnsupportedFlavorException
     {
-      //TODO tidy up this method
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
       final List<? extends Proxy> data = getTransferData(transferable);
@@ -4336,8 +4342,10 @@ public class GraphEditorPanel
           for (int i = 0; i < data.size(); i++) {
             if(eq.equals(data.get(i), proxy)){
               if (sub.getParent().equals(dropList)) {
-                System.out.println(pos == 1);
-                if (dropAction != DnDConstants.ACTION_MOVE) {
+                if(dropList.indexOf(sub) == pos || dropList.indexOf(sub) == pos-1){
+                  data.remove(i);
+                }
+                else if (dropAction != DnDConstants.ACTION_MOVE) {
                   data.remove(i);
                 }
               } else {

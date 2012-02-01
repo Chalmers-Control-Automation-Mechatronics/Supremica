@@ -351,10 +351,12 @@ public class ProxyShapeProducer
     for (final Proxy proxy : list) {
       final int ly = (int) Math.round(y + mHeight);
       Font font = EditorColor.DEFAULT_FONT;
+      mMaxBounds = font.getMaxCharBounds(new FontRenderContext(null, true, true));
       LabelShape lshape = null;
       if (proxy instanceof IdentifierProxy) {
         final IdentifierProxy ident = (IdentifierProxy) proxy;
         font = mRenderingContext.getFont(ident);
+        mMaxBounds = font.getMaxCharBounds(new FontRenderContext(null, true, true));
         lshape = createEdgeLabelShape(proxy, x + indent, ly, font);
         mMap.put(proxy, lshape);
         adjustRect(lshape, indent);
@@ -365,15 +367,22 @@ public class ProxyShapeProducer
         adjustRect(lshape, indent);
         createListShape(foreach.getBody(), x, y, indent + 10);
       }
+
     }
   }
 
+  private Rectangle2D mMaxBounds;
+  private double mMaxHeight = 0;
+
   private void adjustRect(final LabelShape shape, final int indent)
   {
+    if(mMaxHeight < mMaxBounds.getHeight()){
+      mMaxHeight = mMaxBounds.getHeight();
+    }
     final RoundRectangle2D lrect = shape.getShape();
       lrect.setRoundRect(lrect.getX(), lrect.getY(), lrect.getWidth(),
-                         RECT_HEIGHT, lrect.getArcWidth(), lrect.getArcHeight());
-    mHeight += RECT_HEIGHT;
+                         mMaxHeight, lrect.getArcWidth(), lrect.getArcHeight());
+    mHeight += mMaxHeight;
     if (mWidth < lrect.getWidth() + indent) {
       mWidth = (int) lrect.getWidth() + indent;
     }
@@ -518,5 +527,4 @@ public class ProxyShapeProducer
   //# Class Constants
   private static final String BLOCKED_HEADER = "BLOCKED:";
   private static final double BORDER = 5;
-  private static final int RECT_HEIGHT = 16;
 }
