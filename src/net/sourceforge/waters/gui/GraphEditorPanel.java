@@ -58,7 +58,9 @@ import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.command.MoveCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
@@ -109,6 +111,7 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
@@ -2859,16 +2862,13 @@ public class GraphEditorPanel
             if (support.getDropAction() == GraphEditorPanelTransferHandler.MOVE) {
               List<InsertInfo> deletes = new LinkedList<InsertInfo>();
               final List<ProxySubject> list = getCurrentSelection();
-
-              //delete items not in the inserts list??
-
               deletes = getDeletionVictims(list);
               final Command del =
                 new DeleteCommand(deletes, GraphEditorPanel.this, true);
               final CompoundCommand compound =
-                new CompoundCommand("Move Commands");
-              compound.addCommand(ins);
+                new CompoundCommand("Move Labels");
               compound.addCommand(del);
+              compound.addCommand(ins);
               getUndoInterface().executeCommand(compound);
             } else {
               getUndoInterface().executeCommand(ins);
@@ -3855,115 +3855,302 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Inner Class KeySpy
-  private class KeySpy
-    extends KeyAdapter
+  private class KeySpy extends KeyAdapter
   {
+
     public void keyPressed(final KeyEvent e)
     {
-      boolean up = false;
-      boolean down = false;
-      if (e.getKeyCode() == KeyEvent.VK_UP
-          || e.getKeyCode() == KeyEvent.VK_KP_UP) {
-        up = true;
-      } else if (e.getKeyCode() == KeyEvent.VK_DOWN
-                 || e.getKeyCode() == KeyEvent.VK_KP_DOWN) {
-        down = true;
-      }
-      if (up || down) {
-        boolean hasMoved = false;
-        final CompoundCommand upMove = new CompoundCommand("Move Event");
-        for (int i = 0; i < mSelectedList.size(); i++) {
-          final ProxySubject proxy = mSelectedList.get(i);
-          if (!(proxy instanceof LabelBlockSubject)) {
-            ListSubject<? extends ProxySubject> initialList;
-            final ProxySubject parent = SubjectTools.getProxyParent(proxy);
-            if (parent instanceof ForeachSubject) {
-              initialList = ((ForeachSubject) parent).getBodyModifiable();
+      mMoveVisitor = new MoveVisitor();
+      final CompoundCommand cmd =
+        mMoveVisitor.moveItems(mSelectedList, e.getKeyCode());
+      if (cmd != null) {
+      //geometry move
+        final String named = ProxyNamer.getCollectionClassName(mSelectedList);
+        cmd.setName(named + " Move");
+        cmd.end();
+        e.consume();
+        getUndoInterface().executeCommand(cmd);
+      } else {
+        //move within label block
+        boolean up = false;
+        boolean down = false;
+        if (e.getKeyCode() == KeyEvent.VK_UP
+            || e.getKeyCode() == KeyEvent.VK_KP_UP) {
+          up = true;
+        } else if (e.getKeyCode() == KeyEvent.VK_DOWN
+                   || e.getKeyCode() == KeyEvent.VK_KP_DOWN) {
+          down = true;
+        }
+        if (up || down) {
+          boolean hasMoved = false;
+          final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
+          final List<InsertInfo> deletes = new LinkedList<InsertInfo>();
+          final CompoundCommand move = new CompoundCommand("Move LabelBlock item");
+          int i = 0;
+          int insertIndex = -1;
+          ListSubject<? extends ProxySubject> newList = null;
+          double lowestY = 0;
+          while (i < mSelectedList.size()) {
+            final ProxySubject proxy = mSelectedList.get(i);
+            if (hasAncestorInSelection(proxy, mSelectedList)
+                || proxy instanceof LabelBlockSubject
+                || !((proxy instanceof ForeachSubject) || (proxy instanceof IdentifierSubject))) {
+              mSelectedList.remove(i);
             } else {
-              initialList =
-                ((LabelBlockSubject) parent).getEventListModifiable();
-            }
-            int index = initialList.indexOf(proxy);
-            final List<InsertInfo> deletes = new LinkedList<InsertInfo>();
-            final ListInsertPosition delpos =
-              new ListInsertPosition(initialList, index);
-            final InsertInfo delete = new InsertInfo(proxy, delpos);
-            deletes.add(delete);
-            boolean canMove = true;
-            ListSubject<? extends ProxySubject> newList = null;
-            final ProxySubject grandParent =
-              SubjectTools.getProxyParent(parent);
-            if (up) {
-              if (index == 0) {
-                if (grandParent instanceof EdgeSubject) {
-                  canMove = false;
-                } else if (grandParent instanceof ForeachSubject) {
-                  newList =
-                    ((ForeachSubject) grandParent).getBodyModifiable();
-                  index = newList.indexOf(parent);
-                } else {
-                  newList =
-                    ((LabelBlockSubject) grandParent)
-                      .getEventListModifiable();
-                  index = newList.indexOf(parent);
-                }
-              } else if (initialList.get(index - 1) instanceof ForeachSubject) {
-                final ForeachSubject sibling =
-                  (ForeachSubject) initialList.get(index - 1);
-                newList = sibling.getBodyModifiable();
-                index = newList.size();
+              ListSubject<? extends ProxySubject> initialList;
+              final ProxySubject parent = SubjectTools.getProxyParent(proxy);
+              if (parent instanceof ForeachSubject) {
+                initialList = ((ForeachSubject) parent).getBodyModifiable();
               } else {
-                newList = initialList;
-                index--;
+                initialList =
+                  ((LabelBlockSubject) parent).getEventListModifiable();
               }
-            } else if (down) {
-              if (index == initialList.size() - 1) {
-                if (grandParent instanceof EdgeSubject) {
-                  canMove = false;
-                } else if (grandParent instanceof ForeachSubject) {
-                  newList =((ForeachSubject) grandParent).getBodyModifiable();
-                  index = newList.indexOf(parent) + 1;
-                } else {
-                  newList =
-                    ((LabelBlockSubject) grandParent)
-                      .getEventListModifiable();
-                  index = newList.indexOf(parent) + 1;
+              final int index = initialList.indexOf(proxy);
+              final ListInsertPosition delpos =
+                new ListInsertPosition(initialList, index);
+              final InsertInfo delete = new InsertInfo(proxy, delpos);
+              deletes.add(delete);
+              //final boolean canMove = true;
+              final ProxySubject grandParent =
+                SubjectTools.getProxyParent(parent);
+              final ProxyShape proxyShape =
+                getShapeProducer().getShape(proxy);
+              final double ypos = proxyShape.getBounds2D().getY();
+              if (insertIndex == -1) {
+                insertIndex = index;
+              }
+              if (newList == null) {
+                newList = initialList;
+              }
+              if (up) {
+                if (lowestY == 0 || ypos < lowestY) {
+                  lowestY = ypos;
+                  if (index == 0) {
+                    if (grandParent instanceof EdgeSubject) {
+                      insertIndex = 0;
+                      newList = initialList;
+                    } else if (grandParent instanceof ForeachSubject) {
+                      newList =
+                        ((ForeachSubject) grandParent).getBodyModifiable();
+                      insertIndex = newList.indexOf(parent);
+                    } else {
+                      newList =
+                        ((LabelBlockSubject) grandParent)
+                          .getEventListModifiable();
+                      insertIndex = newList.indexOf(parent);
+                    }
+                  } else if (initialList.get(index - 1) instanceof ForeachSubject) {
+                    final ForeachSubject sibling =
+                      (ForeachSubject) initialList.get(index - 1);
+                    newList = sibling.getBodyModifiable();
+                    insertIndex = newList.size();
+                  } else {
+                    newList = initialList;
+                    insertIndex = index - 1;
+                  }
                 }
-              } else if (initialList.get(index + 1) instanceof ForeachSubject) {
-                final ForeachSubject sibling =
-                  (ForeachSubject) initialList.get(index + 1);
-                newList = sibling.getBodyModifiable();
-                index = 0;
-              } else {
-                newList = initialList;
-                index++;
+              } else if (down) {
+                if (lowestY == 0 || ypos > lowestY) {
+                  lowestY = ypos;
+                  if (index == initialList.size() - 1) {
+                    if (grandParent instanceof EdgeSubject) {
+                      insertIndex = index + 1;
+                      newList = initialList;
+                    } else if (grandParent instanceof ForeachSubject) {
+                      newList =
+                        ((ForeachSubject) grandParent).getBodyModifiable();
+                      insertIndex = newList.indexOf(parent) + 1;
+                    } else {
+                      newList =
+                        ((LabelBlockSubject) grandParent)
+                          .getEventListModifiable();
+                      insertIndex = newList.indexOf(parent) + 1;
+                    }
+                  } else if (initialList.get(index + 1) instanceof ForeachSubject) {
+                    final ForeachSubject sibling =
+                      (ForeachSubject) initialList.get(index + 1);
+                    newList = sibling.getBodyModifiable();
+                    insertIndex = 0;
+                  } else {
+                    newList = initialList;
+                    insertIndex = index + 1;
+                  }
+                }
               }
-            }
-            if (canMove) {
-              //TODO move out of loop
-              final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
-              final ListInsertPosition inspos =
-                new ListInsertPosition(newList, index);
-              final InsertInfo insert = new InsertInfo(proxy, inspos);
-              inserts.add(insert);
-              final Command del =
-                new DeleteCommand(deletes, GraphEditorPanel.this, true);
-              final Command ins =
-                new InsertCommand(inserts, GraphEditorPanel.this, null);
-              upMove.addCommand(del);
-              upMove.addCommand(ins);
-              hasMoved = true;
+              i++;
             }
           }
-        }
-        upMove.end();
-        if (hasMoved) {
-          e.consume();
-          getUndoInterface().executeCommand(upMove);
+          //TODO catch: when moving multiple items to top/bottom of labelblock
+          for (final ProxySubject p : mSelectedList) {
+            final ListInsertPosition inspos =
+              new ListInsertPosition(newList, insertIndex++);
+            final InsertInfo insert = new InsertInfo(p, inspos);
+            inserts.add(insert);
+            hasMoved = true;
+          }
+          final Command del =
+            new DeleteCommand(deletes, GraphEditorPanel.this, true);
+          final Command ins =
+            new InsertCommand(inserts, GraphEditorPanel.this, null);
+          move.addCommand(del);
+          move.addCommand(ins);
+          final List<Proxy> proxies = InsertInfo.getProxies(inserts);
+          final String named = ProxyNamer.getCollectionClassName(proxies);
+          move.setName(named + " Move");
+          move.end();
+          if (hasMoved) {
+            e.consume();
+            getUndoInterface().executeCommand(move);
+          }
         }
       }
     }
+
+    private boolean hasAncestorInSelection(final ProxySubject proxy,
+                                           final List<ProxySubject> proxies)
+    {
+      for (int i = 0; i < proxies.size(); i++) {
+        if (SubjectTools.isAncestor((ProxySubject) proxies.get(i), proxy)) {
+          if (proxies.get(i) instanceof ForeachSubject
+              && proxies.get(i) != proxy) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+
+    private class MoveVisitor extends AbstractModuleProxyVisitor
+    {
+
+      private CompoundCommand moveItems(final List<ProxySubject> proxies,
+                                        final int keyCode)
+      {
+        try {
+          mGeometryMoveCount = 0;
+          mLabelBlockCount = 0;
+          mKeyCode = keyCode;
+          final CompoundCommand cmd = new CompoundCommand("Geometry Move");
+          for (final Proxy selected : proxies) {
+            final MoveCommand mve =
+              (MoveCommand) selected.acceptVisitor(this);
+            if (mve != null) {
+              cmd.addCommand(mve);
+            }
+          }
+          //check if it should be a geometric move (there is probably a better way of doing this!)
+          if (mGeometryMoveCount > 0 || mLabelBlockCount > 1
+              || (mLabelBlockCount == 1 && !mHasOtherSelections)) {
+            return cmd;
+          } else {
+            return null;
+          }
+
+        } catch (final VisitorException exception) {
+          throw new WatersRuntimeException(exception);
+        }
+      }
+
+      private Point2D movePoint(final Point2D point)
+      {
+        if (mKeyCode == KeyEvent.VK_UP || mKeyCode == KeyEvent.VK_KP_UP) {
+          point.setLocation(point.getX(), point.getY() - 1);
+        } else if (mKeyCode == KeyEvent.VK_DOWN
+                   || mKeyCode == KeyEvent.VK_KP_DOWN) {
+          point.setLocation(point.getX(), point.getY() + 1);
+        } else if (mKeyCode == KeyEvent.VK_LEFT
+                   || mKeyCode == KeyEvent.VK_KP_LEFT) {
+          point.setLocation(point.getX() - 1, point.getY());
+        } else if (mKeyCode == KeyEvent.VK_RIGHT
+                   || mKeyCode == KeyEvent.VK_KP_RIGHT) {
+          point.setLocation(point.getX() + 1, point.getY());
+        }
+        return point;
+      }
+
+      public MoveCommand visitProxy(final Proxy proxy)
+      {
+        return null;
+      }
+
+      public Object visitGroupNodeProxy(final GroupNodeProxy group)
+      {
+        mGeometryMoveCount++;
+        final GroupNodeSubject sub = (GroupNodeSubject) group;
+        final BoxGeometrySubject box = sub.getGeometry();
+        final Rectangle rect = box.getRectangle().getBounds();
+        final Point2D p = new Point((int) rect.getX(), (int) rect.getY());
+        final Point2D point = movePoint(p);
+        rect.setBounds((int) point.getX(), (int) point.getY(),
+                       (int) rect.getWidth(), (int) rect.getHeight());
+        final BoxGeometrySubject box2 = new BoxGeometrySubject(rect);
+        final MoveCommand cmd =
+          new MoveCommand(box, box2, GraphEditorPanel.this);
+        return cmd;
+      }
+
+      public Object visitForeachProxy(final ForeachProxy foreach)
+      {
+        mHasOtherSelections = true;
+        return null;
+      }
+
+      public Object visitGuardActionBlockProxy
+        (final GuardActionBlockProxy block)
+      {
+        mGeometryMoveCount++;
+        final GuardActionBlockSubject sub = (GuardActionBlockSubject)block;
+        return visitLabelGeometryProxy(sub.getGeometry());
+      }
+
+      public Object visitIdentifierProxy(final IdentifierProxy ident)
+      {
+        mHasOtherSelections = true;
+        return null;
+      }
+
+      public MoveCommand visitLabelBlockProxy(final LabelBlockProxy block)
+      {
+        mLabelBlockCount++;
+        mGeometryMoveCount--;
+        final LabelBlockSubject sub = (LabelBlockSubject) block;
+        return visitLabelGeometryProxy(sub.getGeometry());
+      }
+
+      public MoveCommand visitLabelGeometryProxy(final LabelGeometryProxy label)
+      {
+        mGeometryMoveCount++;
+        final LabelGeometrySubject geo = (LabelGeometrySubject) label;
+        final Point2D point = movePoint(geo.getOffset());
+        final LabelGeometrySubject geo2 =
+          new LabelGeometrySubject(point, label.getAnchor());
+        final MoveCommand cmd =
+          new MoveCommand(geo, geo2, GraphEditorPanel.this);
+        return cmd;
+      }
+
+      public MoveCommand visitSimpleNodeProxy(final SimpleNodeProxy node)
+      {
+        mGeometryMoveCount++;
+        final SimpleNodeSubject sub = (SimpleNodeSubject) node;
+        final PointGeometrySubject geo = sub.getPointGeometry();
+        final Point2D point = movePoint(geo.getPoint());
+        final PointGeometrySubject geo2 = new PointGeometrySubject(point);
+        final MoveCommand cmd =
+          new MoveCommand(geo, geo2, GraphEditorPanel.this);
+        return cmd;
+      }
+
+      private int mKeyCode;
+      private int mGeometryMoveCount = 0;
+      private boolean mHasOtherSelections = false;
+      private int mLabelBlockCount = 0;
+    }
+
+    private MoveVisitor mMoveVisitor;
   }
+
 
 
   //#########################################################################
@@ -4136,7 +4323,7 @@ public class GraphEditorPanel
       boolean change = false;
       for (final Proxy proxy : proxies) {
         final ProxySubject subject = (ProxySubject) proxy;
-        if (subject instanceof IdentifierSubject) {
+        if (subject instanceof IdentifierSubject || subject instanceof ForeachSubject) {
           final LabelBlockSubject block =
             SubjectTools.getAncestor(subject, LabelBlockSubject.class);
           if (block != null && mSelectedSet.add(block)) {
@@ -4232,8 +4419,8 @@ public class GraphEditorPanel
                                  SimpleNodeSubject.class,
                                  LabelBlockSubject.class);
       if (ancestor instanceof SimpleNodeSubject) {
-        return (SimpleNodeSubject) ancestor;
-      } else {
+        return (SimpleNodeSubject) ancestor; }
+      else {
         return subject;
       }
     }
