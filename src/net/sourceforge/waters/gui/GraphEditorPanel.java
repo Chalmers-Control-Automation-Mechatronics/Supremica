@@ -1464,8 +1464,14 @@ public class GraphEditorPanel
   {
     final EditorGraph graph = getSecondaryGraph();
     if (graph != null) {
+      final UndoInterface undo = mRoot.getUndoInterface();
+      if(mLastCommand != null && mLastCommand == undo.getLastCommand()){
+        //undo.getLastCommand().undo();
+        undo.removeLastCommand();
+      }
       final Command cmd =
         graph.createUpdateCommand(this, description, selecting);
+      mLastCommand = cmd;
       if (cmd == null) {
         // ignore
       } else if (undoable) {
@@ -1476,6 +1482,7 @@ public class GraphEditorPanel
     }
   }
 
+  private Command mLastCommand = null;
 
   //#########################################################################
   //# Data Transfer Auxiliaries
@@ -2996,6 +3003,9 @@ public class GraphEditorPanel
         mDropList = foreach.getBodyModifiable();
         setLineAtEnd(foreach);
         setExternalDragStatus(dropAction);
+        if(mDropList.isEmpty()){
+          mY = 0;
+        }
         return true;
       } else {
         mRect = null;
@@ -3895,7 +3905,7 @@ public class GraphEditorPanel
             move.addCommand(ins);
             final List<Proxy> proxies = InsertInfo.getProxies(inserts);
             final String named = ProxyNamer.getCollectionClassName(proxies);
-            move.setName(named + " Move");
+            move.setName(named + " Movement");
             execute = true;
           }
           if (execute) {
@@ -4713,7 +4723,6 @@ public class GraphEditorPanel
     public void exportDone(final JComponent c, final Transferable t,
                            final int action)
     {
-
     }
 
     @Override

@@ -384,6 +384,7 @@ public class ModuleContainer
   public void executeCommand(final Command c)
   {
     c.execute();
+    setLastCommand(c);
     addUndoable(new UndoableCommand(c));
   }
 
@@ -450,6 +451,20 @@ public class ModuleContainer
     fireUndoRedoEvent();
   }
 
+  public void setLastCommand(final Command c){
+    mLastCommand = c;
+  }
+
+  public Command getLastCommand()
+  {
+    return mLastCommand;
+  }
+
+  public void removeLastCommand(){
+    //how do i delete the last command ??
+  }
+
+  private Command mLastCommand = null;
 
   //#######################################################################
   //# Interface javax.swing.event.ChangeListener
@@ -562,5 +577,6 @@ public class ModuleContainer
   //#######################################################################
   //# Class Constants
   static final String TYPE_STRING = "Waters module";
+
 
 }
