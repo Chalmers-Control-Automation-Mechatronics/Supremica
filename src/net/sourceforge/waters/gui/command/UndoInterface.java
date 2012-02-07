@@ -29,8 +29,6 @@ public interface UndoInterface extends Subject
 
     public void undo() throws CannotUndoException;
 
-    public void setLastCommand(Command c);
-
     public Command getLastCommand();
 
     public void removeLastCommand();

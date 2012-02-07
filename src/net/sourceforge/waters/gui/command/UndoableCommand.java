@@ -10,41 +10,45 @@ public class UndoableCommand
     private static final long serialVersionUID = 1L;
 
     private final Command mCommand;
-    
-    public UndoableCommand(Command command)
+
+    public UndoableCommand(final Command command)
     {
         mCommand = command;
     }
-    
+
     /**
      * Redoes the Command
      *
      * @throws CannotRedoException if CanRedo returns false
-     */    
+     */
     public void redo() throws CannotRedoException
     {
         super.redo();
         mCommand.execute();
     }
-    
+
     /**
      * Undoes the Command
      *
      * @throws CannotUndoException if CanUndo returns false
-     */    
+     */
     public void undo() throws CannotUndoException
     {
         super.undo();
         mCommand.undo();
     }
-    
+
     public boolean isSignificant()
     {
         return mCommand.isSignificant();
     }
-    
+
     public String getPresentationName()
     {
         return mCommand.getName();
+    }
+
+    public Command getCommand(){
+      return mCommand;
     }
 }

@@ -533,12 +533,6 @@ public class GraphEditorPanel
           (ListSubject<AbstractSubject>) subject.getParent();
         eventlists.put(eventlist, true);
       }
-      else if(subject instanceof ForeachSubject){
-        final ForeachSubject foreach = (ForeachSubject)subject;
-        final ListSubject<AbstractSubject> eventlist =
-          (ListSubject<AbstractSubject>) foreach.getParent();
-        eventlists.put(eventlist, true);
-      }
       else if(subject.getParent().getParent() instanceof ForeachSubject){
         final ForeachSubject foreach = (ForeachSubject)subject.getParent().getParent();
         final ListSubject<AbstractSubject> eventlist =
@@ -1059,9 +1053,10 @@ public class GraphEditorPanel
     if (mSelectedList.size() != 1 || !isSelected(item)) {
       mSelectedList.clear();
       mSelectedSet.clear();
-      mSelectedList.add(item);
-      mSelectedSet.add(item);
-      fireSelectionChanged();
+      addToSelection(item);
+      //mSelectedList.add(item);
+      //mSelectedSet.add(item);
+      //fireSelectionChanged();
     }
   }
 
@@ -1070,10 +1065,11 @@ public class GraphEditorPanel
    */
   private void addToSelection(final ProxySubject item)
   {
-    if (mSelectedSet.add(item)) {
-      mSelectedList.add(item);
+    //if (mSelectedSet.add(item)) {
+      mSelectableVisitor.addToSelectionList(Collections.singletonList(item));
+      //mSelectedList.add(item);
       fireSelectionChanged();
-    }
+    //}
   }
 
   /**
@@ -1464,10 +1460,16 @@ public class GraphEditorPanel
   {
     final EditorGraph graph = getSecondaryGraph();
     if (graph != null) {
-      final UndoInterface undo = mRoot.getUndoInterface();
-      if(mLastCommand != null && mLastCommand == undo.getLastCommand()){
-        //undo.getLastCommand().undo();
-        undo.removeLastCommand();
+      final UndoInterface undoInterface = mRoot.getUndoInterface();
+      if (!mNewMoveStarted) {
+        if (mLastCommand != null
+            && mLastCommand == undoInterface.getLastCommand()) {
+          undoInterface.undo();
+          undoInterface.removeLastCommand();
+        }
+      }
+      else{
+        mNewMoveStarted = false;
       }
       final Command cmd =
         graph.createUpdateCommand(this, description, selecting);
@@ -1483,6 +1485,7 @@ public class GraphEditorPanel
   }
 
   private Command mLastCommand = null;
+  private boolean mNewMoveStarted = false;
 
   //#########################################################################
   //# Data Transfer Auxiliaries
@@ -2152,6 +2155,7 @@ public class GraphEditorPanel
       mDragStartOnGrid = snapped;
       mDragCurrent = point;
       mDragCurrentOnGrid = snapped;
+      mNewMoveStarted = true;
     }
 
     //#######################################################################
@@ -2794,7 +2798,6 @@ public class GraphEditorPanel
             mDropIndex = -1;
             mRect = null;
             mDropList = elist.getEventListModifiable();
-            setExternalDragStatus(dropAction);
           }
           else if (elist == mFocusedObject) {
             mY = bounds.getMinY();
@@ -2807,16 +2810,8 @@ public class GraphEditorPanel
               mX = rect.getMinX();
               if (point.getY() < rect.getCenterY()) {
                 mY = rect.getMinY();
-                setExternalDragStatus(dropAction);
                 break;
               } else {
-                if(item == mDropList.get(mDropList.size()-1)){
-                  mExternalDragStatus = DragOverStatus.CANTDROP;
-                  setExternalDragStatus(dropAction);
-                }
-                else{
-                  mExternalDragStatus = DragOverStatus.CANDROP;
-                }
                 mY = rect.getMaxY();
                 mDropIndex++;
               }
@@ -2841,8 +2836,8 @@ public class GraphEditorPanel
           mDropList = plain.getEventListModifiable();
           mDropIndex = -1;
           line = null;
-          mExternalDragStatus = DragOverStatus.CANDROP;
         }
+        setExternalDragStatus(dropAction);
       } else {
         line = null;
         mRect = null;
@@ -3002,7 +2997,6 @@ public class GraphEditorPanel
         mRect = rect;
         mDropList = foreach.getBodyModifiable();
         setLineAtEnd(foreach);
-        setExternalDragStatus(dropAction);
         if(mDropList.isEmpty()){
           mY = 0;
         }
@@ -3018,7 +3012,6 @@ public class GraphEditorPanel
           mX = rect2.getMinX();
           mDropIndex = drop;
           mDropList = foreach.getBodyModifiable();
-          setExternalDragStatus(dropAction);
           return true;
         } else {
           drop++;
@@ -3061,7 +3054,7 @@ public class GraphEditorPanel
             }
           }
           mExternalDragStatus = DragOverStatus.CANTDROP;
-        }else {
+        } else {
           mExternalDragStatus = DragOverStatus.CANDROP;
           return;
         }
@@ -4103,7 +4096,7 @@ public class GraphEditorPanel
     //removing items that have ancestors or are not a foreach/identifier
     private List<ProxySubject> getReorderedSelectionList()
     {
-      final List<ProxySubject> newList = new ArrayList<ProxySubject>();
+      final List<ProxySubject> newList = new ArrayList<ProxySubject>(mSelectedList.size());
       int i = 0;
       while (i < mSelectedList.size()) {
         final ProxySubject proxy = mSelectedList.get(i);
@@ -4554,6 +4547,9 @@ public class GraphEditorPanel
                 }
                 else if (dropAction != DnDConstants.ACTION_MOVE) {
                   data.remove(i);
+                }
+                else if(dropList.indexOf(sub) < pos){
+                  pos--;
                 }
               } else {
                 if (eq.contains(dropList, proxy)) {
