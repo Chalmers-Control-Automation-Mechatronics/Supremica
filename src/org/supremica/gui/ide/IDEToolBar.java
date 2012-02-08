@@ -189,7 +189,7 @@ public class IDEToolBar
     addAction(actions.getAction(NewAction.class));
     addAction(actions.getAction(OpenAction.class));
     addAction(actions.getAction(SaveAction.class));
-    addAction(actions.editorPrintAction);
+    //addAction(actions.editorPrintAction);
     addSeparator();
     addAction(actions.getAction(IDEDeleteAction.class));
     addAction(actions.getAction(IDECutAction.class));
