@@ -4092,42 +4092,23 @@ public class GraphEditorPanel
       }
     }
 
-    //This method lists the selections in order they occur in the labelblock,
-    //removing items that have ancestors or are not a foreach/identifier
     private List<ProxySubject> getReorderedSelectionList()
     {
-      final List<ProxySubject> newList = new ArrayList<ProxySubject>(mSelectedList.size());
+      final List<ProxySubject> newList =
+        new ArrayList<ProxySubject>(mSelectedList.size());
       int i = 0;
       while (i < mSelectedList.size()) {
         final ProxySubject proxy = mSelectedList.get(i);
         if ((proxy instanceof IdentifierSubject || proxy instanceof ForeachSubject)
             && !hasAncestorInSelection(proxy, mSelectedList)) {
-          if (newList.isEmpty()) {
-            newList.add(proxy);
-          } else {
-            final ProxyShape proxyShape = getShapeProducer().getShape(proxy);
-            final double ypos = proxyShape.getBounds2D().getY();
-            boolean found = false;
-            for (int x = 0; x < newList.size(); x++) {
-              final ProxySubject proxy2 = newList.get(x);
-              final ProxyShape proxyShape2 =
-                getShapeProducer().getShape(proxy2);
-              final double ypos2 = proxyShape2.getBounds2D().getY();
-              if (ypos < ypos2) {
-                newList.add(x, proxy);
-                found = true;
-                break;
-              }
-            }
-            if (!found) {
-              newList.add(proxy);
-            }
-          }
+          newList.add(proxy);
           i++;
         } else {
           mSelectedList.remove(i);
         }
       }
+      mComparator = new PositionComparator();
+      Collections.sort(newList, mComparator);
       return newList;
     }
 
@@ -4145,9 +4126,27 @@ public class GraphEditorPanel
       return false;
     }
 
-    private MoveVisitor mMoveVisitor;
+  private class PositionComparator implements Comparator<ProxySubject>{
 
+    public int compare(final ProxySubject proxy1, final ProxySubject proxy2)
+    {
+      final SubjectShapeProducer prod = getShapeProducer();
+      final double ypos1 = prod.getShape(proxy1).getBounds2D().getY();
+      final double ypos2 = prod.getShape(proxy2).getBounds2D().getY();
+      if (ypos1 < ypos2) {
+        return -1;
+      }
+      else if (ypos1 > ypos2) {
+        return 1;
+      }
+      return 0;
+    }
   }
+
+    private MoveVisitor mMoveVisitor;
+    private PositionComparator mComparator;
+  }
+
 
 
 
