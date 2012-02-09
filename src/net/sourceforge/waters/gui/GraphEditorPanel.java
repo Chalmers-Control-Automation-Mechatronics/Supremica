@@ -1054,9 +1054,6 @@ public class GraphEditorPanel
       mSelectedList.clear();
       mSelectedSet.clear();
       addToSelection(item);
-      //mSelectedList.add(item);
-      //mSelectedSet.add(item);
-      //fireSelectionChanged();
     }
   }
 
@@ -1065,11 +1062,9 @@ public class GraphEditorPanel
    */
   private void addToSelection(final ProxySubject item)
   {
-    //if (mSelectedSet.add(item)) {
-      mSelectableVisitor.addToSelectionList(Collections.singletonList(item));
-      //mSelectedList.add(item);
+    if(mSelectableVisitor.addToSelectionList(Collections.singletonList(item))){
       fireSelectionChanged();
-    //}
+    }
   }
 
   /**
@@ -1085,12 +1080,15 @@ public class GraphEditorPanel
 
   private void replaceLabelSelection(final ProxySubject item)
   {
-    if(SubjectTools.getAncestor(item, LabelBlockSubject.class) != null){
-      final LabelBlockSubject block =
+    if(!(item instanceof LabelBlockSubject) &&
+      SubjectTools.getAncestor(item, LabelBlockSubject.class) != null){
+      //TODO permanently delete??
+      /*final LabelBlockSubject block =
         (LabelBlockSubject)SubjectTools.getAncestor(item, LabelBlockSubject.class);
       final List<ProxySubject> victims =
         findAllSelectedLabels(block.getEventListModifiable(), item);
-      removeFromSelection(victims);
+      removeFromSelection(victims);*/
+      clearSelection();
       addToSelection(item);
     }
     else {
@@ -1098,7 +1096,7 @@ public class GraphEditorPanel
     }
   }
 
-  private List<ProxySubject> findAllSelectedLabels(final ListSubject<AbstractSubject> list,
+/*  private List<ProxySubject> findAllSelectedLabels(final ListSubject<AbstractSubject> list,
                                      final ProxySubject item){
     final List<ProxySubject> victims = new LinkedList<ProxySubject>();
     for (final ProxySubject label : list) {
@@ -1111,7 +1109,7 @@ public class GraphEditorPanel
       }
     }
     return victims;
-  }
+  }*/
 
   /**
    * Toggles the selection of an item.
@@ -2474,7 +2472,10 @@ public class GraphEditorPanel
           if (mSelectedSet.containsAll(dragged)) {
             removeFromSelection(dragged);
           } else {
-            addToSelection(dragged);
+            final List<ProxySubject> list = getListWithoutLabels();
+            clearSelection();
+            list.addAll(dragged);
+            addToSelection(list);
           }
         } else {
           clearSelection();
@@ -2493,6 +2494,9 @@ public class GraphEditorPanel
       if (label == null) {
         if (wasControlDown()) {
           if (mFocusedObject != null) {
+            final List<ProxySubject> list = getListWithoutLabels();
+            clearSelection();
+            addToSelection(list);
             toggleSelection(mFocusedObject);
           }
         } else {
@@ -2504,12 +2508,36 @@ public class GraphEditorPanel
         }
       } else {
         if (wasControlDown()) {
-          toggleSelection(label);
+          if (isSelected(label)) {
+            removeFromSelection(label);
+          } else {
+            final List<ProxySubject> list = getListWithoutLabels();
+            if (mSelectedSet.removeAll(list)) {
+              mSelectedList.removeAll(list);
+            }
+            if (mSelectableVisitor.addToSelectionList(Collections
+              .singletonList(label))) {
+              fireSelectionChanged();
+            }
+          }
         } else {
           replaceLabelSelection(label);
         }
       }
     }
+
+    private List<ProxySubject> getListWithoutLabels(){
+      final List<ProxySubject> list = new LinkedList<ProxySubject>();
+      for (final ProxySubject sub : mSelectedList) {
+        if (!(sub instanceof IdentifierSubject || sub instanceof ForeachSubject)
+            && sub != mLabelBlock) {
+          list.add(sub);
+        }
+      }
+      return list;
+    }
+
+
 
     //#######################################################################
     //# Rendering
@@ -2606,10 +2634,11 @@ public class GraphEditorPanel
       mClickedObjectWasSelected = clicked != null && isSelected(clicked);
       mMovedObject = mFocusedObject;
       if (mMovedObject == null || !mClickedObjectWasSelected) {
-        if (!wasControlDown()) {
+        if (!wasControlDown() && mMovedObject != null) {
+          replaceSelection(mMovedObject);
+        } else if (!wasControlDown()) {
           clearSelection();
-        }
-        if (mMovedObject != null) {
+        } else if (mMovedObject != null) {
           addToSelection(mMovedObject);
         }
       }
@@ -4320,6 +4349,11 @@ public class GraphEditorPanel
       boolean change = false;
       for (final Proxy proxy : proxies) {
         final ProxySubject subject = (ProxySubject) proxy;
+        final ProxySubject ancestor = getSelectableAncestor(subject);
+        if (ancestor != null && mSelectedSet.add(ancestor)) {
+          mSelectedList.add(ancestor);
+          change = true;
+        }
         if (subject instanceof IdentifierSubject || subject instanceof ForeachSubject) {
           final LabelBlockSubject block =
             SubjectTools.getAncestor(subject, LabelBlockSubject.class);
@@ -4330,11 +4364,6 @@ public class GraphEditorPanel
           if(subject instanceof ForeachSubject){
             addChildrenToSelection((ForeachSubject)subject);
           }
-        }
-        final ProxySubject ancestor = getSelectableAncestor(subject);
-        if (ancestor != null && mSelectedSet.add(ancestor)) {
-          mSelectedList.add(ancestor);
-          change = true;
         }
       }
       return change;
@@ -4364,6 +4393,7 @@ public class GraphEditorPanel
         throw exception.getRuntimeException();
       }
     }
+
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
