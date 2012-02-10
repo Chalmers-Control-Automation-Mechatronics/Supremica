@@ -242,6 +242,10 @@ class DataFlavorVisitor extends AbstractModuleProxyVisitor
     (final LabelBlockProxy block)
   throws VisitorException
   {
+    final List<Proxy> list = block.getEventList();
+    if(list.isEmpty()){
+      return LIST_GRAPH;
+    }
     final List<WatersDataFlavor> flavors = visitEventListExpressionProxy(block);
     final LabelBlockSubject subject = (LabelBlockSubject) block;
     if (subject.getParent() instanceof GraphProxy) {

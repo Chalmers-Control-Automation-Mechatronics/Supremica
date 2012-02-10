@@ -26,16 +26,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.CompoundEdit;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEdit;
-
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.command.UndoableCommand;
+import net.sourceforge.waters.gui.command.WatersUndoManager;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.MainPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -387,20 +384,14 @@ public class ModuleContainer
     addUndoable(new UndoableCommand(c));
   }
 
-  public void addUndoable(final UndoableEdit event)
+  public void addUndoable(final UndoableCommand command)
   {
-    if (event.isSignificant()) {
-      mInsignificant.end();
-      mUndoManager.addEdit(mInsignificant);
-      mInsignificant = new CompoundEdit();
-      mUndoManager.addEdit(event);
+    assert(command.isSignificant());
+      mUndoManager.addCommand(command);
       if (mUndoIndex++ < mUndoCheckPoint) {
         mUndoCheckPoint = -1;
       }
       fireUndoRedoEvent();
-    } else {
-      mInsignificant.addEdit(event);
-    }
   }
 
   public boolean canRedo()
@@ -432,9 +423,6 @@ public class ModuleContainer
 
   public void redo() throws CannotRedoException
   {
-    mInsignificant.end();
-    mInsignificant.undo();
-    mInsignificant = new CompoundEdit();
     mUndoManager.redo();
     mUndoIndex++;
     fireUndoRedoEvent();
@@ -442,12 +430,17 @@ public class ModuleContainer
 
   public void undo() throws CannotUndoException
   {
-    mInsignificant.end();
-    mInsignificant.undo();
-    mInsignificant = new CompoundEdit();
     mUndoManager.undo();
     mUndoIndex--;
     fireUndoRedoEvent();
+  }
+
+  public void removeLastCommand(){
+    mUndoManager.removeLast();
+  }
+
+  public Command getLastCommand(){
+    return mUndoManager.getLastCommand();
   }
 
 
@@ -552,8 +545,7 @@ public class ModuleContainer
   mCompilerPropertyChangeListener;
   private final SupremicaPropertyChangeListener
   mSimulatorPropertyChangeListener;
-  private final UndoManager mUndoManager = new UndoManager();
-  private CompoundEdit mInsignificant = new CompoundEdit();
+  private final WatersUndoManager mUndoManager = new WatersUndoManager();
   private int mUndoIndex = 0;
   private int mUndoCheckPoint = 0;
   private final Collection<Observer> mObservers = new LinkedList<Observer>();
@@ -562,5 +554,6 @@ public class ModuleContainer
   //#######################################################################
   //# Class Constants
   static final String TYPE_STRING = "Waters module";
+
 
 }

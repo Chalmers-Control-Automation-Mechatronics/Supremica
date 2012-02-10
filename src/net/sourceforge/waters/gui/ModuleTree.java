@@ -151,6 +151,10 @@ public abstract class ModuleTree
     return mRoot.getRootWindow().getFocusTracker();
   }
 
+  private boolean isSourceOfDrag(){
+    return getFocusTracker().getWatersSelectionOwner() == ModuleTree.this;
+  }
+
 
   //#########################################################################
   //# Abstract Methods
@@ -496,7 +500,8 @@ public abstract class ModuleTree
       final int y = lastrect.y + lastrect.height;
       rect.height = y - rect.y;
     }
-    scrollRectToVisible(rect);
+   // if(rect != null)
+      scrollRectToVisible(rect);
   }
 
   public void activate()
@@ -772,7 +777,6 @@ public abstract class ModuleTree
     @Override
     public Transferable createTransferable(final JComponent c)
     {
-      getFocusTracker().setSourceOfDragOperation(ModuleTree.this);
       final List<? extends Proxy> selection = getCurrentSelection();
       return WatersDataFlavor.createTransferable(selection);
     }
@@ -781,7 +785,7 @@ public abstract class ModuleTree
     public void exportDone(final JComponent c, final Transferable t,
                            final int action)
     {
-      if (getFocusTracker().getSourceOfDragOperation() == ModuleTree.this) {
+      if (isSourceOfDrag() && mDropList != null) {
         final int count = getSelectionCount();
         final List<InsertInfo> inserts = new ArrayList<InsertInfo>(count);
         final List<Proxy> proxies = new ArrayList<Proxy>();
@@ -852,6 +856,7 @@ public abstract class ModuleTree
           mRoot.getUndoInterface().executeCommand(allMoves);
         }
       }
+      mDropList = null;
     }
 
     @Override
@@ -862,6 +867,9 @@ public abstract class ModuleTree
         if (transferable
           .isDataFlavorSupported(WatersDataFlavor.PARAMETER_BINDING)) {
           return false;
+        }
+        if (!isSourceOfDrag() && support.getDropAction() == MOVE) {
+          support.setDropAction(COPY);
         }
         final JTree.DropLocation drop =
           (JTree.DropLocation) support.getDropLocation();
@@ -928,9 +936,9 @@ public abstract class ModuleTree
               new InsertCommand(inserts, ModuleTree.this, mRoot);
             mRoot.getUndoInterface().executeCommand(allCopies);
           } catch (final IOException exception) {
-            exception.printStackTrace();
+            throw new WatersRuntimeException(exception);
           } catch (final UnsupportedFlavorException exception) {
-            exception.printStackTrace();
+            throw new WatersRuntimeException(exception);
           }
         }
       }

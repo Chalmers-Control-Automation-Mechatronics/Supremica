@@ -54,14 +54,10 @@ public interface ModelVerifierFactory
   public void parse(Iterator<String> iter);
 
   /**
-   * Configures the given model verifier according to any command line arguments
-   * passed to this factory. This method is called while parsing command line
-   * arguments, before loading of any models. Hence, the model verifier does not
-   * yet have its input model when this method is called.
-   *
-   * @return A string array containing all arguments that could not be
-   *         processed. These arguments are to be considered as file names by
-   *         the command line tool.
+   * Configures the given model verifier according to any command line
+   * arguments passed to this factory. This method is called while parsing
+   * command line arguments, before loading of any models. Hence, the model
+   * verifier does not yet have its input model when this method is called.
    */
   public void configure(ModelVerifier verifier);
 

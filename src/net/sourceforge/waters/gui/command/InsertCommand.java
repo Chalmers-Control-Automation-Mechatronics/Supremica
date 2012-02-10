@@ -14,16 +14,18 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
 
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
+import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 
@@ -200,16 +202,19 @@ public class InsertCommand
       return;
     }
     final InsertInfo info = mInserts.get(0);
-    final Proxy proxy = info.getProxy();
-    if (!(proxy instanceof SimpleComponentProxy)) {
+    if (!(info.getProxy() instanceof SimpleComponentProxy)) {
+      return;
+    }
+    final Object inspos = info.getInsertPosition();
+    if (!(inspos instanceof ListInsertPosition)) {
       return;
     }
     try {
-      final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
-      final String name = comp.getName();
-      final ModuleContext context = mRoot.getModuleContext();
+      final ListInsertPosition linspos = (ListInsertPosition) inspos;
+      final ListSubject<? extends ProxySubject> list = linspos.getList();
+      final int pos = linspos.getPosition();
       final SimpleComponentSubject subject =
-        (SimpleComponentSubject) context.getComponent(name);
+        (SimpleComponentSubject) list.get(pos);
       mRoot.showEditor(subject);
     } catch (final GeometryAbsentException exception) {
       throw new WatersRuntimeException(exception);

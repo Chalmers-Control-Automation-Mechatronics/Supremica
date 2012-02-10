@@ -56,6 +56,10 @@ public class EditModuleNameCommand
     iface.showComment();
   }
 
+  public void setUpdatesSelection(final boolean update)
+  {
+  }
+
   public boolean isSignificant()
   {
     return true;

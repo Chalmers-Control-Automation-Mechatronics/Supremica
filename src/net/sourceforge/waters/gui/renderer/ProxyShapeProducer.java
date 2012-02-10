@@ -16,6 +16,8 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,12 +29,14 @@ import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -296,8 +300,8 @@ public class ProxyShapeProducer
   {
     LabelBlockProxyShape shape = (LabelBlockProxyShape) lookup(block);
     if (shape == null) {
-      double width = 0.0;
-      double height = 1.0;
+      mWidth = 0;
+      mHeight = 1;
       double x;
       double y;
       final LabelGeometryProxy geo = block.getGeometry();
@@ -318,29 +322,16 @@ public class ProxyShapeProducer
         final TextLayout text =
           new TextLayout(BLOCKED_HEADER, EditorColor.HEADER_FONT,
                          new FontRenderContext(null, true, true));
-        width = text.getBounds().getWidth();
+        mWidth = (int) text.getBounds().getWidth();
       }
       final int lx = (int) Math.round(x) + 1;
-      for (final Proxy proxy : block.getEventList()) {
-        // Use different font for different event kinds.
-        Font font = EditorColor.DEFAULT_FONT;
-        if (proxy instanceof IdentifierProxy) {
-          final IdentifierProxy ident = (IdentifierProxy) proxy;
-          font = mRenderingContext.getFont(ident);
-        }
-        final int ly = (int) Math.round(y + height);
-        final LabelShape lshape = createEdgeLabelShape(proxy, lx, ly, font);
-        mMap.put(proxy, lshape);
-        final RoundRectangle2D lrect = lshape.getShape();
-        height += lrect.getHeight();
-        if (width < lrect.getWidth()) {
-          width = lrect.getWidth();
-        }
-      }
-      height += 4;
-      width += 3;
+
+      createListShape(block.getEventList(), lx, y, 0);
+
+      mHeight += 4;
+      mWidth += 3;
       final RoundRectangle2D bounds =
-        new RoundRectangle2D.Double(x, y, width, height,
+        new RoundRectangle2D.Double(x, y, mWidth, mHeight,
                                     LabelBlockProxyShape.DEFAULTARCW,
                                     LabelBlockProxyShape.DEFAULTARCH);
       if (eshape != null) {
@@ -353,6 +344,50 @@ public class ProxyShapeProducer
     }
     return shape;
   }
+
+  private void createListShape(final List<Proxy> list, final int x,
+                               final double y, final int indent)
+  {
+    for (final Proxy proxy : list) {
+      final int ly = (int) Math.round(y + mHeight);
+      Font font = EditorColor.DEFAULT_FONT;
+      mMaxBounds = font.getMaxCharBounds(new FontRenderContext(null, true, true));
+      LabelShape lshape = null;
+      if (proxy instanceof IdentifierProxy) {
+        final IdentifierProxy ident = (IdentifierProxy) proxy;
+        font = mRenderingContext.getFont(ident);
+        mMaxBounds = font.getMaxCharBounds(new FontRenderContext(null, true, true));
+        lshape = createEdgeLabelShape(proxy, x + indent, ly, font);
+        mMap.put(proxy, lshape);
+        adjustRect(lshape, indent);
+      } else if (proxy instanceof ForeachProxy) {
+        final ForeachProxy foreach = (ForeachProxy) proxy;
+        lshape = createForeachLabelShape(foreach, x + indent, ly);
+        mMap.put(proxy, lshape);
+        adjustRect(lshape, indent);
+        createListShape(foreach.getBody(), x, y, indent + 10);
+      }
+
+    }
+  }
+
+  private Rectangle2D mMaxBounds;
+  private double mMaxHeight = 0;
+
+  private void adjustRect(final LabelShape shape, final int indent)
+  {
+    if(mMaxHeight < mMaxBounds.getHeight()){
+      mMaxHeight = mMaxBounds.getHeight();
+    }
+    final RoundRectangle2D lrect = shape.getShape();
+      lrect.setRoundRect(lrect.getX(), lrect.getY(), lrect.getWidth(),
+                         mMaxHeight, lrect.getArcWidth(), lrect.getArcHeight());
+    mHeight += mMaxHeight;
+    if (mWidth < lrect.getWidth() + indent) {
+      mWidth = (int) lrect.getWidth() + indent;
+    }
+  }
+
 
   GuardActionBlockProxyShape createGuardActionBlockShape
     (final GuardActionBlockProxy block,
@@ -451,6 +486,30 @@ public class ProxyShapeProducer
     return new LabelShape(label, x, y, font, text);
   }
 
+  private LabelShape createForeachLabelShape(final ForeachProxy foreach,
+                                             final int x, final int y){
+    final Font font = EditorColor.DEFAULT_FONT;
+    final StringWriter stringWriter = new StringWriter();
+
+    final ModuleProxyPrinter proxyPrinter = new ModuleProxyPrinter(stringWriter);
+    try {
+      proxyPrinter.pprint("FOR ");
+      proxyPrinter.pprint(foreach.getName());
+      proxyPrinter.pprint(" IN ");
+      proxyPrinter.pprint(foreach.getRange());
+      if(foreach.getGuard() != null){
+        proxyPrinter.pprint(" WHERE ");
+        proxyPrinter.pprint(foreach.getGuard());
+      }
+
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+    final String text = stringWriter.toString();
+    return new LabelShape(foreach, x, y, font, text);
+  }
+
+
 
   //#########################################################################
   //# Data Members
@@ -460,6 +519,8 @@ public class ProxyShapeProducer
   private final ModuleProxyPrinter mPrinter;
   private final SimpleExpressionCompiler mCompiler;
   private final BindingContext mBindings;
+  private double mHeight;
+  private double mWidth;
 
 
   //#########################################################################

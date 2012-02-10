@@ -10,20 +10,20 @@ public class RemoveEventCommand
     private final AbstractSubject mIdentifier;
     private final int mPosition;
     private final String mDescription = "Remove Event";
-    
-    public RemoveEventCommand(EventListExpressionSubject group,
-        AbstractSubject identifier)
+
+    public RemoveEventCommand(final EventListExpressionSubject group,
+        final AbstractSubject identifier)
     {
         mList = group;
         mIdentifier = identifier;
         mPosition = mList.getEventListModifiable().indexOf(mIdentifier);
     }
-    
+
     public void execute()
     {
         mList.getEventListModifiable().remove(mIdentifier);
     }
-    
+
     /**
      * Undoes the Command
      */
@@ -36,12 +36,16 @@ public class RemoveEventCommand
         }
         mList.getEventListModifiable().add(pos, mIdentifier);
     }
-    
+
+    public void setUpdatesSelection(final boolean update)
+    {
+    }
+
     public boolean isSignificant()
     {
         return true;
     }
-    
+
     public String getName()
     {
         return mDescription;

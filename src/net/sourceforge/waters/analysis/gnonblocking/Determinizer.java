@@ -7,7 +7,7 @@
 //# $Id: OPSearchAutomatonSimplifier.java 5606 2010-05-03 03:02:04Z robi $
 //###########################################################################
 
-package net.sourceforge.waters.analysis.tr;
+package net.sourceforge.waters.analysis.gnonblocking;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
@@ -26,13 +29,15 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 /**
  * A Determinizer.
  *
- * This class is probably superseded by
- * {@link SubsetConstructionTRSimplifier}.
+ * This class is superseded by {@link
+ * net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier
+ * SubsetConstructionTRSimplifier}.
  *
  * @author Simon Ware
  */
 
-public class Determinizer
+@Deprecated
+class Determinizer
 {
 
   //#########################################################################
