@@ -16,6 +16,7 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 
 /**
@@ -168,7 +169,13 @@ public class MoveCommand
     if (getUpdatesSelection()) {
       final SelectionOwner panel = getPanel();
       final ProxySubject parent = (ProxySubject) mSubject.getParent();
-      final List<ProxySubject> list = Collections.singletonList(parent);
+      final List<ProxySubject> list;
+      if(parent instanceof SimpleNodeSubject){
+        list = Collections.singletonList((ProxySubject) mSubject);
+      }
+      else{
+        list = Collections.singletonList(parent);
+      }
       panel.replaceSelection(list);
       panel.scrollToVisible(list);
       panel.activate();

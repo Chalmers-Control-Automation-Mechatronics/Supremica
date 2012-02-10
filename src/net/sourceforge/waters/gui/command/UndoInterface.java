@@ -4,7 +4,6 @@ import net.sourceforge.waters.gui.observer.Subject;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoableEdit;
 
 public interface UndoInterface extends Subject
 {
@@ -13,7 +12,7 @@ public interface UndoInterface extends Subject
      */
     public void executeCommand(Command c);
 
-    public void addUndoable(UndoableEdit e);
+    public void addUndoable(UndoableCommand e);
 
     public boolean canRedo();
 
@@ -32,4 +31,5 @@ public interface UndoInterface extends Subject
     public Command getLastCommand();
 
     public void removeLastCommand();
+
 }
