@@ -26,6 +26,7 @@ import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.EFA.BDDEdges;
 import org.supremica.automata.BDD.EFA.BDDExDisjDepSetsDecorator;
+import org.supremica.automata.BDD.EFA.BDDExDisjEventDepSets;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedManager;
@@ -832,10 +833,10 @@ public class BDDExtendedGuardGenerator {
 
         BDD tmp = manager.getZeroBDD();
 
-        final BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
+        final BDDExDisjEventDepSets depset = (BDDExDisjEventDepSets)automataBDD.getDepSets();
 
-        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToBDDMap().get(eventIndex);
-        final BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+        final BDD eventBDD = depset.getEventIndexToBDDMap().get(eventIndex);
+        final BDD transBDD = depset.getComponentToComponentTransMap().get(eventIndex);
 
         final BDD transWithEventBDD = transBDD.and(eventBDD);
         tmp = safeStatesWithEvent.and(transWithEventBDD).exist(automataBDD.getDestStatesVarSet())
@@ -855,10 +856,10 @@ public class BDDExtendedGuardGenerator {
 
         BDD tmp = manager.getZeroBDD();
 
-        final BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
+        final BDDExDisjEventDepSets depset = (BDDExDisjEventDepSets)automataBDD.getDepSets();
 
-        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToBDDMap().get(eventIndex);
-        final BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+        final BDD eventBDD = depset.getEventIndexToBDDMap().get(eventIndex);
+        final BDD transBDD = depset.getComponentToComponentTransMap().get(eventIndex);
 
         final BDD transWithEventBDD = transBDD.and(eventBDD);
         tmp = reachableStatesWithEvent.and(transWithEventBDD).exist(automataBDD.getDestStatesVarSet())
