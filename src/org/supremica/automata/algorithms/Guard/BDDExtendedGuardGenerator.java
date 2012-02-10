@@ -834,7 +834,7 @@ public class BDDExtendedGuardGenerator {
 
         final BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
 
-        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToTransitionBDD().get(eventIndex);
+        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToBDDMap().get(eventIndex);
         final BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
 
         final BDD transWithEventBDD = transBDD.and(eventBDD);
@@ -857,7 +857,7 @@ public class BDDExtendedGuardGenerator {
 
         final BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
 
-        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToTransitionBDD().get(eventIndex);
+        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToBDDMap().get(eventIndex);
         final BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
 
         final BDD transWithEventBDD = transBDD.and(eventBDD);

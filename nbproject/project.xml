@@ -28,17 +28,11 @@
                     <location>${project.dir}/src</location>
                     <encoding>UTF-8</encoding>
                 </source-folder>
-                <source-folder>
-                    <label>tests\src</label>
-                    <type>java</type>
-                    <location>${project.dir}/tests/src</location>
-                    <encoding>UTF-8</encoding>
-                </source-folder>
             </folders>
             <ide-actions>
                 <action name="build">
                     <script>${ant.script}</script>
-                    <target>build</target>
+                    <target>compile_supremica</target>
                 </action>
                 <action name="clean">
                     <script>${ant.script}</script>
@@ -50,7 +44,7 @@
                 </action>
                 <action name="run">
                     <script>${ant.script}</script>
-                    <target>run</target>
+                    <target>runLocal</target>
                 </action>
                 <action name="test">
                     <script>${ant.script}</script>
@@ -59,7 +53,7 @@
                 <action name="rebuild">
                     <script>${ant.script}</script>
                     <target>clean</target>
-                    <target>build</target>
+                    <target>compile_supremica</target>
                 </action>
                 <action name="debug">
                     <script>nbproject/ide-targets.xml</script>
@@ -92,27 +86,11 @@
                     </context>
                 </action>
             </ide-actions>
-            <export>
-                <type>jar</type>
-                <location>dist/Supremica.jar</location>
-                <script>${ant.script}</script>
-                <build-target>rebuild</build-target>
-            </export>
-            <export>
-                <type>jar</type>
-                <location>dist/SupremicaTest.jar</location>
-                <script>${ant.script}</script>
-                <build-target>rebuild</build-target>
-            </export>
             <view>
                 <items>
                     <source-folder style="packages">
                         <label>src</label>
                         <location>${project.dir}/src</location>
-                    </source-folder>
-                    <source-folder style="packages">
-                        <label>tests\src</label>
-                        <location>${project.dir}/tests/src</location>
                     </source-folder>
                     <source-file>
                         <location>${ant.script}</location>
@@ -134,61 +112,29 @@
             <compilation-unit>
                 <package-root>${project.dir}/src</package-root>
                 <classpath mode="compile">lib/unjared</classpath>
-                <built-to>dist/Supremica.jar</built-to>
-                <built-to>dist/SupremicaTest.jar</built-to>
-                <source-level>1.6</source-level>
-            </compilation-unit>
-            <compilation-unit>
-                <package-root>${project.dir}/tests/src</package-root>
-                <unit-tests/>
-                <classpath mode="compile">lib/junit.jar;dist/Supremica.jar;dist/SupremicaLib.jar</classpath>
                 <source-level>1.6</source-level>
             </compilation-unit>
         </java-data>
         <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
             <module name="org-netbeans-modules-editor-indent">
                 <node name="CodeStyle">
-                    <property name="usedProfile" value="project"/>
-                    <node name="project">
-                        <property name="tab-size" value="8"/>
-                        <property name="text-limit-width" value="80"/>
-                    </node>
+                    <node name="project"/>
                 </node>
                 <node name="text">
                     <node name="x-java">
                         <node name="CodeStyle">
-                            <node name="project">
-                                <property name="wrapExtendsImplementsKeyword" value="WRAP_IF_LONG"/>
-                                <property name="alignMultilineParenthesized" value="true"/>
-                                <property name="wrapTernaryOps" value="WRAP_IF_LONG"/>
-                                <property name="wrapThrowsKeyword" value="WRAP_IF_LONG"/>
-                                <property name="wrapMethodParams" value="WRAP_IF_LONG"/>
-                                <property name="spaces-per-tab" value="2"/>
-                                <property name="wrapAssignOps" value="WRAP_IF_LONG"/>
-                                <property name="alignMultilineCallArgs" value="true"/>
-                                <property name="classDeclBracePlacement" value="NEW_LINE"/>
-                                <property name="wrapChainedMethodCalls" value="WRAP_IF_LONG"/>
-                                <property name="wrapMethodCallArgs" value="WRAP_IF_LONG"/>
-                                <property name="wrapAfterBinaryOps" value="true"/>
-                                <property name="indentCasesFromSwitch" value="false"/>
-                                <property name="wrapBinaryOps" value="WRAP_IF_LONG"/>
-                                <property name="blankLinesAfterImports" value="2"/>
-                                <property name="indent-shift-width" value="2"/>
-                                <property name="text-limit-width" value="78"/>
-                                <property name="wrapAfterTernaryOps" value="true"/>
-                                <property name="text-line-wrap" value="words"/>
-                                <property name="wrapExtendsImplementsList" value="WRAP_IF_LONG"/>
-                                <property name="alignMultilineMethodParams" value="true"/>
-                                <property name="blankLinesBeforeClass" value="2"/>
-                                <property name="tab-size" value="4"/>
-                                <property name="expand-tabs" value="true"/>
-                                <property name="methodDeclBracePlacement" value="NEW_LINE"/>
-                                <property name="wrapThrowsList" value="WRAP_IF_LONG"/>
-                            </node>
+                            <node name="project"/>
                         </node>
+                        <node name="project"/>
                     </node>
+                    <node name="project"/>
+                    <node name="CodeStyle"/>
                 </node>
+                <node name="application"/>
+                <node name="project"/>
+                <node name="x-java"/>
             </module>
+            <module name="org-netbeans-modules-projectimport-eclipse-core"/>
         </preferences>
     </configuration>
 </project>
