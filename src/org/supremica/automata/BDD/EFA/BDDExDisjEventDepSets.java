@@ -1,5 +1,6 @@
 package org.supremica.automata.BDD.EFA;
 
+import gnu.trove.THashSet;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIterator;
@@ -51,34 +52,34 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
     /* Define a map where the key is the index of an event in the index map while the value is the BDD expression of partitioned parts*/
     private final TIntObjectHashMap<BDD> eventToCompleteTransitionBDD;
 
-    /* The base of this partitioning technique. The key is the event index, the value is another map where the key is automaton 
+    /* The base of this partitioning technique. The key is the event index, the value is another map where the key is automaton
      * while the values is which edges in this automaton are labeled by the corresponding event.*/
     private final TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> event2AutomatonsEdges;
 
-    
+
     /** D^{e}(\sigma) and D^{v}(\sigma), refer to the paper. */
-    private TIntObjectHashMap<TIntHashSet> forwardEventDependencySet;
-    private TIntObjectHashMap<TIntHashSet> backwardEventDependencySet;
-    
+    private final TIntObjectHashMap<TIntHashSet> forwardEventDependencySet;
+    private final TIntObjectHashMap<TIntHashSet> backwardEventDependencySet;
+
     private TIntObjectHashMap<TIntHashSet> forwardVariableDependencySet;
     private TIntObjectHashMap<TIntHashSet> backwardVariableDependencySet;
-    
+
     private TIntObjectHashMap<TIntHashSet> forwardDependencyMap;
     private TIntObjectHashMap<TIntHashSet> backwardDependencyMap;
-    
-    /* This is for heuristics. During the fix-pointed iteration, it is the key to pick the most useful BDD for the next round. 
+
+    /* This is for heuristics. During the fix-pointed iteration, it is the key to pick the most useful BDD for the next round.
      * Here I came up with several simple methods. Note that they are not proved yet.
      */
     private final TIntObjectHashMap<TIntIntHashMap> event2ForwardInfluencedEvens;
     private final TIntObjectHashMap<TIntIntHashMap> event2BackwardInfluencedEvents;
 
-      
+
     /** A map from an event index to all of the updated variable names during partitioning. */
     private final TIntObjectHashMap<HashSet<String>> eventIndex2UpdatedVariables;
     /** A map from an event index to the variables appearing in the guard. */
     private final TIntObjectHashMap<HashSet<String>> eventIndex2GuardVariables;
 
-    
+
     /** An event index list in which the included events are enabled from the initial location. */
     private final TIntHashSet initialComponentCandidates;
     /** An event index list in which the included events are enabled to the marked locations. */
@@ -86,12 +87,12 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
     /** An event index list in which all of included events are uncontrollable. */
     private final TIntHashSet uncontrollableComponentCandidates;
 
-    
+
     /** The BDD representing the uncontrollable transition relation. */
     private  BDD uncontrollableTransitionRelationBDD;
-    
 
-    public BDDExDisjEventDepSets(final BDDExtendedAutomata bddAutomata) 
+
+    public BDDExDisjEventDepSets(final BDDExtendedAutomata bddAutomata)
     {
         super(bddAutomata);
         this.event2AutomatonsEdges = bddAutomata.event2AutomatonsEdges;
@@ -99,8 +100,8 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
 
         this.eventToCompleteTransitionBDD = new TIntObjectHashMap<BDD>(size);
         this.eventIndexToBDD = new TIntObjectHashMap<BDD>(size);
-        
-        this.forwardEventDependencySet = new TIntObjectHashMap<TIntHashSet>(size);    
+
+        this.forwardEventDependencySet = new TIntObjectHashMap<TIntHashSet>(size);
         this.backwardEventDependencySet = new TIntObjectHashMap<TIntHashSet>(size);
 
         this.event2ForwardInfluencedEvens = new TIntObjectHashMap<TIntIntHashMap>(size);
@@ -119,18 +120,18 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
     }
 
     @Override
-    protected final void initialize() 
+    protected final void initialize()
     {
         /* Initialize eventIndex2UpdatedVariables and eventIndex2GuardVariables*/
-        for (int i = 0; i < size; i++) 
+        for (int i = 0; i < size; i++)
         {
             eventIndex2GuardVariables.put(i, new HashSet<String>());
             eventIndex2UpdatedVariables.put(i, new HashSet<String>());
         }
-    
+
         events2EventDisParDepSet = new TIntObjectHashMap<EventDisjParDepSet>(size);
-        
-        event2AutomatonsEdges.forEachKey(new TIntProcedure() 
+
+        event2AutomatonsEdges.forEachKey(new TIntProcedure()
         {
             @Override
             public boolean execute(final int eventIndex) {
@@ -144,13 +145,13 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
     }
 
     @Override
-    public TIntObjectHashMap<BDD> getComponentToComponentTransMap() 
+    public TIntObjectHashMap<BDD> getComponentToComponentTransMap()
     {
         if (eventToCompleteTransitionBDD.isEmpty()) {
-            events2EventDisParDepSet.forEachEntry(new TIntObjectProcedure<EventDisjParDepSet>() 
+            events2EventDisParDepSet.forEachEntry(new TIntObjectProcedure<EventDisjParDepSet>()
             {
                 @Override
-                public boolean execute(final int eventIndex, final EventDisjParDepSet t) 
+                public boolean execute(final int eventIndex, final EventDisjParDepSet t)
                 {
                     eventToCompleteTransitionBDD.put(eventIndex, t.eventForwardCompleteTransitions);
                     return true;
@@ -160,14 +161,14 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         return eventToCompleteTransitionBDD;
     }
 
-    public TIntObjectHashMap<BDD> getEventIndexToBDDMap() 
+    public TIntObjectHashMap<BDD> getEventIndexToBDDMap()
     {
-        if (eventIndexToBDD.isEmpty()) 
+        if (eventIndexToBDD.isEmpty())
         {
-            events2EventDisParDepSet.forEachEntry(new TIntObjectProcedure<EventDisjParDepSet>() 
+            events2EventDisParDepSet.forEachEntry(new TIntObjectProcedure<EventDisjParDepSet>()
             {
                 @Override
-                public boolean execute(final int i, final EventDisjParDepSet t) 
+                public boolean execute(final int i, final EventDisjParDepSet t)
                 {
                     eventIndexToBDD.put(i, t.eventBDD);
                     return true;
@@ -176,7 +177,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         }
         return eventIndexToBDD;
     }
-    
+
     @Override
     public TIntObjectHashMap<TIntHashSet> getForwardDependentComponentMap()
     {
@@ -185,31 +186,31 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             forwardDependencyMap = new TIntObjectHashMap<TIntHashSet>(size);
             for(int i = 0; i < size; i++)
                 forwardDependencyMap.put(i, new TIntHashSet());
-            
+
             forwardVariableDependencySet.forEachEntry(new TIntObjectProcedure<TIntHashSet>() {
 
                 @Override
-                public boolean execute(int eventIndex, TIntHashSet eventIndexSet) {
+                public boolean execute(final int eventIndex, final TIntHashSet eventIndexSet) {
                     forwardDependencyMap.put(eventIndex, eventIndexSet);
                     return true;
                 }
             });
-            
+
             event2AutomatonsEdges.forEachEntry(new TIntObjectProcedure<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>>() {
 
                 @Override
-                public boolean execute(int eventIndex, HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automataEdges) {
-                    for (Map.Entry<ExtendedAutomaton, ArrayList<EdgeProxy>> entry : automataEdges.entrySet()) {
-                        ExtendedAutomaton currExAutomaton = entry.getKey();
-                        
-                        List<EdgeProxy> edgesOfCurrExAutomaton = entry.getValue();
-                        for (EdgeProxy anEdge : edgesOfCurrExAutomaton) {
-                            NodeProxy targetLocation = anEdge.getTarget();
-                            
-                            for (EdgeSubject anOutgoingEdge : currExAutomaton.getLocationToOutgoingEdgesMap().get(targetLocation)) {
-                                for (Proxy event : anOutgoingEdge.getLabelBlock().getEventList()) {
-                                    String eventName = ((SimpleIdentifierSubject) event).getName();
-                                    EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
+                public boolean execute(final int eventIndex, final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automataEdges) {
+                    for (final Map.Entry<ExtendedAutomaton, ArrayList<EdgeProxy>> entry : automataEdges.entrySet()) {
+                        final ExtendedAutomaton currExAutomaton = entry.getKey();
+
+                        final List<EdgeProxy> edgesOfCurrExAutomaton = entry.getValue();
+                        for (final EdgeProxy anEdge : edgesOfCurrExAutomaton) {
+                            final NodeProxy targetLocation = anEdge.getTarget();
+
+                            for (final EdgeSubject anOutgoingEdge : currExAutomaton.getLocationToOutgoingEdgesMap().get(targetLocation)) {
+                                for (final Proxy event : anOutgoingEdge.getLabelBlock().getEventList()) {
+                                    final String eventName = ((SimpleIdentifierSubject) event).getName();
+                                    final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
                                     if (!forwardEventDependencySet.containsKey(eventIndex)) {
                                         forwardEventDependencySet.put(eventIndex, new TIntHashSet());
                                     }
@@ -227,18 +228,18 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
     }
 
     @Override
-    public TIntObjectHashMap<TIntHashSet> getBackwardDependentComponentMap() 
+    public TIntObjectHashMap<TIntHashSet> getBackwardDependentComponentMap()
     {
         if (backwardDependencyMap == null) {
             buildVariableDependentComponent();
             backwardDependencyMap = new TIntObjectHashMap<TIntHashSet>(size);
             for(int i = 0; i < size; i++)
                 backwardDependencyMap.put(i, new TIntHashSet());
-            
+
             backwardVariableDependencySet.forEachEntry(new TIntObjectProcedure<TIntHashSet>() {
 
                 @Override
-                public boolean execute(int eventIndex, TIntHashSet eventIndexSet) {
+                public boolean execute(final int eventIndex, final TIntHashSet eventIndexSet) {
                     backwardDependencyMap.put(eventIndex, eventIndexSet);
                     return true;
                 }
@@ -246,13 +247,13 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             event2AutomatonsEdges.forEachEntry(new TIntObjectProcedure<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>>() {
 
                 @Override
-                public boolean execute(int eventIndex, HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automataEdges) {
-                    for (Map.Entry<ExtendedAutomaton, ArrayList<EdgeProxy>> entry : automataEdges.entrySet()) {
-                        for (EdgeProxy anEdge : entry.getValue()) {
-                            for (EdgeSubject anIngoingEdge : entry.getKey().getLocationToIngoingEdgesMap().get(anEdge.getSource())) {
-                                for (Proxy event : anIngoingEdge.getLabelBlock().getEventList()) {
-                                    String eventName = ((SimpleIdentifierSubject) event).getName();
-                                    EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
+                public boolean execute(final int eventIndex, final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automataEdges) {
+                    for (final Map.Entry<ExtendedAutomaton, ArrayList<EdgeProxy>> entry : automataEdges.entrySet()) {
+                        for (final EdgeProxy anEdge : entry.getValue()) {
+                            for (final EdgeSubject anIngoingEdge : entry.getKey().getLocationToIngoingEdgesMap().get(anEdge.getSource())) {
+                                for (final Proxy event : anIngoingEdge.getLabelBlock().getEventList()) {
+                                    final String eventName = ((SimpleIdentifierSubject) event).getName();
+                                    final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
                                     if (!backwardEventDependencySet.containsKey(eventIndex)) {
                                         backwardEventDependencySet.put(eventIndex, new TIntHashSet());
                                     }
@@ -266,31 +267,33 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                 }
             });
         }
-        
+
         return backwardDependencyMap;
     }
-    
+
     /* build both forward and backward variable dependency set at the same time. */
-    private void buildVariableDependentComponent() 
+    private void buildVariableDependentComponent()
     {
         if (forwardVariableDependencySet == null && backwardVariableDependencySet == null) {
-            
+
             forwardVariableDependencySet = new TIntObjectHashMap<TIntHashSet>(size);
             backwardVariableDependencySet = new TIntObjectHashMap<TIntHashSet>(size);
 
-            int[] eventIndexAsKeys = events2EventDisParDepSet.keys();
+            final int[] eventIndexAsKeys = events2EventDisParDepSet.keys();
             for (int i = 0; i < eventIndexAsKeys.length; i++) {
-                int iEventIndex = eventIndexAsKeys[i];
-                HashSet<String> updatedVariables = eventIndex2UpdatedVariables.get(iEventIndex);
-                HashSet<String> guardVariables = eventIndex2GuardVariables.get(iEventIndex);
+                final int iEventIndex = eventIndexAsKeys[i];
+                final HashSet<String> updatedVariables = eventIndex2UpdatedVariables.get(iEventIndex);
+                final HashSet<String> guardVariables = eventIndex2GuardVariables.get(iEventIndex);
                 for (int j = 0; j < eventIndexAsKeys.length; j++) {
                     if (i != j) {
-                        int influencedEventIndex = eventIndexAsKeys[j];
-                        HashSet<String> tempUpdatedVariables = new HashSet(updatedVariables);
-                        HashSet<String> tempGuardVariables = new HashSet(guardVariables);
+                        final int influencedEventIndex = eventIndexAsKeys[j];
+                        final Set<String> tempUpdatedVariables =
+                          new THashSet<String>(updatedVariables);
+                        final Set<String> tempGuardVariables =
+                          new THashSet<String>(guardVariables);
                         tempUpdatedVariables.retainAll(eventIndex2GuardVariables.get(influencedEventIndex));
                         tempGuardVariables.retainAll(eventIndex2UpdatedVariables.get(influencedEventIndex));
-                        if (!tempUpdatedVariables.isEmpty() || 
+                        if (!tempUpdatedVariables.isEmpty() ||
                                 (eventIndex2GuardVariables.get(influencedEventIndex).isEmpty() &&
                                 !eventIndex2UpdatedVariables.get(influencedEventIndex).isEmpty())) {
                             if (!forwardVariableDependencySet.containsKey(iEventIndex)) {
@@ -298,8 +301,8 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                             }
                             forwardVariableDependencySet.get(iEventIndex).add(influencedEventIndex);
                         }
-                        if (!tempGuardVariables.isEmpty() || 
-                                (eventIndex2UpdatedVariables.get(influencedEventIndex).isEmpty()) && 
+                        if (!tempGuardVariables.isEmpty() ||
+                                (eventIndex2UpdatedVariables.get(influencedEventIndex).isEmpty()) &&
                                 !eventIndex2GuardVariables.get(influencedEventIndex).isEmpty()) {
                             if (!backwardVariableDependencySet.containsKey(iEventIndex)) {
                                 backwardVariableDependencySet.put(iEventIndex, new TIntHashSet());
@@ -314,7 +317,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
 
     /* For the heuristic desicision procedure. */
     @Override
-    protected TIntObjectHashMap<TIntIntHashMap> getForwardComponentToInfluencedComponentMap() 
+    protected TIntObjectHashMap<TIntIntHashMap> getForwardComponentToInfluencedComponentMap()
     {
         if (event2ForwardInfluencedEvens.isEmpty()) {
             if (!orgAutomata.getVars().isEmpty()) { // EFAs
@@ -325,23 +328,23 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                     final HashSet<String> updatedVariablesByTheCurrentEvent = eventIndex2UpdatedVariables.get(currentEventIndex);
                     final TIntIntHashMap tmp = new TIntIntHashMap();
                     /* Get the set of dependent evemts (event and variable dependent) */
-                    TIntHashSet dependentEvents = getForwardDependentComponentMap().get(currentEventIndex);
-                    for(TIntIterator itr = dependentEvents.iterator(); itr.hasNext();){
-                        int dependentEventIndex = itr.next();
-                        HashSet<String> guardVariablesByThisEvent = new HashSet<String>(eventIndex2GuardVariables.get(dependentEventIndex));
+                    final TIntHashSet dependentEvents = getForwardDependentComponentMap().get(currentEventIndex);
+                    for(final TIntIterator itr = dependentEvents.iterator(); itr.hasNext();){
+                        final int dependentEventIndex = itr.next();
+                        final HashSet<String> guardVariablesByThisEvent = new HashSet<String>(eventIndex2GuardVariables.get(dependentEventIndex));
                         guardVariablesByThisEvent.retainAll(updatedVariablesByTheCurrentEvent);
                         tmp.put(dependentEventIndex, guardVariablesByThisEvent.size());
                     }
                     event2ForwardInfluencedEvens.put(currentEventIndex, tmp);
                 }
             } else {  // DFAs, i.e. no variable
-                int[] eventIndicesAsKeys = getComponentToComponentTransMap().keys();
+                final int[] eventIndicesAsKeys = getComponentToComponentTransMap().keys();
                 for (int i = 0; i < eventIndicesAsKeys.length; i++) {
-                    int currentEventIndex = eventIndicesAsKeys[i];
+                    final int currentEventIndex = eventIndicesAsKeys[i];
                     final TIntIntHashMap tmp = new TIntIntHashMap();
-                    TIntHashSet dependentEvents = getForwardDependentComponentMap().get(currentEventIndex);
-                    for(TIntIterator itr = dependentEvents.iterator(); itr.hasNext();){
-                        int dependentEventIndex = itr.next();
+                    final TIntHashSet dependentEvents = getForwardDependentComponentMap().get(currentEventIndex);
+                    for(final TIntIterator itr = dependentEvents.iterator(); itr.hasNext();){
+                        final int dependentEventIndex = itr.next();
                         tmp.put(dependentEventIndex, getForwardDependentComponentMap().get(dependentEventIndex).size());
                     }
                     event2ForwardInfluencedEvens.put(currentEventIndex, tmp);
@@ -352,7 +355,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
     }
 
     @Override
-    protected TIntObjectHashMap<TIntIntHashMap> getBackwardComponentToInfluencedComponentMap() 
+    protected TIntObjectHashMap<TIntIntHashMap> getBackwardComponentToInfluencedComponentMap()
     {
         if (event2BackwardInfluencedEvents.isEmpty()) {
             if (!orgAutomata.getVars().isEmpty()) {
@@ -366,23 +369,23 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                        Go over each one, find the set of updated variables. Find the shared variables and the number is the value.
                      */
                     final TIntIntHashMap tmp = new TIntIntHashMap();
-                    TIntHashSet dependentEvents = getBackwardDependentComponentMap().get(currentEventIndex);
-                    for(TIntIterator itr = dependentEvents.iterator(); itr.hasNext();){
-                        int dependentEventIndex = itr.next();
-                        HashSet<String> updatedVariablesByThisEvent = new HashSet<String>(eventIndex2UpdatedVariables.get(dependentEventIndex));
+                    final TIntHashSet dependentEvents = getBackwardDependentComponentMap().get(currentEventIndex);
+                    for(final TIntIterator itr = dependentEvents.iterator(); itr.hasNext();){
+                        final int dependentEventIndex = itr.next();
+                        final HashSet<String> updatedVariablesByThisEvent = new HashSet<String>(eventIndex2UpdatedVariables.get(dependentEventIndex));
                         updatedVariablesByThisEvent.retainAll(guardVariablesByTheCurrentEvent);
                         tmp.put(dependentEventIndex, updatedVariablesByThisEvent.size());
                     }
                     event2BackwardInfluencedEvents.put(currentEventIndex, tmp);
                 }
             } else {
-                int[] eventIndicesAsKeys = getComponentToComponentTransMap().keys();           
+                final int[] eventIndicesAsKeys = getComponentToComponentTransMap().keys();
                 for (int i = 0; i < eventIndicesAsKeys.length; i++) {
-                    int currentEventIndex = eventIndicesAsKeys[i];
+                    final int currentEventIndex = eventIndicesAsKeys[i];
                     final TIntIntHashMap tmp = new TIntIntHashMap();
-                    TIntHashSet dependentEvents = getBackwardDependentComponentMap().get(currentEventIndex);
-                    for(TIntIterator itr = dependentEvents.iterator(); itr.hasNext();){
-                        int dependentEventIndex = itr.next();
+                    final TIntHashSet dependentEvents = getBackwardDependentComponentMap().get(currentEventIndex);
+                    for(final TIntIterator itr = dependentEvents.iterator(); itr.hasNext();){
+                        final int dependentEventIndex = itr.next();
                         tmp.put(dependentEventIndex, getBackwardDependentComponentMap().get(dependentEventIndex).size());
                     }
                     event2BackwardInfluencedEvents.put(currentEventIndex, tmp);
@@ -438,7 +441,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         private final BDD eventForwardCompleteTransitions;
         private BDD eventForwardTransitionWithoutActions;
 
-        public EventDisjParDepSet(final int eventIndex, final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includingAutomata2Edges) 
+        public EventDisjParDepSet(final int eventIndex, final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includingAutomata2Edges)
         {
             this.eventIndex = eventIndex;
             this.includingAutomata2Edges = includingAutomata2Edges;
@@ -447,7 +450,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             initialize();
         }
 
-        private void initialize() 
+        private void initialize()
         {
             /* Create a BDD based on the event index, there is no need. */
             final BDDDomain eventDomain = bddExAutomata.getEventDomain();
@@ -470,7 +473,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             boolean eventIsQualifiedForInitialComponent = false;
             boolean eventIsQualifiedForMarkedComponent = false;
 
-            if (autIterator.hasNext()) 
+            if (autIterator.hasNext())
             {
                 final ExtendedAutomaton firstAutomaton = autIterator.next();
                 final AutIncludingTransLabeledByEvent firstAutTransWithEvent = new AutIncludingTransLabeledByEvent(includingAutomata2Edges, eventIndex, firstAutomaton);
@@ -487,9 +490,9 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                 eventIsQualifiedForMarkedComponent = firstAutTransWithEvent.isQualifiedForMarkedComponent();
             }
 
-            if (includedAutomata.size() == 1) 
+            if (includedAutomata.size() == 1)
             {
-                for (final VariableComponentProxy var : orgAutomata.getVars()) 
+                for (final VariableComponentProxy var : orgAutomata.getVars())
                 {
                     final int varIndex = theIndexMap.getVariableIndex(var);
                     final BDD noneUpdateVar =
@@ -498,18 +501,18 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                             transCorrespondingToUpdatedVariablesWithoutActions[varIndex].ite(transCorrespondingToUpdatedVariables[varIndex],noneUpdateVar);
                 }
 
-                if (eventIsQualifiedForInitialComponent) 
+                if (eventIsQualifiedForInitialComponent)
                 {
                     initialComponentCandidates.add(eventIndex);
                 }
 
-                if (eventIsQualifiedForMarkedComponent) 
+                if (eventIsQualifiedForMarkedComponent)
                 {
                     markedComponentCandidates.add(eventIndex);
                 }
             }
 
-            while (autIterator.hasNext()) 
+            while (autIterator.hasNext())
             {
                 final ExtendedAutomaton currAutomaton = autIterator.next();
                 final AutIncludingTransLabeledByEvent currAutIncTrans = new AutIncludingTransLabeledByEvent(includingAutomata2Edges, eventIndex, currAutomaton);
@@ -518,7 +521,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                 final BDD[] currTransCorrespondingToUpdatedVariables = currAutIncTrans.getTransitionBDDCorrespondingToUpdatedVariables();
                 final BDD[] currTransCorrespondingToUpdatedVariablesWithoutActions = currAutIncTrans.getTransitionBDDCorrespondingToUpdatedVariablesWithoutActions();
 
-                for (final VariableComponentProxy var : orgAutomata.getVars()) 
+                for (final VariableComponentProxy var : orgAutomata.getVars())
                 {
                     final int varIndex = theIndexMap.getVariableIndex(var);
 
@@ -541,7 +544,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                     transCorrespondingToUpdatedVariables[varIndex] = firstUpdatedVar.or(secondUpdatedVar).or(bothUpdatedVar);
                 }
 
-                for (final VariableComponentProxy var : orgAutomata.getVars()) 
+                for (final VariableComponentProxy var : orgAutomata.getVars())
                 {
                     final int varIndex = theIndexMap.getVariableIndex(var);
                     final BDD compensate = bddExAutomata.BDDBitVecTargetVarsMap.get(var.getName()).equ(bddExAutomata.BDDBitVecSourceVarsMap.get(var.getName()));
@@ -556,7 +559,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             }
 
             final BDD tmp = manager.getOneBDD();
-            for (int i = 0; i < bddExAutomata.orgExAutomata.getVars().size(); i++) 
+            for (int i = 0; i < bddExAutomata.orgExAutomata.getVars().size(); i++)
             {
                 final String varName = theIndexMap.getVariableAt(i).getName();
                 transCorrespondingToUpdatedVariables[i] =
@@ -573,9 +576,9 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             /* Merge with "keep" BDD */
             final Set<ExtendedAutomaton> includedAutomataSet = includingAutomata2Edges.keySet();
             BDD keep = manager.getOneBDD();
-            for (final ExtendedAutomaton extendedAutomaton : theExAutomata) 
+            for (final ExtendedAutomaton extendedAutomaton : theExAutomata)
             {
-                if (!includedAutomataSet.contains(extendedAutomaton)) 
+                if (!includedAutomataSet.contains(extendedAutomaton))
                 {
                     final BDDExtendedAutomaton bddAutomaton = bddExAutomata.automatonToBDDAutomatonMap.get(extendedAutomaton);
                     keep = keep.and(bddAutomaton.getSelfLoopsBDD());
@@ -593,18 +596,18 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             eventForwardCompleteTransitions.orWith(isolatedTransBDD);
 
             /* Determine whether or not to put this event as the initialComponentCandidate set or markedComponentCandidate set. */
-            if (eventIsQualifiedForInitialComponent) 
+            if (eventIsQualifiedForInitialComponent)
             {
                 initialComponentCandidates.add(eventIndex);
             }
 
-            if (eventIsQualifiedForMarkedComponent) 
+            if (eventIsQualifiedForMarkedComponent)
             {
                 markedComponentCandidates.add(eventIndex);
             }
 
             /* If the event is uncontrollable, put it into the uncontrollableComponentCandidates */
-            if (bddExAutomata.plantUncontrollableEventIndexList.contains(eventIndex) || bddExAutomata.specUncontrollableEventIndexList.contains(eventIndex)) 
+            if (bddExAutomata.plantUncontrollableEventIndexList.contains(eventIndex) || bddExAutomata.specUncontrollableEventIndexList.contains(eventIndex))
             {
                 uncontrollableComponentCandidates.add(eventIndex);
             }
@@ -637,7 +640,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         private boolean qualifiedForMarkedComponent = false;
 
         /** Constructor*/
-        public AutIncludingTransLabeledByEvent(final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includingAutomata2Edges, final int eventIndex, final ExtendedAutomaton anAutomaton) 
+        public AutIncludingTransLabeledByEvent(final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> includingAutomata2Edges, final int eventIndex, final ExtendedAutomaton anAutomaton)
         {
             this.includingAutomata2Edges = includingAutomata2Edges;
             this.eventIndex = eventIndex;
@@ -649,7 +652,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             initialize();
         }
 
-        private void initialize() 
+        private void initialize()
         {
             /* First initialize the BDD and two BDD arrays*/
             transitionBDDWithoutActions = manager.getZeroBDD(); // It should be zero-BDD, because we want the union of BDD for all edges in one automaton
@@ -659,16 +662,16 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             }
 
             /* Go through each edge and build these two BDD arrays*/
-            for (final Iterator<EdgeProxy> edgeIterator = includingAutomata2Edges.get(anAutomaton).iterator(); edgeIterator.hasNext();) 
+            for (final Iterator<EdgeProxy> edgeIterator = includingAutomata2Edges.get(anAutomaton).iterator(); edgeIterator.hasNext();)
             {
                 final EdgeProxy anEdge = edgeIterator.next();
 
-                if (anAutomaton.isLocationInitial(anEdge.getSource())) 
+                if (anAutomaton.isLocationInitial(anEdge.getSource()))
                 {
                     qualifiedForInitialComponent = true;
                 }
 
-                if (anAutomaton.isLocationAccepted(anEdge.getTarget()) || bddExAutomata.getBDDExAutomaton(anAutomaton).getAllMarked()) 
+                if (anAutomaton.isLocationAccepted(anEdge.getTarget()) || bddExAutomata.getBDDExAutomaton(anAutomaton).getAllMarked())
                 {
                     qualifiedForMarkedComponent = true;
                 }
@@ -685,11 +688,11 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                 List<BinaryExpressionProxy> actions = null;
                 final BDD actionsBDD = manager.getOneBDD();
 
-                if (anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getActions() != null && !anEdge.getGuardActionBlock().getActions().isEmpty()) 
+                if (anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getActions() != null && !anEdge.getGuardActionBlock().getActions().isEmpty())
                 {
                     actions = anEdge.getGuardActionBlock().getActions();
                     /* Iterate each action to extract variables and build BDD*/
-                    for (final BinaryExpressionProxy anAction : actions) 
+                    for (final BinaryExpressionProxy anAction : actions)
                     {
                         final String updatedVariableOfThisAction = ((SimpleIdentifierProxy) anAction.getLeft()).getName();
                         final int varIndex = theIndexMap.getVariableIndexByName(updatedVariableOfThisAction);
@@ -707,14 +710,14 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                 (1) based on the indices of updated variables, OR with them on the BDD array and return this BDD array
                 (2) Or with transitionBDDWithoutActions with transitionWithoutActionsOnCurrEdge
                  */
-                for (final TIntIterator itr = updatedVariableIndexSet.iterator(); itr.hasNext();) 
+                for (final TIntIterator itr = updatedVariableIndexSet.iterator(); itr.hasNext();)
                 {
                     final int variableIndex = itr.next();
                     transitionBDDCorrespondingToUpdatedVariablesWithoutActions[variableIndex] =
                             transitionBDDCorrespondingToUpdatedVariablesWithoutActions[variableIndex].or(transitionWithoutActionsOnCurrEdge);
                 }
 
-                varIndex2Action.forEachEntry(new TIntObjectProcedure<BDD>() 
+                varIndex2Action.forEachEntry(new TIntObjectProcedure<BDD>()
                 {
                     @Override
                     public boolean execute(final int varIndex, final BDD action) {
@@ -727,7 +730,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             }
         }
 
-        private BDD getEdgeBDDWithoutActions(final ExtendedAutomaton anAutomaton, final EdgeProxy anEdge) 
+        private BDD getEdgeBDDWithoutActions(final ExtendedAutomaton anAutomaton, final EdgeProxy anEdge)
         {
             final BDDDomain sourceLocationDomain = bddExAutomata.getSourceLocationDomain(anAutomaton.getName());
             final BDDDomain destLocationDomain = bddExAutomata.getDestLocationDomain(anAutomaton.getName());
@@ -743,11 +746,11 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
 
             BDD guardBDD = manager.getOneBDD();
             List<SimpleExpressionProxy> guards = null;
-            if (anEdge.getGuardActionBlock() != null) 
+            if (anEdge.getGuardActionBlock() != null)
             {
                 guards = anEdge.getGuardActionBlock().getGuards();
             }
-            if (guards != null && guards.size() > 0) 
+            if (guards != null && guards.size() > 0)
             {
                 /* Use it for heuristics*/
                 eventIndex2GuardVariables.get(eventIndex).addAll(extractVariablesFromTheEdge(anEdge));
@@ -760,17 +763,17 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
         }
 
         /* Find which EFA variables are in this edge. */
-        private HashSet<String> extractVariablesFromTheEdge(final EdgeProxy anEdge) 
+        private HashSet<String> extractVariablesFromTheEdge(final EdgeProxy anEdge)
         {
             final HashSet<String> extractedVariables = new HashSet<String>();
 
-            if (anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getGuards() != null && !anEdge.getGuardActionBlock().getGuards().isEmpty()) 
+            if (anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getGuards() != null && !anEdge.getGuardActionBlock().getGuards().isEmpty())
             {
                 final String guardString = anEdge.getGuardActionBlock().getGuards().get(0).toString();
 
-                for (final VariableComponentProxy var : orgAutomata.getVars()) 
+                for (final VariableComponentProxy var : orgAutomata.getVars())
                 {
-                    if (guardString.contains(var.getName())) 
+                    if (guardString.contains(var.getName()))
                     {
                         extractedVariables.add(var.getName());
                     }
@@ -779,27 +782,27 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             return extractedVariables;
         }
 
-        public BDD getTransitionBDDWithoutActions() 
+        public BDD getTransitionBDDWithoutActions()
         {
             return transitionBDDWithoutActions;
         }
 
-        public BDD[] getTransitionBDDCorrespondingToUpdatedVariablesWithoutActions() 
+        public BDD[] getTransitionBDDCorrespondingToUpdatedVariablesWithoutActions()
         {
             return transitionBDDCorrespondingToUpdatedVariablesWithoutActions;
         }
 
-        public BDD[] getTransitionBDDCorrespondingToUpdatedVariables() 
+        public BDD[] getTransitionBDDCorrespondingToUpdatedVariables()
         {
             return transitionBDDCorrespondingToUpdatedVariables;
         }
 
-        public boolean isQualifiedForInitialComponent() 
+        public boolean isQualifiedForInitialComponent()
         {
             return qualifiedForInitialComponent;
         }
 
-        public boolean isQualifiedForMarkedComponent() 
+        public boolean isQualifiedForMarkedComponent()
         {
             return qualifiedForMarkedComponent;
         }
