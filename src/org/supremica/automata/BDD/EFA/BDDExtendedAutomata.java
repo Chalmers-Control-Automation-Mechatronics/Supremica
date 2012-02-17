@@ -816,10 +816,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         {
             if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
             {
-               //reachableStatesBDD = BDDExDisjunctiveReachabilityAlgorithms.restrictedForwardWorkSetAlgorithm(this, getInitialState(), manager.getZeroBDD());
-               //reachableStatesBDD = BDDExDisjunctiveHeuristicReachabilityAlgorithms.forwardWorkSetAlgorithm(this, getInitialState(), manager.getZeroBDD());
                getDepSets();
                reachableStatesBDD = depSets.forwardWorkSetAlgorithm(getInitialState());
+               // TEST
+               //reachableStatesBDD = depSets.randomForwardWorkSet(getInitialState());
             }
             else
             {
@@ -850,14 +850,17 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     BDD getCoreachableStates()
     {
         if (coreachableStatesBDD == null)
-        {
+         {
             if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
             {
                 coreachableStatesBDD = getDepSets().reachableBackwardWorkSetAlgorithm(getMarkedStates(), getReachableStates()); 
                 //coreachableStatesBDD = getDepSets().backwardWorkSetAlgorithm(getMarkedStates());
+                // TEST
+                //coreachableStatesBDD = depSets.randomBackwardWorkSet(getMarkedStates());
             }
             else
             {
+                
                 coreachableStatesBDD = manager.restrictedBackward(manager.getZeroBDD());
             }
 
@@ -958,9 +961,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
 
 //            BDD2IDD2PS(nonblockingStatesBDD, nonblockingStatesBDD, "nonblockingStates");
-            System.err.println("Nonblocking states computed!");
-            final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
-            nbrOfNonblockingStates = nbrOfStatesIDD(idd).longValue();
+            System.err.println("Nonblocking states computed!: " + nonblockingStatesBDD.satCount(sourceStateVariables));
+//            final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
+//            nbrOfNonblockingStates = nbrOfStatesIDD(idd).longValue();
 //            nbrOfNonblockingStates = 1;
 
             nbrOfBlockingStates = nbrOfReachableStates - nbrOfNonblockingStates;

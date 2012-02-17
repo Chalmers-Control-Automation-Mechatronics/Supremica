@@ -541,10 +541,10 @@ public class GraphEditorPanel
       }
     }
     final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
-    final Set<Proxy> lookup = new THashSet<Proxy>(items);
     if (!eventlists.isEmpty()) {
       // Deleting event labels: visit all label blocks, and add deleted items
       // in order of appearance to undo list ...
+      final Set<? extends Proxy> lookup = getRootsOfLabelSelection(items);
       for (final ListSubject<AbstractSubject> eventlist :
              eventlists.keySet()) {
         int pos = 0;
@@ -558,6 +558,7 @@ public class GraphEditorPanel
     } else {
       // Not deleting event labels: then delete everything except node labels
       // First find any edges to be deleted ...
+    final Set<Proxy> lookup = new THashSet<Proxy>(items);
       for (final EdgeSubject edge : graph.getEdgesModifiable()) {
         if (lookup.contains(edge) ||
             lookup.contains(edge.getSource()) ||
@@ -1443,6 +1444,30 @@ public class GraphEditorPanel
     return null;
   }
 
+  private static Set<? extends Proxy> getRootsOfLabelSelection
+    (final Collection<? extends Proxy> items)
+  {
+    if (items.size() <= 1) {
+      return new THashSet<Proxy>(items);
+    } else {
+      final Set<Proxy> set = new THashSet<Proxy>(items);
+      final int size = items.size();
+      final Set<Proxy> reduced = new THashSet<Proxy>(size);
+      for (final Proxy proxy : items) {
+        ProxySubject parent = (ProxySubject) proxy;
+        while (true) {
+          parent = SubjectTools.getProxyParent(parent);
+          if (parent == null || parent instanceof LabelBlockProxy) {
+            reduced.add(proxy);
+            break;
+          } else if (set.contains(parent)) {
+            break;
+          }
+        }
+      }
+      return reduced;
+    }
+  }
 
 
   //#########################################################################
@@ -1462,11 +1487,11 @@ public class GraphEditorPanel
       if (!mNewMoveStarted) {
         if (mLastCommand != null
             && mLastCommand == undoInterface.getLastCommand()) {
+          mLastCommand.setUpdatesSelection(false);
           undoInterface.undo();
           undoInterface.removeLastCommand();
         }
-      }
-      else{
+      } else {
         mNewMoveStarted = false;
       }
       final Command cmd =
@@ -3898,98 +3923,59 @@ public class GraphEditorPanel
     public void keyPressed(final KeyEvent e)
     {
       final int keyCode = e.getKeyCode();
-      if (isAGeometryMove()) {
+      final boolean up =
+        keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_KP_UP;
+      final boolean down =
+        keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_KP_DOWN;
+      final boolean left =
+        keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_KP_LEFT;
+      final boolean right =
+        keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT;
+      if (isAGeometryMove() && (up || down || left || right)) {
         mMoveVisitor = new MoveVisitor();
         createSecondaryGraph();
-        mMoveVisitor.moveAll(getX(keyCode), getY(keyCode));
+        final int x = left ? -1 : right ? 1 : 0;
+        final int y = up ? -1 : down ? 1 : 0;
+        mMoveVisitor.moveAll(x, y);
         commitSecondaryGraph(null, true, true);
         mMoveVisitor = null;
         clearSecondaryGraph();
-      } else {
-        final boolean up =
-          keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_KP_UP;
-        final boolean down =
-          keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_KP_DOWN;
-        if (up || down) {
-          final CompoundCommand move = new CompoundCommand();
-          boolean execute = false;
-          final List<ProxySubject> selectionList =
-            getReorderedSelectionList();
-          final List<InsertInfo> deletes = getDeletes(selectionList);
-          final List<InsertInfo> inserts =
-            getInserts(selectionList, up, down);
-          if (inserts != null && deletes != null) {
-            final Command del =
-              new DeleteCommand(deletes, GraphEditorPanel.this, true);
-            final Command ins =
-              new InsertCommand(inserts, GraphEditorPanel.this, null);
-            move.addCommand(del);
-            move.addCommand(ins);
-            final List<Proxy> proxies = InsertInfo.getProxies(inserts);
-            final String named = ProxyNamer.getCollectionClassName(proxies);
-            move.setName(named + " Movement");
-            execute = true;
-          }
-          if (execute) {
-            move.end();
-            e.consume();
-            getUndoInterface().executeCommand(move);
-          }
+      } else if (up || down) {
+        final CompoundCommand move = new CompoundCommand();
+        boolean execute = false;
+        final List<ProxySubject> selectionList = getReorderedSelectionList();
+        final List<InsertInfo> deletes = getDeletes(selectionList);
+        final List<InsertInfo> inserts = getInserts(selectionList, up, down);
+        if (inserts != null && deletes != null) {
+          final Command del =
+            new DeleteCommand(deletes, GraphEditorPanel.this, true);
+          final Command ins =
+            new InsertCommand(inserts, GraphEditorPanel.this, null);
+          move.addCommand(del);
+          move.addCommand(ins);
+          final List<Proxy> proxies = InsertInfo.getProxies(inserts);
+          final String named = ProxyNamer.getCollectionClassName(proxies);
+          move.setName(named + " Movement");
+          execute = true;
+        }
+        if (execute) {
+          move.end();
+          e.consume();
+          getUndoInterface().executeCommand(move);
         }
       }
     }
 
-    //need a better way of knowing whether its a geometry move or not
-    private boolean isAGeometryMove(){
-      boolean hasInnerSelections = false;
-      int labelBlockCount = 0;
-      boolean objectSelected = false;
-      for(final ProxySubject proxy : mSelectedList){
-        if(proxy instanceof ForeachSubject){
-          hasInnerSelections = true;
-        }else if(proxy instanceof GroupNodeSubject){
-          objectSelected = true;
-        }else if(proxy instanceof GuardActionBlockSubject){
-          objectSelected = true;
-        }else if(proxy instanceof IdentifierSubject){
-          hasInnerSelections = true;
-        }else if(proxy instanceof LabelBlockSubject){
-          labelBlockCount++;
-        }else if(proxy instanceof LabelGeometrySubject){
-          objectSelected = true;
-        }else if(proxy instanceof SimpleNodeSubject){
-          objectSelected = true;
+    private boolean isAGeometryMove()
+    {
+      for (final ProxySubject proxy : mSelectedList) {
+        if (proxy instanceof ForeachSubject) {
+          return false;
+        } else if (proxy instanceof IdentifierSubject) {
+          return false;
         }
-      }
-      if(labelBlockCount == 1 && hasInnerSelections && !objectSelected){
-        return false;
-      }
-      else if(hasInnerSelections && labelBlockCount == 0){
-        return false;
       }
       return true;
-    }
-
-    private int getX(final int keyCode)
-    {
-      if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_KP_LEFT) {
-        return -1;
-      } else if (keyCode == KeyEvent.VK_RIGHT
-                 || keyCode == KeyEvent.VK_KP_RIGHT) {
-        return 1;
-      }
-      return 0;
-    }
-
-    private int getY(final int keyCode)
-    {
-      if (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_KP_UP) {
-        return -1;
-      } else if (keyCode == KeyEvent.VK_DOWN
-                 || keyCode == KeyEvent.VK_KP_DOWN) {
-        return 1;
-      }
-      return 0;
     }
 
     private List<InsertInfo> getDeletes(final List<ProxySubject> selections)

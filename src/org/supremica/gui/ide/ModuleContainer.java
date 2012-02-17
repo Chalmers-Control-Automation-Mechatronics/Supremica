@@ -26,8 +26,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoableEdit;
-
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -386,10 +384,10 @@ public class ModuleContainer
     addUndoable(new UndoableCommand(c));
   }
 
-  public void addUndoable(final UndoableEdit event)
+  public void addUndoable(final UndoableCommand command)
   {
-    assert(event.isSignificant());
-      mUndoManager.addEdit(event);
+    assert(command.isSignificant());
+      mUndoManager.addCommand(command);
       if (mUndoIndex++ < mUndoCheckPoint) {
         mUndoCheckPoint = -1;
       }

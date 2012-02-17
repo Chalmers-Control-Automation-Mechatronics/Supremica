@@ -11,10 +11,21 @@ public class WatersUndoManager extends UndoManager
   }
 
   public Command getLastCommand(){
-    final UndoableCommand undo = (UndoableCommand) lastEdit();
-    return undo.getCommand();
+    return mLastCommand;
   }
 
+  @Override
+  public void undo(){
+    super.undo();
+    mLastCommand = null;
+  }
+
+  public boolean addCommand(final UndoableCommand anEdit){
+    mLastCommand = anEdit.getCommand();
+    return super.addEdit(anEdit);
+  }
+
+  private Command mLastCommand;
   private static final long serialVersionUID = 1L;
 
 }

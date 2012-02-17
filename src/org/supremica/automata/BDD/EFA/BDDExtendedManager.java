@@ -676,11 +676,9 @@ public class BDDExtendedManager
             Qm = Qm.or(extendedClockBDD);
 */
             Qkn = (Qk.or(Qm)).and(forbidden.not());
-
         } while (!Qkn.equals(Qk));
 
 //        try{out.close();}catch (final Exception e){}
-
         return Qkn;
     }
 
@@ -763,7 +761,8 @@ public class BDDExtendedManager
                 break;
             } else {
                 tmpCoreachableStates = bddExAutomata.getDepSets()
-                        .backwardRestrictedWorkSetAlgorithm(bddExAutomata.getMarkedStates(), currentForbidenStates);
+                        .reachableBackwardRestrictedWorkSetAlgorithm(bddExAutomata.getMarkedStates(), currentForbidenStates, bddExAutomata.getReachableStates());
+                        //.backwardRestrictedWorkSetAlgorithm(bddExAutomata.getMarkedStates(), currentForbidenStates);
                 currentForbidenStates = tmpCoreachableStates.not();
                 flag = true;
             }

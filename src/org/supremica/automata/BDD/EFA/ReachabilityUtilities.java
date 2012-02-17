@@ -15,6 +15,9 @@ import net.sf.javabdd.BDD;
  */
 public class ReachabilityUtilities {
 
+    // FOR TEST: the largest number of BDD nodes during the image computation
+    // public static int maxNbrBDDnodes = 0;
+    
     private ReachabilityUtilities() {
         throw new AssertionError();
     }
@@ -52,6 +55,24 @@ public class ReachabilityUtilities {
         previousCoreachableStates.free();
         return coreachableStatesBDD;
     }
+    
+        /* The initial and returned coreachableStatesBDD are "target states". The reachable states are the "source" states. */
+    static BDD preImage2(BDDExtendedAutomata bddAutomata, BDD coreachableStatesBDD, BDD curTransitionRelation, BDD reachableStates) {
+        
+        BDD nextStates;
+        BDD previousCoreachableStates;
+
+        do {
+            previousCoreachableStates = coreachableStatesBDD.id();
+            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.destStateVariables);
+            nextStates = nextStates.and(reachableStates)
+                    .replaceWith(bddAutomata.sourceToDestLocationPairing).replaceWith(bddAutomata.sourceToDestVariablePairing);
+            coreachableStatesBDD = coreachableStatesBDD.orWith(nextStates);
+        } while (!coreachableStatesBDD.equals(previousCoreachableStates));
+
+        previousCoreachableStates.free();
+        return coreachableStatesBDD;
+    }
 
     /* Both of reachableStatesBDD and forbiddenStatesBDD are "source states". */
     static BDD restrictedImage(BDDExtendedAutomata bddAutomata, BDD reachableStatesBDD, BDD forbiddenStatesBDD, BDD curTransitionRelation){
@@ -78,15 +99,39 @@ public class ReachabilityUtilities {
         
         BDD nextStates;
         BDD previousCoreachableStates;
-        BDD premittedStates = forbiddenStatesBDD.not();
-        coreachableStatesBDD = coreachableStatesBDD.and(premittedStates);
+        BDD permittedStates = forbiddenStatesBDD.not();
+        coreachableStatesBDD = coreachableStatesBDD.and(permittedStates);
 
         do {
             previousCoreachableStates = coreachableStatesBDD.id();
-            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist( bddAutomata.destStateVariables);
+            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.destStateVariables);
             nextStates.replaceWith(bddAutomata.sourceToDestLocationPairing).replaceWith(bddAutomata.sourceToDestVariablePairing);
             coreachableStatesBDD.orWith(nextStates);
-            coreachableStatesBDD = coreachableStatesBDD.and(premittedStates);
+            coreachableStatesBDD = coreachableStatesBDD.and(permittedStates);
+        } while (!coreachableStatesBDD.equals(previousCoreachableStates));
+
+        previousCoreachableStates.free();
+        return coreachableStatesBDD;
+    }
+    
+    /* Both of coreachableStatesBDD and forbiddenStatesBDD ought to be "target states". 
+       The reachable states are the "source states".
+     */
+    static BDD restrictedPreImage2(BDDExtendedAutomata bddAutomata, BDD coreachableStatesBDD, BDD forbiddenStatesBDD, 
+                                   BDD curTransitionRelation, BDD reachableStates) {
+        
+        BDD nextStates;
+        BDD previousCoreachableStates;
+        BDD permittedStates = forbiddenStatesBDD.not();
+        coreachableStatesBDD = coreachableStatesBDD.and(permittedStates);
+
+        do {
+            previousCoreachableStates = coreachableStatesBDD.id();
+            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.destStateVariables);
+            nextStates = nextStates.and(reachableStates)
+                    .replaceWith(bddAutomata.sourceToDestLocationPairing).replaceWith(bddAutomata.sourceToDestVariablePairing)
+                    .and(permittedStates);
+            coreachableStatesBDD.orWith(nextStates);
         } while (!coreachableStatesBDD.equals(previousCoreachableStates));
 
         previousCoreachableStates.free();
