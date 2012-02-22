@@ -42,10 +42,10 @@ public abstract class WatersActionManager implements Observer
     addAction(new AnalyzeSDPlantCompletenessAction(ide));
     addAction(new AnalyzeSDActivityLoopAction(ide));
     addAction(new AnalyzeSDSingularPropertyAction(ide));
+    addAction(new AnalyzeSDControllabilityAction(ide));
     addAction(new AnalyzeSDCTwoApropertyAction(ide));
     addAction(new AnalyzeSDCTwoBPropertyAction(ide));
-    addAction(new AnalyzeSDCThreep1_apropertyAction(ide));
-    addAction(new AnalyzeSDCThreep1_bpropertyAction(ide));
+    addAction(new AnalyzeSDCThree_one_propertyAction(ide));
     addAction(new AnalyzeNerodeEquivalentAction(ide));
     addAction(new AnalyzeSDCFourPropertyAction(ide));
     addAction(new AnalyzeProperTimeBehaviorPropertyAction(ide));

@@ -26,6 +26,8 @@ import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCThree_one_propertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDNSLActivityLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
@@ -85,8 +87,6 @@ import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_apropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_bpropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
@@ -374,19 +374,19 @@ public class IDEMenuBar extends JMenuBar
             final Action SSingular =
               actions.getAction(AnalyzeSDSingularPropertyAction.class);
             mVerifyMenu.add(SSingular);
+            final Action Sdone =
+              actions.getAction(AnalyzeSDControllabilityAction.class);
+            mVerifyMenu.add(Sdone);
             final Action Sdtwoa =
               actions.getAction(AnalyzeSDCTwoApropertyAction.class);
             mVerifyMenu.add(Sdtwoa);
             final Action Sdtwob =
               actions.getAction(AnalyzeSDCTwoBPropertyAction.class);
             mVerifyMenu.add(Sdtwob);
-            final Action Sdthree1a =
-              actions.getAction(AnalyzeSDCThreep1_apropertyAction.class);
-            mVerifyMenu.add(Sdthree1a);
-            final Action Sdthree1b =
-              actions.getAction(AnalyzeSDCThreep1_bpropertyAction.class);
-            mVerifyMenu.add(Sdthree1b);
-            final Action SDthree2 =
+            final Action Sdthree1 =
+              actions.getAction(AnalyzeSDCThree_one_propertyAction.class);
+            mVerifyMenu.add(Sdthree1);
+                        final Action SDthree2 =
                 actions.getAction(AnalyzeNerodeEquivalentAction.class);
               mVerifyMenu.add(SDthree2);
             final Action Sdfour =

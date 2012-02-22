@@ -32,22 +32,22 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  * @author Mahvash Baloch , Robi Malik
  */
 
-public class SDCThreebVerifier extends AbstractSDLanguageInclusionChecker
+public class SDCThreeaVerifier extends AbstractSDLanguageInclusionChecker
 {
 
   //#########################################################################
   //# Constructors
-  public SDCThreebVerifier( final ProductDESProxyFactory factory)
+  public SDCThreeaVerifier( final ProductDESProxyFactory factory)
   {
   super(factory);
   }
-  public SDCThreebVerifier(   final LanguageInclusionChecker checker,
+  public SDCThreeaVerifier(   final LanguageInclusionChecker checker,
                             final ProductDESProxyFactory factory
                             )
   {
   super(checker,factory);
   }
-    public SDCThreebVerifier( final LanguageInclusionChecker checker,
+    public SDCThreeaVerifier( final LanguageInclusionChecker checker,
                             final ProductDESProxy model,
                             final ProductDESProxyFactory factory)
     {
@@ -68,8 +68,9 @@ public class SDCThreebVerifier extends AbstractSDLanguageInclusionChecker
 
       for (final EventProxy hib : Hibs)
        {
-        convertedModel = builder.createSDThree_bModel(hib);
-        final LanguageInclusionChecker checker= getLanguageInclusionChecker();
+        convertedModel = builder.createSDThreeModel(hib);
+        final LanguageInclusionChecker checker=
+         getLanguageInclusionChecker();
         checker.setModel(convertedModel);
         final VerificationResult result;
         try {
@@ -93,8 +94,7 @@ public class SDCThreebVerifier extends AbstractSDLanguageInclusionChecker
 
     } finally {
       tearDown();
-
-    }
+     }
   }
 
   public EventProxy getFailedAnswer()
@@ -122,7 +122,6 @@ public class SDCThreebVerifier extends AbstractSDLanguageInclusionChecker
 
    //#########################################################################
   //# Auxiliary Methods
-
   private void recordStatistics(final AnalysisResult result)
   {
      if (mFirstResult) {
@@ -154,4 +153,4 @@ public class SDCThreebVerifier extends AbstractSDLanguageInclusionChecker
   private EventProxy mFailedAnswer;
   private boolean mFirstResult;
   private AnalysisResult Result;
-}
+  }

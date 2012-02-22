@@ -34,7 +34,7 @@ public class AnalyzeSDCTwoBPropertyAction extends WatersAnalyzeAction
 
   protected String getFailureDescription()
   {
-    return "does not satisfy SD controllability Point 2b";
+    return "does not satisfy SD Controllability Point ii";
   }
 
   protected ModelVerifier getModelVerifier
@@ -50,7 +50,7 @@ public class AnalyzeSDCTwoBPropertyAction extends WatersAnalyzeAction
 
   protected String getSuccessDescription()
   {
-    return "satisfies Sd Controllability 2b";
+    return "satisfies SD Controllability Point ii";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;
