@@ -25,7 +25,6 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.EFA.BDDEdges;
-import org.supremica.automata.BDD.EFA.BDDExDisjDepSetsDecorator;
 import org.supremica.automata.BDD.EFA.BDDExDisjEventDepSets;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
