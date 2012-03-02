@@ -15,7 +15,7 @@ import java.util.Set;
 
 
 /**
- * The common superinterface for all loning tools for the various proxy
+ * The common superinterface for all cloning tools for the various proxy
  * implementations and categories. Parameterised by a factory, a proxy
  * cloner can accept objects from one {@link Proxy} implementation and
  * translate them to another.

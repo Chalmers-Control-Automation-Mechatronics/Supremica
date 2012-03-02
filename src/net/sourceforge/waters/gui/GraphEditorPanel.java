@@ -417,12 +417,15 @@ public class GraphEditorPanel
     final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
     if (transferable.isDataFlavorSupported(WatersDataFlavor.GRAPH)) {
       final GraphSubject graph = getGraph();
-      final List<GraphSubject> list = (List<GraphSubject>)
+      final List<GraphProxy> list = (List<GraphProxy>)
         transferable.getTransferData(WatersDataFlavor.GRAPH);
-      final GraphSubject newgraph = list.iterator().next();
-      final LabelBlockSubject newblocked = newgraph.getBlockedEvents();
-      final Collection<NodeSubject> newnodes = newgraph.getNodesModifiable();
-      final Collection<EdgeSubject> newedges = newgraph.getEdgesModifiable();
+      final GraphProxy newgraph = list.iterator().next();
+      final LabelBlockSubject newblocked =
+        (LabelBlockSubject) newgraph.getBlockedEvents();
+      final Set<NodeSubject> newnodes =
+        (Set<NodeSubject>) (Object) newgraph.getNodes();
+      final Collection<EdgeSubject> newedges =
+        (Collection<EdgeSubject>) (Object) newgraph.getEdges();
       final Point2D newpos =
         GeometryTools.getTopLeftPosition(newblocked, newnodes);
       final Point2D pastepos = getPastePosition();
@@ -430,7 +433,6 @@ public class GraphEditorPanel
       final double dy = pastepos.getY() - newpos.getY();
       final Point2D delta = new Point2D.Double(dx, dy);
       if (newblocked != null) {
-        newgraph.setBlockedEvents(null);
         final LabelBlockSubject blocked = graph.getBlockedEvents();
         if (blocked == null) {
           GeometryTools.translate(newblocked, delta);

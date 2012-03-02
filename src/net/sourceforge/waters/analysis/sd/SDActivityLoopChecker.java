@@ -10,17 +10,19 @@
 package net.sourceforge.waters.analysis.sd;
 
 import net.sourceforge.waters.analysis.modular.ModularControlLoopChecker;
+import net.sourceforge.waters.model.analysis.ControlLoopChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- *      This class Checks for Activity Loops in an automata 
+ *      This class Checks for Activity Loops in an automata
         @author Mahvash Baloch
  */
 
 public class SDActivityLoopChecker
   extends ModularControlLoopChecker
+  implements ControlLoopChecker
 
 {
 

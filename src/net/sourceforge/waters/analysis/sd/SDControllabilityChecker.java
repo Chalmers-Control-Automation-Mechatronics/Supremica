@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.sd
-//# CLASS:   SDPlantCompletenessChecker
+//# PACKAGE: net.sourceforge.waters.analysis.monolothic
+//# CLASS:   MonolithicControllabilityChecker
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,30 +17,27 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * @author Mahvash Baloch
+ * @author Robi Malik
  */
 
-public class SDPlantCompletenessChecker
+public class SDControllabilityChecker
   extends ModularControllabilityChecker
   implements ControllabilityChecker
 {
 
   //#########################################################################
   //# Constructors
-  public SDPlantCompletenessChecker(final ProductDESProxyFactory factory,
-                                    final SafetyVerifier checker)
+  public SDControllabilityChecker(final ProductDESProxyFactory factory,
+                                  final SafetyVerifier checker)
   {
     this(null,factory,checker,false);
   }
 
-  public SDPlantCompletenessChecker(final ProductDESProxy model,
-                                    final ProductDESProxyFactory factory,
-                                    final SafetyVerifier checker,
-                                    final boolean least)
-  {
-    super(model, factory,checker, false);
-    setKindTranslator(SDPlantCompletenessKindTranslator.getInstance());
-
+  public SDControllabilityChecker(final ProductDESProxy model,
+                                  final ProductDESProxyFactory factory,
+                                  final SafetyVerifier checker,
+                                  final boolean least)
+  {super(model, factory,checker, false);
 
   }
 

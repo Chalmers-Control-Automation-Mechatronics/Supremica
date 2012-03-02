@@ -50,21 +50,9 @@ public boolean run() throws AnalysisException
     LoopTraceProxy counterexample = null;
     final Collection<AutomatonProxy> oldAutomata = model.getAutomata();
      boolean check = true;
-     boolean conTick = false;
     final int numaut = oldAutomata.size();
     final List<AutomatonProxy> newAutomata =
       new ArrayList<AutomatonProxy>(numaut);
-    for (final AutomatonProxy oldAut : oldAutomata) {
-      final Collection<EventProxy> autEvents = oldAut.getEvents();
-      for (final EventProxy ev : autEvents) {
-        if (ev.getName().equals("tick")) {
-          conTick = true;
-        }
-      }
-      if (!conTick) {
-        return false;
-      }
-    }
     ProductDESProxy newModel = null;
     SDActivityLoopChecker checker = new SDActivityLoopChecker(newModel, getFactory());;
    // final Collection<EventProxy> allEvents = model.getEvents();

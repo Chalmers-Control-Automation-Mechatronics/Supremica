@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui.transfer;
 
 import gnu.trove.THashSet;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -58,6 +59,22 @@ public class GraphDataFlavor extends ModuleDataFlavor
   {
     final Proxy graph = VISITOR.createGraph(data);
     return Collections.singletonList(graph);
+  }
+
+  @Override
+  List<Proxy> createImportData(final Collection<? extends Proxy> data,
+                               final ModuleProxyFactory factory)
+  {
+    final ModuleProxyFactory rootFactory = ModuleElementFactory.getInstance();
+    final ModuleProxyCloner cloner = factory.getCloner();
+    final int size = data.size();
+    final List<Proxy> result = new ArrayList<Proxy>(size);
+    for (final Proxy proxy : data) {
+      final GraphProxy graph = (GraphProxy) proxy;
+      final GraphProxy cloned = cloner.getClonedGraph(graph, rootFactory);
+      result.add(cloned);
+    }
+    return result;
   }
 
 

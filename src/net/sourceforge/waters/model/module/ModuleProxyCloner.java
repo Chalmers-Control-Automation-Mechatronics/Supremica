@@ -75,7 +75,7 @@ public class ModuleProxyCloner
   }
 
   public <P extends Proxy>
-  List<P> getClonedList(Collection<? extends P> collection)
+  List<P> getClonedList(final Collection<? extends P> collection)
   {
     final int size = collection.size();
     final List<Proxy> result = new ArrayList<Proxy>(size);
@@ -85,12 +85,13 @@ public class ModuleProxyCloner
     }
     final List<?> precast = result;
     @SuppressWarnings("unchecked")
+    final
     List<P> cast = (List<P>) precast;
     return cast;
   }
 
   public <P extends Proxy>
-  Set<P> getClonedSet(Collection<? extends P> collection)
+  Set<P> getClonedSet(final Collection<? extends P> collection)
   {
     final int size = collection.size();
     final Set<Proxy> result = new THashSet<Proxy>(size);
@@ -100,8 +101,43 @@ public class ModuleProxyCloner
     }
     final Set<?> precast = result;
     @SuppressWarnings("unchecked")
+    final
     Set<P> cast = (Set<P>) precast;
     return cast;
+  }
+
+  /**
+   * Creates a clone of the given graph using two factories.
+   * This methods creates a clone of a graph's nodes and edges using the
+   * standard factory of this cloner, then creates a new graph using
+   * another factory given as an argument.
+   * @param  graph    The graph to be duplicated.
+   * @param  factory  The factory used to create the new graph.
+   * @return The cloned graph.
+   */
+  public GraphProxy getClonedGraph(final GraphProxy graph,
+                                   final ModuleProxyFactory factory)
+  {
+    final int size = graph.getNodes().size();
+    mNodeMap = new HashMap<String,NodeProxy>(size);
+    try {
+      final boolean deterministic = graph.isDeterministic();
+      final LabelBlockProxy blockedEvents0 = graph.getBlockedEvents();
+      final LabelBlockProxy blockedEvents =
+        blockedEvents0 == null ? null : visitLabelBlockProxy(blockedEvents0);
+      final Collection<NodeProxy> nodes0 = graph.getNodes();
+      final Collection<NodeProxy> nodes = lookupNodeProxyCollection(nodes0);
+      final Collection<EdgeProxy> edges0 = graph.getEdges();
+      final Collection<EdgeProxy> edges = cloneProxyCollection(edges0);
+      return factory.createGraphProxy(deterministic,
+                                      blockedEvents,
+                                      nodes,
+                                      edges);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    } finally {
+      mNodeMap = null;
+    }
   }
 
 
@@ -282,28 +318,11 @@ public class ModuleProxyCloner
                                        body);
   }
 
-  public GraphProxy visitGraphProxy
-    (final GraphProxy proxy)
+  @Override
+  public GraphProxy visitGraphProxy(final GraphProxy graph)
     throws VisitorException
   {
-    final int size = proxy.getNodes().size();
-    mNodeMap = new HashMap<String,NodeProxy>(size);
-    try {
-      final boolean deterministic = proxy.isDeterministic();
-      final LabelBlockProxy blockedEvents0 = proxy.getBlockedEvents();
-      final LabelBlockProxy blockedEvents =
-        blockedEvents0 == null ? null : visitLabelBlockProxy(blockedEvents0);
-      final Collection<NodeProxy> nodes0 = proxy.getNodes();
-      final Collection<NodeProxy> nodes = lookupNodeProxyCollection(nodes0);
-      final Collection<EdgeProxy> edges0 = proxy.getEdges();
-      final Collection<EdgeProxy> edges = cloneProxyCollection(edges0);
-      return mFactory.createGraphProxy(deterministic,
-                                       blockedEvents,
-                                       nodes,
-                                       edges);
-    } finally {
-      mNodeMap = null;
-    }
+    return getClonedGraph(graph, mFactory);
   }
 
   public GroupNodeProxy visitGroupNodeProxy
@@ -687,6 +706,7 @@ public class ModuleProxyCloner
     }
     final Collection<?> precast = result;
     @SuppressWarnings("unchecked")
+    final
     Collection<P> cast = (Collection<P>) precast;
     return cast;
   }
