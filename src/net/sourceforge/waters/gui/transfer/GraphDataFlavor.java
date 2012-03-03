@@ -70,9 +70,14 @@ public class GraphDataFlavor extends ModuleDataFlavor
     final int size = data.size();
     final List<Proxy> result = new ArrayList<Proxy>(size);
     for (final Proxy proxy : data) {
-      final GraphProxy graph = (GraphProxy) proxy;
-      final GraphProxy cloned = cloner.getClonedGraph(graph, rootFactory);
-      result.add(cloned);
+      if (proxy instanceof GraphProxy) {
+        final GraphProxy graph = (GraphProxy) proxy;
+        final GraphProxy cloned = cloner.getClonedGraph(graph, rootFactory);
+        result.add(cloned);
+      } else {
+        final Proxy cloned = cloner.getClone(proxy);
+        result.add(cloned);
+      }
     }
     return result;
   }
