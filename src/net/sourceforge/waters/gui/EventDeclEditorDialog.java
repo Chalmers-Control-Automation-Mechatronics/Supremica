@@ -990,6 +990,31 @@ public class EventDeclEditorDialog
         mEventDecl = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!eq.equals(mEventDecl, template)) {
+
+       /* final EventDeclDeleteVisitor e = new EventDeclDeleteVisitor(mRoot);
+        final List<? extends EventDeclProxy> decls = Collections.singletonList(mEventDecl);
+        final List<InsertInfo> list = e.getDeletionVictims(decls);
+        final CompoundCommand compound = new CompoundCommand();
+        for(final InsertInfo i : list){
+          final Proxy p = i.getProxy();
+          if(p instanceof SimpleIdentifierSubject){
+            final ModuleProxyCloner cloner =
+              ModuleSubjectFactory.getCloningInstance();
+            final SimpleIdentifierSubject sub = (SimpleIdentifierSubject)p;
+            final SimpleIdentifierSubject copy = (SimpleIdentifierSubject)cloner.getClone(p);
+            copy.setName(mNameInput.getText());
+            final SimpleComponentSubject comp =
+              SubjectTools.getAncestor(sub, SimpleComponentSubject.class);
+            final EditorWindowInterface iface =
+              mRoot.getEditorWindowInterface(comp);
+            final GraphEditorPanel graph = iface.getGraphEditorPanel();
+            if (iface != null) {
+              final Command command = new EditCommand(sub, copy, graph);
+              mRoot.getUndoInterface().executeCommand(command);
+            }
+          }
+        }*/
+
         final Command command = new EditCommand(mEventDecl, template, panel);
         mRoot.getUndoInterface().executeCommand(command);
       }

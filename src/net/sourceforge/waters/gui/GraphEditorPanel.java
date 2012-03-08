@@ -1085,12 +1085,6 @@ public class GraphEditorPanel
   {
     if(!(item instanceof LabelBlockSubject) &&
       SubjectTools.getAncestor(item, LabelBlockSubject.class) != null){
-      //TODO permanently delete??
-      /*final LabelBlockSubject block =
-        (LabelBlockSubject)SubjectTools.getAncestor(item, LabelBlockSubject.class);
-      final List<ProxySubject> victims =
-        findAllSelectedLabels(block.getEventListModifiable(), item);
-      removeFromSelection(victims);*/
       clearSelection();
       addToSelection(item);
     }
@@ -1098,21 +1092,6 @@ public class GraphEditorPanel
       replaceSelection(item);
     }
   }
-
-/*  private List<ProxySubject> findAllSelectedLabels(final ListSubject<AbstractSubject> list,
-                                     final ProxySubject item){
-    final List<ProxySubject> victims = new LinkedList<ProxySubject>();
-    for (final ProxySubject label : list) {
-      if (label != item && isSelected(label)) {
-        victims.add(label);
-      }
-      if(label instanceof ForeachSubject){
-        final ForeachSubject foreach = (ForeachSubject)label;
-        victims.addAll(findAllSelectedLabels(foreach.getBodyModifiable(), item));
-      }
-    }
-    return victims;
-  }*/
 
   /**
    * Toggles the selection of an item.
