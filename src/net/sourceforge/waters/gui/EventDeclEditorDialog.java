@@ -995,27 +995,39 @@ public class EventDeclEditorDialog
         final List<? extends EventDeclProxy> decls = Collections.singletonList(mEventDecl);
         final List<InsertInfo> list = e.getDeletionVictims(decls);
         final CompoundCommand compound = new CompoundCommand();
-        for(final InsertInfo i : list){
-          final Proxy p = i.getProxy();
-          if(p instanceof SimpleIdentifierSubject){
-            final ModuleProxyCloner cloner =
-              ModuleSubjectFactory.getCloningInstance();
-            final SimpleIdentifierSubject sub = (SimpleIdentifierSubject)p;
-            final SimpleIdentifierSubject copy = (SimpleIdentifierSubject)cloner.getClone(p);
-            copy.setName(mNameInput.getText());
-            final SimpleComponentSubject comp =
-              SubjectTools.getAncestor(sub, SimpleComponentSubject.class);
-            final EditorWindowInterface iface =
-              mRoot.getEditorWindowInterface(comp);
-            final GraphEditorPanel graph = iface.getGraphEditorPanel();
-            if (iface != null) {
-              final Command command = new EditCommand(sub, copy, graph);
-              mRoot.getUndoInterface().executeCommand(command);
+
+        final ModuleSubject module = mRoot.getModuleSubject();
+       // final List<EventDeclSubject> events = module.getEventDeclListModifiable();
+        final int size = list.size();
+        final ListIterator<InsertInfo> iter = list.listIterator(size);
+        while (iter.hasPrevious()) {
+          final InsertInfo insert = iter.previous();
+          final ProxySubject proxy = (ProxySubject) insert.getProxy();
+          if (proxy instanceof EventDeclProxy) {
+            //events.remove(proxy);
+          } else {
+            if (proxy instanceof SimpleIdentifierSubject) {
+              final SimpleIdentifierSubject subject = (SimpleIdentifierSubject) proxy;
+              final SimpleIdentifierSubject subject2 = (SimpleIdentifierSubject) proxy;
+              final SimpleComponentSubject comp =
+                SubjectTools.getAncestor(subject, SimpleComponentSubject.class);
+              final EditorWindowInterface iface =
+                mRoot.getEditorWindowInterface(comp);
+              if (iface != null) {
+                final SelectionOwner panel2 = iface.getGraphEditorPanel();
+                //final List<ProxySubject> list = Collections.singletonList(proxy);
+                //panel.removeFromSelection(list);
+                subject2.setName(mNameInput.getText());
+                final Command command = new EditCommand(subject, subject2, panel2);
+                compound.addCommand(command);
+              }
             }
           }
+        }
         }*/
 
         final Command command = new EditCommand(mEventDecl, template, panel);
+        //compound.addCommand(command);
         mRoot.getUndoInterface().executeCommand(command);
       }
       dispose();
