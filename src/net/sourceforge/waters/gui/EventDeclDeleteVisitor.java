@@ -76,9 +76,10 @@ class EventDeclDeleteVisitor
   //#########################################################################
   //# Invocation
   List<InsertInfo> getDeletionVictims
-    (final List<? extends EventDeclProxy> decls)
+    (final List<? extends EventDeclProxy> decls)//, final String action)
   {
     try {
+     // mAction = action;
       final int size = decls.size();
       mNames = new THashSet<String>(size);
       for (final EventDeclProxy decl : decls) {
@@ -353,7 +354,10 @@ class EventDeclDeleteVisitor
     final IdentifierProxy ident = mComponent.getIdentifier();
     buffer.append(ident);
     buffer.append("'.\n");
-    buffer.append("Would you like to delete all occurrences of ");
+    buffer.append("Would you like to ");
+    //buffer.append(mAction);
+    buffer.append("deletes");
+    buffer.append(" all occurrences of ");
     buffer.append(mNames.size() == 1 ? "this event?" : "these events?");
     showAutomaton();
     final Frame frame = mRoot.getRootWindow();
@@ -371,6 +375,7 @@ class EventDeclDeleteVisitor
       throw new VisitorException();
     }
   }
+
 
   private void showAutomaton()
   {
@@ -445,5 +450,6 @@ class EventDeclDeleteVisitor
   private Proxy mVictim;
   private boolean mHasShownDialog;
   private boolean mCancelled;
+  //private String mAction;
 
 }

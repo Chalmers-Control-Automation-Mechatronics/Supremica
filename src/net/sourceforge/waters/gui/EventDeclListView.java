@@ -310,7 +310,7 @@ public class EventDeclListView
   {
     @SuppressWarnings("unchecked")
     final List<EventDeclSubject> decls = (List<EventDeclSubject>) items;
-    return mDeleteVisitor.getDeletionVictims(decls);
+    return mDeleteVisitor.getDeletionVictims(decls);//, "delete");
   }
 
   public void insertItems(final List<InsertInfo> inserts)

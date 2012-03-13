@@ -985,6 +985,8 @@ public class EventDeclEditorDialog
       final EventDeclSubject template =
         new EventDeclSubject(ident, kind, observable,
                              scope, ranges, geo, attribs);
+
+
       if (mEventDecl == null) {
         final Command command = new InsertCommand(template, panel, mRoot);
         mEventDecl = template;
@@ -993,7 +995,7 @@ public class EventDeclEditorDialog
 
        /* final EventDeclDeleteVisitor e = new EventDeclDeleteVisitor(mRoot);
         final List<? extends EventDeclProxy> decls = Collections.singletonList(mEventDecl);
-        final List<InsertInfo> list = e.getDeletionVictims(decls);
+        final List<InsertInfo> list = e.getDeletionVictims(decls, "rename");
         final CompoundCommand compound = new CompoundCommand();
 
         final ModuleSubject module = mRoot.getModuleSubject();
@@ -1023,7 +1025,7 @@ public class EventDeclEditorDialog
               }
             }
           }
-        }
+
         }*/
 
         final Command command = new EditCommand(mEventDecl, template, panel);
