@@ -309,7 +309,11 @@ public class CloningGeometryListSubject<E extends Cloneable>
 
   private void fireGeometryChange()
   {
-    final Subject source = mParent != null ? mParent.getParent() : this;
+    //TODO mParent.getParent() can be null ??
+    Subject source = mParent != null ? mParent.getParent() : this;
+    if(mParent != null && mParent.getParent() == null){
+      source = this;
+    }
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(source,
                                              (GeometrySubject) mParent);

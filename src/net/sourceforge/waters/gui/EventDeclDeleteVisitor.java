@@ -76,10 +76,10 @@ class EventDeclDeleteVisitor
   //#########################################################################
   //# Invocation
   List<InsertInfo> getDeletionVictims
-    (final List<? extends EventDeclProxy> decls)//, final String action)
+    (final List<? extends EventDeclProxy> decls, final String action)
   {
     try {
-     // mAction = action;
+      mAction = action;
       final int size = decls.size();
       mNames = new THashSet<String>(size);
       for (final EventDeclProxy decl : decls) {
@@ -355,16 +355,17 @@ class EventDeclDeleteVisitor
     buffer.append(ident);
     buffer.append("'.\n");
     buffer.append("Would you like to ");
-    //buffer.append(mAction);
-    buffer.append("deletes");
+    buffer.append(mAction);
+    //buffer.append("delete");
     buffer.append(" all occurrences of ");
     buffer.append(mNames.size() == 1 ? "this event?" : "these events?");
-    showAutomaton();
+    final List<? extends Proxy> oldSelection = showAutomaton();
     final Frame frame = mRoot.getRootWindow();
     final int choice =
       JOptionPane.showConfirmDialog(frame, buffer, "Event in Use!",
                                     JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE);
+    deselectEvents(oldSelection);
     switch (choice) {
     case JOptionPane.YES_OPTION:
       return;
@@ -376,8 +377,23 @@ class EventDeclDeleteVisitor
     }
   }
 
+  private void deselectEvents(final List<? extends Proxy> oldSelection)
+  {
+    if (oldSelection != null) {
+      try {
+        final SimpleComponentSubject comp =
+          (SimpleComponentSubject) mComponent;
+        final EditorWindowInterface iface = mRoot.showEditor(comp);
+        final SelectionOwner panel = iface.getGraphEditorPanel();
+        panel.replaceSelection(oldSelection);
+      } catch (final GeometryAbsentException exception) {
+        // cannot happen
+      }
+    }
+  }
 
-  private void showAutomaton()
+
+  private List<? extends Proxy> showAutomaton()
   {
     if (mComponent instanceof SimpleComponentSubject) {
       try {
@@ -388,17 +404,20 @@ class EventDeclDeleteVisitor
         comp.acceptVisitor(this);
         final List<Proxy> selection = findSelection(mDeletionVictims);
         final SelectionOwner panel = iface.getGraphEditorPanel();
+        final List<? extends Proxy> oldSelection = panel.getCurrentSelection();
         panel.replaceSelection(selection);
         panel.scrollToVisible(selection);
         mDeletionVictims.clear();
         // Restore keyboard focus!
         mRoot.showEvents();
+        return oldSelection;
       } catch (final GeometryAbsentException exception) {
         // No geometry? --- Nice try anyway ...
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
     }
+    return null;
   }
 
   private List<Proxy> findSelection(final List<InsertInfo> inserts)
@@ -450,6 +469,6 @@ class EventDeclDeleteVisitor
   private Proxy mVictim;
   private boolean mHasShownDialog;
   private boolean mCancelled;
-  //private String mAction;
+  private String mAction;
 
 }
