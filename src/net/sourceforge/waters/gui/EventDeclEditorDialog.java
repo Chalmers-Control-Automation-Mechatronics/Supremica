@@ -79,6 +79,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -998,7 +999,7 @@ public class EventDeclEditorDialog
         mEventDecl = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!eq.equals(mEventDecl, template)) {
-        if (true){ //mEventDecl.getName().equals(template.getName())) {
+        if (true){//mEventDecl.getName().equals(template.getName())) {
           final Command command =
             new EditCommand(mEventDecl, template, panel);
           mRoot.getUndoInterface().executeCommand(command);
@@ -1031,6 +1032,14 @@ public class EventDeclEditorDialog
                   (SimpleIdentifierSubject) proxy;
                 final SimpleIdentifierSubject changed =
                   (SimpleIdentifierSubject) cloner.getClone(proxy);
+                changed.setName(mNameInput.getText());
+                final Command command =
+                  new EditCommand(subject, changed, panel2);
+                compound.addCommand(command);
+              }
+              else if(proxy instanceof IndexedIdentifierSubject){
+                final IndexedIdentifierSubject subject = (IndexedIdentifierSubject)proxy;
+                final IndexedIdentifierSubject changed = (IndexedIdentifierSubject)cloner.getClone(proxy);
                 changed.setName(mNameInput.getText());
                 final Command command =
                   new EditCommand(subject, changed, panel2);
