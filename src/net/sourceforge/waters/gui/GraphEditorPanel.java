@@ -4316,36 +4316,70 @@ public class GraphEditorPanel
       boolean change = false;
       for (final Proxy proxy : proxies) {
         final ProxySubject subject = (ProxySubject) proxy;
-        final ProxySubject ancestor = getSelectableAncestor(subject);
-        if (ancestor != null && mSelectedSet.add(ancestor)) {
-          mSelectedList.add(ancestor);
-          change = true;
-        }
-        if (subject instanceof IdentifierSubject || subject instanceof ForeachSubject) {
-          final LabelBlockSubject block =
-            SubjectTools.getAncestor(subject, LabelBlockSubject.class);
-          if (block != null && mSelectedSet.add(block)) {
-            mSelectedList.add(block);
-            change = true;
+        LabelBlockSubject block = null;
+        if (subject instanceof IdentifierSubject) {
+          block = SubjectTools.getAncestor(subject, LabelBlockSubject.class);
+          if (block != null) {
+            if (mSelectedSet.add(block)) {
+              mSelectedList.add(block);
+              change = true;
+            }
+            if (block.getEventListModifiable().size() > 1 ) {
+              if (mSelectedSet.add(subject)) {
+                mSelectedList.add(subject);
+                change = true;
+              }
+            }
+            else if(!block.getEventListModifiable().contains(subject)){
+              if (mSelectedSet.add(subject)) {
+                mSelectedList.add(subject);
+                change = true;
+              }
+            }
           }
-          if(subject instanceof ForeachSubject){
-            addChildrenToSelection((ForeachSubject)subject);
+        } else if (subject instanceof ForeachSubject) {
+          final ForeachSubject foreach = (ForeachSubject) subject;
+          block = SubjectTools.getAncestor(subject, LabelBlockSubject.class);
+          if (block != null) {
+            if (mSelectedSet.add(block)) {
+              mSelectedList.add(block);
+              change = true;
+            }
+            if (block.getEventListModifiable().size() > 1
+                || foreach.getBodyModifiable().size() > 0) {
+              if (mSelectedSet.add(subject)) {
+                mSelectedList.add(subject);
+                change = true;
+              }
+            }
+            change |= addChildrenToSelection(foreach);
+          }
+        }
+        if (block == null) {
+          final ProxySubject ancestor = getSelectableAncestor(subject);
+          if (ancestor != null && mSelectedSet.add(ancestor)) {
+            mSelectedList.add(ancestor);
+            change = true;
           }
         }
       }
       return change;
     }
 
-    private void addChildrenToSelection(final ForeachSubject foreach){
+    private boolean addChildrenToSelection(final ForeachSubject foreach)
+    {
       final ListSubject<AbstractSubject> list = foreach.getBodyModifiable();
-      for(final ProxySubject p : list){
-        if(mSelectedSet.add(p)){
+      boolean change = false;
+      for (final ProxySubject p : list) {
+        if (mSelectedSet.add(p)) {
           mSelectedList.add(p);
-          if(p instanceof ForeachSubject){
-            addChildrenToSelection((ForeachSubject)p);
-          }
+          change = true;
+        }
+        if (p instanceof ForeachSubject) {
+          change |= addChildrenToSelection((ForeachSubject) p);
         }
       }
+      return change;
     }
 
     private ProxySubject getSelectableAncestor(final Proxy proxy)
