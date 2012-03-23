@@ -333,14 +333,14 @@ public class GraphEditorPanel
     if (!mSelectedList.equals(items)) {
       mSelectedList.clear();
       mSelectedSet.clear();
-      mSelectableVisitor.addToSelectionList(items);
+      mSelectableVisitor.addToSelectionList(items, false);
       fireSelectionChanged();
     }
   }
 
   public void addToSelection(final List<? extends Proxy> items)
   {
-    if (mSelectableVisitor.addToSelectionList(items)) {
+    if (mSelectableVisitor.addToSelectionList(items, false)) {
       fireSelectionChanged();
     }
   }
@@ -1065,7 +1065,7 @@ public class GraphEditorPanel
    */
   private void addToSelection(final ProxySubject item)
   {
-    if(mSelectableVisitor.addToSelectionList(Collections.singletonList(item))){
+    if(mSelectableVisitor.addToSelectionList(Collections.singletonList(item), false)){
       fireSelectionChanged();
     }
   }
@@ -2522,7 +2522,7 @@ public class GraphEditorPanel
               mSelectedList.removeAll(list);
             }
             if (mSelectableVisitor.addToSelectionList(Collections
-              .singletonList(label))) {
+              .singletonList(label), true)) {
               fireSelectionChanged();
             }
           }
@@ -4311,7 +4311,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Invocation
-    private boolean addToSelectionList(final List<? extends Proxy> proxies)
+    private boolean addToSelectionList(final List<? extends Proxy> proxies, final boolean ctrlDown)
     {
       boolean change = false;
       for (final Proxy proxy : proxies) {
@@ -4330,7 +4330,7 @@ public class GraphEditorPanel
                 change = true;
               }
             }
-            else if(!block.getEventListModifiable().contains(subject)){
+            else if(!block.getEventListModifiable().contains(subject) || ctrlDown){
               if (mSelectedSet.add(subject)) {
                 mSelectedList.add(subject);
                 change = true;
