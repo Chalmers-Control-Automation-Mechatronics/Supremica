@@ -58,6 +58,7 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -90,8 +91,9 @@ import net.sourceforge.waters.subject.module.ParameterBindingSubject;
  *
  * @author Carly Hona, Robi Malik
  */
-public abstract class ModuleTree extends JTree implements SelectionOwner,
-  Autoscroll, TreeSelectionListener, FocusListener
+public abstract class ModuleTree
+  extends JTree
+  implements SelectionOwner, Autoscroll, TreeSelectionListener, FocusListener
 {
 
   public ModuleTree(final ModuleWindowInterface root,
@@ -104,7 +106,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     final ModuleSubject module = mRoot.getModuleSubject();
     mModel = new ModuleTreeModel(module, getRootList());
     setModel(mModel);
-    final MouseListener handler = new EditorAliasMouseListener();
+    final MouseListener handler = new ModuleTreeMouseListener();
     addMouseListener(handler);
     addTreeSelectionListener(this);
     addFocusListener(this);
@@ -113,7 +115,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     mAcceptTransferableVisitor = new AcceptTransferableVisitor();
     mDoubleClickVisitor = new DoubleClickVisitor();
 
-    if (getSupportedDataFlavor() == WatersDataFlavor.MODULE_COMPONENT_LIST) {
+    if (getSupportedDataFlavor() == WatersDataFlavor.COMPONENT) {
       setRootVisible(false);
     } else {
       setRootVisible(true);
@@ -124,11 +126,11 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     setToggleClickCount(0);
     manager.installCutCopyPasteActions(this);
 
-    setTransferHandler(new AliasesPanelTransferHandler());
+    setTransferHandler(new ModuleTreeTransferHandler());
     setDragEnabled(true);
     setDropMode(DropMode.INSERT);
 
-    setCellRenderer(new MyTreeRenderer());
+    setCellRenderer(new ModuleTreeRenderer());
     expandAll(getRootList());
   }
 
@@ -149,6 +151,11 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     return mRoot.getRootWindow().getFocusTracker();
   }
 
+  private boolean isSourceOfDrag(){
+    return getFocusTracker().getWatersSelectionOwner() == ModuleTree.this;
+  }
+
+
   //#########################################################################
   //# Abstract Methods
   abstract ListSubject<? extends ProxySubject> getRootList();
@@ -158,6 +165,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   abstract DataFlavor getSupportedDataFlavor();
 
   abstract PopupFactory getPopupFactory();
+
 
   //#######################################################################
   //# Interface java.awt.dnd.Autoscroll
@@ -185,6 +193,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     scrollRowToVisible(realrow);
   }
 
+
   //#########################################################################
   //# Interface java.awt.event.FocusListener
   public void focusGained(final FocusEvent event)
@@ -203,6 +212,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     }
   }
 
+
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
   public void attach(final Observer observer)
@@ -215,9 +225,11 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
 
   public void detach(final Observer observer)
   {
-    mObservers.remove(observer);
-    if (mObservers.isEmpty()) {
-      mObservers = null;
+    if (mObservers != null) {
+      mObservers.remove(observer);
+      if (mObservers.isEmpty()) {
+        mObservers = null;
+      }
     }
   }
 
@@ -232,6 +244,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       }
     }
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
@@ -340,51 +353,6 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     }
   }
 
-  public ListInsertPosition getInsertPosition(final Proxy proxy)
-  {
-    final Proxy anchor = getSelectionAnchor();
-    ListSubject<? extends ProxySubject> list = mModel.getChildren(anchor);
-    if (list == null) {
-      list = getRootList();
-    }
-    return new ListInsertPosition(list, list.size());
-  }
-
-  public void insertCreatedItem(final Proxy proxy, final Object insobj)
-  {
-    final ProxySubject subject = (ProxySubject) proxy;
-    final ListInsertPosition inspos = (ListInsertPosition) insobj;
-    @SuppressWarnings("unchecked")
-    final List<ProxySubject> list = (List<ProxySubject>) inspos.getList();
-    final int pos = inspos.getPosition();
-    list.add(pos, subject);
-  }
-
-  public boolean canCopy(final List<? extends Proxy> items)
-  {
-    final DataFlavor common = WatersDataFlavor.getDataFlavor(items);
-    return common != null;
-  }
-
-  public Transferable createTransferable(final List<? extends Proxy> items)
-  {
-    final List<Proxy> reducedList = new ArrayList<Proxy>();
-    for (final Proxy proxy : items) {
-      boolean hasAncestor = false;
-      final ProxySubject subject = (ProxySubject) proxy;
-      for (final Proxy ancestor : reducedList) {
-        final ProxySubject ancestorSubject = (ProxySubject) ancestor;
-        if (SubjectTools.isAncestor(ancestorSubject, subject)) {
-          hasAncestor = true;
-        }
-      }
-      if (!hasAncestor) {
-        reducedList.add(proxy);
-      }
-    }
-    return getTransferable(reducedList);
-  }
-
   public boolean canPaste(final Transferable transferable)
   {
     Proxy anchor = getSelectionAnchor();
@@ -431,10 +399,10 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
         return null;
       }
     }
-    if (flavor == WatersDataFlavor.IDENTIFIER_LIST
+    if (flavor == WatersDataFlavor.IDENTIFIER
       && transferable
-        .isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS_LIST)) {
-      flavor = WatersDataFlavor.EVENT_ALIAS_LIST;
+        .isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS)) {
+      flavor = WatersDataFlavor.EVENT_ALIAS;
     }
 
     List<InsertInfo> result = new ArrayList<InsertInfo>(pos);
@@ -532,7 +500,8 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       final int y = lastrect.y + lastrect.height;
       rect.height = y - rect.y;
     }
-    scrollRectToVisible(rect);
+   // if(rect != null)
+      scrollRectToVisible(rect);
   }
 
   public void activate()
@@ -561,6 +530,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     fireEditorChangedEvent(event);
   }
 
+
   //#########################################################################
   //# Interface javax.swing.event.TreeSelectionListener
   public void valueChanged(final TreeSelectionEvent event)
@@ -573,6 +543,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       }
     });
   }
+
 
   //#########################################################################
   //#Auxiliary Methods
@@ -588,7 +559,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
 
   private void expandAll(final List<? extends ProxySubject> list)
   {
-    if (getSupportedDataFlavor() == WatersDataFlavor.CONSTANT_ALIAS_LIST) {
+    if (getSupportedDataFlavor() == WatersDataFlavor.CONSTANT_ALIAS) {
       expandPath(getPathForRow(0));
     } else {
       for (final ProxySubject subject : list) {
@@ -606,11 +577,6 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       final List<? extends ProxySubject> body = foreach.getBodyModifiable();
       expandAll(body);
     }
-  }
-
-  private Transferable getTransferable(final List<? extends Proxy> items)
-  {
-    return WatersDataFlavor.createTransferable(items);
   }
 
   private boolean hasAncestorInSelection(final ProxySubject proxy,
@@ -657,34 +623,24 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   public void setSelectionInterval(int index0, final int index1)
   {
     //so root not selected with ctrl-a select all
-    if (rootVisible) {
-      if (index0 == 0) {
-        index0 = 1;
-      }
+    if (rootVisible && index0 == 0) {
+      index0 = 1;
     }
-    final TreePath[] paths = getPathBetweenRows(index0, index1);
-    this.getSelectionModel().setSelectionPaths(paths);
-  }
-
-  public boolean insertAsEventAlias(final DataFlavor flavor,
-                                   final Transferable transferable)
-  {
-    if (flavor == WatersDataFlavor.IDENTIFIER_LIST
-        && transferable
-          .isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS_LIST)) {
-      return true;
+    if (index0 <= index1) {
+      super.setSelectionInterval(index0, index1);
+    } else {
+      super.clearSelection();
     }
-    return false;
   }
 
 
   //#########################################################################
-  //# Inner Class EditorAliasMouseListener
+  //# Inner Class ModuleTreeMouseListener
   /**
    * A simple mouse listener to trigger opening an editor dialog or
    * expand/collapse tree by double-click, or a popup menu by right-click.
    */
-  private class EditorAliasMouseListener extends MouseAdapter
+  private class ModuleTreeMouseListener extends MouseAdapter
   {
     //#######################################################################
     //# Interface java.awt.MouseListener
@@ -808,8 +764,8 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
 
 
   //#########################################################################
-  //# Inner Class AliasesPanelTransferHandler
-  private class AliasesPanelTransferHandler extends TransferHandler
+  //# Inner Class ModuleTreeTransferHandler
+  private class ModuleTreeTransferHandler extends TransferHandler
   {
 
     @Override
@@ -821,15 +777,15 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     @Override
     public Transferable createTransferable(final JComponent c)
     {
-      getFocusTracker().setSourceOfDragOperation(ModuleTree.this);
-      return ModuleTree.this.createTransferable(getCurrentSelection());
+      final List<? extends Proxy> selection = getCurrentSelection();
+      return WatersDataFlavor.createTransferable(selection);
     }
 
     @Override
     public void exportDone(final JComponent c, final Transferable t,
                            final int action)
     {
-      if (getFocusTracker().getSourceOfDragOperation() == ModuleTree.this) {
+      if (isSourceOfDrag() && mDropList != null) {
         final int count = getSelectionCount();
         final List<InsertInfo> inserts = new ArrayList<InsertInfo>(count);
         final List<Proxy> proxies = new ArrayList<Proxy>();
@@ -880,15 +836,19 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
               return;
             }
           }
-          final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+          final ModuleEqualityVisitor eq =
+            ModuleEqualityVisitor.getInstance(false);
           for (final InsertInfo delete : deletes) {
             final Proxy proxy = delete.getProxy();
-            if(!eq.contains(mDropList, proxy)) {
-              final InsertInfo insert =
-              new InsertInfo(proxy, new ListInsertPosition(mDropList,
-                                                           mDropIndex));
-            inserts.add(insert);
-            mDropIndex++;
+            final ListInsertPosition delpos =
+              (ListInsertPosition) delete.getInsertPosition();
+            if (delpos.getList() == mDropList ||
+                !eq.contains(mDropList, proxy)) {
+              final ListInsertPosition inspos =
+                new ListInsertPosition(mDropList, mDropIndex);
+              final InsertInfo insert = new InsertInfo(proxy, inspos);
+              inserts.add(insert);
+              mDropIndex++;
             }
           }
           final RearrangeTreeCommand allMoves =
@@ -896,6 +856,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
           mRoot.getUndoInterface().executeCommand(allMoves);
         }
       }
+      mDropList = null;
     }
 
     @Override
@@ -904,8 +865,11 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       if (support.getComponent() instanceof JTree) {
         final Transferable transferable = support.getTransferable();
         if (transferable
-          .isDataFlavorSupported(WatersDataFlavor.PARAMETER_BINDING_LIST)) {
+          .isDataFlavorSupported(WatersDataFlavor.PARAMETER_BINDING)) {
           return false;
+        }
+        if (!isSourceOfDrag() && support.getDropAction() == MOVE) {
+          support.setDropAction(COPY);
         }
         final JTree.DropLocation drop =
           (JTree.DropLocation) support.getDropLocation();
@@ -932,9 +896,9 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
         final DataFlavor acceptingFlavor =
           mAcceptTransferableVisitor.getFlavorIfDropAllowed(parent,
                                                             transferable);
-        if (acceptingFlavor == WatersDataFlavor.IDENTIFIER_LIST
+        if (acceptingFlavor == WatersDataFlavor.IDENTIFIER
             && transferable
-              .isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS_LIST)) {
+              .isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS)) {
           support.setDropAction(COPY);
         }
         if (acceptingFlavor != null) {
@@ -969,12 +933,12 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
               getInsertInfo(transferable, flavor, mDropList, parentOfDropLoc,
                             mDropIndex);
             final InsertCommand allCopies =
-              new InsertCommand(inserts, ModuleTree.this);
+              new InsertCommand(inserts, ModuleTree.this, mRoot);
             mRoot.getUndoInterface().executeCommand(allCopies);
           } catch (final IOException exception) {
-            exception.printStackTrace();
+            throw new WatersRuntimeException(exception);
           } catch (final UnsupportedFlavorException exception) {
-            exception.printStackTrace();
+            throw new WatersRuntimeException(exception);
           }
         }
       }
@@ -1098,7 +1062,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     {
       try {
         return (List<Proxy>) mTransferable
-          .getTransferData(WatersDataFlavor.PARAMETER_BINDING_LIST);
+          .getTransferData(WatersDataFlavor.PARAMETER_BINDING);
       } catch (final UnsupportedFlavorException exception) {
         exception.printStackTrace();
       } catch (final IOException exception) {
@@ -1146,23 +1110,22 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     private boolean isInList(final List<Proxy> listOfEvents)
     {
       if (mTransferable
-        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)) {
+        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
         try {
           @SuppressWarnings("unchecked")
           final List<Proxy> transferData =
             (List<Proxy>) mTransferable
-              .getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+              .getTransferData(WatersDataFlavor.IDENTIFIER);
           for (final Proxy transferredProxy : transferData) {
             if (!ModuleEqualityVisitor.getInstance(false)
               .contains(listOfEvents, transferredProxy)) {
               return false;
             }
           }
-
         } catch (final UnsupportedFlavorException exception) {
-          exception.printStackTrace();
+          throw new WatersRuntimeException(exception);
         } catch (final IOException exception) {
-          exception.printStackTrace();
+          throw new WatersRuntimeException(exception);
         }
       }
       return true;
@@ -1185,7 +1148,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       final ExpressionProxy exp = event.getExpression();
       if (exp instanceof EventListExpressionProxy) {
         if (!isInList(((EventListExpressionProxy) exp).getEventList())) {
-          return WatersDataFlavor.IDENTIFIER_LIST;
+          return WatersDataFlavor.IDENTIFIER;
         }
       }
       return null;
@@ -1198,7 +1161,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       if (SubjectTools.getAncestor(subject, EventAliasSubject.class,
                                    ParameterBindingSubject.class) != null) {
         if (!isInList(foreach.getBody())) {
-          return WatersDataFlavor.IDENTIFIER_LIST;
+          return WatersDataFlavor.IDENTIFIER;
         }
         return null;
       } else {
@@ -1215,7 +1178,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
     @Override
     public DataFlavor visitInstanceProxy(final InstanceProxy inst)
     {
-      return WatersDataFlavor.PARAMETER_BINDING_LIST;
+      return WatersDataFlavor.PARAMETER_BINDING;
     }
 
     public DataFlavor visitParameterBindingProxy(final ParameterBindingProxy binding)
@@ -1227,7 +1190,7 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
         list = (EventListExpressionProxy) exp;
         if (!isInList(list.getEventList())
             && !(exp instanceof SimpleExpressionProxy)) {
-          return WatersDataFlavor.IDENTIFIER_LIST;
+          return WatersDataFlavor.IDENTIFIER;
         }
       }
       return null;
@@ -1302,8 +1265,13 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
   }
 
 
-  private class MyTreeRenderer extends DefaultTreeCellRenderer
+  //#######################################################################
+  //# Inner Class ModuleTreeRenderer
+  private class ModuleTreeRenderer extends DefaultTreeCellRenderer
   {
+
+    //#######################################################################
+    //# Interface javax.swing.TreeCellRenderer
     @Override
     public Component getTreeCellRendererComponent(final JTree tree,
                                                   final Object value,
@@ -1334,8 +1302,11 @@ public abstract class ModuleTree extends JTree implements SelectionOwner,
       return this;
     }
 
+    //#######################################################################
+    //# Class Constants
     private static final long serialVersionUID = 1L;
   }
+
 
   //#########################################################################
   //# Data Members

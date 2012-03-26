@@ -10,8 +10,9 @@
 
 package net.sourceforge.waters.gui.command;
 
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -139,7 +140,7 @@ public abstract class AbstractEditCommand
   List<Proxy> getSelectionAfterInsert(final List<InsertInfo> inserts)
   {
     final int size = inserts.size();
-    final Set<Proxy> set = new HashSet<Proxy>(size);
+    final Set<Proxy> set = new THashSet<Proxy>(size);
     final List<Proxy> result = new ArrayList<Proxy>(size);
     for (final InsertInfo insert : inserts) {
       final Proxy proxy = insert.getProxy();
@@ -154,16 +155,18 @@ public abstract class AbstractEditCommand
   List<Proxy> getSelectionAfterDelete(final List<InsertInfo> deletes)
   {
     final int size = deletes.size();
-    final Set<Proxy> set = new HashSet<Proxy>(size);
+    final Set<Proxy> set = new THashSet<Proxy>(size);
     final List<Proxy> result = new LinkedList<Proxy>();
     for (final InsertInfo delete : deletes) {
       final Proxy proxy = delete.getProxy();
-      final AbstractSubject subject = (AbstractSubject) proxy;
-      final AbstractSubject parent =
-        (AbstractSubject) SubjectTools.getProxyParent(subject);
-      final Proxy ancestor = mPanel.getSelectableAncestor(parent);
-      if (ancestor != null && ancestor != proxy && set.add(ancestor)) {
-        result.add(ancestor);
+      if (proxy instanceof AbstractSubject) {
+        final AbstractSubject subject = (AbstractSubject) proxy;
+        final AbstractSubject parent =
+          (AbstractSubject) SubjectTools.getProxyParent(subject);
+        final Proxy ancestor = mPanel.getSelectableAncestor(parent);
+        if (ancestor != null && ancestor != proxy && set.add(ancestor)) {
+          result.add(ancestor);
+        }
       }
     }
     return result;

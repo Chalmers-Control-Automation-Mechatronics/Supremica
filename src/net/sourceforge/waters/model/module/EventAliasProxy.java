@@ -16,7 +16,7 @@ package net.sourceforge.waters.model.module;
  * <P>An event alias is used to give a name of a group events used together
  * in different edges or graphs of a module. This kind of alias can occur
  * in the <I>event alias list</I> of a module, or in the body of a
- * <I>foreach alias</I> construct ({@link ForeachEventAliasProxy}).  The
+ * <I>foreach alias</I> construct ({@link ForeachProxy}). The
  * name of an event can be an arbitrary identifier; it can be indexed to
  * support the use of the <I>foreach alias</I> construct. Its value must be
  * an event list expression ({@link EventListExpressionProxy}).</P>

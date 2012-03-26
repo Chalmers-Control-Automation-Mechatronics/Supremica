@@ -39,13 +39,13 @@ public abstract class BDDExDisjAbstractWorkSet {
     boolean forward;
     
     /** When the number of components chosen by the heuristics > 1, put them into this field. 
-     *   Besides, this field is used to choose other components if the chosen one does not cause
-     *   the temporary result change during the fix-point computation.
+     *  Besides, this field is used to choose other components if the chosen one does not cause
+     *  the temporary result change during the fix-point computation.
      */
     protected int[] selectedCandidate;
     
     /** Reinforcement learning plus Tabu search to find the most useful component from selectedCandidate. 
-     *   Now, only simple version is applied. Thus it can be improved at the later stage. 
+     *  Now, only simple version is applied. Thus it can be improved at the later stage. 
      */
     protected ReinforcementLearningPlusTabuSearch rl;
     
@@ -73,7 +73,6 @@ public abstract class BDDExDisjAbstractWorkSet {
     protected BDDExDisjAbstractWorkSet(BDDExDisjDepSets depSets, int size) {
         this.depSets = depSets;
         this.size = size;
-        this.whetherFirst =true;
         this.forward = true;
         this.workset = new boolean[size];
         this.selectedCandidate = new int[size];
@@ -89,7 +88,8 @@ public abstract class BDDExDisjAbstractWorkSet {
     }
     
     /* Pick the most useful component based on different partitioning types
-         When run the fix-point computation, special actions need performing */
+       When run the fix-point computation, special actions need performing. 
+     */
     protected abstract int pickOne(boolean forward);
 
     /* Whether the chosen component made the temporary result change during the fix-point computation */
@@ -112,7 +112,6 @@ public abstract class BDDExDisjAbstractWorkSet {
         for (int i = 0; i < size; i++) {
             workset[i] = true;
         }
-        whetherFirst = true;
         changed = false;
         firstAlternatives.clear();
         oldSubsequentAlternatives.clear();
@@ -123,5 +122,9 @@ public abstract class BDDExDisjAbstractWorkSet {
     /** Detect whether the work set is empty or not. */
     public boolean empty() {
         return worksetCount <= 0;
+    }
+    
+    public void setStart() {
+        whetherFirst = true;
     }
 }

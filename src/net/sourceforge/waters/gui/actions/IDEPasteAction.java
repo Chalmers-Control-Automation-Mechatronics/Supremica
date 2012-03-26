@@ -26,6 +26,7 @@ import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -88,7 +89,8 @@ public class IDEPasteAction
         final Transferable transferable = clipboard.getContents(this);
         final List<InsertInfo> info = watersOwner.getInsertInfo(transferable);
         if (info != null) {
-          final InsertCommand cmd = new InsertCommand(info, watersOwner);
+          final ModuleWindowInterface root = getActiveModuleWindowInterface();
+          final InsertCommand cmd = new InsertCommand(info, watersOwner, root);
           final UndoInterface undoer = watersOwner.getUndoInterface(this);
           if (undoer == null) {
             // If there is no undo interface, just insert them ...

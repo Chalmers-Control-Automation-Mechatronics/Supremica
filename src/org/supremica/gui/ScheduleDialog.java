@@ -29,6 +29,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.scheduling.ModifiedAstar;
@@ -39,6 +44,7 @@ import org.supremica.automata.algorithms.scheduling.VelocityBalancer;
 import org.supremica.automata.algorithms.scheduling.VisGraphScheduler;
 import org.supremica.automata.algorithms.scheduling.milp.Milp;
 import org.supremica.automata.algorithms.scheduling.milp.RandomPathUsingMilp;
+import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -569,7 +575,6 @@ public class ScheduleDialog
 //        }
 //    }
 
-    @SuppressWarnings("deprecation")
     private void addAutomatonToGUI(final Automaton scheduleAuto)
             throws Exception
     {
@@ -614,7 +619,11 @@ public class ScheduleDialog
                         final net.sourceforge.waters.model.module.IdentifierProxy ident = component.getIdentifier();
                         final net.sourceforge.waters.gui.ModuleContext context = ide.getActiveDocumentContainer().getEditorPanel().getModuleContext();
                         context.checkNewComponentName(ident);
-                        ide.getActiveDocumentContainer().getEditorPanel().addComponent((net.sourceforge.waters.subject.base.AbstractSubject) component);
+                        final EditorPanel root = ide.getActiveDocumentContainer().getEditorPanel();
+                        final SelectionOwner panel = root.getComponentsPanel();
+                        final Command cmd = new InsertCommand(component, panel, null, false);
+                        final UndoInterface iface = root.getUndoInterface();
+                        iface.executeCommand(cmd);
                         // Add all (new) events to the module
                         final net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
                         boolean problem = false;

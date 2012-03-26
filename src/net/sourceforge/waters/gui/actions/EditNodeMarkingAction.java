@@ -143,7 +143,7 @@ public class EditNodeMarkingAction
     final EventDeclSubject newdecl =
       new EventDeclSubject(mIdentifier, EventKind.PROPOSITION);
     final SelectionOwner panel = root.getEventsPanel();
-    return new InsertCommand(newdecl, panel, false);
+    return new InsertCommand(newdecl, panel, root, false);
   }
 
 

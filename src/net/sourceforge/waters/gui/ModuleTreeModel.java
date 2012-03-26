@@ -26,13 +26,12 @@ import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.IdentifiedProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -477,9 +476,18 @@ class ModuleTreeModel
       return visibleAncestor != null ? foreach : null;
     }
 
-    public Object visitInstanceProxy(final InstanceProxy inst)
+    @Override
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+      throws VisitorException
     {
-      return inst;
+      final ProxySubject subject = (ProxySubject) ident;
+      if (subject.getParent() instanceof IdentifiedProxy) {
+        final IdentifiedProxy parent = (IdentifiedProxy) subject.getParent();
+        return parent.acceptVisitor(this);
+      } else {
+        final Proxy visibleAncestor = getProperAncestorInTree(subject);
+        return visibleAncestor != null ? ident : null;
+      }
     }
 
     @Override
@@ -499,25 +507,6 @@ class ModuleTreeModel
       final Subject subject = (Subject) elist;
       final Proxy parent = SubjectTools.getProxyParent(subject);
       return parent;
-    }
-
-    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
-    {
-      return comp;
-    }
-
-    @Override
-    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
-      throws VisitorException
-    {
-      final ProxySubject subject = (ProxySubject) expr;
-      final Proxy visibleAncestor = getProperAncestorInTree(subject);
-      return visibleAncestor != null ? expr : null;
-    }
-
-    public Object visitVariableComponentProxy(final VariableComponentProxy var)
-    {
-      return var;
     }
 
   }

@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,8 +60,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconRadioButton;
@@ -71,9 +74,13 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -985,13 +992,65 @@ public class EventDeclEditorDialog
       final EventDeclSubject template =
         new EventDeclSubject(ident, kind, observable,
                              scope, ranges, geo, attribs);
+
+
       if (mEventDecl == null) {
-        final Command command = new InsertCommand(template, panel);
+        final Command command = new InsertCommand(template, panel, mRoot);
         mEventDecl = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!eq.equals(mEventDecl, template)) {
-        final Command command = new EditCommand(mEventDecl, template, panel);
-        mRoot.getUndoInterface().executeCommand(command);
+        if (mEventDecl.getName().equals(template.getName())) {
+          final Command command =
+            new EditCommand(mEventDecl, template, panel);
+          mRoot.getUndoInterface().executeCommand(command);
+        } else {
+          final EventDeclDeleteVisitor e = new EventDeclDeleteVisitor(mRoot);
+          final List<? extends EventDeclProxy> decls =
+            Collections.singletonList(mEventDecl);
+          final List<InsertInfo> victims =
+            e.getDeletionVictims(decls, "rename");
+          if(victims == null){
+            return;
+          }
+          final CompoundCommand compound = new CompoundCommand();
+
+          final int size = victims.size();
+          final ListIterator<InsertInfo> iter = victims.listIterator(size);
+          while (iter.hasPrevious()) {
+            final InsertInfo insert = iter.previous();
+            final ProxySubject proxy = (ProxySubject) insert.getProxy();
+            if (proxy instanceof EventDeclProxy) {
+              final Command command =
+                new EditCommand(mEventDecl, template, panel);
+              compound.addCommand(command);
+            } else {
+              final SelectionOwner panel2 = null;
+              final ModuleProxyCloner cloner =
+                ModuleSubjectFactory.getCloningInstance();
+              if (proxy instanceof SimpleIdentifierSubject) {
+                final SimpleIdentifierSubject subject =
+                  (SimpleIdentifierSubject) proxy;
+                final SimpleIdentifierSubject changed =
+                  (SimpleIdentifierSubject) cloner.getClone(proxy);
+                changed.setName(mNameInput.getText());
+                final Command command =
+                  new EditCommand(subject, changed, panel2);
+                compound.addCommand(command);
+              }
+              else if(proxy instanceof IndexedIdentifierSubject){
+                final IndexedIdentifierSubject subject = (IndexedIdentifierSubject)proxy;
+                final IndexedIdentifierSubject changed = (IndexedIdentifierSubject)cloner.getClone(proxy);
+                changed.setName(mNameInput.getText());
+                final Command command =
+                  new EditCommand(subject, changed, panel2);
+                compound.addCommand(command);
+              }
+            }
+          }
+          compound.end();
+          mRoot.getUndoInterface().executeCommand(compound);
+        }
+
       }
       dispose();
     }

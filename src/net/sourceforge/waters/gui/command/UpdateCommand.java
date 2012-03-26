@@ -162,6 +162,12 @@ public class UpdateCommand
     mPanel.activate();
   }
 
+  @Override
+  public void setUpdatesSelection(final boolean update){
+    super.setUpdatesSelection(update);
+    mUpdatesSelection = false;
+  }
+
 
   //#########################################################################
   //# Auxiliary Static Methods
@@ -177,7 +183,7 @@ public class UpdateCommand
   private final List<? extends Proxy> mAdded;
   private final List<? extends Proxy> mRemoved;
   private final SelectionOwner mPanel;
-  private final boolean mUpdatesSelection;
+  private boolean mUpdatesSelection;
 
   private boolean mHasBeenExecuted;
 

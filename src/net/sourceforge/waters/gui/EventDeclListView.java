@@ -43,7 +43,6 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
-import net.sourceforge.waters.gui.transfer.EventDeclTransferable;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -272,34 +271,9 @@ public class EventDeclListView
     }
   }
 
-  public Proxy getInsertPosition(final Proxy proxy)
-  {
-    return proxy;
-  }
-
-  public void insertCreatedItem(final Proxy proxy, final Object insobj)
-  {
-    final ModuleSubject module = mRoot.getModuleSubject();
-    final List<EventDeclSubject> events = module.getEventDeclListModifiable();
-    final EventDeclSubject decl = (EventDeclSubject) proxy;
-    events.add(decl);
-  }
-
-  public boolean canCopy(final List<? extends Proxy> items)
-  {
-    return !items.isEmpty();
-  }
-
-  public Transferable createTransferable(final List<? extends Proxy> items)
-  {
-    @SuppressWarnings("unchecked")
-    final List<EventDeclSubject> decls = (List<EventDeclSubject>) items;
-    return new EventDeclTransferable(decls);
-  }
-
   public boolean canPaste(final Transferable transferable)
   {
-    return transferable.isDataFlavorSupported(WatersDataFlavor.EVENTDECL_LIST);
+    return transferable.isDataFlavorSupported(WatersDataFlavor.EVENT_DECL);
   }
 
   @SuppressWarnings("unchecked")
@@ -309,7 +283,7 @@ public class EventDeclListView
     final ModuleContext context = mRoot.getModuleContext();
     final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
     final List<Proxy> data = (List<Proxy>) transferable.getTransferData
-      (WatersDataFlavor.EVENTDECL_LIST);
+      (WatersDataFlavor.EVENT_DECL);
     final int size = data.size();
     final Set<String> names = new HashSet<String>(size);
     final List<InsertInfo> result = new ArrayList<InsertInfo>(size);
@@ -336,7 +310,7 @@ public class EventDeclListView
   {
     @SuppressWarnings("unchecked")
     final List<EventDeclSubject> decls = (List<EventDeclSubject>) items;
-    return mDeleteVisitor.getDeletionVictims(decls);
+    return mDeleteVisitor.getDeletionVictims(decls, "delete");
   }
 
   public void insertItems(final List<InsertInfo> inserts)
@@ -572,7 +546,8 @@ public class EventDeclListView
     @Override
     public Transferable createTransferable(final JComponent c)
     {
-      return EventDeclListView.this.createTransferable(getCurrentSelection());
+      final List<? extends Proxy> selection = getCurrentSelection();
+      return WatersDataFlavor.createTransferable(selection);
     }
 
     @Override

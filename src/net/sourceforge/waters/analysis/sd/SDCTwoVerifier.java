@@ -4,11 +4,8 @@
 package net.sourceforge.waters.analysis.sd;
 
 import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
-import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -20,7 +17,7 @@ import java.util.Collection;
  * A model verifier to check SD Controllability Property.
  *
  * This wrapper can be used to check whether a model satisfies
- * SD Controllability Property iii.1
+ * SD Controllability Property ii.a
  *
  * The check is done by creating a test automata and modifying Plant automata for
  * each prohibitable event in the model, and passing these models to a modular
@@ -32,22 +29,29 @@ import java.util.Collection;
  * @author Mahvash Baloch , Robi Malik
  */
 
-public class SDCTwoVerifier extends AbstractSafetyVerifier
-{
-
   //#########################################################################
   //# Constructors
-  public SDCTwoVerifier( final ProductDESProxy model,
-                                     final ProductDESProxyFactory factory,
-                                     final ControllabilityChecker checker)
+  public class SDCTwoVerifier extends AbstractSDLanguageInclusionChecker
+  {
 
-         {
-           super(model,
-                 LanguageInclusionKindTranslator.getInstance(),
-                 LanguageInclusionDiagnostics.getInstance(),
-                 factory);
-           cChecker = checker;
-         }
+    //#########################################################################
+    //# Constructors
+    public SDCTwoVerifier( final ProductDESProxyFactory factory)
+    {
+    super(factory);
+    }
+    public SDCTwoVerifier(   final LanguageInclusionChecker checker,
+                              final ProductDESProxyFactory factory
+                              )
+    {
+    super(checker,factory);
+    }
+      public SDCTwoVerifier( final LanguageInclusionChecker checker,
+                              final ProductDESProxy model,
+                              final ProductDESProxyFactory factory)
+      {
+        super(checker, model, factory );
+       }
 
 
   public boolean run() throws AnalysisException
@@ -70,9 +74,8 @@ public class SDCTwoVerifier extends AbstractSafetyVerifier
       ProductDESProxy convertedModel = null;
 
       convertedModel = builder.createSDTwoModel();
-      final ModularLanguageInclusionChecker checker=
-         new ModularLanguageInclusionChecker(convertedModel, getFactory(),
-                                              cChecker );
+      final LanguageInclusionChecker checker= getLanguageInclusionChecker();
+
         checker.setModel(convertedModel);
         final VerificationResult result;
         try {
@@ -80,9 +83,9 @@ public class SDCTwoVerifier extends AbstractSafetyVerifier
         } finally {
 
           result = checker.getAnalysisResult();
+          setAnalysisResult(result);
 
-          recordStatistics(result);
-        }
+          }
         if (!result.isSatisfied()) {
           final SafetyTraceProxy counterexample =
               checker.getCounterExample();
@@ -91,9 +94,13 @@ public class SDCTwoVerifier extends AbstractSafetyVerifier
         }
 
     return setSatisfiedResult();
-
-
-    } finally {
+    }
+    catch (final AnalysisException exception) {
+      final VerificationResult result = getAnalysisResult();
+      result.setException(exception);
+      throw exception;
+    }
+    finally {
       tearDown();
       }
   }
@@ -107,62 +114,17 @@ public class SDCTwoVerifier extends AbstractSafetyVerifier
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
-    return cChecker.supportsNondeterminism();
+    return false;
   }
 
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.ModelAnalyser
+//#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
-  public SDPropertyVerifierVerificationResult getAnalysisResult()
-  {
-    return (SDPropertyVerifierVerificationResult) super.getAnalysisResult();
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
-  @Override
-  protected void setUp() throws AnalysisException
+  protected void setUp()
+  throws AnalysisException
   {
     super.setUp();
-    mPeakNumberOfNodes = -1;
-    mTotalNumberOfStates = mTotalNumberOfTransitions = 0.0;
-    mPeakNumberOfStates = mPeakNumberOfTransitions = -1.0;
-  }
-
-  @Override
-  protected SDPropertyVerifierVerificationResult createAnalysisResult()
-  {
-    return new SDPropertyVerifierVerificationResult();
-  }
-
-  @Override
-  protected void addStatistics()
-  {
-    super.addStatistics();
-    final SDPropertyVerifierVerificationResult stats = getAnalysisResult();
-    stats.setPeakNumberOfNodes(mPeakNumberOfNodes);
-    stats.setTotalNumberOfStates(mTotalNumberOfStates);
-    stats.setPeakNumberOfStates(mPeakNumberOfStates);
-    stats.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
-    stats.setPeakNumberOfTransitions(mPeakNumberOfTransitions);
-    }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-
-  private void recordStatistics(final VerificationResult result)
-  {
-    mPeakNumberOfNodes =
-        Math.max(mPeakNumberOfNodes, result.getPeakNumberOfNodes());
-    mTotalNumberOfStates += result.getPeakNumberOfStates();
-    mPeakNumberOfStates =
-        Math.max(mPeakNumberOfStates, result.getPeakNumberOfStates());
-    mTotalNumberOfTransitions += result.getPeakNumberOfTransitions();
-    mPeakNumberOfTransitions =
-        Math.max(mPeakNumberOfTransitions, result.getPeakNumberOfTransitions());
-
+    mFailedAnswer = null;
   }
 
 
@@ -170,12 +132,5 @@ public class SDCTwoVerifier extends AbstractSafetyVerifier
   //# Data Members
   private EventProxy mFailedAnswer;
 
-  private int mPeakNumberOfNodes;
-  private double mTotalNumberOfStates;
-  private double mPeakNumberOfStates;
-  private double mTotalNumberOfTransitions;
-  private double mPeakNumberOfTransitions;
 
-
-  private final ControllabilityChecker cChecker;
-}
+  }

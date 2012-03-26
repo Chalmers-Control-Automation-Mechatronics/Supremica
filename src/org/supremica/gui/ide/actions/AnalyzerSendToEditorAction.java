@@ -139,14 +139,14 @@ public class AnalyzerSendToEditorAction extends IDEAction
         final Command cmd;
         final SelectionOwner componentsPanel = panel.getComponentsPanel();
         final InsertCommand insertComponents =
-            new InsertCommand(components, componentsPanel);
+            new InsertCommand(components, componentsPanel, null);
         insertComponents.setUpdatesSelection(false);
         if (decls.isEmpty()) {
           cmd = insertComponents;
         } else {
           final SelectionOwner eventsPanel = panel.getEventsPanel();
           final InsertCommand insertEvents =
-              new InsertCommand(decls, eventsPanel);
+              new InsertCommand(decls, eventsPanel, null);
           insertEvents.setUpdatesSelection(false);
           final String name = insertComponents.getName();
           final CompoundCommand compound = new CompoundCommand(name);

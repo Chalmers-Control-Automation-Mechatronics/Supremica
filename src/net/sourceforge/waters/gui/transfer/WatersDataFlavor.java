@@ -10,82 +10,246 @@
 
 package net.sourceforge.waters.gui.transfer;
 
+import gnu.trove.THashSet;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.plain.module.GraphElement;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 
 
 /**
- * A collection of constants representing the various data flavours
- * that can be copied, pasted, dragged and dropped in the IDE.
+ * <P>The supertype of all data flavours supported by WATERS
+ * transferables.</P>
+ *
+ * <P>This class provides the key functionality for copy/paste and drag/drop
+ * operations of different types of WATERS objects. The data to be copied
+ * or dragged is stored in {@link Transferable} objects created by static
+ * methods {@link #createTransferable(Collection) createTransferable()} in
+ * this class. The data flavours supported by these transferables are
+ * instances of this class or its subclasses, and they control the behaviour
+ * of the transferables.</P>
+ *
+ * <P>Transferables are created by the {@link
+ * #createTransferable(Collection) createTransferable()} methods.
+ * Given a list of {@link Proxy} objects, this method creates a
+ * transferable in the following steps:</P>
+ * <OL>
+ * <LI>The input list is reduced to ensure that the transferable does
+ *     not contain any two items where one is an ancestor of another.</LI>
+ * <LI>A list of possible data flavours is determined (using a {@link
+ *     DataFlavorVisitor}). The first data flavour obtained becomes the
+ *     <I>primary data flavour</I>, which determines how the transferable is
+ *     created.</LI>
+ * <LI>The primary data flavour determines the actual list of data flavours by
+ *     a call to its {@link #reduceDataFlavorList(List) reduceDataFlavorList()}
+ *     method.</LI>
+ * <LI>The final list of data flavours for the transferable is obtained by
+ *     adding Java's string data flavour {@link DataFlavor#stringFlavor} to
+ *     the end of the list returned by {@link #reduceDataFlavorList(List)
+ *     reduceDataFlavorList()}.</LI>
+ * <LI>The data stored in the transferable is copied from the input data by
+ *     a call to the primary data flavour's {@link
+ *     #createExportData(Collection) createExportData()} method.</LI>
+ * <LI>Using the data flavours and the copied data, an instance of
+ *     {@link ProxyTransferable} is created and returned as the
+ *     transferable.</LI>
+ * </OL>
+ *
+ * <P>When data is retrieved from a transferable by the {@link
+ * Transferable#getTransferData(DataFlavor) getTransferData()} method, the
+ * transferable calls the {@link
+ * #createImportData(Collection,ModuleProxyFactory) createImportData()} method
+ * of the requested data flavour, which copies the data back for use by the
+ * GUI.</P>
  *
  * @author Robi Malik
  */
 
-public class WatersDataFlavor
+public abstract class WatersDataFlavor extends DataFlavor
 {
+
+  //#########################################################################
+  //# Factory Methods
   /**
-   * The data flavour for a constant alias
+   * Determines whether the given collection of {@link Proxy} objects can
+   * be stored in a {@link Transferable}.
+   * @return <CODE>true</CODE> if a call to {@link
+   *         #createTransferable(Collection) createTransferable()} with the
+   *         given data will create a {@link Transferable},
+   *         <CODE>false</CODE> otherwise.
    */
-  public static final DataFlavor CONSTANT_ALIAS_LIST =
-    new DataFlavor(ConstantAliasTransferable.class, "List<ConstantAliasProxy>");
-
-  public static final DataFlavor EVENT_ALIAS_LIST =
-    new DataFlavor(EventAliasTransferable.class, "List<EventAliasProxy>");
-
-  public static final DataFlavor EVENTDECL_LIST =
-    new DataFlavor(EventDeclTransferable.class, "List<EventDeclProxy>");
-
-  /**
-   * The data flavour for a graph. It is implemented as a {@link
-   * ProxyTransferable} that cointains a single object of type {@link
-   * net.sourceforge.waters.model.GraphProxy}.
-   */
-  public static final DataFlavor GRAPH =
-    new DataFlavor(GraphTransferable.class, "GraphProxy");
+  public static boolean canCopy(Collection<? extends Proxy> data)
+  {
+    data = getReducedData(data);
+    final DataFlavorVisitor visitor = DataFlavorVisitor.getInstance();
+    return visitor.canCopy(data);
+  }
 
   /**
-   * The data flavour for a guard/action block. It is implemented as a
-   * {@link ProxyTransferable} that cointains a single object of type
-   * {@link net.sourceforge.waters.model.GuardActionBlockProxy}.
+   * Creates a {@link Transferable} containing the given collection of
+   * {@link Proxy} objects. This method automatically determines appropriate
+   * data flavours for the given list of objects and makes modifications to
+   * the data as necessary.
+   * @param  data   The objects to be stored in the transferable.
+   *                The data will be duplicated and copies will be stored
+   *                in the transferable.
+   * @return An instance of {@link ProxyTransferable} containing the data.
+   * @throws {@link IllegalArgumentException} to indicate that no suitable
+   *         data flavour could be identified for the given data.
+   * @see WatersDataFlavor
    */
-  public static final DataFlavor GUARD_ACTION_BLOCK =
-    new DataFlavor(GuardActionBlockTransferable.class,
-                   "GuardActionBlockProxy");
+  public static Transferable createTransferable
+    (Collection<? extends Proxy> data)
+  {
+    data = getReducedData(data);
+    final DataFlavorVisitor visitor = DataFlavorVisitor.getInstance();
+    final List<WatersDataFlavor> flavors =
+      visitor.getTransferDataFlavors(data);
+    final int count = flavors.size() + 1;
+    final DataFlavor[] flavorsArray = new DataFlavor[count];
+    int index = 0;
+    for (final DataFlavor flavor : flavors) {
+      flavorsArray[index++] = flavor;
+    }
+    flavorsArray[index] = DataFlavor.stringFlavor;
+    final WatersDataFlavor flavor0 = flavors.get(0);
+    final List<Proxy> exportData = flavor0.createExportData(data);
+    return new ProxyTransferable(flavorsArray, exportData);
+  }
 
   /**
-   * The data flavour for a list of event labels, as found on an edge of a
-   * graph. It is implemented as a {@link ProxyTransferable} and contains a
-   * list of objects of type {@link
-   * net.sourceforge.waters.model.IdentifierProxy} or {@link
-   * net.sourceforge.waters.model.ForeachEventProxy}
+   * Creates a {@link Transferable} containing a single {@link Proxy} object.
+   * This method behaves like the {@link #createTransferable(Collection)
+   * createTransferable()} method.
+   * @see WatersDataFlavor
    */
-  public static final DataFlavor IDENTIFIER_LIST =
-    new DataFlavor(IdentifierTransferable.class, "List<IdentifierProxy*>");
+  public static Transferable createTransferable(final Proxy proxy)
+  {
+    final List<Proxy> data = Collections.singletonList(proxy);
+    return createTransferable(data);
+  }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static Collection<? extends Proxy> getReducedData
+    (final Collection<? extends Proxy> data)
+  {
+    if (data.size() <= 1 ||
+        !(data.iterator().next() instanceof ProxySubject)) {
+      return data;
+    } else {
+      final Set<Proxy> set = new THashSet<Proxy>(data);
+      final int size = data.size();
+      final Collection<Proxy> reduced = new ArrayList<Proxy>(size);
+      for (final Proxy proxy : data) {
+        ProxySubject parent = (ProxySubject) proxy;
+        while (true) {
+          parent = SubjectTools.getProxyParent(parent);
+          if (parent == null) {
+            reduced.add(proxy);
+            break;
+          } else if (set.contains(parent)) {
+            break;
+          }
+        }
+      }
+      return reduced;
+    }
+  }
+
+
+  //#########################################################################
+  //# Constructor
+  /**
+   * Creates the data flavour for the given {@link Proxy} type.
+   * @param  clazz    The representation class of the data flavour.
+   *                  Data flavours are compared by checking identity of
+   *                  their representation classes, so their cannot be two
+   *                  data flavours using the same representation class.
+   */
+  WatersDataFlavor(final Class<? extends Proxy> clazz)
+  {
+    super(clazz, ProxyTools.getShortClassName(clazz));
+  }
+
+
+  //#########################################################################
+  //# Importing and Exporting Data
+  /**
+   * Determines the actual list of data flavours used by a transferable
+   * with this data flavour as the primary data flavour. This method is
+   * overridden by subclasses to suppress certain data flavours when a more
+   * suitable primary data flavour has been identified.
+   * @param  flavors  The list of possible data flavours determined for the
+   *                  input data (by the {@link DataFlavorVisitor}). The
+   *                  input list must not be modified by this method call.
+   * @return The default implementation returns the input list unmodified.
+   * @see WatersDataFlavor
+   */
+  List<WatersDataFlavor> reduceDataFlavorList
+    (final List<WatersDataFlavor> flavors)
+  {
+    return flavors;
+  }
+
+  /**
+   * Copies input data for use by a {@link Transferable} using this data
+   * flavour as the primary data flavour. This method is used by a <I>Copy</I>
+   * operation to store WATERS objects in the clipboard. Every subclass must
+   * override this method to provide a way to duplicate the input data and
+   * convert it to a form that can be stored in a transferable. Typically,
+   * this is done using a
+   * {@link net.sourceforge.waters.model.base.ProxyCloner ProxyCloner}.
+   * @param  data     Collection of objects to be stored in a
+   *                  {@link Transferable}.
+   * @return List of data used to create a {@link ProxyTransferable}.
+   *         The returned data should not share any references with the
+   *         input.
+   * @see WatersDataFlavor
+   */
+  abstract List<Proxy> createExportData(Collection<? extends Proxy> data);
+
+  /**
+   * Copies the data from a {@link Transferable} using this data flavour as
+   * the primary data flavour. This method is used by a <I>Paste</I> operation
+   * retrieve data from the clipboard and insert in the GUI. Every subclass
+   * must override this method to provide a way to duplicate the transfer data
+   * and convert it to a form that can be used by an application.
+   * @param  data     Collection of objects stored in a
+   *                  {@link ProxyTransferable}.
+   * @param  factory  Factory used to create any {@link Proxy} objects
+   *                  in the output.
+   * @return List of data to be inserted in an application.
+   *         The returned data should be created using the given factory,
+   *         and not share any references with the transfer data.
+   * @see WatersDataFlavor
+   */
+  abstract List<Proxy> createImportData(Collection<? extends Proxy> data,
+                                        ModuleProxyFactory factory);
+
+
+  //#########################################################################
+  //# Available Data Flavours
   /**
    * The data flavour for a list of module components, as contained in the
    * components list tree-view. It is implemented as a {@link
@@ -93,246 +257,82 @@ public class WatersDataFlavor
    * net.sourceforge.waters.model.SimpleComponentProxy}, {@link
    * net.sourceforge.waters.model.VariableComponentProxy}, {@link
    * net.sourceforge.waters.model.InstanceProxy}, or {@link
-   * net.sourceforge.waters.model.ForeachComponentProxy}.
+   * net.sourceforge.waters.model.ForeachProxy}.
    */
-  public static final DataFlavor MODULE_COMPONENT_LIST =
-    new DataFlavor(ComponentTransferable.class, "List<ComponentProxy*>");
+  public static final WatersDataFlavor COMPONENT =
+    new ModuleDataFlavor(ComponentProxy.class);
+
+  /**
+   * The data flavour for a list of constant aliases, as contained in the
+   * named constants tree-view. It is implemented as a {@link
+   * ProxyTransferable} and contains a list of objects of type {@link
+   * ConstantAliasProxy}.
+   */
+  public static final WatersDataFlavor CONSTANT_ALIAS =
+    new ModuleDataFlavor(ConstantAliasProxy.class);
+
+  /**
+   * The data flavour for a list of edges ({@link EdgeProxy}) of a graph.
+   */
+  public static final WatersDataFlavor EDGE = new EdgeDataFlavor();
+
+  /**
+   * The data flavour for a list of event aliases, as contained in the event
+   * aliases tree-view. It is implemented as a {@link ProxyTransferable} and
+   * contains a list of objects of type {@link EventAliasProxy} or
+   * {@link net.sourceforge.waters.model.ForeachProxy}.
+   */
+  public static final WatersDataFlavor EVENT_ALIAS =
+    new ModuleDataFlavor(EventAliasProxy.class);
+
+  /**
+   * The data flavour for a list of event declarations, as contained in the
+   * event list-view. It is implemented as a {@link ProxyTransferable} and
+   * contains a list of objects of type {@link EventDeclProxy}.
+   */
+  public static final WatersDataFlavor EVENT_DECL =
+    new ModuleDataFlavor(EventDeclProxy.class);
+
+  /**
+   * The data flavour for a graph. This is implemented as a {@link
+   * ProxyTransferable} that contains a single object of type {@link
+   * GraphProxy}.
+   */
+  public static final WatersDataFlavor GRAPH = new GraphDataFlavor();
+
+  /**
+   * The data flavour for a guard/action block. It is implemented as a
+   * {@link ProxyTransferable} that contains a single object of type
+   * {@link GuardActionBlockProxy}.
+   */
+  public static final WatersDataFlavor GUARD_ACTION_BLOCK =
+    new ModuleDataFlavor(GuardActionBlockProxy.class);
+
+  /**
+   * The data flavour for a list of event labels, as found on an edge of a
+   * graph. It is implemented as a {@link ProxyTransferable} and contains a
+   * list of objects of type {@link IdentifierProxy} or {@link
+   * net.sourceforge.waters.model.ForeachProxy}
+   */
+  public static final WatersDataFlavor IDENTIFIER =
+    new IdentifierDataFlavor();
+
+  /**
+   * The data flavour for a node labels. Node labels are represented in a
+   * graph using {@link LabelGeometryProxy} objects, which are converted to
+   * {@link net.sourceforge.waters.model.module.SimpleIdentifierProxy
+   * SimpleIdentifierProxy} objects in the transferable.
+   */
+  public static final WatersDataFlavor LABEL_GEOMETRY =
+    new NodeLabelDataFlavor();
 
   /**
    * The data flavour for a list of parameter bindings, as contained in the
    * components list tree-view. It is implemented as a {@link
    * ProxyTransferable} and contains a list of objects of type {@link
-   * net.sourceforge.waters.model.ParameterBindingProxy}.
+   * ParameterBindingProxy}.
    */
-  public static final DataFlavor PARAMETER_BINDING_LIST =
-    new DataFlavor(ParameterBindingTransferable.class,
-                   "List<ParameterBindingProxy>");
-
-  public static final DataFlavor PRODUCT_DES =
-    new DataFlavor(ProductDESTransferable.class, "ProductDESProxy");
-
-  public static final DataFlavor TYPELESS_FOREACH =
-    new DataFlavor(TypelessForeachTransferable.class, "List<Proxy>");
-
-  public static Transferable createTransferable(final Proxy proxy){
-    final List<? extends Proxy> items = Collections.singletonList(proxy);
-    return createTransferable(items);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static Transferable createTransferable(final List<? extends Proxy> items){
-     final DataFlavor dataFlavor = getDataFlavor(items);
-    if (dataFlavor == WatersDataFlavor.CONSTANT_ALIAS_LIST) {
-      return new ConstantAliasTransferable(items);
-    } else if (dataFlavor == WatersDataFlavor.MODULE_COMPONENT_LIST) {
-      return new ComponentTransferable(items);
-    } else if (dataFlavor == WatersDataFlavor.IDENTIFIER_LIST) {
-      return new IdentifierTransferable(items);
-    } else if (dataFlavor == WatersDataFlavor.EVENT_ALIAS_LIST) {
-      return new EventAliasTransferable(items);
-    } else if (dataFlavor == WatersDataFlavor.EVENTDECL_LIST) {
-      return new EventDeclTransferable((List<EventDeclProxy>) items);
-    } else if (dataFlavor == WatersDataFlavor.TYPELESS_FOREACH) {
-      return new TypelessForeachTransferable(items);
-    } else if (dataFlavor == WatersDataFlavor.PARAMETER_BINDING_LIST) {
-      return new ParameterBindingTransferable(items);
-    } else if (dataFlavor == WatersDataFlavor.GRAPH) {
-      return mGraphTransferableVisitor.createTransferable(items);
-    } else
-      return null;
-  }
-
-  public static DataFlavor getDataFlavor(final List<? extends Proxy> items)
-  {
-    DataFlavor common = null;
-    for (final Proxy proxy : items) {
-      final DataFlavor flavor =
-        mExportedDataFlavorVisitor.getDataFlavor(proxy);
-      if (common == null) {
-        common = flavor;
-      } else if (common != flavor) {
-        return null;
-      }
-    }
-    return common;
-  }
-
-  //#########################################################################
-  //# Inner Class ExportedDataFlavorVisitor
-  private static class ExportedDataFlavorVisitor extends AbstractModuleProxyVisitor
-  {
-    //#######################################################################
-    //# Invocation
-    private DataFlavor getDataFlavor(final Proxy proxy)
-    {
-      try {
-        return (DataFlavor) proxy.acceptVisitor(this);
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
-      }
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    @Override
-    public DataFlavor visitComponentProxy(final ComponentProxy comp)
-    {
-      return WatersDataFlavor.MODULE_COMPONENT_LIST;
-    }
-
-    @Override
-    public DataFlavor visitConstantAliasProxy(final ConstantAliasProxy alias)
-    {
-      return WatersDataFlavor.CONSTANT_ALIAS_LIST;
-    }
-
-    @Override
-    public DataFlavor visitEdgeProxy(final EdgeProxy alias)
-    {
-      return WatersDataFlavor.GRAPH;
-    }
-
-    @Override
-    public DataFlavor visitEventAliasProxy(final EventAliasProxy alias)
-    {
-      return WatersDataFlavor.EVENT_ALIAS_LIST;
-    }
-
-    @Override
-    public DataFlavor visitEventDeclProxy(final EventDeclProxy alias)
-    {
-      return WatersDataFlavor.EVENTDECL_LIST;
-    }
-
-    @Override
-    public Object visitExpressionProxy(final ExpressionProxy proxy)
-      throws VisitorException
-    {
-      return WatersDataFlavor.IDENTIFIER_LIST;
-    }
-
-    @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-    {
-      if (foreach.getBody().isEmpty()) {
-        return WatersDataFlavor.TYPELESS_FOREACH;
-      } else {
-        final List<Proxy> list = foreach.getBody();
-        for (int i = 0; i < list.size(); i++) {
-          final DataFlavor flavor = getDataFlavor(list.get(i));
-          if (flavor != WatersDataFlavor.TYPELESS_FOREACH) {
-            return flavor;
-          }
-        }
-      }
-      return WatersDataFlavor.TYPELESS_FOREACH;
-    }
-
-    @Override
-    public Object visitIdentifierProxy(final IdentifierProxy proxy)
-      throws VisitorException
-    {
-      return WatersDataFlavor.IDENTIFIER_LIST;
-    }
-
-    @Override
-    public DataFlavor visitLabelBlockProxy(final LabelBlockProxy alias)
-    {
-      return WatersDataFlavor.GRAPH;
-    }
-
-    @Override
-    public DataFlavor visitNodeProxy(final NodeProxy alias)
-    {
-      return WatersDataFlavor.GRAPH;
-    }
-
-    @Override
-    public DataFlavor visitParameterBindingProxy(final ParameterBindingProxy binding)
-    {
-      return WatersDataFlavor.PARAMETER_BINDING_LIST;
-    }
-  }
-
-  //#########################################################################
-  //# Inner Class GraphTransferableVisitor
-  private static class GraphTransferableVisitor
-    extends AbstractModuleProxyVisitor
-  {
-
-    //#######################################################################
-    //# Invocation
-    private ProxyTransferable<?> createTransferable
-      (final List<? extends Proxy> list)
-    {
-      mTransferredBlock = null;
-      mTransferredNodes = new HashSet<NodeProxy>();
-      mTransferredEdges = new LinkedList<EdgeProxy>();
-      for (final Proxy proxy : list) {
-        try {
-          proxy.acceptVisitor(this);
-        } catch (final VisitorException exception) {
-          throw exception.getRuntimeException();
-        }
-      }
-      final Iterator<EdgeProxy> iter = mTransferredEdges.iterator();
-      while (iter.hasNext()) {
-        final EdgeProxy edge = iter.next();
-        final NodeProxy source = edge.getSource();
-        final NodeProxy target = edge.getTarget();
-        if (!mTransferredNodes.contains(source) ||
-            !mTransferredNodes.contains(target)) {
-          iter.remove();
-        }
-      }
-      final GraphProxy graph = new GraphElement
-        (false, mTransferredBlock, mTransferredNodes, mTransferredEdges);
-      final ProxyTransferable<?> transferable = new GraphTransferable(graph);
-      mTransferredBlock = null;
-      mTransferredNodes = null;
-      mTransferredEdges = null;
-      return transferable;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
-    public Object visitProxy(final Proxy proxy)
-    {
-      return null;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    public Object visitEdgeProxy(final EdgeProxy edge)
-    {
-      mTransferredEdges.add(edge);
-      return null;
-    }
-
-    public Object visitLabelBlockProxy(final LabelBlockProxy block)
-    {
-      final LabelBlockSubject subject = (LabelBlockSubject) block;
-      if (subject.getParent() instanceof GraphProxy) {
-        mTransferredBlock = block;
-      }
-      return null;
-    }
-
-    public Object visitNodeProxy(final NodeProxy node)
-    {
-      mTransferredNodes.add(node);
-      return null;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private LabelBlockProxy mTransferredBlock;
-    private Collection<NodeProxy> mTransferredNodes;
-    private Collection<EdgeProxy> mTransferredEdges;
-  }
-
-
-  private static GraphTransferableVisitor mGraphTransferableVisitor = new GraphTransferableVisitor();
-  private static ExportedDataFlavorVisitor mExportedDataFlavorVisitor = new ExportedDataFlavorVisitor();
+  public static final WatersDataFlavor PARAMETER_BINDING =
+    new ModuleDataFlavor(ParameterBindingProxy.class);
 
 }

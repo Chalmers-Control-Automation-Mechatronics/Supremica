@@ -9,7 +9,9 @@
 
 package net.sourceforge.waters.analysis.sd;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicSafetyVerifier;
+import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -19,24 +21,27 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public class SDPlantCompletenessChecker
-  extends MonolithicSafetyVerifier
-  //implements ControllabilityChecker
+  extends ModularControllabilityChecker
+  implements ControllabilityChecker
 {
 
   //#########################################################################
   //# Constructors
-  public SDPlantCompletenessChecker(final ProductDESProxyFactory factory)
+  public SDPlantCompletenessChecker(final ProductDESProxyFactory factory,
+                                    final SafetyVerifier checker)
   {
-    this(null, factory);
+    this(null,factory,checker,false);
   }
 
   public SDPlantCompletenessChecker(final ProductDESProxy model,
-                                    final ProductDESProxyFactory factory)
+                                    final ProductDESProxyFactory factory,
+                                    final SafetyVerifier checker,
+                                    final boolean least)
   {
-    super(model,
-          SDPlantCompletenessKindTranslator.getInstance(),
-          SDPlantCompletenessDiagnostics.getInstance(),
-          factory);
+    super(model, factory,checker, false);
+    setKindTranslator(SDPlantCompletenessKindTranslator.getInstance());
+
+
   }
 
 }

@@ -3,15 +3,12 @@
 
 package net.sourceforge.waters.analysis.sd;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
-import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -35,22 +32,27 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  * @author Mahvash Baloch , Robi Malik
  */
 
-public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
+public class SDSingularPropertyVerifier extends AbstractSDLanguageInclusionChecker
 {
 
   //#########################################################################
   //# Constructors
-  public SDSingularPropertyVerifier( final ProductDESProxy model,
-                                     final ProductDESProxyFactory factory,
-                                     final ControllabilityChecker checker)
-
-         {
-           super(model,
-                 LanguageInclusionKindTranslator.getInstance(),
-                 LanguageInclusionDiagnostics.getInstance(),
-                 factory);
-           mChecker = checker;
-         }
+  public SDSingularPropertyVerifier( final ProductDESProxyFactory factory)
+  {
+  super(factory);
+  }
+  public SDSingularPropertyVerifier(   final LanguageInclusionChecker checker,
+                            final ProductDESProxyFactory factory
+                            )
+  {
+  super(checker,factory);
+  }
+    public SDSingularPropertyVerifier( final LanguageInclusionChecker checker,
+                            final ProductDESProxy model,
+                            final ProductDESProxyFactory factory)
+    {
+      super(checker, model, factory );
+     }
 
 
   public boolean run() throws AnalysisException
@@ -62,26 +64,23 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
           new SDPropertyBuilder(model, getFactory());
       final List<EventProxy> Hibs =
           (List<EventProxy>) builder.getHibEvents();
-      final int numHib = Hibs.size();
-      mCheckerStats = new ArrayList<VerificationResult>(numHib);
 
       ProductDESProxy convertedModel = null;
-
-      for (final EventProxy hib : Hibs)
+            for (final EventProxy hib : Hibs)
        {
         convertedModel = builder.createSingularModel(hib);
-        final ModularLanguageInclusionChecker checker=
-         new ModularLanguageInclusionChecker(convertedModel, getFactory(),
-                                              mChecker );
+        final LanguageInclusionChecker checker=
+         getLanguageInclusionChecker();
         checker.setModel(convertedModel);
         final VerificationResult result;
         try {
           checker.run();
         } finally {
-
           result = checker.getAnalysisResult();
+          mergeAll(result);
           recordStatistics(result);
-        }
+          setAnalysisResult(Result);
+          }
         if (!result.isSatisfied()) {
           final SafetyTraceProxy counterexample =
               checker.getCounterExample();
@@ -89,12 +88,12 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
           return setFailedResult(counterexample);
         }
       }
-      return setSatisfiedResult();
+      //System.out.println(Result);
+            return setSatisfiedResult();
 
 
     } finally {
       tearDown();
-      mCheckerStats = null;
     }
   }
 
@@ -108,78 +107,55 @@ public class SDSingularPropertyVerifier extends AbstractSafetyVerifier
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
-    return mChecker.supportsNondeterminism();
+    return false;
   }
 
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.ModelAnalyser
+//#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
-  public SDPropertyVerifierVerificationResult getAnalysisResult()
-  {
-    return (SDPropertyVerifierVerificationResult) super.getAnalysisResult();
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
-  @Override
-  protected void setUp() throws AnalysisException
+  protected void setUp()
+  throws AnalysisException
   {
     super.setUp();
-    mPeakNumberOfNodes = -1;
-    mTotalNumberOfStates = mTotalNumberOfTransitions = 0.0;
-    mPeakNumberOfStates = mPeakNumberOfTransitions = -1.0;
+    mFirstResult = true;
+    mFailedAnswer = null;
   }
 
-  @Override
-  protected SDPropertyVerifierVerificationResult createAnalysisResult()
-  {
-    return new SDPropertyVerifierVerificationResult();
-  }
-
-  @Override
-  protected void addStatistics()
-  {
-    super.addStatistics();
-    final SDPropertyVerifierVerificationResult stats = getAnalysisResult();
-    stats.setPeakNumberOfNodes(mPeakNumberOfNodes);
-    stats.setTotalNumberOfStates(mTotalNumberOfStates);
-    stats.setPeakNumberOfStates(mPeakNumberOfStates);
-    stats.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
-    stats.setPeakNumberOfTransitions(mPeakNumberOfTransitions);
-    stats.setCheckerResult(mCheckerStats);
-  }
-
-
-  //#########################################################################
+   //#########################################################################
   //# Auxiliary Methods
-
-  private void recordStatistics(final VerificationResult result)
+  private void recordStatistics(final AnalysisResult result)
   {
-    mPeakNumberOfNodes =
-        Math.max(mPeakNumberOfNodes, result.getPeakNumberOfNodes());
-    mTotalNumberOfStates += result.getPeakNumberOfStates();
-    mPeakNumberOfStates =
-        Math.max(mPeakNumberOfStates, result.getPeakNumberOfStates());
-    mTotalNumberOfTransitions += result.getPeakNumberOfTransitions();
-    mPeakNumberOfTransitions =
-        Math.max(mPeakNumberOfTransitions, result.getPeakNumberOfTransitions());
-    mCheckerStats.add(result);
+     if (mFirstResult) {
+       setAnalysisResult(result);
+       mFirstResult = false;
+
+     } else {
+       final AnalysisResult present = getAnalysisResult();
+       final int numaut1 = present.getTotalNumberOfAutomata();
+       final int numaut2 = result.getTotalNumberOfAutomata();
+       final int numaut = Math.max(numaut1, numaut2);
+       present.merge(result);
+       present.setNumberOfAutomata(numaut);
+     }
+  }
+  private void mergeAll(final AnalysisResult result)
+  {
+     if (mFirstResult) {
+       Result = result;
+     } else {
+       final int numaut1 = Result.getTotalNumberOfAutomata();
+       final int numaut2 = result.getTotalNumberOfAutomata();
+       final int numaut = Math.max(numaut1, numaut2);
+       Result.merge(result);
+       Result.setNumberOfAutomata(numaut);
+     }
   }
 
 
   //#########################################################################
   //# Data Members
   private EventProxy mFailedAnswer;
+  private boolean mFirstResult;
+  private AnalysisResult Result;
 
-  private int mPeakNumberOfNodes;
-  private double mTotalNumberOfStates;
-  private double mPeakNumberOfStates;
-  private double mTotalNumberOfTransitions;
-  private double mPeakNumberOfTransitions;
-
-  private List<VerificationResult> mCheckerStats;
-
-  private final ControllabilityChecker mChecker;
 }

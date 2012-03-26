@@ -69,14 +69,14 @@ import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**
- * <P>A double-up graph used by the controlled surface during drag
+ * <P>A double-up graph used by a {@link GraphEditorPanel} during drag
  * operations.</P>
  *
- * <P>When a drag action is initiated in the controlled surface, it creates
- * a so-called secondary graph of type <CODE>EditorGraph</CODE>. This is a
- * full implementation of the {@link GraphProxy} interface, which is passed
- * to the renderers for display. It is updated continuously during the
- * course of the drag operation, but these changes are not written through
+ * <P>When a drag action is initiated in the {@link GraphEditorPanel}, it
+ * creates a so-called secondary graph of type <CODE>EditorGraph</CODE>.
+ * This is a full implementation of the {@link GraphProxy} interface, which
+ * is passed to the renderers for display. It is updated continuously during
+ * the course of the drag operation, but these changes are not written through
  * to the model immediately.</P>
  *
  * <P>When the drag operation is completed, the <CODE>EditorGraph</CODE>
@@ -84,7 +84,7 @@ import net.sourceforge.waters.xsd.module.SplineKind;
  * the double-up graph, and this command is registered with the undo
  * manager for execution on the main model.</P>
  *
- * @see ControlledSurface, Command
+ * @see GraphEditorPanel, Command
  * @author Simon Ware, Robi Malik
  */
 
@@ -1097,7 +1097,7 @@ class EditorGraph
 
     AbstractEditCommand createInsertCommand(final GraphEditorPanel surface)
     {
-      return new InsertCommand(createOriginal(), surface, false);
+      return new InsertCommand(createOriginal(), surface, null, false);
     }
 
     AbstractEditCommand createDeleteCommand(final GraphEditorPanel surface)

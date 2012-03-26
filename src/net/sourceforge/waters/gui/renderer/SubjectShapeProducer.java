@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -28,9 +29,12 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -142,6 +146,9 @@ public class SubjectShapeProducer
         removeMapping((GuardActionBlockProxy) parent);
       } else if (parent instanceof GraphProxy) {
         removeMapping((Subject) event.getValue());
+      }else if(parent instanceof ForeachSubject){
+        removeMapping((LabelBlockProxy)SubjectTools.
+                      getAncestor(parent, LabelBlockSubject.class));
       }
       break;
     case ModelChangeEvent.NAME_CHANGED:
@@ -154,9 +161,16 @@ public class SubjectShapeProducer
       break;
     case ModelChangeEvent.STATE_CHANGED:
       if (esource instanceof EdgeProxy ||
-          esource instanceof SimpleNodeProxy) {
+          esource instanceof SimpleNodeProxy){
         removeMapping(esource);
-      } else if (esource == getGraph() &&
+      }else if(esource instanceof IdentifierProxy) {
+      final IdentifierSubject simple = (IdentifierSubject)esource;
+        final Subject ancestor = (Subject) SubjectTools.getAncestor
+                (simple, SimpleNodeSubject.class, LabelBlockSubject.class);
+        if(ancestor != null){
+          removeMapping(ancestor);
+        }
+     } else if (esource == getGraph() &&
                  getGraph().getBlockedEvents() == null &&
                  mOldBlockedEventsList != null) {
         removeMapping(mOldBlockedEventsList);

@@ -2,13 +2,12 @@ package org.supremica.automata.BDD.EFA;
 
 /**
  * A helper class as the second stage of heuristic selection
- * The same idea (even some implementation) is from Arash
+ * The same idea (even some implementation) is from Arash Vahidi
  *
  * @author  Zhennan
  * @version  1.0
  *
  */
-
 public class ReinforcementLearningPlusTabuSearch {
 
     private static ReinforcementLearningPlusTabuSearch rl = null;
@@ -18,25 +17,30 @@ public class ReinforcementLearningPlusTabuSearch {
     private int[] activity = null, queue2 = null;
     private boolean punish_inactive;
 
-    private ReinforcementLearningPlusTabuSearch() {
+    private ReinforcementLearningPlusTabuSearch() 
+    {
+        
     }
 
-    public static ReinforcementLearningPlusTabuSearch getInstance(){
-        if(rl == null){
+    public static ReinforcementLearningPlusTabuSearch getInstance() 
+    {
+        if (rl == null) {
             return new ReinforcementLearningPlusTabuSearch();
         }
         return rl;
     }
 
     /* This method must be called to set up some fields after the call of getInstance() */
-    public void setSize(final int size) {
+    public void setSize(final int size) 
+    {
         max_activity = size;
         punish_inactive = true;
         activity = new int[size];
         queue2 = new int[size];
     }
 
-    public void reset() {
+    public void reset() 
+    {
         if (activity != null) {
             for (int i = 0; i < activity.length; i++) {
                 activity[i] = 0;
@@ -44,7 +48,8 @@ public class ReinforcementLearningPlusTabuSearch {
         }
     }
 
-    public int choose(final int[] queue, final int size) {
+    public int choose(final int[] queue, final int size) 
+    {
         if (size <= 0) {
             System.err.println("ERROR");
             return -1;    // ERROR, no choices!
@@ -55,7 +60,8 @@ public class ReinforcementLearningPlusTabuSearch {
         return find_best_active(queue, size);
     }
 
-    public void advance(final int element, final boolean changed) {
+    public void advance(final int element, final boolean changed) 
+    {
         if (punish_inactive) {
             activity[element] += (changed) ? ADD_REWARD : ADD_PUNISH;
             // dont let it grow more than we can handle...
@@ -67,7 +73,8 @@ public class ReinforcementLearningPlusTabuSearch {
         }
     }
 
-    private int find_best_active(final int[] queue, final int size) {
+    private int find_best_active(final int[] queue, final int size) 
+    {
         int count = 0;
         int best = Integer.MIN_VALUE;
         for (int i = 0; i < size; i++) {

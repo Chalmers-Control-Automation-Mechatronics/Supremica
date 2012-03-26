@@ -343,8 +343,8 @@ class EditorSynthesizerDialogStandardPanel
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
             algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
 /*            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
             algorithmSelector.addItem(SynthesisAlgorithm.MODULAR);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
@@ -355,8 +355,8 @@ class EditorSynthesizerDialogStandardPanel
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
             algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
 
 /*
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
@@ -369,8 +369,8 @@ class EditorSynthesizerDialogStandardPanel
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
             algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
+//            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
 /*
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);

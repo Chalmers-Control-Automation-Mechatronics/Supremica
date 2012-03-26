@@ -19,6 +19,7 @@ import net.sourceforge.waters.gui.EditorEditEdgeDialog;
 import net.sourceforge.waters.gui.EventAliasEditorDialog;
 import net.sourceforge.waters.gui.EventDeclEditorDialog;
 import net.sourceforge.waters.gui.ForeachEditorDialog;
+import net.sourceforge.waters.gui.InstanceEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.ParameterBindingEditorDialog;
 import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
@@ -35,6 +36,7 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
@@ -43,6 +45,7 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
+import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
@@ -216,6 +219,16 @@ public class IDEPropertiesAction
         final FocusTracker tracker = getFocusTracker();
         final SelectionOwner panel = tracker.getWatersSelectionOwner();
         new ForeachEditorDialog(root, panel, subject);
+      }
+      return true;
+    }
+
+    // TODO Auto-generated method stub
+    public Boolean visitInstanceProxy(final InstanceProxy instance){
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final InstanceSubject subject = (InstanceSubject) instance;
+        new InstanceEditorDialog(root, subject);
       }
       return true;
     }

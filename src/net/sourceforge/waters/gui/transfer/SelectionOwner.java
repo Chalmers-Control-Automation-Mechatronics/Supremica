@@ -78,8 +78,8 @@ public interface SelectionOwner
   public List<? extends Proxy> getAllSelectableItems();
 
   /**
-   * Gets the focussed item of the current selection.
-   * The focussed item is the item in the component that was selected
+   * Gets the focused item of the current selection.
+   * The focused item is the item in the component that was selected
    * last, which typically is the target of a 'properties' or similar action.
    * @return The single selected item that is to be considered as the anchor,
    *         or <CODE>null</CODE> if no such item can be identified.
@@ -139,48 +139,6 @@ public interface SelectionOwner
    * @see    {@link #getSelectableAncestor(Proxy) getSelectableAncestor()}
    */
   public void removeFromSelection(List<? extends Proxy> items);
-
-  /**
-   * Gets the insert position for a given item.
-   * @param  item    The item to be inserted.
-   * @return An object that identifies to the panel where and how to insert
-   *         the given item if a create or paste operation is completed at
-   *         this time.
-   */
-  public Object getInsertPosition(final Proxy item);
-
-  /**
-   * Inserts a new item into the panel.
-   * This method is typically called when a dialog to edit a new item is
-   * completed. It inserts the created item into the data structure. The
-   * insertion is performed directly, without cloning, and without using a
-   * command. The item is not selected, this has to be done separately.
-   * @param  item   The item to be inserted.
-   * @param  inspos An object identifying where and how to insert the
-   *                new item. The insert position is typically obtained
-   *                using the {@link #getInsertPosition()} method.
-   */
-  public void insertCreatedItem(final Proxy item, final Object inspos);
-
-  /**
-   * Determines whether the contents of the given selection can be
-   * converted to a transferable to dragged or placed on the clipboard.
-   * @param items   The list of items to be copied, as produced by the
-   *                {@link #getCurrentSelection()} method.
-   */
-  public boolean canCopy(List<? extends Proxy> items);
-
-  /**
-   * Converts the given list of selected items into a transferable.
-   * This method is typically used by a 'copy' action in order to place
-   * the contents of the selection in the clipboard.
-   * @param items   The list of items to be converted, as produced by the
-   *                {@link #getCurrentSelection()} method. A call to {@link
-   *                #canCopy(List<Proxy>) canCopy()} must return
-   *                <CODE>true</CODE> for this list, otherwise the result
-   *                is undetermined.
-   */
-  public Transferable createTransferable(List<? extends Proxy> items);
 
   /**
    * Determines whether the contents of the given transferable can be
