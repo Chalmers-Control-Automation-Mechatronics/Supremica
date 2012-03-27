@@ -383,25 +383,27 @@ public class InstanceEditorDialog extends JDialog
   private URI relativise(final URI file, final URI module)
   {
     String product = file.toString();
-    final String filePath = product;
-    final String modulePath = module.toString();
-    final String[] fileArray = filePath.split("/");
-    final String[] moduleArray = modulePath.split("/");
-    if (file.compareTo(module) == 0) {
-      product = fileArray[fileArray.length - 1];
-    } else {
-      int i = 0;
-      while (i < moduleArray.length && i < fileArray.length) {
-        if (moduleArray[i].compareTo(fileArray[i]) != 0) {
-          i++;
-          int dotSets = moduleArray.length - i;
-          product = filePath.split("/", i)[i - 1];
-          while (dotSets > 0) {
-            product = "../" + product;
-            dotSets--;
+    if (module != null) {
+      final String filePath = product;
+      final String modulePath = module.toString();
+      final String[] fileArray = filePath.split("/");
+      final String[] moduleArray = modulePath.split("/");
+      if (file.compareTo(module) == 0) {
+        product = fileArray[fileArray.length - 1];
+      } else {
+        int i = 0;
+        while (i < moduleArray.length && i < fileArray.length) {
+          if (moduleArray[i].compareTo(fileArray[i]) != 0) {
+            i++;
+            int dotSets = moduleArray.length - i;
+            product = filePath.split("/", i)[i - 1];
+            while (dotSets > 0) {
+              product = "../" + product;
+              dotSets--;
+            }
           }
+          i++;
         }
-        i++;
       }
     }
     try {
@@ -426,18 +428,25 @@ public class InstanceEditorDialog extends JDialog
       final URI moduleUri = module.getLocation();
       final JFormattedTextField textfield = (JFormattedTextField) input;
       final String text = textfield.getText();
-        String mod = moduleUri.getPath();
-        mod = mod.substring(0, mod.lastIndexOf("/") + 1);
-        mod += text + ".wmod";
-        final File file = new File(mod);
+      File file = null;
       try {
-        final JFormattedTextField.AbstractFormatter formatter =
-          textfield.getFormatter();
-        formatter.stringToValue(text);
-        if(moduleUri.getPath().compareTo(file.getAbsolutePath()) == 0){
-          mMessage = "Cannot make recursive instantiations of the module!";
-          return false;
+        if (moduleUri != null) {
+          String mod = moduleUri.getPath();
+          mod = mod.substring(0, mod.lastIndexOf("/") + 1);
+          mod += text + ".wmod";
+          file = new File(mod);
+
+          final JFormattedTextField.AbstractFormatter formatter =
+            textfield.getFormatter();
+          formatter.stringToValue(text);
+          if (moduleUri.getPath().compareTo(file.getAbsolutePath()) == 0) {
+            mMessage = "Cannot make recursive instantiations of the module!";
+            return false;
+          }
+        } else {
+          file = new File(text + ".wmod");
         }
+
         if (text.length() != 0) {
           final DocumentManager docman =
             mRoot.getRootWindow().getDocumentManager();
@@ -478,8 +487,9 @@ public class InstanceEditorDialog extends JDialog
     public boolean accept(final File file)
     {
       final ModuleSubject module = mRoot.getModuleSubject();
+      final URI modURI = module.getLocation();
       //filter out the current module
-      if (file.getAbsolutePath().compareTo(module.getLocation().getPath()) == 0) {
+      if (modURI != null && file.getAbsolutePath().compareTo(modURI.getPath()) == 0) {
         return false;
       }
       //filter out files that aren't .wmod
