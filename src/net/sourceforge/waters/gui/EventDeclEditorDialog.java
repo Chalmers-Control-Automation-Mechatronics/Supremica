@@ -999,7 +999,7 @@ public class EventDeclEditorDialog
         mEventDecl = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!eq.equals(mEventDecl, template)) {
-        if (true){//mEventDecl.getName().equals(template.getName())) {
+        if (mEventDecl.getName().equals(template.getName())) {
           final Command command =
             new EditCommand(mEventDecl, template, panel);
           mRoot.getUndoInterface().executeCommand(command);
