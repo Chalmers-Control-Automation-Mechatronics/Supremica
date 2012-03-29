@@ -135,7 +135,7 @@
                     </Edge>
                     <Edge Target="S7" Source="S5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
+                            <SimpleIdentifier Name="v"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-24" X="0"/>
                             </LabelGeometry>
@@ -144,7 +144,7 @@
                             <Point Y="240" X="176"/>
                         </StartPointGeometry>
                     </Edge>
-                    <Edge Target="S2" Source="S5">
+                    <Edge Target="S2" Source="S7">
                         <LabelBlock>
                             <SimpleIdentifier Name="w"/>
                             <LabelGeometry Anchor="NW">
@@ -152,13 +152,10 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="240" X="176"/>
+                            <Point Y="240" X="128"/>
                         </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point Y="170" X="152"/>
-                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="S9" Source="S6">
+                    <Edge Target="S9" Source="S7">
                         <LabelBlock>
                             <SimpleIdentifier Name="v"/>
                             <LabelGeometry Anchor="NW">
@@ -166,15 +163,12 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="240" X="80"/>
+                            <Point Y="240" X="128"/>
                         </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point Y="166" X="108"/>
-                        </SplineGeometry>
                     </Edge>
                     <Edge Target="S7" Source="S6">
                         <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
+                            <SimpleIdentifier Name="v"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-21" X="-7"/>
                             </LabelGeometry>
@@ -237,7 +231,7 @@
                             <Point Y="368" X="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="2" X="-34"/>
+                            <Point Y="-3" X="-25"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -326,9 +320,9 @@
                     </Edge>
                     <Edge Target="S7" Source="S6">
                         <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
+                            <SimpleIdentifier Name="v"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-7"/>
+                                <Point Y="-15" X="-14"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
