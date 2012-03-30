@@ -322,20 +322,8 @@ public class SynthesisAbstractionTRSimplifier
     }
     setUpTauClosure();
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    mUncontrollableTransitionStorage = new UncontrollableTransitionStorage();
     final int numStates = rel.getNumberOfStates();
-    mHasUncontrollable = new boolean[numStates];
-    final TransitionIterator itr = rel.createAllTransitionsReadOnlyIterator();
-    itr.resetEvents(EventEncoding.NONTAU, mLastLocalUncontrollableEvent);
-    while(itr.advance()){
-      final int source = itr.getCurrentSourceState();
-      mHasUncontrollable[source] = true;
-    }
-    itr.resetEvents(mLastLocalControllableEvent+1,
-                    mLastSharedUncontrollableEvent);
-    while(itr.advance()){
-      final int source = itr.getCurrentSourceState();
-      mHasUncontrollable[source] = true;
-    }
     mTempClass = new TIntArrayList(numStates);
     mOriginalTransitionRelation = null;
   }
@@ -383,7 +371,7 @@ public class SynthesisAbstractionTRSimplifier
     mPredecessors = null;
     mSplitters = null;
     mTempClass = null;
-    mHasUncontrollable = null;
+    mUncontrollableTransitionStorage = null;
   }
 
   /**
@@ -691,8 +679,7 @@ public class SynthesisAbstractionTRSimplifier
       final int size = mTempClass.size();
       for (int i = 0; i < size; i++) {
         final int state = mTempClass.get(i);
-        explore(state, mLastLocalControllableEvent, visited, found,
-                splitClasses);
+        exploreLocalControllable(state, visited, found, splitClasses);
       }
       for (final EquivalenceClass splitClass : splitClasses) {
         splitClass.splitUsingOverflowList();
@@ -712,7 +699,8 @@ public class SynthesisAbstractionTRSimplifier
           new THashSet<EquivalenceClass>();
         for (int i = 0; i < size; i++) {
           final int state = mTempClass.get(i);
-          explore(state, event, visited, found, splitClasses);
+          exploreSharedControllable(state, event,
+                                    visited, found, splitClasses);
         }
         for (final EquivalenceClass splitClass : splitClasses) {
           splitClass.splitUsingOverflowList();
@@ -720,110 +708,169 @@ public class SynthesisAbstractionTRSimplifier
       }
     }
 
-    private void explore(final int endState, final int event,
-                         final Set <SearchRecord> visited,
-                         final TIntHashSet found,
-                         final Collection<EquivalenceClass> splitClasses )
+    private void exploreLocalControllable
+      (final int endState,
+       final Set <SearchRecord> visited,
+       final TIntHashSet found,
+       final Collection<EquivalenceClass> splitClasses)
     {
-      final Queue<SearchRecord> opened = new ArrayDeque<SearchRecord>();
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final EquivalenceClass endClass = mStateToClass[endState];
+      final SearchRecord initial = new SearchRecord(endState);
+      visited.add(initial);
+      open.add(initial);
+      while (!open.isEmpty()){
+        final SearchRecord record = open.remove();
+        final int state = record.getState();
+        mPredecessorIterator.resetState(state);
+        final EquivalenceClass startingClass = record.getStartingClass();
+        if (startingClass == null || mStateToClass[state] == startingClass) {
+          // Store full path if starting class OK or unassigned ...
+          if (found.add(state)) {
+            final EquivalenceClass splitClass = mStateToClass[state];
+            if (splitClass.getSize() > 1) {
+              splitClass.moveToOverflowList(state);
+              splitClasses.add(splitClass);
+            }
+          }
+        }
+        // Visit predecessors for local controllable transitions if this
+        // state's class is the start or end class or can be made the
+        // start class ...
+        if (startingClass == null ||
+            mStateToClass[state] == startingClass ||
+            mStateToClass[state] == endClass) {
+          final EquivalenceClass newStartingClass =
+            mStateToClass[state] != endClass ? mStateToClass[state]
+                                             : startingClass;
+          mPredecessorIterator.resetEvents(mLastLocalUncontrollableEvent + 1,
+                                           mLastLocalControllableEvent);
+          while (mPredecessorIterator.advance()) {
+            final int source = mPredecessorIterator.getCurrentSourceState();
+            final SearchRecord next =
+              new SearchRecord(source, newStartingClass, true);
+            if (visited.add(next)) {
+              open.add(next);
+            }
+          }
+        }
+        // Visit predecessors for all local uncontrollable transitions ...
+        mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
+                                         mLastLocalUncontrollableEvent);
+        while (mPredecessorIterator.advance()) {
+          final int source = mPredecessorIterator.getCurrentSourceState();
+          final SearchRecord next =
+            new SearchRecord(source, startingClass, true);
+          if (visited.add(next)) {
+            open.add(next);
+          }
+        }
+      }
+    }
+
+    private void exploreSharedControllable
+      (final int endState,
+       final int event,
+       final Set <SearchRecord> visited,
+       final TIntHashSet found,
+       final Collection<EquivalenceClass> splitClasses)
+    {
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final EquivalenceClass endClass = mStateToClass[endState];
       final SearchRecord initial =
         new SearchRecord(endState, null,
                          event > EventEncoding.TAU &&
                          event <= mLastLocalControllableEvent);
       visited.add(initial);
-      opened.add(initial);
-      while(!opened.isEmpty()){
-        final SearchRecord record = opened.remove();
-        mPredecessorIterator.resetState(record.getState());
+      open.add(initial);
+      while (!open.isEmpty()){
+        final SearchRecord record = open.remove();
+        final int state = record.getState();
+        mPredecessorIterator.resetState(state);
         if (record.getHasEvent()) {
-          final int state = record.getState();
-          if (mStateToClass[state] == record .getStartingClass()
-            || record .getStartingClass() == null) {
-            // output source state
-            if(found.add(state)){
+          // In first part of path (before the event)
+          final EquivalenceClass startingClass = record.getStartingClass();
+          if (startingClass == null ||
+              mStateToClass[state] == startingClass) {
+            // Store full path if starting class OK or unassigned ...
+            if (found.add(state)) {
               final EquivalenceClass splitClass = mStateToClass[state];
               if (splitClass.getSize() > 1) {
                 splitClass.moveToOverflowList(state);
                 splitClasses.add(splitClass);
               }
             }
-          }
-
-          // Visit predecessors ...
-          if (mHasUncontrollable[state] && !(mStateToClass[state] == endClass
-             || mStateToClass[state] == record.getStartingClass())){
-            if (record.getStartingClass() == null){
-              mPredecessorIterator.resetEvents(mLastLocalUncontrollableEvent + 1,
-                                               mLastLocalControllableEvent);
-              while (mPredecessorIterator.advance()) {
-                final int source = mPredecessorIterator.getCurrentSourceState();
-                final SearchRecord next = new SearchRecord(source,
-                                                     mStateToClass[state],
-                                                     true);
-                if (visited.add(next)){
-                  opened.add(next);
-                }
-              }
-            }
-            mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
-                                             mLastLocalUncontrollableEvent);
-            while (mPredecessorIterator.advance()) {
-              final int source = mPredecessorIterator.getCurrentSourceState();
-              final SearchRecord next = new SearchRecord(source,
-                                                   record.getStartingClass(),
-                                                   true);
-              if (visited.add(next)){
-                opened.add(next);
-              }
-            }
-          } else {
-            mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
+            // Visit predecessors for local controllable transitions if this
+            // state's class is or can be made the starting class ...
+            mPredecessorIterator.resetEvents(mLastLocalUncontrollableEvent + 1,
                                              mLastLocalControllableEvent);
             while (mPredecessorIterator.advance()) {
               final int source = mPredecessorIterator.getCurrentSourceState();
-              final SearchRecord next = new SearchRecord(source,
-                                                   record.getStartingClass(),
-                                                   true);
+              final SearchRecord next =
+                new SearchRecord(source, mStateToClass[state], true);
               if (visited.add(next)){
-                opened.add(next);
+                open.add(next);
               }
             }
-
           }
-        } else {  // !record.hasEvent()
+          // Visit predecessors for all local uncontrollable transitions ...
           mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
-                                           mLastLocalControllableEvent);
+                                           mLastLocalUncontrollableEvent);
           while (mPredecessorIterator.advance()) {
             final int source = mPredecessorIterator.getCurrentSourceState();
-            final EquivalenceClass newStartingClass;
-            if (mHasUncontrollable[source]) {
-              final EquivalenceClass sourceClass = mStateToClass[source];
-              if (sourceClass == endClass ||
-                  record.getStartingClass() == sourceClass) {
-                newStartingClass = record.getStartingClass();
-              } else if (record.getStartingClass() == null){
-                newStartingClass = sourceClass;
-              } else {
-                continue;
-              }
-            } else{
-              newStartingClass = record.getStartingClass();
-            }
-            final SearchRecord next = new SearchRecord(source, newStartingClass,
-                                                 false);
-            if (visited.add(next)){
-              opened.add(next);
+            final SearchRecord next =
+              new SearchRecord(source, startingClass, true);
+            if (visited.add(next)) {
+              open.add(next);
             }
           }
+        } else {
+          // In second part of path (after the event)
+          final EquivalenceClass stateClass = mStateToClass[state];
+          // Visit predecessors for all local transitions ...
+          mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
+                                           mLastLocalControllableEvent);
+          preds:
+          while (mPredecessorIterator.advance()) {
+            final int source = mPredecessorIterator.getCurrentSourceState();
+            final EquivalenceClass sourceClass = mStateToClass[source];
+            // If the source state is not equivalent to the end state,
+            // it must not be uncontrollable
+            if (sourceClass != endClass) {
+              // The source state is uncontrollable, if it has a shared
+              // uncontrollable event outgoing (indicated by null iterator),
+              // or if it has a local uncontrollable successor state not
+              // equivalent to the source state, the current state, or the
+              // end state.
+              final IntListBuffer.Iterator iter =
+                mUncontrollableTransitionStorage.getIterator(source);
+              if (iter == null) {
+                continue;
+              } else {
+                while (iter.advance()) {
+                  final int succ = iter.getCurrentData();
+                  final EquivalenceClass succClass = mStateToClass[succ];
+                  if (succClass != sourceClass &&
+                      succClass != stateClass &&
+                      succClass != endClass) {
+                    continue preds;
+                  }
+                }
+              }
+            }
+            // Otherwise just explore ...
+            final SearchRecord next = new SearchRecord(source, null, false);
+            if (visited.add(next)){
+              open.add(next);
+            }
+          }
+          // Visit predecessors for the shared event ...
           mPredecessorIterator.resetEvent(event);
           while (mPredecessorIterator.advance()){
             final int source = mPredecessorIterator.getCurrentSourceState();
-            final SearchRecord next = new SearchRecord(source,
-                                                 record.getStartingClass(),
-                                                 true);
+            final SearchRecord next = new SearchRecord(source, null, true);
             if (visited.add(next)){
-              opened.add(next);
+              open.add(next);
             }
           }
         }
@@ -981,6 +1028,11 @@ public class SynthesisAbstractionTRSimplifier
 
     //#######################################################################
     //# Constructors
+    private SearchRecord(final int state)
+    {
+      this(state, null, false);
+    }
+
     private SearchRecord(final int state,
                          final EquivalenceClass startingClass,
                          final boolean hasEvent)
@@ -1054,11 +1106,106 @@ public class SynthesisAbstractionTRSimplifier
 
 
   //#########################################################################
+  //# Inner Class UncontrollableTransitionStorage
+  /**
+   * Auxiliary class to store local uncontrollable transitions.
+   * Stores for each state the list of successor states reached by
+   * some local uncontrollable transition, excluding selfloops and
+   * duplicates. States with an outgoing shared uncontrollable
+   * transition are marked specially and are not associated with any
+   * list of successor states.
+   */
+  private class UncontrollableTransitionStorage {
+
+    //#######################################################################
+    //# Constructor
+    private UncontrollableTransitionStorage()
+    {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int numStates = rel.getNumberOfStates();
+      mLists = new int[numStates];
+      mBuffer = new IntListBuffer();
+      final int empty = mBuffer.createList();
+      int state;
+      for (state = 0; state < numStates; state++) {
+        mLists[state] = empty;
+      }
+      for (state = 0; state < numStates; state++) {
+        mPredecessorIterator.resetState(state);
+        mPredecessorIterator.resetEvents(mLastLocalControllableEvent + 1,
+                                         mLastSharedUncontrollableEvent);
+        while (mPredecessorIterator.advance()) {
+          final int pred = mPredecessorIterator.getCurrentSourceState();
+          mLists[pred] = IntListBuffer.NULL;
+        }
+      }
+      for (state = 0; state < numStates; state++) {
+        mPredecessorIterator.resetState(state);
+        mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
+                                         mLastLocalUncontrollableEvent);
+        while (mPredecessorIterator.advance()) {
+          final int pred = mPredecessorIterator.getCurrentSourceState();
+          if (pred == state) {
+            continue;
+          }
+          int list = mLists[pred];
+          if (list == IntListBuffer.NULL) {
+            continue;
+          } else if (list == empty) {
+            mLists[pred] = list = mBuffer.createList();
+            mBuffer.prepend(list, state);
+          } else {
+            mBuffer.prependUnique(list, state);
+          }
+        }
+      }
+      mIterator = mBuffer.createReadOnlyIterator();
+    }
+
+    //#######################################################################
+    //# Access
+    IntListBuffer.Iterator getIterator(final int state)
+    {
+      final int list = mLists[state];
+      if (list == IntListBuffer.NULL) {
+        return null;
+      } else {
+        mIterator.reset(list);
+        return mIterator;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int[] mLists;
+    private final IntListBuffer mBuffer;
+    private final IntListBuffer.ReadOnlyIterator mIterator;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private long mPropositionMask = ~0;
   private int mTransitionLimit = Integer.MAX_VALUE;
+  /**
+   * The code of the last local uncontrollable event.
+   * Local uncontrollable events are thus stored in the range from
+   * {@link EventEncoding#NONTAU} to mLastLocalUncontrollableEvent.
+   */
   private int mLastLocalUncontrollableEvent;
+  /**
+   * The code of the last local controllable event.
+   * Local controllable events are thus stored in the range from
+   * {@link #mLastLocalUncontrollableEvent}+1 to
+   * mLastLocalControllableEvent.
+   */
   private int mLastLocalControllableEvent;
+  /**
+   * The code of the last shared uncontrollable event.
+   * Shared uncontrollable events are thus stored in the range from
+   * {@link #mLastLocalControllableEvent}+1 to
+   * mLastSharedUncontrollableEvent.
+   */
   private int mLastSharedUncontrollableEvent;
 
   private ListBufferTransitionRelation mOriginalTransitionRelation;
@@ -1073,7 +1220,7 @@ public class SynthesisAbstractionTRSimplifier
   private TransitionIterator mPredecessorIterator;
   private TransitionIterator mUncontrollableTauIterator;
   private TransitionIterator mUncontrollableEventIterator;
-  private boolean[] mHasUncontrollable;
+  private UncontrollableTransitionStorage mUncontrollableTransitionStorage;
   private IntListBuffer mClassLists;
   private IntListBuffer.ReadOnlyIterator mClassReadIterator;
   private IntListBuffer.ModifyingIterator mClassWriteIterator;
