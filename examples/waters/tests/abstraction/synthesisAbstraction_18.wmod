@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="synthesisAbstraction_17" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="synthesisAbstraction_18" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A test for synthesis abstraction, WODES 2012 version.
-States S1 and S3 cannot be merged, because S1-a-&gt;S4 but only S2-a-&gt;S3-(c)-&gt;S4, and S3 has the shared uncontrollable event u outgoing and is not equivalent to S4.</ns2:Comment>
+States S1 and S3 can be merged, because S1-a-&gt;S4 and S2-a-&gt;S3-(c)-&gt;S4, and S3 only has the local uncontrollable transition u outgoing, which leads to S4.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Observable="false" Kind="CONTROLLABLE" Name="c"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="u"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="u"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">
@@ -143,15 +143,15 @@ States S1 and S3 cannot be merged, because S1-a-&gt;S4 but only S2-a-&gt;S3-(c)-
                             <Point Y="32" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-14" X="10"/>
+                            <Point Y="-4" X="-23"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S23">
+                    <SimpleNode Name="S123">
                         <PointGeometry>
-                            <Point Y="112" X="208"/>
+                            <Point Y="112" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-26" X="-9"/>
+                            <Point Y="-5" X="-41"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
@@ -162,75 +162,40 @@ States S1 and S3 cannot be merged, because S1-a-&gt;S4 but only S2-a-&gt;S3-(c)-
                             <Point Y="192" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="11"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <PointGeometry>
-                            <Point Y="112" X="48"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-20" X="-24"/>
+                            <Point Y="-7" X="-24"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S23" Source="S0">
+                    <Edge Target="S123" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="8"/>
+                                <Point Y="-23" X="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S4" Source="S23">
+                    <Edge Target="S4" Source="S123">
                         <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
                             <SimpleIdentifier Name="c"/>
                             <SimpleIdentifier Name="u"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-2" X="2"/>
+                                <Point Y="-19" X="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S23" Source="S23">
+                    <Edge Target="S123" Source="S123">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-2" X="-22"/>
+                                <Point Y="-9" X="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="112" X="253"/>
+                            <Point Y="112" X="173"/>
                         </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S1" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="b"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-15"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S4" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                            <SimpleIdentifier Name="c"/>
-                            <SimpleIdentifier Name="u"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S23" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <EndPointGeometry>
-                            <Point Y="112" X="208"/>
-                        </EndPointGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
