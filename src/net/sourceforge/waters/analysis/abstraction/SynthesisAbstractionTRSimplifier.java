@@ -708,7 +708,7 @@ public class SynthesisAbstractionTRSimplifier
       final EquivalenceClass endClass = mStateToClass[endState];
       final boolean local =
         event > EventEncoding.TAU && event <= mLastLocalControllableEvent;
-      final SearchRecord initial = new SearchRecord(endState, null, local);
+      final SearchRecord initial = new SearchRecord(endState, null, false);
       visited.add(initial);
       open.add(initial);
       while (!open.isEmpty()){
@@ -772,8 +772,8 @@ public class SynthesisAbstractionTRSimplifier
             // The source state is uncontrollable, if it has a shared
             // uncontrollable event outgoing (indicated by null iterator),
             // or if it has a local uncontrollable successor state not
-            // equal to the source state, the current state, or the
-            // end state.
+            // equal to the source state nor to the current state, nor
+            // equivalent to the end state.
             final IntListBuffer.Iterator iter =
               mUncontrollableTransitionStorage.getIterator(source);
             if (iter == null) {
@@ -792,13 +792,21 @@ public class SynthesisAbstractionTRSimplifier
               open.add(next);
             }
           }
-          // Visit predecessors for the shared event ...
-          mPredecessorIterator.resetEvent(event);
-          while (mPredecessorIterator.advance()){
-            final int source = mPredecessorIterator.getCurrentSourceState();
-            final SearchRecord next = new SearchRecord(source, null, true);
+          if (local) {
+            // For local events can switch to first path any time ...
+            final SearchRecord next = new SearchRecord(state, null, true);
             if (visited.add(next)){
               open.add(next);
+            }
+          } else {
+            // Or visit predecessors for the shared event ...
+            mPredecessorIterator.resetEvent(event);
+            while (mPredecessorIterator.advance()){
+              final int source = mPredecessorIterator.getCurrentSourceState();
+              final SearchRecord next = new SearchRecord(source, null, true);
+              if (visited.add(next)){
+                open.add(next);
+              }
             }
           }
         }
