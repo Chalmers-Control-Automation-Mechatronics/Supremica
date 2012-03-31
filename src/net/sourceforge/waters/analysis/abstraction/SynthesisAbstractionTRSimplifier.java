@@ -682,20 +682,17 @@ public class SynthesisAbstractionTRSimplifier
 
     private void splitOnControllable(final int event)
     {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      if (rel.isUsedEvent(event)) {
       final int size = mTempClass.size();
-        final Set <SearchRecord> visited = new THashSet<SearchRecord>();
-        final TIntHashSet found = new TIntHashSet();
-        final Collection<EquivalenceClass> splitClasses =
-          new THashSet<EquivalenceClass>();
-        for (int i = 0; i < size; i++) {
-          final int state = mTempClass.get(i);
-          exploreControllable(state, event, visited, found, splitClasses);
-        }
-        for (final EquivalenceClass splitClass : splitClasses) {
-          splitClass.splitUsingOverflowList();
-        }
+      final Set <SearchRecord> visited = new THashSet<SearchRecord>();
+      final TIntHashSet found = new TIntHashSet();
+      final Collection<EquivalenceClass> splitClasses =
+        new THashSet<EquivalenceClass>();
+      for (int i = 0; i < size; i++) {
+        final int state = mTempClass.get(i);
+        exploreControllable(state, event, visited, found, splitClasses);
+      }
+      for (final EquivalenceClass splitClass : splitClasses) {
+        splitClass.splitUsingOverflowList();
       }
     }
 
