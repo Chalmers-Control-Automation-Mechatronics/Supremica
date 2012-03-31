@@ -672,8 +672,9 @@ public class SynthesisAbstractionTRSimplifier
         }
       }
       // ... including omega
-      splitOnControllable(EventEncoding.TAU);
-
+      if (rel.isUsedEvent(EventEncoding.TAU)) {
+        splitOnControllable(EventEncoding.TAU);
+      }
       // Controllable local events
       splitOnControllable(mLastLocalControllableEvent);
 
@@ -755,7 +756,6 @@ public class SynthesisAbstractionTRSimplifier
           }
         } else {
           // In second part of path (after the event)
-          final EquivalenceClass stateClass = mStateToClass[state];
           // Visit predecessors for all local transitions ...
           mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
                                            mLastLocalControllableEvent);
@@ -772,7 +772,7 @@ public class SynthesisAbstractionTRSimplifier
             // The source state is uncontrollable, if it has a shared
             // uncontrollable event outgoing (indicated by null iterator),
             // or if it has a local uncontrollable successor state not
-            // equivalent to the source state, the current state, or the
+            // equal to the source state, the current state, or the
             // end state.
             final IntListBuffer.Iterator iter =
               mUncontrollableTransitionStorage.getIterator(source);
@@ -781,10 +781,7 @@ public class SynthesisAbstractionTRSimplifier
             } else {
               while (iter.advance()) {
                 final int succ = iter.getCurrentData();
-                final EquivalenceClass succClass = mStateToClass[succ];
-                if (succClass != sourceClass &&
-                    succClass != stateClass &&
-                    succClass != endClass) {
+                if (succ != state && mStateToClass[succ] != endClass) {
                   continue preds;
                 }
               }
