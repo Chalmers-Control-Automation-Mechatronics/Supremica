@@ -217,24 +217,25 @@ public class CompositionalSynthesizerExperiments
     */
 //    synthesiseTbedNoderailB();
 //    synthesiseCentralLockingKoordwspBlock();
+    synthesisAGV();
+    synthesisAGVB();
+    synthesissAip0Alps();
+    synthesissRhoneSubPatch0();
+//    synthesissAip0Aip();
+    synthesisFenCaiWon09B();
+    synthesisFenCaiWon09Synth();
+    synthesissFms2003();
+    synthesiseFischertechnik();
+    synthesiseIPC();
+//    synthesisAip0tough();
+    synthesiseTbedCtct();
+    synthesiseTbedNoderailUncont();
+    synthesiseTbedNoderailB();
     synthesiseCentralLockingVerriegel3b();
     synthesiseVerrigel4B();
-    synthesissAip0Alps();
-    synthesissAip0Aip();
-//    synthesisAip0tough();
-//    synthesiseTbedCtct();
-    synthesiseTbedNoderailB();
-    synthesiseTbedNoderailUncont();
-    synthesiseFischertechnik();
-//    synthesisLargestCoherent();
-    synthesisFenCaiWon09Synth();
-    synthesisFenCaiWon09B();
-    synthesisAGVB();
-    synthesisAGV();
-    synthesissRhoneSubPatch0();
-    synthesissFms2003();
-    synthesiseIPC();
 //    synthesiseFlexibleManufacturingSystem();
+//  synthesisLargestCoherent();
+
   }
 
 
