@@ -1490,6 +1490,20 @@ public class GraphEditorPanel
     }
   }
 
+  protected boolean createSecondaryGraph()
+  {
+    return createSecondaryGraph(false);
+  }
+
+  protected boolean createSecondaryGraph(final boolean newMove)
+  {
+    if(newMove){
+       mNewMoveStarted = newMove;
+    }
+
+    return super.createSecondaryGraph();
+  }
+
   private Command mLastCommand = null;
   private boolean mNewMoveStarted = false;
 
@@ -3916,7 +3930,7 @@ public class GraphEditorPanel
         keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT;
       if (isAGeometryMove() && (up || down || left || right)) {
         mMoveVisitor = new MoveVisitor();
-        createSecondaryGraph();
+        createSecondaryGraph(true);
         final int x = left ? -1 : right ? 1 : 0;
         final int y = up ? -1 : down ? 1 : 0;
         mMoveVisitor.moveAll(x, y);

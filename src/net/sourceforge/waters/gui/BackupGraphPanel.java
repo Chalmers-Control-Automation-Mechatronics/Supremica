@@ -178,7 +178,7 @@ public class BackupGraphPanel
       // For clean undo, geometry should only be added to the secondary graph;
       // Unfortunately, this does not work yet and will cause exceptions...
       // ~~~Robi
-      createSecondaryGraph();
+      createSecondaryGraph(true);
       final SimpleComponentSubject comp =
         (SimpleComponentSubject) getGraph().getParent();
       final String name = comp == null ? "graph" : comp.getName();
@@ -213,6 +213,22 @@ public class BackupGraphPanel
   }
 
   protected boolean createSecondaryGraph()
+  {
+    if (mSecondaryGraph == null) {
+      final ModuleSubject module = getModule();
+      final RenderingContext context =
+        getShapeProducer().getRenderingContext();
+      mSecondaryGraph = new EditorGraph(getGraph());
+      mSecondaryShapeProducer = new SubjectShapeProducer
+        (mSecondaryGraph, mSecondaryGraph, module, context);
+      mSecondaryGraph.addModelObserver(mGraphModelObserver);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  protected boolean createSecondaryGraph(final boolean newMove)
   {
     if (mSecondaryGraph == null) {
       final ModuleSubject module = getModule();
