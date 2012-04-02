@@ -264,7 +264,8 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "aip0alps.wmod");
   }
 
-  private void synthesissAip0Aip() throws Exception
+  @SuppressWarnings("unused")
+  private void synthesiseAip0Aip() throws Exception
   {
     runModel("valid", "synthesis_experiment", "aip0aip.wmod");
   }
@@ -291,7 +292,6 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod");
   }
 
-  @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
     runModel("valid", "synthesis_experiment", "tbed_ctct.wmod");

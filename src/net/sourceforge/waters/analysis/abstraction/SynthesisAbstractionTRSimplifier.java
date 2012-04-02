@@ -782,6 +782,8 @@ public class SynthesisAbstractionTRSimplifier
               while (iter.advance()) {
                 final int succ = iter.getCurrentData();
                 if (succ != state && mStateToClass[succ] != endClass) {
+                  // Uncontrollable transition storage does not contain
+                  // selfloops, so no need to check for that.
                   continue preds;
                 }
               }
