@@ -319,6 +319,14 @@ public class SynthesisAbstractionTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_synthesisAbstraction_22() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_22.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
 
   /**
    * A test to see whether a single abstraction rule object can perform multiple
