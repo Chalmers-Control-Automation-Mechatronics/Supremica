@@ -2490,10 +2490,9 @@ public class GraphEditorPanel
       if (label == null) {
         if (wasControlDown()) {
           if (mFocusedObject != null) {
-            final List<ProxySubject> list = getListWithoutLabels();
-            clearSelection();
-            addToSelection(list);
+            final List<ProxySubject> list = getListOfSelectedLabels();
             toggleSelection(mFocusedObject);
+            removeFromSelection(list);
           }
         } else {
           if (mFocusedObject == null) {
@@ -2533,6 +2532,15 @@ public class GraphEditorPanel
       return list;
     }
 
+    private List<ProxySubject> getListOfSelectedLabels(){
+      final List<ProxySubject> list = new LinkedList<ProxySubject>();
+      for (final ProxySubject sub : mSelectedList) {
+        if (sub instanceof IdentifierSubject || sub instanceof ForeachSubject) {
+          list.add(sub);
+        }
+      }
+      return list;
+    }
 
 
     //#######################################################################
