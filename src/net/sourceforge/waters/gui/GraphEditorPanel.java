@@ -78,6 +78,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
@@ -103,6 +104,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -1466,17 +1468,6 @@ public class GraphEditorPanel
   {
     final EditorGraph graph = getSecondaryGraph();
     if (graph != null) {
-      final UndoInterface undoInterface = mRoot.getUndoInterface();
-      if (!mNewMoveStarted) {
-        if (mLastCommand != null
-            && mLastCommand == undoInterface.getLastCommand()) {
-          mLastCommand.setUpdatesSelection(false);
-          undoInterface.undo();
-          undoInterface.removeLastCommand();
-        }
-      } else {
-        mNewMoveStarted = false;
-      }
       final Command cmd =
         graph.createUpdateCommand(this, description, selecting);
       mLastCommand = cmd;
@@ -1490,22 +1481,6 @@ public class GraphEditorPanel
     }
   }
 
-  protected boolean createSecondaryGraph()
-  {
-    return createSecondaryGraph(false);
-  }
-
-  protected boolean createSecondaryGraph(final boolean newMove)
-  {
-    if(newMove){
-       mNewMoveStarted = newMove;
-    }
-
-    return super.createSecondaryGraph();
-  }
-
-  private Command mLastCommand = null;
-  private boolean mNewMoveStarted = false;
 
   //#########################################################################
   //# Data Transfer Auxiliaries
@@ -2175,7 +2150,6 @@ public class GraphEditorPanel
       mDragStartOnGrid = snapped;
       mDragCurrent = point;
       mDragCurrentOnGrid = snapped;
-      mNewMoveStarted = true;
     }
 
     //#######################################################################
@@ -3930,11 +3904,11 @@ public class GraphEditorPanel
         keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT;
       if (isAGeometryMove() && (up || down || left || right)) {
         mMoveVisitor = new MoveVisitor();
-        createSecondaryGraph(true);
+        createSecondaryGraph();
         final int x = left ? -1 : right ? 1 : 0;
         final int y = up ? -1 : down ? 1 : 0;
         mMoveVisitor.moveAll(x, y);
-        commitSecondaryGraph(null, true, true);
+        commitGraph(null, true, true);
         mMoveVisitor = null;
         clearSecondaryGraph();
       } else if (up || down) {
@@ -3959,6 +3933,32 @@ public class GraphEditorPanel
           move.end();
           e.consume();
           getUndoInterface().executeCommand(move);
+        }
+      }
+    }
+
+    private void commitGraph(final String description,
+                             final boolean selecting,
+                             final boolean undoable){
+      final EditorGraph graph = getSecondaryGraph();
+      if (graph != null) {
+        final UndoInterface undoInterface = mRoot.getUndoInterface();
+          if (mLastCommand != null
+              && mLastCommand == undoInterface.getLastCommand()) {
+            mLastCommand.setUpdatesSelection(false);
+            undoInterface.undo();
+            undoInterface.removeLastCommand();
+          }
+
+        final Command cmd =
+          graph.createUpdateCommand(GraphEditorPanel.this, description, selecting);
+        mLastCommand = cmd;
+        if (cmd == null) {
+          // ignore
+        } else if (undoable) {
+          getUndoInterface().executeCommand(cmd);
+        } else {
+          cmd.execute();
         }
       }
     }
@@ -4438,6 +4438,14 @@ public class GraphEditorPanel
       return visitEventListMember(foreach);
     }
 
+    public Object visitGeometryProxy(final GeometryProxy proxy)
+      throws VisitorException
+    {
+      final GeometrySubject geo = (GeometrySubject)proxy;
+      final Proxy parent = (Proxy) geo.getParent();
+      return parent.acceptVisitor(this);
+    }
+
     public GuardActionBlockProxy visitGuardActionBlockProxy
       (final GuardActionBlockProxy block)
     {
@@ -4888,6 +4896,7 @@ public class GraphEditorPanel
   private final HighlightComparator mComparator = new HighlightComparator();
   private List<Observer> mObservers;
 
+  private Command mLastCommand = null;
 
   //#########################################################################
   //# Class Constants
