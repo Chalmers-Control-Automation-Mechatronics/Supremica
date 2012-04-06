@@ -587,6 +587,7 @@ public class CompositionalSynthesizer
       final int tlimit = getMonolithicTransitionLimit();
       syncBuilder.setTransitionLimit(tlimit);
       syncBuilder.setConstructsResult(true);
+      syncBuilder.setPropositions(getPropositions());
       syncBuilder.run();
       automaton = syncBuilder.getComputedAutomaton();
       break;
@@ -1066,6 +1067,8 @@ public class CompositionalSynthesizer
         getCurrentSynchronousProductBuilder();
       builder.setNodeLimit(getMonolithicStateLimit());
       builder.setTransitionLimit(getMonolithicTransitionLimit());
+      builder.setConstructsResult(true);
+      builder.setPropositions(getPropositions());
       builder.setModel(model);
       for (final DistinguisherInfo info:renamings) {
         final EventProxy original = info.getOriginalEvent();
