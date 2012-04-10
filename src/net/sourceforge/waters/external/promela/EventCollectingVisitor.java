@@ -877,9 +877,37 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitVar(final VardefTreeNode t)
   {
+    /**
+     * This bit is new
+     * @author Ethan Duff
+     */
+
+    final Tree typeTreeNode = t.getChild(0);
+    if(typeTreeNode.getClass().equals(TypeTreeNode.class))
+    {
+      //The node is a TypeTreeNode
+      //TODO? Maybe have something here
+    }
+    else
+    {
+      //Unexpected type for the first child. This should not be possible if the grammar is working correctly.
+      System.err.println("EventCollectingVisitor.visitVar: Class of first child is " + typeTreeNode.getClass().toString() + ", but expected " + TypeTreeNode.class.toString());
+    }
+
+    for(int i = 1; i < t.getChildCount(); i++)
+    {
+      //These are all of the names for the variables that are being instantiated in this declaration
+      //All of their types are specified by the typeTreeNode
+      //TODO something here
+    }
+
+    /**
+     * This is old stuff, and is left in for now, but will be replaced by the above when finished
+     */
+
     final Tree tree = t.getChild(0);
 
-      for(int i=1;i<t.getChildCount();i++){
+    for(int i=1;i<t.getChildCount();i++){
         if(tree.getText().equals("mtype")){
 
           proctypeVar.put(t.getChild(i).getText(),"mtype");
@@ -887,7 +915,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
           proctypeVar.put(t.getChild(i).getText(),"byte");
         }
-      }
+    }
 
     return null;
   }
