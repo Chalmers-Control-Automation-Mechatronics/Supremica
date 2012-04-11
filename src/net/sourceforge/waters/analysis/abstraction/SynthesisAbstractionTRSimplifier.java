@@ -316,9 +316,6 @@ public class SynthesisAbstractionTRSimplifier
     super.setUp();
     if (mSplitters == null) {
       mHasModifications = false;
-      final boolean modified = mHasModifications;
-      setUpInitialPartitionBasedOnDefaultMarking();
-      mHasModifications |= modified;
     }
     setUpTauClosure();
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -331,6 +328,11 @@ public class SynthesisAbstractionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
+    if (mSplitters == null) {
+      final boolean modified = mHasModifications;
+      setUpInitialPartitionBasedOnDefaultMarking();
+      mHasModifications |= modified;
+    }
     if (mNumClasses < mNumReachableStates) {
       int prevNumClasses = mNumClasses;
       while (true) {
@@ -347,7 +349,7 @@ public class SynthesisAbstractionTRSimplifier
         enqueueAlltheClasses();
       }
     }
-    if(mOmegaState >= 0) {
+    if (mOmegaState >= 0) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
       rel.setReachable(mOmegaState, false);
       rel.setUsedEvent(EventEncoding.TAU, false);
