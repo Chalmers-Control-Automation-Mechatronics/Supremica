@@ -307,6 +307,14 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testSimpleManufacturingSystem() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "simple_manufacturing_system";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testSmallFactory2() throws Exception
   {
     final String group = "tests";
@@ -315,11 +323,11 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
-  public void testSimpleManufacturingSystem() throws Exception
+  public void testSoeCont() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
-    final String name = "simple_manufacturing_system";
+    final String name = "soe_cont";
     runSynthesizer(group, subdir, name, true);
   }
 
