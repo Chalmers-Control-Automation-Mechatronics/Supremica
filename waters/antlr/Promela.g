@@ -341,10 +341,10 @@ decl_lstRule
 
 //modified
 one_declRule
-@init  { paraphrases.push("in declaration"); }
+@init  { paraphrases.push("in declaration"); boolean visible = true;}
 @after { paraphrases.pop(); }
-	:	(visibleRule)? typenameRule ivarRule (COMMA ivarRule)*
-		-> ^(VARDEFINITION<VardefTreeNode> typenameRule ivarRule+)
+	:	(visibleRule {visible = $visibleRule.visible;})? typenameRule ivarRule (COMMA ivarRule)*
+		-> ^(VARDEFINITION<VardefTreeNode>[visible] typenameRule ivarRule+)
 	;
 
 optionsRule
@@ -442,8 +442,9 @@ unameRule
 	:	NAME
 	;
 	
-visibleRule
-	:	HIDDEN | SHOW
+visibleRule returns [boolean visible]
+	:	HIDDEN { $visible = false; }
+	   | SHOW { $visible = true; }
 	;
 	
 constRule

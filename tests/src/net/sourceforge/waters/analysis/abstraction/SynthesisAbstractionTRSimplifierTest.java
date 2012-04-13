@@ -247,6 +247,87 @@ public class SynthesisAbstractionTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_synthesisAbstraction_13() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_13.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_14() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_14.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_15() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_15.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_16() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_16.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_17() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_17.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_18() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_18.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_19() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_19.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_20() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_20.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_21() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_21.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_22() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_22.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.

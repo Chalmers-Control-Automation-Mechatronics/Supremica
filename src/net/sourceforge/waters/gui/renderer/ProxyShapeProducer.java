@@ -27,6 +27,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -48,6 +49,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
+import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 
 
@@ -190,6 +192,20 @@ public class ProxyShapeProducer
       createGuardActionBlockShape(block, shape);
     }
     return shape;
+  }
+
+  public Object visitGeometryProxy(final GeometryProxy proxy)
+    throws VisitorException
+  {
+    final GeometrySubject geo = (GeometrySubject)proxy;
+    final Proxy parent = (Proxy) geo.getParent();
+    return parent.acceptVisitor(this);
+  }
+
+  public Object visitLabelGeometryProxy(final LabelGeometryProxy proxy)
+    throws VisitorException
+  {
+    return visitProxy(proxy);
   }
 
   public LabelBlockProxyShape visitLabelBlockProxy(final LabelBlockProxy block)

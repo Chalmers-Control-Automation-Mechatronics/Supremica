@@ -1,0 +1,1531 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="transfer10" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This testcase is based on the Transfer Line example from 'Notes on Control of Discrete-Event Systems' my W.M Wonham. Here with 10 serially connected, identical cells.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_01_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_02_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_03_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_04_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_05_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_06_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_07_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_08_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_09_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M1_10_finished"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_01_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_01_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_02_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_02_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_03_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_03_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_04_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_04_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_05_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_05_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_06_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_06_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_07_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_07_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_08_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_08_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_09_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_09_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="M2_10_finished"/>
+        <EventDecl Kind="CONTROLLABLE" Name="M2_10_started"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_01_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_01_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_02_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_02_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_03_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_03_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_04_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_04_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_05_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_05_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_06_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_06_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_07_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_07_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_08_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_08_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_09_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_09_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TU_10_reject"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TU_10_take"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_4"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_5"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_6"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_7"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_8"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="transfer_9"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="B2_09">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_09_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_09_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_02">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_02_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_02_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_01">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_01_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_01_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_04">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_04_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_04_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_03">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_03_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_03_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_06">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_06_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_06_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_05">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_05_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_05_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_08">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_08_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_08_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_07">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_07_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_07_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_04">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_04_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_04_reject"/>
+                            <SimpleIdentifier Name="transfer_4"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_05">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_05_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_05_reject"/>
+                            <SimpleIdentifier Name="transfer_5"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_02">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_02_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_02_reject"/>
+                            <SimpleIdentifier Name="transfer_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_03">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_03_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_03_reject"/>
+                            <SimpleIdentifier Name="transfer_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_08">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_08_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_08_reject"/>
+                            <SimpleIdentifier Name="transfer_8"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_09">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_09_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_09_reject"/>
+                            <SimpleIdentifier Name="transfer_9"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_06">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_06_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_06_reject"/>
+                            <SimpleIdentifier Name="transfer_6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_07">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_07_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_07_reject"/>
+                            <SimpleIdentifier Name="transfer_7"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_05">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_05_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_05_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_04">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_04_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_04_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_03">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_03_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_03_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_02">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_02_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_02_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_01">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_01_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_01_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_10">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_10_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_10_reject"/>
+                            <SimpleIdentifier Name="finish"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_10">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_10_finished"/>
+                            <SimpleIdentifier Name="TU_10_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_10_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_10_finished"/>
+                            <SimpleIdentifier Name="TU_10_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_10_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_10_finished"/>
+                            <SimpleIdentifier Name="TU_10_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_10_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_10">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_10_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_10">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_10_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_10_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_09">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_09_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_09_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_08">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_08_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_08_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_07">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_07_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_07_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M2_06">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_06_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_06_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_09">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_8"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_09_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="TU_01">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_01_take"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_01_reject"/>
+                            <SimpleIdentifier Name="transfer_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_05">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_05_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_06">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_06_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_07">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_07_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_08">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_08_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_04">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_04_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_03">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_03_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_02">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_02_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="M1_01">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_01_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_09">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_09_finished"/>
+                            <SimpleIdentifier Name="TU_09_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_09_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_09_finished"/>
+                            <SimpleIdentifier Name="TU_09_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_09_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_09_finished"/>
+                            <SimpleIdentifier Name="TU_09_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_09_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_08">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_08_finished"/>
+                            <SimpleIdentifier Name="TU_08_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_08_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_08_finished"/>
+                            <SimpleIdentifier Name="TU_08_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_08_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_08_finished"/>
+                            <SimpleIdentifier Name="TU_08_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_08_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_03">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_03_finished"/>
+                            <SimpleIdentifier Name="TU_03_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_03_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_03_finished"/>
+                            <SimpleIdentifier Name="TU_03_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_03_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_03_finished"/>
+                            <SimpleIdentifier Name="TU_03_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_03_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_02">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_02_finished"/>
+                            <SimpleIdentifier Name="TU_02_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_02_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_02_finished"/>
+                            <SimpleIdentifier Name="TU_02_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_02_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_02_finished"/>
+                            <SimpleIdentifier Name="TU_02_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_02_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B2_10">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_10_finished"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TU_10_take"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_01">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_01_finished"/>
+                            <SimpleIdentifier Name="TU_01_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_01_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_01_finished"/>
+                            <SimpleIdentifier Name="TU_01_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_01_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_01_finished"/>
+                            <SimpleIdentifier Name="TU_01_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_01_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_07">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_07_finished"/>
+                            <SimpleIdentifier Name="TU_07_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_07_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_07_finished"/>
+                            <SimpleIdentifier Name="TU_07_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_07_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_07_finished"/>
+                            <SimpleIdentifier Name="TU_07_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_07_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_06">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_06_finished"/>
+                            <SimpleIdentifier Name="TU_06_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_06_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_06_finished"/>
+                            <SimpleIdentifier Name="TU_06_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_06_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_06_finished"/>
+                            <SimpleIdentifier Name="TU_06_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_06_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_05">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_05_finished"/>
+                            <SimpleIdentifier Name="TU_05_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_05_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_05_finished"/>
+                            <SimpleIdentifier Name="TU_05_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_05_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_05_finished"/>
+                            <SimpleIdentifier Name="TU_05_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_05_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="B1_04">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_04_finished"/>
+                            <SimpleIdentifier Name="TU_04_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_04_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_04_finished"/>
+                            <SimpleIdentifier Name="TU_04_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_04_started"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M1_04_finished"/>
+                            <SimpleIdentifier Name="TU_04_reject"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="M2_04_started"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

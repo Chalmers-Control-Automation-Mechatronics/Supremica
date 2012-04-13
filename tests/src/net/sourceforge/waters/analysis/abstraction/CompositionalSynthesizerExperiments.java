@@ -217,24 +217,25 @@ public class CompositionalSynthesizerExperiments
     */
 //    synthesiseTbedNoderailB();
 //    synthesiseCentralLockingKoordwspBlock();
+    synthesisAGV();
+    synthesisAGVB();
+    synthesissAip0Alps();
+    synthesissRhoneSubPatch0();
+//    synthesissAip0Aip();
+    synthesisFenCaiWon09B();
+    synthesisFenCaiWon09Synth();
+    synthesissFms2003();
+    synthesiseFischertechnik();
+    synthesiseIPC();
+//    synthesisAip0tough();
+    synthesiseTbedCtct();
+    synthesiseTbedNoderailUncont();
+    synthesiseTbedNoderailB();
     synthesiseCentralLockingVerriegel3b();
     synthesiseVerrigel4B();
-    synthesissAip0Alps();
-    synthesissAip0Aip();
-//    synthesisAip0tough();
-//    synthesiseTbedCtct();
-    synthesiseTbedNoderailB();
-    synthesiseTbedNoderailUncont();
-    synthesiseFischertechnik();
-//    synthesisLargestCoherent();
-    synthesisFenCaiWon09Synth();
-    synthesisFenCaiWon09B();
-    synthesisAGVB();
-    synthesisAGV();
-    synthesissRhoneSubPatch0();
-    synthesissFms2003();
-    synthesiseIPC();
 //    synthesiseFlexibleManufacturingSystem();
+//  synthesisLargestCoherent();
+
   }
 
 
@@ -263,7 +264,8 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "aip0alps.wmod");
   }
 
-  private void synthesissAip0Aip() throws Exception
+  @SuppressWarnings("unused")
+  private void synthesiseAip0Aip() throws Exception
   {
     runModel("valid", "synthesis_experiment", "aip0aip.wmod");
   }
@@ -290,7 +292,6 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod");
   }
 
-  @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
     runModel("valid", "synthesis_experiment", "tbed_ctct.wmod");

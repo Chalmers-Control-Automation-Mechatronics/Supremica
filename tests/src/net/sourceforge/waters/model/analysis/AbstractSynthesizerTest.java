@@ -16,9 +16,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
-import net.sourceforge.waters.analysis.monolithic.MonolithicLanguageInclusionChecker;
+
+import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -82,10 +83,9 @@ public abstract class AbstractSynthesizerTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSynthesizer = createSynthesizer(factory);
-    mControllabilityChecker = new MonolithicControllabilityChecker(factory);
-    mLanguageInclusionChecker =
-      new MonolithicLanguageInclusionChecker(factory);
-    mConflictChecker = new MonolithicConflictChecker(factory);
+    mControllabilityChecker = new NativeControllabilityChecker(factory);
+    mLanguageInclusionChecker = new NativeLanguageInclusionChecker(factory);
+    mConflictChecker = new NativeConflictChecker(factory);
     mTraceMarshaller = new JAXBTraceMarshaller(factory);
     setNodeLimit();
   }
@@ -328,6 +328,14 @@ public abstract class AbstractSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "tank_process";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testTbedMinsync() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tbed_minsync";
     runSynthesizer(group, subdir, name, true);
   }
 

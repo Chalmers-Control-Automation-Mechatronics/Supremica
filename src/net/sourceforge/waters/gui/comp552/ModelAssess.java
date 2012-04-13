@@ -248,19 +248,36 @@ public class ModelAssess
           } else if (words.length == 3) {
             final String propname = words[1];
             final float marks = Float.parseFloat(words[2]);
-            new ConflictTest(sol, marks, propname);
+            new ConflictTest(sol, null, marks, propname);
+          } else if (words.length == 4) {
+            final String propname = words[1];
+            final AbstractTest depends = sol.getTestForProperty(words[2]);
+            final float marks = Float.parseFloat(words[3]);
+            new ConflictTest(sol, depends, marks, propname);
           }
         } else if (key.equals("loop")) {
           final float marks = Float.parseFloat(words[1]);
           new LoopTest(sol, marks);
         } else if (key.equals("inclusion")) {
           final String propname = words[1];
-          final float marks = Float.parseFloat(words[2]);
-          new LanguageInclusionTest(sol, marks, propname);
+          if (words.length == 3) {
+            final float marks = Float.parseFloat(words[2]);
+            new LanguageInclusionTest(sol, null, marks, propname);
+          } else if (words.length == 4) {
+            final AbstractTest depends = sol.getTestForProperty(words[2]);
+            final float marks = Float.parseFloat(words[3]);
+            new LanguageInclusionTest(sol, depends, marks, propname);
+          }
         } else if (key.equals("exclusion")) {
           final String propname = words[1];
-          final float marks = Float.parseFloat(words[2]);
-          new LanguageExclusionTest(sol, marks, propname);
+          if (words.length == 3) {
+            final float marks = Float.parseFloat(words[2]);
+            new LanguageExclusionTest(sol, null, marks, propname);
+          } else if (words.length == 4) {
+            final AbstractTest depends = sol.getTestForProperty(words[2]);
+            final float marks = Float.parseFloat(words[3]);
+            new LanguageExclusionTest(sol, depends, marks, propname);
+          }
         }
       }
     } finally {
@@ -679,6 +696,14 @@ public class ModelAssess
         }
       }
       mTests = new LinkedList<AbstractTest>();
+      mTestLookup = new HashMap<String,AbstractTest>();
+    }
+
+    //#######################################################################
+    //# Override for java.lang.Object
+    public String toString()
+    {
+      return mModule.getName();
     }
 
     //#######################################################################
@@ -686,6 +711,17 @@ public class ModelAssess
     private void addTest(final AbstractTest test)
     {
       mTests.add(test);
+    }
+
+    private void setTestForProperty(final String propname,
+                                    final AbstractTest test)
+    {
+      mTestLookup.put(propname, test);
+    }
+
+    private AbstractTest getTestForProperty(final String propname)
+    {
+      return mTestLookup.get(propname);
     }
 
     private float runTests(final ProductDESProxy des)
@@ -773,14 +809,14 @@ public class ModelAssess
     private int getNumberOfMatches(final ModuleProxy attempt)
     {
       int matches = 0;
-        for (final EventDeclProxy decl : attempt.getEventDeclList()) {
-          if (decl.getKind() != EventKind.PROPOSITION) {
-            final String name = decl.getName();
-            if (hasEventDecl(name)) {
-              matches++;
-            }
+      for (final EventDeclProxy decl : attempt.getEventDeclList()) {
+        if (decl.getKind() != EventKind.PROPOSITION) {
+          final String name = decl.getName();
+          if (hasEventDecl(name)) {
+            matches++;
           }
         }
+      }
       return matches;
     }
 
@@ -1059,6 +1095,7 @@ public class ModelAssess
     //# Data Members
     private final ModuleProxy mModule;
     private final List<AbstractTest> mTests;
+    private final Map<String,AbstractTest> mTestLookup;
 
     private ProductDESProxy mProductDES;
     private final Collection<String> mEventDeclNames;
@@ -1076,11 +1113,18 @@ public class ModelAssess
   {
 
     //#######################################################################
-    //# Constructor
+    //# Constructors
     AbstractTest(final Solution sol, final String name, final float marks)
+    {
+      this(sol, name, null, marks);
+    }
+
+    AbstractTest(final Solution sol, final String name,
+                 final AbstractTest depends, final float marks)
     {
       mSolution = sol;
       mName = name;
+      mDependency = depends;
       mMarks = marks;
       sol.addTest(this);
     }
@@ -1099,17 +1143,22 @@ public class ModelAssess
       printLaTeXString(mName, false);
       mOutput.print(" ... ");
       try {
-        final boolean result = check(des);
-        if (result) {
+        mLastResult = check(des);
+        if (mLastResult) {
+          float marks = mMarks;
           mOutput.print("OK");
           if (mMarks > 0.0f) {
-            mOutput.print(" (");
-            printMarks(mMarks);
-            mOutput.print(')');
+            if (mDependency != null && !mDependency.mLastResult) {
+              marks = 0.0f;
+            } else {
+              mOutput.print(" (");
+              printMarks(mMarks);
+              mOutput.print(')');
+            }
           }
           mOutput.println();
           mOutput.println();
-          return mMarks;
+          return marks;
         } else {
           mOutput.println("{\\bf Failed}");
           printDiagnostics();
@@ -1117,6 +1166,7 @@ public class ModelAssess
           return 0.0f;
         }
       } catch (final AnalysisException exception) {
+        mLastResult = false;
         final String ename = ProxyTools.getShortClassName(exception);
         mOutput.println("{\\bf " + ename + "!}");
         mOutput.println();
@@ -1136,7 +1186,10 @@ public class ModelAssess
     //# Data Members
     private final Solution mSolution;
     private final String mName;
+    private final AbstractTest mDependency;
     private final float mMarks;
+
+    private boolean mLastResult;
 
   }
 
@@ -1225,7 +1278,16 @@ public class ModelAssess
                               final float marks,
                               final ModelVerifier verifier)
     {
-      super(sol, name, marks);
+      this(sol, name, null, marks, verifier);
+    }
+
+    AbstractModelVerifierTest(final Solution sol,
+                              final String name,
+                              final AbstractTest depends,
+                              final float marks,
+                              final ModelVerifier verifier)
+    {
+      super(sol, name, depends, marks);
       mVerifier = verifier;
     }
 
@@ -1317,12 +1379,14 @@ public class ModelAssess
     }
 
     ConflictTest(final Solution sol,
+                 final AbstractTest depends,
                  final float marks,
                  final String propname)
     {
-      super(sol, "Property " + propname, marks,
+      super(sol, "Property " + propname, depends, marks,
             new NativeConflictChecker(mProductDESFactory));
       mPropertyName = propname;
+      sol.setTestForProperty(propname, this);
     }
 
     //#######################################################################
@@ -1376,12 +1440,14 @@ public class ModelAssess
     //#######################################################################
     //# Constructor
     LanguageInclusionTest(final Solution sol,
+                          final AbstractTest depends,
                           final float marks,
                           final String propname)
     {
-      super(sol, "Property " + propname, marks,
+      super(sol, "Property " + propname, depends, marks,
             new NativeLanguageInclusionChecker(mProductDESFactory));
       mPropertyName = propname;
+      sol.setTestForProperty(propname, this);
     }
 
     //#######################################################################
@@ -1410,12 +1476,14 @@ public class ModelAssess
     //#######################################################################
     //# Constructor
     LanguageExclusionTest(final Solution sol,
+                          final AbstractTest depends,
                           final float marks,
                           final String propname)
     {
-      super(sol, "Property " + propname, marks,
+      super(sol, "Property " + propname, depends, marks,
             new NativeLanguageInclusionChecker(mProductDESFactory));
       mPropertyName = propname;
+      sol.setTestForProperty(propname, this);
     }
 
     //#######################################################################
@@ -1447,8 +1515,13 @@ public class ModelAssess
     {
       mStudentID = studid;
       mUserID = uid;
-      mName = name;
-      mFilterBegin = uid + "-";
+      int splitpos = name.indexOf(',');
+      mLastName = name.substring(0, splitpos);
+      while (name.charAt(++splitpos) == ' ') {
+      }
+      mFirstName = name.substring(splitpos);
+      mFilterBegin = mFirstName + ' ' + mLastName + '_';
+      // mFilterBegin = uid + "-";
     }
 
     //#######################################################################
@@ -1462,11 +1535,13 @@ public class ModelAssess
     //# Printing
     private void printHeader(final PrintStream output)
     {
+      final String name = mLastName + ", " + mFirstName;
       output.println("\\cleardoublepage");
-      output.println("\\section*{" + mName + "}");
-      output.println("\\markboth{" + mName + "}{" + mName + "}");
+      output.println("\\section*{" + name + "}");
+      output.println("\\markboth{" + name + "}{" + name + "}");
       output.println("\\thispagestyle{plain}");
-      output.println("{\\bf Full name:}\\quad " + mName + "\\\\");
+      output.println("{\\bf Family name:}\\quad " + mLastName + "\\\\");
+      output.println("{\\bf First name:}\\quad " + mFirstName + "\\\\");
       output.println("{\\bf Student ID:}\\quad " + mStudentID + "\\\\");
       output.println("{\\bf User ID:}\\quad {\\tt " + mUserID + "}");
       output.println();
@@ -1476,7 +1551,8 @@ public class ModelAssess
     //# Data Members
     private final String mStudentID;
     private final String mUserID;
-    private final String mName;
+    private final String mFirstName;
+    private final String mLastName;
     private final String mFilterBegin;
 
   }

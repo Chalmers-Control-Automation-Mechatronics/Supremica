@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -33,6 +34,7 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -161,13 +163,13 @@ public class SubjectShapeProducer
       if (esource instanceof EdgeProxy ||
           esource instanceof SimpleNodeProxy){
         removeMapping(esource);
- /*     }else if(esource instanceof IdentifierProxy) {
+      }else if(esource instanceof IdentifierProxy) {
       final IdentifierSubject simple = (IdentifierSubject)esource;
         final Subject ancestor = (Subject) SubjectTools.getAncestor
                 (simple, SimpleNodeSubject.class, LabelBlockSubject.class);
         if(ancestor != null){
           removeMapping(ancestor);
-        }*/
+        }
      } else if (esource == getGraph() &&
                  getGraph().getBlockedEvents() == null &&
                  mOldBlockedEventsList != null) {
