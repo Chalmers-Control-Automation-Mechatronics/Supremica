@@ -147,6 +147,14 @@ public abstract class AbstractSynthesizerTest
 
   //#########################################################################
   //# Test Cases --- synthesis
+  public void testAip0Sub1P0() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "aip0sub1p0";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testBallProcess() throws Exception
   {
     final String group = "tests";
