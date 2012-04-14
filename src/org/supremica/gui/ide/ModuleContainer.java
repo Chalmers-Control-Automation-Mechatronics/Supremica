@@ -42,6 +42,7 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
@@ -52,11 +53,17 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -221,15 +228,7 @@ public class ModuleContainer
       break;
     case ModelChangeEvent.ITEM_REMOVED:
       final Object value = event.getValue();
-      if (value instanceof SimpleComponentSubject) {
-        final ComponentEditorPanel panel =
-          mEditorPanel.getActiveEditorWindowInterface();
-        if (panel != null && panel.getComponent() == value) {
-          mEditorPanel.showComment();
-          // Do not even try to close or dispose the graph panel:
-          // deletions can be undone!
-        }
-      }
+      mUpdateGraphPanelVisitor.updateGraphPanel((Proxy) value);
       mCompiledDES = null;
       break;
     case ModelChangeEvent.GEOMETRY_CHANGED:
@@ -245,6 +244,53 @@ public class ModuleContainer
     return ModelObserver.CLEANUP_PRIORITY_0;
   }
 
+  /**
+   * This visitor is used to make sure an automaton is no longer visible in
+   * the graph panel if it (or its parent) has been deleted from the module.
+   * @author Carly Hona
+   */
+  private class UpdateGraphPanelVisitor extends AbstractModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    public void updateGraphPanel(final Proxy proxy)
+    {
+      try {
+        proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
+      throws VisitorException
+    {
+      final ForeachSubject subject = (ForeachSubject)foreach;
+      final ListSubject<AbstractSubject> children = subject.getBodyModifiable();
+      for(final AbstractSubject sub : children){
+        if(sub.acceptVisitor(this) != null){
+          return null;
+        }
+      }
+      return null;
+    }
+
+    @Override
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy simple)
+      throws VisitorException
+    {
+      final ComponentEditorPanel panel =
+        mEditorPanel.getActiveEditorWindowInterface();
+      if (panel != null && panel.getComponent() == simple) {
+        mEditorPanel.showComment();
+        return simple; //stop iterating children if in a foreach
+      }
+      return null;
+    }
+  }
 
   //#########################################################################
   //# Simple Access
@@ -540,6 +586,7 @@ public class ModuleContainer
   private final ExpressionParser mExpressionParser;
   private final ProxyPrinter mPrinter;
   private ProductDESProxy mCompiledDES;
+  private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor = new UpdateGraphPanelVisitor();
 
   private final CompilerPropertyChangeListener
   mCompilerPropertyChangeListener;
