@@ -1171,6 +1171,16 @@ public class CompositionalSynthesizer
     {
       final TransitionRelationSimplifier simplifier = getSimplifier();
       try {
+        final ProductDESProxyFactory factory = getFactory();
+        final Collection<EventProxy> newEvents = new ArrayList<EventProxy>
+                                                                (local.size());
+        for (final EventProxy e:local) {
+          final EventProxy newEvent =
+          factory.createEventProxy(e.getName(), e.getKind(), false);
+          newEvents.add(newEvent);
+        }
+        local.removeAll(local);
+        local.addAll(newEvents);
         final EventEncoding eventEnc = createEventEncoding(aut, local);
         final StateEncoding inputStateEnc = createStateEncoding(aut);
         final int config = simplifier.getPreferredInputConfiguration();
@@ -1192,7 +1202,6 @@ public class CompositionalSynthesizer
           final ListBufferTransitionRelation supervisor =
             mHalfWaySynthesisSimplifier.getPseudoSupervisor();
           if (original == null) {
-            final ProductDESProxyFactory factory = getFactory();
             final StateEncoding outputStateEnc = new StateEncoding();
             final AutomatonProxy convertedAut =
               rel.createAutomaton(factory, eventEnc, outputStateEnc);
