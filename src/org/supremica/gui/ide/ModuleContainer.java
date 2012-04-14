@@ -1,6 +1,6 @@
 //# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters/Supremica IDE
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
@@ -59,11 +59,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
-import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -120,6 +117,7 @@ public class ModuleContainer
 
     mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
     {
+      @Override
       public void mouseClicked(final java.awt.event.MouseEvent e)
       {
         if (mTabPanel.getSelectedComponent().getName().equals
@@ -134,16 +132,19 @@ public class ModuleContainer
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# org.supremica.gui.ide.DocumentContainer
+  @Override
   public boolean hasUnsavedChanges()
   {
     return mUndoIndex != mUndoCheckPoint;
   }
 
+  @Override
   public void setCheckPoint()
   {
     mUndoCheckPoint = mUndoIndex;
   }
 
+  @Override
   public void close()
   {
     mEditorPanel.close();
@@ -244,53 +245,6 @@ public class ModuleContainer
     return ModelObserver.CLEANUP_PRIORITY_0;
   }
 
-  /**
-   * This visitor is used to make sure an automaton is no longer visible in
-   * the graph panel if it (or its parent) has been deleted from the module.
-   * @author Carly Hona
-   */
-  private class UpdateGraphPanelVisitor extends AbstractModuleProxyVisitor
-  {
-    //#######################################################################
-    //# Invocation
-    public void updateGraphPanel(final Proxy proxy)
-    {
-      try {
-        proxy.acceptVisitor(this);
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
-      }
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-      throws VisitorException
-    {
-      final ForeachSubject subject = (ForeachSubject)foreach;
-      final ListSubject<AbstractSubject> children = subject.getBodyModifiable();
-      for(final AbstractSubject sub : children){
-        if(sub.acceptVisitor(this) != null){
-          return null;
-        }
-      }
-      return null;
-    }
-
-    @Override
-    public Object visitSimpleComponentProxy(final SimpleComponentProxy simple)
-      throws VisitorException
-    {
-      final ComponentEditorPanel panel =
-        mEditorPanel.getActiveEditorWindowInterface();
-      if (panel != null && panel.getComponent() == simple) {
-        mEditorPanel.showComment();
-        return simple; //stop iterating children if in a foreach
-      }
-      return null;
-    }
-  }
 
   //#########################################################################
   //# Simple Access
@@ -568,6 +522,65 @@ public class ModuleContainer
 
 
   //#######################################################################
+  //# Inner Class UpdateGraphPanelVisitor
+  /**
+   * This visitor is used to make sure an automaton is no longer visible in
+   * the graph panel if it (or its parent) has been deleted from the module.
+   * @author Carly Hona
+   */
+  private class UpdateGraphPanelVisitor extends AbstractModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    public void updateGraphPanel(final Proxy proxy)
+    {
+      try {
+        if (mEditorPanel.getActiveEditorWindowInterface() != null) {
+          proxy.acceptVisitor(this);
+        }
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
+    public Object visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
+      throws VisitorException
+    {
+      for (final Proxy proxy : foreach.getBody()) {
+        if (proxy.acceptVisitor(this) != null) {
+          return null;
+        }
+      }
+      return null;
+    }
+
+    @Override
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy simple)
+      throws VisitorException
+    {
+      final ComponentEditorPanel panel =
+        mEditorPanel.getActiveEditorWindowInterface();
+      if (panel.getComponent() == simple) {
+        mEditorPanel.showComment();
+        return simple; //stop iterating children if in a foreach
+      }
+      return null;
+    }
+  }
+
+
+  //#######################################################################
   //# Data Members
   private final JTabbedPane mTabPanel;
   private final EditorPanel mEditorPanel;
@@ -585,13 +598,14 @@ public class ModuleContainer
   private final ModuleCompiler mCompiler;
   private final ExpressionParser mExpressionParser;
   private final ProxyPrinter mPrinter;
+  private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
+    new UpdateGraphPanelVisitor();
   private ProductDESProxy mCompiledDES;
-  private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor = new UpdateGraphPanelVisitor();
 
   private final CompilerPropertyChangeListener
-  mCompilerPropertyChangeListener;
+    mCompilerPropertyChangeListener;
   private final SupremicaPropertyChangeListener
-  mSimulatorPropertyChangeListener;
+    mSimulatorPropertyChangeListener;
   private final WatersUndoManager mUndoManager = new WatersUndoManager();
   private int mUndoIndex = 0;
   private int mUndoCheckPoint = 0;
@@ -601,6 +615,5 @@ public class ModuleContainer
   //#######################################################################
   //# Class Constants
   static final String TYPE_STRING = "Waters module";
-
 
 }
