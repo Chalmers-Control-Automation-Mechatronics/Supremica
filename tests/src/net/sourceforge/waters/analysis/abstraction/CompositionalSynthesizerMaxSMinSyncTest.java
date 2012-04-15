@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   CompositionalSynthesizerMustLMinSyncTest
+//# CLASS:   CompositionalSynthesizerMaxSMinSyncTest
 //###########################################################################
 //# $Id$
 //###########################################################################

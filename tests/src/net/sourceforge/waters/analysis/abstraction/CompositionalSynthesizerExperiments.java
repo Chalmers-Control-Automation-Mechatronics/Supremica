@@ -146,7 +146,8 @@ public class CompositionalSynthesizerExperiments
                 final List<ParameterBindingProxy> bindings)
   throws Exception
   {
-    System.out.println("Running " + name + " ...");
+    printAndLog("Running " + name + " with " +
+                mPreselecting + "/" + mSelecting + " ...");
     final String inputprop = System.getProperty("waters.test.inputdir");
     final File inputRoot = new File(inputprop);
     final File rootdir = new File(inputRoot, "waters");
@@ -235,7 +236,6 @@ public class CompositionalSynthesizerExperiments
     synthesiseVerrigel4B();
 //    synthesiseFlexibleManufacturingSystem();
 //  synthesisLargestCoherent();
-
   }
 
 
@@ -362,6 +362,15 @@ public class CompositionalSynthesizerExperiments
     final Formatter formatter = new Formatter(System.out);
     final float difftime = 0.001f * (stop - start);
     formatter.format("%.3f s\n", difftime);
+  }
+
+
+  //#########################################################################
+  //# Logging
+  private void printAndLog(final String msg)
+  {
+    System.out.println(msg);
+    getLogger().info(msg);
   }
 
 

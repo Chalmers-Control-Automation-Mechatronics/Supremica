@@ -4355,13 +4355,7 @@ public class GraphEditorPanel
                 change = true;
               }
             }
-            else if(!block.getEventListModifiable().contains(subject)){
-              if (mSelectedSet.add(subject)) {
-                mSelectedList.add(subject);
-                change = true;
-              }
-            }
-            else if(ctrlDown){
+            else if(!block.getEventListModifiable().contains(subject) || ctrlDown){
               if (mSelectedSet.add(subject)) {
                 mSelectedList.add(subject);
                 change = true;

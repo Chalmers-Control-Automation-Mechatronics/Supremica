@@ -294,6 +294,7 @@ public class CompositionalSynthesizer
             SynthesisAbstractionTRSimplifier();
     final int limit = getInternalTransitionLimit();
     synthesisAbstraction.setTransitionLimit(limit);
+    //synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(false);
     chain.add(synthesisAbstraction);
     final AbstractionProcedure proc =
       new SynthesisAbstractionProcedure(chain, synthesisAbstraction, halfWay);
@@ -1170,6 +1171,16 @@ public class CompositionalSynthesizer
     {
       final TransitionRelationSimplifier simplifier = getSimplifier();
       try {
+        final ProductDESProxyFactory factory = getFactory();
+        final Collection<EventProxy> newEvents = new ArrayList<EventProxy>
+                                                                (local.size());
+        for (final EventProxy e:local) {
+          final EventProxy newEvent =
+          factory.createEventProxy(e.getName(), e.getKind(), false);
+          newEvents.add(newEvent);
+        }
+        local.removeAll(local);
+        local.addAll(newEvents);
         final EventEncoding eventEnc = createEventEncoding(aut, local);
         final StateEncoding inputStateEnc = createStateEncoding(aut);
         final int config = simplifier.getPreferredInputConfiguration();
@@ -1191,7 +1202,6 @@ public class CompositionalSynthesizer
           final ListBufferTransitionRelation supervisor =
             mHalfWaySynthesisSimplifier.getPseudoSupervisor();
           if (original == null) {
-            final ProductDESProxyFactory factory = getFactory();
             final StateEncoding outputStateEnc = new StateEncoding();
             final AutomatonProxy convertedAut =
               rel.createAutomaton(factory, eventEnc, outputStateEnc);
@@ -1271,43 +1281,50 @@ public class CompositionalSynthesizer
         new ArrayList<EventProxy>(autAlphabet.size() - local.size());
       final Collection<EventProxy> encodedEvents =
         new ArrayList<EventProxy>(autAlphabet.size());
-      int propositionSize = 0;
       for (final EventProxy event : autAlphabet) {
-        if (translator.getEventKind(event) == EventKind.PROPOSITION) {
-          propositionSize++;
-        }
-        if (local.contains(event)) {
-          if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
+        switch (translator.getEventKind(event)) {
+        case CONTROLLABLE:
+          if (local.contains(event)) {
             localControllableEvents.add(event);
           } else {
-            localUncontrollableEvents.add(event);
-          }
-        } else {
-          if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
             sharedControllableEvents.add(event);
+          }
+          break;
+        case UNCONTROLLABLE:
+          if (local.contains(event)) {
+            localUncontrollableEvents.add(event);
           } else {
             sharedUncontrollableEvents.add(event);
           }
+          break;
+        case PROPOSITION:
+          // Put propositions in last list---its size does not matter.
+          sharedControllableEvents.add(event);
+          break;
+        default:
+          throw new IllegalArgumentException
+            ("Unknown event kind " + translator.getEventKind(event) +
+             " found for event " + event.getName() + "!");
         }
       }
-      final int lastUncontrollableLocalEvent =
+      final int lastLocalUncontrollableEvent =
         localUncontrollableEvents.size();
-      final int lastControllableLocalEvent =
-        localControllableEvents.size() + lastUncontrollableLocalEvent;
-      final int lastUncontrollableSharedEvent =
-        local.size() + sharedUncontrollableEvents.size();
+      final int lastLocalControllableEvent =
+        lastLocalUncontrollableEvent + localControllableEvents.size();
+      final int lastSharedUncontrollableEvent =
+        lastLocalControllableEvent + sharedUncontrollableEvents.size();
       mSynthesisAbstraction.setLastLocalControllableEvent
-        (lastControllableLocalEvent);
+        (lastLocalControllableEvent);
       mSynthesisAbstraction.setLastLocalUncontrollableEvent
-        (lastUncontrollableLocalEvent);
+        (lastLocalUncontrollableEvent);
       mSynthesisAbstraction.setLastSharedUncontrollableEvent
-        (lastUncontrollableSharedEvent);
+        (lastSharedUncontrollableEvent);
       mHalfWaySynthesisSimplifier.setLastLocalUncontrollableEvent
-        (lastUncontrollableLocalEvent);
+        (lastLocalUncontrollableEvent);
       mHalfWaySynthesisSimplifier.setLastLocalControllableEvent
-        (lastControllableLocalEvent);
+        (lastLocalControllableEvent);
       mHalfWaySynthesisSimplifier.setLastSharedUncontrollableEvent
-        (lastUncontrollableSharedEvent - propositionSize);
+        (lastSharedUncontrollableEvent);
       encodedEvents.addAll(localUncontrollableEvents);
       encodedEvents.addAll(localControllableEvents);
       encodedEvents.addAll(sharedUncontrollableEvents);
