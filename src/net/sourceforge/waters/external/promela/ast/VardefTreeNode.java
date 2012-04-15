@@ -7,11 +7,11 @@ import org.antlr.runtime.Token;
 public class VardefTreeNode extends PromelaTree
 {
 
-  public VardefTreeNode(final int token, final boolean visible)
+  public VardefTreeNode(final int token, final boolean visible, final String type)
   {
-    // TODO Need int constructor
     this((Token)new CommonToken(token,"Vardefinition"));
     mVisible = visible;
+    mVariableType = type;
   }
 
   public VardefTreeNode(final Token token)
@@ -46,6 +46,16 @@ public class VardefTreeNode extends PromelaTree
   }
 
   /**
+   * A method to get the type of the variable(s) that are being created
+   * @author Ethan Duff
+   * @return A string indicating the type of the variable. Will be 'bit' 'byte' 'short' 'int' 'mtype'
+   */
+  public String getVariableType()
+  {
+    return mVariableType;
+  }
+
+  /**
    * A method to get the locality of the variable(s) being created
    * @author Ethan Duff
    * @return TRUE if the variable(s) are global, or FALSE if they are local to a method
@@ -61,6 +71,7 @@ public class VardefTreeNode extends PromelaTree
 
   //NEW<============================================================================================================================================
   private boolean mVisible;
+  private String mVariableType;
   //private boolean mGlobal; //This member may or may not be included
   //===============================================================================================================================================>
 

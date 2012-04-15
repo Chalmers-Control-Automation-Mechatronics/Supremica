@@ -182,6 +182,25 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitVar(final VardefTreeNode t)
   {
+    /**
+     * This bit is new
+     * @author Ethan Duff
+     */
+
+    final String type = t.getVariableType();
+
+    for(int i = 0; i < t.getChildCount(); i++)
+    {
+      //These are all of the names for the variables that are being instantiated in this declaration
+      //All of their types are specified by the typeTreeNode
+
+      proctypeVar.put(t.getChild(i).getText(), type);
+    }
+
+    /**
+     * This is old stuff, and is left in for future reference
+     */
+    /*
     final Tree tree = t.getChild(0);
 
     for(int i=1;i<t.getChildCount();i++){
@@ -192,7 +211,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
         proctypeVar.put(t.getChild(i).getText(),"byte");
       }
-    }
+    }*/
     return null;
   }
 
