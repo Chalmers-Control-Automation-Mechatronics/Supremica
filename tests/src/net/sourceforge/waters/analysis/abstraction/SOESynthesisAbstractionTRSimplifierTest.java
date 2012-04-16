@@ -31,7 +31,7 @@ import junit.framework.TestSuite;
  * @author Robi Malik
  */
 
-public class SynthesisAbstractionTRSimplifierTest
+public class SOESynthesisAbstractionTRSimplifierTest
   extends AbstractTRSimplifierTest
 {
 
@@ -40,7 +40,7 @@ public class SynthesisAbstractionTRSimplifierTest
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(SynthesisAbstractionTRSimplifierTest.class);
+        new TestSuite(SOESynthesisAbstractionTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -128,6 +128,7 @@ public class SynthesisAbstractionTRSimplifierTest
     super.configureTransitionRelationSimplifier();
     final SynthesisAbstractionTRSimplifier simplifier =
       getTransitionRelationSimplifier();
+    simplifier.setUsesWeakSynthesisObservationEquivalence(false);
     simplifier.setLastLocalUncontrollableEvent(mLastLocalUncontrollable);
     simplifier.setLastLocalControllableEvent(mLastLocalControllable);
     simplifier.setLastSharedUncontrollableEvent(mLastSharedUncontrollable);
@@ -251,7 +252,7 @@ public class SynthesisAbstractionTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_13.wmod";
+    final String name = "SOEsynthesisAbstraction_13.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -291,7 +292,7 @@ public class SynthesisAbstractionTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_18.wmod";
+    final String name = "SOEsynthesisAbstraction_18.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -299,7 +300,7 @@ public class SynthesisAbstractionTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_19.wmod";
+    final String name = "SOEsynthesisAbstraction_19.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -307,7 +308,7 @@ public class SynthesisAbstractionTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_20.wmod";
+    final String name = "SOEsynthesisAbstraction_20.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -323,7 +324,7 @@ public class SynthesisAbstractionTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_22.wmod";
+    final String name = "SOEsynthesisAbstraction_22.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -331,10 +332,17 @@ public class SynthesisAbstractionTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_23.wmod";
+    final String name = "SOEsynthesisAbstraction_23.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_synthesisAbstraction_24() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_24.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
 
   /**
    * A test to see whether a single abstraction rule object can perform multiple
