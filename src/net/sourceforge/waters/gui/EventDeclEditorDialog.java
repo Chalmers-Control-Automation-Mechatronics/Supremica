@@ -79,6 +79,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
@@ -669,12 +670,14 @@ public class EventDeclEditorDialog
       final String name = mNameInput.getText();
       final int pos = mNameInput.getCaretPosition();
       restorer = new Runnable() {
-          public void run()
-          {
-            mNameInput.setText(name);
-            mNameInput.setCaretPosition(pos);
-          }
-        };
+        public void run()
+        {
+          mIsFilterEnabled = false;
+          mNameInput.setText(name);
+          mIsFilterEnabled = true;
+          mNameInput.setCaretPosition(pos);
+        }
+      };
     }
     resetPanels();
     mDisplayingMoreOptions = !mDisplayingMoreOptions;
@@ -929,8 +932,8 @@ public class EventDeclEditorDialog
           });
       }
     } else {
-      final SimpleIdentifierSubject ident =
-        (SimpleIdentifierSubject) mNameInput.getValue();
+      final IdentifierSubject ident =
+        (IdentifierSubject) mNameInput.getValue();
       final EventKind kind;
       if (mControllableButton.isSelected()) {
         kind = EventKind.CONTROLLABLE;
@@ -992,7 +995,6 @@ public class EventDeclEditorDialog
       final EventDeclSubject template =
         new EventDeclSubject(ident, kind, observable,
                              scope, ranges, geo, attribs);
-
 
       if (mEventDecl == null) {
         final Command command = new InsertCommand(template, panel, mRoot);
@@ -1144,23 +1146,28 @@ public class EventDeclEditorDialog
     //# Auxiliary Methods
     private String filter(final String text)
     {
-      if (text == null) {
-        return null;
-      } else {
-        final ExpressionParser parser = getExpressionParser();
-        final int len = text.length();
-        final StringBuffer buffer = new StringBuffer(len);
-        for (int i = 0; i < len; i++) {
-          final char ch = text.charAt(i);
-          if (parser.isIdentifierCharacter(ch)) {
-            buffer.append(ch);
-          }
-        }
-        if (buffer.length() == 0) {
+      if (mIsFilterEnabled) {
+        if (text == null) {
           return null;
         } else {
-          return buffer.toString();
+          final ExpressionParser parser = getExpressionParser();
+          final int len = text.length();
+          final StringBuffer buffer = new StringBuffer(len);
+          for (int i = 0; i < len; i++) {
+            final char ch = text.charAt(i);
+            if (parser.isIdentifierCharacter(ch)) {
+              buffer.append(ch);
+            }
+          }
+          if (buffer.length() == 0) {
+            return null;
+          } else {
+            return buffer.toString();
+          }
         }
+      }
+      else{
+        return text;
       }
     }
 
@@ -1328,6 +1335,7 @@ public class EventDeclEditorDialog
   // Dialog state
   private final ModuleWindowInterface mRoot;
   private boolean mDisplayingMoreOptions;
+  private boolean mIsFilterEnabled = true;
 
   // Swing components
   private JPanel mNamePanel;
