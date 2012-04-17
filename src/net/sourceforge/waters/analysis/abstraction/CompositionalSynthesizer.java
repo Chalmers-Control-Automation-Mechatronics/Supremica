@@ -34,6 +34,7 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisTools;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -199,7 +200,6 @@ public class CompositionalSynthesizer
   }
 
 
-
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
   public ProductDESProxy getComputedProductDES()
@@ -221,7 +221,15 @@ public class CompositionalSynthesizer
     return mDefaultMarking;
   }
 
+  public void setUsedAbstractionMethods(final int methods)
+  {
+    mUsedAbstractionMethods = methods;
+  }
 
+  public int getUsedAbstractionMethods()
+  {
+    return mUsedAbstractionMethods;
+  }
 
 
   //#########################################################################
@@ -277,27 +285,38 @@ public class CompositionalSynthesizer
     setPropositions(props);
 
     final ChainTRSimplifier chain = new ChainTRSimplifier();
-    /*
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover);
-     */
-    final HalfWaySynthesisTRSimplifier halfWay =
-      new HalfWaySynthesisTRSimplifier();
-    chain.add(halfWay);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
-    chain.add(bisimulator);
-    final SynthesisAbstractionTRSimplifier synthesisAbstraction= new
-            SynthesisAbstractionTRSimplifier();
-    final int limit = getInternalTransitionLimit();
-    synthesisAbstraction.setTransitionLimit(limit);
-    //synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(false);
-    chain.add(synthesisAbstraction);
+    final HalfWaySynthesisTRSimplifier halfWay;
+    if ((mUsedAbstractionMethods & USE_HALFWAY) != 0) {
+      halfWay = new HalfWaySynthesisTRSimplifier();
+      chain.add(halfWay);
+    } else {
+      halfWay = null;
+    }
+    if ((mUsedAbstractionMethods & USE_BISIMULATION) != 0) {
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier();
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+      chain.add(bisimulator);
+    }
+    final SynthesisAbstractionTRSimplifier synthesisAbstraction;
+    if ((mUsedAbstractionMethods & USE_WSOE) != 0) {
+      synthesisAbstraction = new SynthesisAbstractionTRSimplifier();
+      final int limit = getInternalTransitionLimit();
+      synthesisAbstraction.setTransitionLimit(limit);
+      synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(true);
+      chain.add(synthesisAbstraction);
+    } else if ((mUsedAbstractionMethods & USE_SOE) != 0) {
+      synthesisAbstraction = new SynthesisAbstractionTRSimplifier();
+      final int limit = getInternalTransitionLimit();
+      synthesisAbstraction.setTransitionLimit(limit);
+      synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(false);
+      chain.add(synthesisAbstraction);
+    } else {
+      synthesisAbstraction = null;
+    }
     final AbstractionProcedure proc =
-      new SynthesisAbstractionProcedure(chain, synthesisAbstraction, halfWay);
+      new SynthesisAbstractionProcedure(chain, halfWay, synthesisAbstraction);
     setAbstractionProcedure(proc);
 
     mDistinguisherInfoList = new LinkedList<DistinguisherInfo> ();
@@ -519,42 +538,6 @@ public class CompositionalSynthesizer
         }
       }
     }
-//    } else if(step instanceof EventRemovalStep){
-//      final List<AutomatonProxy> before = step.getOriginalAutomata();
-//      final List<AutomatonProxy> after = step.getResultAutomata();
-//      final Iterator <AutomatonProxy> beforeIterator = before.iterator();
-//      final Iterator <AutomatonProxy> afterIterator = after.iterator();
-//      while (beforeIterator.hasNext()) {
-//        final AutomatonProxy beforeAutomaton = beforeIterator.next();
-//        final AutomatonProxy afterAutomaton = afterIterator.next();
-//        final int sizeBefore = getNumControllableEvents(beforeAutomaton);
-//        final int sizeAfter = getNumControllableEvents(afterAutomaton);
-//        if (sizeBefore != sizeAfter) {
-//          final String name = "dis:" + beforeAutomaton.getName();
-//          final Collection <EventProxy> events = beforeAutomaton.getEvents();
-//          final Collection <StateProxy> states = beforeAutomaton.getStates();
-//          final Collection <TransitionProxy> transitions =
-//            beforeAutomaton.getTransitions();
-//          final AutomatonProxy distinguisher =
-//            factory.createAutomatonProxy(name, ComponentKind.SUPERVISOR,
-//                                         events, states, transitions);
-//          result.addSupervisor(distinguisher);
-//        }
-//      }
-  }
-
-  @SuppressWarnings("unused")
-  private int getNumControllableEvents(final AutomatonProxy aut)
-  {
-    final KindTranslator translator = getKindTranslator();
-    final Collection<EventProxy> alphabet = aut.getEvents();
-    int size = 0;
-    for(final EventProxy event:alphabet){
-      if(translator.getEventKind(event) == EventKind.CONTROLLABLE){
-        size++;
-      }
-    }
-   return size;
   }
 
   @Override
@@ -597,6 +580,7 @@ public class CompositionalSynthesizer
     final ListBufferTransitionRelation supervisor =
       synthesise(automaton, coding);
     if (supervisor != null) {
+      reportSupervisor("monolithic", supervisor);
       final CompositionalSynthesisResult result = getAnalysisResult();
       if (supervisor.getNumberOfReachableStates() == 0) {
         result.setSatisfied(false);
@@ -798,6 +782,7 @@ public class CompositionalSynthesizer
       mDistinguisherInfoList.add(info);
       mRenamedEvents.addAll(replacement);
     }
+    reportAbstractionResult(simplifiedAutomaton, distinguisherAutomaton);
 
     return new SynthesisAbstractionStep(simplifiedAutomaton,
                                         originalAutomaton,
@@ -1146,6 +1131,38 @@ public class CompositionalSynthesizer
 
 
   //#########################################################################
+  //# Debugging
+  private void reportAbstractionResult(final AutomatonProxy aut,
+                                       final AutomatonProxy dist)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final boolean nonblocking = AnalysisTools.isNonBlocking(aut);
+      String msg = "Simplified automaton is " +
+        (nonblocking ? "nonblocking." : "BLOCKING.");
+      logger.debug(msg);
+      if (dist != null) {
+        msg = "Creating distinguisher '" + dist.getName() + "' with " +
+          dist.getStates().size() + " states.";
+        logger.debug(msg);
+      }
+    }
+  }
+
+  private void reportSupervisor(final String kind,
+                                final ListBufferTransitionRelation sup)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled() && sup != null) {
+      final String msg = "Got " + kind + " supervisor '" +
+        sup.getName() + "' with " +
+        sup.getNumberOfReachableStates() + " states.";
+      logger.debug(msg);
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class SynthesisAbstractionProcedure
   protected class SynthesisAbstractionProcedure
     extends AbstractionProcedure
@@ -1154,8 +1171,8 @@ public class CompositionalSynthesizer
     //# Constructor
     protected SynthesisAbstractionProcedure
       (final TransitionRelationSimplifier simplifier,
-       final SynthesisAbstractionTRSimplifier synthesisAbstraction,
-       final HalfWaySynthesisTRSimplifier halfWaySynthesisSimplifier)
+       final HalfWaySynthesisTRSimplifier halfWaySynthesisSimplifier,
+       final SynthesisAbstractionTRSimplifier synthesisAbstraction)
     {
       mSimplifier = simplifier;
       mSynthesisAbstraction = synthesisAbstraction;
@@ -1171,16 +1188,6 @@ public class CompositionalSynthesizer
     {
       final TransitionRelationSimplifier simplifier = getSimplifier();
       try {
-        final ProductDESProxyFactory factory = getFactory();
-        final Collection<EventProxy> newEvents = new ArrayList<EventProxy>
-                                                                (local.size());
-        for (final EventProxy e:local) {
-          final EventProxy newEvent =
-          factory.createEventProxy(e.getName(), e.getKind(), false);
-          newEvents.add(newEvent);
-        }
-        local.removeAll(local);
-        local.addAll(newEvents);
         final EventEncoding eventEnc = createEventEncoding(aut, local);
         final StateEncoding inputStateEnc = createStateEncoding(aut);
         final int config = simplifier.getPreferredInputConfiguration();
@@ -1198,18 +1205,20 @@ public class CompositionalSynthesizer
             return null;
           }
           final ListBufferTransitionRelation original =
-            mSynthesisAbstraction.getOriginalTransitionRelation();
+            getOriginalTransitionRelation();
           final ListBufferTransitionRelation supervisor =
-            mHalfWaySynthesisSimplifier.getPseudoSupervisor();
+            getPseudoSupervisor();
+          reportSupervisor("halfway synthesis", supervisor);
           if (original == null) {
+            final ProductDESProxyFactory factory = getFactory();
             final StateEncoding outputStateEnc = new StateEncoding();
             final AutomatonProxy convertedAut =
               rel.createAutomaton(factory, eventEnc, outputStateEnc);
+            reportAbstractionResult(convertedAut, null);
             return new SynthesisAbstractionStep(convertedAut, aut,
                                                 supervisor, eventEnc);
           } else {
-            final List<int[]> partition =
-              mSynthesisAbstraction.getResultPartition();
+            final List<int[]> partition = getResultPartition();
             final SynthesisAbstractionStep step =
               createDeterministicAutomaton(aut, original, rel,
                                            partition, eventEnc);
@@ -1313,18 +1322,6 @@ public class CompositionalSynthesizer
         lastLocalUncontrollableEvent + localControllableEvents.size();
       final int lastSharedUncontrollableEvent =
         lastLocalControllableEvent + sharedUncontrollableEvents.size();
-      mSynthesisAbstraction.setLastLocalControllableEvent
-        (lastLocalControllableEvent);
-      mSynthesisAbstraction.setLastLocalUncontrollableEvent
-        (lastLocalUncontrollableEvent);
-      mSynthesisAbstraction.setLastSharedUncontrollableEvent
-        (lastSharedUncontrollableEvent);
-      mHalfWaySynthesisSimplifier.setLastLocalUncontrollableEvent
-        (lastLocalUncontrollableEvent);
-      mHalfWaySynthesisSimplifier.setLastLocalControllableEvent
-        (lastLocalControllableEvent);
-      mHalfWaySynthesisSimplifier.setLastSharedUncontrollableEvent
-        (lastSharedUncontrollableEvent);
       encodedEvents.addAll(localUncontrollableEvents);
       encodedEvents.addAll(localControllableEvents);
       encodedEvents.addAll(sharedUncontrollableEvents);
@@ -1332,12 +1329,28 @@ public class CompositionalSynthesizer
       final EventEncoding encoding =
         new EventEncoding(encodedEvents, translator, filter,
                           EventEncoding.FILTER_PROPOSITIONS);
-      mHalfWaySynthesisSimplifier.
-        setDefaultMarkingID(encoding.getEventCode(mUsedDefaultMarking));
-      mSynthesisAbstraction.
-        setDefaultMarkingID(encoding.getEventCode(mUsedDefaultMarking));
-      final TIntHashSet renamed = getRenamedControllables(encoding);
-      mHalfWaySynthesisSimplifier.setRenamedEvents(renamed);
+      if (mSynthesisAbstraction != null) {
+        mSynthesisAbstraction.setLastLocalControllableEvent
+          (lastLocalControllableEvent);
+        mSynthesisAbstraction.setLastLocalUncontrollableEvent
+          (lastLocalUncontrollableEvent);
+        mSynthesisAbstraction.setLastSharedUncontrollableEvent
+          (lastSharedUncontrollableEvent);
+        mSynthesisAbstraction.setDefaultMarkingID
+          (encoding.getEventCode(mUsedDefaultMarking));
+      }
+      if (mHalfWaySynthesisSimplifier != null) {
+        mHalfWaySynthesisSimplifier.setLastLocalUncontrollableEvent
+          (lastLocalUncontrollableEvent);
+        mHalfWaySynthesisSimplifier.setLastLocalControllableEvent
+          (lastLocalControllableEvent);
+        mHalfWaySynthesisSimplifier.setLastSharedUncontrollableEvent
+          (lastSharedUncontrollableEvent);
+        mHalfWaySynthesisSimplifier.setDefaultMarkingID
+          (encoding.getEventCode(mUsedDefaultMarking));
+        final TIntHashSet renamed = getRenamedControllables(encoding);
+        mHalfWaySynthesisSimplifier.setRenamedEvents(renamed);
+      }
       return encoding;
     }
 
@@ -1348,12 +1361,40 @@ public class CompositionalSynthesizer
       return encoding;
     }
 
+    private ListBufferTransitionRelation getOriginalTransitionRelation()
+    {
+      if (mSynthesisAbstraction == null) {
+        return null;
+      } else {
+        return mSynthesisAbstraction.getOriginalTransitionRelation();
+      }
+    }
+
+    private ListBufferTransitionRelation getPseudoSupervisor()
+    {
+      if (mHalfWaySynthesisSimplifier == null) {
+        return null;
+      } else {
+        return mHalfWaySynthesisSimplifier.getPseudoSupervisor();
+      }
+    }
+
+    private List<int[]> getResultPartition()
+    {
+      if (mSynthesisAbstraction == null) {
+        return null;
+      } else {
+        return mSynthesisAbstraction.getResultPartition();
+      }
+    }
+
     //#######################################################################
     //# Data Members
     private final TransitionRelationSimplifier mSimplifier;
     private final SynthesisAbstractionTRSimplifier mSynthesisAbstraction;
     private final HalfWaySynthesisTRSimplifier mHalfWaySynthesisSimplifier;
   }
+
 
   //#########################################################################
   //# Inner Class SynthesisAbstractionStep
@@ -1500,8 +1541,19 @@ public class CompositionalSynthesizer
   private boolean mConstructsResult = true;
   private EventProxy mDefaultMarking;
   private EventProxy mUsedDefaultMarking;
+  private int mUsedAbstractionMethods = USE_ALL;
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
-  static int mRenamingIsUsed;
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final int USE_HALFWAY = 0x01;
+  public static final int USE_BISIMULATION = 0x02;
+  public static final int USE_SOE = 0x04;
+  public static final int USE_WSOE = 0x08;
+  public static final int USE_ALL =
+    USE_HALFWAY | USE_BISIMULATION | USE_WSOE;
+
 }
