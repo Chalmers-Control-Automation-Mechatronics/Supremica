@@ -268,7 +268,10 @@ public class SynthesisObservationEquivalenceTRSimplifier
     mStateToClass = new EquivalenceClass[numStates];
     mPredecessors = new int[numStates];
     mSplitters = new PriorityQueue<EquivalenceClass>();
-    mUncontrollableTransitionStorage = new UncontrollableTransitionStorage();
+    if (mWeak) {
+      mUncontrollableTransitionStorage =
+        new UncontrollableTransitionStorage();
+    }
     mTempClass = new TIntArrayList(numStates);
     mOriginalTransitionRelation = null;
   }
@@ -649,7 +652,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
       splitOnControllable(mLastLocalControllableEvent);
 
       mTempClass.clear();
-      mUncontrollableTransitionStorage.clearUniqueSuccessorCache();
+      if (mWeak) {
+        mUncontrollableTransitionStorage.clearUniqueSuccessorCache();
+      }
     }
 
     private void splitOnControllable(final int event)
@@ -671,7 +676,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
     private void exploreControllable
       (final int endState,
        final int event,
-       final Set <SearchRecord> visited,
+       final Set<SearchRecord> visited,
        final TIntHashSet found,
        final Collection<EquivalenceClass> splitClasses)
     {
@@ -679,18 +684,20 @@ public class SynthesisObservationEquivalenceTRSimplifier
       final EquivalenceClass endClass = mStateToClass[endState];
       final boolean local =
         event > EventEncoding.TAU && event <= mLastLocalControllableEvent;
-      final SearchRecord initial = new SearchRecord(endState, null, false);
-      visited.add(initial);
-      open.add(initial);
+      // For SOE, search for local events starts on first part of path,
+      // every other search starts on second part of path ...
+      final SearchRecord initial =
+        new SearchRecord(endState, null, local && !mWeak);
+      addSearchRecord(initial, open, visited);
       while (!open.isEmpty()){
         final SearchRecord record = open.remove();
         final int state = record.getState();
+        final EquivalenceClass stateClass = mStateToClass[state];
         mPredecessorIterator.resetState(state);
         if (record.getHasEvent()) {
           // In first part of path (before the event)
           final EquivalenceClass startingClass = record.getStartingClass();
-          if (startingClass == null ||
-              mStateToClass[state] == startingClass) {
+          if (startingClass == null || startingClass == stateClass) {
             // Store full path if starting class OK or unassigned ...
             if (found.add(state)) {
               final EquivalenceClass splitClass = mStateToClass[state];
@@ -702,16 +709,14 @@ public class SynthesisObservationEquivalenceTRSimplifier
             // Visit predecessors for local controllable transitions if this
             // state's class is or can be made the starting class ...
             final EquivalenceClass controllableStartClass =
-              local && state == endState ? null : mStateToClass[state];
+              local && stateClass == endClass ? null : stateClass;
             mPredecessorIterator.resetEvents(mLastLocalUncontrollableEvent + 1,
                                              mLastLocalControllableEvent);
             while (mPredecessorIterator.advance()) {
               final int source = mPredecessorIterator.getCurrentSourceState();
               final SearchRecord next =
                 new SearchRecord(source, controllableStartClass, true);
-              if (visited.add(next)){
-                open.add(next);
-              }
+              addSearchRecord(next, open, visited);
             }
           }
           // Visit predecessors for all local uncontrollable transitions ...
@@ -721,9 +726,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
             final int source = mPredecessorIterator.getCurrentSourceState();
             final SearchRecord next =
               new SearchRecord(source, startingClass, true);
-            if (visited.add(next)) {
-              open.add(next);
-            }
+            addSearchRecord(next, open, visited);
           }
         } else {
           // In second part of path (after the event)
@@ -754,29 +757,43 @@ public class SynthesisObservationEquivalenceTRSimplifier
               }
               // Otherwise just explore ...
               final SearchRecord next = new SearchRecord(source, null, false);
-              if (visited.add(next)){
-                open.add(next);
-              }
+              addSearchRecord(next, open, visited);
             }
           }
           if (local) {
             // For local events can switch to first path any time ...
             final SearchRecord next = new SearchRecord(state, null, true);
-            if (visited.add(next)){
-              open.add(next);
-            }
+            addSearchRecord(next, open, visited);
           } else {
             // Or visit predecessors for the shared event ...
             mPredecessorIterator.resetEvent(event);
             while (mPredecessorIterator.advance()){
               final int source = mPredecessorIterator.getCurrentSourceState();
               final SearchRecord next = new SearchRecord(source, null, true);
-              if (visited.add(next)){
-                open.add(next);
-              }
+              addSearchRecord(next, open, visited);
             }
           }
         }
+      }
+    }
+
+    private boolean addSearchRecord(final SearchRecord record,
+                                    final Queue<SearchRecord> queue,
+                                    final Set<SearchRecord> set)
+    {
+      if (record.getStartingClass() != null) {
+        final int state = record.getState();
+        final boolean hasEvent = record.getHasEvent();
+        final SearchRecord alt = new SearchRecord(state, null, hasEvent);
+        if (set.contains(alt)) {
+          return false;
+        }
+      }
+      if (set.add(record)) {
+        queue.add(record);
+        return true;
+      } else {
+        return false;
       }
     }
 
@@ -909,6 +926,10 @@ public class SynthesisObservationEquivalenceTRSimplifier
     public void dump(final PrintWriter printer)
     {
       mListBuffer.dumpList(printer, mList);
+      if (mOverflowList != IntListBuffer.NULL) {
+        printer.print('+');
+        mListBuffer.dumpList(printer, mOverflowList);
+      }
     }
 
     //#######################################################################

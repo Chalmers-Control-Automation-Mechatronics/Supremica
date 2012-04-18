@@ -57,10 +57,7 @@ public class SynthesisObservationEquivalenceTRSimplifierTest
   protected SynthesisObservationEquivalenceTRSimplifier
     createTransitionRelationSimplifier()
   {
-    final SynthesisObservationEquivalenceTRSimplifier simplifier =
-      new SynthesisObservationEquivalenceTRSimplifier();
-    simplifier.setUsesWeakSynthesisObservationEquivalence(false);
-    return simplifier;
+    return new SynthesisObservationEquivalenceTRSimplifier();
   }
 
   @Override
@@ -347,9 +344,17 @@ public class SynthesisObservationEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_synthesisAbstraction_25() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_25.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   /**
-   * A test to see whether a single abstraction rule object can perform multiple
-   * abstractions in sequence.
+   * A test to see whether a single abstraction rule object can perform
+   * multiple abstractions in sequence.
    */
   public void testReentrant() throws Exception
   {

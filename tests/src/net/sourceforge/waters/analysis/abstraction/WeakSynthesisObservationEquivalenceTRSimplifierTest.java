@@ -57,10 +57,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   protected SynthesisObservationEquivalenceTRSimplifier
     createTransitionRelationSimplifier()
   {
-    final SynthesisObservationEquivalenceTRSimplifier simplifier =
-      new SynthesisObservationEquivalenceTRSimplifier();
-    simplifier.setUsesWeakSynthesisObservationEquivalence(true);
-    return simplifier;
+    return new SynthesisObservationEquivalenceTRSimplifier();
   }
 
   @Override
@@ -131,6 +128,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
     super.configureTransitionRelationSimplifier();
     final SynthesisObservationEquivalenceTRSimplifier simplifier =
       getTransitionRelationSimplifier();
+    simplifier.setUsesWeakSynthesisObservationEquivalence(true);
     simplifier.setLastLocalUncontrollableEvent(mLastLocalUncontrollable);
     simplifier.setLastLocalControllableEvent(mLastLocalControllable);
     simplifier.setLastSharedUncontrollableEvent(mLastSharedUncontrollable);
@@ -338,12 +336,19 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-
   public void test_synthesisAbstraction_24() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "synthesisAbstraction_24.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_25() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesisAbstraction_25.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

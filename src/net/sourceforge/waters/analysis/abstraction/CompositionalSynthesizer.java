@@ -34,7 +34,6 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AnalysisTools;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -239,12 +238,6 @@ public class CompositionalSynthesizer
     try {
       setUp();
       final CompositionalSynthesisResult result = getAnalysisResult();
-//      int size = 0;
-//      final Iterator<AutomatonProxy> iter = result.getComputedAutomata().iterator();
-//      while (iter.hasNext()) {
-//        final AutomatonProxy aut = iter.next();
-//        size = aut.getStates().size();
-//      }
       if (!result.isFinished()) {
         runCompositionalMinimisation();
       }
@@ -299,15 +292,15 @@ public class CompositionalSynthesizer
         (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
       chain.add(bisimulator);
     }
-    final SynthesisAbstractionTRSimplifier synthesisAbstraction;
+    final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction;
     if ((mUsedAbstractionMethods & USE_WSOE) != 0) {
-      synthesisAbstraction = new SynthesisAbstractionTRSimplifier();
+      synthesisAbstraction = new SynthesisObservationEquivalenceTRSimplifier();
       final int limit = getInternalTransitionLimit();
       synthesisAbstraction.setTransitionLimit(limit);
       synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(true);
       chain.add(synthesisAbstraction);
     } else if ((mUsedAbstractionMethods & USE_SOE) != 0) {
-      synthesisAbstraction = new SynthesisAbstractionTRSimplifier();
+      synthesisAbstraction = new SynthesisObservationEquivalenceTRSimplifier();
       final int limit = getInternalTransitionLimit();
       synthesisAbstraction.setTransitionLimit(limit);
       synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(false);
@@ -1137,14 +1130,16 @@ public class CompositionalSynthesizer
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
+      /*
       final boolean nonblocking = AnalysisTools.isNonBlocking(aut);
-      String msg = "Simplified automaton is " +
+      final String msg1 = "Simplified automaton is " +
         (nonblocking ? "nonblocking." : "BLOCKING.");
-      logger.debug(msg);
+      logger.debug(msg1);
+      */
       if (dist != null) {
-        msg = "Creating distinguisher '" + dist.getName() + "' with " +
-          dist.getStates().size() + " states.";
-        logger.debug(msg);
+        final String msg2 = "Creating distinguisher '" + dist.getName() +
+          "' with " + dist.getStates().size() + " states.";
+        logger.debug(msg2);
       }
     }
   }
@@ -1172,7 +1167,7 @@ public class CompositionalSynthesizer
     protected SynthesisAbstractionProcedure
       (final TransitionRelationSimplifier simplifier,
        final HalfWaySynthesisTRSimplifier halfWaySynthesisSimplifier,
-       final SynthesisAbstractionTRSimplifier synthesisAbstraction)
+       final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction)
     {
       mSimplifier = simplifier;
       mSynthesisAbstraction = synthesisAbstraction;
@@ -1391,7 +1386,8 @@ public class CompositionalSynthesizer
     //#######################################################################
     //# Data Members
     private final TransitionRelationSimplifier mSimplifier;
-    private final SynthesisAbstractionTRSimplifier mSynthesisAbstraction;
+    private final SynthesisObservationEquivalenceTRSimplifier
+      mSynthesisAbstraction;
     private final HalfWaySynthesisTRSimplifier mHalfWaySynthesisSimplifier;
   }
 
