@@ -1828,7 +1828,7 @@ public class GraphEditorPanel
       super.mousePressed(event);
       if (event.getButton() == MouseEvent.BUTTON1) {
         final ProxySubject item = getItemToBeSelected(event);
-         if (item == null || event.isControlDown()) {
+         if (item == null || event.isShiftDown()) {
           // Clicking on whitespace --- drag select.
           mInternalDragAction = new InternalDragActionSelect(event);
         } else if (item != mFocusedObject) {
@@ -1958,7 +1958,7 @@ public class GraphEditorPanel
     {
       super.mousePressed(event);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        if (event.isControlDown() || mFocusedObject == null) {
+        if (event.isShiftDown() || mFocusedObject == null) {
           // Clicking on whitespace --- drag select.
           mInternalDragAction = new InternalDragActionSelect(event);
         } else {
@@ -2001,7 +2001,7 @@ public class GraphEditorPanel
       mPopupFactory.maybeShowPopup
         (GraphEditorPanel.this, event, mFocusedObject);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        if (event.isControlDown()) {
+        if (event.isShiftDown()) {
           mInternalDragAction = new InternalDragActionSelect(event);
         } else if (mFocusedObject == null) {
           // Create new nodegroup
@@ -2085,7 +2085,7 @@ public class GraphEditorPanel
         (GraphEditorPanel.this, event, mFocusedObject);
       if (event.getButton() == MouseEvent.BUTTON1) {
         final ProxySubject item = getItemToBeSelected(event);
-        if (item == null || event.isControlDown()) {
+        if (item == null || event.isShiftDown()) {
           mInternalDragAction = new InternalDragActionSelect(event);
         } else if (item != mFocusedObject) {
           if (isSelected(item)) {
@@ -2137,14 +2137,16 @@ public class GraphEditorPanel
 
     private InternalDragAction(final MouseEvent event, final Point snapped)
     {
-      this(event.getPoint(), snapped, event.isControlDown());
+      this(event.getPoint(), snapped, event.isControlDown(), event.isShiftDown());
     }
 
     private InternalDragAction(final Point point,
                                final Point snapped,
-                               final boolean controlDown)
+                               final boolean controlDown,
+                               final boolean shiftDown)
     {
       mWasControlDown = controlDown;
+      mWasShiftDown = shiftDown;
       mPreviousSelection = null;
       mDragStart = point;
       mDragStartOnGrid = snapped;
@@ -2154,9 +2156,14 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Simple Access
+    @SuppressWarnings("unused")
     boolean wasControlDown()
     {
       return mWasControlDown;
+    }
+
+    boolean wasShiftDown(){
+      return mWasShiftDown;
     }
 
     boolean hasDragged()
@@ -2239,6 +2246,26 @@ public class GraphEditorPanel
       return false;
     }
 
+    protected boolean canSelectLabels(final ProxySubject item)
+    {
+      if (item instanceof SimpleIdentifierSubject
+          || item instanceof ForeachSubject) {
+        int count = 0;
+        for (final ProxySubject sub : mSelectedList) {
+          if (!(sub instanceof SimpleIdentifierSubject)
+              && !(sub instanceof ForeachSubject)) {
+            count++;
+          }
+          else{
+            return true;
+          }
+        }
+        return count <= 1;
+      } else {
+        return false;
+      }
+    }
+
     //#######################################################################
     //# Temporary Selection
     void copyCurrentSelection()
@@ -2265,6 +2292,10 @@ public class GraphEditorPanel
      */
     boolean continueDrag(final Point point)
     {
+      //the group node tool can never drag with shift pressed
+      if(mController == mGroupNodeController && wasShiftDown()){
+        return false;
+      }
       if (mDragCurrent.equals(point)) {
         return false;
       }
@@ -2336,6 +2367,10 @@ public class GraphEditorPanel
      * Whether control was pressed when this drag action was started.
      */
     private final boolean mWasControlDown;
+    /**
+     * Whether shift was pressed when this drag action was started.
+     */
+    private final boolean mWasShiftDown;
     /**
      * Backup of the selection when this action was started,
      * if requested by calling {@link #copyCurrentSelection()}.
@@ -2462,7 +2497,7 @@ public class GraphEditorPanel
     {
       if (super.continueDrag(point)) {
         final List<ProxySubject> dragged = getDragSelection();
-        if (wasControlDown()) {
+        if (wasShiftDown()) {
           clearSelection();
           addToSelection(getPreviousSelection());
           if (mSelectedSet.containsAll(dragged)) {
@@ -2488,11 +2523,15 @@ public class GraphEditorPanel
       super.cancelDrag(point);
       final ProxySubject label = getLabelToBeSelected();
       if (label == null) {
-        if (wasControlDown()) {
+        if (wasShiftDown()) {
           if (mFocusedObject != null) {
             final List<ProxySubject> list = getListOfSelectedLabels();
-            toggleSelection(mFocusedObject);
-            removeFromSelection(list);
+            //if there are no labels selected, deselect labelblock
+            //otherwise do nothing
+            if(list.isEmpty()){
+              toggleSelection(mFocusedObject);
+              removeFromSelection(list);
+            }
           }
         } else {
           if (mFocusedObject == null) {
@@ -2502,10 +2541,10 @@ public class GraphEditorPanel
           }
         }
       } else {
-        if (wasControlDown()) {
+        if (wasShiftDown()) {
           if (isSelected(label)) {
             removeFromSelection(label);
-          } else {
+          } else if (canSelectLabels(label)){
             final List<ProxySubject> list = getListWithoutLabels();
             if (mSelectedSet.removeAll(list)) {
               mSelectedList.removeAll(list);
@@ -2514,6 +2553,8 @@ public class GraphEditorPanel
               .singletonList(label), true)) {
               fireSelectionChanged();
             }
+          } else {
+            toggleSelection(mLabelBlock);
           }
         } else {
           replaceLabelSelection(label);
@@ -2637,10 +2678,11 @@ public class GraphEditorPanel
       mClickedObject = clicked;
       mClickedObjectWasSelected = clicked != null && isSelected(clicked);
       mMovedObject = mFocusedObject;
+      mCanSelectLabels = canSelectLabels(mClickedObject);
       if (mMovedObject == null || !mClickedObjectWasSelected) {
-        if (!wasControlDown() && mMovedObject != null) {
+        if (!wasShiftDown() && mMovedObject != null) {
           replaceSelection(mMovedObject);
-        } else if (!wasControlDown()) {
+        } else if (!wasShiftDown()) {
           clearSelection();
         } else if (mMovedObject != null) {
           addToSelection(mMovedObject);
@@ -2722,14 +2764,20 @@ public class GraphEditorPanel
     {
       super.cancelDrag(point);
       if (mClickedObject != null) {
-        if (!wasControlDown()) {
+        if (!wasShiftDown() && mCanSelectLabels) {
           replaceLabelSelection(mClickedObject);
         } else if (mClickedObjectWasSelected) {
-          removeFromSelection(mClickedObject);
+          if(wasShiftDown()){
+            removeFromSelection(mClickedObject);
+          }
+          else{
+            replaceSelection(mClickedObject);
+          }
         }
       }
       mMoveVisitor = null;
     }
+
 
     //#######################################################################
     //# Data Members
@@ -2738,6 +2786,7 @@ public class GraphEditorPanel
     private final boolean mClickedObjectWasSelected;
     private final ProxySubject mMovedObject;
     private MoveVisitor mMoveVisitor;
+    private final boolean mCanSelectLabels;
 
   }
 
@@ -2761,7 +2810,7 @@ public class GraphEditorPanel
 
     private InternalDragActionDND(final Point point)
     {
-      super(point, point, false);
+      super(point, point, false, false);
       mClickedLabel = null;
       mExternalDragStatus = DragOverStatus.NOTDRAG;
     }
@@ -2774,7 +2823,7 @@ public class GraphEditorPanel
       final boolean draggedBefore = hasDragged();
       final boolean draggedNow = super.continueDrag(event.getPoint());
       if(!draggedBefore && draggedNow){
-        if(event.isControlDown()){
+        if(event.isShiftDown()){
           getTransferHandler().exportAsDrag(GraphEditorPanel.this, event,
                                           TransferHandler.COPY);
         }
@@ -2791,7 +2840,7 @@ public class GraphEditorPanel
     {
       super.cancelDrag(point);
       if (mClickedLabel != null) {
-        if (wasControlDown()) {
+        if (wasShiftDown()) {
           toggleSelection(mClickedLabel);
         } else {
           replaceLabelSelection(mClickedLabel);
