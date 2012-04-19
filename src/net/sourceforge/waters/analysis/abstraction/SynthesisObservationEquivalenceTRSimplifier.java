@@ -750,11 +750,16 @@ public class SynthesisObservationEquivalenceTRSimplifier
               // not equal to the source state nor to the current state, nor
               // equivalent to the end state.
               final int usucc = mUncontrollableTransitionStorage.
-                getUniqueSuccessor(source, endClass);
+                getUniqueSuccessor(source, state, endClass);
+//              if (usucc == MULTIPLE_SUCCESSORS ||
+//                  (usucc != NO_SUCCESSOR && usucc != state)) {
+//                continue;
+//              }
+
               if (usucc == MULTIPLE_SUCCESSORS ||
-                  (usucc != NO_SUCCESSOR && usucc != state)) {
-                continue;
-              }
+                (usucc != NO_SUCCESSOR)) {
+              continue;
+            }
               // Otherwise just explore ...
               final SearchRecord next = new SearchRecord(source, null, false);
               addSearchRecord(next, open, visited);
@@ -1110,32 +1115,33 @@ public class SynthesisObservationEquivalenceTRSimplifier
      * If there is more than one such transition, it returns
      * {@link #MULTIPLE_SUCCESSORS}.
      */
-    private int getUniqueSuccessor(final int state,
+    private int getUniqueSuccessor(final int sourceState, final int endState,
                                    final EquivalenceClass endClass)
     {
-      final int list = mLists[state];
+      final int list = mLists[sourceState];
       if (list == IntListBuffer.NULL) {
         return MULTIPLE_SUCCESSORS;
       }
       if (mUniqueSuccessorCache == null) {
         mUniqueSuccessorCache = new TIntIntHashMap();
-      } else if (mUniqueSuccessorCache.containsKey(state)) {
-        return mUniqueSuccessorCache.get(state);
+      } else if (mUniqueSuccessorCache.containsKey(sourceState)) {
+        return mUniqueSuccessorCache.get(sourceState);
       }
       mIterator.reset(list);
       int result = NO_SUCCESSOR;
       while (mIterator.advance()) {
         final int succ = mIterator.getCurrentData();
-        if (mStateToClass[succ] != endClass) {
+        if (mStateToClass[succ] != endClass
+            || mStateToClass[succ] != mStateToClass[endState]) {
           if (result == NO_SUCCESSOR) {
             result = succ;
           } else {
-            mUniqueSuccessorCache.put(state, MULTIPLE_SUCCESSORS);
+            mUniqueSuccessorCache.put(sourceState, MULTIPLE_SUCCESSORS);
             return MULTIPLE_SUCCESSORS;
           }
         }
       }
-      mUniqueSuccessorCache.put(state, result);
+      mUniqueSuccessorCache.put(sourceState, result);
       return result;
     }
 

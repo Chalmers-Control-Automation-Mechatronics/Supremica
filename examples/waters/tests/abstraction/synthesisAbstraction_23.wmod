@@ -219,14 +219,6 @@ Note that S1 and S2 will be merged when weak synthesis observation equivalence i
                             <Point Y="-8" X="-25"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S2">
-                        <PointGeometry>
-                            <Point Y="112" X="240"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="9"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                     <SimpleNode Name="S3456">
                         <PointGeometry>
                             <Point Y="176" X="176"/>
@@ -251,6 +243,7 @@ Note that S1 and S2 will be merged when weak synthesis observation equivalence i
                     <Edge Target="S1" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
+                            <SimpleIdentifier Name="d"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-16" X="-15"/>
                             </LabelGeometry>
@@ -259,14 +252,6 @@ Note that S1 and S2 will be merged when weak synthesis observation equivalence i
                             <Point Y="48" X="176"/>
                         </StartPointGeometry>
                     </Edge>
-                    <Edge Target="S2" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="d"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-14" X="4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
                     <Edge Target="S3456" Source="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
@@ -274,17 +259,6 @@ Note that S1 and S2 will be merged when weak synthesis observation equivalence i
                                 <Point Y="-11" X="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Target="S3456" Source="S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="c"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="5"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <EndPointGeometry>
-                            <Point Y="176" X="176"/>
-                        </EndPointGeometry>
                     </Edge>
                     <Edge Target="S7" Source="S3456">
                         <LabelBlock>
