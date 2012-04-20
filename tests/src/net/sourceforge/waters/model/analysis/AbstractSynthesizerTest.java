@@ -403,14 +403,6 @@ public abstract class AbstractSynthesizerTest
     runSynthesizer(group, subdir, name, false);
   }
 
-  public void testRhoneSubsystem1Patch0() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "rhone_subsystem1_patch0";
-    runSynthesizer(group, subdir, name, true);
-  }
-
 
   //#########################################################################
   //# Test Cases --- BIG
