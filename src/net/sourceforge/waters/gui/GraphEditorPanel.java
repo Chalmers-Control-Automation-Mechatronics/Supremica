@@ -3834,8 +3834,9 @@ public class GraphEditorPanel
     //#######################################################################
     //# Data Members
     private final Set<Class<? extends Proxy>> mMovedTypes;
-    private final Collection<ProxySubject> mMovedObjects;
-    private final Map<EdgeProxy,MovingEdge> mEdgeMap;
+    // TODO Compiler bug? Why can't the following two be final???
+    private Collection<ProxySubject> mMovedObjects = null;
+    private Map<EdgeProxy,MovingEdge> mEdgeMap = null;
     private int mDeltaX;
     private int mDeltaY;
 

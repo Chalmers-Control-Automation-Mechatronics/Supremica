@@ -12,7 +12,8 @@ package net.sourceforge.waters.analysis.abstraction;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TLongHashSet;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -205,7 +206,11 @@ public class SynthesisObservationEquivalenceTRSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
-    return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
+    if (mWeak) {
+      return ListBufferTransitionRelation.CONFIG_ALL;
+    } else {
+      return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
+    }
   }
 
   @Override
@@ -260,17 +265,16 @@ public class SynthesisObservationEquivalenceTRSimplifier
     mHasModifications = false;
     setUpTauClosure();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    mNumClasses = 0;
     mListBuffer = new IntListBuffer();
     mClassReadIterator = mListBuffer.createReadOnlyIterator();
     mClassWriteIterator = mListBuffer.createModifyingIterator();
+    mNumClasses = 0;
     final int numStates = rel.getNumberOfStates();
     mStateToClass = new EquivalenceClass[numStates];
     mPredecessors = new int[numStates];
     mSplitters = new PriorityQueue<EquivalenceClass>();
     if (mWeak) {
-      mUncontrollableTransitionStorage =
-        new UncontrollableTransitionStorage();
+      mUncontrollableTransitionCache = new UncontrollableTransitionCache();
     }
     mTempClass = new TIntArrayList(numStates);
     mOriginalTransitionRelation = null;
@@ -320,7 +324,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
     mPredecessors = null;
     mSplitters = null;
     mTempClass = null;
-    mUncontrollableTransitionStorage = null;
+    mUncontrollableTransitionCache = null;
   }
 
   /**
@@ -414,8 +418,8 @@ public class SynthesisObservationEquivalenceTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final int limit = getTransitionLimit();
       mUncontrollableTauClosure =
-        rel.createPredecessorsTauClosure(limit, EventEncoding.NONTAU,
-                                         mLastLocalUncontrollableEvent);
+        rel.createPredecessorsTauClosure(EventEncoding.NONTAU, mLastLocalUncontrollableEvent,
+                                         limit);
       mPredecessorIterator = rel.createPredecessorsReadOnlyIterator();
       mUncontrollableTauIterator =
         new OneEventCachingTransitionIterator
@@ -519,6 +523,19 @@ public class SynthesisObservationEquivalenceTRSimplifier
       setUpSmallestState();
     }
 
+    /**
+     * Creates a dummy class only used as marker by
+     * {@link UncontrollableTransitionCache}.
+     */
+    private EquivalenceClass(final UncontrollableTransitionCache cache)
+    {
+      mSize = 0;
+      mList = mOverflowList = IntListBuffer.NULL;
+      mOverflowSize = -1;
+      mSmallestState = Integer.MAX_VALUE;
+      mIsOpenSplitter = false;
+    }
+
     //#######################################################################
     //# Initialisation
     void setSize(final int size)
@@ -565,6 +582,16 @@ public class SynthesisObservationEquivalenceTRSimplifier
     void reset(final IntListBuffer.Iterator iter)
     {
       iter.reset(mList);
+    }
+
+    boolean resetOverflowList(final IntListBuffer.Iterator iter)
+    {
+      if (mOverflowList != IntListBuffer.NULL) {
+        iter.reset(mOverflowList);
+        return true;
+      } else {
+        return false;
+      }
     }
 
     //#######################################################################
@@ -653,7 +680,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
       mTempClass.clear();
       if (mWeak) {
-        mUncontrollableTransitionStorage.clearUniqueSuccessorCache();
+        mUncontrollableTransitionCache.clearCache();
       }
     }
 
@@ -668,8 +695,13 @@ public class SynthesisObservationEquivalenceTRSimplifier
         final int state = mTempClass.get(i);
         exploreControllable(state, event, visited, found, splitClasses);
       }
+      boolean split = false;
       for (final EquivalenceClass splitClass : splitClasses) {
-        splitClass.splitUsingOverflowList();
+        split |= splitClass.splitUsingOverflowList();
+      }
+      if (split && mWeak) {
+        // If classes have changed, the cache may become invalid.
+        mUncontrollableTransitionCache.clearCache();
       }
     }
 
@@ -745,21 +777,18 @@ public class SynthesisObservationEquivalenceTRSimplifier
               }
               // If the source state is uncontrollable, also forget about it.
               // The source state is uncontrollable, if it has a shared
-              // uncontrollable event outgoing (usucc == MULTIPLE_SUCCESSORS),
+              // uncontrollable event outgoing to a state not also reachable
+              // from the end class (usucc == BAD_CLASS),
               // or if it has a local uncontrollable successor state
-              // not equal to the source state nor to the current state, nor
-              // equivalent to the end state.
-              final int usucc = mUncontrollableTransitionStorage.
-                getUniqueSuccessor(source, state, endClass);
-//              if (usucc == MULTIPLE_SUCCESSORS ||
-//                  (usucc != NO_SUCCESSOR && usucc != state)) {
-//                continue;
-//              }
-
-              if (usucc == MULTIPLE_SUCCESSORS ||
-                (usucc != NO_SUCCESSOR)) {
-              continue;
-            }
+              // not equivalent to the source state, nor to the current state,
+              // nor to the end state.
+              final EquivalenceClass usucc = mUncontrollableTransitionCache.
+                getUniqueSuccessorClass(source, endClass);
+              if (usucc == mUncontrollableTransitionCache.BAD_CLASS ||
+                  (usucc != mUncontrollableTransitionCache.NO_CLASS &&
+                   usucc != stateClass)) {
+                continue;
+              }
               // Otherwise just explore ...
               final SearchRecord next = new SearchRecord(source, null, false);
               addSearchRecord(next, open, visited);
@@ -860,17 +889,28 @@ public class SynthesisObservationEquivalenceTRSimplifier
       }
     }
 
-    private void splitUsingOverflowList()
+    /**
+     * Splits this class if necessary.
+     * This method checks the overflow list of this class, and splits
+     * off a new class if necessary.
+     * @return <CODE>true</CODE> if the class has been split,
+     *         <CODE>false</CODE> otherwise.
+     */
+    private boolean splitUsingOverflowList()
     {
+      final boolean split;
       if (mOverflowSize <= 0) {
-        return;
+        return false;
       } else if (mOverflowSize == getSize()) {
         mList = mOverflowList;
+        split = false;
       } else {
         doSimpleSplit(mOverflowList, mOverflowSize, mOverflowSize >= 0);
+        split = true;
       }
       mOverflowSize = 0;
       mOverflowList = IntListBuffer.NULL;
+      return split;
     }
 
     //#######################################################################
@@ -1031,118 +1071,191 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class UncontrollableTransitionStorage
+  //# Inner Class UncontrollableTransitionCache
   /**
-   * <P>Auxiliary class to store local uncontrollable transitions.</P>
+   * <P>Auxiliary class for caching of uncontrollable successors.</P>
    *
-   * <P>Stores for each state the list of successor states reached by
-   * some local uncontrollable transition, excluding selfloops and
-   * duplicates. States with an outgoing shared uncontrollable
-   * transition are marked specially and are not associated with any
-   * list of successor states.</P>
+   * <P>The uncontrollable transition cache is reset before processing
+   * the split on equivalence class with controllable events. For each
+   * class being split, it collects two kinds of information.</P>
    *
-   * <P>This class also implements a cache to check for states with
-   * exactly one local uncontrollable transition to a state outside of
-   * the class currently being split on, which reduces the complexity
-   * of the backwards search for weak synthesis observation equivalence.</P>
+   * <P>First, it stores the uncontrollable successor classes of the end
+   * class obtained from the full-event closure via local uncontrollable
+   * transitions. That is, it stores for a given uncontrollable event
+   * <I>u</I>, the set of a classes [<I>y</I>] that can be reached by <I>u</I>
+   * when it is possibly preceded and/or succeeded by some local
+   * uncontrollable events. The information is stored in hash set of
+   * event-class pairs (<I>u</I>, [<I>y</I>]), which are computed on demand
+   * when the first transition with event <I>u</I> is encountered while
+   * searching.</P>
+   *
+   * <P>Second, the cache stores for each state whether there is exactly one
+   * class of states reachable by local uncontrollable transitions, which
+   * is different from the class of the state and the class currently being
+   * split on. This class is compared with the class of the target state
+   * of a transition encountered in the backwards search for the second
+   * path. This information is computed on demand when a state is first
+   * encountered by the backwards search.</P>
    */
-  private class UncontrollableTransitionStorage {
+  private class UncontrollableTransitionCache {
 
     //#######################################################################
     //# Constructor
-    private UncontrollableTransitionStorage()
+    private UncontrollableTransitionCache()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
-      mLists = new int[numStates];
-      final int empty = mListBuffer.createList();
-      int state;
-      for (state = 0; state < numStates; state++) {
-        mLists[state] = empty;
-      }
-      int ecount = numStates;
-      for (state = 0; state < numStates; state++) {
-        mPredecessorIterator.resetState(state);
-        mPredecessorIterator.resetEvents(mLastLocalControllableEvent + 1,
-                                         mLastSharedUncontrollableEvent);
-        while (mPredecessorIterator.advance()) {
-          final int pred = mPredecessorIterator.getCurrentSourceState();
-          if (mLists[pred] == empty) {
-            mLists[pred] = IntListBuffer.NULL;
-            ecount--;
-          }
-        }
-      }
-      for (state = 0; state < numStates; state++) {
-        mPredecessorIterator.resetState(state);
-        mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
-                                         mLastLocalUncontrollableEvent);
-        while (mPredecessorIterator.advance()) {
-          final int pred = mPredecessorIterator.getCurrentSourceState();
-          if (pred == state) {
-            continue;
-          }
-          int list = mLists[pred];
-          if (list == IntListBuffer.NULL) {
-            continue;
-          } else if (list == empty) {
-            mLists[pred] = list = mListBuffer.createList();
-            mListBuffer.prepend(list, state);
-            ecount--;
-          } else {
-            mListBuffer.prependUnique(list, state);
-          }
-        }
-      }
-      if (ecount == 0) {
-        mListBuffer.dispose(empty);
-      }
-      mIterator = mListBuffer.createReadOnlyIterator();
+      final int limit = getTransitionLimit();
+      mUncontrollableSuccessorsTauClosure =
+        rel.createSuccessorsTauClosure(EventEncoding.NONTAU,
+                                       mLastLocalUncontrollableEvent,
+                                       limit);
+      mTauClosureIterator =
+        mUncontrollableSuccessorsTauClosure.createIterator();
+      mPostEventClosureIterator =
+        mUncontrollableSuccessorsTauClosure.createPostEventClosureIterator();
+      mFullEventClosureIterator =
+        mUncontrollableSuccessorsTauClosure.createFullEventClosureIterator();
+      mClassReadIterator = mListBuffer.createReadOnlyIterator();
     }
 
     //#######################################################################
     //# Cache Access
     /**
-     * Gets a unique uncontrollable successor of a given state.
-     * This method first checks whether the given source state
-     * <CODE>state</CODE> has a shared uncontrollable transition outgoing;
-     * if so, it returns {@link #MULTIPLE_SUCCESSORS}.
-     * Otherwise it checks for local uncontrollable transitions outgoing
-     * from <CODE>state</CODE> that are not selfloops, and that do not lead
-     * to a state in the given <CODE>endClass</CODE>. If there is no such
-     * transition, it returns {@link #NO_SUCCESSORS}. If there is exactly
-     * one such transition, it returns the target state of that transition.
-     * If there is more than one such transition, it returns
-     * {@link #MULTIPLE_SUCCESSORS}.
+     * <P>Gets a unique uncontrollable successor class of a given state.</P>
+     *
+     * <P>This method first checks whether the given source state
+     * <CODE>state</CODE> can execute a shared uncontrollable event
+     * (possibly preceded by local uncontrollable events) entering a
+     * class not reachable from the given <CODE>endClass</CODE> by the same
+     * shared uncontrollable event. If so, {@link #BAD_CLASS} is
+     * returned.</P>
+     *
+     * <P>Otherwise it searches the tau-closure of local uncontrollable
+     * transitions outgoing from <CODE>state</CODE> for reachable classes
+     * not equal to the the class of <CODE>state</CODE> nor to
+     * <CODE>endClass</CODE>. If there is no such class,
+     * <CODE>{@link #NO_CLASS}</CODE> is returned. If there is exactly one
+     * such class, that class is returned. If there is more than one such
+     * class, {@link #BAD_CLASS} is returned.</P>
      */
-    private int getUniqueSuccessor(final int sourceState, final int endState,
-                                   final EquivalenceClass endClass)
+    private EquivalenceClass getUniqueSuccessorClass
+      (final int state, final EquivalenceClass endClass)
     {
-      final int list = mLists[sourceState];
-      if (list == IntListBuffer.NULL) {
-        return MULTIPLE_SUCCESSORS;
+      initCache();
+      EquivalenceClass result = mUniqueSuccessorClassCache.get(state);
+      if (result != null) {
+        return result;
       }
-      if (mUniqueSuccessorCache == null) {
-        mUniqueSuccessorCache = new TIntIntHashMap();
-      } else if (mUniqueSuccessorCache.containsKey(sourceState)) {
-        return mUniqueSuccessorCache.get(sourceState);
-      }
-      mIterator.reset(list);
-      int result = NO_SUCCESSOR;
-      while (mIterator.advance()) {
-        final int succ = mIterator.getCurrentData();
-        if (mStateToClass[succ] != endClass
-            || mStateToClass[succ] != mStateToClass[endState]) {
-          if (result == NO_SUCCESSOR) {
-            result = succ;
+      final EquivalenceClass stateClass = mStateToClass[state];
+      mPostEventClosureIterator.resetEvents(mLastLocalControllableEvent + 1,
+                                            mLastSharedUncontrollableEvent);
+      mTauClosureIterator.resetState(state);
+      outer:
+      while (mTauClosureIterator.advance()) {
+        final int succ = mTauClosureIterator.getCurrentTargetState();
+        mPostEventClosureIterator.resume(succ);
+        while (mPostEventClosureIterator.advance()) {
+          final int event = mPostEventClosureIterator.getCurrentEvent();
+          final int esucc = mPostEventClosureIterator.getCurrentTargetState();
+          if (!lookupEventSuccessorCache(endClass, event, esucc)) {
+            result = BAD_CLASS;
+            break outer;
+          }
+        }
+        final EquivalenceClass succClass = mStateToClass[succ];
+        if (succClass != endClass && succClass != stateClass) {
+          if (result == null) {
+            result = succClass;
           } else {
-            mUniqueSuccessorCache.put(sourceState, MULTIPLE_SUCCESSORS);
-            return MULTIPLE_SUCCESSORS;
+            result = BAD_CLASS;
           }
         }
       }
-      mUniqueSuccessorCache.put(sourceState, result);
+      if (result == null) {
+        result = NO_CLASS;
+      }
+      mUniqueSuccessorClassCache.put(state, result);
       return result;
+    }
+
+    /**
+     * Initialises the cache used by the
+     * {@link #getUniqueSuccessor(int,EquivalenceClass) getUniqueSuccessor()}
+     * method if not yet initialised. This method is called automatically.
+     */
+    private void initCache()
+    {
+      if (mUniqueSuccessorClassCache == null) {
+        mUniqueSuccessorClassCache = new TIntObjectHashMap<EquivalenceClass>();
+        mEventSuccessorCache = new TLongHashSet();
+      }
+    }
+
+    /**
+     * Initialises the cache of uncontrollable successors for the given
+     * class and event, if not yet initialised. This method is called
+     * automatically.
+     * @param endClass
+     *          The class currently being split on.
+     * @param event
+     *          The shared uncontrollable event being checked.
+     */
+    private void initEventCache(final EquivalenceClass endClass,
+                                final int event)
+    {
+      // Have we done this already for this class and event?
+      final long eshift = ((long) event) << 32;
+      final long ecode = 0xffffffffL | eshift;
+      if (mEventSuccessorCache.add(ecode)) {
+        mFullEventClosureIterator.resetEvent(event);
+        for (int pass = 1; pass <= 2; pass++) {
+          // For all states in endClass, normal or in overflow list ...
+          if (pass == 1) {
+            endClass.reset(mClassReadIterator);
+          } else if (!endClass.resetOverflowList(mClassReadIterator)) {
+            break;
+          }
+          while (mClassReadIterator.advance()) {
+            final int state = mClassReadIterator.getCurrentData();
+            // For all successors in tau-closure of event ...
+            mFullEventClosureIterator.resume(state);
+            while (mFullEventClosureIterator.advance()) {
+              // Add transition to cache ...
+              final int succ =
+                mFullEventClosureIterator.getCurrentTargetState();
+              final EquivalenceClass succClass = mStateToClass[succ];
+              final int succCode = succClass.getSmallestState();
+              final long code = succCode | eshift;
+              mEventSuccessorCache.add(code);
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     * Checks for the existence of a shared uncontrollable transition in the
+     * full-event closure from the class currently being split to class of
+     * a given successor state.
+     * @param endClass
+     *          The class currently being split on.
+     * @param event
+     *          The shared uncontrollable event being checked.
+     * @param succ
+     *          The successor state to be checked.
+     * @return <CODE>true</CODE> if a such a transition exists,
+     *         <CODE>false</CODE> otherwise.
+     */
+    private boolean lookupEventSuccessorCache(final EquivalenceClass endClass,
+                                              final int event,
+                                              final int succ)
+    {
+      initEventCache(endClass, event);
+      final EquivalenceClass succClass = mStateToClass[succ];
+      final int succCode = succClass.getSmallestState();
+      final long eshift = ((long) event) << 32;
+      final long code = succCode | eshift;
+      return mEventSuccessorCache.contains(code);
     }
 
     /**
@@ -1151,16 +1264,42 @@ public class SynthesisObservationEquivalenceTRSimplifier
      * method. The cache needs to be cleared when starting to split on a
      * new end class.
      */
-    private void clearUniqueSuccessorCache()
+    private void clearCache()
     {
-      mUniqueSuccessorCache = null;
+      mUniqueSuccessorClassCache = null;
+      mEventSuccessorCache = null;
     }
 
     //#######################################################################
     //# Data Members
-    private final int[] mLists;
-    private final IntListBuffer.ReadOnlyIterator mIterator;
-    private TIntIntHashMap mUniqueSuccessorCache;
+    private final TauClosure mUncontrollableSuccessorsTauClosure;
+    private final TransitionIterator mTauClosureIterator;
+    private final TransitionIterator mPostEventClosureIterator;
+    private final TransitionIterator mFullEventClosureIterator;
+    private final IntListBuffer.ReadOnlyIterator mClassReadIterator;
+    private TIntObjectHashMap<EquivalenceClass> mUniqueSuccessorClassCache;
+    private TLongHashSet mEventSuccessorCache;
+
+    //#######################################################################
+    //# Class Constants
+    /**
+     * Dummy equivalence class used as a result from {@link
+     * #getUniqueSuccessorClass(int, EquivalenceClass)
+     * getUniqueSuccessorClass()} to indicate that a state has no
+     * local uncontrollable successors outside of its own class or the
+     * class currently being split on.
+     */
+    private final EquivalenceClass NO_CLASS = new EquivalenceClass(this);
+    /**
+     * Dummy equivalence class used as a result from {@link
+     * #getUniqueSuccessorClass(int, EquivalenceClass)
+     * getUniqueSuccessorClass()} to indicate that a state has shared
+     * uncontrollable transitions outgoing that do not match the class
+     * currently being split on, or local uncontrollable successors in
+     * more than one class besides of its own class and the class currently
+     * being split on.
+     */
+    private final EquivalenceClass BAD_CLASS = new EquivalenceClass(this);
   }
 
 
@@ -1209,7 +1348,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
   private TransitionIterator mPredecessorIterator;
   private TransitionIterator mUncontrollableTauIterator;
   private TransitionIterator mUncontrollableEventIterator;
-  private UncontrollableTransitionStorage mUncontrollableTransitionStorage;
+  private UncontrollableTransitionCache mUncontrollableTransitionCache;
   private IntListBuffer mListBuffer;
   private IntListBuffer.ReadOnlyIterator mClassReadIterator;
   private IntListBuffer.ModifyingIterator mClassWriteIterator;
@@ -1218,20 +1357,4 @@ public class SynthesisObservationEquivalenceTRSimplifier
   private Queue<EquivalenceClass> mSplitters;
   private TIntArrayList mTempClass;
 
-
-  //#########################################################################
-  //# Class Constants
-  /**
-   * Constant indicating a state with no uncontrollable successor.
-   * @see UncontrollableTransitionStorage#getUniqueSuccessor(int,EquivalenceClass)
-   *      getUniqueSuccessor()
-   */
-  private static final int NO_SUCCESSOR = -1;
-  /**
-   * Constant indicating a state with a shared uncontrollable successor,
-   * or multiple local uncontrollable successors.
-   * @see UncontrollableTransitionStorage#getUniqueSuccessor(int,EquivalenceClass)
-   *      getUniqueSuccessor()
-   */
-  private static final int MULTIPLE_SUCCESSORS = -2;
 }

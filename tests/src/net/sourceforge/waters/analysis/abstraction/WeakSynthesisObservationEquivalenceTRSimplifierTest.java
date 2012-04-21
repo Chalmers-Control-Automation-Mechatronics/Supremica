@@ -150,7 +150,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_1.wmod";
+    final String name = "soe01.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -159,7 +159,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_2.wmod";
+    final String name = "soe02.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -168,7 +168,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_3.wmod";
+    final String name = "soe03.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -177,7 +177,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_4.wmod";
+    final String name = "soe04.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -186,7 +186,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_5.wmod";
+    final String name = "soe05.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -195,7 +195,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_6.wmod";
+    final String name = "soe06.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -204,7 +204,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_7.wmod";
+    final String name = "soe07.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -212,7 +212,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_8.wmod";
+    final String name = "soe08.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -220,7 +220,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_9.wmod";
+    final String name = "soe09.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -228,7 +228,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_10.wmod";
+    final String name = "soe10.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -236,7 +236,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_11.wmod";
+    final String name = "soe11.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -244,7 +244,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_12.wmod";
+    final String name = "soe12.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -252,7 +252,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_13.wmod";
+    final String name = "wsoe13.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -260,7 +260,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_14.wmod";
+    final String name = "soe14.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -268,7 +268,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_15.wmod";
+    final String name = "soe15.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -276,7 +276,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_16.wmod";
+    final String name = "soe16.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -284,7 +284,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_17.wmod";
+    final String name = "soe17.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -292,7 +292,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_18.wmod";
+    final String name = "wsoe18.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -300,7 +300,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_19.wmod";
+    final String name = "wsoe19.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -308,7 +308,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_20.wmod";
+    final String name = "wsoe20.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -316,7 +316,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_21.wmod";
+    final String name = "soe21.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -324,7 +324,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_22.wmod";
+    final String name = "wsoe22.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -332,7 +332,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_23.wmod";
+    final String name = "soe23.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -340,7 +340,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_24.wmod";
+    final String name = "soe24.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -348,7 +348,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_25.wmod";
+    final String name = "soe25.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -356,7 +356,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_26.wmod";
+    final String name = "soe26.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -364,7 +364,47 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "synthesisAbstraction_27.wmod";
+    final String name = "soe27.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_28() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "wsoe28.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_29() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "soe29.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_30() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "soe30.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_31() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "wsoe31.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_32() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "soe32.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
