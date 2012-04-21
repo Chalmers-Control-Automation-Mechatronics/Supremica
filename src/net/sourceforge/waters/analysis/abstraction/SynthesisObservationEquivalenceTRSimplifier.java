@@ -59,7 +59,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  */
 
 public class SynthesisObservationEquivalenceTRSimplifier
-  extends AbstractMarkingTRSimplifier
+  extends AbstractSynthesisTRSimplifier
 {
 
   //#########################################################################
@@ -108,74 +108,6 @@ public class SynthesisObservationEquivalenceTRSimplifier
     return mTransitionLimit;
   }
 
-  /**
-   * Sets the code of the last local uncontrollable event. Events are encoded
-   * such that all local events appear before all shared events, and all
-   * uncontrollable local events appear before controllable local events. The
-   * tau event code ({@link EventEncoding#TAU} is not used. Therefore, the
-   * range of uncontrollable local events is from {@link EventEncoding#NONTAU}
-   * to {@link #getLastLocalUncontrollableEvent()} inclusive.
-   */
-  public void setLastLocalUncontrollableEvent(final int event)
-  {
-    mLastLocalUncontrollableEvent = event;
-  }
-
-  /**
-   * Gets the code of the last local uncontrollable event.
-   *
-   * @see #setLastLocalUncontrollableEvent(int) setLastLocalUncontrollableEvent()
-   */
-  public int getLastLocalUncontrollableEvent()
-  {
-    return mLastLocalUncontrollableEvent;
-  }
-
-  /**
-   * Sets the code of the last local controllable event. Events are encoded
-   * such that all local events appear before all shared events, and all
-   * uncontrollable local events appear before controllable local events.
-   * Therefore, the range of controllable local events is from
-   * {@link #getLastLocalUncontrollableEvent()}+1 to
-   * {@link #getLastLocalControllableEvent()} inclusive.
-   */
-  public void setLastLocalControllableEvent(final int event)
-  {
-    mLastLocalControllableEvent = event;
-  }
-
-  /**
-   * Gets the code of the last local controllable event.
-   *
-   * @see #setLastLocalControllableEvent(int) setLastLocalControllableEvent()
-   */
-  public int getLastLocalControllableEvent()
-  {
-    return mLastLocalControllableEvent;
-  }
-
-  /**
-   * Sets the code of the last shared uncontrollable event. Events are encoded
-   * such that all local events appear before all shared events, and all
-   * uncontrollable local events appear before controllable events.
-   * Therefore, the range of uncontrollable shared events is from
-   * {@link #getLastLocalControllableEvent()}+1 to
-   * {@link #getLastSharedUncontrollableEvent()} inclusive.
-   */
-  public void setLastSharedUncontrollableEvent(final int event)
-  {
-    mLastSharedUncontrollableEvent = event;
-  }
-
-  /**
-   * Gets the code of the last shared uncontrollable event.
-   *
-   * @see #setLastSharedUncontrollableEvent(int) setLastSharedUncontrollableEvent()
-   */
-  public int getLastSharedUncontrollableEvent()
-  {
-    return mLastSharedUncontrollableEvent;
-  }
 
   /**
    * Enables or disables weak synthesis observation equivalence.
@@ -219,7 +151,6 @@ public class SynthesisObservationEquivalenceTRSimplifier
     reset();
     super.setTransitionRelation(rel);
     mNumReachableStates = rel.getNumberOfReachableStates();
-    mNumEvents = rel.getNumberOfProperEvents();
   }
 
   @Override
@@ -341,15 +272,16 @@ public class SynthesisObservationEquivalenceTRSimplifier
       mUncontrollableTauClosure = null;
       mUncontrollableTauIterator = null;
       mUncontrollableEventIterator = null;
-      final ListBufferTransitionRelation copy = new ListBufferTransitionRelation
-        (rel,ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final ListBufferTransitionRelation copy =
+        new ListBufferTransitionRelation
+          (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       super.applyResultPartition();
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();
-      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      if (!rel.isDeterministic()) {
-        mOriginalTransitionRelation = copy;
-      }
+      // TODO Only need to keep original of the first synthesis abstraction,
+      // and only when this or some later abstraction is nondeterministic.
+      // Can we somehow save memory here?
+      mOriginalTransitionRelation = copy;
     } else {
       if (mHasModifications) {
         rel.removeProperSelfLoopEvents();
@@ -418,8 +350,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final int limit = getTransitionLimit();
       mUncontrollableTauClosure =
-        rel.createPredecessorsTauClosure(EventEncoding.NONTAU, mLastLocalUncontrollableEvent,
-                                         limit);
+        createLocalUncontrollablePredecessorsTauClosure(limit);
       mPredecessorIterator = rel.createPredecessorsReadOnlyIterator();
       mUncontrollableTauIterator =
         new OneEventCachingTransitionIterator
@@ -648,10 +579,15 @@ public class SynthesisObservationEquivalenceTRSimplifier
       mIsOpenSplitter = false;
       collect(mTempClass);
 
+      // Event codes
+      final int lastLocal =  getLastLocalControllableEvent();
+      final int firstShared = lastLocal + 1;
+      final int lastSharedUncont = getLastSharedUncontrollableEvent();
+      final int firstSharedCont = lastSharedUncont + 1;
+      final int lastSharedCont = getLastSharedControllableEvent();
+
       // Uncontrollable shared events
-      for (int event = mLastLocalControllableEvent + 1;
-           event <= mLastSharedUncontrollableEvent;
-           event++) {
+      for (int event = firstShared; event <= lastSharedUncont; event++) {
         if (rel.isUsedEvent(event)) {
           final TransitionIterator transIter = mUncontrollableEventIterator;
           transIter.resetEvent(event);
@@ -665,8 +601,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
       splitOn(transIter);
 
       // Controllable shared events
-      for (int event = mLastSharedUncontrollableEvent + 1;
-           event < mNumEvents; event++) {
+      for (int event = firstSharedCont; event <= lastSharedCont; event++) {
         if (rel.isUsedEvent(event)) {
           splitOnControllable(event);
         }
@@ -676,7 +611,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
         splitOnControllable(EventEncoding.TAU);
       }
       // Controllable local events
-      splitOnControllable(mLastLocalControllableEvent);
+      splitOnControllable(lastLocal);
 
       mTempClass.clear();
       if (mWeak) {
@@ -714,8 +649,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
     {
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final EquivalenceClass endClass = mStateToClass[endState];
-      final boolean local =
-        event > EventEncoding.TAU && event <= mLastLocalControllableEvent;
+      final boolean local = isLocal(event);
       // For SOE, search for local events starts on first part of path,
       // every other search starts on second part of path ...
       final SearchRecord initial =
@@ -742,8 +676,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
             // state's class is or can be made the starting class ...
             final EquivalenceClass controllableStartClass =
               local && stateClass == endClass ? null : stateClass;
-            mPredecessorIterator.resetEvents(mLastLocalUncontrollableEvent + 1,
-                                             mLastLocalControllableEvent);
+            iterateLocalControllable(mPredecessorIterator);
             while (mPredecessorIterator.advance()) {
               final int source = mPredecessorIterator.getCurrentSourceState();
               final SearchRecord next =
@@ -752,8 +685,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
             }
           }
           // Visit predecessors for all local uncontrollable transitions ...
-          mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
-                                           mLastLocalUncontrollableEvent);
+          iterateLocalUncontrollable(mPredecessorIterator);
           while (mPredecessorIterator.advance()) {
             final int source = mPredecessorIterator.getCurrentSourceState();
             final SearchRecord next =
@@ -765,8 +697,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
           if (mWeak) {
             // For weak synthesis observation equivalence,
             // visit predecessors for all local transitions ...
-            mPredecessorIterator.resetEvents(EventEncoding.NONTAU,
-                                             mLastLocalControllableEvent);
+            iterateLocal(mPredecessorIterator);
             while (mPredecessorIterator.advance()) {
               final int source = mPredecessorIterator.getCurrentSourceState();
               final EquivalenceClass sourceClass = mStateToClass[source];
@@ -1103,12 +1034,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
     //# Constructor
     private UncontrollableTransitionCache()
     {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
       final int limit = getTransitionLimit();
       mUncontrollableSuccessorsTauClosure =
-        rel.createSuccessorsTauClosure(EventEncoding.NONTAU,
-                                       mLastLocalUncontrollableEvent,
-                                       limit);
+        createLocalUncontrollableSuccessorsTauClosure(limit);
       mTauClosureIterator =
         mUncontrollableSuccessorsTauClosure.createIterator();
       mPostEventClosureIterator =
@@ -1147,8 +1075,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
         return result;
       }
       final EquivalenceClass stateClass = mStateToClass[state];
-      mPostEventClosureIterator.resetEvents(mLastLocalControllableEvent + 1,
-                                            mLastSharedUncontrollableEvent);
+      iterateSharedUncontrollable(mPostEventClosureIterator);
       mTauClosureIterator.resetState(state);
       outer:
       while (mTauClosureIterator.advance()) {
@@ -1312,34 +1239,13 @@ public class SynthesisObservationEquivalenceTRSimplifier
    */
   private int mTransitionLimit = Integer.MAX_VALUE;
   /**
-   * The code of the last local uncontrollable event.
-   * Local uncontrollable events are thus stored in the range from
-   * {@link EventEncoding#NONTAU} to mLastLocalUncontrollableEvent.
-   */
-  private int mLastLocalUncontrollableEvent;
-  /**
-   * The code of the last local controllable event.
-   * Local controllable events are thus stored in the range from
-   * {@link #mLastLocalUncontrollableEvent}+1 to
-   * mLastLocalControllableEvent.
-   */
-  private int mLastLocalControllableEvent;
-  /**
-   * The code of the last shared uncontrollable event.
-   * Shared uncontrollable events are thus stored in the range from
-   * {@link #mLastLocalControllableEvent}+1 to
-   * mLastSharedUncontrollableEvent.
-   */
-  private int mLastSharedUncontrollableEvent;
-  /**
-   * Whether or not weak synthesis observation equivalence is used
+   * Whether or not weak synthesis observation equivalence is used.
    */
   private boolean mWeak = true;
 
   private ListBufferTransitionRelation mOriginalTransitionRelation;
 
   private int mNumReachableStates;
-  private int mNumEvents;
   private int mNumClasses;
   private boolean mHasModifications;
 

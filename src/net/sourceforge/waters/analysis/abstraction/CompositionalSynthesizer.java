@@ -220,11 +220,44 @@ public class CompositionalSynthesizer
     return mDefaultMarking;
   }
 
+  /**
+   * <P>Specifies the abstraction methods used in the abstraction chain.</P>
+   *
+   * <P>The abstraction chain defines the methods used to simplify automata
+   * during compositional minimisation. Then chain is specified by flags,
+   * that indicate whether or not a particular method is used.</P>
+   *
+   * <P>The order of abstraction is predefined: first halfway synthesis,
+   * then bisimulation, then synthesis observation equivalence,
+   * and finally weak synthesis observation equivalence, if these methods
+   * are included. The default setting is {@link #CHAIN_WSOE}, which includes
+   * all methods except synthesis observation equivalence.</P>
+   *
+   * @param  methods
+   *           An integer combination of flags specifying which abstraction
+   *           methods are in the chain. For example use
+   *           {@link #USE_HALFWAY}&nbsp;|&nbsp;{@link #USE_BISIMULATION} to
+   *           specify an abstraction sequence that performs only halfway
+   *           synthesis and bisimulation.
+   *
+   * @see #USE_HALFWAY
+   * @see #USE_BISIMULATION
+   * @see #USE_SOE
+   * @see #USE_WSOE
+   * @see #CHAIN_SOE
+   * @see #CHAIN_WSOE
+   * @see #CHAIN_ALL
+   */
   public void setUsedAbstractionMethods(final int methods)
   {
     mUsedAbstractionMethods = methods;
   }
 
+  /**
+   * Gets the combination of abstraction methods used in the abstraction
+   * chain.
+   * @see #setUsedAbstractionMethods(int) setUsedAbstractionMethods()
+   */
   public int getUsedAbstractionMethods()
   {
     return mUsedAbstractionMethods;
@@ -278,38 +311,32 @@ public class CompositionalSynthesizer
     setPropositions(props);
 
     final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final HalfWaySynthesisTRSimplifier halfWay;
     if ((mUsedAbstractionMethods & USE_HALFWAY) != 0) {
-      halfWay = new HalfWaySynthesisTRSimplifier();
+      final HalfWaySynthesisTRSimplifier halfWay =
+        new HalfWaySynthesisTRSimplifier();
       chain.add(halfWay);
-    } else {
-      halfWay = null;
     }
     if ((mUsedAbstractionMethods & USE_BISIMULATION) != 0) {
-      final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier();
-      bisimulator.setEquivalence
-        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+      final TransitionRelationSimplifier bisimulator =
+        new BisimulationTRSimplifier();
       chain.add(bisimulator);
     }
-    final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction;
-    if ((mUsedAbstractionMethods & USE_WSOE) != 0) {
-      synthesisAbstraction = new SynthesisObservationEquivalenceTRSimplifier();
-      final int limit = getInternalTransitionLimit();
-      synthesisAbstraction.setTransitionLimit(limit);
-      synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(true);
-      chain.add(synthesisAbstraction);
-    } else if ((mUsedAbstractionMethods & USE_SOE) != 0) {
-      synthesisAbstraction = new SynthesisObservationEquivalenceTRSimplifier();
-      final int limit = getInternalTransitionLimit();
+    final int limit = getInternalTransitionLimit();
+    if ((mUsedAbstractionMethods & USE_SOE) != 0) {
+      final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction =
+        new SynthesisObservationEquivalenceTRSimplifier();
       synthesisAbstraction.setTransitionLimit(limit);
       synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(false);
       chain.add(synthesisAbstraction);
-    } else {
-      synthesisAbstraction = null;
     }
-    final AbstractionProcedure proc =
-      new SynthesisAbstractionProcedure(chain, halfWay, synthesisAbstraction);
+    if ((mUsedAbstractionMethods & USE_WSOE) != 0) {
+      final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction =
+        new SynthesisObservationEquivalenceTRSimplifier();
+      synthesisAbstraction.setTransitionLimit(limit);
+      synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(true);
+      chain.add(synthesisAbstraction);
+    }
+    final AbstractionProcedure proc = new SynthesisAbstractionProcedure(chain);
     setAbstractionProcedure(proc);
 
     mDistinguisherInfoList = new LinkedList<DistinguisherInfo> ();
@@ -1164,14 +1191,9 @@ public class CompositionalSynthesizer
   {
     //#######################################################################
     //# Constructor
-    protected SynthesisAbstractionProcedure
-      (final TransitionRelationSimplifier simplifier,
-       final HalfWaySynthesisTRSimplifier halfWaySynthesisSimplifier,
-       final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction)
+    protected SynthesisAbstractionProcedure(final ChainTRSimplifier chain)
     {
-      mSimplifier = simplifier;
-      mSynthesisAbstraction = synthesisAbstraction;
-      mHalfWaySynthesisSimplifier = halfWaySynthesisSimplifier;
+      mChain = chain;
     }
 
     //#######################################################################
@@ -1181,19 +1203,18 @@ public class CompositionalSynthesizer
                                   final Collection<EventProxy> local)
       throws AnalysisException
     {
-      final TransitionRelationSimplifier simplifier = getSimplifier();
       try {
         final EventEncoding eventEnc = createEventEncoding(aut, local);
         final StateEncoding inputStateEnc = createStateEncoding(aut);
-        final int config = simplifier.getPreferredInputConfiguration();
+        final int config = mChain.getPreferredInputConfiguration();
         final ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);
         final int numStates = rel.getNumberOfReachableStates();
         final int numTrans = rel.getNumberOfTransitions();
         final int numMarkings = rel.getNumberOfMarkings();
-        simplifier.setTransitionRelation(rel);
-        if (simplifier.run()) {
+        mChain.setTransitionRelation(rel);
+        if (mChain.run()) {
           if (rel.getNumberOfReachableStates() == numStates &&
               rel.getNumberOfTransitions() == numTrans &&
               rel.getNumberOfMarkings() == numMarkings) {
@@ -1224,7 +1245,7 @@ public class CompositionalSynthesizer
           return null;
         }
       } finally {
-        simplifier.reset();
+        mChain.reset();
       }
     }
 
@@ -1232,32 +1253,25 @@ public class CompositionalSynthesizer
     protected void storeStatistics()
     {
       final CompositionalSynthesisResult result = getAnalysisResult();
-      result.setSimplifierStatistics(mSimplifier);
+      result.setSimplifierStatistics(mChain);
     }
 
     @Override
     protected void resetStatistics()
     {
-      mSimplifier.createStatistics();
+      mChain.createStatistics();
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.analysis.Abortable
     public void requestAbort()
     {
-      mSimplifier.requestAbort();
+      mChain.requestAbort();
     }
 
     public boolean isAborting()
     {
-      return mSimplifier.isAborting();
-    }
-
-    //#######################################################################
-    //# Simple Access
-    protected TransitionRelationSimplifier getSimplifier()
-    {
-      return mSimplifier;
+      return mChain.isAborting();
     }
 
     //#######################################################################
@@ -1324,27 +1338,23 @@ public class CompositionalSynthesizer
       final EventEncoding encoding =
         new EventEncoding(encodedEvents, translator, filter,
                           EventEncoding.FILTER_PROPOSITIONS);
-      if (mSynthesisAbstraction != null) {
-        mSynthesisAbstraction.setLastLocalControllableEvent
-          (lastLocalControllableEvent);
-        mSynthesisAbstraction.setLastLocalUncontrollableEvent
-          (lastLocalUncontrollableEvent);
-        mSynthesisAbstraction.setLastSharedUncontrollableEvent
-          (lastSharedUncontrollableEvent);
-        mSynthesisAbstraction.setDefaultMarkingID
-          (encoding.getEventCode(mUsedDefaultMarking));
-      }
-      if (mHalfWaySynthesisSimplifier != null) {
-        mHalfWaySynthesisSimplifier.setLastLocalUncontrollableEvent
-          (lastLocalUncontrollableEvent);
-        mHalfWaySynthesisSimplifier.setLastLocalControllableEvent
-          (lastLocalControllableEvent);
-        mHalfWaySynthesisSimplifier.setLastSharedUncontrollableEvent
-          (lastSharedUncontrollableEvent);
-        mHalfWaySynthesisSimplifier.setDefaultMarkingID
-          (encoding.getEventCode(mUsedDefaultMarking));
-        final TIntHashSet renamed = getRenamedControllables(encoding);
-        mHalfWaySynthesisSimplifier.setRenamedEvents(renamed);
+      final int defaultMarkingID = encoding.getEventCode(mUsedDefaultMarking);
+      mChain.setDefaultMarkingID(defaultMarkingID);
+      for (int index = 0; index < mChain.size(); index++) {
+        final TransitionRelationSimplifier step = mChain.getStep(index);
+        if (step instanceof AbstractSynthesisTRSimplifier) {
+          final AbstractSynthesisTRSimplifier simp =
+            (AbstractSynthesisTRSimplifier) step;
+          simp.setLastLocalControllableEvent(lastLocalControllableEvent);
+          simp.setLastLocalUncontrollableEvent(lastLocalUncontrollableEvent);
+          simp.setLastSharedUncontrollableEvent(lastSharedUncontrollableEvent);
+          if (simp instanceof HalfWaySynthesisTRSimplifier) {
+            final HalfWaySynthesisTRSimplifier halfWay =
+              (HalfWaySynthesisTRSimplifier) simp;
+            final TIntHashSet renamed = getRenamedControllables(encoding);
+            halfWay.setRenamedEvents(renamed);
+          }
+        }
       }
       return encoding;
     }
@@ -1358,37 +1368,80 @@ public class CompositionalSynthesizer
 
     private ListBufferTransitionRelation getOriginalTransitionRelation()
     {
-      if (mSynthesisAbstraction == null) {
-        return null;
-      } else {
-        return mSynthesisAbstraction.getOriginalTransitionRelation();
+      for (int index = 0; index < mChain.size(); index++) {
+        final TransitionRelationSimplifier step = mChain.getStep(index);
+        if (step instanceof SynthesisObservationEquivalenceTRSimplifier) {
+          final SynthesisObservationEquivalenceTRSimplifier soe =
+            (SynthesisObservationEquivalenceTRSimplifier) step;
+          final ListBufferTransitionRelation result =
+            soe.getOriginalTransitionRelation();
+          if (result != null) {
+            return result;
+          }
+        }
       }
-    }
-
-    private ListBufferTransitionRelation getPseudoSupervisor()
-    {
-      if (mHalfWaySynthesisSimplifier == null) {
-        return null;
-      } else {
-        return mHalfWaySynthesisSimplifier.getPseudoSupervisor();
-      }
+      return null;
     }
 
     private List<int[]> getResultPartition()
     {
-      if (mSynthesisAbstraction == null) {
-        return null;
-      } else {
-        return mSynthesisAbstraction.getResultPartition();
+      return mChain.getResultPartition();
+    }
+
+    private ListBufferTransitionRelation getPseudoSupervisor()
+    {
+      for (int index = 0; index < mChain.size(); index++) {
+        final TransitionRelationSimplifier step = mChain.getStep(index);
+        if (step instanceof HalfWaySynthesisTRSimplifier) {
+          final HalfWaySynthesisTRSimplifier halfWay =
+            (HalfWaySynthesisTRSimplifier) step;
+          return halfWay.getPseudoSupervisor();
+        }
       }
+      return null;
     }
 
     //#######################################################################
     //# Data Members
-    private final TransitionRelationSimplifier mSimplifier;
-    private final SynthesisObservationEquivalenceTRSimplifier
-      mSynthesisAbstraction;
-    private final HalfWaySynthesisTRSimplifier mHalfWaySynthesisSimplifier;
+    private final ChainTRSimplifier mChain;
+  }
+
+
+  //#########################################################################
+  //# Inner Class BisimulationTRSimplifier
+  /**
+   * A specialised observation equivalence simplifier for use only in
+   * synthesis. This is used for bisimulation abstraction before
+   * synthesis observation equivalence.
+   */
+  private static class BisimulationTRSimplifier
+    extends ObservationEquivalenceTRSimplifier
+  {
+    //#######################################################################
+    //# Constructor
+    private BisimulationTRSimplifier()
+    {
+      setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+    @Override
+    /**
+     * Destructively applies the computed partitioning to the simplifier's
+     * transition relation. After applying the partition, this implementation
+     * removes the result partition from the simplifier, pretending to the
+     * chain that no partition was computed. In this way, the partition
+     * computed from the chain will only include the synthesis observation
+     * equivalence steps.
+     */
+    protected void applyResultPartition() throws AnalysisException
+    {
+      super.applyResultPartition();
+      setResultPartitionList(null);
+    }
   }
 
 
@@ -1537,7 +1590,7 @@ public class CompositionalSynthesizer
   private boolean mConstructsResult = true;
   private EventProxy mDefaultMarking;
   private EventProxy mUsedDefaultMarking;
-  private int mUsedAbstractionMethods = USE_ALL;
+  private int mUsedAbstractionMethods = CHAIN_ALL;
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
@@ -1545,11 +1598,47 @@ public class CompositionalSynthesizer
 
   //#########################################################################
   //# Class Constants
+  /**
+   * Flag to include halfway synthesis in abstraction chain.
+   */
   public static final int USE_HALFWAY = 0x01;
+  /**
+   * Flag to include halfway bisimulation in abstraction chain.
+   */
   public static final int USE_BISIMULATION = 0x02;
+  /**
+   * Flag to include synthesis observation equivalence in abstraction chain.
+   */
   public static final int USE_SOE = 0x04;
+  /**
+   * Flag to include weak synthesis observation equivalence in abstraction
+   * chain.
+   */
   public static final int USE_WSOE = 0x08;
-  public static final int USE_ALL =
+
+  /**
+   * Argument to {@link #setUsedAbstractionMethods(int)
+   * setUsedAbstractionMethods()} for specifying an abstraction chain
+   * consisting of halfway synthesis, bisimulation, and synthesis observation
+   * equivalence.
+   */
+  public static final int CHAIN_SOE =
+    USE_HALFWAY | USE_BISIMULATION | USE_SOE;
+  /**
+   * Argument to {@link #setUsedAbstractionMethods(int)
+   * setUsedAbstractionMethods()} for specifying an abstraction chain
+   * consisting of halfway synthesis, bisimulation, and weak synthesis
+   * observation equivalence. This is the default.
+   */
+  public static final int CHAIN_WSOE =
     USE_HALFWAY | USE_BISIMULATION | USE_WSOE;
+  /**
+   * Argument to {@link #setUsedAbstractionMethods(int)
+   * setUsedAbstractionMethods()} for specifying an abstraction chain
+   * consisting of halfway synthesis, bisimulation, synthesis observation
+   * equivalence, and weak synthesis observation equivalence.
+   */
+  public static final int CHAIN_ALL =
+    USE_HALFWAY | USE_BISIMULATION | USE_SOE | USE_WSOE;
 
 }

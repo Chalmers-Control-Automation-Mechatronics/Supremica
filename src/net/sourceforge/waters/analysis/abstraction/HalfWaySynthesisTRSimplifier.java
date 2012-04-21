@@ -13,7 +13,6 @@ import java.util.BitSet;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbortException;
@@ -30,7 +29,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  */
 
 public class HalfWaySynthesisTRSimplifier
-  extends AbstractMarkingTRSimplifier
+  extends AbstractSynthesisTRSimplifier
 {
 
   //#########################################################################
@@ -62,75 +61,6 @@ public class HalfWaySynthesisTRSimplifier
 
   //#########################################################################
   //# Configuration
-  /**
-   * Sets the code of the last local uncontrollable event. Events are encoded
-   * such that all local events appear before all shared events, and all
-   * uncontrollable local events appear before controllable local events. The
-   * tau event code ({@link EventEncoding#TAU} is not used. Therefore, the
-   * range of uncontrollable local events is from {@link EventEncoding#NONTAU}
-   * to {@link #getLastLocalUncontrollableEvent()} inclusive.
-   */
-  public void setLastLocalUncontrollableEvent(final int event)
-  {
-    mLastLocalUncontrollableEvent = event;
-  }
-
-  /**
-   * Gets the code of the last local uncontrollable event.
-   *
-   * @see #setLastLocalUncontrollableEvent(int) setLastLocalUncontrollableEvent()
-   */
-  public int getLastLocalUncontrollableEvent()
-  {
-    return mLastLocalUncontrollableEvent;
-  }
-
-  /**
-   * Sets the code of the last local controllable event. Events are encoded
-   * such that all local events appear before all shared events, and all
-   * uncontrollable local events appear before controllable local events.
-   * Therefore, the range of controllable local events is from
-   * {@link #getLastLocalUncontrollableEvent()}+1 to
-   * {@link #getLastLocalControllableEvent()} inclusive.
-   */
-  public void setLastLocalControllableEvent(final int event)
-  {
-    mLastLocalControllableEvent = event;
-  }
-
-  /**
-   * Gets the code of the last local controllable event.
-   *
-   * @see #setLastLocalControllableEvent(int) setLastLocalControllableEvent()
-   */
-  public int getLastLocalControllableEvent()
-  {
-    return mLastLocalControllableEvent;
-  }
-
-  /**
-   * Sets the code of the last shared uncontrollable event. Events are encoded
-   * such that all local events appear before all shared events, and all
-   * uncontrollable local events appear before controllable events.
-   * Therefore, the range of uncontrollable shared events is from
-   * {@link #getLastLocalControllableEvent()}+1 to
-   * {@link #getLastSharedUncontrollableEvent()} inclusive.
-   */
-  public void setLastSharedUncontrollableEvent(final int event)
-  {
-    mLastSharedUncontrollableEvent = event;
-  }
-
-  /**
-   * Gets the code of the last shared uncontrollable event.
-   *
-   * @see #setLastSharedUncontrollableEvent(int) setLastSharedUncontrollableEvent()
-   */
-  public int getLastSharedUncontrollableEvent()
-  {
-    return mLastSharedUncontrollableEvent;
-  }
-
   /**
    * Sets the set of renamed event indexes.
    * Renamed controllable events are treated specially for the benefit
@@ -336,7 +266,7 @@ public class HalfWaySynthesisTRSimplifier
     final BitSet oldBadStates = (BitSet) badStates.clone();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    iter.resetEvents(EventEncoding.NONTAU, mLastLocalUncontrollableEvent);
+    iterateLocalUncontrollable(iter);
     final TIntStack unvisited = new TIntStack();
     for (int state = oldBadStates.nextSetBit(0); state >= 0;
          state = oldBadStates.nextSetBit(state+1)) {
@@ -395,20 +325,9 @@ public class HalfWaySynthesisTRSimplifier
       mRenamedEvents.contains(event);
   }
 
-  private boolean isControllable(final int event)
-  {
-    return
-      event > mLastLocalUncontrollableEvent &&
-      event <= mLastLocalControllableEvent ||
-      event > mLastSharedUncontrollableEvent;
-  }
-
 
   //#########################################################################
   //# Data Members
-  private int mLastLocalUncontrollableEvent;
-  private int mLastLocalControllableEvent;
-  private int mLastSharedUncontrollableEvent;
   private TIntHashSet mRenamedEvents;
 
   private ListBufferTransitionRelation mPseudoSupervisor;

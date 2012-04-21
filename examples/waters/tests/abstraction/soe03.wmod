@@ -24,20 +24,20 @@ Sahar Mohajerani, Robi Malik, Simon Ware, Martin Fabian. On the Use of Observati
                             <Point Y="-16" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point Y="112" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-15" X="-27"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="q2">
                         <PointGeometry>
                             <Point Y="160" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-10" X="-27"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="q6">
-                        <PointGeometry>
-                            <Point Y="160" X="224"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="q3">
@@ -49,17 +49,6 @@ Sahar Mohajerani, Robi Malik, Simon Ware, Martin Fabian. On the Use of Observati
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-5" X="-26"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="q7">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="208" X="240"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="q4">
@@ -78,12 +67,23 @@ Sahar Mohajerani, Robi Malik, Simon Ware, Martin Fabian. On the Use of Observati
                             <Point Y="-16" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="q1">
+                    <SimpleNode Name="q6">
                         <PointGeometry>
-                            <Point Y="112" X="128"/>
+                            <Point Y="160" X="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-15" X="-27"/>
+                            <Point Y="-7" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="208" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-5" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
