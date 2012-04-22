@@ -1221,7 +1221,7 @@ public class CompositionalSynthesizer
             return null;
           }
           final ListBufferTransitionRelation original =
-            getOriginalTransitionRelation();
+            getTransitionRelationBeforeSOE(rel);
           final ListBufferTransitionRelation supervisor =
             getPseudoSupervisor();
           reportSupervisor("halfway synthesis", supervisor);
@@ -1366,7 +1366,8 @@ public class CompositionalSynthesizer
       return encoding;
     }
 
-    private ListBufferTransitionRelation getOriginalTransitionRelation()
+    private ListBufferTransitionRelation getTransitionRelationBeforeSOE
+      (final ListBufferTransitionRelation rel)
     {
       for (int index = 0; index < mChain.size(); index++) {
         final TransitionRelationSimplifier step = mChain.getStep(index);
@@ -1376,7 +1377,12 @@ public class CompositionalSynthesizer
           final ListBufferTransitionRelation result =
             soe.getOriginalTransitionRelation();
           if (result != null) {
-            return result;
+            rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+            if (rel.isDeterministic()) {
+              return null;
+            } else {
+              return result;
+            }
           }
         }
       }

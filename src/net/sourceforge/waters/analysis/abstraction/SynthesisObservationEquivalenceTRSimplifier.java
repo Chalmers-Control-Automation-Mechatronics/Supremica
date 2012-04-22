@@ -1034,13 +1034,13 @@ public class SynthesisObservationEquivalenceTRSimplifier
     //# Constructor
     private UncontrollableTransitionCache()
     {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mEventIterator = rel.createSuccessorsReadOnlyIterator();
       final int limit = getTransitionLimit();
       mUncontrollableSuccessorsTauClosure =
         createLocalUncontrollableSuccessorsTauClosure(limit);
       mTauClosureIterator =
         mUncontrollableSuccessorsTauClosure.createIterator();
-      mPostEventClosureIterator =
-        mUncontrollableSuccessorsTauClosure.createPostEventClosureIterator();
       mFullEventClosureIterator =
         mUncontrollableSuccessorsTauClosure.createFullEventClosureIterator();
       mClassReadIterator = mListBuffer.createReadOnlyIterator();
@@ -1075,15 +1075,15 @@ public class SynthesisObservationEquivalenceTRSimplifier
         return result;
       }
       final EquivalenceClass stateClass = mStateToClass[state];
-      iterateSharedUncontrollable(mPostEventClosureIterator);
+      iterateSharedUncontrollable(mEventIterator);
       mTauClosureIterator.resetState(state);
       outer:
       while (mTauClosureIterator.advance()) {
         final int succ = mTauClosureIterator.getCurrentTargetState();
-        mPostEventClosureIterator.resume(succ);
-        while (mPostEventClosureIterator.advance()) {
-          final int event = mPostEventClosureIterator.getCurrentEvent();
-          final int esucc = mPostEventClosureIterator.getCurrentTargetState();
+        mEventIterator.resume(succ);
+        while (mEventIterator.advance()) {
+          final int event = mEventIterator.getCurrentEvent();
+          final int esucc = mEventIterator.getCurrentTargetState();
           if (!lookupEventSuccessorCache(endClass, event, esucc)) {
             result = BAD_CLASS;
             break outer;
@@ -1199,9 +1199,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Data Members
+    private final TransitionIterator mEventIterator;
     private final TauClosure mUncontrollableSuccessorsTauClosure;
     private final TransitionIterator mTauClosureIterator;
-    private final TransitionIterator mPostEventClosureIterator;
     private final TransitionIterator mFullEventClosureIterator;
     private final IntListBuffer.ReadOnlyIterator mClassReadIterator;
     private TIntObjectHashMap<EquivalenceClass> mUniqueSuccessorClassCache;
