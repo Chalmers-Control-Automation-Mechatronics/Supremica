@@ -251,11 +251,13 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "koordwsp_block.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesiseCentralLockingVerriegel3b() throws Exception
   {
     runModel("valid", "synthesis_experiment", "verriegel3b.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesiseVerrigel4B() throws Exception
   {
     runModel("valid", "synthesis_experiment", "verriegel4b.wmod");
@@ -273,6 +275,7 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "aip0aip.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesisFenCaiWon09Synth() throws Exception
   {
     runModel("valid", "synthesis_experiment", "FenCaiWon09_synth.wmod");
@@ -295,6 +298,7 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
     runModel("valid", "synthesis_experiment", "tbed_ctct.wmod");
