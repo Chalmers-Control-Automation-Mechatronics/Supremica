@@ -314,7 +314,7 @@ public class CompositionalSynthesizer
     if ((mUsedAbstractionMethods & USE_HALFWAY) != 0) {
       final HalfWaySynthesisTRSimplifier halfWay =
         new HalfWaySynthesisTRSimplifier();
-      chain.add(halfWay);
+//      chain.add(halfWay);
     }
     if ((mUsedAbstractionMethods & USE_BISIMULATION) != 0) {
       final TransitionRelationSimplifier bisimulator =
@@ -585,6 +585,7 @@ public class CompositionalSynthesizer
       final MonolithicSynchronousProductBuilder syncBuilder =
         getCurrentSynchronousProductBuilder();
       final ProductDESProxy des = createProductDESProxy(automata);
+
       syncBuilder.setModel(des);
       final int slimit = getMonolithicStateLimit();
       syncBuilder.setNodeLimit(slimit);
@@ -602,6 +603,8 @@ public class CompositionalSynthesizer
     if (supervisor != null) {
       reportSupervisor("monolithic", supervisor);
       final CompositionalSynthesisResult result = getAnalysisResult();
+      result.setSynchSize(automaton.getStates().size());
+      result.setSupSize(supervisor.getNumberOfStates());
       if (supervisor.getNumberOfReachableStates() == 0) {
         result.setSatisfied(false);
         return false;

@@ -158,6 +158,9 @@ public class CompositionalSynthesizerExperiments
     final File filename = new File(dir, name);
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mSynthesizer.setModel(des);
+    mSynthesizer.setUsedAbstractionMethods
+    (CompositionalSynthesizer.USE_BISIMULATION |
+     CompositionalSynthesizer.USE_SOE);
     try {
       mSynthesizer.run();
     } catch (final AnalysisException exception) {
@@ -224,16 +227,17 @@ public class CompositionalSynthesizerExperiments
     synthesissRhoneSubPatch0();
 //    synthesissAip0Aip();
     synthesisFenCaiWon09B();
-    synthesisFenCaiWon09Synth();
+//    synthesisFenCaiWon09Synth();
     synthesissFms2003();
     synthesiseFischertechnik();
     synthesiseIPC();
+    synthesiseCentralLockingKoordwspBlock();
 //    synthesisAip0tough();
-    synthesiseTbedCtct();
+//    synthesiseTbedCtct();
     synthesiseTbedNoderailUncont();
     synthesiseTbedNoderailB();
-    synthesiseCentralLockingVerriegel3b();
-    synthesiseVerrigel4B();
+//    synthesiseCentralLockingVerriegel3b();
+//    synthesiseVerrigel4B();
 //    synthesiseFlexibleManufacturingSystem();
 //  synthesisLargestCoherent();
   }
@@ -242,7 +246,6 @@ public class CompositionalSynthesizerExperiments
   //#########################################################################
   //# Models
   // Central locking
-  @SuppressWarnings("unused")
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
     runModel("valid", "synthesis_experiment", "koordwsp_block.wmod");
