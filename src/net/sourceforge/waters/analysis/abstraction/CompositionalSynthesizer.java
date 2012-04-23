@@ -314,7 +314,7 @@ public class CompositionalSynthesizer
     if ((mUsedAbstractionMethods & USE_HALFWAY) != 0) {
       final HalfWaySynthesisTRSimplifier halfWay =
         new HalfWaySynthesisTRSimplifier();
-//      chain.add(halfWay);
+      chain.add(halfWay);
     }
     if ((mUsedAbstractionMethods & USE_BISIMULATION) != 0) {
       final TransitionRelationSimplifier bisimulator =
