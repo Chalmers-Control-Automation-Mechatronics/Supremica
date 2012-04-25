@@ -1602,7 +1602,6 @@ public class CompositionalSynthesizer
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
-  private int mSynchSize;
 
 
   //#########################################################################
