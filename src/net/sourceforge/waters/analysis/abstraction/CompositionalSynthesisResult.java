@@ -89,21 +89,6 @@ public class CompositionalSynthesisResult
     return mRenamingIsUsed;
   }
 
-   void setSynchSize (final int automatonSize) {
-     mSynchSize = automatonSize;
-   }
-
-    int getSynchSize() {
-     return mSynchSize;
-   }
-
-    void setSupSize (final int supSize) {
-      mSupSize = supSize;
-    }
-
-     int getSupSize() {
-      return mSupSize;
-    }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.DefaultAnalysisResult
@@ -134,8 +119,8 @@ public class CompositionalSynthesisResult
     writer.print("SynchSize");
     writer.print(',');
     writer.print("RenamingIsUsed");
-//    writer.print(',');
-//    writer.print("NumberOfSupervisors");
+    writer.print(',');
+    writer.print("NumberOfSupervisors");
     writer.print(',');
     writer.print("LargestSupervisor");
 
@@ -146,11 +131,11 @@ public class CompositionalSynthesisResult
   {
     super.printCSVHorizontal(writer);
     writer.print(",");
-    writer.print(getSynchSize());
+    writer.print(CompositionalSynthesizer.getSynchSize());
     writer.print(",");
     writer.print(getRenamingIsUsed());
     writer.print(",");
-    writer.print(getSupSize());
+    writer.print(mSupervisors.size());
     writer.print(",");
     int largest = 0;
     for (int i=0; i<mSupervisors.size(); i++){

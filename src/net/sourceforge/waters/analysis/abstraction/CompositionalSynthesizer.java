@@ -263,6 +263,10 @@ public class CompositionalSynthesizer
     return mUsedAbstractionMethods;
   }
 
+  public static int getSynchSize() {
+    return mSynchSize;
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -603,8 +607,7 @@ public class CompositionalSynthesizer
     if (supervisor != null) {
       reportSupervisor("monolithic", supervisor);
       final CompositionalSynthesisResult result = getAnalysisResult();
-      result.setSynchSize(automaton.getStates().size());
-      result.setSupSize(supervisor.getNumberOfStates());
+      mSynchSize = mSynchSize + automaton.getStates().size();
       if (supervisor.getNumberOfReachableStates() == 0) {
         result.setSatisfied(false);
         return false;
@@ -1603,6 +1606,7 @@ public class CompositionalSynthesizer
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
+  private static int mSynchSize;
 
 
   //#########################################################################
