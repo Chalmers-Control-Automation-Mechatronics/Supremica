@@ -2248,11 +2248,11 @@ public class GraphEditorPanel
 
     protected boolean canSelectLabels(final ProxySubject item)
     {
-      if (item instanceof SimpleIdentifierSubject
+      if (item instanceof IdentifierSubject
           || item instanceof ForeachSubject) {
         int count = 0;
         for (final ProxySubject sub : mSelectedList) {
-          if (!(sub instanceof SimpleIdentifierSubject)
+          if (!(sub instanceof IdentifierSubject)
               && !(sub instanceof ForeachSubject)) {
             count++;
           }
