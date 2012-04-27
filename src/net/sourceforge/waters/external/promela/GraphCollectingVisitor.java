@@ -73,7 +73,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
   Hashtable<String,Integer> copyOfOccur = new Hashtable<String,Integer>();
   Collection<Proxy> mComponents = new ArrayList<Proxy>();
 
-  private Hashtable<String,String> proctypeVar = new Hashtable<String,String>();
+  //This is an accessor to the symbol table that is used for storing variables in
+  private SymbolTable mSymbolTable;
+  int mCurrentTableCount = 0;//The amount of tables that have currently been visited by the graph collecting visitor. This is used to retrieve the correct table when entering a block
+
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
 
   Map<String,PromelaNode> mGotoNode = new HashMap<String,PromelaNode>();
@@ -82,9 +85,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   private Collection<EventDeclProxy> mEvents = new ArrayList<EventDeclProxy>();
 
-  public GraphCollectingVisitor(final EventCollectingVisitor v){
+  public GraphCollectingVisitor(final EventCollectingVisitor v, final SymbolTable table){
     mVisitor = v;
     mFactory = v.getFactory();
+    mSymbolTable = table;
   }
 
   public PromelaGraph collectGraphs(final PromelaTree node)
@@ -111,7 +115,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
   //Now it directly create PromelaGraph object, using events from Event collector; No need to visit further children
   public Object visitProcType(final ProctypeTreeNode t)
   {
-    proctypeVar = new Hashtable<String,String>();
+    //Retrieve the symbol table for the current position
+    mCurrentTableCount++;
+    mSymbolTable = mSymbolTable.getChildTable("table" + mCurrentTableCount);
+    if(mSymbolTable == null)
+    {
+      System.err.println("ERROR: RETRIEVED A NULL SYMBOL TABLE");
+    }
+
     mUnWinding = false;
     final String procName = t.getText();
     final int occurance = mVisitor.getOccur().get(procName);
@@ -169,6 +180,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
       mComponents.add(f);
 
     }
+
+    //Are leaving the current context, so move up to the previous level on the symbol table
+    mSymbolTable = mSymbolTable.getParentTable();
+
     return null;
   }
 
@@ -182,20 +197,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitVar(final VardefTreeNode t)
   {
-    /**
-     * This bit is new
-     * @author Ethan Duff
-     */
 
-    final String type = t.getVariableType();
-
-    for(int i = 0; i < t.getChildCount(); i++)
-    {
-      //These are all of the names for the variables that are being instantiated in this declaration
-      //All of their types are specified by the typeTreeNode
-
-      proctypeVar.put(t.getChild(i).getText(), type);
-    }
+    //Nothing to do here, as it was done by the event collecting visitor class
 
     /**
      * This is old stuff, and is left in for future reference
@@ -790,7 +793,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     for(int y=0;y<ch.getType().size();y++){
       if(ch.getType().get(y).equals("byte")){
       //if(labels.get(y+1)!=null){
-        if(!proctypeVar.containsKey(labels.get(y+1))){
+        if(!mSymbolTable.contains(labels.get(y+1))){
           final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
           indexes.add(c);
           templabel.add(c);
@@ -1120,7 +1123,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
      // if(proctypeVar.isEmpty() || (!proctypeVar.containsKey(t.getText()) && !mVisitor.getGlobalVar().containsKey(t.getText()))){
         //labels.add(null);
      // }else
-      if(proctypeVar.containsKey(t.getText()) || mVisitor.getGlobalVar().containsKey(t.getText())){
+      if(mSymbolTable.contains(t.getText()) || true){
           labels.add(t.getText());
       }
     }else if(t.getParent() instanceof SendTreeNode){
@@ -1136,7 +1139,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         while (!(tree instanceof ProctypeTreeNode)) {
           tree = tree.getParent();
         }
-        if(mVisitor.getGlobalVar().containsKey(t.getText()) || proctypeVar.containsKey(t.getText())){
+        if(mSymbolTable.contains(t.getText()) || true){
           labels.add(t.getText());
         }
       }else{

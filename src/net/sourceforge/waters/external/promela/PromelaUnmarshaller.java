@@ -140,8 +140,10 @@ public class PromelaUnmarshaller
     throws IOException, URISyntaxException,
            WatersMarshalException, WatersUnmarshalException
   {
-    mVisitor = new EventCollectingVisitor(mFactory);
-    mGraphVisitor= new GraphCollectingVisitor(mVisitor);
+    //Create the symbol table for use by the event visitor and graph visitor
+    mSymbolTable = new SymbolTable();
+    mEventVisitor = new EventCollectingVisitor(mFactory, mSymbolTable);
+    mGraphVisitor= new GraphCollectingVisitor(mEventVisitor, mSymbolTable);
 
     final URL url = uri.toURL();
     final InputStream stream = url.openStream();
@@ -160,8 +162,8 @@ public class PromelaUnmarshaller
     }
 
     //mVisitor.visitModule(ast);
-    mVisitor.collectEvents(ast);
-    mVisitor.makeMsg();
+    mEventVisitor.collectEvents(ast);
+    mEventVisitor.makeMsg();
     mGraphVisitor.collectGraphs(ast);
    // mGraphVisitor.createChannelGraph();
    // mVisitor.output();
@@ -219,8 +221,10 @@ public class PromelaUnmarshaller
   private File mOutputDir;
 
   private DocumentManager mDocumentManager;
-  private EventCollectingVisitor mVisitor;
+  private EventCollectingVisitor mEventVisitor;
   private GraphCollectingVisitor mGraphVisitor;
+  private SymbolTable mSymbolTable;
+
   //#########################################################################
   //# Class Constants
   private static final String PROMELA_EXTENSION = ".pml";
