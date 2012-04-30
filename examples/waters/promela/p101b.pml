@@ -15,8 +15,8 @@ proctype A()
 
 proctype B()
 {
-  byte key;
-  byte data;
+  show byte key;
+  show byte data;
   ch?key(data);
 }
 
