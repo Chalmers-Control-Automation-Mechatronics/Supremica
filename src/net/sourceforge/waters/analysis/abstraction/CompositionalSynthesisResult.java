@@ -89,6 +89,15 @@ public class CompositionalSynthesisResult
     return mRenamingIsUsed;
   }
 
+   void addSynchSize (final int size) {
+     mSynchSize = mSynchSize + size;
+   }
+
+    int getSynchSize() {
+     return mSynchSize;
+   }
+
+
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.DefaultAnalysisResult
   @Override
@@ -115,6 +124,8 @@ public class CompositionalSynthesisResult
   {
     super.printCSVHorizontalHeadings(writer);
     writer.print(',');
+    writer.print("SynchSize");
+    writer.print(',');
     writer.print("RenamingIsUsed");
     writer.print(',');
     writer.print("NumberOfSupervisors");
@@ -127,6 +138,8 @@ public class CompositionalSynthesisResult
   public void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
+    writer.print(",");
+    writer.print(getSynchSize());
     writer.print(",");
     writer.print(getRenamingIsUsed());
     writer.print(",");
@@ -177,5 +190,6 @@ public class CompositionalSynthesisResult
   private ProductDESProxy mProductDES;
   private final List<AutomatonProxy> mSupervisors;
   private int mRenamingIsUsed;
+  private int mSynchSize;
 
 }

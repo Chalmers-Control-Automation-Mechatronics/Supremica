@@ -1075,7 +1075,6 @@ public class ListBufferTransitionRelation
 
   /**
    * Obtains the tau-closure of the successors of this transition relation.
-   *
    * @param limit
    *          The maximum number of transitions that can be stored. If the
    *          number of transitions already in the transition relation plus
@@ -1097,8 +1096,14 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Obtains the tau-closure of the successors of this transition relation.
-   *
+   * Obtains a local-event closure over successors of this transition
+   * relation.
+   * @param firstLocal
+   *          the event code of the first local event to be included in
+   *          the closure.
+   * @param lastLocal
+   *          the event code of the last local event (inclusive) to be
+   *          included in the closure.
    * @param limit
    *          The maximum number of transitions that can be stored. If the
    *          number of transitions already in the transition relation plus
@@ -1108,22 +1113,21 @@ public class ListBufferTransitionRelation
    *          always to be computed on the fly.
    * @return A {@link TauClosure} object, which can be used to obtain a
    *         {@link TransitionIterator} over the tau-closure of the
-   *         predecessor transition relation.
+   *         successor transition relation.
    */
-  public TauClosure createPredecessorsTauClosure(final int limit,
-                                                 final int firstLocal,
-                                                 final int lastLocal)
+  public TauClosure createSuccessorsTauClosure(final int firstLocal,
+                                               final int lastLocal,
+                                               final int limit)
   {
-    if (mPredecessorBuffer != null) {
-      return new TauClosure(mPredecessorBuffer, firstLocal, lastLocal, limit);
+    if (mSuccessorBuffer != null) {
+      return new TauClosure(mSuccessorBuffer, firstLocal, lastLocal, limit);
     } else {
-      throw createNoBufferException(CONFIG_PREDECESSORS);
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
 
   /**
-   * Obtains the tau-closure of the successors of this transition relation.
-   *
+   * Obtains the tau-closure of the predecessors of this transition relation.
    * @param limit
    *          The maximum number of transitions that can be stored. If the
    *          number of transitions already in the transition relation plus
@@ -1139,6 +1143,37 @@ public class ListBufferTransitionRelation
   {
     if (mPredecessorBuffer != null) {
       return new TauClosure(mPredecessorBuffer, limit);
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
+    }
+  }
+
+  /**
+   * Obtains a local-event closure over predecessors of this transition
+   * relation.
+   * @param firstLocal
+   *          the event code of the first local event to be included in
+   *          the closure.
+   * @param lastLocal
+   *          the event code of the last local event (inclusive) to be
+   *          included in the closure.
+   * @param limit
+   *          The maximum number of transitions that can be stored. If the
+   *          number of transitions already in the transition relation plus
+   *          the number of computed tau transitions exceeds the limit,
+   *          precomputation is aborted and transitions will be produced on
+   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          always to be computed on the fly.
+   * @return A {@link TauClosure} object, which can be used to obtain a
+   *         {@link TransitionIterator} over the tau-closure of the
+   *         predecessor transition relation.
+   */
+  public TauClosure createPredecessorsTauClosure(final int firstLocal,
+                                                 final int lastLocal,
+                                                 final int limit)
+  {
+    if (mPredecessorBuffer != null) {
+      return new TauClosure(mPredecessorBuffer, firstLocal, lastLocal, limit);
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }

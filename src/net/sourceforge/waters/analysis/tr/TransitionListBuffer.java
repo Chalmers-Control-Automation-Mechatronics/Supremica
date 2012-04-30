@@ -1361,7 +1361,8 @@ public abstract class TransitionListBuffer
           int event = mFirstEvent;
           int code = (mFromState << mStateShift) | event;
           int current = mStateEventTransitions.get(code);
-          while (current == NULL && ++event <= mLastEvent) {
+          while (current == NULL && event < mLastEvent) {
+            event++;
             code++;
             current = mStateEventTransitions.get(code);
           }

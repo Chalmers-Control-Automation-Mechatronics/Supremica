@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="soe32" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for synthesis observation equivalent.
+This tests whether the class containing only state S7 is correctly split on controllable events c and d at the same time.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="c"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="u"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="d"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="t"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="v"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point Y="48" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-15" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point Y="80" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="-25"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point Y="80" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3">
+                        <PointGeometry>
+                            <Point Y="128" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-7" X="-24"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S4">
+                        <PointGeometry>
+                            <Point Y="128" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S5">
+                        <PointGeometry>
+                            <Point Y="96" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S6">
+                        <PointGeometry>
+                            <Point Y="160" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="208" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S1" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="48" X="176"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Target="S2" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-14" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S3" Source="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S5" Source="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="u"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-24" X="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S4" Source="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S6" Source="S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point Y="160" X="176"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="S7" Source="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="185" X="131"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S7" Source="S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="184" X="222"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S7" Source="S6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S6" Source="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S5" Source="S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="u"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point Y="48" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-15" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S12">
+                        <PointGeometry>
+                            <Point Y="80" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="-31"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S34">
+                        <PointGeometry>
+                            <Point Y="128" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="-34"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S5">
+                        <PointGeometry>
+                            <Point Y="96" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S6">
+                        <PointGeometry>
+                            <Point Y="160" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="208" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S12" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-33" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="48" X="176"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Target="S34" Source="S12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S5" Source="S34">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="u"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-24" X="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S7" Source="S34">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="185" X="131"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S7" Source="S6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S6" Source="S34">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

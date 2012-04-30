@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="soe10" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="getB1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="getB2"/>
+        <EventDecl Observable="false" Kind="CONTROLLABLE" Name="getB6"/>
+        <EventDecl Kind="CONTROLLABLE" Name="getM2H3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="getM2H4"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="outM2"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="184" X="101"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="1" X="-33"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fromB6">
+                        <PointGeometry>
+                            <Point Y="191" X="199"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fromB1">
+                        <PointGeometry>
+                            <Point Y="267" X="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fromB2">
+                        <PointGeometry>
+                            <Point Y="96" X="57"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="fromB1" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getB1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="235" X="81"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="fromB2" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getB2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="131" X="87"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="fromB6" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getB6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="198" X="153"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="fromB1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getM2H3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="223" X="63"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="fromB2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="outM2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="12" X="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="141" X="67"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="fromB6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getM2H4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-24" X="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="176" X="155"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="184" X="101"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="1" X="-33"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fromB6">
+                        <PointGeometry>
+                            <Point Y="191" X="199"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fromB1">
+                        <PointGeometry>
+                            <Point Y="267" X="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="fromB1" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getB1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="235" X="81"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="fromB6" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getB6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="198" X="153"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="fromB1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getM2H3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="223" X="63"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="outM2"/>
+                            <SimpleIdentifier Name="getB2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-43" X="-44"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="184" X="101"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="142" X="85"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="fromB6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="getM2H4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-24" X="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="176" X="155"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

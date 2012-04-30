@@ -158,6 +158,8 @@ public class CompositionalSynthesizerExperiments
     final File filename = new File(dir, name);
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mSynthesizer.setModel(des);
+    mSynthesizer.setUsedAbstractionMethods
+    (CompositionalSynthesizer.USE_SOE);
     try {
       mSynthesizer.run();
     } catch (final AnalysisException exception) {
@@ -224,16 +226,17 @@ public class CompositionalSynthesizerExperiments
     synthesissRhoneSubPatch0();
 //    synthesissAip0Aip();
     synthesisFenCaiWon09B();
-    synthesisFenCaiWon09Synth();
+//    synthesisFenCaiWon09Synth();
     synthesissFms2003();
     synthesiseFischertechnik();
     synthesiseIPC();
+    synthesiseCentralLockingKoordwspBlock();
 //    synthesisAip0tough();
-    synthesiseTbedCtct();
+//    synthesiseTbedCtct();
     synthesiseTbedNoderailUncont();
     synthesiseTbedNoderailB();
-    synthesiseCentralLockingVerriegel3b();
-    synthesiseVerrigel4B();
+//    synthesiseCentralLockingVerriegel3b();
+//    synthesiseVerrigel4B();
 //    synthesiseFlexibleManufacturingSystem();
 //  synthesisLargestCoherent();
   }
@@ -242,17 +245,18 @@ public class CompositionalSynthesizerExperiments
   //#########################################################################
   //# Models
   // Central locking
-  @SuppressWarnings("unused")
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
     runModel("valid", "synthesis_experiment", "koordwsp_block.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesiseCentralLockingVerriegel3b() throws Exception
   {
     runModel("valid", "synthesis_experiment", "verriegel3b.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesiseVerrigel4B() throws Exception
   {
     runModel("valid", "synthesis_experiment", "verriegel4b.wmod");
@@ -270,6 +274,7 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "aip0aip.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesisFenCaiWon09Synth() throws Exception
   {
     runModel("valid", "synthesis_experiment", "FenCaiWon09_synth.wmod");
@@ -292,6 +297,7 @@ public class CompositionalSynthesizerExperiments
     runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
     runModel("valid", "synthesis_experiment", "tbed_ctct.wmod");
