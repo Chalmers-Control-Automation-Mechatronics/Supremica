@@ -826,6 +826,7 @@
     <xs:element ref="M:BinaryExpression"/>
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:IndexedIdentifier"/>
     <xs:element ref="M:QualifiedIdentifier"/>
     <xs:element ref="M:UnaryExpression"/>
   </xs:choice>
