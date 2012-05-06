@@ -9,6 +9,8 @@
 
 chan name = [0] of { byte, byte };
 
+byte state;
+
 init
 {       
         run A();
@@ -23,6 +25,5 @@ proctype A()
 
 proctype B()
 {       
-        byte state;
         name?msgtype(state)
 }

@@ -59,12 +59,11 @@ public class VardefTreeNode extends PromelaTree
    * A method to get the locality of the variable(s) being created
    * @author Ethan Duff
    * @return TRUE if the variable(s) are global, or FALSE if they are local to a method
-   */ /* This method may or may not be included
+   */
   public boolean isGlobal()
   {
     return mGlobal;
   }
-  */
   //===============================================================================================================================================>
 
   private final String mChanState;
@@ -72,7 +71,7 @@ public class VardefTreeNode extends PromelaTree
   //NEW<============================================================================================================================================
   private boolean mVisible;
   private String mVariableType;
-  //private boolean mGlobal; //This member may or may not be included
+  private boolean mGlobal;
   //===============================================================================================================================================>
 
 }
