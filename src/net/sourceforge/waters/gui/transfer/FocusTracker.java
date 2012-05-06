@@ -40,7 +40,7 @@ import net.sourceforge.waters.gui.observer.Subject;
  * EditorChangedEvent.Kind#SELECTION_CHANGED}, and interested components
  * can register listeners through the {@link Subject} interface.</P>
  *
- * <P>This implementation supports to types of focus-owning components,
+ * <P>This implementation supports two types of focus-owning components,
  * <UL>
  * <LI>WATERS panels implementing the {@link SelectionOwner} interface;</LI>
  * <LI>Swing somponents that are subclass of {@link JTextComponent}, in
@@ -131,7 +131,7 @@ public class FocusTracker
   {
     fireSelectionChanged();
   }
- 
+
 
   //#########################################################################
   //# Interface java.awt.event.WindowFocusListener
@@ -161,12 +161,12 @@ public class FocusTracker
   {
     mObservers.add(observer);
   }
-    
+
   public void detach(final Observer observer)
   {
     mObservers.remove(observer);
   }
-    
+
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     // Just in case they try to register or deregister observers

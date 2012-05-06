@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="tank_process" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Unknown origin (Balemi?). A tank with two valves, input (Valve1) and output (Valve2), a heating element, a temperature sensor. When the tank becomes empty, half full, and full, events are fired. When being filled, the event 'in' is fired (at half full and full) and when being emptied the event 'out' is fired (at half full and empty).    The specifications and thair respective objectives are...   * FillDrain, saying that the tank should be completely filled and then completely emptied, alternatingly.   * Heat, saying that after turning on the heater the tank must become hot before the element can be turned on and the tank emptied.   * NeverHeatEmpty, saying that the element must not be turned on before the tank is at least half full.    The valves for opening and closing the valves and for turning the element on and off are controllable. All other events are uncontrollable.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="in"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="out"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t0"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="v10"/>
+        <EventDecl Kind="CONTROLLABLE" Name="v11"/>
+        <EventDecl Kind="CONTROLLABLE" Name="v20"/>
+        <EventDecl Kind="CONTROLLABLE" Name="v21"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="Valve1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="v1closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="v1opened">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="v1opened" Source="v1closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="v1closed" Source="v1opened">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="v1opened" Source="v1opened">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Valve2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="v2closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="v2open">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="v2open" Source="v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="v2closed" Source="v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="v2open" Source="v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Tank">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="full">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="half">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="half" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="half" Source="full">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="empty" Source="half">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="full" Source="half">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Heat">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="h0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="h1"/>
+                    <SimpleNode Name="h2"/>
+                    <SimpleNode Name="h3"/>
+                    <SimpleNode Name="h4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="h1" Source="h0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="h2" Source="h1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="h3" Source="h2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="h4" Source="h3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="h0" Source="h4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v20"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Temperature">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="cold">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="hot">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="hot" Source="cold">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="cold" Source="hot">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Element">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="off">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="on">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="off" Source="off">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on" Source="off">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off" Source="on">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on" Source="on">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="NeverHeatEmpty">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="n0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="n1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="n1" Source="n0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="n0" Source="n1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="n1" Source="n1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="FillDrain">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="f0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="f1"/>
+                    <SimpleNode Name="f2"/>
+                    <SimpleNode Name="f3"/>
+                    <SimpleNode Name="f4"/>
+                    <SimpleNode Name="f5"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="f1" Source="f0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="f2" Source="f1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="f3" Source="f2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="f4" Source="f3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="f5" Source="f4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="f0" Source="f5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v20"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="off.f0.h0.n0.empty.cold.v1closed.v2closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="off.f0.h0.n0.empty.cold.v1opened.v2closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="off.f0.h0.n0.empty.hot.v1closed.v2closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="off.f0.h0.n0.empty.hot.v1opened.v2closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="off.f1.h0.n1.half.cold.v1opened.v2closed"/>
+                    <SimpleNode Name="off.f1.h0.n1.half.hot.v1opened.v2closed"/>
+                    <SimpleNode Name="off.f1.h3.n1.half.cold.v1opened.v2closed"/>
+                    <SimpleNode Name="off.f1.h3.n1.half.hot.v1opened.v2closed"/>
+                    <SimpleNode Name="off.f2.h0.n1.full.cold.v1opened.v2closed"/>
+                    <SimpleNode Name="off.f2.h0.n1.full.hot.v1opened.v2closed"/>
+                    <SimpleNode Name="off.f2.h3.n1.full.cold.v1opened.v2closed"/>
+                    <SimpleNode Name="off.f2.h3.n1.full.hot.v1opened.v2closed"/>
+                    <SimpleNode Name="off.f3.h0.n1.full.cold.v1closed.v2closed"/>
+                    <SimpleNode Name="off.f3.h0.n1.full.hot.v1closed.v2closed"/>
+                    <SimpleNode Name="off.f3.h3.n1.full.cold.v1closed.v2closed"/>
+                    <SimpleNode Name="off.f3.h3.n1.full.hot.v1closed.v2closed"/>
+                    <SimpleNode Name="off.f3.h4.n1.full.cold.v1closed.v2open"/>
+                    <SimpleNode Name="off.f3.h4.n1.full.hot.v1closed.v2open"/>
+                    <SimpleNode Name="off.f4.h4.n1.half.cold.v1closed.v2open"/>
+                    <SimpleNode Name="off.f4.h4.n1.half.hot.v1closed.v2open"/>
+                    <SimpleNode Name="off.f5.h4.n1.empty.cold.v1closed.v2open"/>
+                    <SimpleNode Name="off.f5.h4.n1.empty.hot.v1closed.v2open"/>
+                    <SimpleNode Name="on.f1.h1.n1.half.cold.v1opened.v2closed"/>
+                    <SimpleNode Name="on.f1.h2.n1.half.hot.v1opened.v2closed"/>
+                    <SimpleNode Name="on.f2.h1.n1.full.cold.v1opened.v2closed"/>
+                    <SimpleNode Name="on.f2.h2.n1.full.hot.v1opened.v2closed"/>
+                    <SimpleNode Name="on.f3.h1.n1.full.cold.v1closed.v2closed"/>
+                    <SimpleNode Name="on.f3.h2.n1.full.hot.v1closed.v2closed"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="off.f0.h0.n0.empty.cold.v1opened.v2closed" Source="off.f0.h0.n0.empty.cold.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f1.h0.n1.half.cold.v1opened.v2closed" Source="off.f0.h0.n0.empty.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f0.h0.n0.empty.cold.v1closed.v2closed" Source="off.f0.h0.n0.empty.hot.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f0.h0.n0.empty.hot.v1opened.v2closed" Source="off.f0.h0.n0.empty.hot.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f0.h0.n0.empty.cold.v1opened.v2closed" Source="off.f0.h0.n0.empty.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f1.h0.n1.half.hot.v1opened.v2closed" Source="off.f0.h0.n0.empty.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f2.h0.n1.full.cold.v1opened.v2closed" Source="off.f1.h0.n1.half.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f1.h1.n1.half.cold.v1opened.v2closed" Source="off.f1.h0.n1.half.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f1.h0.n1.half.cold.v1opened.v2closed" Source="off.f1.h0.n1.half.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f2.h0.n1.full.hot.v1opened.v2closed" Source="off.f1.h0.n1.half.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f2.h3.n1.full.cold.v1opened.v2closed" Source="off.f1.h3.n1.half.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f1.h3.n1.half.cold.v1opened.v2closed" Source="off.f1.h3.n1.half.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f2.h3.n1.full.hot.v1opened.v2closed" Source="off.f1.h3.n1.half.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h0.n1.full.cold.v1closed.v2closed" Source="off.f2.h0.n1.full.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f2.h1.n1.full.cold.v1opened.v2closed" Source="off.f2.h0.n1.full.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f2.h0.n1.full.cold.v1opened.v2closed" Source="off.f2.h0.n1.full.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h0.n1.full.hot.v1closed.v2closed" Source="off.f2.h0.n1.full.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h3.n1.full.cold.v1closed.v2closed" Source="off.f2.h3.n1.full.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f2.h3.n1.full.cold.v1opened.v2closed" Source="off.f2.h3.n1.full.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h3.n1.full.hot.v1closed.v2closed" Source="off.f2.h3.n1.full.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f3.h1.n1.full.cold.v1closed.v2closed" Source="off.f3.h0.n1.full.cold.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h0.n1.full.cold.v1closed.v2closed" Source="off.f3.h0.n1.full.hot.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h4.n1.full.cold.v1closed.v2open" Source="off.f3.h3.n1.full.cold.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h3.n1.full.cold.v1closed.v2closed" Source="off.f3.h3.n1.full.hot.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h4.n1.full.hot.v1closed.v2open" Source="off.f3.h3.n1.full.hot.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f4.h4.n1.half.cold.v1closed.v2open" Source="off.f3.h4.n1.full.cold.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h4.n1.full.cold.v1closed.v2open" Source="off.f3.h4.n1.full.hot.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f4.h4.n1.half.hot.v1closed.v2open" Source="off.f3.h4.n1.full.hot.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f5.h4.n1.empty.cold.v1closed.v2open" Source="off.f4.h4.n1.half.cold.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f4.h4.n1.half.cold.v1closed.v2open" Source="off.f4.h4.n1.half.hot.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f5.h4.n1.empty.hot.v1closed.v2open" Source="off.f4.h4.n1.half.hot.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f0.h0.n0.empty.cold.v1closed.v2closed" Source="off.f5.h4.n1.empty.cold.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f0.h0.n0.empty.hot.v1closed.v2closed" Source="off.f5.h4.n1.empty.hot.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f5.h4.n1.empty.cold.v1closed.v2open" Source="off.f5.h4.n1.empty.hot.v1closed.v2open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f1.h2.n1.half.hot.v1opened.v2closed" Source="on.f1.h1.n1.half.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f2.h1.n1.full.cold.v1opened.v2closed" Source="on.f1.h1.n1.half.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f1.h3.n1.half.hot.v1opened.v2closed" Source="on.f1.h2.n1.half.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f2.h2.n1.full.hot.v1opened.v2closed" Source="on.f1.h2.n1.half.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f2.h2.n1.full.hot.v1opened.v2closed" Source="on.f2.h1.n1.full.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f3.h1.n1.full.cold.v1closed.v2closed" Source="on.f2.h1.n1.full.cold.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f2.h3.n1.full.hot.v1opened.v2closed" Source="on.f2.h2.n1.full.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e0"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f3.h2.n1.full.hot.v1closed.v2closed" Source="on.f2.h2.n1.full.hot.v1opened.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="v10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="on.f3.h2.n1.full.hot.v1closed.v2closed" Source="on.f3.h1.n1.full.cold.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="off.f3.h3.n1.full.hot.v1closed.v2closed" Source="on.f3.h2.n1.full.hot.v1closed.v2closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e0"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

@@ -139,10 +139,10 @@ private AutomatonProxy createSD2_Test()
 
    // self loop all Sigma Events on the initial state
   for(final EventProxy ev: allEvents)
-  {
-    final TransitionProxy Sigmatransition =
+  { if(ev.getKind()!= EventKind.PROPOSITION)
+    {final TransitionProxy Sigmatransition =
           mFactory.createTransitionProxy(initialState, ev, initialState);
-    transitions.add(Sigmatransition);
+    transitions.add(Sigmatransition);}
     newEvents.add(ev);
   }
 
@@ -160,7 +160,7 @@ private AutomatonProxy createSD2_Test()
     // the transitions which accepts non-prohibitable events from the event list
     for(final EventProxy ev: allEvents)
     {
-      if(!(hibEvents.contains(ev)))
+      if(!(hibEvents.contains(ev)) && ev.getKind()!=EventKind.PROPOSITION)
         {
         final TransitionProxy nhibTransition =
           mFactory.createTransitionProxy(t2State, ev, initialState);

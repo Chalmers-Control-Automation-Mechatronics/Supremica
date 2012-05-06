@@ -211,9 +211,9 @@ public class Candidate implements Comparable<Candidate>
    * Returns an ordered list of all events in the automata of this candidate,
    * including propositions.
    */
-  public List<EventProxy> getAllEvents()
+  public List<EventProxy> getOrderedEvents()
   {
-    return getAllEvents(mAutomata);
+    return getOrderedEvents(mAutomata);
   }
 
 
@@ -243,7 +243,7 @@ public class Candidate implements Comparable<Candidate>
   private void identifyCommonEvents()
   {
     mCommonEvents = 0;
-    for (final EventProxy event : getAllEvents()) {
+    for (final EventProxy event : getOrderedEvents()) {
       if (event.getKind() != EventKind.PROPOSITION) {
         boolean shared = true;
         for (final AutomatonProxy aut : getAutomata()) {
@@ -304,16 +304,27 @@ public class Candidate implements Comparable<Candidate>
   }
 
   /**
-   * Returns an ordered list of all events in the given automata,
+   * Returns an set of all events in the given automata,
    * including propositions.
    */
-  public static List<EventProxy> getAllEvents
+  public static Set<EventProxy> getAllEvents
     (final Collection<AutomatonProxy> automata)
   {
     final Set<EventProxy> set = new THashSet<EventProxy>();
     for (final AutomatonProxy aut : automata) {
       set.addAll(aut.getEvents());
     }
+    return set;
+  }
+
+  /**
+   * Returns an ordered list of all events in the given automata,
+   * including propositions.
+   */
+  public static List<EventProxy> getOrderedEvents
+    (final Collection<AutomatonProxy> automata)
+  {
+    final Set<EventProxy> set = getAllEvents(automata);
     final List<EventProxy> list = new ArrayList<EventProxy>(set);
     Collections.sort(list);
     return list;

@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -101,7 +101,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * @author Robi Malik
  */
 
-public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
+public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################
@@ -947,7 +947,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
 
   //#########################################################################
   //# Inner Class PrimeSearcher
-  private class PrimeSearcher extends AbstractModuleProxyVisitor {
+  private class PrimeSearcher extends DefaultModuleProxyVisitor {
 
     //#######################################################################
     //# Invocation
@@ -1011,7 +1011,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
 
   //#########################################################################
   //# Inner Class NameCompiler
-  private class NameCompiler extends AbstractModuleProxyVisitor {
+  private class NameCompiler extends DefaultModuleProxyVisitor {
 
     //#######################################################################
     //# Invocation
@@ -1097,7 +1097,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
 
   //#########################################################################
   //# Inner Class IndexAdder
-  private class IndexAdder extends AbstractModuleProxyVisitor {
+  private class IndexAdder extends DefaultModuleProxyVisitor {
 
     //#######################################################################
     //# Invocation

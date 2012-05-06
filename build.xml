@@ -223,9 +223,9 @@
         <delete dir="${lib}/${unjared}"/>
         <mkdir dir="${lib}/${unjared}"/>        
         <delete dir="${resources}"/>
-        <mkdir dir="${resources}"/>        
+        <mkdir dir="${resources}"/>
         <delete dir="${lib}/${unjared}/META-INF"/>
-        <mkdir dir="${lib}/${unjared}/META-INF"/>        
+        <mkdir dir="${lib}/${unjared}/META-INF"/>
         <ant dir="${waters.dir}" target="clean" inheritAll="false"/>
     </target>
     
@@ -555,7 +555,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
     </target>
 
-    <target name="-detect_arch" unless="java.arch">
+    <target name="-detect_arch" unless="native.host.arch">
         <ant dir="${waters.dir}" target="jniglue-jar" inheritAll="false"/>
         <java classname="net.sourceforge.waters.build.arch.ArchitectureDetector"
               fork="true" failonerror="true">
@@ -570,15 +570,55 @@ Class-Path: ${manifest.pathlist}</echo>
 
     <target name="-dynamic_libs" depends="-detect_arch">
         <copy todir="${dist}" failonerror="false">
-            <fileset dir="${platform}/${java.arch}/lib" includes="*"/>
+            <fileset dir="${platform}/${native.host.arch}/lib" includes="*"/>
         </copy>
     </target>
 
-    <target name="cpp_waters">
-        <ant dir="${waters.dir}" target="cpp" inheritAll="false"/>
+    <target name="cpp_waters" depends="-detect_arch"
+            description="Builds debug version of Waters dynamic link library.">
+        <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+            <property name="native.host.arch" value="${native.host.arch}"/>
+        </ant>
         <copy todir="${dist}" failonerror="false">
-            <fileset dir="${waters.dir}/cpp/lib" includes="*"/>
+            <fileset dir="${waters.dir}/cpp/lib/${native.host.arch}.debug"
+                     includes="*"/>
         </copy>
+    </target>
+
+    <target name="ccpp_waters" depends="-detect_arch"
+            description="Builds Waters dynamic libraries for multiple platforms.">
+      <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+        <property name="native.host.arch" value="${native.host.arch}"/>
+        <property name="native.target.arch" value="win32.x86"/>
+        <property name="make.release" value="1"/>
+      </ant>
+      <copy todir="${platform}/win32.x86/lib" failonerror="false">
+        <fileset dir="${waters.dir}/cpp/lib/win32.x86" includes="*"/>
+      </copy>
+      <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+        <property name="native.host.arch" value="${native.host.arch}"/>
+        <property name="native.target.arch" value="win32.amd64"/>
+        <property name="make.release" value="1"/>
+      </ant>
+      <copy todir="${platform}/win32.amd64/lib" failonerror="false">
+        <fileset dir="${waters.dir}/cpp/lib/win32.amd64" includes="*"/>
+      </copy>
+      <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+        <property name="native.host.arch" value="${native.host.arch}"/>
+        <property name="native.target.arch" value="linux.x86"/>
+        <property name="make.release" value="1"/>
+      </ant>
+      <copy todir="${platform}/linux.x86/lib" failonerror="false">
+        <fileset dir="${waters.dir}/cpp/lib/linux.x86" includes="*"/>
+      </copy>
+      <ant dir="${waters.dir}" target="cpp" inheritAll="false">
+        <property name="native.host.arch" value="${native.host.arch}"/>
+        <property name="native.target.arch" value="linux.amd64"/>
+        <property name="make.release" value="1"/>
+      </ant>
+      <copy todir="${platform}/linux.amd64/lib" failonerror="false">
+        <fileset dir="${waters.dir}/cpp/lib/linux.amd64" includes="*"/>
+      </copy>
     </target>
 
     <target name="-jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
@@ -866,6 +906,37 @@ Class-Path: ${manifest.pathlist}</echo>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
                     <include name="**/NewConflictCheckerTest.java"/>
+                    <exclude name="**/Test*.java"/>
+                    <exclude name="org/supremica/testhelpers/**/*.java"/>
+                    <exclude name="**/TestPackage*.java"/>
+                    <exclude name="**/Abstract*.java"/>
+                    <exclude name="**/Native*.java"/>
+                    <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
+                </fileset>
+            </batchtest>
+            <classpath>
+                <pathelement location="${dist}/Supremica.jar"/>
+                <pathelement location="${dist}/SupremicaLib.jar"/>
+                <pathelement location="${dist}/SupremicaTest.jar"/>
+                <pathelement path="${java.class.path}"/>
+            </classpath>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
+            <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="waters.test.ant" value="true"/>
+            <sysproperty key="java.library.path" value="${dist}"/>
+        </junit>
+    </target>
+    
+    <target name="run_test10" depends="build">
+        <mkdir dir="${logs.results}"/>
+        <delete>
+            <fileset dir="${logs.results}" includes="**/log4j.log"/>
+        </delete>
+        <junit printsummary="on" fork="true" maxmemory="512m" haltonfailure="false">
+            <formatter type="xml"/>
+            <batchtest todir="${logs.results}">
+                <fileset dir="${testssrc}">
+                    <include name="**/AlphaConflictCheckerTest.java"/>
                     <exclude name="**/Test*.java"/>
                     <exclude name="org/supremica/testhelpers/**/*.java"/>
                     <exclude name="**/TestPackage*.java"/>

@@ -42,6 +42,7 @@ class PreJavaException {
 public:
   //#########################################################################
   //# Constructors, Destructors & Co.
+  explicit PreJavaException();
   explicit PreJavaException(uint32_t classcode);
   explicit PreJavaException(uint32_t classcode,
 			    const char* msg,

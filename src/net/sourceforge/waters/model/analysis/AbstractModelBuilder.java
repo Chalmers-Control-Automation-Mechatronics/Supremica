@@ -111,7 +111,7 @@ public abstract class AbstractModelBuilder<P extends Proxy>
    * Stores a  result indicating successful computation.
    * Setting the computed object also marks the analysis run as completed and
    * sets the Boolean result.
-   * @param  aut    The computed object, or <CODE>null</CODE> to
+   * @param  proxy  The computed object, or <CODE>null</CODE> to
    *                indicate an unsuccessful computation. The Boolean analysis
    *                result is set to <CODE>false</CODE> if and only if this
    *                parameter is <CODE>null</CODE>.

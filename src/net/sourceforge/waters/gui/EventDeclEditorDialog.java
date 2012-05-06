@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,8 +60,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconRadioButton;
@@ -71,9 +74,14 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -662,12 +670,14 @@ public class EventDeclEditorDialog
       final String name = mNameInput.getText();
       final int pos = mNameInput.getCaretPosition();
       restorer = new Runnable() {
-          public void run()
-          {
-            mNameInput.setText(name);
-            mNameInput.setCaretPosition(pos);
-          }
-        };
+        public void run()
+        {
+          mIsFilterEnabled = false;
+          mNameInput.setText(name);
+          mIsFilterEnabled = true;
+          mNameInput.setCaretPosition(pos);
+        }
+      };
     }
     resetPanels();
     mDisplayingMoreOptions = !mDisplayingMoreOptions;
@@ -922,8 +932,8 @@ public class EventDeclEditorDialog
           });
       }
     } else {
-      final SimpleIdentifierSubject ident =
-        (SimpleIdentifierSubject) mNameInput.getValue();
+      final IdentifierSubject ident =
+        (IdentifierSubject) mNameInput.getValue();
       final EventKind kind;
       if (mControllableButton.isSelected()) {
         kind = EventKind.CONTROLLABLE;
@@ -985,13 +995,64 @@ public class EventDeclEditorDialog
       final EventDeclSubject template =
         new EventDeclSubject(ident, kind, observable,
                              scope, ranges, geo, attribs);
+
       if (mEventDecl == null) {
-        final Command command = new InsertCommand(template, panel);
+        final Command command = new InsertCommand(template, panel, mRoot);
         mEventDecl = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else if (!eq.equals(mEventDecl, template)) {
-        final Command command = new EditCommand(mEventDecl, template, panel);
-        mRoot.getUndoInterface().executeCommand(command);
+        if (mEventDecl.getName().equals(template.getName())) {
+          final Command command =
+            new EditCommand(mEventDecl, template, panel);
+          mRoot.getUndoInterface().executeCommand(command);
+        } else {
+          final EventDeclDeleteVisitor e = new EventDeclDeleteVisitor(mRoot);
+          final List<? extends EventDeclProxy> decls =
+            Collections.singletonList(mEventDecl);
+          final List<InsertInfo> victims =
+            e.getDeletionVictims(decls, "rename");
+          if(victims == null){
+            return;
+          }
+          final CompoundCommand compound = new CompoundCommand();
+
+          final int size = victims.size();
+          final ListIterator<InsertInfo> iter = victims.listIterator(size);
+          while (iter.hasPrevious()) {
+            final InsertInfo insert = iter.previous();
+            final ProxySubject proxy = (ProxySubject) insert.getProxy();
+            if (proxy instanceof EventDeclProxy) {
+              final Command command =
+                new EditCommand(mEventDecl, template, panel);
+              compound.addCommand(command);
+            } else {
+              final SelectionOwner panel2 = null;
+              final ModuleProxyCloner cloner =
+                ModuleSubjectFactory.getCloningInstance();
+              if (proxy instanceof SimpleIdentifierSubject) {
+                final SimpleIdentifierSubject subject =
+                  (SimpleIdentifierSubject) proxy;
+                final SimpleIdentifierSubject changed =
+                  (SimpleIdentifierSubject) cloner.getClone(proxy);
+                changed.setName(mNameInput.getText());
+                final Command command =
+                  new EditCommand(subject, changed, panel2);
+                compound.addCommand(command);
+              }
+              else if(proxy instanceof IndexedIdentifierSubject){
+                final IndexedIdentifierSubject subject = (IndexedIdentifierSubject)proxy;
+                final IndexedIdentifierSubject changed = (IndexedIdentifierSubject)cloner.getClone(proxy);
+                changed.setName(mNameInput.getText());
+                final Command command =
+                  new EditCommand(subject, changed, panel2);
+                compound.addCommand(command);
+              }
+            }
+          }
+          compound.end();
+          mRoot.getUndoInterface().executeCommand(compound);
+        }
+
       }
       dispose();
     }
@@ -1085,23 +1146,28 @@ public class EventDeclEditorDialog
     //# Auxiliary Methods
     private String filter(final String text)
     {
-      if (text == null) {
-        return null;
-      } else {
-        final ExpressionParser parser = getExpressionParser();
-        final int len = text.length();
-        final StringBuffer buffer = new StringBuffer(len);
-        for (int i = 0; i < len; i++) {
-          final char ch = text.charAt(i);
-          if (parser.isIdentifierCharacter(ch)) {
-            buffer.append(ch);
-          }
-        }
-        if (buffer.length() == 0) {
+      if (mIsFilterEnabled) {
+        if (text == null) {
           return null;
         } else {
-          return buffer.toString();
+          final ExpressionParser parser = getExpressionParser();
+          final int len = text.length();
+          final StringBuffer buffer = new StringBuffer(len);
+          for (int i = 0; i < len; i++) {
+            final char ch = text.charAt(i);
+            if (parser.isIdentifierCharacter(ch)) {
+              buffer.append(ch);
+            }
+          }
+          if (buffer.length() == 0) {
+            return null;
+          } else {
+            return buffer.toString();
+          }
         }
+      }
+      else{
+        return text;
       }
     }
 
@@ -1269,6 +1335,7 @@ public class EventDeclEditorDialog
   // Dialog state
   private final ModuleWindowInterface mRoot;
   private boolean mDisplayingMoreOptions;
+  private boolean mIsFilterEnabled = true;
 
   // Swing components
   private JPanel mNamePanel;

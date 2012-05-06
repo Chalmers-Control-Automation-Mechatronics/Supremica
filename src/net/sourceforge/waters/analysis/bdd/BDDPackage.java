@@ -21,7 +21,7 @@ public enum BDDPackage
   //# Enumeration
   BUDDY(true),
   CUDD(true),
-  CAL(false),
+  //CAL(false),
   J(false),
   JAVA(false),
   JDD(false),

@@ -122,6 +122,13 @@ public class CompoundCommand
     }
   }
 
+  public void setUpdatesSelection(final boolean update)
+  {
+    for (final Command cmd : mCommands) {
+      cmd.setUpdatesSelection(update);
+    }
+  }
+
 
   //#########################################################################
   //# Data Members

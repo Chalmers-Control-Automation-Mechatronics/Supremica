@@ -27,6 +27,7 @@ import net.sourceforge.waters.gui.observer.ClipboardChangedEvent;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 
 import org.supremica.gui.ide.IDE;
@@ -81,13 +82,13 @@ public class IDECopyAction
       final List<? extends Proxy> selection =
         watersOwner.getCurrentSelection();
       final Transferable transferable =
-        watersOwner.createTransferable(selection);
+        WatersDataFlavor.createTransferable(selection);
       final Clipboard clipboard =
         Toolkit.getDefaultToolkit().getSystemClipboard();
       clipboard.setContents(transferable, this);
       fireClipboardChanged();
     } else if (swingOwner != null) {
-      mDefaultAction.actionPerformed(event);      
+      mDefaultAction.actionPerformed(event);
       fireClipboardChanged();
     }
   }
@@ -105,7 +106,7 @@ public class IDECopyAction
       if (watersOwner != null) {
         final List<? extends Proxy> selection =
           watersOwner.getCurrentSelection();
-        enabled = watersOwner.canCopy(selection);
+        enabled = WatersDataFlavor.canCopy(selection);
       } else if (swingOwner != null) {
         enabled = swingOwner.getSelectedText() != null;
       } else {

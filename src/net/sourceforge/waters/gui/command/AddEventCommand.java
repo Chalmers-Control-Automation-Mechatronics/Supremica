@@ -33,26 +33,26 @@ public class AddEventCommand
 
   //#########################################################################
   //# Constructors
-  public AddEventCommand(EventListExpressionSubject list,
-                         IdentifierSubject identifier,
-                         int position)
+  public AddEventCommand(final EventListExpressionSubject list,
+                         final IdentifierSubject identifier,
+                         final int position)
   {
     this(list, Collections.singletonList(identifier), position);
   }
-  
-  public AddEventCommand(EventListExpressionSubject list,
-                         List<? extends IdentifierSubject> identifiers,
-                         int position)
+
+  public AddEventCommand(final EventListExpressionSubject list,
+                         final List<? extends IdentifierSubject> identifiers,
+                         final int position)
   {
     mList = list;
     final List<IdentifierSubject> modIdentifiers =
       new ArrayList<IdentifierSubject>(identifiers.size());
-    Set<IdentifierSubject> contents =
+    final Set<IdentifierSubject> contents =
       new TreeSet<IdentifierSubject>(NamedComparator.getInstance());
-    for (AbstractSubject a : mList.getEventListModifiable()) {
+    for (final AbstractSubject a : mList.getEventListModifiable()) {
       contents.add((IdentifierSubject)a);
     }
-    for (IdentifierSubject n: identifiers) {
+    for (final IdentifierSubject n: identifiers) {
       if (contents.add(n)) {
         modIdentifiers.add(n.clone());
       }
@@ -60,7 +60,7 @@ public class AddEventCommand
     mIdentifiers = Collections.unmodifiableList(modIdentifiers);
     mPosition = position;
   }
-	
+
 
   //#########################################################################
   //# Simple Access
@@ -83,6 +83,10 @@ public class AddEventCommand
   public void undo()
   {
     mList.getEventListModifiable().removeAll(mIdentifiers);
+  }
+
+  public void setUpdatesSelection(final boolean update)
+  {
   }
 
   public boolean isSignificant()

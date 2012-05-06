@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -74,6 +76,7 @@ public class HalfWaySynthesisTRSimplifierTest
     final Collection<EventProxy> sharedControllable =
       new ArrayList<EventProxy>(numEvents);
     EventProxy marking = null;
+    mLastSharedControllable = 0;
     for (final EventProxy event : events) {
       switch (event.getKind()) {
       case UNCONTROLLABLE:
@@ -82,6 +85,7 @@ public class HalfWaySynthesisTRSimplifierTest
         } else {
           localUncontrollable.add(event);
         }
+        mLastSharedControllable++;
         break;
       case CONTROLLABLE:
         if (event.isObservable()) {
@@ -89,6 +93,7 @@ public class HalfWaySynthesisTRSimplifierTest
         } else {
           localControllable.add(event);
         }
+        mLastSharedControllable++;
         break;
       case PROPOSITION:
         sharedControllable.add(event);
@@ -123,6 +128,15 @@ public class HalfWaySynthesisTRSimplifierTest
     simplifier.setLastLocalUncontrollableEvent(mLastLocalUncontrollable);
     simplifier.setLastLocalControllableEvent(mLastLocalControllable);
     simplifier.setLastSharedUncontrollableEvent(mLastSharedUncontrollable);
+    if (mSettingRenamed) {
+      final int numRenamed = mLastSharedControllable - mLastSharedUncontrollable;
+      final TIntHashSet renamed = new TIntHashSet(numRenamed);
+      for (int e = mLastSharedUncontrollable + 1;
+           e <= mLastSharedControllable; e++) {
+        renamed.add(e);
+      }
+      simplifier.setRenamedEvents(renamed);
+    }
   }
 
 
@@ -233,6 +247,22 @@ public class HalfWaySynthesisTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_HalfwaySynthesis_11() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "HalfwaySynthesis_11.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_HalfwaySynthesis_12() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "HalfwaySynthesis_12.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   @Override
   public void test_basic_7() throws Exception
   {
@@ -265,5 +295,7 @@ public class HalfWaySynthesisTRSimplifierTest
   private int mLastLocalUncontrollable;
   private int mLastLocalControllable;
   private int mLastSharedUncontrollable;
+  private int mLastSharedControllable;
   private int mDefaultMarkingID;
+  private final boolean mSettingRenamed = true;
 }

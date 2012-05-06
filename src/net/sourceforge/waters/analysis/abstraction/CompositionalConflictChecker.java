@@ -1918,7 +1918,8 @@ public class CompositionalConflictChecker
       mSimplifier = new OPSearchAutomatonSimplifier(factory, translator);
       final Collection<EventProxy> props = getPropositions();
       mSimplifier.setPropositions(props);
-      mStatistics = new TRSimplifierStatistics(mSimplifier, true, true);
+      mStatistics =
+        new OPSearchTRSimplifierStatistics(mSimplifier, true, true);
     }
 
     //#######################################################################
@@ -1943,7 +1944,7 @@ public class CompositionalConflictChecker
         final int limit = getCurrentInternalStateLimit();
         mSimplifier.setNodeLimit(limit);
         mSimplifier.run();
-        final PartitionedAutomatonResult result =
+        final OPSearchAutomatonResult result =
           mSimplifier.getAnalysisResult();
         final AutomatonProxy convertedAut = result.getComputedProxy();
         if (aut == convertedAut) {
@@ -1951,6 +1952,8 @@ public class CompositionalConflictChecker
           return null;
         }
         mStatistics.recordFinish(convertedAut, true);
+        final int iter = result.getNumberOfIterations();
+        mStatistics.recordIterations(iter);
         final StateEncoding inputEnc = result.getInputEncoding();
         final StateEncoding outputEnc = result.getOutputEncoding();
         final List<int[]> partition = result.getPartition();
@@ -1975,7 +1978,7 @@ public class CompositionalConflictChecker
     protected void storeStatistics()
     {
       final CompositionalVerificationResult result = getAnalysisResult();
-      final List<TRSimplifierStatistics> list =
+      final List<OPSearchTRSimplifierStatistics> list =
         Collections.singletonList(mStatistics);
       result.setSimplifierStatistics(list);
     }
@@ -1983,7 +1986,8 @@ public class CompositionalConflictChecker
     @Override
     protected void resetStatistics()
     {
-      mStatistics = new TRSimplifierStatistics(mSimplifier, true, true);
+      mStatistics =
+        new OPSearchTRSimplifierStatistics(mSimplifier, true, true);
     }
 
     //#########################################################################
@@ -2001,7 +2005,7 @@ public class CompositionalConflictChecker
     //#########################################################################
     //# Data Members
     private final OPSearchAutomatonSimplifier mSimplifier;
-    private TRSimplifierStatistics mStatistics;
+    private OPSearchTRSimplifierStatistics mStatistics;
   }
 
 

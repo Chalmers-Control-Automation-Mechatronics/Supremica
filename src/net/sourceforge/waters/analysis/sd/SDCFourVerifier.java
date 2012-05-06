@@ -2,13 +2,8 @@
 
 package net.sourceforge.waters.analysis.sd;
 
-import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
-import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -26,23 +21,33 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  * @author Mahvash Baloch, Robi Malik
  */
 
-public class SDCFourVerifier extends AbstractSafetyVerifier
+public class SDCFourVerifier extends AbstractSDLanguageInclusionChecker
 
 {
 
   //#########################################################################
   //# Constructors
-  public SDCFourVerifier( final ProductDESProxy model,
-                              final ProductDESProxyFactory factory,
-                              final ControllabilityChecker checker)
+public SDCFourVerifier( final ProductDESProxyFactory factory)
+
+{
+super(factory);
+}
+public SDCFourVerifier(   final LanguageInclusionChecker checker,
+                          final ProductDESProxyFactory factory
+                          )
+
+{
+super(checker,factory);
+
+}
+  public SDCFourVerifier( final LanguageInclusionChecker checker,
+                          final ProductDESProxy model,
+                          final ProductDESProxyFactory factory
+                              )
 
   {
-    super(model,
-          LanguageInclusionKindTranslator.getInstance(),
-          LanguageInclusionDiagnostics.getInstance(),
-          factory);
-    mChecker = checker;
-  }
+    super(checker, model, factory );
+   }
 
 
   //#########################################################################
@@ -60,9 +65,7 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
       ProductDESProxy convertedModel = null;
       convertedModel = builder.createModelSDFour();
 
-      final ModularLanguageInclusionChecker checker=
-        new ModularLanguageInclusionChecker(convertedModel, getFactory(),
-                                             mChecker );
+      final LanguageInclusionChecker checker= getLanguageInclusionChecker();
       checker.setModel(convertedModel);
 
       final VerificationResult result;
@@ -72,9 +75,13 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
       } finally {
         result = checker.getAnalysisResult();
         setAnalysisResult(result);
+
       }
         if(result.isSatisfied())
-        return(true);
+          {
+
+          return(true);
+          }
         else
         { final SafetyTraceProxy counterexample = checker.getCounterExample();
           return setFailedResult(counterexample);
@@ -89,11 +96,9 @@ public class SDCFourVerifier extends AbstractSafetyVerifier
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
   {
-    return mChecker.supportsNondeterminism();
+    return false;
   }
 
 
-  //#########################################################################
-  //# Data Members
-  private final ControllabilityChecker mChecker;
+
 }

@@ -67,9 +67,7 @@ public abstract class AbstractControlLoopCheckerTest
   public void test_Uneven_Cancel10()
     throws Exception
   {
-    for (int looper = 0; looper < 10; looper++)
-    {
-      System.out.println("Run " + looper);
+    for (int looper = 0; looper < 10; looper++) {
       test_Uneven_Cancel1();
     }
   }
@@ -313,12 +311,12 @@ public abstract class AbstractControlLoopCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
-  public void test_Nasty_PartialLoop() throws Exception
+  public void test_Nasty_EmptySpec() throws Exception
   {
     final String group = "tests";
     final String dir = "nasty";
-    final String name = "partial_loop.wmod";
-    runModelVerifier(group, dir, name, false);
+    final String name = "empty_spec.wmod";
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Nasty_JustProperty() throws Exception
@@ -326,6 +324,14 @@ public abstract class AbstractControlLoopCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "just_property.wdes";
+    runModelVerifier(group, dir, name, false);
+  }
+
+  public void test_Nasty_PartialLoop() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "partial_loop.wmod";
     runModelVerifier(group, dir, name, false);
   }
 

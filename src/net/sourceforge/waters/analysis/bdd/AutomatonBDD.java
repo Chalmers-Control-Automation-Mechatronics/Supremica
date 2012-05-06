@@ -192,7 +192,7 @@ class AutomatonBDD
 
   //#########################################################################
   //# Constructing BDDs
-  BDD getInitialStateBDD(final BDDFactory factory)
+  BDD createInitialStateBDD(final BDDFactory factory)
   {
     final BDD result = factory.zero();
     final Collection<StateProxy> states = mAutomaton.getStates();

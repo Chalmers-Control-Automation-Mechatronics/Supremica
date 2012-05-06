@@ -31,7 +31,6 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
-import net.sourceforge.waters.gui.transfer.WatersDragSourceListener;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -312,7 +311,7 @@ public class IDE
 
     // Now start the gui...
     InterfaceManager.getInstance().initLookAndFeel();
-    WatersDragSourceListener.setup();
+    //WatersDragSourceListener.setup();
     final IDE ide = new IDE();
 
     // Open initial module(s)

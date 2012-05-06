@@ -14,8 +14,13 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Action;
@@ -30,8 +35,9 @@ import javax.swing.JRootPane;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
@@ -97,8 +103,22 @@ public class SimpleComponentEditorDialog
    */
   private void createComponents()
   {
-    final SimpleComponentSubject template =
-      mComponent == null ? COMPONENT_TEMPLATE : mComponent;
+    final SimpleComponentSubject template;
+    if (mComponent == null) {
+      try {
+        template = COMPONENT_TEMPLATE;
+        final SelectionOwner panel = mRoot.getComponentsPanel();
+        final List<InsertInfo> inserts = panel.getInsertInfo(TRANSFERABLE);
+        final InsertInfo insert = inserts.get(0);
+        mInsertPosition = insert.getInsertPosition();
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      } catch (final UnsupportedFlavorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    } else {
+      template = mComponent;
+    }
     final ModuleContext context = mRoot.getModuleContext();
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
@@ -310,14 +330,11 @@ public class SimpleComponentEditorDialog
         final SimpleComponentSubject template =
           new SimpleComponentSubject(ident, kind, graph, attribs);
         final SelectionOwner panel = mRoot.getComponentsPanel();
-        final Command command = new InsertCommand(template, panel);
+        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
+        final List<InsertInfo> list = Collections.singletonList(insert);
+        final Command command = new InsertCommand(list, panel, mRoot);
         mComponent = template;
         mRoot.getUndoInterface().executeCommand(command);
-        try {
-          mRoot.showEditor(mComponent);
-        } catch (final GeometryAbsentException exception) {
-          throw new WatersRuntimeException(exception);
-        }
       } else {
         final ModuleEqualityVisitor eq =
           ModuleEqualityVisitor.getInstance(true);
@@ -415,6 +432,7 @@ public class SimpleComponentEditorDialog
    * committed to the model when the OK button is pressed.</P>
    */
   private SimpleComponentSubject mComponent;
+  private Object mInsertPosition;
 
 
   //#########################################################################
@@ -426,5 +444,7 @@ public class SimpleComponentEditorDialog
     new SimpleComponentSubject(new SimpleIdentifierSubject(""),
                                ComponentKind.SPEC,
                                GRAPH_TEMPLATE);
+  private static final Transferable TRANSFERABLE =
+    WatersDataFlavor.createTransferable(COMPONENT_TEMPLATE);
 
 }

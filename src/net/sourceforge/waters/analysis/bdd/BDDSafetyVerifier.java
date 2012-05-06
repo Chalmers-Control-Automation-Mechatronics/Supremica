@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -204,8 +204,11 @@ public class BDDSafetyVerifier
       final EventBDD[] eventBDDs = super.createEventBDDs();
       final VerificationResult result = getAnalysisResult();
       if (!result.isFinished()) {
+        final BDDFactory bddFactory = getBDDFactory();
+        final int limit = getPartitioningSizeLimit();
         final Partitioning<ConditionPartitionBDD> condPartitioning =
-          new Partitioning<ConditionPartitionBDD>(ConditionPartitionBDD.class);
+          new GreedyPartitioning<ConditionPartitionBDD>
+            (bddFactory, ConditionPartitionBDD.class, limit);
         int condcount0 = 0;
         for (final EventBDD eventBDD : eventBDDs) {
           final BDD cond = eventBDD.getControllabilityConditionBDD();
@@ -216,12 +219,9 @@ public class BDDSafetyVerifier
             condcount0++;
           }
         }
-        final BDDFactory bddFactory = getBDDFactory();
         final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
-        final int limit = getPartitioningSizeLimit();
-        final Collection<ConditionPartitionBDD> conditions =
-          condPartitioning.mergePartitions(automatonBDDs, bddFactory, limit);
-        mConditionBDDs = new ArrayList<ConditionPartitionBDD>(conditions);
+          condPartitioning.merge(automatonBDDs);
+        mConditionBDDs = condPartitioning.getFullPartition();
         final int condcount1 = mConditionBDDs.size();
         if (logger.isDebugEnabled() && condcount0 > condcount1) {
           logger.debug("Merged conditions: " + condcount0 +
@@ -229,6 +229,40 @@ public class BDDSafetyVerifier
         }
       }
       return eventBDDs;
+    }
+  }
+
+  @Override
+  BDD createInitialStateBDD(final AutomatonBDD autBDD)
+  {
+    final BDDFactory bddFactory = getBDDFactory();
+    final BDD autinit = autBDD.createInitialStateBDD(bddFactory);
+    if (autinit.isZero()) {
+      final VerificationResult result = getAnalysisResult();
+      final KindTranslator translator = getKindTranslator();
+      if (result.isFinished() && result.isSatisfied()) {
+        // result is already set
+      } else if (autBDD.getKind() == ComponentKind.PLANT ||
+                 translator.getEventKind(KindTranslator.INIT) ==
+                 EventKind.CONTROLLABLE) {
+        result.setSatisfied(true);
+      } else {
+        final ProductDESProxyFactory desFactory = getFactory();
+        final String tracename = getTraceName();
+        final AutomatonProxy aut = autBDD.getAutomaton();
+        final String comment = getTraceComment(null, aut, null);
+        final ProductDESProxy model = getModel();
+        final List<AutomatonProxy> automata = getAutomata();
+        final TraceStepProxy step = desFactory.createTraceStepProxy(null);
+        final List<TraceStepProxy> steps = Collections.singletonList(step);
+        final SafetyTraceProxy counterexample =
+          desFactory.createSafetyTraceProxy
+          (tracename, comment, null, model, automata, steps);
+        result.setCounterExample(counterexample);
+      }
+      return null;
+    } else {
+      return autinit;
     }
   }
 
@@ -311,7 +345,6 @@ public class BDDSafetyVerifier
    * @return An English string that describes why the safety property is
    *         violated, which can be used as a trace comment.
    */
-  @SuppressWarnings("unused")
   private String getTraceComment(final EventProxy event,
                                  final AutomatonProxy aut,
                                  final StateProxy state)

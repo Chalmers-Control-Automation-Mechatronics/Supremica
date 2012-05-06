@@ -38,6 +38,16 @@ public class BDDPackageTest extends AbstractWatersTest
 
   //#########################################################################
   //# Test Cases
+  public void testBDDLibrary_buddy()
+  {
+    System.loadLibrary("buddy");
+  }
+
+  public void testBDDLibrary_cudd()
+  {
+    System.loadLibrary("cudd");
+  }
+
   public void testBDDPackage_java()
     throws SecurityException, NoSuchMethodException
   {
@@ -53,15 +63,23 @@ public class BDDPackageTest extends AbstractWatersTest
   public void testBDDPackage_buddy_after_jdd()
     throws SecurityException, NoSuchMethodException
   {
-    System.loadLibrary("jdd");
-    testBDDPackage(BDDPackage.BUDDY);
+    try {
+      System.loadLibrary("jdd");
+      testBDDPackage(BDDPackage.BUDDY);
+    } catch (final UnsatisfiedLinkError error) {
+      // No jdd.dll --- no problem.
+    }
   }
 
   public void testBDDPackage_buddy_before_jdd()
     throws SecurityException, NoSuchMethodException
   {
-    testBDDPackage(BDDPackage.BUDDY);
-    System.loadLibrary("jdd");
+    try {
+      testBDDPackage(BDDPackage.BUDDY);
+      System.loadLibrary("jdd");
+    } catch (final UnsatisfiedLinkError error) {
+      // No jdd.dll --- no problem.
+    }
   }
 
   public void testBDDPackage_cudd()
@@ -70,11 +88,13 @@ public class BDDPackageTest extends AbstractWatersTest
     testBDDPackage(BDDPackage.CUDD);
   }
 
+  /*
   public void testBDDPackage_cal()
     throws SecurityException, NoSuchMethodException
   {
     testBDDPackage(BDDPackage.CAL);
   }
+  */
 
   public void testEmptyReorder_java()
     throws SecurityException, NoSuchMethodException

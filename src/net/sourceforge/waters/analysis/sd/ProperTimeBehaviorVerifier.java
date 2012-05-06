@@ -79,8 +79,9 @@ public class ProperTimeBehaviorVerifier extends AbstractSDConflictChecker
       } finally {
         result = checker.getAnalysisResult();
         setAnalysisResult(result);
-      }
+              }
       if (result.isSatisfied()) {
+
         return true;
       } else {
         final ConflictTraceProxy counterexample = checker.getCounterExample();

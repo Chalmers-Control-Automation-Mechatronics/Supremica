@@ -27,17 +27,20 @@ public abstract class CompositionalConflictCheckerExperiments extends
     AbstractAnalysisTest
 {
 
-  // #######################################################################
-  // # Constructor
-
-  public CompositionalConflictCheckerExperiments(
-                                                 final String statsFilename,
-                                                 final String preselectingHeuristic,
-                                                 final String selectingHeuristic,
-                                                 final int rules)
-      throws FileNotFoundException
+  //#########################################################################
+  //# Constructor
+  public CompositionalConflictCheckerExperiments
+    (final String statsFilename,
+     final String preselectingHeuristic,
+     final String selectingHeuristic,
+     final int rules)
+  throws FileNotFoundException
   {
-    mOut = new FileOutputStream(statsFilename);
+    final String outputprop = System.getProperty("waters.test.outputdir");
+    final File dir = new File(outputprop);
+    ensureDirectoryExists(dir);
+    final File statsFile = new File(dir, statsFilename);
+    mOut = new FileOutputStream(statsFile);
     mPrintWriter = null;
     mPreselecting = preselectingHeuristic.toLowerCase();
     mSelecting = selectingHeuristic.toLowerCase();

@@ -11,7 +11,6 @@
 package org.supremica.gui.ide;
 
 import java.awt.Component;
-import java.awt.Frame;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,6 +22,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sourceforge.waters.gui.AliasesPanel;
 import net.sourceforge.waters.gui.ComponentsTree;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.EventDeclListView;
@@ -36,12 +36,14 @@ import net.sourceforge.waters.gui.observer.SubPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.supremica.gui.ide.actions.Actions;
+import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaPropertyChangeEvent;
+import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -54,7 +56,7 @@ import org.supremica.gui.ide.actions.Actions;
 
 public class EditorPanel
     extends MainPanel
-    implements ModuleWindowInterface, ChangeListener, Subject
+    implements ModuleWindowInterface, ChangeListener, Subject, SupremicaPropertyChangeListener
 {
 
     //#######################################################################
@@ -74,16 +76,29 @@ public class EditorPanel
 
 		final IDE ide = mModuleContainer.getIDE();
         final WatersPopupActionManager manager = ide.getPopupActionManager();
-        final ComponentsTree comptree = new ComponentsTree(this, manager);
-        mComponentsTab = new Tab("Components", comptree);
-        final EventDeclListView eventlist =
+
+        final AliasesPanel aliasesPanel =
+          new AliasesPanel(this, manager);
+        mAliasesTab = new Tab("Definitions", aliasesPanel);
+        if (Config.INCLUDE_INSTANTION.get()) {
+          mAliasesTab.addToTabbedPane();
+        }
+        mTabMap.put(aliasesPanel.getConstantAliasesPanel(), mAliasesTab);
+        mTabMap.put(aliasesPanel.getEventAliasesPanel(), mAliasesTab);
+        final EventDeclListView eventsPanel =
             new EventDeclListView(this, manager);
-        mEventsTab = new Tab("Events", eventlist);
-        // aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
+        mEventsTab = new Tab("Events", eventsPanel);
+        mEventsTab.addToTabbedPane();
+        mTabMap.put(eventsPanel, mEventsTab);
+        final ComponentsTree compPanel = new ComponentsTree(this, manager);
+        mComponentsTab = new Tab("Components", compPanel);
+        mComponentsTab.addToTabbedPane();
         mComponentsTab.activate();
+        mTabMap.put(compPanel, mComponentsTab);
 
         mCommentPanel = new CommentPanel(moduleContainer);
         setRightComponent(mCommentPanel);
+        Config.INCLUDE_INSTANTION.addPropertyChangeListener(this);
     }
 
 
@@ -119,19 +134,37 @@ public class EditorPanel
         return mModuleContainer.getExpressionParser();
     }
 
-    public Frame getRootWindow()
+    public IDE getRootWindow()
     {
-        return (Frame) getTopLevelAncestor();
+        return (IDE) getTopLevelAncestor();
     }
 
     public SelectionOwner getComponentsPanel()
     {
-        return mComponentsTab.getPanel();
+        return (SelectionOwner) mComponentsTab.getPanel();
     }
 
     public SelectionOwner getEventsPanel()
     {
-        return mEventsTab.getPanel();
+        return (SelectionOwner) mEventsTab.getPanel();
+    }
+
+    public SelectionOwner getConstantAliasesPanel()
+    {
+      final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
+      return panel.getConstantAliasesPanel();
+    }
+
+    public SelectionOwner getEventAliasesPanel()
+    {
+      final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
+      return panel.getEventAliasesPanel();
+    }
+
+    public SelectionOwner getInstancePanel()
+    {
+      // TODO Auto-generated method stub
+      return (SelectionOwner) mComponentsTab.getPanel();
     }
 
     public void showComponents()
@@ -218,6 +251,16 @@ public class EditorPanel
     }
 
 
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      if (Config.INCLUDE_INSTANTION.get()) {
+        mAliasesTab.addToTabbedPane(0);
+      }
+      else{
+        mAliasesTab.removeFromTabbedPane();
+      }
+    }
+
     //######################################################################
     //#
     protected boolean setRightComponent(final JComponent newComponent)
@@ -243,14 +286,6 @@ public class EditorPanel
         }
     }
 
-    @Deprecated
-    public void addComponent(final Proxy proxy)
-    {
-        final SelectionOwner component = mComponentsTab.getPanel();
-        final Object inspos = component.getInsertPosition(proxy);
-        component.insertCreatedItem(proxy, inspos);
-    }
-
 
     //#######################################################################
     //# Auxiliary Methods
@@ -270,21 +305,18 @@ public class EditorPanel
         private Tab(final String name, final JComponent panel)
         {
             mPanel = panel;
-            mSelectionOwner = (SelectionOwner) panel;
             mScrollPane = new JScrollPane(panel);
             mScrollPane.setName(name);
             mScrollPane.setPreferredSize
                 (IDEDimensions.leftEditorPreferredSize);
             mScrollPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-            mTabbedPane.add(mScrollPane);
-            mTabMap.put(mSelectionOwner, this);
         }
 
         //###################################################################
         //# Simple Access
-        private SelectionOwner getPanel()
+        private JComponent getPanel()
         {
-            return mSelectionOwner;
+            return mPanel;
         }
 
         private void activate()
@@ -293,10 +325,21 @@ public class EditorPanel
             mPanel.requestFocusInWindow();
         }
 
+        private void addToTabbedPane(){
+          mTabbedPane.add(mScrollPane);
+        }
+
+        private void addToTabbedPane(final int index){
+          mTabbedPane.add(mScrollPane, index);
+        }
+
+        private void removeFromTabbedPane(){
+          mTabbedPane.remove(mScrollPane);
+        }
+
         //###################################################################
         //# Data Members
         private final JComponent mPanel;
-        private final SelectionOwner mSelectionOwner;
         private final JScrollPane mScrollPane;
 
     }
@@ -310,6 +353,7 @@ public class EditorPanel
     private final JTabbedPane mTabbedPane;
     private final Tab mComponentsTab;
     private final Tab mEventsTab;
+    private final Tab mAliasesTab;
     private final CommentPanel mCommentPanel;
 
     private final Collection<Observer> mObservers = new LinkedList<Observer>();
@@ -318,5 +362,8 @@ public class EditorPanel
     //#########################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+
+
+
 
 }

@@ -14,25 +14,39 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.EditorEditEdgeDialog;
+import net.sourceforge.waters.gui.EventAliasEditorDialog;
 import net.sourceforge.waters.gui.EventDeclEditorDialog;
-import net.sourceforge.waters.gui.ForeachComponentEditorDialog;
+import net.sourceforge.waters.gui.ForeachEditorDialog;
+import net.sourceforge.waters.gui.InstanceEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.ParameterBindingEditorDialog;
 import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
 import net.sourceforge.waters.gui.VariableEditorDialog;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.subject.module.ConstantAliasSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.ForeachComponentSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
+import net.sourceforge.waters.subject.module.InstanceSubject;
+import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 
@@ -42,7 +56,7 @@ import org.supremica.gui.ide.IDE;
 /**
  * <P>The action associated with the 'properties' menu buttons.</P>
  *
- * <P>This action pops up a dialog box to edit the currently focussed
+ * <P>This action pops up a dialog box to edit the currently focused
  * item, if that item is of a supported type. To support this action,
  * components including editable items must implement the {@link
  * SelectionOwner} interface and return the item to be edited through
@@ -93,7 +107,7 @@ public class IDEPropertiesAction
 
 
   //#########################################################################
-  //# Auxilary Methods
+  //# Auxiliary Methods
   private void updateEnabledStatus()
   {
     final Proxy proxy = getActionArgument();
@@ -123,7 +137,7 @@ public class IDEPropertiesAction
   //#########################################################################
   //# Inner Class PropertiesVisitor
   private class PropertiesVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -132,9 +146,9 @@ public class IDEPropertiesAction
     {
       try {
         mDoEdit = false;
-	return (Boolean) proxy.acceptVisitor(this);
+        return (Boolean) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
@@ -142,9 +156,9 @@ public class IDEPropertiesAction
     {
       try {
         mDoEdit = true;
-	proxy.acceptVisitor(this);
+        proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
@@ -157,12 +171,32 @@ public class IDEPropertiesAction
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    public Boolean visitConstantAliasProxy(final ConstantAliasProxy decl)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final ConstantAliasSubject subject = (ConstantAliasSubject) decl;
+        new ConstantAliasEditorDialog(root, subject);
+      }
+      return true;
+    }
+
     public Boolean visitEdgeProxy(final EdgeProxy edge)
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final EdgeSubject subject = (EdgeSubject) edge;
         EditorEditEdgeDialog.showDialog(subject, root);
+      }
+      return true;
+    }
+
+    public Boolean visitEventAliasProxy(final EventAliasProxy alias)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final EventAliasSubject subject = (EventAliasSubject) alias;
+        new EventAliasEditorDialog(root, subject);
       }
       return true;
     }
@@ -177,13 +211,34 @@ public class IDEPropertiesAction
       return true;
     }
 
-    public Boolean visitForeachComponentProxy
-      (final ForeachComponentProxy comp)
+    public Boolean visitForeachProxy(final ForeachProxy foreach)
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        final ForeachComponentSubject subject = (ForeachComponentSubject) comp;
-        new ForeachComponentEditorDialog(root, subject);
+        final ForeachSubject subject = (ForeachSubject) foreach;
+        final FocusTracker tracker = getFocusTracker();
+        final SelectionOwner panel = tracker.getWatersSelectionOwner();
+        new ForeachEditorDialog(root, panel, subject);
+      }
+      return true;
+    }
+
+    public Boolean visitInstanceProxy(final InstanceProxy instance)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final InstanceSubject subject = (InstanceSubject) instance;
+        new InstanceEditorDialog(root, subject);
+      }
+      return true;
+    }
+
+    public Boolean visitParameterBindingProxy(final ParameterBindingProxy binding)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final ParameterBindingSubject subject = (ParameterBindingSubject) binding;
+        new ParameterBindingEditorDialog(root,subject);
       }
       return true;
     }

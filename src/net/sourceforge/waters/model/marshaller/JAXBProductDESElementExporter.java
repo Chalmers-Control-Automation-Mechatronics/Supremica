@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.AbstractProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -344,7 +344,7 @@ abstract class JAXBProductDESElementExporter
   //#########################################################################
   //# Inner Class RefExporter
   private class RefExporter<P extends NamedProxy>
-    extends AbstractProductDESProxyVisitor
+    extends DefaultProductDESProxyVisitor
   {
 
     //#######################################################################

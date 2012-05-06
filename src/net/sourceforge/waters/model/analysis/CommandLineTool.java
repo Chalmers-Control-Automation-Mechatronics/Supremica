@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.analysis;
 import java.lang.reflect.Method;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -77,7 +78,6 @@ public class CommandLineTool
   {
     boolean verbose = true;
     boolean stats = false;
-    boolean optimise = true;
     boolean noargs = false;
     int timeout = -1;
     PrintWriter csv = null;
@@ -98,11 +98,11 @@ public class CommandLineTool
       ModelVerifier wrapper = null;
 
       final String factoryname = args[0];
-      final List<String> arglist = new LinkedList<String>();
+      final List<String> argList = new LinkedList<String>();
       for (int i = 1; i < args.length; i++) {
         final String arg = args[i];
         if (noargs) {
-          arglist.add(arg);
+          argList.add(arg);
         } else if (arg.equals("-q") || arg.equals("-quiet")) {
           verbose = false;
         } else if (arg.equals("-sic5")) {
@@ -111,8 +111,6 @@ public class CommandLineTool
           wrapper = new SICProperty6Verifier(desFactory);
         } else if (arg.equals("-stats")) {
           stats = true;
-        } else if (arg.equals("-noopt")) {
-          optimise = false;
         } else if (arg.equals("-timeout") && i + 1 < args.length) {
           try {
             timeout = Integer.parseInt(args[++i]);
@@ -136,13 +134,13 @@ public class CommandLineTool
             }
             bindings.add(binding);
           } else {
-            arglist.add(arg);
+            argList.add(arg);
           }
         } else if (arg.equals("--")) {
           noargs = true;
-          arglist.add(arg);
+          argList.add(arg);
         } else {
-          arglist.add(arg);
+          argList.add(arg);
         }
       }
 
@@ -174,21 +172,19 @@ public class CommandLineTool
       docManager.registerUnmarshaller(moduleMarshaller);
       docManager.registerUnmarshaller(importer);
 
-      final Iterator<String> iter = arglist.iterator();
+      final Iterator<String> iter = argList.iterator();
       final String checkname = iter.next();
       iter.remove();
 
       final Class<?> fclazz = loader.loadClass(factoryname);
-      final Method getinst = fclazz.getMethod("getInstance", List.class);
+      final Method getinst = fclazz.getMethod("getInstance");
       final ModelVerifierFactory factory =
-        (ModelVerifierFactory) getinst.invoke(null, arglist);
+        (ModelVerifierFactory) getinst.invoke(null);
       final String createname = "create" + checkname + "Checker";
       final Method getcheck =
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
-      final boolean noProperties =
-        !(checker instanceof LanguageInclusionChecker);
       final boolean noPropositions = !(checker instanceof ConflictChecker);
       if (wrapper == null) {
         wrapper = checker;
@@ -204,11 +200,13 @@ public class CommandLineTool
       }
       final Watchdog watchdog = new Watchdog(wrapper, timeout);
       final Collection<String> empty = Collections.emptyList();
-      final List<String> filenames = factory.configure(checker);
+      final Iterator<String> argIter = argList.iterator();
+      factory.parse(argIter);
+      factory.configure(checker);
 
       final Formatter formatter = new Formatter(System.out);
       boolean first = true;
-      for (final String name : filenames) {
+      for (final String name : argList) {
         final File filename = new File(name);
         final DocumentProxy doc = docManager.load(filename);
         ProductDESProxy des = null;
@@ -218,10 +216,6 @@ public class CommandLineTool
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          compiler.setOptimizationEnabled(optimise);
-          if (noProperties) {
-            compiler.setEnabledPropertyNames(empty);
-          }
           if (noPropositions) {
             compiler.setEnabledPropositionNames(empty);
           }
@@ -312,6 +306,14 @@ public class CommandLineTool
       }
 
     } catch (final WatersUnmarshalException exception) {
+      System.err.print("FATAL ERROR (");
+      System.err.print(ProxyTools.getShortClassName(exception));
+      System.err.println(")");
+      final String msg = exception.getMessage();
+      if (msg != null) {
+        System.err.println(exception.getMessage());
+      }
+    } catch (final IOException exception) {
       System.err.print("FATAL ERROR (");
       System.err.print(ProxyTools.getShortClassName(exception));
       System.err.println(")");

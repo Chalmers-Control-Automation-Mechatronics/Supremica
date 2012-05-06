@@ -19,6 +19,7 @@ import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -44,10 +45,8 @@ public class Renderer
       final RenderingInformation info =
         context.getRenderingInformation(blocked);
       queue.offer(new ShapeToRender(shape, info));
-      for (final Proxy proxy : blocked.getEventList()) {
-        queue.offer(new ShapeToRender(producer.getShape(proxy),
-                                      context.getRenderingInformation(proxy)));
-      }
+
+      listToRender(blocked.getEventList(), queue, producer);
     }
 
     // Nodes
@@ -68,10 +67,9 @@ public class Renderer
           .getRenderingInformation(edge)));
       queue.offer(new ShapeToRender(producer.getShape(edge.getLabelBlock()),
           context.getRenderingInformation(edge.getLabelBlock())));
-      for (final Proxy p : edge.getLabelBlock().getEventList()) {
-        queue.offer(new ShapeToRender(producer.getShape(p), context
-            .getRenderingInformation(p)));
-      }
+
+      listToRender(edge.getLabelBlock().getEventList(), queue, producer);
+
       if (edge.getGuardActionBlock() != null) {
         queue.offer(new ShapeToRender(producer.getShape(edge
             .getGuardActionBlock()), context.getRenderingInformation(edge
@@ -81,17 +79,17 @@ public class Renderer
               new RenderingInformation(false, false, EditorColor.ACTIONCOLOR,
                   EditorColor.ACTIONCOLOR, 0)));
         }
-        List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
+        final List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
         // A naive solution for showing the added guards(after synthesis) with different color.
         if(guards.size() == 1)
         {
-            SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
+            final SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
             queue.offer(new ShapeToRender(producer.getShape(guard),
                 new RenderingInformation(false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
         }
         else if(guards.size() == 2)
         {
-            SimpleExpressionProxy guard = guards.get(0);
+            final SimpleExpressionProxy guard = guards.get(0);
             queue.offer(new ShapeToRender(producer.getShape(guard),
                 new RenderingInformation(false, false, EditorColor.ADDEDGUARDCOLOR, EditorColor.ADDEDGUARDCOLOR, 0)));
         }
@@ -103,7 +101,7 @@ public class Renderer
                 if(i==2)
                     guardColor = EditorColor.ADDEDGUARDCOLOR;
 
-                SimpleExpressionProxy guard = guards.get(i); //Change color
+                final SimpleExpressionProxy guard = guards.get(i); //Change color
                 queue.offer(new ShapeToRender(producer.getShape(guard),
                     new RenderingInformation(false, false, guardColor, guardColor, 0)));
             }
@@ -160,5 +158,18 @@ public class Renderer
             return mStatus.getPriority() - o.mStatus.getPriority();
         }
 
+    }
+
+    private void listToRender(final List<Proxy> list,
+                              final PriorityQueue<ShapeToRender> queue,
+                              final ProxyShapeProducer producer){
+      for (final Proxy proxy : list) {
+        queue.offer(new ShapeToRender(producer.getShape(proxy),
+             producer.getRenderingContext().getRenderingInformation(proxy)));
+        if(proxy instanceof ForeachProxy){
+          final ForeachProxy foreach = (ForeachProxy)proxy;
+          listToRender(foreach.getBody(), queue, producer);
+        }
+      }
     }
 }

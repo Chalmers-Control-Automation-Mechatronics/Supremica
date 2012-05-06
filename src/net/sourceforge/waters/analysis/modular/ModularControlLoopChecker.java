@@ -17,6 +17,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -94,51 +96,39 @@ public class ModularControlLoopChecker
         while (removedLoopEvents);
         final LoopTraceProxy loop = testAll();
         if (loop != null) {
-          setFailedResult(loop);
-          return false;
+          return setFailedResult(loop);
         }
-        boolean failed = true;
         AutomataGroup primary = null;
         int bestScore = Integer.MIN_VALUE;
-        for (final AutomataGroup group : mAutoSets)
-        {
-          if (group.getScore() > bestScore)
-          {
+        for (final AutomataGroup group : mAutoSets) {
+          if (group.getScore() > bestScore) {
             bestScore = group.getScore();
             primary = group;
           }
         }
+        if (primary == null) {
+          return setSatisfiedResult();
+        }
         bestScore = Integer.MIN_VALUE;
         AutomataGroup bestGroup = null;
-        if (primary.getTrace() != null) {
-          for (final AutomataGroup checkLoop : mAutoSets) {
-            if (checkLoop != primary) {
-              final int score = checkLoop.isControlLoop(primary, mTranslator);
-              if (score > bestScore)
-              {
-                bestGroup = checkLoop;
-                bestScore = score;
-              }
+        assert primary.getTrace() != null : "Primary has no trace!";
+        for (final AutomataGroup checkLoop : mAutoSets) {
+          if (checkLoop != primary) {
+            final int score = checkLoop.isControlLoop(primary, mTranslator);
+            if (score > bestScore) {
+              bestGroup = checkLoop;
+              bestScore = score;
             }
           }
-          if (bestGroup != null)
-          {
-            checkAbort();
-            //System.out.println("DEBUG: Merged with score " + bestGroup.isControlLoop(primary, mTranslator) + " at time " + System.currentTimeMillis());
-            mAutoSets.remove(bestGroup);
-            primary.merge(bestGroup);
-            failed = false;
-            mTotalCompositions++;
-            updateResult(primary);
-           }
         }
-        else
-          throw new IllegalArgumentException("Primary has no trace. This shouldn't happen, as the implementation demands that such a group has a score of Integer.MIN_VALUE");
-        if (failed)
-          throw new AnalysisException("ERROR: Two automata could not be selected for merging. Scoring system may not work. Num Events: " + mLoopEvents.size());
+        assert bestGroup != null : "Could not find two automata for merging!";
+        checkAbort();
+        mAutoSets.remove(bestGroup);
+        primary.merge(bestGroup);
+        mTotalCompositions++;
+        updateResult(primary);
       }
-    }
-    finally {
+    } finally {
       tearDown();
     }
   }
@@ -222,16 +212,10 @@ public class ModularControlLoopChecker
     return output;
   }
 
-  public LoopTraceProxy getCounterExample()
-  {
-      return (LoopTraceProxy) super.getCounterExample();
-  }
 
-  public Collection<EventProxy> getNonLoopEvents()
-  {
-    throw new UnsupportedOperationException("Modular Control Loop Checker does not calculate non-loop events");
-  }
-
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
   @Override
   public void setKindTranslator(final KindTranslator translator)
   {
@@ -239,20 +223,14 @@ public class ModularControlLoopChecker
     mTranslator = new ManipulativeTranslator(translator);
   }
 
-  public void setMergeVersion(final AutomataGroup.MergeVersion m)
+  @Override
+  public LoopTraceProxy getCounterExample()
   {
-    AutomataGroup.setMergeVersion(m);
-  }
-  public void setSelectVersion(final AutomataGroup.SelectVersion s)
-  {
-    AutomataGroup.setSelectVersion(s);
-  }
-  public void setControlLoopDetection(final MonolithicSCCControlLoopChecker.CLDetector c)
-  {
-    MonolithicSCCControlLoopChecker.setLoopDetector(c);
+    return (LoopTraceProxy) super.getCounterExample();
   }
 
-  public void setUp() throws AnalysisException
+  @Override
+  protected void setUp() throws AnalysisException
   {
     super.setUp();
     mAutoSets = new ArrayList<AutomataGroup>();
@@ -276,7 +254,8 @@ public class ModularControlLoopChecker
     mTotalCompositions = 0;
   }
 
-  public void tearDown()
+  @Override
+  protected void tearDown()
   {
     super.tearDown();
     mLoopEvents = null;
@@ -290,6 +269,49 @@ public class ModularControlLoopChecker
     mTotalTransitions = -1;
     mTotalCompositions = -1;
   }
+
+  @Override
+  protected boolean setFailedResult(final TraceProxy counterexample)
+  {
+    final LoopTraceProxy loop = (LoopTraceProxy) counterexample;
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = getModel();
+    final String desname = des.getName();
+    final String tracename = desname + "-loop";
+    final String comment = loop.getComment();
+    final Collection<AutomatonProxy> automata = loop.getAutomata();
+    final List<TraceStepProxy> steps = loop.getTraceSteps();
+    final int index = loop.getLoopIndex();
+    final LoopTraceProxy wrapper =
+      factory.createLoopTraceProxy(tracename, comment, null,
+                                   des, automata, steps, index);
+    return super.setFailedResult(wrapper);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
+  public Collection<EventProxy> getNonLoopEvents()
+  {
+    throw new UnsupportedOperationException
+      ("Modular Control Loop Checker does not calculate non-loop events");
+  }
+
+  public void setMergeVersion(final AutomataGroup.MergeVersion m)
+  {
+    AutomataGroup.setMergeVersion(m);
+  }
+
+  public void setSelectVersion(final AutomataGroup.SelectVersion s)
+  {
+    AutomataGroup.setSelectVersion(s);
+  }
+
+  public void setControlLoopDetection(final MonolithicSCCControlLoopChecker.CLDetector c)
+  {
+    MonolithicSCCControlLoopChecker.setLoopDetector(c);
+  }
+
 
   private class ManipulativeTranslator implements KindTranslator
   {

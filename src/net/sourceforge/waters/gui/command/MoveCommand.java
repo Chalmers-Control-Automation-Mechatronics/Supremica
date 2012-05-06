@@ -16,13 +16,15 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 
 /**
- * <P>A general command for changing a geometry object.</P>
+ * <P>A general command for changing the geometry of a single graphical
+ * object.</P>
  *
- * <P>This command is typically used after the user has moved some settings
- * some graphical object. a dialog. It is passed a geometry subject to be
+ * <P>This command is typically used after the user has moved a
+ * graphical objects. It is passed a {@link GeometrySubject} to be
  * modified, and a dummy geometry containing the new values. When executed,
  * all changes are applied at the same time, in an attempt to reduce the
  * number of geometry change notifications fired.</P>
@@ -34,6 +36,10 @@ import net.sourceforge.waters.subject.base.ProxySubject;
  * <P>The internal mechanism for the assignment is the {@link
  * GeometrySubject#assignFrom(GeometrySubject) assignFrom()} method, which
  * supports uniform assignments between subjects.</P>
+ *
+ * <P>This command only supports the geometry change for a single graphical
+ * object. To modify several objects at the same time, multiple MoveCommand
+ * objects can be grouped in a {@link CompoundCommand}.</P>
  *
  * @author Robi Malik
  */
@@ -104,7 +110,7 @@ public class MoveCommand
     }
     mHasBeenExecuted = false;
   }
-        
+
 
   //#########################################################################
   //# Simple Access
@@ -163,7 +169,13 @@ public class MoveCommand
     if (getUpdatesSelection()) {
       final SelectionOwner panel = getPanel();
       final ProxySubject parent = (ProxySubject) mSubject.getParent();
-      final List<ProxySubject> list = Collections.singletonList(parent);
+      final List<ProxySubject> list;
+      if(parent instanceof SimpleNodeSubject){
+        list = Collections.singletonList((ProxySubject) mSubject);
+      }
+      else{
+        list = Collections.singletonList(parent);
+      }
       panel.replaceSelection(list);
       panel.scrollToVisible(list);
       panel.activate();

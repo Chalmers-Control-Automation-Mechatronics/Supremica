@@ -6,11 +6,12 @@ import org.antlr.runtime.Token;
 
 public class VardefTreeNode extends PromelaTree
 {
-  public VardefTreeNode(final int token)
+
+  public VardefTreeNode(final int token, final boolean visible, final String type)
   {
-    // TODO Need int constructor
     this((Token)new CommonToken(token,"Vardefinition"));
-    mChanState = "Vardefinition";
+    mVisible = visible;
+    mVariableType = type;
   }
 
   public VardefTreeNode(final Token token)
@@ -33,6 +34,44 @@ public class VardefTreeNode extends PromelaTree
     return  visitor.visitVar(this);
   }
 
-  private String mChanState;
+  //NEW<============================================================================================================================================
+  /**
+   * A method to get the visibility of the variable(s) that are being created
+   * @author Ethan Duff
+   * @return TRUE if the variable should be included in the system space or FALSE otherwise
+   */
+  public boolean isVisible()
+  {
+    return mVisible;
+  }
+
+  /**
+   * A method to get the type of the variable(s) that are being created
+   * @author Ethan Duff
+   * @return A string indicating the type of the variable. Will be 'bit' 'byte' 'short' 'int' 'mtype'
+   */
+  public String getVariableType()
+  {
+    return mVariableType;
+  }
+
+  /**
+   * A method to get the locality of the variable(s) being created
+   * @author Ethan Duff
+   * @return TRUE if the variable(s) are global, or FALSE if they are local to a method
+   */
+  public boolean isGlobal()
+  {
+    return mGlobal;
+  }
+  //===============================================================================================================================================>
+
+  private final String mChanState;
+
+  //NEW<============================================================================================================================================
+  private boolean mVisible;
+  private String mVariableType;
+  private boolean mGlobal;
+  //===============================================================================================================================================>
 
 }

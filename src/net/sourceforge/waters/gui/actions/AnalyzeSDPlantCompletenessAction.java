@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDPlantCompletenessChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -39,8 +40,10 @@ public class AnalyzeSDPlantCompletenessAction extends WatersAnalyzeAction
   protected ModelVerifier getModelVerifier
     (final ModelVerifierFactory factory,
      final ProductDESProxyFactory desFactory)
-  {
-     return new SDPlantCompletenessChecker(null, desFactory);
+  {  final ControllabilityChecker checker=
+  factory.createControllabilityChecker(desFactory);
+
+     return new SDPlantCompletenessChecker(desFactory,checker);
   }
 
   protected String getSuccessDescription()

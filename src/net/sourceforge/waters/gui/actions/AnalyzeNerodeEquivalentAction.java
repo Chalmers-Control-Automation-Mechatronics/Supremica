@@ -33,7 +33,7 @@ public class AnalyzeNerodeEquivalentAction extends WatersAnalyzeAction
 
   protected String getFailureDescription()
   {
-    return "does not satisfy Nerode Equivalence Property";
+    return "does not satisfy SD Controllability Point iii.2";
   }
 
   protected ModelVerifier getModelVerifier
@@ -45,7 +45,7 @@ public class AnalyzeNerodeEquivalentAction extends WatersAnalyzeAction
 
   protected String getSuccessDescription()
   {
-    return "satisfies Nerode Equivalence Property";
+    return "satisfies SD Controllability Point iii.2";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;

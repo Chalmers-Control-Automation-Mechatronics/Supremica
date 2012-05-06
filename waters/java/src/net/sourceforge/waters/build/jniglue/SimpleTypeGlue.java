@@ -20,9 +20,10 @@ class SimpleTypeGlue extends TypeGlue {
   private static final int C_CHAR = 2;
   private static final int C_DOUBLE = 3;
   private static final int C_INT = 4;
+  private static final int C_LONG = 5;
   @SuppressWarnings("unused")
-  private static final int C_OBJECT = 5;
-  private static final int C_STRING = 6;
+  private static final int C_OBJECT = 6;
+  private static final int C_STRING = 7;
 
   static final SimpleTypeGlue TYPE_VOID =
     new SimpleTypeGlue(C_VOID, "void", "void", "void",
@@ -38,7 +39,10 @@ class SimpleTypeGlue extends TypeGlue {
 		       "D", "Double", double.class);
   static final SimpleTypeGlue TYPE_INT =
     new SimpleTypeGlue(C_INT, "int", "int", "jint",
-		       "I", "Int", int.class);
+               "I", "Int", int.class);
+  static final SimpleTypeGlue TYPE_LONG =
+    new SimpleTypeGlue(C_LONG, "long", "jlong", "jlong",
+                       "J", "Long", long.class);
   static final SimpleTypeGlue TYPE_STRING =
     new SimpleTypeGlue(C_STRING, "String", "jstring", "jstring",
 		       "Ljava/lang/String;", "Object", String.class);

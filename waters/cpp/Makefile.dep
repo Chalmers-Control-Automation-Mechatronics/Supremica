@@ -9,7 +9,7 @@
 #############################################################################
 # OS dependent
 
-ifeq "$(OSTYPE)" "linux-gnu"
+ifeq "$(HOST_OS)" "linux"
   MKDIR         = mkdir -p $(strip $(1))
 else
   MKDIR         = $(if $(wildcard $(1)),,mkdir $(subst /,\,$(1)))
@@ -23,16 +23,10 @@ endif
 
 all::			$(LIB)
 
-test::			$(TESTAPP)
-
 
 $(LIB):			$(OBJ)
 			$(call MKDIR,$(LIBDIR))
 			$(CXX) -shared $(LDFLAGS) -o $@ $^
-
-$(TESTAPP):		$(LIB) $(TESTOBJ)
-			$(call MKDIR,$(BINDIR))
-			$(CXX) -o $@ -L$(LIBDIR) -l$(PROJECT) $(TESTOBJ)
 
 
 #############################################################################
@@ -48,7 +42,7 @@ $(OBJDIR)/%.o:		$(SRCDIR)/%.cpp
 # Dependencies
 
 $(DEP):			$(CPP) $(HPP) Makefile
-			$(CXX) -MM $(INCDIRS) $(CPP) | \
+			$(CXX) $(ARCH_FLAGS) -MM $(INCDIRS) $(CPP) | \
 	sed -e "/:/s|^.*: *$(SRCDIR)/\(.*\)/[^/]*\.cpp|$(OBJDIR)/\1/\0|" > $@
 
 -include $(DEP)

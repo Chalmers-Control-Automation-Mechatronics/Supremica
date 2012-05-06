@@ -9,13 +9,13 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.List;
-
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -36,12 +36,6 @@ public class ProjectingModelVerifierFactory
     return SingletonHolder.INSTANCE;
   }
 
-  public static ProjectingModelVerifierFactory
-    getInstance(final List<String> cmdline)
-  {
-    return new ProjectingModelVerifierFactory(cmdline);
-  }
-
   private static class SingletonHolder {
     private static final ProjectingModelVerifierFactory INSTANCE =
       new ProjectingModelVerifierFactory();
@@ -54,9 +48,14 @@ public class ProjectingModelVerifierFactory
   {
   }
 
-  private ProjectingModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(new MonolithicStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
     addArgument(new MonolithicTransitionLimitArgument());
@@ -76,14 +75,16 @@ public class ProjectingModelVerifierFactory
       (factory, new NativeControllabilityChecker(factory), projector);
   }
 
+  @Override
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ModularLanguageInclusionChecker(
-       null, factory,
-       /*new OneUncontrollableChecker(null, factory,
-                                    createControllabilityChecker(factory)),*/
-       createControllabilityChecker(factory));
+    final SafetyVerifier mono =
+      new NativeLanguageInclusionChecker(factory);
+    final SafetyProjectionBuilder projector = new Projection2(factory);
+    final SafetyVerifier cont =
+      new ProjectingControllabilityChecker(factory, mono, projector);
+    return new ModularLanguageInclusionChecker(null, factory, cont);
   }
 
 

@@ -481,6 +481,21 @@ public class IntStateBuffer
   //#########################################################################
   //# Advanced Access
   /**
+   * Returns whether this state buffer represents an empty state set.
+   * @return <CODE>true</CODE> if all states in the buffer are marked
+   *         as unreachable, <CODE>false</CODE> otherwise.
+   */
+  public boolean isEmpty()
+  {
+    for (final int tags : mStateInfo) {
+      if ((tags & TAG_REACHABLE) != 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Gets the number of states currently marked as reachable in this state
    * buffer.
    */

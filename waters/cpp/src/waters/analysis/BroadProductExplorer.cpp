@@ -20,6 +20,7 @@
 
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/JavaString.h"
+#include "jni/cache/PreEventNotFoundException.h"
 #include "jni/cache/PreJavaException.h"
 #include "jni/glue/AutomatonGlue.h"
 #include "jni/glue/CollectionGlue.h"
@@ -580,8 +581,11 @@ setupSafety()
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
-    if (aut->getNumberOfInitialStates() == 0) {
+    if (aut->getNumberOfInitialStates() == 0 && !isTrivial()) {
       setTrivial();
+      if (!aut->isPlant() && isInitialUncontrollable()) {
+        setTraceEvent(0, aut);
+      }
     }
     setupTransitions(aut, autglue, eventmap);
     const jni::SetGlue& events = autglue.getEventsGlue(cache);
@@ -698,6 +702,9 @@ setupTransitions
       jni::TransitionGlue trans(javaobject, cache);
       const jni::EventGlue& eventglue = trans.getEventGlue(cache);
       BroadEventRecord* eventrecord = eventmap.get(&eventglue);
+      if (eventrecord == 0) {
+        throw jni::PreEventNotFoundException(getModel(), eventglue.getName());
+      }
       const jni::StateGlue& sourceglue = trans.getSourceGlue(cache);
       const uint32_t sourcecode = statemap->get(&sourceglue);
       const jni::StateGlue& targetglue = trans.getTargetGlue(cache);

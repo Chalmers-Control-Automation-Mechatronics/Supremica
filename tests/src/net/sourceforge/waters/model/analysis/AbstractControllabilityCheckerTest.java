@@ -101,6 +101,13 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, name, true);
   }
 
+  public void testSmallFactory2u() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "small_factory_2u.wmod";
+    runModelVerifier(group, name, false);
+  }
+
   public void testTictactoe() throws Exception
   {
     final String group = "handwritten";
@@ -405,6 +412,14 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "ims";
     final String name = "ims.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void test_Nasty_EmptySpec() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "empty_spec.wmod";
     runModelVerifier(group, dir, name, true);
   }
 

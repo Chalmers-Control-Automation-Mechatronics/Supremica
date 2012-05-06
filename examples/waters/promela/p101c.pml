@@ -2,16 +2,17 @@
 
 chan name = [0] of { byte, byte };
 
-/* byte name; 	typo  - this line shouldn't have been here */
-
 proctype A()
-{	name!msgtype(124);
+{
+	name!msgtype(124);
 	name!msgtype(121)
 }
 proctype B()
-{	byte state;
+{
+	byte state = 60;
 	name?msgtype(state)
 }
 init
-{	atomic { run A(); run B() }
+{
+	atomic { run A(); run B() }
 }

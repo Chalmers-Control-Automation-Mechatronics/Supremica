@@ -1,0 +1,64 @@
+//# This may look like C code, but it really is -*- C++ -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: jni.javah
+//# CLASS:   PreEventNotFoundException
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
+#ifndef _PreEventNotFoundException_h_
+#define _PreEventNotFoundException_h_
+
+#ifdef __GNUG__
+#pragma interface
+#endif
+
+#if _MSC_VER >= 1000
+#pragma once
+#endif
+
+#include <jni.h>
+
+#include "jni/cache/PreJavaException.h"
+#include "jni/glue/ProductDESGlue.h"
+
+
+namespace jni {
+
+class ClassCache;
+
+
+//###########################################################################
+//# Class PreEventNotFoundException
+//###########################################################################
+//# A data structure containing the information for an event-not-found
+//# exception to be thrown from native code. This is thrown as a C++ exception
+//# to be converted to a proper EventNotFoundException for Java as soon as the
+//# environment becomes available.
+//###########################################################################
+
+class PreEventNotFoundException : public PreJavaException
+{
+public:
+  //#########################################################################
+  //# Constructors, Destructors & Co.
+  explicit PreEventNotFoundException(const ProductDESGlue& model, jstring name);
+  PreEventNotFoundException(const PreEventNotFoundException& partner);
+  PreEventNotFoundException& operator=(const PreEventNotFoundException& partner);
+
+  //#########################################################################
+  //# Throwing Exceptions
+  virtual jint throwJavaException(ClassCache& cache) const;
+
+private:
+  //#########################################################################
+  //# Data Members
+  ProductDESGlue mModel;
+  jstring mName;
+};
+
+}   /* namespace jni */
+
+#endif  /* !_PreEventNotFoundException_h_ */

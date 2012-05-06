@@ -41,7 +41,6 @@ import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
-import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -289,7 +288,8 @@ public class CompositionalGeneralisedConflictChecker
         final String name = Candidate.getCompositionName(remainingAut);
         final String comment =
           "Simplified initial model for CompositionalGeneralisedConflictChecker";
-        final List<EventProxy> events = Candidate.getAllEvents(remainingAut);
+        final List<EventProxy> events =
+          Candidate.getOrderedEvents(remainingAut);
         model = factory.createProductDESProxy
           (name, comment, null, events, remainingAut);
         mapEventsToAutomata(model);
@@ -326,7 +326,7 @@ public class CompositionalGeneralisedConflictChecker
             final String name = Candidate.getCompositionName(remainingAut);
             final String comment =
               "Intermediate model for CompositionalGeneralisedConflictChecker";
-            final List<EventProxy> events = Candidate.getAllEvents(remainingAut);
+            final List<EventProxy> events = Candidate.getOrderedEvents(remainingAut);
             model = factory.createProductDESProxy
               (name, comment, null, events, remainingAut);
             mapEventsToAutomata(model);
@@ -361,12 +361,12 @@ public class CompositionalGeneralisedConflictChecker
         final int size = modifyingSteps.size();
         ConflictTraceProxy convertedTrace = counterexample;
         convertedTrace = saturateTrace(counterexample);
-        TraceChecker.checkCounterExample(convertedTrace, true);
+        // TraceChecker.checkCounterExample(convertedTrace, true);
         final ListIterator<Step> iter = modifyingSteps.listIterator(size);
         while (iter.hasPrevious()) {
           final Step step = iter.previous();
           final ConflictTraceProxy newTrace = step.convertTrace(convertedTrace);
-          TraceChecker.checkCounterExample(newTrace, true);
+          // TraceChecker.checkCounterExample(newTrace, true);
           convertedTrace = newTrace;
         }
         setFailedResult(convertedTrace);
@@ -747,7 +747,7 @@ public class CompositionalGeneralisedConflictChecker
     // synchronous product of
     final ProductDESProxyFactory factory = getFactory();
     final String name = candidate.toString();
-    final List<EventProxy> events = candidate.getAllEvents();
+    final List<EventProxy> events = candidate.getOrderedEvents();
     final List<AutomatonProxy> automata = candidate.getAutomata();
     final ProductDESProxy candidateModel = factory.createProductDESProxy
       (name, "Automatically created from candidate.", null, events, automata);

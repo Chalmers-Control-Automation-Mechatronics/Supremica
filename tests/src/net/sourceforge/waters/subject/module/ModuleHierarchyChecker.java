@@ -14,7 +14,7 @@ import java.util.Collection;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -48,7 +48,7 @@ import net.sourceforge.waters.subject.base.Subject;
 
 
 class ModuleHierarchyChecker
-  extends AbstractModuleProxyVisitor
+  extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################

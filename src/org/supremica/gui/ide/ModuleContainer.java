@@ -1,6 +1,6 @@
 //# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters/Supremica IDE
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
@@ -26,16 +26,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.CompoundEdit;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEdit;
-
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.command.UndoableCommand;
+import net.sourceforge.waters.gui.command.WatersUndoManager;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.MainPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -45,6 +42,7 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
@@ -55,7 +53,10 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -116,6 +117,7 @@ public class ModuleContainer
 
     mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
     {
+      @Override
       public void mouseClicked(final java.awt.event.MouseEvent e)
       {
         if (mTabPanel.getSelectedComponent().getName().equals
@@ -130,16 +132,19 @@ public class ModuleContainer
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# org.supremica.gui.ide.DocumentContainer
+  @Override
   public boolean hasUnsavedChanges()
   {
     return mUndoIndex != mUndoCheckPoint;
   }
 
+  @Override
   public void setCheckPoint()
   {
     mUndoCheckPoint = mUndoIndex;
   }
 
+  @Override
   public void close()
   {
     mEditorPanel.close();
@@ -224,15 +229,7 @@ public class ModuleContainer
       break;
     case ModelChangeEvent.ITEM_REMOVED:
       final Object value = event.getValue();
-      if (value instanceof SimpleComponentSubject) {
-        final ComponentEditorPanel panel =
-          mEditorPanel.getActiveEditorWindowInterface();
-        if (panel != null && panel.getComponent() == value) {
-          mEditorPanel.showComment();
-          // Do not even try to close or dispose the graph panel:
-          // deletions can be undone!
-        }
-      }
+      mUpdateGraphPanelVisitor.updateGraphPanel((Proxy) value);
       mCompiledDES = null;
       break;
     case ModelChangeEvent.GEOMETRY_CHANGED:
@@ -387,20 +384,14 @@ public class ModuleContainer
     addUndoable(new UndoableCommand(c));
   }
 
-  public void addUndoable(final UndoableEdit event)
+  public void addUndoable(final UndoableCommand command)
   {
-    if (event.isSignificant()) {
-      mInsignificant.end();
-      mUndoManager.addEdit(mInsignificant);
-      mInsignificant = new CompoundEdit();
-      mUndoManager.addEdit(event);
+    assert(command.isSignificant());
+      mUndoManager.addCommand(command);
       if (mUndoIndex++ < mUndoCheckPoint) {
         mUndoCheckPoint = -1;
       }
       fireUndoRedoEvent();
-    } else {
-      mInsignificant.addEdit(event);
-    }
   }
 
   public boolean canRedo()
@@ -432,9 +423,6 @@ public class ModuleContainer
 
   public void redo() throws CannotRedoException
   {
-    mInsignificant.end();
-    mInsignificant.undo();
-    mInsignificant = new CompoundEdit();
     mUndoManager.redo();
     mUndoIndex++;
     fireUndoRedoEvent();
@@ -442,12 +430,17 @@ public class ModuleContainer
 
   public void undo() throws CannotUndoException
   {
-    mInsignificant.end();
-    mInsignificant.undo();
-    mInsignificant = new CompoundEdit();
     mUndoManager.undo();
     mUndoIndex--;
     fireUndoRedoEvent();
+  }
+
+  public void removeLastCommand(){
+    mUndoManager.removeLast();
+  }
+
+  public Command getLastCommand(){
+    return mUndoManager.getLastCommand();
   }
 
 
@@ -529,6 +522,65 @@ public class ModuleContainer
 
 
   //#######################################################################
+  //# Inner Class UpdateGraphPanelVisitor
+  /**
+   * This visitor is used to make sure an automaton is no longer visible in
+   * the graph panel if it (or its parent) has been deleted from the module.
+   * @author Carly Hona
+   */
+  private class UpdateGraphPanelVisitor extends DefaultModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    public void updateGraphPanel(final Proxy proxy)
+    {
+      try {
+        if (mEditorPanel.getActiveEditorWindowInterface() != null) {
+          proxy.acceptVisitor(this);
+        }
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
+    public Object visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
+      throws VisitorException
+    {
+      for (final Proxy proxy : foreach.getBody()) {
+        if (proxy.acceptVisitor(this) != null) {
+          return null;
+        }
+      }
+      return null;
+    }
+
+    @Override
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy simple)
+      throws VisitorException
+    {
+      final ComponentEditorPanel panel =
+        mEditorPanel.getActiveEditorWindowInterface();
+      if (panel.getComponent() == simple) {
+        mEditorPanel.showComment();
+        return simple; //stop iterating children if in a foreach
+      }
+      return null;
+    }
+  }
+
+
+  //#######################################################################
   //# Data Members
   private final JTabbedPane mTabPanel;
   private final EditorPanel mEditorPanel;
@@ -546,14 +598,15 @@ public class ModuleContainer
   private final ModuleCompiler mCompiler;
   private final ExpressionParser mExpressionParser;
   private final ProxyPrinter mPrinter;
+  private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
+    new UpdateGraphPanelVisitor();
   private ProductDESProxy mCompiledDES;
 
   private final CompilerPropertyChangeListener
-  mCompilerPropertyChangeListener;
+    mCompilerPropertyChangeListener;
   private final SupremicaPropertyChangeListener
-  mSimulatorPropertyChangeListener;
-  private final UndoManager mUndoManager = new UndoManager();
-  private CompoundEdit mInsignificant = new CompoundEdit();
+    mSimulatorPropertyChangeListener;
+  private final WatersUndoManager mUndoManager = new WatersUndoManager();
   private int mUndoIndex = 0;
   private int mUndoCheckPoint = 0;
   private final Collection<Observer> mObservers = new LinkedList<Observer>();

@@ -26,6 +26,8 @@ import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCThree_one_propertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDNSLActivityLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
@@ -38,8 +40,12 @@ import net.sourceforge.waters.gui.actions.IDEDeselectAllAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.IDEPropertiesAction;
 import net.sourceforge.waters.gui.actions.IDESelectAllAction;
+import net.sourceforge.waters.gui.actions.InsertConstantAliasAction;
+import net.sourceforge.waters.gui.actions.InsertEventAliasAction;
 import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
-import net.sourceforge.waters.gui.actions.InsertForeachComponentAction;
+import net.sourceforge.waters.gui.actions.InsertForeachAction;
+import net.sourceforge.waters.gui.actions.InsertInstanceAction;
+import net.sourceforge.waters.gui.actions.InsertParameterBindingAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
@@ -81,8 +87,6 @@ import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_apropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThreep1_bpropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
@@ -248,7 +252,7 @@ public class IDEMenuBar extends JMenuBar
       mFileMenu.addSeparator();
       final Action importAction = actions.getAction(ImportAction.class);
       mFileMenu.add(importAction);
-      mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
+      //mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
       mFileMenu.add(mIDE.getActions().editorSavePostscriptAction.getMenuItem());
       final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
       mFileMenu.add(epsprint);
@@ -307,8 +311,21 @@ public class IDEMenuBar extends JMenuBar
         mCreateMenu.add(insvar);
         if (Config.INCLUDE_INSTANTION.isTrue()) {
           final Action insforeach =
-              actions.getAction(InsertForeachComponentAction.class);
+              actions.getAction(InsertForeachAction.class);
           mCreateMenu.add(insforeach);
+          final Action insalias =
+            actions.getAction(InsertConstantAliasAction.class);
+          mCreateMenu.add(insalias);
+          final Action inseventalias =
+            actions.getAction(InsertEventAliasAction.class);
+          mCreateMenu.add(inseventalias);
+       // TODO Auto-generated method stub
+          final Action insinstance =
+            actions.getAction(InsertInstanceAction.class);
+          mCreateMenu.add(insinstance);
+          final Action inparam =
+            actions.getAction(InsertParameterBindingAction.class);
+          mCreateMenu.add(inparam);
         }
         final Action insevent = actions.getAction(InsertEventDeclAction.class);
         mCreateMenu.add(insevent);
@@ -357,19 +374,19 @@ public class IDEMenuBar extends JMenuBar
             final Action SSingular =
               actions.getAction(AnalyzeSDSingularPropertyAction.class);
             mVerifyMenu.add(SSingular);
+            final Action Sdone =
+              actions.getAction(AnalyzeSDControllabilityAction.class);
+            mVerifyMenu.add(Sdone);
             final Action Sdtwoa =
               actions.getAction(AnalyzeSDCTwoApropertyAction.class);
             mVerifyMenu.add(Sdtwoa);
             final Action Sdtwob =
               actions.getAction(AnalyzeSDCTwoBPropertyAction.class);
             mVerifyMenu.add(Sdtwob);
-            final Action Sdthree1a =
-              actions.getAction(AnalyzeSDCThreep1_apropertyAction.class);
-            mVerifyMenu.add(Sdthree1a);
-            final Action Sdthree1b =
-              actions.getAction(AnalyzeSDCThreep1_bpropertyAction.class);
-            mVerifyMenu.add(Sdthree1b);
-            final Action SDthree2 =
+            final Action Sdthree1 =
+              actions.getAction(AnalyzeSDCThree_one_propertyAction.class);
+            mVerifyMenu.add(Sdthree1);
+                        final Action SDthree2 =
                 actions.getAction(AnalyzeNerodeEquivalentAction.class);
               mVerifyMenu.add(SDthree2);
             final Action Sdfour =

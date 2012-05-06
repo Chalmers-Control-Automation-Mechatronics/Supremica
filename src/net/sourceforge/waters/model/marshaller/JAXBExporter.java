@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.base.AbstractProxyVisitor;
+import net.sourceforge.waters.model.base.DefaultProxyVisitor;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -27,7 +27,7 @@ import net.sourceforge.waters.xsd.base.NamedType;
 
 
 abstract class JAXBExporter
-  extends AbstractProxyVisitor
+  extends DefaultProxyVisitor
 {
 
   //#########################################################################

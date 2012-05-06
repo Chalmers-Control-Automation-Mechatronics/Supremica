@@ -214,8 +214,8 @@ public class ChainTRSimplifier
       if (step.run()) {
         if (logger.isDebugEnabled()) {
           logger.debug(rel.getNumberOfReachableStates() + " states, " +
-            rel.getNumberOfTransitions() + " transitions, " +
-            rel.getNumberOfMarkings() + " markings.");
+                       rel.getNumberOfTransitions() + " transitions, " +
+                       rel.getNumberOfMarkings() + " markings.");
         }
         result = true;
         mIsObservationEquivalentAbstraction &=

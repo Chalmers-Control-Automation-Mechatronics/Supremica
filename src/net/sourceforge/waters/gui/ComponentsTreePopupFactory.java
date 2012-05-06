@@ -16,7 +16,7 @@ import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -59,6 +59,11 @@ class ComponentsTreePopupFactory
     popup.add(newaut);
     final IDEAction newvar = master.getInsertVariableAction();
     popup.add(newvar);
+    final IDEAction newfor = master.getInsertForeachComponentAction();
+    popup.add(newfor);
+    // TODO
+    final IDEAction newinst = master.getInsertInstanceAction();
+    popup.add(newinst);
     final IDEAction showcomment = master.getShowModuleCommentAction();
     popup.add(showcomment);
   }
@@ -67,7 +72,7 @@ class ComponentsTreePopupFactory
   //#########################################################################
   //# Inner Class GraphPopupVisitor
   private class ComponentsTreePopupVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -89,6 +94,8 @@ class ComponentsTreePopupFactory
       final ModuleProxy module = mContext.getModule();
       final IDEAction gotomod = master.getGotoModuleAction(module, name);
       popup.add(gotomod);
+      final IDEAction param = master.getInsertParameterBindingAction();
+      popup.add(param);
       return null;
     }
 

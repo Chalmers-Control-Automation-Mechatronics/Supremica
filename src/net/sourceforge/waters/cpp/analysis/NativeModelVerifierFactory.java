@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
-import java.util.List;
-
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -28,14 +26,32 @@ public class NativeModelVerifierFactory
 {
 
   //#########################################################################
+  //# Singleton Pattern
+  public static NativeModelVerifierFactory getInstance()
+  {
+    return SingletonHolder.INSTANCE;
+  }
+
+  private static class SingletonHolder {
+    private static final NativeModelVerifierFactory INSTANCE =
+      new NativeModelVerifierFactory();
+  }
+
+
+  //#########################################################################
   //# Constructors
   private NativeModelVerifierFactory()
   {
   }
 
-  private NativeModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(new CommandLineArgumentBroad());
     addArgument(new CommandLineArgumentNarrow());
   }
@@ -59,23 +75,6 @@ public class NativeModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new NativeLanguageInclusionChecker(factory);
-  }
-
-
-  //#########################################################################
-  //# Factory Instantiation
-  public static NativeModelVerifierFactory getInstance()
-  {
-    if (theInstance == null) {
-      theInstance = new NativeModelVerifierFactory();
-    }
-    return theInstance;
-  }
-
-  public static NativeModelVerifierFactory
-    getInstance(final List<String> cmdline)
-  {
-    return new NativeModelVerifierFactory(cmdline);
   }
 
 
@@ -113,10 +112,5 @@ public class NativeModelVerifierFactory
       nverifier.setExplorerMode(ExplorerMode.NARROW);
     }
   }
-
-
-  //#########################################################################
-  //# Class Variables
-  private static NativeModelVerifierFactory theInstance = null;
 
 }

@@ -40,7 +40,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -58,7 +58,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
+public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 {
 
   //##########################################################################
@@ -286,7 +286,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
           }
         }
         removeSelfloopedEvents(alphabet);
-        if (alphabet.isEmpty()) {
+        if (mNumReachableStates > 0 && alphabet.isEmpty()) {
           return null;
         }
       } else {

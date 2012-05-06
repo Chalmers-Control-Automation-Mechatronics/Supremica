@@ -11,7 +11,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDCTwoVerifier;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -34,25 +34,25 @@ public class AnalyzeSDCTwoApropertyAction extends WatersAnalyzeAction
 
   protected String getFailureDescription()
   {
-    return "does not satisfy SD Controllability ii_a Property ";
+    return "does not satisfy SD Controllability Point ii ";
   }
 
   protected ModelVerifier getModelVerifier
     (final ModelVerifierFactory factory,
      final ProductDESProxyFactory desFactory)
   {
-    final ControllabilityChecker Checker =
-        factory.createControllabilityChecker(desFactory);
+    final LanguageInclusionChecker Checker =
+        factory.createLanguageInclusionChecker(desFactory);
 
 
         final SDCTwoVerifier verifier =
-        new SDCTwoVerifier(null, desFactory, Checker);
+        new SDCTwoVerifier(Checker, null, desFactory);
     return verifier;
   }
 
   protected String getSuccessDescription()
   {
-    return "satisfies SD Controllability Property ii_a";
+    return "satisfies SD Controllability Point ii";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;

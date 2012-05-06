@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
 //# CLASS:   ObservationEquivalenceRule
 //###########################################################################
@@ -135,8 +135,8 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
       final boolean modified = bisimulator.run();
       if (modified) {
         mPartition = bisimulator.getResultPartition();
-        rel.removeRedundantPropositions();
         final ProductDESProxyFactory factory = getFactory();
+        rel.removeRedundantPropositions();
         mOutputEncoding = new StateEncoding();
         return rel.createAutomaton(factory, eventEnc, mOutputEncoding);
       } else {

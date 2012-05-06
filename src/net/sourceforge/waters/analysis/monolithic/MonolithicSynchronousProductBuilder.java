@@ -48,6 +48,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * A Java implementation of the monolithic synchronous product algorithm.
@@ -232,6 +234,17 @@ public class MonolithicSynchronousProductBuilder
       } else {
         return true;
       }
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      final Logger logger = getLogger();
+      logger.debug("<out of memory>");
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final StackOverflowError error) {
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }

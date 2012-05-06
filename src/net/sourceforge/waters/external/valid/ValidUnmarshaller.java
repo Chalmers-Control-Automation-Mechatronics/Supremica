@@ -89,6 +89,8 @@ public class ValidUnmarshaller
       throw new WatersUnmarshalException(uri, exception);
     } catch (final URISyntaxException exception) {
       throw new WatersUnmarshalException(uri, exception);
+    } catch (final IOException exception) {
+      throw new WatersUnmarshalException(uri, exception);
     }
   }
 
@@ -111,13 +113,13 @@ public class ValidUnmarshaller
   {
     return FILTERS;
   }
-  
+
   public DocumentManager getDocumentManager()
   {
     return null;
   }
 
-  public void setDocumentManager(DocumentManager manager)
+  public void setDocumentManager(final DocumentManager manager)
   {
   }
 
@@ -144,13 +146,13 @@ public class ValidUnmarshaller
         }
       }
     }
-    
+
     public String getDescription()
     {
       return DESCR_VMOD;
     }
   }
-    
+
 
   //#########################################################################
   //# Data Members

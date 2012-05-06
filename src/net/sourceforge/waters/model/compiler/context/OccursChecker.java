@@ -13,7 +13,7 @@ package net.sourceforge.waters.model.compiler.context;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -32,7 +32,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-public class OccursChecker extends AbstractModuleProxyVisitor
+public class OccursChecker extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################

@@ -14,7 +14,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
-import net.sourceforge.waters.model.base.AbstractProxyVisitor;
+import net.sourceforge.waters.model.base.DefaultProxyVisitor;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 
 
 public class ProxyPrinter
-  extends AbstractProxyVisitor
+  extends DefaultProxyVisitor
 {
 
   //#########################################################################

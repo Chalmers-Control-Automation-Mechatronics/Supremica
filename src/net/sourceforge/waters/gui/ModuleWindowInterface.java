@@ -9,14 +9,14 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Frame;
-
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -32,17 +32,17 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 
 public interface ModuleWindowInterface
 {
-    
+
   /**
    * Gets the undo manager used to pass commands to this GUI.
    */
   public UndoInterface getUndoInterface();
-    
+
   /**
    * Gets the module edited by the GUI represented by this inteface.
    */
   public ModuleSubject getModuleSubject();
-    
+
   /**
    * Gets the module context to be used for name-based lookups in the
    * module.
@@ -53,12 +53,12 @@ public interface ModuleWindowInterface
    * Gets the shared expression parser used by this GUI.
    */
   public ExpressionParser getExpressionParser();
-    
+
   /**
    * Gets the root window of this GUI.
    * Dialogs will use this as their owner.
    */
-  public Frame getRootWindow();
+  public IDE getRootWindow();
 
   /**
    * Gets the components panel for the module edited by this GUI.
@@ -69,6 +69,21 @@ public interface ModuleWindowInterface
    * Gets the events panel for the module edited by this GUI.
    */
   public SelectionOwner getEventsPanel();
+
+  /**
+   * Gets the alias panel for the module edited by this GUI.
+   */
+  public SelectionOwner getConstantAliasesPanel();
+
+  /**
+   * Gets the event alias panel for the module edited by this GUI.
+   */
+  public SelectionOwner getEventAliasesPanel();
+
+  /**
+   * Gets the instance panel for the module edited by this GUI.
+   */
+  public SelectionOwner getInstancePanel();
 
   /**
    * Shows the list of components of the module so the user can edit it.
@@ -85,7 +100,7 @@ public interface ModuleWindowInterface
    */
   public EditorWindowInterface showEditor(SimpleComponentSubject comp)
     throws GeometryAbsentException;
- 
+
   /**
    * Gets the graph editor for the given component.
    * @return The editor window interface to edit the given component,
@@ -94,14 +109,14 @@ public interface ModuleWindowInterface
    */
   public EditorWindowInterface getEditorWindowInterface
     (SimpleComponentSubject comp);
-    
+
   /**
    * Gets the currently graph editor that is currently displayed,
    * or <CODE>null</CODE>. The returned editor does not necessarily
    * own the keyboard focus.
    */
   public EditorWindowInterface getActiveEditorWindowInterface();
-    
+
   /**
    * Shows the comment editor panel for the current module.
    */

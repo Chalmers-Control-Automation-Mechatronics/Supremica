@@ -33,13 +33,11 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
   {
     if (args.length == 4) {
       final String filename = args[0];
-      final String outputprop = System.getProperty("waters.test.outputdir");
       final String preselectingHeuristic = args[1];
       final String selectingHeuristic = args[2];
       final int rules = Integer.decode(args[3]);
       final CompositionalGeneralisedConflictCheckerExperiments experiment =
-          new CompositionalGeneralisedConflictCheckerExperiments(outputprop
-              + filename, preselectingHeuristic, selectingHeuristic, rules);
+          new CompositionalGeneralisedConflictCheckerExperiments(filename, preselectingHeuristic, selectingHeuristic, rules);
       experiment.setUp();
       experiment.runAllTests();
       experiment.tearDown();

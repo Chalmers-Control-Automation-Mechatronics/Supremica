@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -69,6 +70,18 @@ public class NativeSafetyVerifier
 
   //#########################################################################
   //# Auxiliary Methods
+  /**
+   * Returns how to handle automata without initial states.
+   * @return <CODE>true</CODE> if verification is to fail when encountering
+   *         a specification without an initial state.
+   */
+  public boolean isInitialUncontrollable()
+  {
+    final KindTranslator translator = getKindTranslator();
+    return translator.getEventKind(KindTranslator.INIT) ==
+      EventKind.UNCONTROLLABLE;
+  }
+
   /**
    * Gets a name that can be used for a counterexample for the current model.
    */

@@ -201,77 +201,27 @@ public interface ModuleProxyFactory
        EventKind kind);
 
   /**
-   * Creates a new foreach construct for module components.
-   * @param name The name of the new foreach construct for module components.
-   * @param range The range of the new foreach construct for module components.
-   * @param guard The guard of the new foreach construct for module components, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct for module components, or <CODE>null</CODE> if empty.
+   * Creates a new foreach construct.
+   * @param name The name of the new foreach construct.
+   * @param range The range of the new foreach construct.
+   * @param guard The guard of the new foreach construct, or <CODE>null</CODE>.
+   * @param body The body of the new foreach construct, or <CODE>null</CODE> if empty.
    */
-  public ForeachComponentProxy createForeachComponentProxy
+  public ForeachProxy createForeachProxy
       (String name,
        SimpleExpressionProxy range,
        SimpleExpressionProxy guard,
        Collection<? extends Proxy> body);
 
   /**
-   * Creates a new foreach construct for module components using default values.
-   * This method creates a foreach construct for module components with
+   * Creates a new foreach construct using default values.
+   * This method creates a foreach construct with
    * the guard set to <CODE>null</CODE> and
    * an empty body.
-   * @param name The name of the new foreach construct for module components.
-   * @param range The range of the new foreach construct for module components.
+   * @param name The name of the new foreach construct.
+   * @param range The range of the new foreach construct.
    */
-  public ForeachComponentProxy createForeachComponentProxy
-      (String name,
-       SimpleExpressionProxy range);
-
-  /**
-   * Creates a new foreach construct for aliases.
-   * @param name The name of the new foreach construct for aliases.
-   * @param range The range of the new foreach construct for aliases.
-   * @param guard The guard of the new foreach construct for aliases, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct for aliases, or <CODE>null</CODE> if empty.
-   */
-  public ForeachEventAliasProxy createForeachEventAliasProxy
-      (String name,
-       SimpleExpressionProxy range,
-       SimpleExpressionProxy guard,
-       Collection<? extends Proxy> body);
-
-  /**
-   * Creates a new foreach construct for aliases using default values.
-   * This method creates a foreach construct for aliases with
-   * the guard set to <CODE>null</CODE> and
-   * an empty body.
-   * @param name The name of the new foreach construct for aliases.
-   * @param range The range of the new foreach construct for aliases.
-   */
-  public ForeachEventAliasProxy createForeachEventAliasProxy
-      (String name,
-       SimpleExpressionProxy range);
-
-  /**
-   * Creates a new foreach construct for events.
-   * @param name The name of the new foreach construct for events.
-   * @param range The range of the new foreach construct for events.
-   * @param guard The guard of the new foreach construct for events, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct for events, or <CODE>null</CODE> if empty.
-   */
-  public ForeachEventProxy createForeachEventProxy
-      (String name,
-       SimpleExpressionProxy range,
-       SimpleExpressionProxy guard,
-       Collection<? extends Proxy> body);
-
-  /**
-   * Creates a new foreach construct for events using default values.
-   * This method creates a foreach construct for events with
-   * the guard set to <CODE>null</CODE> and
-   * an empty body.
-   * @param name The name of the new foreach construct for events.
-   * @param range The range of the new foreach construct for events.
-   */
-  public ForeachEventProxy createForeachEventProxy
+  public ForeachProxy createForeachProxy
       (String name,
        SimpleExpressionProxy range);
 

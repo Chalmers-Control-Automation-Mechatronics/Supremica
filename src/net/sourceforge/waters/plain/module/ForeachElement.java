@@ -18,7 +18,10 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.base.NamedElement;
 
@@ -29,7 +32,7 @@ import net.sourceforge.waters.plain.base.NamedElement;
  * @author Robi Malik
  */
 
-public abstract class ForeachElement
+public final class ForeachElement
   extends NamedElement
   implements ForeachProxy
 {
@@ -43,10 +46,10 @@ public abstract class ForeachElement
    * @param guard The guard of the new foreach construct, or <CODE>null</CODE>.
    * @param body The body of the new foreach construct, or <CODE>null</CODE> if empty.
    */
-  protected ForeachElement(final String name,
-                           final SimpleExpressionProxy range,
-                           final SimpleExpressionProxy guard,
-                           final Collection<? extends Proxy> body)
+  public ForeachElement(final String name,
+                        final SimpleExpressionProxy range,
+                        final SimpleExpressionProxy guard,
+                        final Collection<? extends Proxy> body)
   {
     super(name);
     mRange = range;
@@ -69,8 +72,8 @@ public abstract class ForeachElement
    * @param name The name of the new foreach construct.
    * @param range The range of the new foreach construct.
    */
-  protected ForeachElement(final String name,
-                           final SimpleExpressionProxy range)
+  public ForeachElement(final String name,
+                        final SimpleExpressionProxy range)
   {
     this(name,
          range,
@@ -84,6 +87,24 @@ public abstract class ForeachElement
   public ForeachElement clone()
   {
     return (ForeachElement) super.clone();
+  }
+
+
+  //#########################################################################
+  //# Comparing
+  public Class<ForeachProxy> getProxyInterface()
+  {
+    return ForeachProxy.class;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.Proxy
+  public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
+  {
+    final ModuleProxyVisitor downcast = (ModuleProxyVisitor) visitor;
+    return downcast.visitForeachProxy(this);
   }
 
 

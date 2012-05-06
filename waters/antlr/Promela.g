@@ -341,10 +341,10 @@ decl_lstRule
 
 //modified
 one_declRule
-@init  { paraphrases.push("in declaration"); }
+@init  { paraphrases.push("in declaration"); boolean visible = true; String type="";}
 @after { paraphrases.pop(); }
-	:	(visibleRule)? typenameRule ivarRule (COMMA ivarRule)*
-		-> ^(VARDEFINITION<VardefTreeNode> typenameRule ivarRule+)
+	:	(visibleRule {visible = $visibleRule.visible;})? typenameRule {type = $typenameRule.type;} ivarRule (COMMA ivarRule)*
+		-> ^(VARDEFINITION<VardefTreeNode>[visible, type] ivarRule+)
 	;
 
 optionsRule
@@ -417,12 +417,12 @@ pollRule
 //		-> ^(STATEMENT constRule typenameRule* )
 //	;
 	
-typenameRule
-	:	BIT | BOOL
-		 | BYTE -> ^(BYTE<TypeTreeNode>)
-		 | SHORT 
-		| INT 
-		| MTYPE ->^(MTYPE<TypeTreeNode>)
+typenameRule returns [String type]
+	:	BIT | BOOL {$type = "bit";}
+		 | BYTE {$type = "byte";}
+		 | SHORT {$type = "short";}
+		| INT {$type = "int";}
+		| MTYPE {$type = "mtype";}
 		| unameRule
 		
 	;
@@ -442,8 +442,9 @@ unameRule
 	:	NAME
 	;
 	
-visibleRule
-	:	HIDDEN | SHOW
+visibleRule returns [boolean visible]
+	:	HIDDEN { $visible = false; }
+	   | SHOW { $visible = true; }
 	;
 	
 constRule

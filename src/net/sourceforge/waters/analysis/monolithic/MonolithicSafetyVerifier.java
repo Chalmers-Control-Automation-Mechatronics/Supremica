@@ -14,6 +14,7 @@ import gnu.trove.THashSet;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -149,6 +152,7 @@ public class MonolithicSafetyVerifier
       mSystemState = new int[mNumAutomata];
 
       // Separate the automatons by kind
+      AutomatonProxy initUncontrollable = null;
       for (final AutomatonProxy ap : automata) {
         // Get all states
         stateSet = ap.getStates();
@@ -192,8 +196,17 @@ public class MonolithicSafetyVerifier
             }
           }
         }
-        // Store all the information by automaton type
         final ComponentKind kind = translator.getComponentKind(ap);
+        if (initialState == null) {
+          if (kind == ComponentKind.PLANT ||
+              translator.getEventKind(KindTranslator.INIT) ==
+              EventKind.CONTROLLABLE) {
+            return setSatisfiedResult();
+          } else {
+            initUncontrollable = ap;
+          }
+        }
+        // Store all the information by automaton type
         switch (kind) {
         case PLANT:
           mAutomata[ck] = ap;
@@ -218,6 +231,17 @@ public class MonolithicSafetyVerifier
           break;
         }
       }
+      if (initUncontrollable != null) {
+        final ProductDESProxyFactory factory = getFactory();
+        final String tracename = getTraceName();
+        final String comment =
+          getTraceComment(null, initUncontrollable, null);
+        final TraceStepProxy step = factory.createTraceStepProxy(null);
+        final List<TraceStepProxy> steps = Collections.singletonList(step);
+        final SafetyTraceProxy counterexample = factory.createSafetyTraceProxy
+          (tracename, comment, null, model, automata, steps);
+        return setFailedResult(counterexample);
+      }
 
       // Set the mCodePosition list
       for (i = 0; i < mNumAutomata; i++) {
@@ -238,6 +262,14 @@ public class MonolithicSafetyVerifier
         final SafetyTraceProxy counterexample = computeCounterExample();
         return setFailedResult(counterexample);
       }
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      final Logger logger = getLogger();
+      logger.debug("<out of memory>");
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }
@@ -559,11 +591,11 @@ public class MonolithicSafetyVerifier
     steps.add(0, init);
     final String tracename = getTraceName();
     final String comment = getTraceComment(event0, aut, state0);
+    final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
     final SafetyTraceProxy trace = factory.createSafetyTraceProxy
-      (tracename, comment, null, des, null, steps);
+      (tracename, comment, null, des, automata, steps);
     return trace;
   }
-
 
   //#########################################################################
   //# Data Members

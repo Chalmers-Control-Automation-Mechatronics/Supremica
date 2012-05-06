@@ -162,6 +162,11 @@ class SimulatorState
     return mEvent;
   }
 
+  int getNumberOfEnabledAutomata()
+  {
+    return mStateMap.size();
+  }
+
   StateProxy getState(final AutomatonProxy aut)
   {
     final Entry entry = mStateMap.get(aut);
@@ -197,7 +202,12 @@ class SimulatorState
   //# Overrides for java.lang.Object
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer(mEvent.getName());
+    final StringBuffer buffer = new StringBuffer();
+    if (mEvent == null) {
+      buffer.append("(init)");
+    } else {
+      buffer.append(mEvent.getName());
+    }
     buffer.append(" -> [");
     boolean first = true;
     for (final Map.Entry<AutomatonProxy,Entry> entry : mStateMap.entrySet()) {

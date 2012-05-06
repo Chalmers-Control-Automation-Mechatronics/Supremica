@@ -47,6 +47,19 @@ public final class AutomatonTools
   }
 
   /**
+   * Returns whether the given automaton has at least one initial state.
+   */
+  public static boolean hasInitialState(final AutomatonProxy aut)
+  {
+    for (final StateProxy state : aut.getStates()) {
+      if (state.isInitial()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Creates a product DES consisting of a single automaton.
    * @param  aut      The automaton to be used in the product DES.
    * @param  factory  Factory to construct objects.

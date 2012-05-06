@@ -67,7 +67,10 @@ public class EventCollectingVisitor implements PromelaVisitor
   ArrayList<String> lowerEnd = new ArrayList<String>();
   ArrayList<String> upperEnd = new ArrayList<String>();
   ArrayList<String> rangeData = new ArrayList<String>();
-  private Hashtable<String,String> proctypeVar = new Hashtable<String,String>();
+
+  private SymbolTable mSymbolTable;//This is an accessor to the symbol table that is used for storing variables in
+  int mCurrentTableCount = 0;
+
   final Hashtable<String,THashSet<IdentifierProxy>> procEvent = new Hashtable<String,THashSet<IdentifierProxy>>();
   final Hashtable<String,LabelTreeNode> gotoLabel = new Hashtable<String,LabelTreeNode>();
   //This is the output event table, for each proctype
@@ -83,9 +86,9 @@ public class EventCollectingVisitor implements PromelaVisitor
   Hashtable<String,List<Message>> mSendersMsg = new Hashtable<String,List<Message>>();
   //########################################################################
   //# Invocation
-  public EventCollectingVisitor(final ModuleProxyFactory factory){
+  public EventCollectingVisitor(final ModuleProxyFactory factory, final SymbolTable table){
     mFactory = factory;
-
+    mSymbolTable = table;
   }
 
   public void collectEvents(final PromelaTree node)
@@ -619,11 +622,20 @@ public class EventCollectingVisitor implements PromelaVisitor
   }
 
   public Object visitProcType(final ProctypeTreeNode t){
-    proctypeVar = new Hashtable<String,String>();
+    //Have entered a new context, so add a new table for the context, and use that currently
+    mCurrentTableCount++;
+    mSymbolTable = mSymbolTable.addNewSymbolTable("table" + mCurrentTableCount);
+
+    //Store a reference to the current symbol table inside the node t
+    t.setSymbolTable(mSymbolTable);
+
     for(int i=0;i<t.getChildCount();i++){
         final PromelaTree node = (PromelaTree)t.getChild(i);
         node.acceptVisitor(this);
     }
+
+    //Are leaving the current context, so move back to the upper level of the table
+    mSymbolTable = mSymbolTable.getParentTable();
 
     return null;
   }
@@ -777,7 +789,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
      if(ch.getType().get(y).equals("byte")){
         //if(labels.get(y+1)!=null){
-       if(!proctypeVar.containsKey(labels.get(y+1))){
+       if(!mSymbolTable.contains(labels.get(y+1))){
         final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
         indexes.add(c);
         }else{
@@ -786,8 +798,8 @@ public class EventCollectingVisitor implements PromelaVisitor
      }
      else if(ch.getType().get(y).equals("mtype")){
        //if(mGlobalVar.get(labels.get(y+1)).equals("mtype")){
-       if(proctypeVar.containsKey(labels.get(y+1))){
-         if(proctypeVar.get(labels.get(y+1)).equals("mtype")){
+       if(mSymbolTable.contains(labels.get(y+1))){
+         if(mSymbolTable.get(labels.get(y+1)).getVariableType().equals("mtype")){
 
            for(final Map.Entry<String,String> s: mGlobalVar.entrySet()){
              final List<SimpleExpressionProxy> tempindex = new ArrayList<SimpleExpressionProxy>();
@@ -877,9 +889,22 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitVar(final VardefTreeNode t)
   {
+
+    for(int i = 0; i < t.getChildCount(); i++)
+    {
+      //These are all of the names for the variables that are being instantiated in this declaration
+      //All of their types are specified by the typeTreeNode
+
+      mSymbolTable.put(t.getChild(i).getText(), t);
+    }
+
+    /**
+     * This is old stuff, and is left in for future reference
+     */
+    /*
     final Tree tree = t.getChild(0);
 
-      for(int i=1;i<t.getChildCount();i++){
+    for(int i=1;i<t.getChildCount();i++){
         if(tree.getText().equals("mtype")){
 
           proctypeVar.put(t.getChild(i).getText(),"mtype");
@@ -887,19 +912,18 @@ public class EventCollectingVisitor implements PromelaVisitor
 
           proctypeVar.put(t.getChild(i).getText(),"byte");
         }
-      }
+    }*/
 
     return null;
   }
 
   public Object visitName(final NameTreeNode t)
   {
-    System.out.println("");
     if(t.getParent() instanceof MsgTreeNode){
       //if(proctypeVar.isEmpty() || (!proctypeVar.containsKey(t.getText()) && !mGlobalVar.containsKey(t.getText()))){
         //labels.add(t.getText());
      //}else
-        if(proctypeVar.containsKey(t.getText()) || mGlobalVar.containsKey(t.getText())){
+        if(mSymbolTable.contains(t.getText()) || true/*mSymbolTable.containsMType(t.getText())*/){//TODO Add into symbol table the mtype definitions
 
           labels.add(t.getText());
 
@@ -926,7 +950,7 @@ public class EventCollectingVisitor implements PromelaVisitor
         while (!(tree instanceof ProctypeTreeNode)) {
           tree = tree.getParent();
         }
-        if(mGlobalVar.containsKey(t.getText()) || proctypeVar.containsKey(t.getText())){
+        if(mSymbolTable.contains(t.getText()) || true){
           labels.add(t.getText());
         }
       }else{

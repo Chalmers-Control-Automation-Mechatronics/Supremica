@@ -9,8 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.util.List;
-
+import java.util.Iterator;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -52,17 +51,21 @@ public interface ModelVerifierFactory
 
   //#########################################################################
   //# Command Line Arguments
+  public void parse(Iterator<String> iter);
+
   /**
-   * Configures the given model verifier according to any command line arguments
-   * passed to this factory. This method is called while parsing command line
-   * arguments, before loading of any models. Hence, the model verifier does not
-   * yet have its input model when this method is called.
-   *
-   * @return A string array containing all arguments that could not be
-   *         processed. These arguments are to be considered as file names by
-   *         the command line tool.
+   * Configures the given model verifier according to any command line
+   * arguments passed to this factory. This method is called while parsing
+   * command line arguments, before loading of any models. Hence, the model
+   * verifier does not yet have its input model when this method is called.
    */
-  public List<String> configure(ModelVerifier verifier);
+  public void configure(ModelVerifier verifier);
+
+  /**
+   * Configures the given compiler according to any command line arguments
+   * passed to this factory.
+   */
+  public void configure(ModuleCompiler compiler);
 
   /**
    * Configures the given model verifier after command line arguments parsing
@@ -71,11 +74,5 @@ public interface ModelVerifierFactory
    * called, the model verifier's input model is available.
    */
   public void postConfigure(ModelVerifier verifier) throws AnalysisException;
-
-  /**
-   * Configures the given compiler according to any command line arguments
-   * passed to this factory.
-   */
-  public void configure(ModuleCompiler compiler);
 
 }

@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
-//# PACKAGE: org.supremica.gui.ide.actions
+//# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersPopupActionManager
 //###########################################################################
 //# $Id$
@@ -51,12 +51,17 @@ public class WatersPopupActionManager
     master.installCutCopyPasteActions(comp);
   }
 
+  public void invokeMouseClickAction(final IDEAction action)
+  {
+    invokeMouseClickAction(action, null);
+  }
+
   public void invokeMouseClickAction(final IDEAction action,
                                      final MouseEvent event)
   {
     if (action.isEnabled()) {
       final String key = (String) action.getValue(Action.ACTION_COMMAND_KEY);
-      final int mods = event.getModifiers();
+      final int mods = event == null ? 0 : event.getModifiers();
       final ActionEvent newevent =
         new ActionEvent(this, ActionEvent.ACTION_PERFORMED, key, mods);
       action.actionPerformed(newevent);
@@ -86,7 +91,12 @@ public class WatersPopupActionManager
 
   public IDEAction getDeleteAction(final Proxy arg)
   {
-    return arg == null ? getDeleteAction() : new IDEDeleteAction(mIDE, arg);
+    if(arg == null || arg instanceof ModuleProxy){
+      return getDeleteAction();
+    }
+    else{
+      return new IDEDeleteAction(mIDE, arg);
+    }
   }
 
   public IDEAction getDeselectAllAction()
@@ -150,10 +160,41 @@ public class WatersPopupActionManager
     return new EditLabelRecallAction(mIDE, arg);
   }
 
+  public IDEAction getInsertConstantAliasAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertConstantAliasAction.class);
+  }
+
+  public IDEAction getInsertEventAliasAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertEventAliasAction.class);
+  }
+
   public IDEAction getInsertEventDeclAction()
   {
     final WatersActionManager master = mIDE.getActions();
     return master.getAction(InsertEventDeclAction.class);
+  }
+
+  public IDEAction getInsertForeachComponentAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertForeachAction.class);
+  }
+
+  //TODO Auto-generated method stub
+  public IDEAction getInsertInstanceAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertInstanceAction.class);
+  }
+
+  public IDEAction getInsertParameterBindingAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(InsertParameterBindingAction.class);
   }
 
   public IDEAction getInsertSimpleComponentAction()

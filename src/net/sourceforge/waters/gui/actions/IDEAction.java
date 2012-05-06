@@ -10,17 +10,23 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
+
+import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
@@ -121,6 +127,26 @@ public abstract class IDEAction
       return null;
     } else {
       return panel.getSelectionAnchor();
+    }
+  }
+
+  /**
+   * Retrieves a references to the active editor panel.
+   * @return  A module window interface to access the active editor panel,
+   *          or <CODE>null</CODE> if no editor panel is currently active.
+   */
+  ModuleWindowInterface getActiveModuleWindowInterface()
+  {
+    final IDE ide = getIDE();
+    final DocumentContainer container = ide.getActiveDocumentContainer();
+    if (container == null || !(container instanceof ModuleContainer)) {
+      return null;
+    }
+    final Component panel = container.getActivePanel();
+    if (panel instanceof EditorPanel) {
+      return (ModuleWindowInterface) panel;
+    } else {
+      return null;
     }
   }
 

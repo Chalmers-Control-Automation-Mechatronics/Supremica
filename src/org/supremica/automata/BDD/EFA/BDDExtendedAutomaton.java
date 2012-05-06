@@ -71,6 +71,9 @@ public class BDDExtendedAutomaton {
 
     int nbrOfTerms;
     public boolean allwFrbdnChosen = false;
+    
+    // If there is no location marked in this EFA, then all of locations are treated as marked location.
+    private boolean allMarked = false;
 
     public BDDExtendedAutomaton(final BDDExtendedAutomata bddExAutomata, final ExtendedAutomaton theExAutomaton)
     {
@@ -159,6 +162,7 @@ public class BDDExtendedAutomaton {
         }
         if(!anyMarkedLocation)
         {
+            allMarked = true;
             markedLocations = tempMarkedLocations.id();
         }
 
@@ -326,6 +330,11 @@ public class BDDExtendedAutomaton {
     public BDD getEdgeBackwardBDD()
     {
         return edgeBackwardBDD;
+    }
+    
+    public boolean getAllMarked()
+    {
+        return allMarked;
     }
 
     public ArrayList<String> getComplementLocationNames(final ArrayList<String> locationNames)

@@ -36,7 +36,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -372,7 +372,7 @@ public class ProductDESImporter
 
   //#########################################################################
   //# Inner Class EnumSymbolCollector
-  private class EnumSymbolCollector extends AbstractModuleProxyVisitor
+  private class EnumSymbolCollector extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Constructors

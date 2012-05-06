@@ -4,6 +4,14 @@
   <description>
   </description>
 
+  <macrodef name="propertycopy">
+    <attribute name="name"/>
+    <attribute name="from"/>
+    <sequential>
+      <property name="@{name}" value="${@{from}}"/>
+    </sequential>
+  </macrodef>
+
   <property file="build.properties"/>
 
   <property name="supremica.root" location=".."/>
@@ -42,7 +50,6 @@
   <property name="classes" location="java/classes"/>
   <property name="antlr" location="antlr"/>
   <property name="cpp" location="cpp"/>
-  <property name="cpplib" location="${cpp}/lib"/>
   <property name="docsrc" location="java/javadoc"/>
   <property name="supremica.examples" location="${supremica.root}/examples"/>
   <property name="waters.examples" location="${supremica.examples}/waters"/>
@@ -91,13 +98,6 @@
     <pathelement location="${junit.jar}"/>
   </path>
 
-  <pathconvert property="waters.library.path" targetos="unix">
-    <path>
-      <pathelement path="${java.library.path}"/>
-      <pathelement location="${cpplib}"/>
-      <pathelement location="${bddlib}"/>
-    </path>
-  </pathconvert>
 
   <target name="init">
     <tstamp/>
@@ -273,12 +273,44 @@
     </java> 
   </target>
 
-  <target name="cpp" depends="javah,jniglue" if="native.make"
-          description="Build native library.">
+  <target name="-guess-host-arch" unless="native.host.arch">
+    <property name="native.host.arch" value="${native.ostype}"/>
+    <property name="cpp.lib.dir" location="${cpp}/lib/${native.host.arch}"/>
+  </target>
+
+  <target name="-guess-target-arch" unless="native.target.arch"
+          depends="-guess-host-arch">
+    <property name="native.target.arch" value="${native.host.arch}"/>
+  </target>
+
+  <target name="-set-debug" unless="make.release">
+    <property name="cpp.debug.suffix" value=".debug"/>
+    <property name="cpp.debug" value="1"/>
+  </target>
+
+  <target name="-set-ccpp" if="native.compiler.${native.target.arch}">
+    <propertycopy name="cpp.ccpp"
+                  from="native.compiler.${native.target.arch}"/>
+  </target>
+
+  <target name="cpp"
+      depends="-guess-host-arch,-guess-target-arch,-set-debug,-set-ccpp,javah,jniglue"
+      if="native.make" description="Builds Waters dynamic link library.">
+    <property name="cpp.ccpp" value=""/>
     <exec executable="${native.make}" dir="${cpp}"
           failonerror="true" failifexecutionfails="false">
-      <arg value="OSTYPE=${native.ostype}"/>
+      <arg value="HOST_ARCH=${native.host.arch}"/>
+      <arg value="TARGET_ARCH=${native.target.arch}"/>
+      <arg value="CCPP=${cpp.ccpp}"/>
+      <arg value="DEBUG=${cpp.debug}"/>
     </exec>
+    <pathconvert property="waters.library.path">
+      <path>
+        <pathelement location="${cpp.lib.dir}${cpp.debug.suffix}"/>
+        <pathelement location="${bddlib}"/>
+        <pathelement path="${java.library.path}"/>
+      </path>
+    </pathconvert>
   </target>
 
   <target name="waters" depends="waters-jar,cpp"
@@ -346,7 +378,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}" if="native.make">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/op/*.java"/>
+          <include name="**/Native*.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
@@ -649,7 +681,16 @@
     </copy>
   </target>
 
-  <target name="clean" description="Clean up.">
+
+  <target name="-clean-cpp" depends="-guess-host-arch" if="native.make">
+    <exec executable="${native.make}" dir="${cpp}"
+          failifexecutionfails="false">
+      <arg value="HOST_ARCH=${native.host.arch}"/>
+      <arg value="clean"/>
+    </exec>
+  </target>
+
+  <target name="clean" description="Clean up." depends="-clean-cpp">
     <delete dir="${src}/net/sourceforge/waters/xsd/"/>
     <delete dir="${classes}"/>
     <delete dir="${logs}"/>
@@ -658,11 +699,6 @@
     <delete dir="${javah.dir}"/>
     <delete dir="${jniglue.outdir}"/>
     <delete dir="${antlr.promela.outdir}"/>
-    <exec executable="${native.make}" dir="${cpp}"
-          failifexecutionfails="false">
-      <arg value="OSTYPE=${native.ostype}"/>
-      <arg value="clean"/>
-    </exec>
   </target>
 
 </project>

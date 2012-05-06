@@ -9,13 +9,14 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import gnu.trove.THashSet;
+
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,35 +49,30 @@ public abstract class AbstractModelVerifierFactory
   //# Constructors
   protected AbstractModelVerifierFactory()
   {
-    mArgumentList = null;
-    mArgumentMap = null;
-    mMarkingArgument = null;
-    mPreMarkingArgument = null;
-  }
-
-  protected AbstractModelVerifierFactory(final List<String> arglist)
-  {
-    mArgumentList = arglist;
     mArgumentMap = new HashMap<String,CommandLineArgument>(16);
-    mMarkingArgument = new MarkingArgument();
-    mPreMarkingArgument = new PreMarkingArgument();
-    addArgument(new HelpArgument());
-    addArgument(new LimitArgument());
-    addArgument(new TransitionLimitArgument());
-    addArgument(mMarkingArgument);
-    addArgument(mPreMarkingArgument);
-    addArgument(new PropertyArgument());
+    mArgumentList = new LinkedList<CommandLineArgument>();
   }
 
 
   //#########################################################################
   //# Configuration
+  protected void addArguments()
+  {
+    addArgument(new EndArgument());
+    addArgument(new HelpArgument());
+    addArgument(new LimitArgument());
+    addArgument(new MarkingArgument());
+    addArgument(new NoOptimisationArgument());
+    addArgument(new PreMarkingArgument());
+    addArgument(new PropertyArgument());
+    addArgument(new TransitionLimitArgument());
+  }
+
   protected void addArgument(final CommandLineArgument argument)
   {
-    if (mArgumentMap != null) {
-      final String name = argument.getName();
-      mArgumentMap.put(name, argument);
-    }
+    final String name = argument.getName();
+    mArgumentMap.put(name, argument);
+    mArgumentList.add(argument);
   }
 
 
@@ -106,74 +102,51 @@ public abstract class AbstractModelVerifierFactory
     throw createUnsupportedOperationException("language inclusion");
   }
 
-  public List<String> configure(final ModelVerifier verifier)
+
+  public void parse(final Iterator<String> iter)
   {
-    if (mArgumentList != null && mArgumentMap != null) {
-      final Collection<CommandLineArgument> used =
-        new HashSet<CommandLineArgument>();
-      final List<String> filenames = new LinkedList<String>();
-      final Iterator<String> iter = mArgumentList.iterator();
-      while (iter.hasNext()) {
-        final String name = iter.next();
-        final CommandLineArgument arg = mArgumentMap.get(name);
-        if (arg != null) {
-          used.add(arg);
-          arg.parse(iter);
-          arg.configure(verifier);
-        } else if (name.equals("--")) {
-          while (iter.hasNext()) {
-            final String nextname = iter.next();
-            filenames.add(nextname);
-          }
-        } else {
-          filenames.add(name);
-        }
+    mArgumentMap.clear();
+    mArgumentList.clear();
+    addArguments();
+    while (iter.hasNext()) {
+      final String name = iter.next();
+      final CommandLineArgument arg = mArgumentMap.get(name);
+      if (arg != null) {
+        iter.remove();
+        arg.parse(iter);
+      } else if (name.startsWith("-")) {
+        System.err.println("Unsupported option " + name +
+                           ". Try -help to see available options.");
+        System.exit(1);
       }
-      checkRequiredArguments(used);
-      return filenames;
-    } else {
-      return null;
+    }
+    checkRequiredArguments();
+  }
+
+  public void configure(final ModelVerifier verifier)
+  {
+    for (final CommandLineArgument arg : mArgumentList) {
+      if (arg.isUsed()) {
+        arg.configure(verifier);
+      }
     }
   }
 
   public void configure(final ModuleCompiler compiler)
   {
-    if (mArgumentList != null && mArgumentMap != null) {
-      final Collection<CommandLineArgument> used =
-        new HashSet<CommandLineArgument>();
-      final Iterator<String> iter = mArgumentList.iterator();
-      while (iter.hasNext()) {
-        final String name = iter.next();
-        final CommandLineArgument arg = mArgumentMap.get(name);
-        if (arg != null) {
-          used.add(arg);
-          arg.parse(iter);
-          arg.configure(compiler);
-        } else if (name.equals("--")) {
-          break;
-        }
+    for (final CommandLineArgument arg : mArgumentList) {
+      if (arg.isUsed()) {
+        arg.configure(compiler);
       }
-      checkRequiredArguments(used);
     }
   }
 
   public void postConfigure(final ModelVerifier checker)
-    throws EventNotFoundException
+  throws AnalysisException
   {
-    if (checker instanceof ConflictChecker) {
-      final ConflictChecker cchecker = (ConflictChecker) checker;
-      final ProductDESProxy model = checker.getModel();
-      final String markingname = mMarkingArgument.getValue();
-      if (markingname != null) {
-        final EventProxy marking =
-          AbstractConflictChecker.getMarkingProposition(model, markingname);
-        cchecker.setMarkingProposition(marking);
-      }
-      final String premarkingname = mPreMarkingArgument.getValue();
-      if (premarkingname != null) {
-        final EventProxy premarking =
-          AbstractConflictChecker.getMarkingProposition(model, premarkingname);
-        cchecker.setPreconditionMarking(premarking);
+    for (final CommandLineArgument arg : mArgumentList) {
+      if (arg.isUsed()) {
+        arg.postConfigure(checker);
       }
     }
   }
@@ -192,11 +165,10 @@ public abstract class AbstractModelVerifierFactory
     return new UnsupportedOperationException(msg);
   }
 
-  private void checkRequiredArguments
-    (final Collection<CommandLineArgument> used)
+  private void checkRequiredArguments()
   {
-    for (final CommandLineArgument arg : mArgumentMap.values()) {
-      if (arg.isRequired() && !used.contains(arg)) {
+    for (final CommandLineArgument arg : mArgumentList) {
+      if (arg.isRequired() && !arg.isUsed()) {
         final String clsname = getClass().getName();
         final int dotpos = clsname.lastIndexOf('.');
         final String msg =
@@ -209,8 +181,32 @@ public abstract class AbstractModelVerifierFactory
 
 
   //#########################################################################
+  //# Inner Class EndArgument
+  private class EndArgument extends CommandLineArgument
+  {
+    //#######################################################################
+    //# Constructors
+    private EndArgument()
+    {
+      super("--", "Treat remaining arguments as file names");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void parse(final Iterator<String> iter)
+    {
+      while (iter.hasNext()) {
+        iter.next();
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class HelpArgument
-  private class HelpArgument extends CommandLineArgument
+  private class HelpArgument extends CommandLineArgumentFlag
   {
     //#######################################################################
     //# Constructors
@@ -222,23 +218,22 @@ public abstract class AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void parse(final Iterator<String> iter)
-    {
-    }
-
+    @Override
     protected void configure(final ModelVerifier verifier)
     {
-      final String name =
-        ProxyTools.getShortClassName(AbstractModelVerifierFactory.this);
-      System.err.println
-        (name + " supports the following command line options:");
-      final List<CommandLineArgument> args =
-        new ArrayList<CommandLineArgument>(mArgumentMap.values());
-      Collections.sort(args);
-      for (final CommandLineArgument arg : args) {
-        arg.dump(System.err, verifier);
+      if (getValue()) {
+        final String name =
+          ProxyTools.getShortClassName(AbstractModelVerifierFactory.this);
+        System.err.println
+          (name + " supports the following command line options:");
+        final List<CommandLineArgument> args =
+          new ArrayList<CommandLineArgument>(mArgumentMap.values());
+        Collections.sort(args);
+        for (final CommandLineArgument arg : args) {
+          arg.dump(System.err, verifier);
+        }
+        System.exit(0);
       }
-      System.exit(0);
     }
   }
 
@@ -268,31 +263,6 @@ public abstract class AbstractModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class TransitionLimitArgument
-  private static class TransitionLimitArgument
-    extends CommandLineArgumentInteger
-  {
-    //#######################################################################
-    //# Constructors
-    private TransitionLimitArgument()
-    {
-      super("-tlimit",
-            "Maximum number of transitions stored");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
-    {
-      final int limit = getValue();
-      verifier.setTransitionLimit(limit);
-    }
-
-  }
-
-
-  //#########################################################################
   //# Inner Class MarkingArgument
   private static class MarkingArgument
     extends CommandLineArgumentString
@@ -308,6 +278,16 @@ public abstract class AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModelVerifier verifier)
+    {
+      if (!(verifier instanceof ConflictChecker)) {
+        fail("Command line option " + getName() +
+             " is only supported for conflict check!");
+      }
+    }
+
+    @Override
     protected void configure(final ModuleCompiler compiler)
     {
       final String name = getValue();
@@ -337,12 +317,42 @@ public abstract class AbstractModelVerifierFactory
       compiler.setEnabledPropositionNames(props);
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    protected void postConfigure(final ModelVerifier verifier)
+    throws EventNotFoundException
     {
-      if (!(verifier instanceof ConflictChecker)) {
-        fail("Command line option " + getName() +
-             " is only supported for conflict check!");
+      final ConflictChecker cchecker = (ConflictChecker) verifier;
+      final ProductDESProxy model = cchecker.getModel();
+      final String markingname = getValue();
+      if (markingname != null) {
+        final EventProxy marking =
+          AbstractConflictChecker.getMarkingProposition(model, markingname);
+        cchecker.setMarkingProposition(marking);
       }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class NoOptimisationArgument
+  private static class NoOptimisationArgument
+    extends CommandLineArgumentFlag
+  {
+    //#######################################################################
+    //# Constructors
+    private NoOptimisationArgument()
+    {
+      super("-noopt", "Disable compiler optimisation");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModuleCompiler compiler)
+    {
+      final boolean opt = !getValue();
+      compiler.setOptimizationEnabled(opt);
     }
   }
 
@@ -364,6 +374,16 @@ public abstract class AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModelVerifier verifier)
+    {
+      if (!(verifier instanceof ConflictChecker)) {
+        fail("Command line option " + getName() +
+             " is only supported for conflict check!");
+      }
+    }
+
+    @Override
     protected void configure(final ModuleCompiler compiler)
     {
       final String name = getValue();
@@ -381,11 +401,17 @@ public abstract class AbstractModelVerifierFactory
       compiler.setEnabledPropositionNames(props);
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    protected void postConfigure(final ModelVerifier verifier)
+    throws EventNotFoundException
     {
-      if (!(verifier instanceof ConflictChecker)) {
-        fail("Command line option " + getName() +
-             " is only supported for conflict check!");
+      final ConflictChecker cchecker = (ConflictChecker) verifier;
+      final ProductDESProxy model = cchecker.getModel();
+      final String markingname = getValue();
+      if (markingname != null) {
+        final EventProxy marking =
+          AbstractConflictChecker.getMarkingProposition(model, markingname);
+        cchecker.setPreconditionMarking(marking);
       }
     }
   }
@@ -394,7 +420,7 @@ public abstract class AbstractModelVerifierFactory
   //#########################################################################
   //# Inner Class PropertyArgument
   private class PropertyArgument
-    extends CommandLineArgumentString
+    extends CommandLineArgumentStringList
   {
     //#######################################################################
     //# Constructors
@@ -403,42 +429,42 @@ public abstract class AbstractModelVerifierFactory
       super("-property",
             "Property for language inclusion check\n" +
             "(can be used more than once)");
+      setUsed(true);
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModuleCompiler compiler)
-    {
-      Collection<String> props = compiler.getEnabledPropertyNames();
-      if (props == null) {
-        props = new LinkedList<String>();
-        compiler.setEnabledPropertyNames(props);
-      }
-      final String name = getValue();
-      props.add(name);
-    }
-
+    @Override
     protected void configure(final ModelVerifier verifier)
     {
+      final Collection<String> props = getValues();
       if (verifier instanceof LanguageInclusionChecker) {
-        final String name = getValue();
-        final LanguageInclusionChecker lchecker =
-          (LanguageInclusionChecker) verifier;
-        final KindTranslator trans = lchecker.getKindTranslator();
-        if (trans instanceof PropertyKindTranslator) {
-          final PropertyKindTranslator ptrans = (PropertyKindTranslator) trans;
-          ptrans.addPropertyName(name);
+        if (props.isEmpty()) {
+          setUsed(false);
         } else {
-          final PropertyKindTranslator ptrans =
-            new PropertyKindTranslator(name);
-          lchecker.setKindTranslator(ptrans);
+          final LanguageInclusionChecker lchecker =
+            (LanguageInclusionChecker) verifier;
+          final Collection<String> names = getValues();
+          final PropertyKindTranslator translator =
+            new PropertyKindTranslator(names);
+          lchecker.setKindTranslator(translator);
         }
       } else {
-        fail("Command line option " + getName() +
-             " is only supported for language inclusion!");
+        if (!props.isEmpty()) {
+          fail("Command line option " + getName() +
+               " is only supported for language inclusion!");
+        }
       }
     }
+
+    @Override
+    protected void configure(final ModuleCompiler compiler)
+    {
+      final Collection<String> props = getValues();
+      compiler.setEnabledPropertyNames(props);
+    }
+
 
     //#######################################################################
     //# Printing
@@ -454,16 +480,39 @@ public abstract class AbstractModelVerifierFactory
 
 
   //#########################################################################
+  //# Inner Class TransitionLimitArgument
+  private static class TransitionLimitArgument
+    extends CommandLineArgumentInteger
+  {
+    //#######################################################################
+    //# Constructors
+    private TransitionLimitArgument()
+    {
+      super("-tlimit",
+            "Maximum number of transitions stored");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final int limit = getValue();
+      verifier.setTransitionLimit(limit);
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class PropertyKindTranslator
   private static class PropertyKindTranslator
     implements KindTranslator, Serializable
   {
     //#######################################################################
     //# Constructor
-    PropertyKindTranslator(final String name)
+    PropertyKindTranslator(final Collection<String> names)
     {
-      mUsedPropertyNames = new HashSet<String>();
-      mUsedPropertyNames.add(name);
+      mUsedPropertyNames = new THashSet<String>(names);
     }
 
     //#######################################################################
@@ -500,13 +549,6 @@ public abstract class AbstractModelVerifierFactory
     }
 
     //#######################################################################
-    //# Simple Access
-    void addPropertyName(final String name)
-    {
-      mUsedPropertyNames.add(name);
-    }
-
-    //#######################################################################
     //# Data Members
     private final Collection<String> mUsedPropertyNames;
 
@@ -518,9 +560,7 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Data Members
-  private final List<String> mArgumentList;
   private final Map<String,CommandLineArgument> mArgumentMap;
-  private final CommandLineArgumentString mMarkingArgument;
-  private final CommandLineArgumentString mPreMarkingArgument;
+  private final List<CommandLineArgument> mArgumentList;
 
 }

@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import java.util.List;
-
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
@@ -36,12 +34,6 @@ public class BDDModelVerifierFactory
     return SingletonHolder.theInstance;
   }
 
-  public static BDDModelVerifierFactory getInstance
-    (final List<String> cmdline)
-  {
-    return new BDDModelVerifierFactory(cmdline);
-  }
-
   private static class SingletonHolder {
     private static final BDDModelVerifierFactory theInstance =
       new BDDModelVerifierFactory();
@@ -54,13 +46,19 @@ public class BDDModelVerifierFactory
   {
   }
 
-  private BDDModelVerifierFactory(final List<String> arglist)
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  @Override
+  protected void addArguments()
   {
-    super(arglist);
+    super.addArguments();
     addArgument(new CommandLineArgumentPack());
     addArgument(new CommandLineArgumentOrder());
     addArgument(new CommandLineArgumentInitialSize());
-    addArgument(new CommandLineArgumentParitioningSizeLimit());
+    addArgument(new CommandLineArgumentPartitioningStrategy());
+    addArgument(new CommandLineArgumentPartitioningSizeLimit());
     addArgument(new CommandLineArgumentDynamic());
   }
 
@@ -189,16 +187,43 @@ public class BDDModelVerifierFactory
     }
   }
 
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentOrder
+  private static class CommandLineArgumentPartitioningStrategy
+    extends CommandLineArgumentEnum<TransitionPartitioningStrategy>
+  {
+    //#######################################################################
+    //# Constructor
+    private CommandLineArgumentPartitioningStrategy()
+    {
+      super("-part", "Set transition partitioning strategy",
+            TransitionPartitioningStrategy.class);
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModelVerifier verifier)
+    {
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final TransitionPartitioningStrategy strategy = getValue();
+      bddVerifier.setTransitionPartitioningStrategy(strategy);
+    }
+  }
+
+
   //#########################################################################
   //# Inner Class CommandLineArgumentParitioningSizeLimit
-  private static class CommandLineArgumentParitioningSizeLimit
+  private static class CommandLineArgumentPartitioningSizeLimit
     extends CommandLineArgumentInteger
   {
     //#######################################################################
     //# Constructor
-    private CommandLineArgumentParitioningSizeLimit()
+    private CommandLineArgumentPartitioningSizeLimit()
     {
-      super("-part", "Maximum BDD size when merging partitioned BDDs");
+      super("-plimit", "Maximum BDD size when merging partitioned BDDs");
     }
 
     //#######################################################################

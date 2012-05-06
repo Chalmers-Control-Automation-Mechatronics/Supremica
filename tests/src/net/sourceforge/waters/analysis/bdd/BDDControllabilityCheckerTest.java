@@ -14,7 +14,6 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -43,10 +42,14 @@ public class BDDControllabilityCheckerTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  protected ControllabilityChecker
-    createModelVerifier(final ProductDESProxyFactory factory)
+  protected BDDControllabilityChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
-    return new BDDControllabilityChecker(factory);
+    final BDDControllabilityChecker checker =
+      new BDDControllabilityChecker(factory);
+    checker.setTransitionPartitioningStrategy
+      (TransitionPartitioningStrategy.AUTOMATA);
+    return checker;
   }
 
 }

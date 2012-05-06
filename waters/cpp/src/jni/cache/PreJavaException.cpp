@@ -11,6 +11,7 @@
 #pragma implementation
 #endif
 
+#include <iostream>
 #include <string.h>
 
 #include "jni/cache/ClassCache.h"
@@ -26,6 +27,13 @@ namespace jni {
 
 //###########################################################################
 //# PreJavaException: Constructors, Destructors & Co.
+
+PreJavaException::
+PreJavaException()
+  : mClassCode(UINT32_MAX)
+{
+  initMessage(0,true);
+}
 
 PreJavaException::
 PreJavaException(uint32_t classcode)

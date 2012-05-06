@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
 /**
  * A general compositional model verifier to be subclassed for different
  * properties. This class adds to the general base class {@link
- * AbstractCompositionalModelAnalyser} a common {@link #run()} that
+ * AbstractCompositionalModelAnalyzer} a common {@link #run()} that
  * supports counter example computation.
  *
  * <I>References:</I><BR>
@@ -147,10 +147,6 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Configuration
-
-
-  //#########################################################################
-  //# Specific Access
   protected void setMonolithicVerifier(final ModelVerifier verifier)
   {
     mMonolithicVerifier = verifier;
@@ -182,6 +178,9 @@ public abstract class AbstractCompositionalModelVerifier
     mCurrentMonolithicVerifier.setKindTranslator(translator);
   }
 
+
+  //#########################################################################
+  //# Specific Access
   /**
    * Stores a verification result indicating that the property checked
    * is satisfied and marks the run as completed.

@@ -17,7 +17,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -59,7 +59,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  */
 
 public class ExpressionComparator
-  extends AbstractModuleProxyVisitor
+  extends DefaultModuleProxyVisitor
   implements Comparator<SimpleExpressionProxy>
 {
 

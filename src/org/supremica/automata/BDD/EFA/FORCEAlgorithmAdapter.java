@@ -18,7 +18,7 @@ public class FORCEAlgorithmAdapter {
     private final static int TOTAL_ROUNDS = 500; // total force rounds
     private final static int MIN_ITR = 20;	// min iterations in a round
     private final static double STOP_CONST_C = 6; // constant c in the paper
-    private int[] order, cutcount;
+    private int[] order;
     private int size;
     private Node[] nodes;
     private double[] weights, window_tmp;
@@ -44,7 +44,6 @@ public class FORCEAlgorithmAdapter {
         size = gf.numOfNodes();
         nodes = new Node[size];
         order = new int[size];
-        cutcount = new int[size];
         weights = new double[size];
         window_tmp = new double[4]; // size of the window
 
@@ -66,16 +65,7 @@ public class FORCEAlgorithmAdapter {
         // iterate
         lowest_cost = Double.MAX_VALUE;
         for (int rounds = 0; rounds < TOTAL_ROUNDS; rounds++) {
-
-            // get inital order
-            switch (rounds % 2) {
-                case 0:
-                    create_dfs_order();
-                    break;
-                case 1:
-                    create_random_order();
-                    break;
-            }
+            create_dfs_order();
 
             // do a series of iterations
             final double span = iterate(max_itr);
@@ -336,64 +326,6 @@ public class FORCEAlgorithmAdapter {
      */
     private double ordering_cost() {
         return total_span();
-        /*switch (cost_type) {
-            case Options.FORCE_TYPE_MAXCUT:
-                return max_cut();
-            case Options.FORCE_TYPE_TOTALSPAN:
-                return total_span();
-            case Options.FORCE_TYPE_MAXSPAN:
-                return max_span();
-            default:
-                // should not happen!
-                return 0;
-        }*/
-    }
-
-    /**
-     * Max cut is the size of the largest cut in the graph.
-     * The i:th cut is the number of connections across level i + 0.5.
-     */
-    @SuppressWarnings("unused")
-    private double max_cut() {
-
-        // XXX: i am sure that there is a better way for doing so, but im am too tired to figure that out right now
-
-        for (int i = 0; i < size; i++) {
-            cutcount[i] = 0;
-        }
-
-        for (int i = 0; i < size; i++) {
-
-            // find the end points of this hyperedge
-            find_hyperedge_ends(nodes[i]);
-
-            for (int j = (int) edge_start; j < (int) edge_end; j++) {
-                cutcount[j]++;
-            }
-        }
-
-
-        int max = 0;
-        for (int i = 0; i < size; i++) {
-            max = Math.max(max, cutcount[i]);
-        }
-
-        return (double) max;
-
-    }
-
-    /**
-     * Max span is the size of the longest hyper-edge.
-     */
-    @SuppressWarnings("unused")
-    private double max_span() {
-        double span = 0;
-
-        for (int i = 0; i < size; i++) {
-            find_hyperedge_ends(nodes[i]);
-            span = Math.max(span, (edge_end - edge_start));
-        }
-        return span;
     }
 
     /**
@@ -440,24 +372,11 @@ public class FORCEAlgorithmAdapter {
         edge_end = max;
     }
 
-    // -- [ code to generate an initial ordering ] ---------------------
-    /**
-     * we must start with some initial order ...
-     */
-    private void create_random_order() {
-        final int[] perm = Util.permutate(size);
-        for (int idx = 0; idx < size; idx++) {
-            nodes[idx].lv = perm[idx];
-        }
-
-    }
-
     /**
      * we could also start with a randomly started DFS order
      */
     private void create_dfs_order() {
-
-        dfs_label(nodes[ (int) (Math.random() * size)]);
+        dfs_label(nodes[0]);
     }
 
     // do DFS labelling starting from this node

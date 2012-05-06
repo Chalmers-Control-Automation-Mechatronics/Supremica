@@ -110,8 +110,8 @@ public class DocumentManager
    *          determined automatically using a {@link ProxyMarshaller}.
    * @param clazz
    *          The desired class of the document to be loaded. This is used to
-   *          identify an appropriate {@link ProxyMarshaller}.
-   * @return The loaded document. This may just a cached copy, or it may
+   *          identify an appropriate {@link ProxyUnmarshaller}.
+   * @return The loaded document. This may just be a cached copy, or it may
    *         actually be retrieved by reading an external file.
    * @throws WatersUnmarshalException
    *           to indicate that parsing the input file has failed for some
@@ -119,8 +119,8 @@ public class DocumentManager
    * @throws IOException
    *           to indicate that the input file could not be opened or read.
    * @throws IllegalArgumentException
-   *           to indicate that no registered {@link ProxyMarshaller} for the
-   *           given class was found.
+   *           to indicate that no registered {@link ProxyUnmarshaller} for
+   *           the given class was found.
    */
   public <DD extends DocumentProxy> DD load(final URI uri, final String name,
       final Class<DD> clazz) throws WatersUnmarshalException, IOException
@@ -149,7 +149,7 @@ public class DocumentManager
    * file name, guessing the expected class from the file name extension.
    * @param uri
    *          A URI specifying the location of the document to be retrieved.
-   * @return The loaded document. This may be just a cached copy, or it may
+   * @return The loaded document. This may be just be a cached copy, or it may
    *         actually be retrieved by reading an external file.
    * @throws WatersUnmarshalException
    *           to indicate that parsing the input file has failed for some
@@ -188,11 +188,11 @@ public class DocumentManager
    *          The directory containing the file to be loaded.
    * @param name
    *          The name of the file without extension. The extension is
-   *          determined automatically using a {@link ProxyMarshaller}.
+   *          determined automatically using a {@link ProxyUnmarshaller}.
    * @param clazz
    *          The desired class of the document to be loaded. This is used to
-   *          identify an appropriate {@link ProxyMarshaller}.
-   * @return The loaded document. This may just a cached copy, or it may
+   *          identify an appropriate {@link ProxyUnmarshaller}.
+   * @return The loaded document. This may just be a cached copy, or it may
    *         actually be retrieved by reading an external file.
    * @throws WatersUnmarshalException
    *           to indicate that parsing the input file has failed for some
@@ -200,8 +200,8 @@ public class DocumentManager
    * @throws IOException
    *           to indicate that the input file could not be opened or read.
    * @throws IllegalArgumentException
-   *           to indicate that no registered {@link ProxyMarshaller} for the
-   *           given class was found.
+   *           to indicate that no registered {@link ProxyUnmarshaller} for
+   *           the given class was found.
    */
   public <DD extends DocumentProxy> DD load(final File path, final String name,
       final Class<DD> clazz) throws WatersUnmarshalException, IOException
@@ -233,7 +233,7 @@ public class DocumentManager
    * file name, guessing the expected class from the file name extension.
    * @param url
    *          A URL specifying the location of the document to be retrieved.
-   * @return The loaded document. This may be just a cached copy, or it may
+   * @return The loaded document. This may be just be a cached copy, or it may
    *         actually be retrieved by reading an external file.
    * @throws WatersUnmarshalException
    *           to indicate that parsing the input file has failed for some
@@ -257,7 +257,7 @@ public class DocumentManager
    * file name, guessing the expected class from the file name extension.
    * @param filename
    *          The absolute path of the file to be loaded.
-   * @return The loaded document. This may be just a cached copy, or it may
+   * @return The loaded document. This may be just be a cached copy, or it may
    *         actually be retrieved by reading an external file.
    * @throws WatersUnmarshalException
    *           to indicate that parsing the input file has failed for some
@@ -604,7 +604,7 @@ public class DocumentManager
       final File file = getFile();
       if (file != null) {
         final long modtime = file.lastModified();
-        return modtime >= mOpeningTime;
+        return modtime > mOpeningTime;
       } else {
         return false;
       }

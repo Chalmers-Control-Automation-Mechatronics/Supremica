@@ -20,8 +20,8 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -36,7 +36,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  *
  * @author Robi Malik
  */
-public class DeterministicModuleChecker extends AbstractModuleProxyVisitor
+public class DeterministicModuleChecker extends DefaultModuleProxyVisitor
 {
 
   //#######################################################################
@@ -77,7 +77,7 @@ public class DeterministicModuleChecker extends AbstractModuleProxyVisitor
   //#######################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
-  public Boolean visitForeachComponentProxy(final ForeachComponentProxy foreach)
+  public Boolean visitForeachProxy(final ForeachProxy foreach)
     throws VisitorException
   {
     for (final Proxy proxy : foreach.getBody()) {
