@@ -38,7 +38,7 @@ import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -376,7 +376,7 @@ public class EFACompiler
    * EFAVariable} object that contains the range of possible state values
    * of that component.
    */
-  private class Pass1Visitor extends AbstractModuleProxyVisitor
+  private class Pass1Visitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -466,7 +466,7 @@ public class EFACompiler
   /**
    * The visitor implementing the second pass of EFA compilation.
    */
-  private class Pass2Visitor extends AbstractModuleProxyVisitor
+  private class Pass2Visitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -716,7 +716,7 @@ public class EFACompiler
   /**
    * The visitor implementing the fourth pass of EFA compilation.
    */
-  private class Pass4Visitor extends AbstractModuleProxyVisitor
+  private class Pass4Visitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

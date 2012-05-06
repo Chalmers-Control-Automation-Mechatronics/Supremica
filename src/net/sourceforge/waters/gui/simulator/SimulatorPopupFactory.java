@@ -21,7 +21,7 @@ import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.des.AbstractProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import org.supremica.gui.ide.ModuleContainer;
@@ -93,7 +93,7 @@ class SimulatorPopupFactory extends PopupFactory
 
   //#########################################################################
   //# Inner Class PopupVisitor
-  private class PopupVisitor extends AbstractProductDESProxyVisitor
+  private class PopupVisitor extends DefaultProductDESProxyVisitor
   {
 
     //#######################################################################

@@ -54,7 +54,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -651,7 +651,7 @@ public class AutomatonDisplayPane
 
   //#########################################################################
   //# Inner Class GraphToolTipVisitor
-  private class GraphToolTipVisitor extends AbstractModuleProxyVisitor
+  private class GraphToolTipVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation

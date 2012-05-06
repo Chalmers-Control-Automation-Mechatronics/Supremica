@@ -18,7 +18,7 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -46,7 +46,7 @@ import net.sourceforge.waters.subject.module.LabelBlockSubject;
  * @author Robi Malik
  */
 
-class DataFlavorVisitor extends AbstractModuleProxyVisitor
+class DataFlavorVisitor extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################

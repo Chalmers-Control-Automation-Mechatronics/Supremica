@@ -30,7 +30,7 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
@@ -56,7 +56,7 @@ import org.supremica.gui.ide.IDE;
 /**
  * <P>The action associated with the 'properties' menu buttons.</P>
  *
- * <P>This action pops up a dialog box to edit the currently focussed
+ * <P>This action pops up a dialog box to edit the currently focused
  * item, if that item is of a supported type. To support this action,
  * components including editable items must implement the {@link
  * SelectionOwner} interface and return the item to be edited through
@@ -137,7 +137,7 @@ public class IDEPropertiesAction
   //#########################################################################
   //# Inner Class PropertiesVisitor
   private class PropertiesVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -146,9 +146,9 @@ public class IDEPropertiesAction
     {
       try {
         mDoEdit = false;
-	return (Boolean) proxy.acceptVisitor(this);
+        return (Boolean) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
@@ -156,9 +156,9 @@ public class IDEPropertiesAction
     {
       try {
         mDoEdit = true;
-	proxy.acceptVisitor(this);
+        proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
@@ -223,8 +223,8 @@ public class IDEPropertiesAction
       return true;
     }
 
-    // TODO Auto-generated method stub
-    public Boolean visitInstanceProxy(final InstanceProxy instance){
+    public Boolean visitInstanceProxy(final InstanceProxy instance)
+    {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final InstanceSubject subject = (InstanceSubject) instance;

@@ -86,7 +86,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -3679,7 +3679,7 @@ public class GraphEditorPanel
    * visitor interface. This class also contains the logic to determine
    * whether edges connected to moving nodes are to be moved or transformed.
    */
-  private class MoveVisitor extends AbstractModuleProxyVisitor
+  private class MoveVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -4380,7 +4380,7 @@ public class GraphEditorPanel
   //#########################################################################
   //# Inner Class SelectableVisitor
   private class SelectableVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -4556,7 +4556,7 @@ public class GraphEditorPanel
   //#########################################################################
   //# Inner Class IdentifierPasteVisitor
   private class IdentifierPasteVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

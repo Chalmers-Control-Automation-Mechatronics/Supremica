@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.compiler.context.
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -281,7 +281,7 @@ class CompiledNameSpace
 
   //#########################################################################
   //# Inner Class EventLookupVisitor
-  private static class EventLookupVisitor extends AbstractModuleProxyVisitor
+  private static class EventLookupVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
@@ -366,7 +366,7 @@ class CompiledNameSpace
   //#########################################################################
   //# Inner Class ComponentLookupVisitor
   private static class ComponentLookupVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
@@ -442,7 +442,7 @@ class CompiledNameSpace
   //#########################################################################
   //# Inner Class NameSpaceLookupVisitor
   private static class NameSpaceLookupVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
@@ -508,7 +508,7 @@ class CompiledNameSpace
 
   //#########################################################################
   //# Inner Class EventAddVisitor
-  private static class EventAddVisitor extends AbstractModuleProxyVisitor
+  private static class EventAddVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
@@ -584,7 +584,7 @@ class CompiledNameSpace
 
   //#########################################################################
   //# Inner Class ComponentAddVisitor
-  private static class ComponentAddVisitor extends AbstractModuleProxyVisitor
+  private static class ComponentAddVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
@@ -655,7 +655,7 @@ class CompiledNameSpace
 
   //#########################################################################
   //# Inner Class NameSpaceAddVisitor
-  private static class NameSpaceAddVisitor extends AbstractModuleProxyVisitor
+  private static class NameSpaceAddVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation

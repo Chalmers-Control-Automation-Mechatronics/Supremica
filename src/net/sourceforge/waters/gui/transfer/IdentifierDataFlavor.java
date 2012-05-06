@@ -16,7 +16,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -61,7 +61,7 @@ class IdentifierDataFlavor extends ModuleDataFlavor
 
   //#########################################################################
   //# Inner Class ConversionVisitor
-  private static class ConversionVisitor extends AbstractModuleProxyVisitor
+  private static class ConversionVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

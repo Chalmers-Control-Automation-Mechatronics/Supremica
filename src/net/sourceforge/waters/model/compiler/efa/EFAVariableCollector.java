@@ -14,7 +14,7 @@ import java.util.Collection;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -29,7 +29,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  */
 
 class EFAVariableCollector
-  extends AbstractModuleProxyVisitor
+  extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################

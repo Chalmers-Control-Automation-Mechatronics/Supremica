@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -332,7 +332,7 @@ public class SimpleExpressionCompiler
   //#########################################################################
   //# Inner Class SimplificationVisitor
   private class SimplificationVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -504,7 +504,7 @@ public class SimpleExpressionCompiler
   //#########################################################################
   //# Inner Class AtomicVisitor
   private class AtomicVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -556,7 +556,7 @@ public class SimpleExpressionCompiler
   //#########################################################################
   //# Inner Class RangeVisitor
   private class RangeVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

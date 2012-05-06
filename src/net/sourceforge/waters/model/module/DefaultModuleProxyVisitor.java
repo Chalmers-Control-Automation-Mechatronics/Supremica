@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.module
-//# CLASS:   AbstractModuleProxyVisitor
+//# CLASS:   DefaultModuleProxyVisitor
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,237 +12,286 @@
 
 package net.sourceforge.waters.model.module;
 
-import net.sourceforge.waters.model.base.AbstractProxyVisitor;
+import net.sourceforge.waters.model.base.DefaultProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 
 
-public class AbstractModuleProxyVisitor
-  extends AbstractProxyVisitor
+/**
+ * <P>An empty implementation of the {@link ModuleProxyVisitor} interface.</P>
+ *
+ * <P>This is an adapter class to make it more convenient to implement
+ * visitors that do not explicitly implement all the visit methods.
+ * All the visit methods in this adapter class do nothing or call the visit
+ * method for the immediate superclass of their argument.</P>
+ *
+ * @author Robi Malik
+ */
+
+public class DefaultModuleProxyVisitor
+  extends DefaultProxyVisitor
   implements ModuleProxyVisitor
 {
 
+  @Override
   public Object visitAliasProxy(final AliasProxy proxy)
     throws VisitorException
   {
     return visitIdentifiedProxy(proxy);
   }
 
+  @Override
   public Object visitBinaryExpressionProxy(final BinaryExpressionProxy proxy)
     throws VisitorException
   {
     return visitSimpleExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitBoxGeometryProxy(final BoxGeometryProxy proxy)
     throws VisitorException
   {
     return visitGeometryProxy(proxy);
   }
 
+  @Override
   public Object visitColorGeometryProxy(final ColorGeometryProxy proxy)
     throws VisitorException
   {
     return visitGeometryProxy(proxy);
   }
 
+  @Override
   public Object visitComponentProxy(final ComponentProxy proxy)
     throws VisitorException
   {
     return visitIdentifiedProxy(proxy);
   }
 
+  @Override
   public Object visitConstantAliasProxy(final ConstantAliasProxy proxy)
     throws VisitorException
   {
     return visitAliasProxy(proxy);
   }
 
+  @Override
   public Object visitEdgeProxy(final EdgeProxy proxy)
     throws VisitorException
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Object visitEnumSetExpressionProxy(final EnumSetExpressionProxy proxy)
     throws VisitorException
   {
     return visitSimpleExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitEventAliasProxy(final EventAliasProxy proxy)
     throws VisitorException
   {
     return visitAliasProxy(proxy);
   }
 
+  @Override
   public Object visitEventDeclProxy(final EventDeclProxy proxy)
     throws VisitorException
   {
     return visitIdentifiedProxy(proxy);
   }
 
+  @Override
   public Object visitEventListExpressionProxy(final EventListExpressionProxy proxy)
     throws VisitorException
   {
     return visitExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitExpressionProxy(final ExpressionProxy proxy)
     throws VisitorException
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Object visitForeachProxy(final ForeachProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
   }
 
+  @Override
   public Object visitGraphProxy(final GraphProxy proxy)
     throws VisitorException
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Object visitGroupNodeProxy(final GroupNodeProxy proxy)
     throws VisitorException
   {
     return visitNodeProxy(proxy);
   }
 
+  @Override
   public Object visitGuardActionBlockProxy(final GuardActionBlockProxy proxy)
     throws VisitorException
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Object visitIdentifiedProxy(final IdentifiedProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
   }
 
+  @Override
   public Object visitIdentifierProxy(final IdentifierProxy proxy)
     throws VisitorException
   {
     return visitSimpleExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitIndexedIdentifierProxy(final IndexedIdentifierProxy proxy)
     throws VisitorException
   {
     return visitIdentifierProxy(proxy);
   }
 
+  @Override
   public Object visitInstanceProxy(final InstanceProxy proxy)
     throws VisitorException
   {
     return visitComponentProxy(proxy);
   }
 
+  @Override
   public Object visitIntConstantProxy(final IntConstantProxy proxy)
     throws VisitorException
   {
     return visitSimpleExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitLabelBlockProxy(final LabelBlockProxy proxy)
     throws VisitorException
   {
     return visitEventListExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitLabelGeometryProxy(final LabelGeometryProxy proxy)
     throws VisitorException
   {
     return visitGeometryProxy(proxy);
   }
 
+  @Override
   public Object visitModuleProxy(final ModuleProxy proxy)
     throws VisitorException
   {
     return visitDocumentProxy(proxy);
   }
 
+  @Override
   public Object visitModuleSequenceProxy(final ModuleSequenceProxy proxy)
     throws VisitorException
   {
     return visitDocumentProxy(proxy);
   }
 
+  @Override
   public Object visitNodeProxy(final NodeProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
   }
 
+  @Override
   public Object visitParameterBindingProxy(final ParameterBindingProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
   }
 
+  @Override
   public Object visitPlainEventListProxy(final PlainEventListProxy proxy)
     throws VisitorException
   {
     return visitEventListExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitPointGeometryProxy(final PointGeometryProxy proxy)
     throws VisitorException
   {
     return visitGeometryProxy(proxy);
   }
 
+  @Override
   public Object visitQualifiedIdentifierProxy(final QualifiedIdentifierProxy proxy)
     throws VisitorException
   {
     return visitIdentifierProxy(proxy);
   }
 
+  @Override
   public Object visitSimpleComponentProxy(final SimpleComponentProxy proxy)
     throws VisitorException
   {
     return visitComponentProxy(proxy);
   }
 
+  @Override
   public Object visitSimpleExpressionProxy(final SimpleExpressionProxy proxy)
     throws VisitorException
   {
     return visitExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy proxy)
     throws VisitorException
   {
     return visitIdentifierProxy(proxy);
   }
 
+  @Override
   public Object visitSimpleNodeProxy(final SimpleNodeProxy proxy)
     throws VisitorException
   {
     return visitNodeProxy(proxy);
   }
 
+  @Override
   public Object visitSplineGeometryProxy(final SplineGeometryProxy proxy)
     throws VisitorException
   {
     return visitGeometryProxy(proxy);
   }
 
+  @Override
   public Object visitUnaryExpressionProxy(final UnaryExpressionProxy proxy)
     throws VisitorException
   {
     return visitSimpleExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitVariableComponentProxy(final VariableComponentProxy proxy)
     throws VisitorException
   {
     return visitComponentProxy(proxy);
   }
 
+  @Override
   public Object visitVariableMarkingProxy(final VariableMarkingProxy proxy)
     throws VisitorException
   {

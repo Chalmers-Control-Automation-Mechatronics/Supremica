@@ -29,7 +29,7 @@ import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -58,7 +58,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 
 class EventDeclDeleteVisitor
-  extends AbstractModuleProxyVisitor
+  extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################

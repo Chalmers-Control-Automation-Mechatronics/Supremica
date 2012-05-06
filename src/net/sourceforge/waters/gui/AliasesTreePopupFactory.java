@@ -16,7 +16,7 @@ import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 
 
 class AliasesTreePopupFactory
@@ -67,7 +67,7 @@ class AliasesTreePopupFactory
   //#########################################################################
   //# Inner Class AliasesTreePopupVisitor
   private class AliasesTreePopupVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

@@ -33,7 +33,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -1640,7 +1640,7 @@ class EditorGraph
   //#########################################################################
   //# Inner Class FakeGetterVisitor
   private class FakeGetterVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
@@ -1697,7 +1697,7 @@ class EditorGraph
   //#########################################################################
   //# Inner Class OriginalGetterVisitor
   private class OriginalGetterVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
@@ -1760,7 +1760,7 @@ class EditorGraph
   //#########################################################################
   //# Inner Class ChangeRecordCreatorVisitor
   private class ChangeRecordCreatorVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation

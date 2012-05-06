@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -608,7 +608,7 @@ public class EventTableModel
   //#########################################################################
   //# Inner Class IdentifierCollectVisitor
   private class IdentifierCollectVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -702,7 +702,7 @@ public class EventTableModel
   //#########################################################################
   //# Inner Class GraphSearchVisitor
   private class GraphSearchVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

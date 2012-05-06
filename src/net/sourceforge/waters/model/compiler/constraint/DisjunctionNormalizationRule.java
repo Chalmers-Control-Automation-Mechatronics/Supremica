@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -147,7 +147,7 @@ class DisjunctionNormalizationRule extends SimplificationRule
   //#########################################################################
   //# Inner Class DisjunctionCollector
   private static class DisjunctionCollector
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

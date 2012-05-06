@@ -82,7 +82,7 @@ import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
-import net.sourceforge.waters.model.base.AbstractProxyVisitor;
+import net.sourceforge.waters.model.base.DefaultProxyVisitor;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -94,7 +94,7 @@ import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -252,7 +252,7 @@ public class ProcessCommandLineArguments
                         // Loop throgh components and print eps-figures
                         //module.acceptVisitor(new EPSPrinterVisitor(module));
                         final List<Proxy> components = module.getComponentList();
-                        final AbstractProxyVisitor visitor = new EPSPrinterVisitor(module, verbose);
+                        final DefaultProxyVisitor visitor = new EPSPrinterVisitor(module, verbose);
                         visitor.visitCollection(components);
                     }
                     catch (final IOException ex)
@@ -520,7 +520,7 @@ public class ProcessCommandLineArguments
  * for the graphs.
  */
 class EPSPrinterVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
 {
 
     //#######################################################################

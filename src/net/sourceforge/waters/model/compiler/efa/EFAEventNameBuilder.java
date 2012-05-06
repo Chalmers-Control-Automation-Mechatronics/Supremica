@@ -26,7 +26,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -334,7 +334,7 @@ class EFAEventNameBuilder {
   //#########################################################################
   //# Inner Class VariableCollectVisitor
   private class VariableCollectVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.base
-//# CLASS:   AbstractProxyVisitor
+//# CLASS:   DefaultProxyVisitor
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -23,7 +23,7 @@ import java.util.Collection;
  * @author Robi Malik
  */
 
-public class AbstractProxyVisitor implements ProxyVisitor {
+abstract public class DefaultProxyVisitor implements ProxyVisitor {
 
   //#########################################################################
   //# Visitor Methods

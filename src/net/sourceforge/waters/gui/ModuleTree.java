@@ -59,7 +59,7 @@ import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
@@ -689,7 +689,7 @@ public abstract class ModuleTree
 
   //#########################################################################
   //# Inner Class DoubleClickVisitor
-  private class DoubleClickVisitor extends AbstractModuleProxyVisitor
+  private class DoubleClickVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -953,7 +953,7 @@ public abstract class ModuleTree
 
   //#########################################################################
   //# Inner Class GetListVisitor
-  private class GetListVisitor extends AbstractModuleProxyVisitor
+  private class GetListVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
@@ -1086,7 +1086,7 @@ public abstract class ModuleTree
 
   //#########################################################################
   //# Inner Class AcceptedDataFlavorVisitor
-  private class AcceptTransferableVisitor extends AbstractModuleProxyVisitor
+  private class AcceptTransferableVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation

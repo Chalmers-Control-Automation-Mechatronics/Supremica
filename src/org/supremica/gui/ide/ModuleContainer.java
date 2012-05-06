@@ -53,7 +53,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -528,7 +528,7 @@ public class ModuleContainer
    * the graph panel if it (or its parent) has been deleted from the module.
    * @author Carly Hona
    */
-  private class UpdateGraphPanelVisitor extends AbstractModuleProxyVisitor
+  private class UpdateGraphPanelVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation

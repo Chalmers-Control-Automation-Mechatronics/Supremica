@@ -24,7 +24,7 @@ import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -89,7 +89,7 @@ public class EditLabelRecallAction
   //#########################################################################
   //# Inner Class RecallEnabledVisitor
   private class RecallEnabledVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -97,9 +97,9 @@ public class EditLabelRecallAction
     private boolean canRecall(final Proxy proxy)
     {
       try {
-	return (Boolean) proxy.acceptVisitor(this);
+        return (Boolean) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 
@@ -141,7 +141,7 @@ public class EditLabelRecallAction
   //#########################################################################
   //# Inner Class RecallVisitor
   private class RecallVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -157,6 +157,7 @@ public class EditLabelRecallAction
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    @Override
     public Command visitEdgeProxy(final EdgeProxy proxy)
     {
       final ModuleProxyCloner cloner =
@@ -171,6 +172,7 @@ public class EditLabelRecallAction
       return new EditCommand(geo, cloned, panel, "Label Movement");
     }
 
+    @Override
     public Command visitSimpleNodeProxy(final SimpleNodeProxy proxy)
     {
       final ModuleProxyCloner cloner =

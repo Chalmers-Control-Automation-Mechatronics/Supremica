@@ -71,7 +71,7 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -1058,7 +1058,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
   //#########################################################################
   //# Inner Class DeleteVisitor
-  private class DeleteVisitor extends AbstractModuleProxyVisitor
+  private class DeleteVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1168,7 +1168,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
   //#########################################################################
   //# Inner Class ReplaceVisitor
-  private class ReplaceVisitor extends AbstractModuleProxyVisitor
+  private class ReplaceVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

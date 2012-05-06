@@ -23,7 +23,7 @@ import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -99,7 +99,7 @@ class GraphPopupFactory
   //#########################################################################
   //# Inner Class GraphPopupVisitor
   private class GraphPopupVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

@@ -13,7 +13,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -259,7 +259,7 @@ public class SubjectShapeProducer
   //#########################################################################
   //# Inner Class RemoveMappingVisitor
   private class RemoveMappingVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

@@ -20,7 +20,7 @@ import javax.swing.tree.TreeModel;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
@@ -340,7 +340,7 @@ class ComponentsTreeModel
   //#########################################################################
   //# Inner Class ChildrenGetterVisitor
   private static class ChildrenGetterVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -386,7 +386,7 @@ class ComponentsTreeModel
   //#########################################################################
   //# Inner Class TypeCheckerVisitor
   private static class TypeCheckerVisitor
-    extends AbstractModuleProxyVisitor
+    extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

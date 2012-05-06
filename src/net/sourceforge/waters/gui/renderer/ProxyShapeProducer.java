@@ -34,7 +34,7 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -54,7 +54,7 @@ import net.sourceforge.waters.subject.module.GeometryTools;
 
 
 public class ProxyShapeProducer
-  extends AbstractModuleProxyVisitor
+  extends DefaultModuleProxyVisitor
 {
   //#########################################################################
   //# Constructors

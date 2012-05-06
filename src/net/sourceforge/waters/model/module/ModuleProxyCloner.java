@@ -46,7 +46,7 @@ import net.sourceforge.waters.xsd.module.SplineKind;
  */
 
 public class ModuleProxyCloner
-  extends AbstractModuleProxyVisitor
+  extends DefaultModuleProxyVisitor
   implements ProxyCloner
 {
 
@@ -85,8 +85,7 @@ public class ModuleProxyCloner
     }
     final List<?> precast = result;
     @SuppressWarnings("unchecked")
-    final
-    List<P> cast = (List<P>) precast;
+    final List<P> cast = (List<P>) precast;
     return cast;
   }
 
@@ -101,33 +100,32 @@ public class ModuleProxyCloner
     }
     final Set<?> precast = result;
     @SuppressWarnings("unchecked")
-    final
-    Set<P> cast = (Set<P>) precast;
+    final Set<P> cast = (Set<P>) precast;
     return cast;
   }
 
   /**
    * Creates a clone of the given graph using two factories.
-   * This methods creates a clone of a graph's nodes and edges using the
-   * standard factory of this cloner, then creates a new graph using
-   * another factory given as an argument.
+   * This methods creates a clone of a graph's nodes and edges using
+   * the standard factory of this cloner, then creates a new graph 
+   * using another factory given as an argument.
    * @param  graph    The graph to be duplicated.
    * @param  factory  The factory used to create the new graph.
    * @return The cloned graph.
    */
-  public GraphProxy getClonedGraph(final GraphProxy graph,
+  public GraphProxy getClonedGraph(final GraphProxy proxy,
                                    final ModuleProxyFactory factory)
   {
-    final int size = graph.getNodes().size();
+    final int size = proxy.getNodes().size();
     mNodeMap = new HashMap<String,NodeProxy>(size);
     try {
-      final boolean deterministic = graph.isDeterministic();
-      final LabelBlockProxy blockedEvents0 = graph.getBlockedEvents();
+      final boolean deterministic = proxy.isDeterministic();
+      final LabelBlockProxy blockedEvents0 = proxy.getBlockedEvents();
       final LabelBlockProxy blockedEvents =
         blockedEvents0 == null ? null : visitLabelBlockProxy(blockedEvents0);
-      final Collection<NodeProxy> nodes0 = graph.getNodes();
+      final Collection<NodeProxy> nodes0 = proxy.getNodes();
       final Collection<NodeProxy> nodes = lookupNodeProxyCollection(nodes0);
-      final Collection<EdgeProxy> edges0 = graph.getEdges();
+      final Collection<EdgeProxy> edges0 = proxy.getEdges();
       final Collection<EdgeProxy> edges = cloneProxyCollection(edges0);
       return factory.createGraphProxy(deterministic,
                                       blockedEvents,
@@ -143,6 +141,7 @@ public class ModuleProxyCloner
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public AliasProxy visitAliasProxy
     (final AliasProxy proxy)
     throws VisitorException
@@ -150,6 +149,7 @@ public class ModuleProxyCloner
     return (AliasProxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public BinaryExpressionProxy visitBinaryExpressionProxy
     (final BinaryExpressionProxy proxy)
     throws VisitorException
@@ -166,6 +166,7 @@ public class ModuleProxyCloner
                                                 right);
   }
 
+  @Override
   public BoxGeometryProxy visitBoxGeometryProxy
     (final BoxGeometryProxy proxy)
     throws VisitorException
@@ -174,6 +175,7 @@ public class ModuleProxyCloner
     return mFactory.createBoxGeometryProxy(rectangle);
   }
 
+  @Override
   public ColorGeometryProxy visitColorGeometryProxy
     (final ColorGeometryProxy proxy)
     throws VisitorException
@@ -182,6 +184,7 @@ public class ModuleProxyCloner
     return mFactory.createColorGeometryProxy(colorSet);
   }
 
+  @Override
   public ComponentProxy visitComponentProxy
     (final ComponentProxy proxy)
     throws VisitorException
@@ -189,6 +192,7 @@ public class ModuleProxyCloner
     return (ComponentProxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public ConstantAliasProxy visitConstantAliasProxy
     (final ConstantAliasProxy proxy)
     throws VisitorException
@@ -203,6 +207,7 @@ public class ModuleProxyCloner
                                              scope);
   }
 
+  @Override
   public EdgeProxy visitEdgeProxy
     (final EdgeProxy proxy)
     throws VisitorException
@@ -237,6 +242,7 @@ public class ModuleProxyCloner
                                     endPoint);
   }
 
+  @Override
   public EnumSetExpressionProxy visitEnumSetExpressionProxy
     (final EnumSetExpressionProxy proxy)
     throws VisitorException
@@ -249,6 +255,7 @@ public class ModuleProxyCloner
                                                  items);
   }
 
+  @Override
   public EventAliasProxy visitEventAliasProxy
     (final EventAliasProxy proxy)
     throws VisitorException
@@ -261,6 +268,7 @@ public class ModuleProxyCloner
                                           expression);
   }
 
+  @Override
   public EventDeclProxy visitEventDeclProxy
     (final EventDeclProxy proxy)
     throws VisitorException
@@ -286,6 +294,7 @@ public class ModuleProxyCloner
                                          attributes);
   }
 
+  @Override
   public EventListExpressionProxy visitEventListExpressionProxy
     (final EventListExpressionProxy proxy)
     throws VisitorException
@@ -293,6 +302,7 @@ public class ModuleProxyCloner
     return (EventListExpressionProxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public ExpressionProxy visitExpressionProxy
     (final ExpressionProxy proxy)
     throws VisitorException
@@ -300,6 +310,7 @@ public class ModuleProxyCloner
     return (ExpressionProxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public ForeachProxy visitForeachProxy
     (final ForeachProxy proxy)
     throws VisitorException
@@ -319,12 +330,31 @@ public class ModuleProxyCloner
   }
 
   @Override
-  public GraphProxy visitGraphProxy(final GraphProxy graph)
+  public GraphProxy visitGraphProxy
+    (final GraphProxy proxy)
     throws VisitorException
   {
-    return getClonedGraph(graph, mFactory);
+    final int size = proxy.getNodes().size();
+    mNodeMap = new HashMap<String,NodeProxy>(size);
+    try {
+      final boolean deterministic = proxy.isDeterministic();
+      final LabelBlockProxy blockedEvents0 = proxy.getBlockedEvents();
+      final LabelBlockProxy blockedEvents =
+        blockedEvents0 == null ? null : visitLabelBlockProxy(blockedEvents0);
+      final Collection<NodeProxy> nodes0 = proxy.getNodes();
+      final Collection<NodeProxy> nodes = lookupNodeProxyCollection(nodes0);
+      final Collection<EdgeProxy> edges0 = proxy.getEdges();
+      final Collection<EdgeProxy> edges = cloneProxyCollection(edges0);
+      return mFactory.createGraphProxy(deterministic,
+                                       blockedEvents,
+                                       nodes,
+                                       edges);
+    } finally {
+      mNodeMap = null;
+    }
   }
 
+  @Override
   public GroupNodeProxy visitGroupNodeProxy
     (final GroupNodeProxy proxy)
     throws VisitorException
@@ -346,6 +376,7 @@ public class ModuleProxyCloner
                                          geometry);
   }
 
+  @Override
   public GuardActionBlockProxy visitGuardActionBlockProxy
     (final GuardActionBlockProxy proxy)
     throws VisitorException
@@ -364,6 +395,7 @@ public class ModuleProxyCloner
                                                 geometry);
   }
 
+  @Override
   public IdentifiedProxy visitIdentifiedProxy
     (final IdentifiedProxy proxy)
     throws VisitorException
@@ -371,6 +403,7 @@ public class ModuleProxyCloner
     return (IdentifiedProxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public IdentifierProxy visitIdentifierProxy
     (final IdentifierProxy proxy)
     throws VisitorException
@@ -378,6 +411,7 @@ public class ModuleProxyCloner
     return (IdentifierProxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public IndexedIdentifierProxy visitIndexedIdentifierProxy
     (final IndexedIdentifierProxy proxy)
     throws VisitorException
@@ -392,6 +426,7 @@ public class ModuleProxyCloner
                                                  indexes);
   }
 
+  @Override
   public InstanceProxy visitInstanceProxy
     (final InstanceProxy proxy)
     throws VisitorException
@@ -408,6 +443,7 @@ public class ModuleProxyCloner
                                         bindingList);
   }
 
+  @Override
   public IntConstantProxy visitIntConstantProxy
     (final IntConstantProxy proxy)
     throws VisitorException
@@ -418,6 +454,7 @@ public class ModuleProxyCloner
                                            value);
   }
 
+  @Override
   public LabelBlockProxy visitLabelBlockProxy
     (final LabelBlockProxy proxy)
     throws VisitorException
@@ -431,6 +468,7 @@ public class ModuleProxyCloner
                                           geometry);
   }
 
+  @Override
   public LabelGeometryProxy visitLabelGeometryProxy
     (final LabelGeometryProxy proxy)
     throws VisitorException
@@ -441,6 +479,7 @@ public class ModuleProxyCloner
                                              anchor);
   }
 
+  @Override
   public ModuleProxy visitModuleProxy
     (final ModuleProxy proxy)
     throws VisitorException
@@ -470,6 +509,7 @@ public class ModuleProxyCloner
                                       componentList);
   }
 
+  @Override
   public ModuleSequenceProxy visitModuleSequenceProxy
     (final ModuleSequenceProxy proxy)
     throws VisitorException
@@ -484,6 +524,7 @@ public class ModuleProxyCloner
                                               modules);
   }
 
+  @Override
   public NodeProxy visitNodeProxy
     (final NodeProxy proxy)
     throws VisitorException
@@ -491,6 +532,7 @@ public class ModuleProxyCloner
     return (NodeProxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public ParameterBindingProxy visitParameterBindingProxy
     (final ParameterBindingProxy proxy)
     throws VisitorException
@@ -502,6 +544,7 @@ public class ModuleProxyCloner
                                                 expression);
   }
 
+  @Override
   public PlainEventListProxy visitPlainEventListProxy
     (final PlainEventListProxy proxy)
     throws VisitorException
@@ -511,6 +554,7 @@ public class ModuleProxyCloner
     return mFactory.createPlainEventListProxy(eventList);
   }
 
+  @Override
   public PointGeometryProxy visitPointGeometryProxy
     (final PointGeometryProxy proxy)
     throws VisitorException
@@ -519,6 +563,7 @@ public class ModuleProxyCloner
     return mFactory.createPointGeometryProxy(point);
   }
 
+  @Override
   public Proxy visitProxy
     (final Proxy proxy)
     throws VisitorException
@@ -526,6 +571,7 @@ public class ModuleProxyCloner
     return (Proxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy proxy)
     throws VisitorException
@@ -543,6 +589,7 @@ public class ModuleProxyCloner
                                                    componentIdentifier);
   }
 
+  @Override
   public SimpleComponentProxy visitSimpleComponentProxy
     (final SimpleComponentProxy proxy)
     throws VisitorException
@@ -559,6 +606,7 @@ public class ModuleProxyCloner
                                                attributes);
   }
 
+  @Override
   public SimpleExpressionProxy visitSimpleExpressionProxy
     (final SimpleExpressionProxy proxy)
     throws VisitorException
@@ -566,6 +614,7 @@ public class ModuleProxyCloner
     return (SimpleExpressionProxy) proxy.acceptVisitor(this);
   }
 
+  @Override
   public SimpleIdentifierProxy visitSimpleIdentifierProxy
     (final SimpleIdentifierProxy proxy)
     throws VisitorException
@@ -576,6 +625,7 @@ public class ModuleProxyCloner
                                                 name);
   }
 
+  @Override
   public SimpleNodeProxy visitSimpleNodeProxy
     (final SimpleNodeProxy proxy)
     throws VisitorException
@@ -603,6 +653,7 @@ public class ModuleProxyCloner
                                           labelGeometry);
   }
 
+  @Override
   public SplineGeometryProxy visitSplineGeometryProxy
     (final SplineGeometryProxy proxy)
     throws VisitorException
@@ -613,6 +664,7 @@ public class ModuleProxyCloner
                                               kind);
   }
 
+  @Override
   public UnaryExpressionProxy visitUnaryExpressionProxy
     (final UnaryExpressionProxy proxy)
     throws VisitorException
@@ -627,6 +679,7 @@ public class ModuleProxyCloner
                                                subTerm);
   }
 
+  @Override
   public VariableComponentProxy visitVariableComponentProxy
     (final VariableComponentProxy proxy)
     throws VisitorException
@@ -651,6 +704,7 @@ public class ModuleProxyCloner
                                                  variableMarkings);
   }
 
+  @Override
   public VariableMarkingProxy visitVariableMarkingProxy
     (final VariableMarkingProxy proxy)
     throws VisitorException
@@ -706,7 +760,6 @@ public class ModuleProxyCloner
     }
     final Collection<?> precast = result;
     @SuppressWarnings("unchecked")
-    final
     Collection<P> cast = (Collection<P>) precast;
     return cast;
   }

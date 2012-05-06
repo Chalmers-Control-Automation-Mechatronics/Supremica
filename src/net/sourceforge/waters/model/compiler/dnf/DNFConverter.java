@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -36,7 +36,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-public class DNFConverter extends AbstractModuleProxyVisitor {
+public class DNFConverter extends DefaultModuleProxyVisitor {
 
   //#########################################################################
   //# Constructors

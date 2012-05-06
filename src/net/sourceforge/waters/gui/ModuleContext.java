@@ -26,7 +26,7 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
@@ -919,7 +919,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class CanDropVisitor
-  private class CanDropVisitor extends AbstractModuleProxyVisitor
+  private class CanDropVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -980,7 +980,7 @@ public class ModuleContext
   //#########################################################################
   //# Inner Class IdentifierNameVisitor
   private static class IdentifierNameVisitor extends
-    AbstractModuleProxyVisitor
+    DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1022,7 +1022,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class IconGetterVisitor
-  private class IconGetterVisitor extends AbstractModuleProxyVisitor
+  private class IconGetterVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1125,7 +1125,7 @@ public class ModuleContext
   //#########################################################################
   //# Inner Class ToolTipGetterVisitor
   private static class ToolTipGetterVisitor extends
-    AbstractModuleProxyVisitor
+    DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1181,7 +1181,7 @@ public class ModuleContext
   //#########################################################################
   //# Inner Class PropositionColorCollectorVisitor
   private class PropositionColorCollectorVisitor extends
-    AbstractModuleProxyVisitor
+    DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1258,7 +1258,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class PropositionFinderVisitor
-  private class PropositionFinderVisitor extends AbstractModuleProxyVisitor
+  private class PropositionFinderVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################
@@ -1371,7 +1371,7 @@ public class ModuleContext
   //#########################################################################
   //# Inner Class WrapperGetterVisitor
   private class WrapperGetterVisitor extends
-    AbstractModuleProxyVisitor
+    DefaultModuleProxyVisitor
   {
 
     //#######################################################################

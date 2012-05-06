@@ -20,7 +20,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
@@ -36,7 +36,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  *
  * @author Robi Malik
  */
-public class DeterministicModuleChecker extends AbstractModuleProxyVisitor
+public class DeterministicModuleChecker extends DefaultModuleProxyVisitor
 {
 
   //#######################################################################

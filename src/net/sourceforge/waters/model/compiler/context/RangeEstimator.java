@@ -20,7 +20,7 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  */
 
 public class RangeEstimator
-  extends AbstractModuleProxyVisitor
+  extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################

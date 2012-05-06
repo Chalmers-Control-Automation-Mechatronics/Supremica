@@ -19,7 +19,7 @@ import net.sourceforge.waters.gui.PropositionIcon.ColorInfo;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -43,7 +43,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
  */
 
 public class DefaultRenderingContext
-  extends AbstractModuleProxyVisitor
+  extends DefaultModuleProxyVisitor
   implements RenderingContext
 {
 

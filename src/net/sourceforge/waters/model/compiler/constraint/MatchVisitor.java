@@ -14,7 +14,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
-class MatchVisitor extends AbstractModuleProxyVisitor
+class MatchVisitor extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################

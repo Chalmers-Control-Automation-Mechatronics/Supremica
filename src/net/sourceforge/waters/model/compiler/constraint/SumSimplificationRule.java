@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -221,7 +221,7 @@ class SumSimplificationRule extends SimplificationRule
 
   //#########################################################################
   //# Inner Class SumVisitor
-  private static class SumVisitor extends AbstractModuleProxyVisitor
+  private static class SumVisitor extends DefaultModuleProxyVisitor
   {
 
     //#######################################################################

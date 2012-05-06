@@ -14,7 +14,7 @@ import gnu.trove.TObjectHashingStrategy;
 
 import java.util.Set;
 
-import net.sourceforge.waters.model.des.AbstractProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -30,7 +30,7 @@ import net.sourceforge.waters.model.module.GraphProxy;
  * @author Robi Malik
  */
 public class DeterministicProductDESChecker
-  extends AbstractProductDESProxyVisitor
+  extends DefaultProductDESProxyVisitor
   implements TObjectHashingStrategy<TransitionProxy>
 {
 

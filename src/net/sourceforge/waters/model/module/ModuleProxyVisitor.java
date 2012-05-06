@@ -16,6 +16,12 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 
 
+/**
+ * The visitor interface for the module class hierarchy.
+ *
+ * @author Robi Malik
+ */
+
 public interface ModuleProxyVisitor
   extends ProxyVisitor
 {

@@ -26,7 +26,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -235,8 +235,10 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
   //#########################################################################
   //# Inner Class PropertyFindVisitor
-  private class PropertyFindVisitor extends AbstractModuleProxyVisitor
+  private class PropertyFindVisitor extends DefaultModuleProxyVisitor
   {
+    //#######################################################################
+    //# Invocation
     private boolean containsProperty(final ModuleProxy proxy)
     {
       try {
@@ -252,11 +254,15 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       return (Boolean)proxy.acceptVisitor(this);
     }
 
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitProxy(final Proxy proxy)
     {
       return false;
     }
 
+    @Override
     public Boolean visitForeachProxy(final ForeachProxy foreach)
     throws VisitorException
     {
@@ -268,6 +274,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       return false;
     }
 
+    @Override
     public Boolean visitModuleProxy(final ModuleProxy proxy)
     throws VisitorException
     {
@@ -277,11 +284,13 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       return false;
     }
 
+    @Override
     public Boolean visitSimpleComponentProxy(final SimpleComponentProxy proxy)
     {
       return proxy.getKind() == ComponentKind.PROPERTY;
     }
   }
+
 
   //#########################################################################
   //# Data Members

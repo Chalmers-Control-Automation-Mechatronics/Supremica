@@ -54,10 +54,13 @@ proc Java_ProcessPackage {impls subpack prefix} {
   Java_GenerateFactory "model" $subpack $prefix $destname $classes 1 \
       implClassMap importMap
   set destname [file join $indir "${prefix}ProxyVisitor.java"]
-  Java_GenerateVisitor $subpack $prefix $destname $classes 1 \
+  Java_GenerateVisitor $subpack $prefix $destname $classes "Iface" \
       implClassMap importMap
-  set destname [file join $indir "Abstract${prefix}ProxyVisitor.java"]
-  Java_GenerateVisitor $subpack $prefix $destname $classes 0 \
+  set destname [file join $indir "Default${prefix}ProxyVisitor.java"]
+  Java_GenerateVisitor $subpack $prefix $destname $classes "Default" \
+      implClassMap importMap
+  set destname [file join $indir "Descending${prefix}ProxyVisitor.java"]
+  Java_GenerateVisitor $subpack $prefix $destname $classes "Descending" \
       implClassMap importMap
   set destname [file join $indir "${prefix}ProxyCloner.java"]
   Java_GenerateCloningVisitor $subpack $prefix $destname $classes \
@@ -1358,15 +1361,26 @@ proc Java_GenerateFactory {impl subpack prefix destname classnames
 ##############################################################################
 
 proc Java_GenerateVisitor {subpack prefix destname classnames
-			   iface classMapName importMapName} {
+			   mode classMapName importMapName} {
   upvar $classMapName classMap
   upvar $importMapName importMap
-  if {$iface} {
+  if {[string compare $mode "Iface"] == 0} {
+    set iface 1
     set keyword "interface"
     set visitorname "${prefix}ProxyVisitor"
-  } else {
+  } elseif {[string compare $mode "Default"] == 0} {
+    set iface 0
+    set descending 0
     set keyword "class"
-    set visitorname "Abstract${prefix}ProxyVisitor"
+    set visitorname "Default${prefix}ProxyVisitor"
+  } elseif {[string compare $mode "Descending"] == 0} {
+    set iface 0
+    set descending 1
+    set keyword "class"
+    set visitorname "Descending${prefix}ProxyVisitor"
+  } else {
+    puts stderr "ERROR: Unknown visitor generation mode $mode!"
+    exit 1
   }
   set packname "net.sourceforge.waters.model.$subpack"
 
@@ -1385,12 +1399,42 @@ proc Java_GenerateVisitor {subpack prefix destname classnames
     }
 
   ############################################################################
+  # Write Javadoc
+    Java_WriteLn $stream $umap "/**"
+    if {$iface} {
+      Java_WriteLn $stream $umap \
+          " * The visitor interface for the module class hierarchy."
+    } else {
+      Java_WriteLn $stream $umap " * <P>An empty implementation of the {@link ${prefix}ProxyVisitor} interface.</P>"
+      Java_WriteLn $stream $umap " *"
+      Java_WriteLn $stream $umap " * <P>This is an adapter class to make it more convenient to implement"
+      Java_WriteLn $stream $umap " * visitors that do not explicitly implement all the visit methods."
+      if {$descending} {
+        Java_WriteLn $stream $umap \
+            " * All the visit methods in this adapter class call the visit"
+        Java_WriteLn $stream $umap \
+            " * method for the immediate superclass and"
+        Java_WriteLn $stream $umap \
+            " * afterwards visit all children of their argument."
+        Java_WriteLn $stream $umap \
+            " * In all cases, <CODE>null</CODE> is returned.</P>"
+      } else {
+        Java_WriteLn $stream $umap " * All the visit methods in this adapter class do nothing or call the visit"
+        Java_WriteLn $stream $umap " * method for the immediate superclass of their argument.</P>"
+      }
+    }
+    Java_WriteLn $stream $umap " *"
+    Java_WriteLn $stream $umap " * @author Robi Malik"
+    Java_WriteLn $stream $umap " */"
+    Java_WriteLn $stream $umap ""
+
+  ############################################################################
   # Write Headers
     Java_WriteLn $stream $umap "public $keyword $visitorname"
     if {$iface} {
       Java_WriteLn $stream $umap "  extends ProxyVisitor"
     } else {
-      Java_WriteLn $stream $umap "  extends AbstractProxyVisitor"
+      Java_WriteLn $stream $umap "  extends ${mode}ProxyVisitor"
       Java_WriteLn $stream $umap "  implements ${prefix}ProxyVisitor"
     }
     Java_WriteLn $stream $umap "\{"
@@ -1403,6 +1447,9 @@ proc Java_GenerateVisitor {subpack prefix destname classnames
       set classinfo $classMap($classname)
       set supername [Java_ClassGetParent $classinfo]
       regsub {^Abstract} $supername "" supername
+      if {!$iface} {
+	Java_WriteLn $stream $umap "  @Override"
+      }
       Java_Write $stream $umap "  public Object visit${classname}("
       if {!$iface} {
 	Java_Write $stream $umap "final "
@@ -1414,7 +1461,63 @@ proc Java_GenerateVisitor {subpack prefix destname classnames
       } else {
 	Java_WriteLn $stream $umap ""
 	Java_WriteLn $stream $umap "  \{"
-	Java_WriteLn $stream $umap "    return visit${supername}(proxy);"
+        set attribs [Java_ClassGetAttributes $classinfo]
+        set numattribs [llength $attribs]
+        if {$descending && $numattribs > 0} {
+          Java_WriteLn $stream $umap "    visit${supername}(proxy);"
+          foreach attrib $attribs {
+            set decltype [Java_AttribGetDeclaredType $attrib ""]
+            set paramname [Java_AttribGetParameterName $attrib ""]
+            set gettername [Java_AttribGetGetterName $attrib ""]
+            if {[regexp {Proxy$} $decltype all]} {
+              set eqstatus [Java_AttribGetEqualityStatus $attrib ""]
+              Java_WriteLn $stream $umap \
+                  "    final $decltype $paramname = proxy.${gettername}();"
+              if {[string compare $eqstatus "optional"] == 0} {
+                Java_WriteLn $stream $umap "    if ($paramname != null) \{"
+                set ind "  "
+              } else {
+                set ind ""
+              }
+              set memberclassinfo $classMap($decltype)
+              if {[Java_ClassIsAbstract $memberclassinfo]} {
+                Java_WriteLn $stream $umap \
+                    "$ind    $paramname.acceptVisitor(this);"
+              } else {
+                Java_WriteLn $stream $umap \
+                    "$ind    visit${decltype}($paramname);"
+              }
+              if {[string compare $eqstatus "optional"] == 0} {
+                Java_WriteLn $stream $umap "    \}"
+              }
+            } elseif {[Java_IsCollectionType $decltype] &&
+                      [regexp {<(\? extends )?([a-zA-Z]+Proxy)>} \
+                           $decltype all ext itemtype]} {
+              set itemclassinfo $classMap($itemtype)
+              set abstract [Java_ClassIsAbstract $itemclassinfo]
+              Java_WriteLn $stream $umap \
+                  "    final $decltype $paramname = proxy.${gettername}();"
+              if {[string compare $paramname "indexes"] == 0} {
+                set itemname "index"
+              } else {
+                regsub {(s|List)$} $paramname "" itemname
+              }
+              Java_WriteLn $stream $umap \
+                  "    for (final $itemtype $itemname : $paramname) \{"
+              if {$abstract} {
+                Java_WriteLn $stream $umap \
+                    "      $itemname.acceptVisitor(this);"
+              } else {
+                Java_WriteLn $stream $umap \
+                    "      visit${itemtype}($itemname);"
+              }
+              Java_WriteLn $stream $umap "    \}"
+            }
+          }
+          Java_WriteLn $stream $umap "    return null;"
+        } else {
+          Java_WriteLn $stream $umap "    return visit${supername}(proxy);"
+        }
 	Java_WriteLn $stream $umap "  \}"
       }
       Java_WriteLn $stream $umap ""
@@ -1473,7 +1576,7 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap " */"
     Java_WriteLn $stream $umap ""
     Java_WriteLn $stream $umap "public $keyword $visitorname"
-    Java_WriteLn $stream $umap "  extends Abstract${prefix}ProxyVisitor"
+    Java_WriteLn $stream $umap "  extends Default${prefix}ProxyVisitor"
     Java_WriteLn $stream $umap "  implements ProxyCloner"
     Java_WriteLn $stream $umap "\{"
 
@@ -1505,9 +1608,13 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "    \}"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
+
+
+  ############################################################################
+  # Special Cloners
     Java_WriteLn $stream $umap "  public <P extends Proxy>"
     Java_WriteLn $stream $umap \
-        "  List<P> getClonedList(Collection<? extends P> collection)"
+        "  List<P> getClonedList(final Collection<? extends P> collection)"
     Java_WriteLn $stream $umap "  \{"
     Java_WriteLn $stream $umap "    final int size = collection.size();"
     Java_WriteLn $stream $umap \
@@ -1518,13 +1625,13 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "    \}"
     Java_WriteLn $stream $umap "    final List<?> precast = result;"
     Java_WriteLn $stream $umap "    @SuppressWarnings(\"unchecked\")"
-    Java_WriteLn $stream $umap "    List<P> cast = (List<P>) precast;"
+    Java_WriteLn $stream $umap "    final List<P> cast = (List<P>) precast;"
     Java_WriteLn $stream $umap "    return cast;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
     Java_WriteLn $stream $umap "  public <P extends Proxy>"
     Java_WriteLn $stream $umap \
-        "  Set<P> getClonedSet(Collection<? extends P> collection)"
+        "  Set<P> getClonedSet(final Collection<? extends P> collection)"
     Java_WriteLn $stream $umap "  \{"
     Java_WriteLn $stream $umap "    final int size = collection.size();"
     Java_WriteLn $stream $umap \
@@ -1535,11 +1642,36 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "    \}"
     Java_WriteLn $stream $umap "    final Set<?> precast = result;"
     Java_WriteLn $stream $umap "    @SuppressWarnings(\"unchecked\")"
-    Java_WriteLn $stream $umap "    Set<P> cast = (Set<P>) precast;"
+    Java_WriteLn $stream $umap "    final Set<P> cast = (Set<P>) precast;"
     Java_WriteLn $stream $umap "    return cast;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
-    
+
+    Java_WriteLn $stream $umap "  /**"
+    Java_WriteLn $stream $umap \
+        "   * Creates a clone of the given graph using two factories."
+    Java_WriteLn $stream $umap \
+        "   * This methods creates a clone of a graph's nodes and edges using"
+    Java_WriteLn $stream $umap \
+        "   * the standard factory of this cloner, then creates a new graph "
+    Java_WriteLn $stream $umap \
+        "   * using another factory given as an argument."
+    Java_WriteLn $stream $umap \
+        "   * @param  graph    The graph to be duplicated."
+    Java_WriteLn $stream $umap \
+        "   * @param  factory  The factory used to create the new graph."
+    Java_WriteLn $stream $umap "   * @return The cloned graph."
+    Java_WriteLn $stream $umap "   */"
+    Java_WriteLn $stream $umap \
+        "  public GraphProxy getClonedGraph(final GraphProxy proxy,"
+    Java_WriteLn $stream $umap \
+        "                                   final ModuleProxyFactory factory)"
+    Java_WriteLn $stream $umap "  \{"
+    set classinfo $classMap(GraphProxy)
+    Java_GenerateCloningMethodBody $stream classMap $umap $classinfo factory
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+   
   ############################################################################
   # Write Visitor Methods
     Java_GenerateSeparatorComment $stream $umap \
@@ -1547,99 +1679,12 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     set classnames [lsort $classnames]
     foreach classname $classnames {
       set classinfo $classMap($classname)
+      Java_WriteLn $stream $umap "  @Override"
       Java_WriteLn $stream $umap "  public $classname visit${classname}"
       Java_WriteLn $stream $umap "    (final $classname proxy)"
       Java_WriteLn $stream $umap "    throws VisitorException"
       Java_WriteLn $stream $umap "  \{"
-      if {[Java_ClassIsAbstract $classinfo]} {
-        Java_WriteLn $stream $umap \
-            "    return ($classname) proxy.acceptVisitor(this);"
-      } else {
-        set isroot [expr [string compare $classname "GraphProxy"] == 0]
-        if {$isroot} {
-          Java_WriteLn $stream $umap \
-              "    final int size = proxy.getNodes().size();"
-          Java_WriteLn $stream $umap \
-              "    mNodeMap = new HashMap<String,NodeProxy>(size);"
-          Java_WriteLn $stream $umap \
-              "    try \{"
-          set ind "  "
-        } else {
-          set ind ""
-        }
-        set allattribs [Java_ClassGetAllAttributes $classinfo classMap]
-        set args ""
-	foreach attrib $allattribs {
-	  set decltype [Java_AttribGetDeclaredType $attrib $impl]
-          if {[string compare $decltype "URI"] == 0} {
-            lappend args "null"
-            continue
-          }
-	  set refstatus [Java_AttribGetRefStatus $attrib $impl]
-          set paramname [Java_AttribGetParameterName $attrib $impl]
-          set gettername [Java_AttribGetGetterName $attrib $impl]
-	  set iscoll [Java_IsCollectionType $decltype]
-          if {[regexp {Proxy$} $decltype all]} {
-            if {[string compare $refstatus "owned"] == 0} {
-              set method "visit$decltype"
-            } else {
-              set method "lookup$decltype"
-            }
-          } elseif {$iscoll} {
-            regexp {<(.*)>} $decltype all elemtype
-            if {![regexp {^Map<} $decltype all]} {
-              regsub {^[A-Z].*<} $decltype "Collection<" decltype
-            }
-            if {![regexp {Proxy$} $elemtype all]} {
-              set method "use"
-            } elseif {[string compare $elemtype "NodeProxy"] == 0} {
-              set method "lookup${elemtype}Collection"
-            } else {
-              set method "cloneProxyCollection"
-            }
-          } else {
-            set method "use"
-          }
-          if {[string compare $method "use"] == 0} {
-            Java_WriteLn $stream $umap \
-                "$ind    final $decltype $paramname = proxy.${gettername}();"
-          } else {
-            set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-            set paramname0 "${paramname}0"
-            Java_WriteLn $stream $umap \
-                "$ind    final $decltype $paramname0 = proxy.${gettername}();"
-            if {[string compare $eqstatus "required"] == 0} {
-              Java_WriteLn $stream $umap \
-                "$ind    final $decltype $paramname = ${method}($paramname0);"
-            } else {
-              set ite "$paramname0 == null ? null : ${method}($paramname0)"
-              Java_WriteLn $stream $umap \
-                "$ind    final $decltype $paramname = $ite;"
-            }
-          }
-          lappend args $paramname
-	}
-        set text "$ind    return mFactory.create${classname}("
-        set indent [string length $text]
-        set indent [string range $gSpaces 1 $indent]
-        Java_Write $stream $umap $text
-        set first 1
-        foreach arg $args {
-          if {$first} {
-            set first 0
-          } else {
-            Java_WriteLn $stream $umap ","
-            Java_Write $stream $umap $indent
-          }
-          Java_Write $stream $umap $arg
-        }
-        Java_WriteLn $stream $umap ");"
-        if {$isroot} {
-          Java_WriteLn $stream $umap "    \} finally \{"
-          Java_WriteLn $stream $umap "      mNodeMap = null;"
-          Java_WriteLn $stream $umap "    \}"
-        }
-      }
+      Java_GenerateCloningMethodBody $stream classMap $umap $classinfo mFactory
       Java_WriteLn $stream $umap "  \}"
       Java_WriteLn $stream $umap ""
     }
@@ -1718,6 +1763,115 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
 
 }
 
+
+proc Java_GenerateCloningMethodBody {stream classMapName useMapName
+                                     classinfo factory} {
+  global gSpaces
+  upvar $classMapName classMap
+  if {[string compare $useMapName ""] == 0} {
+    set umap ""
+  } else {
+    upvar $useMapName useMap
+    set umap useMap
+  }
+  set impl "plain"
+  set classname [Java_ClassGetName $classinfo]
+  if {[Java_ClassIsAbstract $classinfo]} {
+    Java_WriteLn $stream $umap \
+        "    return ($classname) proxy.acceptVisitor(this);"
+  } else {
+    set isroot [expr [string compare $classname "GraphProxy"] == 0]
+    if {$isroot} {
+      Java_WriteLn $stream $umap \
+          "    final int size = proxy.getNodes().size();"
+      Java_WriteLn $stream $umap \
+          "    mNodeMap = new HashMap<String,NodeProxy>(size);"
+      Java_WriteLn $stream $umap \
+          "    try \{"
+      set ind "  "
+    } else {
+      set ind ""
+    }
+    set allattribs [Java_ClassGetAllAttributes $classinfo classMap]
+    set args ""
+    foreach attrib $allattribs {
+      set decltype [Java_AttribGetDeclaredType $attrib $impl]
+      if {[string compare $decltype "URI"] == 0} {
+        lappend args "null"
+        continue
+      }
+      set refstatus [Java_AttribGetRefStatus $attrib $impl]
+      set paramname [Java_AttribGetParameterName $attrib $impl]
+      set gettername [Java_AttribGetGetterName $attrib $impl]
+      set iscoll [Java_IsCollectionType $decltype]
+      if {[regexp {Proxy$} $decltype all]} {
+        if {[string compare $refstatus "owned"] == 0} {
+          set method "visit$decltype"
+        } else {
+          set method "lookup$decltype"
+        }
+      } elseif {$iscoll} {
+        regexp {<(.*)>} $decltype all elemtype
+        if {![regexp {^Map<} $decltype all]} {
+          regsub {^[A-Z].*<} $decltype "Collection<" decltype
+        }
+        if {![regexp {Proxy$} $elemtype all]} {
+          set method "use"
+        } elseif {[string compare $elemtype "NodeProxy"] == 0} {
+          set method "lookup${elemtype}Collection"
+        } else {
+          set method "cloneProxyCollection"
+        }
+      } else {
+        set method "use"
+      }
+      if {[string compare $method "use"] == 0} {
+        Java_WriteLn $stream $umap \
+            "$ind    final $decltype $paramname = proxy.${gettername}();"
+      } else {
+        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+        set paramname0 "${paramname}0"
+        Java_WriteLn $stream $umap \
+            "$ind    final $decltype $paramname0 = proxy.${gettername}();"
+        if {[string compare $eqstatus "required"] == 0} {
+          Java_WriteLn $stream $umap \
+              "$ind    final $decltype $paramname = ${method}($paramname0);"
+        } else {
+          set ite "$paramname0 == null ? null : ${method}($paramname0)"
+          Java_WriteLn $stream $umap \
+              "$ind    final $decltype $paramname = $ite;"
+        }
+      }
+      lappend args $paramname
+    }
+    set text "$ind    return $factory.create${classname}("
+    set indent [string length $text]
+    set indent [string range $gSpaces 1 $indent]
+    Java_Write $stream $umap $text
+    set first 1
+    foreach arg $args {
+      if {$first} {
+        set first 0
+      } else {
+        Java_WriteLn $stream $umap ","
+        Java_Write $stream $umap $indent
+      }
+      Java_Write $stream $umap $arg
+    }
+    Java_WriteLn $stream $umap ");"
+    if {$isroot} {
+      if {[string compare $factory "mFactory"] != 0} {
+        Java_WriteLn $stream $umap \
+            "    \} catch (final VisitorException exception) \{"
+        Java_WriteLn $stream $umap \
+            "      throw exception.getRuntimeException();"
+      }
+      Java_WriteLn $stream $umap "    \} finally \{"
+      Java_WriteLn $stream $umap "      mNodeMap = null;"
+      Java_WriteLn $stream $umap "    \}"
+    }
+  }
+}
 
 
 ##############################################################################
@@ -3098,6 +3252,10 @@ proc Aux_Hash {text hash0} {
     set ch [string index $text $i]
     scan $ch "%c" value
     set result [expr 5 * $result + $value]
+  }
+  set result [expr $result & 0xffffffffffffffff]
+  if {$result >= 0x8000000000000000} {
+    incr result -0x10000000000000000
   }
   return $result
 }
