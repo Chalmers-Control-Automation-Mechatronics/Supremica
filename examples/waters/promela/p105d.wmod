@@ -128,6 +128,20 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <VariableComponent Name="var_C_val">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="var_C_val"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="proctype_C">
             <Graph>
                 <NodeList>

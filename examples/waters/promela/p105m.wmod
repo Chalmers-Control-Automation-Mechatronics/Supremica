@@ -181,6 +181,25 @@
                 <SimpleIdentifier Name="B_2"/>
             </EnumSetExpression>
             <ComponentList>
+                <VariableComponent>
+                    <IndexedIdentifier Name="var_B_val">
+                        <SimpleIdentifier Name="procid"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <IntConstant Value="255"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="var_B_val">
+                                <SimpleIdentifier Name="procid"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
                 <SimpleComponent Kind="PLANT">
                     <IndexedIdentifier Name="proctype_B">
                         <SimpleIdentifier Name="procid"/>
@@ -279,6 +298,25 @@
                 <SimpleIdentifier Name="C_1"/>
             </EnumSetExpression>
             <ComponentList>
+                <VariableComponent>
+                    <IndexedIdentifier Name="var_C_val">
+                        <SimpleIdentifier Name="procid"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <IntConstant Value="255"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="var_C_val">
+                                <SimpleIdentifier Name="procid"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
                 <SimpleComponent Kind="PLANT">
                     <IndexedIdentifier Name="proctype_C">
                         <SimpleIdentifier Name="procid"/>

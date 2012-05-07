@@ -121,6 +121,25 @@
                 <SimpleIdentifier Name="B_1"/>
             </EnumSetExpression>
             <ComponentList>
+                <VariableComponent>
+                    <IndexedIdentifier Name="var_B_state">
+                        <SimpleIdentifier Name="procid"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <IntConstant Value="255"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="var_B_state">
+                                <SimpleIdentifier Name="procid"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
                 <SimpleComponent Kind="PLANT">
                     <IndexedIdentifier Name="proctype_B">
                         <SimpleIdentifier Name="procid"/>

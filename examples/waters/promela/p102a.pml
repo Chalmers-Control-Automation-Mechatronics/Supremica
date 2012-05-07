@@ -9,7 +9,7 @@ proctype A()
 	name!msgtype(121)
 }
 proctype B()
-{	byte state;
+{	hidden byte state;
 	name?msgtype(state)
 }
 init
