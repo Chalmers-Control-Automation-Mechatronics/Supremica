@@ -245,6 +245,23 @@ public class DocumentContainerManager
     return openContainer(uri, false);
   }
 
+  public DocumentContainer openContainer(final DocumentProxy doc)
+  {
+    final URI uri = doc.getLocation();
+    final DocumentContainer found = mURIContainerMap.get(uri);
+    if (found == null) {
+      final DocumentContainer container = createContainer(doc);
+      if (container == null) {
+        return null;
+      }
+      addContainer(container);
+      return container;
+    } else {
+      setActiveContainer(found);
+      return found;
+    }
+  }
+
   public void saveActiveContainer()
   {
     mWasCancelled = false;
@@ -294,7 +311,6 @@ public class DocumentContainerManager
       ("Unknown document type: " + doc.getClass().getName() + "!");
     }
   }
-
 
 
   //#########################################################################

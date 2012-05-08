@@ -273,27 +273,27 @@ public class IDE
   //# Interface org.supremica.gui.ide.IDEReportInterface
   public void error(final String msg)
   {
-    logger.error(msg);
+    LOGGER.error(msg);
   }
 
   public void error(final String msg, final Throwable t)
   {
-    logger.error(msg, t);
+    LOGGER.error(msg, t);
   }
 
   public void info(final String msg)
   {
-    logger.info(msg);
+    LOGGER.info(msg);
   }
 
   public void warn(final String msg)
   {
-    logger.warn(msg);
+    LOGGER.warn(msg);
   }
 
   public void debug(final String msg)
   {
-    logger.debug(msg);
+    LOGGER.debug(msg);
   }
 
 
@@ -307,7 +307,7 @@ public class IDE
 
     // Initialise logging
     SupremicaLoggerFactory.initialiseSupremicaLoggerFactory();
-    logger = SupremicaLoggerFactory.createLogger(IDE.class);
+    LOGGER = SupremicaLoggerFactory.createLogger(IDE.class);
 
     // Now start the gui...
     InterfaceManager.getInstance().initLookAndFeel();
@@ -456,9 +456,9 @@ public class IDE
   // has finished (or messages WILL disappear).  Try running "IDE -h" and
   // "IDE", _both_ should give output, to console and log display,
   // respectively.
-  private static Logger logger = null;
+  private static Logger LOGGER = null;
   public static void setLogger(final Logger aLogger) {
-    logger = aLogger;
+    LOGGER = aLogger;
   }
 
 

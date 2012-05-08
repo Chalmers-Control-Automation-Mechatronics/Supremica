@@ -32,6 +32,8 @@ public class DefaultModuleProxyVisitor
   implements ModuleProxyVisitor
 {
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
   public Object visitAliasProxy(final AliasProxy proxy)
     throws VisitorException

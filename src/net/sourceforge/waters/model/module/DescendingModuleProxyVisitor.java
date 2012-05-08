@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DescendingProxyVisitor;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 
 
@@ -38,6 +39,8 @@ public class DescendingModuleProxyVisitor
   implements ModuleProxyVisitor
 {
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
   public Object visitAliasProxy(final AliasProxy proxy)
     throws VisitorException
@@ -126,9 +129,7 @@ public class DescendingModuleProxyVisitor
   {
     visitSimpleExpressionProxy(proxy);
     final List<SimpleIdentifierProxy> items = proxy.getItems();
-    for (final SimpleIdentifierProxy item : items) {
-      visitSimpleIdentifierProxy(item);
-    }
+    visitCollection(items);
     return null;
   }
 
@@ -145,9 +146,7 @@ public class DescendingModuleProxyVisitor
   {
     visitIdentifiedProxy(proxy);
     final List<SimpleExpressionProxy> ranges = proxy.getRanges();
-    for (final SimpleExpressionProxy range : ranges) {
-      range.acceptVisitor(this);
-    }
+    visitCollection(ranges);
     final ColorGeometryProxy colorGeometry = proxy.getColorGeometry();
     visitColorGeometryProxy(colorGeometry);
     return null;
@@ -158,6 +157,8 @@ public class DescendingModuleProxyVisitor
     throws VisitorException
   {
     visitExpressionProxy(proxy);
+    final List<Proxy> eventList = proxy.getEventList();
+    visitCollection(eventList);
     return null;
   }
 
@@ -179,6 +180,8 @@ public class DescendingModuleProxyVisitor
     if (guard != null) {
       guard.acceptVisitor(this);
     }
+    final List<Proxy> body = proxy.getBody();
+    visitCollection(body);
     return null;
   }
 
@@ -192,13 +195,9 @@ public class DescendingModuleProxyVisitor
       visitLabelBlockProxy(blockedEvents);
     }
     final Set<NodeProxy> nodes = proxy.getNodes();
-    for (final NodeProxy node : nodes) {
-      node.acceptVisitor(this);
-    }
+    visitCollection(nodes);
     final Collection<EdgeProxy> edges = proxy.getEdges();
-    for (final EdgeProxy edge : edges) {
-      visitEdgeProxy(edge);
-    }
+    visitCollection(edges);
     return null;
   }
 
@@ -208,9 +207,7 @@ public class DescendingModuleProxyVisitor
   {
     visitNodeProxy(proxy);
     final Set<NodeProxy> immediateChildNodes = proxy.getImmediateChildNodes();
-    for (final NodeProxy immediateChildNode : immediateChildNodes) {
-      immediateChildNode.acceptVisitor(this);
-    }
+    visitCollection(immediateChildNodes);
     final BoxGeometryProxy geometry = proxy.getGeometry();
     visitBoxGeometryProxy(geometry);
     return null;
@@ -222,13 +219,9 @@ public class DescendingModuleProxyVisitor
   {
     visitProxy(proxy);
     final List<SimpleExpressionProxy> guards = proxy.getGuards();
-    for (final SimpleExpressionProxy guard : guards) {
-      guard.acceptVisitor(this);
-    }
+    visitCollection(guards);
     final List<BinaryExpressionProxy> actions = proxy.getActions();
-    for (final BinaryExpressionProxy action : actions) {
-      visitBinaryExpressionProxy(action);
-    }
+    visitCollection(actions);
     final LabelGeometryProxy geometry = proxy.getGeometry();
     visitLabelGeometryProxy(geometry);
     return null;
@@ -257,9 +250,7 @@ public class DescendingModuleProxyVisitor
   {
     visitIdentifierProxy(proxy);
     final List<SimpleExpressionProxy> indexes = proxy.getIndexes();
-    for (final SimpleExpressionProxy index : indexes) {
-      index.acceptVisitor(this);
-    }
+    visitCollection(indexes);
     return null;
   }
 
@@ -269,9 +260,7 @@ public class DescendingModuleProxyVisitor
   {
     visitComponentProxy(proxy);
     final List<ParameterBindingProxy> bindingList = proxy.getBindingList();
-    for (final ParameterBindingProxy binding : bindingList) {
-      visitParameterBindingProxy(binding);
-    }
+    visitCollection(bindingList);
     return null;
   }
 
@@ -308,13 +297,13 @@ public class DescendingModuleProxyVisitor
     visitDocumentProxy(proxy);
     final List<ConstantAliasProxy> constantAliasList =
       proxy.getConstantAliasList();
-    for (final ConstantAliasProxy constantAlias : constantAliasList) {
-      visitConstantAliasProxy(constantAlias);
-    }
+    visitCollection(constantAliasList);
     final List<EventDeclProxy> eventDeclList = proxy.getEventDeclList();
-    for (final EventDeclProxy eventDecl : eventDeclList) {
-      visitEventDeclProxy(eventDecl);
-    }
+    visitCollection(eventDeclList);
+    final List<Proxy> eventAliasList = proxy.getEventAliasList();
+    visitCollection(eventAliasList);
+    final List<Proxy> componentList = proxy.getComponentList();
+    visitCollection(componentList);
     return null;
   }
 
@@ -324,9 +313,7 @@ public class DescendingModuleProxyVisitor
   {
     visitDocumentProxy(proxy);
     final List<ModuleProxy> modules = proxy.getModules();
-    for (final ModuleProxy module : modules) {
-      visitModuleProxy(module);
-    }
+    visitCollection(modules);
     return null;
   }
 
@@ -449,9 +436,7 @@ public class DescendingModuleProxyVisitor
     initialStatePredicate.acceptVisitor(this);
     final List<VariableMarkingProxy> variableMarkings =
       proxy.getVariableMarkings();
-    for (final VariableMarkingProxy variableMarking : variableMarkings) {
-      visitVariableMarkingProxy(variableMarking);
-    }
+    visitCollection(variableMarkings);
     return null;
   }
 

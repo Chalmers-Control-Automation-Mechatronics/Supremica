@@ -49,7 +49,7 @@ proc Java_ProcessPackage {impls subpack prefix} {
     Java_GenerateFactory $impl $subpack $prefix $destname $classes 0 \
         implClassMap importMap
   }
-   
+
   set destname [file join $indir "${prefix}ProxyFactory.java"]
   Java_GenerateFactory "model" $subpack $prefix $destname $classes 1 \
       implClassMap importMap
@@ -324,7 +324,7 @@ proc Java_ProcessClassHierarchy {impl subpack inMapName outMapName} {
 
   # SPECIALS
   set Impl [Java_GetImplObjectName $impl]
-  if {[string compare $subpack "module"] == 0} { 
+  if {[string compare $subpack "module"] == 0} {
     # IdentifiedProxy
     set classinfo $outClassMap(IdentifiedProxy)
     set classinfo [Java_ClassSetParent $classinfo "AbstractNamedProxy"]
@@ -370,7 +370,7 @@ proc Java_ProcessClassHierarchy {impl subpack inMapName outMapName} {
           "  throw exception;" \
           "\}"]
       set classinfo [Java_ClassSetSpecial $classinfo $special]
-    }        
+    }
     set outClassMap(GroupNodeProxy) $classinfo
 
     set classinfo $outClassMap(SimpleNodeProxy)
@@ -391,7 +391,7 @@ proc Java_ProcessClassHierarchy {impl subpack inMapName outMapName} {
     set attribs [lreplace $attribs $index $index $attrib]
     set classinfo [Java_ClassSetAttributes $classinfo $attribs]
     set outClassMap(GraphProxy) $classinfo
-  } elseif {[string compare $subpack "des"] == 0} { 
+  } elseif {[string compare $subpack "des"] == 0} {
     # TransitionProxy
     set classinfo $outClassMap(TransitionProxy)
     set special \
@@ -686,7 +686,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           Java_WriteSetParent $stream $umap $membername $eqstatus "this"
         }
       }
-    }     
+    }
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
 
@@ -1064,7 +1064,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           } else {
             Java_WriteLn $stream $umap "    fireStateChanged();"
           }
-        }         
+        }
         Java_WriteLn $stream $umap "  \}"
         Java_WriteLn $stream $umap ""
         catch {unset getcomment}
@@ -1215,7 +1215,7 @@ proc Java_GenerateFactory {impl subpack prefix destname classnames
     if {!$iface} {
       Java_GenerateSeparatorComment $stream $umap \
           "Interface net.sourceforge.waters.model.$subpack.$interfacename"
-    } 
+    }
     if {$iface} {
       Java_WriteLn $stream $umap "  /**"
       Java_WriteLn $stream $umap \
@@ -1434,14 +1434,20 @@ proc Java_GenerateVisitor {subpack prefix destname classnames
     if {$iface} {
       Java_WriteLn $stream $umap "  extends ProxyVisitor"
     } else {
+      set ifacename "${prefix}ProxyVisitor"
       Java_WriteLn $stream $umap "  extends ${mode}ProxyVisitor"
-      Java_WriteLn $stream $umap "  implements ${prefix}ProxyVisitor"
+      Java_WriteLn $stream $umap "  implements $ifacename"
     }
     Java_WriteLn $stream $umap "\{"
-    Java_WriteLn $stream $umap ""
 
   ############################################################################
   # Write Visitor Methods
+    if {$iface} {
+      Java_GenerateSeparatorComment $stream $umap "Visitor Methods"
+    } else {
+      set pack $importMap($ifacename)
+      Java_GenerateSeparatorComment $stream $umap "Interface $pack.$ifacename"
+    }
     set classnames [lsort $classnames]
     foreach classname $classnames {
       set classinfo $classMap($classname)
@@ -1491,27 +1497,14 @@ proc Java_GenerateVisitor {subpack prefix destname classnames
                 Java_WriteLn $stream $umap "    \}"
               }
             } elseif {[Java_IsCollectionType $decltype] &&
-                      [regexp {<(\? extends )?([a-zA-Z]+Proxy)>} \
+                      [regexp {<(\? extends )?([a-zA-Z]*Proxy)>} \
                            $decltype all ext itemtype]} {
               set itemclassinfo $classMap($itemtype)
               set abstract [Java_ClassIsAbstract $itemclassinfo]
               Java_WriteLn $stream $umap \
                   "    final $decltype $paramname = proxy.${gettername}();"
-              if {[string compare $paramname "indexes"] == 0} {
-                set itemname "index"
-              } else {
-                regsub {(s|List)$} $paramname "" itemname
-              }
               Java_WriteLn $stream $umap \
-                  "    for (final $itemtype $itemname : $paramname) \{"
-              if {$abstract} {
-                Java_WriteLn $stream $umap \
-                    "      $itemname.acceptVisitor(this);"
-              } else {
-                Java_WriteLn $stream $umap \
-                    "      visit${itemtype}($itemname);"
-              }
-              Java_WriteLn $stream $umap "    \}"
+                  "    visitCollection($paramname);"
             }
           }
           Java_WriteLn $stream $umap "    return null;"
@@ -1671,7 +1664,7 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_GenerateCloningMethodBody $stream classMap $umap $classinfo factory
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
-   
+
   ############################################################################
   # Write Visitor Methods
     Java_GenerateSeparatorComment $stream $umap \
@@ -1942,7 +1935,7 @@ proc Java_GenerateHashCodeVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
     for {set geo 0} {$geo <= 1} {incr geo} {
-      if {$geo} { 
+      if {$geo} {
         set gbool "true"
         set gname "With"
       } else {
@@ -1957,7 +1950,7 @@ proc Java_GenerateHashCodeVisitor {subpack prefix destname classnames
       Java_WriteLn $stream $umap "  \}"
       Java_WriteLn $stream $umap ""
     }
-    
+
   ############################################################################
   # Write Visitor Methods
     Java_GenerateSeparatorComment $stream $umap \
@@ -2007,7 +2000,7 @@ proc Java_GenerateHashCodeVisitor {subpack prefix destname classnames
           } else {
             set attribs $nongeoattribs
             set indent 4
-          }              
+          }
           set indent [string range $gSpaces 1 $indent]
           foreach attrib $attribs {
             set varname [Java_AttribGetParameterName $attrib $impl]
@@ -2158,7 +2151,7 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
     for {set geo 0} {$geo <= 1} {incr geo} {
-      if {$geo} { 
+      if {$geo} {
         set gbool "true"
         set gname "With"
       } else {
@@ -2217,7 +2210,7 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
         "    $nonreporter = diag ? getInstance(geo) : this;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
-   
+
   ############################################################################
   # Write Overrides
     Java_GenerateSeparatorComment $stream $umap \
@@ -2286,7 +2279,7 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
           } else {
             set attribs $nongeoattribs
             set indent 6
-          }              
+          }
           set indent [string range $gSpaces 1 $indent]
           foreach attrib $attribs {
             set varname [Java_AttribGetParameterName $attrib $impl]
@@ -2444,7 +2437,7 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
         "  private final ${prefix}HashCodeVisitor mHashCodeVisitor;"
     Java_WriteLn $stream $umap \
         "  private final $visitorname $nonreporter;"
- 
+
     if {$write} {
       Java_WriteLn $stream $umap ""
       Java_WriteLn $stream $umap "\}"
@@ -2507,7 +2500,7 @@ proc Java_WritePackageAndImports {stream packname
   Java_WritePackageAndImportList $stream $allimports $packname
 }
 
-proc Java_CollectUsedImports {currentpack useMapName 
+proc Java_CollectUsedImports {currentpack useMapName
                               globalImportMapName importMapName} {
   upvar $useMapName useMap
   upvar $globalImportMapName globalImportMap
@@ -2563,7 +2556,7 @@ proc Java_WriteSetParent {stream umap varname eqstatus parent} {
     set umap useMap
   }
   if {[string compare $eqstatus "required"] == 0} {
-    Java_WriteLn $stream $umap "    $varname.setParent($parent);"         
+    Java_WriteLn $stream $umap "    $varname.setParent($parent);"
   } else {
     Java_WriteLn $stream $umap "    if ($varname != null) \{"
     Java_WriteLn $stream $umap "      $varname.setParent($parent);"
@@ -2902,7 +2895,7 @@ proc Java_AttribGetCastTransformerName {attrib impl} {
       [regexp {^(List)<} $decltype all collectiontype] ||
       [regexp {^(Set)<} $decltype all collectiontype]} {
     return "$collectiontype<?>"
-  } elseif {[regexp {^(Map)<} $decltype all collectiontype]} { 
+  } elseif {[regexp {^(Map)<} $decltype all collectiontype]} {
     return "$collectiontype<?,?>"
   } else {
     return ""
@@ -3111,7 +3104,7 @@ proc Java_WriteConstructorComment {stream umap impl methodkind
         incr i
       }
     }
-  }  
+  }
   Java_WriteLn $stream $umap "."
   foreach attrib $attribs {
     set dftvalue [Java_AttribGetDefaultValue $attrib $impl]
@@ -3164,7 +3157,7 @@ proc Java_Write {stream useMapName line} {
     upvar $useMapName useMap
     Java_RecordString useMap $line
   }
-} 
+}
 
 proc Java_WriteLn {stream useMapName line} {
   if {[string compare $useMapName ""] == 0} {
@@ -3181,7 +3174,7 @@ proc Java_WriteLn {stream useMapName line} {
     upvar $useMapName useMap
     Java_RecordString useMap $line
   }
-} 
+}
 
 proc Java_RecordString {useMapName line} {
   upvar $useMapName useMap
@@ -3191,7 +3184,7 @@ proc Java_RecordString {useMapName line} {
       set useMap($word) 1
     }
   }
-} 
+}
 
 proc Java_GenerateHeaderComment {stream packname classname} {
   global gSep75

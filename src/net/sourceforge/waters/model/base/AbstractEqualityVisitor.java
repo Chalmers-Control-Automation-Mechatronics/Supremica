@@ -81,7 +81,7 @@ public abstract class AbstractEqualityVisitor
   }
 
   /**
-   * Returns whether provides diagnostic information.
+   * Returns whether this equality checker provides diagnostic information.
    */
   public boolean isProvidingDiagnostics()
   {
