@@ -12,6 +12,8 @@ package net.sourceforge.waters.gui.command;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.subject.module.EventAliasSubject;
+import net.sourceforge.waters.subject.module.ExpressionSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -27,19 +29,7 @@ public class EditCommandTest extends AbstractCommandTest
 {
 
   //#########################################################################
-  //# Constructors
-  public EditCommandTest()
-  {
-  }
-
-  public EditCommandTest(final String name)
-  {
-    super(name);
-  }
-
-
-  //#########################################################################
-  //# Overrides for junit.framework.TestCase
+  //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
     return new TestSuite(EditCommandTest.class);
@@ -53,6 +43,48 @@ public class EditCommandTest extends AbstractCommandTest
 
   //#########################################################################
   //# Test Cases
+  public void testEventAliasMakeComplex()
+    throws Exception
+  {
+    final String dir = "tests";
+    final String subdir = "nasty";
+    final String name = "eventaliases";
+    final ModuleContainer container = loadModule(dir, subdir, name);
+    final EventAliasSubject simple = findEventAlias(container, "simple");
+    final ModuleProxyCloner cloner = getSubjectCloner();
+    final EventAliasSubject complex = findEventAlias(container, "complex");
+    final ExpressionSubject expr0 = complex.getExpression();
+    final ExpressionSubject expr1 = (ExpressionSubject) cloner.getClone(expr0);
+    final EventAliasSubject target =
+      (EventAliasSubject) cloner.getClone(simple);
+    target.setExpression(expr1);
+    final SelectionOwner panel =
+      container.getEditorPanel().getEventAliasesPanel();
+    final Command cmd = new EditCommand(simple, target, panel);
+    executeCommand(cmd, container, simple, target);
+  }
+
+  public void testEventAliasMakeSimple()
+    throws Exception
+  {
+    final String dir = "tests";
+    final String subdir = "nasty";
+    final String name = "eventaliases";
+    final ModuleContainer container = loadModule(dir, subdir, name);
+    final EventAliasSubject complex = findEventAlias(container, "complex");
+    final ModuleProxyCloner cloner = getSubjectCloner();
+    final EventAliasSubject simple = findEventAlias(container, "simple");
+    final ExpressionSubject expr0 = simple.getExpression();
+    final ExpressionSubject expr1 = (ExpressionSubject) cloner.getClone(expr0);
+    final EventAliasSubject target =
+      (EventAliasSubject) cloner.getClone(complex);
+    target.setExpression(expr1);
+    final SelectionOwner panel =
+      container.getEditorPanel().getEventAliasesPanel();
+    final Command cmd = new EditCommand(complex, target, panel);
+    executeCommand(cmd, container, complex, target);
+  }
+
   public void testSimpleComponentRename()
     throws Exception
   {
@@ -73,7 +105,7 @@ public class EditCommandTest extends AbstractCommandTest
     executeCommand(cmd, container, comp, target);
   }
 
-  public void testNodeRename()
+  public void testSimpleNodeRename()
     throws Exception
   {
     final String dir = "handwritten";

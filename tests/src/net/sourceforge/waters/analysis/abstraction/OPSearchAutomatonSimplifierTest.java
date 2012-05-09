@@ -66,123 +66,123 @@ public class OPSearchAutomatonSimplifierTest
   //# Test Cases
   public void testOPempty() throws Exception
   {
-    runOPSearch("alpharemoval_8.wmod", true);
+    runOPSearch("alpharemoval_8.wmod");
   }
 
   public void testOP1() throws Exception
   {
-    runOPSearch("op01.wmod", false);
+    runOPSearch("op01.wmod");
   }
 
   public void testOP2() throws Exception
   {
-    runOPSearch("op02.wmod", true);
+    runOPSearch("op02.wmod");
   }
 
   public void testOP3() throws Exception
   {
-    runOPSearch("op03.wmod", false);
+    runOPSearch("op03.wmod");
   }
 
   public void testOP3a() throws Exception
   {
-    runOPSearch("tauTransRemovalFromNonAlpha_3.wmod", true);
+    runOPSearch("tauTransRemovalFromNonAlpha_3.wmod");
   }
 
   public void testOP4() throws Exception
   {
-    runOPSearch("op04.wmod", true);
+    runOPSearch("op04.wmod");
   }
 
   public void testOP5() throws Exception
   {
-    runOPSearch("op05.wmod", true);
+    runOPSearch("op05.wmod");
   }
 
   public void testOP6() throws Exception
   {
-    runOPSearch("op06.wmod", true);
+    runOPSearch("op06.wmod");
   }
 
   public void testOP7() throws Exception
   {
-    runOPSearch("op07.wmod", true);
+    runOPSearch("op07.wmod");
   }
 
   public void testOP8() throws Exception
   {
-    runOPSearch("op08.wmod", true);
+    runOPSearch("op08.wmod");
   }
 
   public void testOP9() throws Exception
   {
-    runOPSearch("op09.wmod", true);
+    runOPSearch("op09.wmod");
   }
 
   public void testOP10() throws Exception
   {
-    runOPSearch("op10.wmod", true);
+    runOPSearch("op10.wmod");
   }
 
   public void testOP11() throws Exception
   {
-    runOPSearch("op11.wmod", true);
+    runOPSearch("op11.wmod");
   }
 
   public void testOP12() throws Exception
   {
-    runOPSearch("op12.wmod", true);
+    runOPSearch("op12.wmod");
   }
 
   public void testOP13() throws Exception
   {
-    runOPSearch("op13.wmod", true);
+    runOPSearch("op13.wmod");
   }
 
   public void testOP14() throws Exception
   {
-    runOPSearch("op14.wmod", true);
+    runOPSearch("op14.wmod");
   }
 
   public void testOP15() throws Exception
   {
-    runOPSearch("op15.wmod", true);
+    runOPSearch("op15.wmod");
   }
 
   public void testOP15a() throws Exception
   {
-    runOPSearch("op15a.wmod", true);
+    runOPSearch("op15a.wmod");
   }
 
   public void testOP16() throws Exception
   {
-    runOPSearch("op16.wmod", false);
+    runOPSearch("op16.wmod");
   }
 
   public void testOP17() throws Exception
   {
-    runOPSearch("op17.wmod", true);
+    runOPSearch("op17.wmod");
   }
 
   public void testOP18() throws Exception
   {
-    runOPSearch("op18.wmod", true);
+    runOPSearch("op18.wmod");
   }
 
   public void testOP19() throws Exception
   {
-    runOPSearch("op19.wmod", true);
+    runOPSearch("op19.wmod");
   }
 
   public void testOP20() throws Exception
   {
-    runOPSearch("op20.wmod", true);
+    runOPSearch("op20.wmod");
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private void runOPSearch(final String name, final boolean expect)
+  private void runOPSearch(final String name)
     throws Exception
   {
     final ProductDESProxy des = getCompiledDES("tests", "abstraction", name);

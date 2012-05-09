@@ -56,6 +56,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     testMarshal("handwritten", "dosingtankEFA");
   }
 
+  public void testMarshal_eventaliases()
+    throws Exception
+  {
+    testMarshal("tests", "nasty", "eventaliases");
+  }
+
   public void testMarshal_machine()
     throws Exception
   {

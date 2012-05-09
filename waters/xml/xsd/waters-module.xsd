@@ -244,6 +244,7 @@
         <xs:sequence>
           <xs:element ref="M:EventList" minOccurs="0"/>
         </xs:sequence>
+        <xs:attribute name="Unpack" type="xs:boolean" default="false"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

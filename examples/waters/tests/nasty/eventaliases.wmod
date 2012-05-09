@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="eventaliases" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test module that contains but a few event aliases.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="e"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e2"/>
+    </EventDeclList>
+    <EventAliasList>
+        <EventAlias Name="simple">
+            <EventListExpression Unpack="true">
+                <EventList>
+                    <SimpleIdentifier Name="e"/>
+                </EventList>
+            </EventListExpression>
+        </EventAlias>
+        <EventAlias Name="complex">
+            <EventListExpression>
+                <EventList>
+                    <SimpleIdentifier Name="e1"/>
+                    <SimpleIdentifier Name="e2"/>
+                </EventList>
+            </EventListExpression>
+        </EventAlias>
+    </EventAliasList>
+</Module>

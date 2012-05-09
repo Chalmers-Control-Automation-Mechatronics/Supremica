@@ -679,8 +679,18 @@ public class JAXBModuleExporter
   {
     copyAliasProxy(proxy, element);
     final ExpressionProxy eventListProxy = proxy.getExpression();
-    final EventListExpression eventListElement =
-      (EventListExpression) eventListProxy.acceptVisitor(this);
+    final ExpressionType expressionElement =
+      (ExpressionType) eventListProxy.acceptVisitor(this);
+    final EventListExpression eventListElement;
+    if (expressionElement instanceof EventListExpression) {
+      eventListElement = (EventListExpression) expressionElement;
+    } else {
+      final EventListType elist = mFactory.createEventListType();
+      elist.getList().add(expressionElement);
+      eventListElement = mFactory.createEventListExpression();
+      eventListElement.setEventList(elist);
+      eventListElement.setUnpack(true);
+    }
     element.setExpression(eventListElement);
   }
 

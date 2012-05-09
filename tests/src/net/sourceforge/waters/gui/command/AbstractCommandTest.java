@@ -36,6 +36,8 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -192,9 +194,25 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
     return panel.getGraphEditorPanel();
   }
 
+  protected EventAliasSubject findEventAlias
+    (final ModuleContainer container, final String name)
+  {
+    final ModuleSubject module = container.getModule();
+    for (final Proxy proxy : module.getEventAliasList()) {
+      if (proxy instanceof EventAliasSubject) {
+        final EventAliasSubject alias = (EventAliasSubject) proxy;
+        if (alias.getName().equals(name)) {
+          return alias;
+        }
+      }
+    }
+    fail("Module '" + module.getName() +
+         "' does not contain an event alias called '" + name + "'!");
+    return null;
+  }
+
   protected SimpleComponentSubject findSimpleComponent
     (final ModuleContainer container, final String name)
-    throws GeometryAbsentException
   {
     final ModuleSubject module = container.getModule();
     for (final Proxy proxy : module.getComponentList()) {
@@ -243,14 +261,22 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
         printer.pprint(msg);
         for (final Proxy node : nodes) {
           if (!expected.contains(node)) {
-            printer.pprint("\nUnexpected: ");
-            printer.pprint(node);
+            final ProxySubject subject = (ProxySubject) node;
+            final ProxySubject parent = SubjectTools.getProxyParent(subject);
+            if (parent ==  null || expected.contains(parent)) {
+              printer.pprint("\nUnexpected: ");
+              printer.pprint(node);
+            }
           }
         }
         for (final Proxy node : expected) {
           if (!nodes.contains(node)) {
-            printer.pprint("\nMissing: ");
-            printer.pprint(node);
+            final ProxySubject subject = (ProxySubject) node;
+            final ProxySubject parent = SubjectTools.getProxyParent(subject);
+            if (parent ==  null || nodes.contains(parent)) {
+              printer.pprint("\nMissing: ");
+              printer.pprint(node);
+            }
           }
         }
         final String diag = sWriter.toString();

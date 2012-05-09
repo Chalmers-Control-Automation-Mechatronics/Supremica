@@ -44,7 +44,7 @@ public class OPSearchConflictCheckerTest extends
     final CompositionalConflictChecker checker =
       new CompositionalConflictChecker
         (CompositionalConflictChecker.AbstractionMethod.OPSEARCH, factory);
-    checker.setInternalStateLimit(50000);
+    checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
     return checker;
