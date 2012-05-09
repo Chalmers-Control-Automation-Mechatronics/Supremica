@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="op_2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Example automaton from the paper Patricia Nascimento Pena, Jos? Eduardo Ribeiro Cury, Robi Malik, and St?phane Lafortune, "Title: Efficient Computation of Observer Projections using OP-Verifiers", 10th Workshop on Discrete Event Systems (WODES 2010), 30 August - 2 September, 2010.
-The automaton is the abstracted version of the automaton in the paper, which does  satisfy the observer property.</ns2:Comment>
+<Module Name="op03" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>An example to test the OP-search and OP-verifier algorithms for automata with silent loops. This automaton does not satisfy the observer property, and all unobservable transitions except the transitions between state S3 and S5 must be made observable to achieve the observer property.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Observable="false" Kind="CONTROLLABLE" Name="x"/>
-        <EventDecl Kind="CONTROLLABLE" Name="z"/>
+        <EventDecl Observable="false" Kind="CONTROLLABLE" Name="z"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
                 <Color Red="204" Green="204" Blue="204"/>
             </ColorGeometry>
         </EventDecl>
+        <EventDecl Observable="false" Kind="CONTROLLABLE" Name=":op1:result"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">
@@ -129,7 +129,7 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                     </Edge>
                     <Edge Target="S4" Source="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="z"/>
+                            <SimpleIdentifier Name="x"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-10" X="-18"/>
                             </LabelGeometry>
@@ -142,6 +142,9 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                                 <Point Y="-11" X="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="72" X="154"/>
+                        </SplineGeometry>
                         <EndPointGeometry>
                             <Point Y="96" X="160"/>
                         </EndPointGeometry>
@@ -170,6 +173,17 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
+                    <Edge Target="S3" Source="S5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="x"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="71" X="167"/>
+                        </SplineGeometry>
+                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
@@ -178,7 +192,7 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point Y="48" X="96"/>
+                            <Point Y="48" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-8" X="-8"/>
@@ -186,7 +200,7 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="48" X="144"/>
+                            <Point Y="48" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-8" X="-8"/>
@@ -194,21 +208,10 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                     </SimpleNode>
                     <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point Y="96" X="96"/>
+                            <Point Y="96" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="-8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S3">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="48" X="192"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
@@ -216,15 +219,26 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="96" X="144"/>
+                            <Point Y="96" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Name="S5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="48" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="S6">
                         <PointGeometry>
-                            <Point Y="144" X="168"/>
+                            <Point Y="144" X="152"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="-10"/>
@@ -235,7 +249,7 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="192" X="168"/>
+                            <Point Y="192" X="152"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-8" X="-8"/>
@@ -251,23 +265,26 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S3" Source="S1">
+                    <Edge Target="S5" Source="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-17" X="-4"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <EndPointGeometry>
+                            <Point Y="48" X="176"/>
+                        </EndPointGeometry>
                     </Edge>
                     <Edge Target="S2" Source="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="z"/>
+                            <SimpleIdentifier Name=":op1:result"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="-16"/>
+                                <Point Y="-13" X="-71"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <EndPointGeometry>
-                            <Point Y="96" X="96"/>
+                            <Point Y="96" X="80"/>
                         </EndPointGeometry>
                     </Edge>
                     <Edge Target="S4" Source="S2">
@@ -280,24 +297,21 @@ The automaton is the abstracted version of the automaton in the paper, which doe
                     </Edge>
                     <Edge Target="S4" Source="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="z"/>
+                            <SimpleIdentifier Name=":op1:result"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-18"/>
+                                <Point Y="-12" X="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S6" Source="S3">
+                    <Edge Target="S6" Source="S5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="z"/>
+                            <SimpleIdentifier Name=":op1:result"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="3"/>
+                                <Point Y="-5" X="1"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="48" X="192"/>
-                        </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="105" X="189"/>
+                            <Point Y="101" X="174"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S6" Source="S4">

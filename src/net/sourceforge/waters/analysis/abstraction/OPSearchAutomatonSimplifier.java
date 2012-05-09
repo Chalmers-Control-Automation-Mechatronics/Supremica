@@ -20,6 +20,10 @@ import gnu.trove.TLongLongHashMap;
 import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -178,6 +182,11 @@ public class OPSearchAutomatonSimplifier
     return mOutputHiddenEvent;
   }
 
+  public void setLogFile(final File logFile)
+  {
+    mLogFile = logFile;
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -196,6 +205,7 @@ public class OPSearchAutomatonSimplifier
         //MarshallingTools.saveModule(aut, "before.wmod");
       }
       setUp();
+      dumpVerifierToLogFile("Initial OP-Verifier:");
       if (mOperationMode == Mode.VERIFY) {
         final boolean satisfied = mListBuffer.isEmpty(mPredecessorsOfDead);
         return setBooleanResult(satisfied);
@@ -516,7 +526,19 @@ public class OPSearchAutomatonSimplifier
       }
     }
     // Proper event transitions ...
+    final boolean check;
     if (code1 != code2) {
+      check = true;
+    } else if (comp1 != null) {
+      // When running OP-Verifier, we must also check pairs reached from
+      // different states in a strongly component. This is not necessary
+      // in OP-Search, because all nondeterminism in strongly connected
+      // components will be resolved anyway in the output automaton.
+      check = (mOperationMode == Mode.VERIFY);
+    } else {
+      check = false;
+    }
+    if (check) {
       for (int e = 0; e < mUnobservableTau; e++) {
         int esucc1 = 0, esucc2 = 0;
         final boolean en1, en2;
@@ -953,7 +975,7 @@ public class OPSearchAutomatonSimplifier
       final int succ2 = mObservableSuccessor[current2][e];
       if (succ1 != NO_TRANSITION && succ2 != NO_TRANSITION && succ1 != succ2) {
         final int root1 = getRootIndex(succ1);
-        final int root2 = getRootIndex(succ1);
+        final int root2 = getRootIndex(succ2);
         if (root1 == startroot && root2 == startroot) {
           final long succpair = getPair(succ1, succ2);
           if (!mBFSLongVisited.containsKey(succpair)) {
@@ -1486,6 +1508,22 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Debugging
+  private void dumpVerifierToLogFile(final String header)
+    throws AnalysisException
+  {
+    if (mLogFile != null) {
+      try {
+        final OutputStream stream = new FileOutputStream(mLogFile);
+        final PrintWriter writer = new PrintWriter(stream);
+        writer.println(header);
+        dump(writer);
+        writer.close();
+      } catch (final IOException exception) {
+        throw new AnalysisException(exception);
+      }
+    }
+  }
+
   private void dump(final PrintWriter writer)
   {
     writer.println("EVENTS");
@@ -1530,8 +1568,8 @@ public class OPSearchAutomatonSimplifier
     for (int i = 0; i < mVerifierStatePairs.size(); i++) {
       final int code = mOriginalStates.length + i;
       final long pair = mVerifierStatePairs.get(i);
-      final int p1 = (int) (pair >> 32);
-      final int p2 = (int) (pair & 0xffffffffL);
+      final int p1 = (int) (pair & 0xffffffffL);
+      final int p2 = (int) (pair >> 32);
       writer.println("  " + code + ": (" + p1 + '/' + p2 + ')');
     }
     writer.println("PREDECESSORS");
@@ -1872,6 +1910,7 @@ public class OPSearchAutomatonSimplifier
   private Collection<EventProxy> mHiddenEvents;
   private Collection<EventProxy> mPropositions;
   private EventProxy mOutputHiddenEvent;
+  private File mLogFile;
 
   private AutomatonProxy mInputAutomaton;
   private IntListBuffer mListBuffer;

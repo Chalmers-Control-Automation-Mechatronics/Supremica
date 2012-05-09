@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="op_1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="op01" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Example automaton from the paper Patricia Nascimento Pena, Jos? Eduardo Ribeiro Cury, Robi Malik, and St?phane Lafortune, "Title: Efficient Computation of Observer Projections using OP-Verifiers", 10th Workshop on Discrete Event Systems (WODES 2010), 30 August - 2 September, 2010.
 The automaton does not satisfy the observer property, and all unobservable transitions except the transition from state S3 to S5 must be made observable to achieve the observer property.</ns2:Comment>
     <EventDeclList>

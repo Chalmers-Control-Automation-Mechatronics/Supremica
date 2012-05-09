@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="op_15" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This OP-search test checks whether the OP-search algorithm correctly creates multiple observable tau transitions to the same target state.</ns2:Comment>
+<Module Name="op15a" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This OP-search test checks whether observable tau transitions are correctly treated in combination with bisimulation.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="close_out"/>
         <EventDecl Kind="CONTROLLABLE" Name="open_out"/>
@@ -97,9 +97,8 @@
                     <Edge Target="S0" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="s1_off"/>
-                            <SimpleIdentifier Name="s1_on"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-33" X="-33"/>
+                                <Point Y="-17" X="-32"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -284,29 +283,18 @@
                             <Point Y="-23" X="-10"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S7">
+                    <SimpleNode Initial="true" Name="S07">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point Y="272" X="240"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-17" X="-26"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="192" X="144"/>
-                        </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="0" X="-46"/>
+                            <Point Y="36" X="0"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="2"/>
+                            <Point Y="4" X="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -376,7 +364,7 @@
                             <Point Y="312" X="321"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S7" Source="S6">
+                    <Edge Target="S07" Source="S6">
                         <LabelBlock>
                             <SimpleIdentifier Name="close_out"/>
                             <LabelGeometry Anchor="NW">
@@ -384,7 +372,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S12" Source="S7">
+                    <Edge Target="S12" Source="S07">
                         <LabelBlock>
                             <SimpleIdentifier Name=":op1:result"/>
                             <LabelGeometry Anchor="NW">
@@ -392,36 +380,16 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S7" Source="S7">
+                    <Edge Target="S07" Source="S07">
                         <LabelBlock>
                             <SimpleIdentifier Name="s1_off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-11"/>
+                                <Point Y="16" X="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="299" X="213"/>
+                            <Point Y="276" X="195"/>
                         </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S0" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="s1_off"/>
-                            <SimpleIdentifier Name="s1_on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="-25"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="146" X="147"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S12" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name=":op1:result"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-33"/>
-                            </LabelGeometry>
-                        </LabelBlock>
                     </Edge>
                 </EdgeList>
             </Graph>

@@ -11,53 +11,57 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.List;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
 /**
  * @author Robi Malik
  */
 
-public class OPSearchAutomatonSimplifierTest
+public class OPVerifierTest
   extends AbstractAnalysisTest
 {
 
   //#########################################################################
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
+  {
+    final TestSuite testSuite = new TestSuite(OPVerifierTest.class);
+    return testSuite;
+  }
+
+  public static void main(final String[] args)
+  {
+    junit.textui.TestRunner.run(suite());
+  }
+
+
+  //#########################################################################
   //# Overrides for base class junit.framework.TestCase
-  public OPSearchAutomatonSimplifierTest()
-  {
-  }
-
-  public OPSearchAutomatonSimplifierTest(final String name)
-  {
-    super(name);
-  }
-
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    mSimplifier = new OPSearchAutomatonSimplifier(factory, translator);
-    mSimplifier.setOutputName("result");
-    mIsomorphismChecker = new IsomorphismChecker(factory, true);
+    mVerifier = new OPSearchAutomatonSimplifier(factory, translator);
+    mVerifier.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
   }
 
+  @Override
   protected void tearDown() throws Exception
   {
-    mSimplifier = null;
-    mIsomorphismChecker = null;
-    mBindings = null;
+    mVerifier = null;
     super.tearDown();
   }
 
@@ -66,123 +70,123 @@ public class OPSearchAutomatonSimplifierTest
   //# Test Cases
   public void testOPempty() throws Exception
   {
-    runOPSearch("alpharemoval_8.wmod", true);
+    runOPVerifier("alpharemoval_8.wmod", true);
   }
 
   public void testOP1() throws Exception
   {
-    runOPSearch("op01.wmod", false);
+    runOPVerifier("op01.wmod", false);
   }
 
   public void testOP2() throws Exception
   {
-    runOPSearch("op02.wmod", true);
+    runOPVerifier("op02.wmod", true);
   }
 
   public void testOP3() throws Exception
   {
-    runOPSearch("op03.wmod", false);
+    runOPVerifier("op03.wmod", false);
   }
 
   public void testOP3a() throws Exception
   {
-    runOPSearch("tauTransRemovalFromNonAlpha_3.wmod", true);
+    runOPVerifier("tauTransRemovalFromNonAlpha_3.wmod", false);
   }
 
   public void testOP4() throws Exception
   {
-    runOPSearch("op04.wmod", true);
+    runOPVerifier("op04.wmod", true);
   }
 
   public void testOP5() throws Exception
   {
-    runOPSearch("op05.wmod", true);
+    runOPVerifier("op05.wmod", false);
   }
 
   public void testOP6() throws Exception
   {
-    runOPSearch("op06.wmod", true);
+    runOPVerifier("op06.wmod", true);
   }
 
   public void testOP7() throws Exception
   {
-    runOPSearch("op07.wmod", true);
+    runOPVerifier("op07.wmod", false);
   }
 
   public void testOP8() throws Exception
   {
-    runOPSearch("op08.wmod", true);
+    runOPVerifier("op08.wmod", true);
   }
 
   public void testOP9() throws Exception
   {
-    runOPSearch("op09.wmod", true);
+    runOPVerifier("op09.wmod", true);
   }
 
   public void testOP10() throws Exception
   {
-    runOPSearch("op10.wmod", true);
+    runOPVerifier("op10.wmod", true);
   }
 
   public void testOP11() throws Exception
   {
-    runOPSearch("op11.wmod", true);
+    runOPVerifier("op11.wmod", false);
   }
 
   public void testOP12() throws Exception
   {
-    runOPSearch("op12.wmod", true);
+    runOPVerifier("op12.wmod", true);
   }
 
   public void testOP13() throws Exception
   {
-    runOPSearch("op13.wmod", true);
+    runOPVerifier("op13.wmod", false);
   }
 
   public void testOP14() throws Exception
   {
-    runOPSearch("op14.wmod", true);
+    runOPVerifier("op14.wmod", false);
   }
 
   public void testOP15() throws Exception
   {
-    runOPSearch("op15.wmod", true);
+    runOPVerifier("op15.wmod", false);
   }
 
   public void testOP15a() throws Exception
   {
-    runOPSearch("op15a.wmod", true);
+    runOPVerifier("op15a.wmod", false);
   }
 
   public void testOP16() throws Exception
   {
-    runOPSearch("op16.wmod", false);
+    runOPVerifier("op16.wmod", false);
   }
 
   public void testOP17() throws Exception
   {
-    runOPSearch("op17.wmod", true);
+    runOPVerifier("op17.wmod", false);
   }
 
   public void testOP18() throws Exception
   {
-    runOPSearch("op18.wmod", true);
+    runOPVerifier("op18.wmod", false);
   }
 
   public void testOP19() throws Exception
   {
-    runOPSearch("op19.wmod", true);
+    runOPVerifier("op19.wmod", false);
   }
 
   public void testOP20() throws Exception
   {
-    runOPSearch("op20.wmod", true);
+    runOPVerifier("op20.wmod", true);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private void runOPSearch(final String name, final boolean expect)
+  private void runOPVerifier(final String name, final boolean expect)
     throws Exception
   {
     final ProductDESProxy des = getCompiledDES("tests", "abstraction", name);
@@ -190,23 +194,10 @@ public class OPSearchAutomatonSimplifierTest
     getLogger().info("Checking " + desname + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     final List<EventProxy> hidden = getUnobservableEvents(des);
-    mSimplifier.setModel(before);
-    mSimplifier.setHiddenEvents(hidden);
-    final boolean result = mSimplifier.run();
-    final AutomatonProxy aut = mSimplifier.getComputedAutomaton();
-    final String basename = appendSuffixes(desname, mBindings);
-    final String comment =
-      "Test output from " + ProxyTools.getShortClassName(mSimplifier) + '.';
-    saveAutomaton(aut, basename, comment);
-    assertTrue("Unexpected result (false) from OP-Verifier!", result);
-    final AutomatonProxy after = getAutomaton(des, AFTER);
-    if (after == null) {
-      assertSame("Test expects no change, " +
-                 "but the object returned is not the same as the input!",
-                 before, aut);
-    } else {
-      mIsomorphismChecker.checkIsomorphism(aut, after);
-    }
+    mVerifier.setModel(before);
+    mVerifier.setHiddenEvents(hidden);
+    final boolean result = mVerifier.run();
+    assertEquals("Unexpected result from OP-Verifier!", expect, result);
     getLogger().info("Done " + desname);
   }
 
@@ -214,6 +205,7 @@ public class OPSearchAutomatonSimplifierTest
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractAnalysisTest
+  @Override
   protected void configure(final ModuleCompiler compiler)
   {
     compiler.setOptimizationEnabled(false);
@@ -222,14 +214,11 @@ public class OPSearchAutomatonSimplifierTest
 
   //#########################################################################
   //# Data Members
-  private OPSearchAutomatonSimplifier mSimplifier;
-  private IsomorphismChecker mIsomorphismChecker;
-  private List<ParameterBindingProxy> mBindings;
+  private OPSearchAutomatonSimplifier mVerifier;
 
 
   //#########################################################################
   //# Class Constants
   private final String BEFORE = "before";
-  private final String AFTER = "after";
 
 }

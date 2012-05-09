@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="op_4" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>An example to test the OP-search and OP-verifier algorithms for automata with silent loops. This automaton does satisfies the observer property.</ns2:Comment>
+<Module Name="op02" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Example automaton from the paper Patricia Nascimento Pena, Jos? Eduardo Ribeiro Cury, Robi Malik, and St?phane Lafortune, "Title: Efficient Computation of Observer Projections using OP-Verifiers", 10th Workshop on Discrete Event Systems (WODES 2010), 30 August - 2 September, 2010.
+The automaton is the abstracted version of the automaton in the paper, which does  satisfy the observer property.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
@@ -141,9 +142,6 @@
                                 <Point Y="-11" X="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="73" X="152"/>
-                        </SplineGeometry>
                         <EndPointGeometry>
                             <Point Y="96" X="160"/>
                         </EndPointGeometry>
@@ -171,17 +169,6 @@
                                 <Point Y="-8" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Target="S3" Source="S5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="x"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="5"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="71" X="169"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

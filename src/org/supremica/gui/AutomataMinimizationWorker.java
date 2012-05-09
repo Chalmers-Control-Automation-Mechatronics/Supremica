@@ -52,6 +52,8 @@ package org.supremica.gui;
 import java.awt.*;
 import javax.swing.*;
 
+import net.sourceforge.waters.model.base.ProxyTools;
+
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
@@ -151,7 +153,7 @@ public class AutomataMinimizationWorker
                 try
                 {
                     final AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
-                    
+
                     if (theAutomata.size() == 1)
                     {
                         minimizer.setExecutionDialog(executionDialog);
@@ -175,13 +177,16 @@ public class AutomataMinimizationWorker
 
                     result.addAutomaton(newAutomaton);
                 }
-                catch (final Exception ex)
+                catch (final Exception exception)
                 {
-                    logger.error("Exception in AutomatonMinimizerWorker. Automaton: " +
-                        currAutomaton.getName() + " " + ex);
-                    logger.debug(ex.getStackTrace());
+                  final String eclassname =
+                    ProxyTools.getShortClassName(exception);
+                  final String classname = ProxyTools.getShortClassName(this);
+                  logger.error(eclassname + " in " + classname +
+                               ", automaton " + currAutomaton.getName() +
+                               ": " + exception.getMessage());
+                  logger.debug(exception.getStackTrace());
                 }
-
                 if (!options.getKeepOriginal())
                 {
                     theProject.removeAutomaton(currAutomaton);
