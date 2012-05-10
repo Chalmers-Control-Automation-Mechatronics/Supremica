@@ -123,6 +123,11 @@ public abstract class AbstractWatersTest
     ensureDirectoryExists(dirname);
   }
 
+  protected File getLogFile()
+  {
+    return mLogFile;
+  }
+
 
   //#########################################################################
   //# Proxy Equality Assertions

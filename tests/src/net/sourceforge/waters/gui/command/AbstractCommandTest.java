@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
@@ -37,6 +38,7 @@ import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -194,6 +196,28 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
     return panel.getGraphEditorPanel();
   }
 
+
+  protected EdgeSubject findEdge(final GraphEditorPanel panel,
+                                 final String sourceName,
+                                 final String targetName)
+  {
+    final GraphSubject graph = panel.getGraph();
+    for (final EdgeProxy edge : graph.getEdges()) {
+      final NodeProxy source = edge.getSource();
+      final NodeProxy target = edge.getTarget();
+      if (source.getName().equals(sourceName) &&
+          target.getName().equals(targetName)) {
+        return (EdgeSubject) edge;
+      }
+    }
+    final SimpleComponentSubject comp =
+      (SimpleComponentSubject) graph.getParent();
+    fail("Graph '" + comp.getName() +
+         "' does not contain an edge from '" + sourceName +
+         "' to '" + targetName + "'!");
+    return null;
+  }
+
   protected EventAliasSubject findEventAlias
     (final ModuleContainer container, final String name)
   {
@@ -258,7 +282,6 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
         final StringWriter sWriter = new StringWriter();
         final PrintWriter pWriter = new PrintWriter(sWriter);
         final ModuleProxyPrinter printer = new ModuleProxyPrinter(pWriter);
-        printer.pprint(msg);
         for (final Proxy node : nodes) {
           if (!expected.contains(node)) {
             final ProxySubject subject = (ProxySubject) node;
@@ -279,8 +302,19 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
             }
           }
         }
-        final String diag = sWriter.toString();
-        fail(diag);
+        final String diagnostics = sWriter.toString();
+        getLogger().error(msg);
+        getLogger().info(diagnostics);
+        final String fullmsg;
+        if (System.getProperty("waters.test.ant") == null) {
+          fullmsg = msg + diagnostics;
+        } else {
+          // Funny thing, when run from ANT, the text after the first newline
+          // in the argument passed to fail() gets printed on the console.
+          // So we suppress the output and refer the programmer to the log file.
+          fullmsg = msg + " (See " + getLogFile() + " for details.)";
+        }
+        fail(fullmsg);
       } catch (final IOException exception) {
         throw new WatersRuntimeException(exception);
       }

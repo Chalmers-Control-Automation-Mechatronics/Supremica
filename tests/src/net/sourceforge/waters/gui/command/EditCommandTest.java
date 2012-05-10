@@ -12,8 +12,13 @@ package net.sourceforge.waters.gui.command;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -43,6 +48,26 @@ public class EditCommandTest extends AbstractCommandTest
 
   //#########################################################################
   //# Test Cases
+  public void testEdgeLabelReplacement()
+    throws Exception
+  {
+    final String dir = "handwritten";
+    final String name = "manwolfgoatcabbage";
+    final ModuleContainer container = loadModule(dir, name);
+    final GraphEditorPanel panel = openGraph(container, "Man");
+    final EdgeSubject edge = findEdge(panel, "ml", "mr");
+    final ModuleProxyCloner cloner = getSubjectCloner();
+    final EdgeSubject target = (EdgeSubject) cloner.getClone(edge);
+    final LabelBlockSubject block = target.getLabelBlock();
+    final ListSubject<AbstractSubject> list = block.getEventListModifiable();
+    final ModuleSubjectFactory factory = getSubjectFactory();
+    final IdentifierSubject ident =
+      factory.createSimpleIdentifierProxy("change");
+    list.set(1, ident);
+    final Command cmd = new EditCommand(edge, target, panel);
+    executeCommand(cmd, container, edge, target);
+  }
+
   public void testEventAliasMakeComplex()
     throws Exception
   {
