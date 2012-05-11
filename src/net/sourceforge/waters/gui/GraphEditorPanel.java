@@ -1139,12 +1139,6 @@ public class GraphEditorPanel
       return false;
     } else if (isSelected(original)) {
       return true;
-      //TODO remove this, add to selection manually
-    } else if (original instanceof LabelGeometrySubject ||
-               original instanceof LabelBlockSubject ||
-               original instanceof GuardActionBlockSubject) {
-      final ProxySubject parent = (ProxySubject) original.getParent();
-      return isSelected(parent);
     } else {
       return false;
     }
@@ -1720,9 +1714,13 @@ public class GraphEditorPanel
           }
           else{
             if (event.isShiftDown()) {
-                clearSelection();
-                addToSelection(list);
+              if(list.isEmpty()){
+                final LabelBlockSubject block = SubjectTools.getAncestor(item, LabelBlockSubject.class);
+                toggleSelection(block);
+              }
+              else{
                 toggleSelection(item);
+              }
             }
             else{
                 replaceSelection(item);
@@ -1920,24 +1918,24 @@ public class GraphEditorPanel
     {
       if(mInternalDragAction == null){
         if(mFocusedObject == null){
-          mInternalDragAction = new InternalDragActionSelect(event, mStartPoint);
+          mInternalDragAction = new InternalDragActionSelect(mStartPoint);
         }
         else{
           final ProxySubject subject = getItemToBeSelected(event);
           if(mFocusedObject == subject || !isSelected(subject)){
             final Handle handle = getClickedHandle(subject, event);
             if(handle == null){
-              mInternalDragAction = new InternalDragActionMove(event, mStartPoint);
+              mInternalDragAction = new InternalDragActionMove(mStartPoint);
             }
             else{
               switch (handle.getType()) {
               case INITIAL:
-                mInternalDragAction = new InternalDragActionInitial(event, mStartPoint);
+                mInternalDragAction = new InternalDragActionInitial(mStartPoint);
                 break;
               case SOURCE:
               case TARGET:
                 mInternalDragAction =
-                  new InternalDragActionEdge(event, handle, mStartPoint);
+                  new InternalDragActionEdge(handle, mStartPoint);
                 break;
               case NW:
               case N:
@@ -1947,7 +1945,7 @@ public class GraphEditorPanel
               case SW:
               case S:
               case SE:
-                mInternalDragAction = new InternalDragActionResizeGroupNode(event, handle, mStartPoint);
+                mInternalDragAction = new InternalDragActionResizeGroupNode(handle, mStartPoint);
                 break;
               default:
                 throw new IllegalStateException
@@ -1956,7 +1954,7 @@ public class GraphEditorPanel
             }
           }
           else{
-             mInternalDragAction = new InternalDragActionDND(event, mFocusedObject, mStartPoint);
+             mInternalDragAction = new InternalDragActionDND(mFocusedObject, mStartPoint);
           }
         }
       }
@@ -2052,22 +2050,22 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(event, mStartPoint);
+            new InternalDragActionSelect(mStartPoint);
         } else {
           final ProxySubject subject = getItemToBeSelected(event);
           if (mFocusedObject == subject || !isSelected(subject)) {
             final Handle handle = getClickedHandle(subject, event);
             if (handle == null) {
               mInternalDragAction =
-                new InternalDragActionMove(event, mStartPoint);
+                new InternalDragActionMove(mStartPoint);
             } else {
               if(handle.getType() == HandleType.INITIAL){
                 mInternalDragAction =
-                  new InternalDragActionInitial(event, mStartPoint);
+                  new InternalDragActionInitial(mStartPoint);
               }
               else{
                 mInternalDragAction =
-                new InternalDragActionSelect(event, mStartPoint);
+                new InternalDragActionSelect(mStartPoint);
               }
             }
           }
@@ -2107,14 +2105,14 @@ public class GraphEditorPanel
     public void mouseDragged(final MouseEvent event){
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
-          mInternalDragAction = new InternalDragActionCreateGroupNode(event);
+          mInternalDragAction = new InternalDragActionCreateGroupNode(mStartPoint);
         } else {
           final Handle handle = getClickedHandle(mFocusedObject, event);
           if (handle == null) {
-            mInternalDragAction = new InternalDragActionMove(event, mStartPoint);
+            mInternalDragAction = new InternalDragActionMove(mStartPoint);
           } else {
             mInternalDragAction =
-              new InternalDragActionResizeGroupNode(event, handle, mStartPoint);
+              new InternalDragActionResizeGroupNode(handle, mStartPoint);
           }
         }
       }
@@ -2186,33 +2184,33 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(event, mStartPoint);
+            new InternalDragActionSelect(mStartPoint);
         } else {
           final ProxySubject item = getItemToBeSelected(event);
           if(mFocusedObject == item || !isSelected(item)){
             final Handle handle = getClickedHandle(item, event);
             if(handle == null && canBeSelected(item)){
-              mInternalDragAction = new InternalDragActionMove(event, mStartPoint);
+              mInternalDragAction = new InternalDragActionMove(mStartPoint);
             }
             else{
               if (item instanceof NodeSubject) {
                 // Clicking on node or nodegroup --- create edge.
                 mInternalDragAction =
-                  new InternalDragActionEdge(event, mStartPoint);
+                  new InternalDragActionEdge(mStartPoint);
               } else if (item instanceof EdgeSubject) {
                 if (handle == null) {
                   mInternalDragAction =
-                    new InternalDragActionMove(event, mStartPoint);
+                    new InternalDragActionMove(mStartPoint);
                 } else {
                   mInternalDragAction =
-                    new InternalDragActionEdge(event, handle, mStartPoint);
+                    new InternalDragActionEdge(handle, mStartPoint);
                 }
               }
             }
           }
           else{
             mInternalDragAction =
-              new InternalDragActionDND(event, item, mStartPoint);
+              new InternalDragActionDND(item, mStartPoint);
           }
 
         }
@@ -2238,22 +2236,14 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragAction(final MouseEvent event, final Point start)
+    private InternalDragAction(final Point start)
     {
-      this(event, start, event.getPoint());
-    }
-
-    private InternalDragAction(final MouseEvent event, final Point start, final Point snapped)
-    {
-      this(start, snapped, event.isControlDown(), event.isShiftDown());
+      this(start, false);
     }
 
     private InternalDragAction(final Point point,
-                               final Point snapped,
-                               final boolean controlDown,
                                final boolean shiftDown)
     {
-      mWasControlDown = controlDown;
       mWasShiftDown = shiftDown;
       mPreviousSelection = null;
       mDragStart = point;
@@ -2264,11 +2254,6 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Simple Access
-    @SuppressWarnings("unused")
-    boolean wasControlDown()
-    {
-      return mWasControlDown;
-    }
 
     boolean wasShiftDown(){
       return mWasShiftDown;
@@ -2287,12 +2272,6 @@ public class GraphEditorPanel
     Point getDragStart()
     {
       return mDragStart;
-    }
-
-    @SuppressWarnings("unused")
-	Point getDragStartOnGrid()
-    {
-      return mDragStartOnGrid;
     }
 
     Point getDragCurrent()
@@ -2449,10 +2428,6 @@ public class GraphEditorPanel
     //#######################################################################
     //# Data Members
     /**
-     * Whether control was pressed when this drag action was started.
-     */
-    private final boolean mWasControlDown;
-    /**
      * Whether shift was pressed when this drag action was started.
      */
     private final boolean mWasShiftDown;
@@ -2498,14 +2473,9 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private BigInternalDragAction(final MouseEvent event, final Point start)
+    private BigInternalDragAction(final Point start)
     {
-      super(event, start);
-    }
-
-    private BigInternalDragAction(final MouseEvent event, final Point start, final Point snapped)
-    {
-      super(event, start, snapped);
+      super(start);
     }
 
     //#######################################################################
@@ -2564,9 +2534,9 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionSelect(final MouseEvent event, final Point start)
+    private InternalDragActionSelect(final Point start)
     {
-      super(event, start);
+      super(start);
       if (mFocusedObject instanceof LabelBlockSubject &&
           isSelected(mFocusedObject)) {
         mLabelBlock = (LabelBlockSubject) mFocusedObject;
@@ -2685,16 +2655,15 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionMove(final MouseEvent event, final Point start)
+    private InternalDragActionMove(final Point start)
     {
-      this(event, mFocusedObject, start);
+      this(mFocusedObject, start);
     }
 
-    private InternalDragActionMove(final MouseEvent event,
-                                   final ProxySubject clicked,
+    private InternalDragActionMove(final ProxySubject clicked,
                                    final Point start)
     {
-      super(event, start);
+      super(start);
       //mClickedObject = clicked;
       mClickedObjectWasSelected = clicked != null && isSelected(clicked);
       mMovedObject = mFocusedObject;
@@ -2809,19 +2778,18 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionDND(final MouseEvent event,
-                                  final ProxySubject label,
+    private InternalDragActionDND(final ProxySubject label,
                                   final Point start)
     {
-      super(event, start);
+      super(start);
       mClickedLabel = label;
       addToSelection(mClickedLabel);
       mExternalDragStatus = DragOverStatus.NOTDRAG;
     }
-//TODO do I need to change these ???
+
     private InternalDragActionDND(final Point point)
     {
-      super(point, point, false, false);
+      super(point);
       mClickedLabel = null;
       mExternalDragStatus = DragOverStatus.NOTDRAG;
     }
@@ -3197,9 +3165,9 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionInitial(final MouseEvent event, final Point start)
+    private InternalDragActionInitial(final Point start)
     {
-      super(event, start);
+      super(start);
       mNode = (SimpleNodeSubject) mFocusedObject;
       replaceSelection(mFocusedObject);
     }
@@ -3252,11 +3220,10 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionCreateGroupNode(final MouseEvent event)
+    private InternalDragActionCreateGroupNode(final Point start)
     {
-      super(event,
-            Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get() ?
-            findGrid(event.getPoint()) : event.getPoint());
+      super(Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get() ?
+            findGrid(start) : start);
       clearSelection();
     }
 
@@ -3302,11 +3269,10 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionResizeGroupNode(final MouseEvent event,
-                                              final Handle handle,
+    private InternalDragActionResizeGroupNode(final Handle handle,
                                               final Point start)
     {
-      super(event, start);
+      super(start);
       mGroup = (GroupNodeSubject) mFocusedObject;
       replaceSelection(mFocusedObject);
       final Rectangle2D rect = mGroup.getGeometry().getRectangle();
@@ -3505,9 +3471,9 @@ public class GraphEditorPanel
     /**
      * Creates a drag action to create a new edge.
      */
-    private InternalDragActionEdge(final MouseEvent event, final Point start)
+    private InternalDragActionEdge(final Point start)
     {
-      super(event, start);
+      super(start);
       mSource = (NodeSubject) mFocusedObject;
       mAnchor = GeometryTools.getDefaultPosition(mSource, getDragStart());
       mIsSource = false;
@@ -3518,14 +3484,13 @@ public class GraphEditorPanel
     }
 
     /**
-     * Creates a drag action to redirect the redirect the source or
+     * Creates a drag action to redirect the source or
      * target of an edge.
      */
-    private InternalDragActionEdge(final MouseEvent event,
-                                   final Handle handle,
+    private InternalDragActionEdge(final Handle handle,
                                    final Point start)
     {
-      super(event, start);
+      super(start);
       mSource = null;
       mAnchor = null;
       mOrigEdge = (EdgeSubject) mFocusedObject;
@@ -4412,18 +4377,10 @@ public class GraphEditorPanel
               mSelectedList.add(block);
               change = true;
             }
-         //   if (block.getEventListModifiable().size() > 1 ) {
-              if (mSelectedSet.add(subject)) {
-                mSelectedList.add(subject);
-                change = true;
-              }
-          /*  }
-            else if(!block.getEventListModifiable().contains(subject) || ctrlDown){
-              if (mSelectedSet.add(subject)) {
-                mSelectedList.add(subject);
-                change = true;
-              }
-            }*/
+            if (mSelectedSet.add(subject)) {
+              mSelectedList.add(subject);
+              change = true;
+            }
           }
         } else if (subject instanceof ForeachSubject) {
           final ForeachSubject foreach = (ForeachSubject) subject;
@@ -4448,7 +4405,26 @@ public class GraphEditorPanel
           if (ancestor != null && mSelectedSet.add(ancestor)) {
             mSelectedList.add(ancestor);
             change = true;
+            if(ancestor instanceof EdgeSubject){
+              final EdgeSubject edge = (EdgeSubject)ancestor;
+              final LabelBlockSubject labelBlock = edge.getLabelBlock();
+              final GuardActionBlockSubject guard = edge.getGuardActionBlock();
+              if(mSelectedSet.add(labelBlock)) {
+                mSelectedList.add(labelBlock);
+              }
+              if(guard != null && mSelectedSet.add(guard)) {
+                mSelectedList.add(guard);
+              }
+            }
+            else if(ancestor instanceof SimpleNodeSubject){
+              final SimpleNodeSubject node = (SimpleNodeSubject)ancestor;
+              final LabelGeometrySubject label = node.getLabelGeometry();
+              if(mSelectedSet.add(label)) {
+                mSelectedList.add(label);
+              }
+            }
           }
+
         }
       }
       return change;
