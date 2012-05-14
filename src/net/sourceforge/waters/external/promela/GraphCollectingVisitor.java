@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
 import net.sourceforge.waters.external.promela.ast.BreakStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
@@ -18,6 +17,7 @@ import net.sourceforge.waters.external.promela.ast.DoConditionTreeNode;
 import net.sourceforge.waters.external.promela.ast.GotoTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.InitialTreeNode;
+import net.sourceforge.waters.external.promela.ast.IntegerTreeNode;
 import net.sourceforge.waters.external.promela.ast.LabelTreeNode;
 import net.sourceforge.waters.external.promela.ast.ModuleTreeNode;
 import net.sourceforge.waters.external.promela.ast.MsgTreeNode;
@@ -36,7 +36,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -76,7 +76,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   Hashtable<String,Integer> copyOfOccur = new Hashtable<String,Integer>();
   Collection<Proxy> mComponents = new ArrayList<Proxy>();
 
-  //This is an accessor to the symbol table that is used for storing variables in
+  //This is a reference to the symbol table that is used for storing variables in
   private SymbolTable mSymbolTable;
 
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
@@ -99,11 +99,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return (PromelaGraph) node.acceptVisitor(this);
   }
 
-  public Collection<EventDeclProxy> getEvent(){
+  public Collection<EventDeclProxy> getEvent()
+  {
     return mEvents;
   }
 
-  public Collection<Proxy> getComponents(){
+  public Collection<Proxy> getComponents()
+  {
     return mComponents;
   }
 
@@ -119,7 +121,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
       {
         final VardefTreeNode node = (VardefTreeNode)mSymbolTable.get(keyName);
 
-        createVariable(keyName, node);
+        final VariableComponentProxy var = createVariable(keyName, node, t);
+        if(var != null)
+          mComponents.add(var);
       }
     }
 
@@ -136,21 +140,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
     //Retrieve the symbol table for the current position
     mSymbolTable = t.getSymbolTable();
 
-    //Now, create the variables
-    for(final String keyName : mSymbolTable.getLocalKeys())
-    {
-      if(mSymbolTable.get(keyName) instanceof VardefTreeNode
-        && ((VardefTreeNode) mSymbolTable.get(keyName)).isVisible())
-      {
-        final VardefTreeNode node = (VardefTreeNode)mSymbolTable.get(keyName);
-
-        createVariable(keyName, node, t);
-      }
-    }
-
     mUnWinding = false;
     final String procName = t.getText();
     final int occurance = mVisitor.getOccur().get(procName);
+
     //visit child 1
     final PromelaTree statement = (PromelaTree) t.getChild(1);
     PromelaGraph g = collectGraphs(statement);
@@ -179,8 +172,23 @@ public class GraphCollectingVisitor implements PromelaVisitor
     g = PromelaGraph.sequentialComposition(newGraph, g,mUnWinding,mFactory);
     final GraphProxy graph = g.createGraphProxy(mFactory, procName);
     SimpleComponentProxy component;
-    if(occurance ==1)
+
+    if(occurance == 1)
     {
+      //Create the variables
+      for(final String keyName : mSymbolTable.getLocalKeys())
+      {
+        if(mSymbolTable.get(keyName) instanceof VardefTreeNode
+          && ((VardefTreeNode) mSymbolTable.get(keyName)).isVisible())
+        {
+          final VardefTreeNode node = (VardefTreeNode)mSymbolTable.get(keyName);
+
+          final VariableComponentProxy var = createVariable(keyName, node, t);
+          if(var != null)
+            mComponents.add(var);
+        }
+      }
+
       final IdentifierProxy name = mFactory.createSimpleIdentifierProxy("proctype_"+procName);
       component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
       mComponents.add(component);
@@ -188,7 +196,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     else
     {
       final Collection<SimpleIdentifierProxy> procs = new ArrayList<SimpleIdentifierProxy>();
-      for(int i=0;i<occurance;i++)
+      for(int i=0; i<occurance; i++)
       {
         final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(procName+"_"+i);
         procs.add(id);
@@ -200,12 +208,24 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
       final IndexedIdentifierProxy name = mFactory.createIndexedIdentifierProxy("proctype_"+procName,indexes);
 
-
       component = mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
-      //mFactory.c
 
       final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(procs);
-      final Collection<SimpleComponentProxy> c = new ArrayList<SimpleComponentProxy>();
+      final Collection<ComponentProxy> c = new ArrayList<ComponentProxy>();
+
+      //Create the variables
+      for(final String keyName : mSymbolTable.getLocalKeys())
+      {
+        if(mSymbolTable.get(keyName) instanceof VardefTreeNode
+          && ((VardefTreeNode) mSymbolTable.get(keyName)).isVisible())
+        {
+          final VardefTreeNode node = (VardefTreeNode)mSymbolTable.get(keyName);
+
+          final VariableComponentProxy var = createIndexedVariable(keyName, node, t);
+          if(var != null)
+            c.add(var);
+        }
+      }
 
       c.add(component);
       final ForeachProxy f = mFactory.createForeachProxy("procid", en,null,c);
@@ -220,32 +240,16 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitMsg(final MsgTreeNode t)
   {
-    for(int i=0;i<t.getChildCount();i++){
-      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+    for(int i=0; i<t.getChildCount(); i++)
+    {
+      ((PromelaTree)t.getChild(i)).acceptVisitor(this);
     }
     return null;
   }
 
   public Object visitVar(final VardefTreeNode t)
   {
-
     //Nothing to do here, as it was done by the event collecting visitor class
-
-    /**
-     * This is old stuff, and is left in for future reference
-     */
-    /*
-    final Tree tree = t.getChild(0);
-
-    for(int i=1;i<t.getChildCount();i++){
-      if(tree.getText().equals("mtype")){
-
-        proctypeVar.put(t.getChild(i).getText(),"mtype");
-      }else if(tree.getText().equals("byte")){
-
-        proctypeVar.put(t.getChild(i).getText(),"byte");
-      }
-    }*/
     return null;
   }
 
@@ -254,11 +258,164 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final String name = t.getChild(0).getText();
     chanNames.add(name);
     final ChanInfo ch = mVisitor.getChan().get(name);
-   // @SuppressWarnings("unused")
     final ModuleProxyCloner cloner = mFactory.getCloner();
 
-    if(ch.getChanLength()==1){
+    if(ch.getChanLength()==1)
+    {
+      visit_ExchangeChannel(name, ch);
+    }
+    else if(ch.getChanLength()>1)
+    {
+      visit_BufferedChannel(name, ch, cloner);
+    }
 
+    for(int i=0;i<t.getChildCount();i++)
+    {
+      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+    }
+    return null;
+  }
+
+  private void visit_ExchangeChannel(final String name, final ChanInfo ch)
+  {
+    final Collection<NodeProxy> mNodes = new ArrayList<NodeProxy>();
+    final Collection<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
+    final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
+    final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(accepting);
+    final List<SimpleIdentifierProxy> list = Collections.singletonList(id);
+    final PlainEventListProxy eventList = mFactory.createPlainEventListProxy(list);
+    final NodeProxy start = mFactory.createSimpleNodeProxy("empty", eventList, true, null, null, null);
+
+    mNodes.add(start);
+    loop1:
+    for(final Message msg : ch.getOutput())
+    {
+      if(msg.getMsg().contains(null) || msg.getSenders().size()==0)
+        continue loop1;
+
+      String ename = "s";
+      for(final SimpleExpressionProxy s: msg.getMsg())
+      {
+        ename += "_"+s;
+      }
+      final NodeProxy node = mFactory.createSimpleNodeProxy(ename);
+      mNodes.add(node);
+
+      final Collection<IdentifierProxy> labelBlock = new ArrayList<IdentifierProxy>();
+      for(int i=0;i<msg.getSenders().size();i++)
+      {
+        final String procname = msg.getSenders().get(i);
+
+        /**
+         * The following section has been changed.
+         * Original is contained in GraphCollectingVisitor.java.old
+         * Snippet One
+         * @author Ethan Duff
+         */
+        for(int a=0;a<mVisitor.getOccur().get(procname);a++)
+        {
+          final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+
+          //Not sure why case '== 1' needs to be treated separately
+          if(mVisitor.getOccur().get(procname) == 1 && ch.isSenderPresent()
+            || mVisitor.getOccur().get(procname) != 1)
+          {
+            final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+a);
+            indexes.add(ident);
+          }
+
+          for(int b=0;b<ch.getType().size();b++)
+          {
+            final SimpleExpressionProxy s = msg.getMsg().get(b);
+
+            if(ch.getType().get(b).equals("mtype"))
+            {
+              final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
+              indexes.add(c1);
+            }
+            else
+            {
+              final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+              indexes.add(c1);
+            }
+          }
+          final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("send_"+name, indexes);
+          labelBlock.add(ident);
+        }
+        /**
+         * The above code was changed
+         */
+      }
+
+      final LabelBlockProxy label = mFactory.createLabelBlockProxy(labelBlock, null);
+      if(!labelBlock.isEmpty())
+      {
+        final EdgeProxy sendEdge = mFactory.createEdgeProxy(start, node, label, null, null, null, null);
+        mEdges.add(sendEdge);
+      }
+      final Collection<IdentifierProxy> labelBlock2 = new ArrayList<IdentifierProxy>();
+
+      for(int i=0;i<msg.getRecipients().size();i++)
+      {
+        if(!msg.hasSenders()) break;
+        final String procname = msg.getRecipients().get(i);
+
+        /**
+         * The below code has been changed
+         * Original is contained in GraphCollectingVisitor.java.old
+         * Snippet Two
+         * @author Ethan Duff
+         */
+        for(int a=0;a<mVisitor.getOccur().get(procname);a++)
+        {
+          final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+
+          if(mVisitor.getOccur().get(procname)==1 && ch.isRecipientPresent() || mVisitor.getOccur().get(procname)!=1)
+          {
+            final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+a);
+            indexes.add(ident);
+          }
+          for(int b=0;b<ch.getType().size();b++)
+          {
+            final SimpleExpressionProxy s = msg.getMsg().get(b);
+
+            if(ch.getType().get(b).equals("mtype"))
+            {
+              final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
+              indexes.add(c1);
+            }
+            else
+            {
+              final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+              indexes.add(c1);
+            }
+
+          }
+          final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("recv_"+name, indexes);
+          labelBlock2.add(ident);
+        }
+        /**
+         * The above code was changed
+         */
+      }
+      final LabelBlockProxy label2 = mFactory.createLabelBlockProxy(labelBlock2, null);
+      if(!labelBlock2.isEmpty())
+      {
+        final EdgeProxy recvEdge = mFactory.createEdgeProxy(node, start, label2, null, null, null, null);
+        mEdges.add(recvEdge);
+      }
+    }
+
+    final GraphProxy graph = mFactory.createGraphProxy(true, null, mNodes, mEdges);
+    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("channel_"+name);
+    final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
+    mComponents.add(component);
+  }
+
+  private void visit_BufferedChannel(final String name, final ChanInfo ch, final ModuleProxyCloner cloner)
+  {
+    for(int l=0;l<=ch.getChanLength()-1;l++)
+    {
       final Collection<NodeProxy> mNodes = new ArrayList<NodeProxy>();
       final Collection<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
       final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
@@ -266,13 +423,15 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final List<SimpleIdentifierProxy> list = Collections.singletonList(id);
       final PlainEventListProxy eventList = mFactory.createPlainEventListProxy(list);
       final NodeProxy start = mFactory.createSimpleNodeProxy("empty", eventList, true, null, null, null);
-
       mNodes.add(start);
-      loop1:
-      for(final Message msg : ch.getOutput()){
-        if(msg.getMsg().contains(null) || msg.getSenders().size()==0)
-          continue loop1;
 
+      loop1:
+      for(final Message msg : ch.getOutput())
+      {
+        if(msg.getMsg().contains(null) || msg.getSenders().size()==0)
+        {
+          continue loop1;
+        }
         String ename = "s";
         for(final SimpleExpressionProxy s: msg.getMsg())
         {
@@ -282,294 +441,170 @@ public class GraphCollectingVisitor implements PromelaVisitor
         mNodes.add(node);
 
         final Collection<IdentifierProxy> labelBlock = new ArrayList<IdentifierProxy>();
+        final Collection<IdentifierProxy> labelBlock2 = new ArrayList<IdentifierProxy>();
+        final Collection<IdentifierProxy> labelBlock3 = new ArrayList<IdentifierProxy>();
+
         for(int i=0;i<msg.getSenders().size();i++)
         {
           final String procname = msg.getSenders().get(i);
 
-          /**
-           * The following section has been changed.
-           * Original is contained in GraphCollectingVisitor.java.old
-           * Snippet One
-           * @author Ethan Duff
-           * TODO Use better variable names
-           */
-          for(int a=0;a<mVisitor.getOccur().get(procname);a++)
+          final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+          if(ch.isSenderPresent())
           {
-            final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
-
-            //Not sure why case '== 1' needs to be treated separately
-            if(mVisitor.getOccur().get(procname) == 1 && ch.isSenderPresent()
-              || mVisitor.getOccur().get(procname) != 1)
-            {
-              final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+a);
-              indexes.add(ident);
-            }
-
-            for(int b=0;b<ch.getType().size();b++)
-            {
-              final SimpleExpressionProxy s = msg.getMsg().get(b);
-              if(ch.getType().get(b).equals("byte"))
-              {
-                final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
-                indexes.add(c1);
-              }
-              else if(ch.getType().get(b).equals("mtype"))
-              {
-                final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
-                indexes.add(c1);
-              }
-            }
-            final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("send_"+name, indexes);
-            labelBlock.add(ident);
+            final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+0);
+            indexes.add(ident);
           }
-          /**
-           * The above code was changed
-           */
+          for(int a=0;a<ch.getType().size();a++)
+          {
+            final SimpleExpressionProxy s = msg.getMsg().get(a);
+            if(ch.getType().get(a).equals("mtype"))
+            {
+              final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
+              indexes.add(c1);
+            }
+            else
+            {
+              final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
+              indexes.add(c1);
+            }
+          }
+
+          IndexedIdentifierProxy ident = null;
+          final Collection<SimpleExpressionProxy> copyofindex = cloner.getClonedList(indexes);
+          final IntConstantProxy c0 = mFactory.createIntConstantProxy(l);
+          copyofindex.add(c0);
+          ident = mFactory.createIndexedIdentifierProxy("send_"+name, copyofindex);
+
+          if(l>0)
+          {
+            for(int x=0;x<l;x++)
+            {
+              final Collection<SimpleExpressionProxy> copy= cloner.getClonedList(indexes);
+              final IntConstantProxy c2 = mFactory.createIntConstantProxy(x);
+              copy.add(c2);
+              final IndexedIdentifierProxy ident3 = mFactory.createIndexedIdentifierProxy("send_"+name, copy);
+              labelBlock3.add(ident3);
+            }
+          }
+          labelBlock.add(ident);
+          if(l!=ch.getChanLength()-1)
+          {
+            if(ch.getChanLength()>2)
+            {
+              final IntConstantProxy c2 = (IntConstantProxy) cloner.getClone(c0);
+              indexes.add(c2);
+              final IndexedIdentifierProxy ident2 = mFactory.createIndexedIdentifierProxy("rppl_"+name, cloner.getClonedList(indexes));
+              labelBlock.add(ident2);
+            }
+            else
+            {
+              final IndexedIdentifierProxy ident2 = mFactory.createIndexedIdentifierProxy("rppl_"+name,cloner.getClonedList(indexes));
+              labelBlock.add(ident2);
+            }
+          }
         }
-        final LabelBlockProxy label =
-              mFactory.createLabelBlockProxy(labelBlock, null);
-        if(!labelBlock.isEmpty()){
-          final EdgeProxy sendEdge =
-                mFactory.createEdgeProxy(start, node, label, null, null, null, null);
+
+        final LabelBlockProxy label = mFactory.createLabelBlockProxy(labelBlock, null);
+        final LabelBlockProxy label3 = mFactory.createLabelBlockProxy(labelBlock3,null);
+        if(!labelBlock.isEmpty())
+        {
+          final EdgeProxy sendEdge = mFactory.createEdgeProxy(start, node, label, null, null, null, null);
           mEdges.add(sendEdge);
         }
-        final Collection<IdentifierProxy> labelBlock2 = new ArrayList<IdentifierProxy>();
+        if(!labelBlock3.isEmpty())
+        {
+          EdgeProxy e = null;
+          for(final EdgeProxy ed: mEdges)
+          {
+            if(ed.getSource()==start && ed.getTarget()==start)
+            {
+              e = ed;
+            }
+          }
+          if(e!=null)
+          {
+            final Collection<Proxy> copy= cloner.getClonedList(e.getLabelBlock().getEventList());
+            copy.addAll(labelBlock3);
+            final LabelBlockProxy label4 = mFactory.createLabelBlockProxy(cloner.getClonedList(copy),null);
+            mEdges.remove(e);
+            final EdgeProxy sendingEdge = mFactory.createEdgeProxy(start, start, label4, null, null, null, null);
+            mEdges.add(sendingEdge);
+          }
+          else
+          {
+            final EdgeProxy sendingEdge = mFactory.createEdgeProxy(start, start, label3, null, null, null, null);
+            mEdges.add(sendingEdge);
+          }
+        }
+
+        /*
+         * Receiving
+         */
 
         for(int i=0;i<msg.getRecipients().size();i++)
         {
-          if(!msg.hasSenders()) break;
-          final String procname = msg.getRecipients().get(i);
+          if(!msg.hasSenders())
+            break;
 
-          /**
-           * The below code has been changed
-           * Original is contained in GraphCollectingVisitor.java.old
-           * Snippet Two
-           * @author Ethan Duff
-           * TODO Use better variable names
-           */
-          for(int a=0;a<mVisitor.getOccur().get(procname);a++)
+          final String procname = msg.getRecipients().get(i);
+          if(mVisitor.getOccur().get(procname)==1)
           {
             final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
-
-            if(mVisitor.getOccur().get(procname)==1 && ch.isRecipientPresent()
-              || mVisitor.getOccur().get(procname)!=1)
+            if(ch.isRecipientPresent())
             {
-              final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+a);
+              final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+0);
               indexes.add(ident);
             }
-            for(int b=0;b<ch.getType().size();b++)
+            for(int a=0;a<ch.getType().size();a++)
             {
-              final SimpleExpressionProxy s = msg.getMsg().get(b);
-              if(ch.getType().get(b).equals("byte"))
+              final SimpleExpressionProxy s = msg.getMsg().get(a);
+              if(ch.getType().get(a).equals("byte"))
               {
                 final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
                 indexes.add(c1);
               }
-              else if(ch.getType().get(b).equals("mtype"))
+              else if(ch.getType().get(a).equals("mtype"))
               {
                 final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
                 indexes.add(c1);
               }
             }
-            final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("recv_"+name, indexes);
+            IndexedIdentifierProxy ident = null;
+            if(l==0)
+            {
+              ident = mFactory.createIndexedIdentifierProxy("recv_"+name, indexes);
+            }
+            else
+            {
+              if(ch.getChanLength()>2)
+              {
+              final IntConstantProxy c2 = mFactory.createIntConstantProxy(l-1);
+              indexes.add(c2);
+              ident = mFactory.createIndexedIdentifierProxy("rppl_"+name, indexes);
+              }
+              else
+              {
+                ident = mFactory.createIndexedIdentifierProxy("rppl_"+name, indexes);
+              }
+            }
             labelBlock2.add(ident);
           }
-          /**
-           * The above code was changed
-           */
         }
-        final LabelBlockProxy label2 =
-            mFactory.createLabelBlockProxy(labelBlock2, null);
-        if(!labelBlock2.isEmpty()){
-          final EdgeProxy recvEdge =
-              mFactory.createEdgeProxy(node, start, label2, null, null, null, null);
+        final LabelBlockProxy label2 = mFactory.createLabelBlockProxy(labelBlock2, null);
+        if(!labelBlock2.isEmpty())
+        {
+          final EdgeProxy recvEdge = mFactory.createEdgeProxy(node, start, label2, null, null, null, null);
           mEdges.add(recvEdge);
         }
       }
-
       final GraphProxy graph = mFactory.createGraphProxy(true, null, mNodes, mEdges);
-      final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("channel_"+name);
+      final IntConstantProxy ch_index = mFactory.createIntConstantProxy(l);
+      final Collection<SimpleExpressionProxy> ChIndex = new ArrayList<SimpleExpressionProxy>();
+      ChIndex.add(ch_index);
+      final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("channel_"+name, ChIndex);
       final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
       mComponents.add(component);
     }
-    else if(ch.getChanLength()>1)
-    {
-      for(int l=0;l<=ch.getChanLength()-1;l++){
-        final Collection<NodeProxy> mNodes = new ArrayList<NodeProxy>();
-        final Collection<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
-        final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
-        final SimpleIdentifierProxy id =
-            mFactory.createSimpleIdentifierProxy(accepting);
-        final List<SimpleIdentifierProxy> list = Collections.singletonList(id);
-        final PlainEventListProxy eventList =
-            mFactory.createPlainEventListProxy(list);
-        final NodeProxy start = mFactory.createSimpleNodeProxy("empty", eventList, true, null, null, null);
-        mNodes.add(start);
-
-        loop1:
-        for(final Message msg : ch.getOutput()){
-          if(msg.getMsg().contains(null) || msg.getSenders().size()==0){
-            continue loop1;
-          }
-          String ename = "s";
-          for(final SimpleExpressionProxy s: msg.getMsg()){
-            ename += "_"+s;
-          }
-          final NodeProxy node = mFactory.createSimpleNodeProxy(ename);
-          mNodes.add(node);
-
-          final Collection<IdentifierProxy> labelBlock = new ArrayList<IdentifierProxy>();
-          final Collection<IdentifierProxy> labelBlock2 = new ArrayList<IdentifierProxy>();
-          final Collection<IdentifierProxy> labelBlock3 = new ArrayList<IdentifierProxy>();
-          //final Collection<IdentifierProxy> returnLabelBlock = new ArrayList<IdentifierProxy>();
-          for(int i=0;i<msg.getSenders().size();i++){
-            final String procname = msg.getSenders().get(i);
-           // if(mVisitor.getOccur().get(procname)==1){
-              final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
-              if(ch.isSenderPresent()){
-                final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+0);
-                indexes.add(ident);
-              }
-              for(int a=0;a<ch.getType().size();a++){
-                final SimpleExpressionProxy s = msg.getMsg().get(a);
-                if(ch.getType().get(a).equals("byte")){
-                  final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
-                  //final IntConstantProxy c2 = mFactory.createIntConstantProxy(l);
-                  indexes.add(c1);
-                  //indexes.add(c2);
-                }else if(ch.getType().get(a).equals("mtype")){
-                  final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
-                //  final IntConstantProxy c2 = mFactory.createIntConstantProxy(l);
-                  indexes.add(c1);
-               // indexes.add(c2);
-                }
-              }
-
-              IndexedIdentifierProxy ident = null;
-              final Collection<SimpleExpressionProxy> copyofindex = cloner.getClonedList(indexes);
-              final IntConstantProxy c0 = mFactory.createIntConstantProxy(l);
-              copyofindex.add(c0);
-              ident = mFactory.createIndexedIdentifierProxy("send_"+name, copyofindex);
-          //    labelBlock.add(ident);
-              if(l>0){
-                for(int x=0;x<l;x++){
-                  final Collection<SimpleExpressionProxy> copy= cloner.getClonedList(indexes);
-                  final IntConstantProxy c2 = mFactory.createIntConstantProxy(x);
-                  copy.add(c2);
-                  final IndexedIdentifierProxy ident3 = mFactory.createIndexedIdentifierProxy("send_"+name, copy);
-                  labelBlock3.add(ident3);
-                }
-              }
-              labelBlock.add(ident);
-              if(l!=ch.getChanLength()-1){
-                if(ch.getChanLength()>2){
-                  final IntConstantProxy c2 = (IntConstantProxy) cloner.getClone(c0);//mFactory.createIntConstantProxy(l);
-                  indexes.add(c2);
-                  final IndexedIdentifierProxy ident2 = mFactory.createIndexedIdentifierProxy("rppl_"+name, cloner.getClonedList(indexes));
-                  labelBlock.add(ident2);
-                }else{
-                  final IndexedIdentifierProxy ident2 = mFactory.createIndexedIdentifierProxy("rppl_"+name,cloner.getClonedList(indexes));
-                  labelBlock.add(ident2);
-                }
-              }
-
-          }
-
-          final LabelBlockProxy label =
-              mFactory.createLabelBlockProxy(labelBlock, null);
-          final LabelBlockProxy label3 =
-              mFactory.createLabelBlockProxy(labelBlock3,null);
-          if(!labelBlock.isEmpty()){
-            final EdgeProxy sendEdge =
-                  mFactory.createEdgeProxy(start, node, label, null, null, null, null);
-            mEdges.add(sendEdge);
-          }
-          if(!labelBlock3.isEmpty()){
-            EdgeProxy e = null;
-            for(final EdgeProxy ed: mEdges){
-              if(ed.getSource()==start && ed.getTarget()==start){
-                e = ed;
-              }
-            }
-            if(e!=null){
-              final Collection<Proxy> copy= cloner.getClonedList(e.getLabelBlock().getEventList());
-              copy.addAll(labelBlock3);
-              final LabelBlockProxy label4 =
-                  mFactory.createLabelBlockProxy(cloner.getClonedList(copy),null);
-              mEdges.remove(e);
-              final EdgeProxy sendingEdge =
-                  mFactory.createEdgeProxy(start, start, label4, null, null, null, null);
-              mEdges.add(sendingEdge);
-            }else{
-              final EdgeProxy sendingEdge =
-                  mFactory.createEdgeProxy(start, start, label3, null, null, null, null);
-              mEdges.add(sendingEdge);
-            }
-          }
-
-          /*
-           * Receiving
-           */
-
-          for(int i=0;i<msg.getRecipients().size();i++){
-
-              if(!msg.hasSenders()) break;
-              final String procname = msg.getRecipients().get(i);
-              if(mVisitor.getOccur().get(procname)==1){
-
-                final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
-                if(ch.isRecipientPresent()){
-                  final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(procname+"_"+0);
-                  indexes.add(ident);
-                }
-                for(int a=0;a<ch.getType().size();a++){
-                  final SimpleExpressionProxy s = msg.getMsg().get(a);
-                  if(ch.getType().get(a).equals("byte")){
-                    final IntConstantProxy c1 = mFactory.createIntConstantProxy(Integer.parseInt(s.toString()));
-                    indexes.add(c1);
-                  }else if(ch.getType().get(a).equals("mtype")){
-                    final IdentifierProxy c1 = mFactory.createSimpleIdentifierProxy(s.toString());
-                    indexes.add(c1);
-                  }
-                }
-                IndexedIdentifierProxy ident = null;
-                if(l==0){
-                  ident = mFactory.createIndexedIdentifierProxy("recv_"+name, indexes);
-                }else{
-                  if(ch.getChanLength()>2){
-                  final IntConstantProxy c2 = mFactory.createIntConstantProxy(l-1);
-                  indexes.add(c2);
-                  ident = mFactory.createIndexedIdentifierProxy("rppl_"+name, indexes);
-                  }else{
-                    ident = mFactory.createIndexedIdentifierProxy("rppl_"+name, indexes);
-                  }
-                }
-                labelBlock2.add(ident);
-
-              }
-
-          }
-          final LabelBlockProxy label2 =
-              mFactory.createLabelBlockProxy(labelBlock2, null);
-          if(!labelBlock2.isEmpty()){
-            final EdgeProxy recvEdge =
-                mFactory.createEdgeProxy(node, start, label2, null, null, null, null);
-            mEdges.add(recvEdge);
-          }
-        }
-        final GraphProxy graph = mFactory.createGraphProxy(true, null, mNodes, mEdges);
-        final IntConstantProxy ch_index = mFactory.createIntConstantProxy(l);
-        final Collection<SimpleExpressionProxy> ChIndex = new ArrayList<SimpleExpressionProxy>();
-        ChIndex.add(ch_index);
-        final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("channel_"+name, ChIndex);
-        final SimpleComponentProxy component = mFactory.createSimpleComponentProxy(ident, ComponentKind.PLANT, graph);
-        mComponents.add(component);
-      }
-    }
-    for(int i=0;i<t.getChildCount();i++){
-      ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
-    }
-    return null;
   }
 
   public Object visitProcTypeStatement(final ProctypeStatementTreeNode t)
@@ -582,13 +617,17 @@ public class GraphCollectingVisitor implements PromelaVisitor
     PromelaGraph result = null;
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
     result = PromelaGraph.sequentialComposition(result,step,mUnWinding,mFactory);
-    for(final PromelaNode n: result.getNodes()){
-      if(n.isGoto()){
+    for(final PromelaNode n: result.getNodes())
+    {
+      if(n.isGoto())
+      {
         removeNode.add(n);
         final String name = n.getGotoLabel();
         final PromelaNode newNode = mGotoNode.get(name);
-        for(final PromelaEdge e: result.getEdges()){
-          if(e.getTarget()==n){
+        for(final PromelaEdge e: result.getEdges())
+        {
+          if(e.getTarget()==n)
+          {
             final PromelaLabel label = e.getLabelBlock();
             final PromelaNode sourceNode = e.getSource();
             removeEdge.add(e);
@@ -617,7 +656,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final Comparator<SimpleExpressionProxy> comparator = new ExpressionComparator(optable);
     final String chanName = t.getChild(0).getText();
     final ChanInfo ch = mVisitor.getChan().get(chanName);
-    //System.out.println(ch);
+
     final int length = ch.getChanLength();
     Tree tree = t;
     while (!(tree instanceof ProctypeTreeNode))
@@ -853,8 +892,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     runedOnce++;
     final ModuleProxyCloner cloner = mFactory.getCloner();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    final Comparator<SimpleExpressionProxy> comparator =
-      new ExpressionComparator(optable);
+    final Comparator<SimpleExpressionProxy> comparator = new ExpressionComparator(optable);
 
      //receive statement
     final String chanName = t.getChild(0).getText();
@@ -882,17 +920,18 @@ public class GraphCollectingVisitor implements PromelaVisitor
     {
       if(ch.getType().get(y).equals("byte"))
       {
-        //if(labels.get(y+1)!=null){
-        if(!mSymbolTable.containsKey(labels.get(y+1)))
+        if(mSymbolTable.containsKey(labels.get(y+1)))
+        {
+          //TODO Assign value to the variable
+          indexes.add(null);
+        }
+        else
         {
           final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
           indexes.add(c);
           templabel.add(c);
         }
-        else
-        {
-          indexes.add(null);
-        }
+
         final Message msg = new Message(cloner.getClonedList(indexes));
         msgList.add(msg);
       }
@@ -911,6 +950,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         else if(mSymbolTable.containsKey(labels.get(y+1))
           && mSymbolTable.get(labels.get(y+1)) instanceof VardefTreeNode)
         {
+          //indexes.add(null);
           for(final Map.Entry<String,PromelaTree> entry : mSymbolTable.getEntrySet())
           {
             indexes = new ArrayList<SimpleExpressionProxy>();
@@ -927,6 +967,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         else
         {
           //TODO Not sure what to do here, probably throw error
+          //May not even be possible to reach here
           System.err.println("HERE");
         }
       }
@@ -935,18 +976,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
      * Used to create Event declaration
      */
 
-    //final List<SimpleExpressionProxy> index = new ArrayList<SimpleExpressionProxy>(indexes);
-    //final Message msg = new Message(index);
     final List<IdentifierProxy> events = new ArrayList<IdentifierProxy>();
 
-    //for(final Message m: ch.getOutput()){
-    for(int currentMessage = 0; currentMessage < ch.getOutput().size(); currentMessage++)
+    for(final Message m: ch.getOutput())
     {
-      final Message m = ch.getOutput().get(currentMessage);
-
       boolean isSame = false;
 
-      //TODO Update this to make it work for the mtypes
       for(final Message allmsg: msgList)
       {
         if(allmsg.equals(m))
@@ -968,9 +1003,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
           }
           if(!m2.getMsg().contains(null) && !m.getMsg().contains(null))
           {
-            for(int i=0;i< m.getMsg().size();i++)
+            for(int i=0; i<m.getMsg().size(); i++)
             {
-              if(comparator.compare(m.getMsg().get(i),m2.getMsg().get(i))!=0)
+              if(comparator.compare(m.getMsg().get(i), m2.getMsg().get(i))!=0)
               {
                 continue loop2;
               }
@@ -989,8 +1024,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
               }
               else if (mVisitor.getOccur().get(s)>1)
               {
-                //TODO
-                for(int i=0;i<mVisitor.getOccur().get(s);i++)
+                //TODO I have no idea why this todo is here -- Was here before me. Ethan Duff
+                for(int i=0; i<mVisitor.getOccur().get(s); i++)
                 {
                   final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(s+"_"+i);
                   senders.add(ident);
@@ -1022,7 +1057,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
             }
             else if(indexes.size()>1)
             {
-              //TODO
+              //TODO I have no idea why this todo is here -- Was here before me
               boolean test = false;
               final ArrayList<SimpleExpressionProxy> l = new ArrayList<SimpleExpressionProxy>(indexes);
               for(int i=0;i<indexes.size();i++)
@@ -1085,7 +1120,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       isSame = false;
     }
     final boolean isEnd = checkEnd(t.getParent());
-    //  final boolean isEnd = false;
+
     return new PromelaGraph(events,isEnd,mFactory);
   }
 
@@ -1279,12 +1314,15 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return null;
   }
 
-  public Collection<String> distinct(final Collection<String> t,final Collection<String> output){
+  public Collection<String> distinct(final Collection<String> t,final Collection<String> output)
+  {
     final ArrayList<String> temp = new ArrayList<String>(t);
-    for(int i=0;i<t.size();i++){
+    for(int i=0;i<t.size();i++)
+    {
       final String compare = temp.get(i);
       temp.set(i, null);
-      if(temp.contains(compare)){
+      if(temp.contains(compare))
+      {
         output.add(compare);
       }
     }
@@ -1293,7 +1331,6 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitInitialStatement(final InitialStatementTreeNode t)
   {
-    //assert t.getText().equals("atomic");
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("initrun");
     final PromelaGraph initGraph = new PromelaGraph(ident,false);
     return initGraph;
@@ -1304,23 +1341,29 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final String name = t.getChild(0).getText();
     PromelaGraph graph=null;
     final boolean isEnd = checkEnd(t.getParent());
-    if(!mIsInit){
+    if(!mIsInit)
+    {
 
-    }else{
-
+    }
+    else
+    {
       final int occur1 = mVisitor.getOccur().get(name);
       final int occur2 = copyOfOccur.get(name);
-      if(occur1>1){
-      if(occur1-occur2 < occur1){
-        final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
-        final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(name+"_"+(occur1-occur2));
-        indexes.add(id);
-        //final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
-        final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
-        graph = new PromelaGraph(ident,isEnd);
+      if(occur1>1)
+      {
+        if(occur1-occur2 < occur1)
+        {
+          final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+          final IdentifierProxy id = mFactory.createSimpleIdentifierProxy(name+"_"+(occur1-occur2));
+          indexes.add(id);
+          //final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
+          final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
+          graph = new PromelaGraph(ident,isEnd);
+        }
+        copyOfOccur.put(name,occur2-1);
       }
-      copyOfOccur.put(name,occur2-1);
-      }else{
+      else
+      {
         final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
         graph = new PromelaGraph(ident,isEnd);
       }
@@ -1331,33 +1374,49 @@ public class GraphCollectingVisitor implements PromelaVisitor
   //return graph of init events
   public Object visitName(final NameTreeNode t)
   {
-    if(t.getParent() instanceof RunTreeNode){
+    if(t.getParent() instanceof RunTreeNode)
+    {
       procNames.add(t.getText());
-    }else if(t.getParent() instanceof MsgTreeNode){
-     // if(proctypeVar.isEmpty() || (!proctypeVar.containsKey(t.getText()) && !mVisitor.getGlobalVar().containsKey(t.getText()))){
-        //labels.add(null);
-     // }else
-      if(mSymbolTable.containsKey(t.getText())){
+    }
+    else if(t.getParent() instanceof MsgTreeNode)
+    {
+      if(mSymbolTable.containsKey(t.getText()))
+      {
           labels.add(t.getText());
       }
-    }else if(t.getParent() instanceof SendTreeNode){
-      if(!mVisitor.getChanMsg().contains(t.getText())){
-        if(mSymbolTable.containsKey(t.getText())){
+    }
+    else if(t.getParent() instanceof SendTreeNode)
+    {
+      if(!mVisitor.getChanMsg().contains(t.getText()))
+      {
+        if(mSymbolTable.containsKey(t.getText()))
+        {
           labels.add(t.getText());
         }
       }
     }
-    else if(t.getParent() instanceof ReceiveTreeNode){
-      if(!mVisitor.getChanMsg().contains(t.getText())){
+    else if(t.getParent() instanceof ReceiveTreeNode)
+    {
+      if(!mVisitor.getChanMsg().contains(t.getText()))
+      {
         Tree tree = t;
-        while (!(tree instanceof ProctypeTreeNode)) {
+        while (!(tree instanceof ProctypeTreeNode))
+        {
           tree = tree.getParent();
         }
-        if(mSymbolTable.containsKey(t.getText())){
+        if(mSymbolTable.containsKey(t.getText()))
+        {
           labels.add(t.getText());
         }
-      }else{
-       // labels.add(t.getText());
+      }
+      else if(t.getParent() instanceof ReceiveTreeNode)
+      {
+        //Do nothing, as is handled elsewhere
+      }
+      else
+      {
+        System.err.println("GraphCollectingVisitor.visitName()\n" +
+          "Parent of NameTreeNode is of unexpected type " + ((Object)t.getParent()).getClass());
       }
     }
 
@@ -1367,11 +1426,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitSemicolon(final SemicolonTreeNode t)
   {
     PromelaGraph result = null;
-      for(int i=0;i<t.getChildCount();i++){
-        final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-        mUnWinding = false;
-        result = PromelaGraph.sequentialComposition(result,step,mUnWinding,mFactory);
-      }
+    for(int i=0;i<t.getChildCount();i++)
+    {
+      final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
+      mUnWinding = false;
+      result = PromelaGraph.sequentialComposition(result,step,mUnWinding,mFactory);
+    }
     return result;
   }
 
@@ -1384,11 +1444,11 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     PromelaGraph result = null;
     final boolean isEnd = checkEnd(t.getParent());
-    for(int i=0;i<t.getChildCount();i++){
+    for(int i=0;i<t.getChildCount();i++)
+    {
       mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       result = PromelaGraph.combineComposition(result,step,mUnWinding,isEnd,mFactory);
-
     }
 
     return result;
@@ -1400,19 +1460,21 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final boolean isEnd = checkEnd(t.getParent());
     counter =counter+1;
     Tree tree = t;
-    while(!(tree instanceof ProctypeTreeNode)){
+    while(!(tree instanceof ProctypeTreeNode))
+    {
       tree = tree.getParent();
     }
     final PromelaGraph result;
 
     final PromelaNode endNode = new PromelaNode(PromelaNode.EndType.END);
     final List<PromelaGraph> branches = new ArrayList<PromelaGraph>();
-    for(int i=0;i<t.getChildCount();i++){
+    for(int i=0; i<t.getChildCount(); i++)
+    {
       mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       branches.add(step);
     }
-   // final boolean isEnd = false;
+    //final boolean isEnd = false;
     result = PromelaGraph.doCombineComposition2(branches, unwinding,isEnd,mFactory);
     mLabelEnd.put(""+counter,endNode);
 
@@ -1422,17 +1484,21 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitBreak(final BreakStatementTreeNode t)
   {
     final ModuleProxyCloner cloner = mFactory.getCloner();
-    if (!mUnWinding) {
+    if(!mUnWinding)
+    {
       final PromelaNode node = new PromelaNode(PromelaNode.EndType.BREAK);
       final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
       cNodes.add(node);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
       final PromelaGraph result = new PromelaGraph(cNodes,cEdges);
       return result;
-    } else {
+    }
+    else
+    {
       //create step_* transition
       Tree tree = t;
-      while (!(tree instanceof ProctypeTreeNode)) {
+      while (!(tree instanceof ProctypeTreeNode))
+      {
         tree = tree.getParent();
       }
       final String name = tree.getText();
@@ -1445,16 +1511,18 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final IdentifierProxy ident2;
       final Collection<SimpleIdentifierProxy> procs = new ArrayList<SimpleIdentifierProxy>();
       final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
-      if(mVisitor.getOccur().get(name)==1){
+      if(mVisitor.getOccur().get(name)==1)
+      {
         ident = mFactory.createSimpleIdentifierProxy("step_"+name);
         ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
-      }else{
-
-
+      }
+      else
+      {
         final Collection<SimpleIdentifierProxy> list2 = new ArrayList<SimpleIdentifierProxy>();
-        for(int i=0;i<mVisitor.getOccur().get(name);i++){
+        for(int i=0;i<mVisitor.getOccur().get(name);i++)
+        {
           final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(name+"_"+i);
-          //indexes.add(id);
+
           procs.add((SimpleIdentifierProxy) cloner.getClone(id));
         }
         final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(procs);
@@ -1466,16 +1534,22 @@ public class GraphCollectingVisitor implements PromelaVisitor
         list2.add(id2);
         ident2 = mFactory.createIndexedIdentifierProxy("step_"+name,list2);
       }
+
       EventDeclProxy event;
-      if(procs.size()==0){
+      if(procs.size()==0)
+      {
         event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-      }else{
+      }
+      else
+      {
         event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, indexes,null, null);
       }
-      if (!mEvents.contains(event)) {
+
+      if(!mEvents.contains(event))
+      {
        mEvents.add(event);
       }
-     // ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
+
       label.add(ident2);
       final PromelaLabel l = new PromelaLabel(label);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
@@ -1499,7 +1573,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitGoto(final GotoTreeNode t)
   {
-    if (!mUnWinding) {
+    if(!mUnWinding)
+    {
       final String labelName = t.getText();
       final PromelaNode node = new PromelaNode(labelName); //creating goto label
       final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
@@ -1507,9 +1582,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
       final PromelaGraph result = new PromelaGraph(cNodes, cEdges);
       return result;
-    } else {
+    }
+    else
+    {
       Tree tree = t;
-      while (!(tree instanceof ProctypeTreeNode)) {
+      while (!(tree instanceof ProctypeTreeNode))
+      {
         tree = tree.getParent();
       }
       final String name = tree.getText();
@@ -1522,7 +1600,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-      if (!mEvents.contains(event)) {
+      if (!mEvents.contains(event))
+      {
         mEvents.add(event);
       }
       final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
@@ -1538,16 +1617,20 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitSkip(final SkipTreeNode t)
   {
-    if(!mUnWinding){
+    if(!mUnWinding)
+    {
       final PromelaNode node = new PromelaNode(PromelaNode.EndType.END);
       final List<PromelaNode> cNodes = new ArrayList<PromelaNode>();
       cNodes.add(node);
       final List<PromelaEdge> cEdges = new ArrayList<PromelaEdge>();
       final PromelaGraph result = new PromelaGraph(cNodes,cEdges,node);
       return result;
-    } else {
+    }
+    else
+    {
       Tree tree = t;
-      while(!(tree instanceof ProctypeTreeNode)){
+      while(!(tree instanceof ProctypeTreeNode))
+      {
         tree = tree.getParent();
       }
       final String name = tree.getText();
@@ -1560,7 +1643,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final Collection<SimpleExpressionProxy> label = new ArrayList<SimpleExpressionProxy>();
       final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("step_"+name);
       final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE);
-      if(!mEvents.contains(event)){
+      if(!mEvents.contains(event))
+      {
         mEvents.add(event);
       }
       final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("step_"+name);
@@ -1574,20 +1658,16 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
   }
 
-  @SuppressWarnings("unused")
-  public void createChannelGraph()
+  public boolean checkEnd(final Tree t)
   {
-    final String name = chanNames.get(0);
-    final ModuleProxyCloner cloner = mFactory.getCloner();
-
-  }
-
-  public boolean checkEnd(final Tree t){
-    if(t instanceof LabelTreeNode){
+    if(t instanceof LabelTreeNode)
+    {
       final String temp = t.getText();
-      if(temp.length()>=3){
+      if(temp.length() >= 3)
+      {
         final String end = temp.substring(0, 3);
-        if(end.toLowerCase().equals("end")){
+        if(end.toLowerCase().equals("end"))
+        {
           return true;
         }
       }
@@ -1596,31 +1676,20 @@ public class GraphCollectingVisitor implements PromelaVisitor
   }
 
   /**
-   * A method to create a variable.
-   * Variable type will be global
-   * @param variableName The name of the variable
-   * @param variableDefinition The VardefTreeNode containing the definition for the variable
-   */
-  private void createVariable(final String variableName, final VardefTreeNode variableDefinition)
-  {
-    createVariable(variableName, variableDefinition, null);
-  }
-
-  /**
    * A method to create a variable
    * @param variableName The name of the variable
    * @param variableDefinition The VardefTreeNode containing the definition for the variable
    * @param processType The ProctypeTreeNode that contains the process this variable is being created for.
+   * @return The variable that has been created
    */
-  private void createVariable(final String variableName, final VardefTreeNode variableDefinition,
+  private VariableComponentProxy createVariable(final String variableName, final VardefTreeNode variableDefinition,
                               final CommonTree processType)
   {
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
 
-    //TODO make sure that the name doesn't clash other name
-
+    //TODO make sure that the name doesn't clash with other names
     SimpleIdentifierProxy name = null;
-    if(processType == null)
+    if(processType instanceof ModuleTreeNode)
     {
       //This is a global variable
       name = mFactory.createSimpleIdentifierProxy("var_" + variableName);
@@ -1631,14 +1700,147 @@ public class GraphCollectingVisitor implements PromelaVisitor
       name = mFactory.createSimpleIdentifierProxy("var_" + processType.getText()  + "_" + variableName);
     }
 
-    if(variableDefinition.getVariableType().equals("byte"))
-    {
-      final IntConstantProxy zero = mFactory.createIntConstantProxy(0);
-      final IntConstantProxy max = mFactory.createIntConstantProxy(255);
-      final BinaryOperator range = optable.getRangeOperator();
-      final BinaryExpressionProxy type = mFactory.createBinaryExpressionProxy(range, zero, max);
-      final BinaryOperator equals = optable.getEqualsOperator();
+    SimpleExpressionProxy type;
+    SimpleExpressionProxy init;
+    SimpleExpressionProxy initialValue;
 
+    if(variableDefinition.getVariableType().equals("mtype"))
+    {
+      //Get the module tree node that contains the mtype names
+      Tree t = processType;
+      while(!(t instanceof ModuleTreeNode))
+      {
+        t = t.getParent();
+      }
+
+      //Get all of the possible values for the mtype
+      final ArrayList<SimpleIdentifierProxy> values = new ArrayList<SimpleIdentifierProxy>();
+
+      for(final String mtype : ((ModuleTreeNode)t).getMtypes())
+      {
+        values.add(mFactory.createSimpleIdentifierProxy(mtype));
+      }
+
+      type = mFactory.createEnumSetExpressionProxy(values);
+
+      String initialVal = values.get(0).getName();//The default initial value
+      if(false)//TODO get the initial value
+      {
+        initialVal = "";
+      }
+
+      //Specify the initial value
+      initialValue = mFactory.createSimpleIdentifierProxy(initialVal);
+    }
+    else
+    {
+      //Get the initial value
+      int initialVal = 0;//The default initial value
+      for(int i=0; i<variableDefinition.getChildCount(); i++)
+      {
+        final NameTreeNode n = (NameTreeNode)variableDefinition.getChild(i);
+        if(n.getText().equals(variableName))
+        {
+          for(int j=0;j<n.getChildCount(); j++)
+          {
+            if(n.getChild(j) instanceof ConstantTreeNode)
+            {
+              final ConstantTreeNode c = (ConstantTreeNode) n.getChild(j);
+              initialVal = new Integer(c.getText());
+
+              break;
+            }
+          }
+        }
+      }
+
+      //Create the variable range expression
+      final IntConstantProxy zero = mFactory.createIntConstantProxy(0);
+      final IntConstantProxy max = mFactory.createIntConstantProxy((
+        (IntegerTreeNode)mSymbolTable.get(variableDefinition.getVariableType())).getValue());
+      final BinaryOperator range = optable.getRangeOperator();
+      type = mFactory.createBinaryExpressionProxy(range, zero, max);
+
+      //Specify the initial value
+      initialValue = mFactory.createIntConstantProxy(initialVal);
+    }
+
+    //Create the initial value expression
+    final BinaryOperator equals = optable.getEqualsOperator();
+    final SimpleExpressionProxy name_2 = mFactory.createSimpleIdentifierProxy(name.getName());
+
+    init = mFactory.createBinaryExpressionProxy(equals, name_2, initialValue);
+
+    //Create the variable
+    final VariableComponentProxy var = mFactory.createVariableComponentProxy(name, type, true, init);
+    return var;
+  }
+
+  /**
+   * A method to create an indexed variable.
+   * The variables will be indexed by "procid"
+   * @param variableName The name of the variable
+   * @param variableDefinition The VardefTreeNode containing the definition for the variable
+   * @param processType The ProctypeTreeNode that contains the process this variable is being created for.
+   * @return The variable that has been created
+   */
+  private VariableComponentProxy createIndexedVariable(final String variableName, final VardefTreeNode variableDefinition,
+                              final CommonTree processType)
+  {
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+
+    //TODO make sure that the name doesn't clash with other names
+
+    final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>();
+    final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy("procid");
+    indexes.add(id);
+
+    IndexedIdentifierProxy name = null;
+    if(processType == null)
+    {
+      //This is a global variable
+      name = mFactory.createIndexedIdentifierProxy("var_" + variableName, indexes);
+    }
+    else
+    {
+      //This is a local variable
+      name = mFactory.createIndexedIdentifierProxy("var_" + processType.getText()  + "_" + variableName, indexes);
+    }
+
+    SimpleExpressionProxy type;
+    SimpleExpressionProxy init;
+    SimpleExpressionProxy initialValue;
+    if(variableDefinition.getVariableType().equals("mtype"))
+    {
+    //Get the module tree node that contains the mtype names
+      Tree t = processType;
+      while(!(t instanceof ModuleTreeNode))
+      {
+        t = t.getParent();
+      }
+
+      //Get all of the possible values for the mtype
+      final ArrayList<SimpleIdentifierProxy> values = new ArrayList<SimpleIdentifierProxy>();
+
+      for(final String mtype : ((ModuleTreeNode)t).getMtypes())
+      {
+        values.add(mFactory.createSimpleIdentifierProxy(mtype));
+      }
+
+      type = mFactory.createEnumSetExpressionProxy(values);
+
+      String initialVal = values.get(0).getName();//The default initial value
+      if(false)//TODO get the initial value
+      {
+        initialVal = "";
+      }
+
+      //Specify the initial value
+      initialValue = mFactory.createSimpleIdentifierProxy(initialVal);
+    }
+    else
+    {
+      //Get the initial value
       int initialVal = 0;
       for(int i=0; i<variableDefinition.getChildCount(); i++)
       {
@@ -1658,12 +1860,27 @@ public class GraphCollectingVisitor implements PromelaVisitor
         }
       }
 
-      final SimpleIdentifierProxy name_2 = mFactory.createSimpleIdentifierProxy(name.getName());
-      final IntConstantProxy initialValue = mFactory.createIntConstantProxy(initialVal);
-      final BinaryExpressionProxy init = mFactory.createBinaryExpressionProxy(equals, name_2, initialValue);
-      final VariableComponentProxy var = mFactory.createVariableComponentProxy(name, type, true, init);
+      //Create the variable range expression
+      final IntConstantProxy zero = mFactory.createIntConstantProxy(0);
+      final IntConstantProxy max = mFactory.createIntConstantProxy((
+        (IntegerTreeNode)mSymbolTable.get(variableDefinition.getVariableType())).getValue());
+      final BinaryOperator range = optable.getRangeOperator();
+      type = mFactory.createBinaryExpressionProxy(range, zero, max);
 
-      mComponents.add(var);
+      initialValue = mFactory.createIntConstantProxy(initialVal);
+
     }
+
+    //Create the initial value expression
+    final BinaryOperator equals = optable.getEqualsOperator();
+    final Collection<SimpleExpressionProxy> indexes_2 = new ArrayList<SimpleExpressionProxy>();
+    final SimpleIdentifierProxy id_2 = mFactory.createSimpleIdentifierProxy("procid");
+    indexes_2.add(id_2);
+    final IndexedIdentifierProxy name_2 = mFactory.createIndexedIdentifierProxy(name.getName(), indexes_2);
+    init = mFactory.createBinaryExpressionProxy(equals, name_2, initialValue);
+
+    //Create the variable
+    final VariableComponentProxy var = mFactory.createVariableComponentProxy(name, type, true, init);
+    return var;
   }
 }

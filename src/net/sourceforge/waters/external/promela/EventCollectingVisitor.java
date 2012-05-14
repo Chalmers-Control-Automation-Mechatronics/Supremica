@@ -59,7 +59,6 @@ public class EventCollectingVisitor implements PromelaVisitor
   ArrayList<String> labels = new ArrayList<String>();
   private final Hashtable<String, ChanInfo> chan = new Hashtable<String,ChanInfo>();
 
-
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
 
@@ -135,7 +134,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   public void makeMsg()
   {
     final ModuleProxyCloner cloner = mFactory.getCloner();
-    //TODO
+    //TODO I have no idea why this todo is here -- Was here before me. Ethan Duff
     final Comparator<SimpleExpressionProxy> comparator = new ExpressionComparator(optable);
     for(final Map.Entry<String,ChanInfo> chanIn: chan.entrySet())
     {
@@ -212,58 +211,15 @@ public class EventCollectingVisitor implements PromelaVisitor
               {
                 m2.addRecipient(s);
               }
-
-              boolean test = true;
-              for(final Message t1: chanIn.getValue().getOutput())
-              {
-                if(t1.equals(m))
-                {
-                  test = false;
-                  break;
-                }
-                else
-                {
-                  test = true;
-                }
-              }
-              if(test)
-              {
-                chanIn.getValue().addMsgList(m);
-              }
             }
 
-            boolean test = true;
-            for(final Message t1: chanIn.getValue().getOutput())
-            {
-              if(t1.equals(m2))
-              {
-                test = false;
-                break;
-              }
-              else
-              {
-                test = true;
-              }
-            }
-            if(test)
+            if(!chanIn.getValue().getOutput().contains(m2))
             {
               chanIn.getValue().addMsgList(m2);
             }
           }
-          boolean test = true;
-          for(final Message t1: chanIn.getValue().getOutput())
-          {
-            if(t1.equals(m))
-            {
-              test = false;
-              break;
-            }
-            else
-            {
-              test = true;
-            }
-          }
-          if(test)
+
+          if(!chanIn.getValue().getOutput().contains(m))
           {
             chanIn.getValue().addMsgList(m);
           }
@@ -397,26 +353,12 @@ public class EventCollectingVisitor implements PromelaVisitor
           final Collection<String> tempList = new ArrayList<String>();
           for (final String s : sendRange)
           {
-            if(occur.get(s)==1)
+            for(int i=0;i<occur.get(s);i++)
             {
-              final String temp = s + "_0";
-              for (int i = 0; i < occur.get(s); i++)
+              final String temp = s+"_"+i;
+              if(!c.getSenders().contains(temp))
               {
-                if(!c.getSenders().contains(temp))
-                {
-                  tempList.add(temp);
-                }
-              }
-            }
-            else if(occur.get(s)>1)
-            {
-              for(int i=0;i<occur.get(s);i++)
-              {
-                final String temp = s+"_"+i;
-                if(!c.getSenders().contains(temp))
-                {
-                  tempList.add(temp);
-                }
+                tempList.add(temp);
               }
             }
           }
@@ -580,8 +522,7 @@ public class EventCollectingVisitor implements PromelaVisitor
         {
           if(chanIn.getValue().getType().get(i).equals("mtype"))
           {
-            final EnumSetExpressionProxy en =
-              createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
+            final EnumSetExpressionProxy en = createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
             dataRange.add(en);
           }
           else
@@ -708,29 +649,28 @@ public class EventCollectingVisitor implements PromelaVisitor
   {
     final List<SimpleExpressionProxy> rangeValues = table.get(argIndex);
     final int numValues = rangeValues.size();
-    final List<SimpleIdentifierProxy> enumValues = new ArrayList<SimpleIdentifierProxy>(numValues); ;
+    final List<SimpleIdentifierProxy> enumValues = new ArrayList<SimpleIdentifierProxy>(numValues);
 
-    for (int i=0;i<rangeValues.size();i++) {
-        final SimpleIdentifierProxy cloned =
-            (SimpleIdentifierProxy) cloner.getClone(rangeValues.get(i));
+    for (int i=0;i<rangeValues.size();i++)
+    {
+        final SimpleIdentifierProxy cloned = (SimpleIdentifierProxy) cloner.getClone(rangeValues.get(i));
         enumValues.add(cloned);
      }
 
-    final EnumSetExpressionProxy en =
-      mFactory.createEnumSetExpressionProxy(enumValues);
-      return en;
+    final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(enumValues);
+    return en;
   }
 
   //########################################################################
   //# Interface net.sourceforge.waters.external.promela.PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)
   {
-    //final String name = t.getText();
     final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
     final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(accepting);
     final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.PROPOSITION);
     mEventDecls.add(event);
-    for(int i=0;i<t.getChildCount();i++) {
+    for(int i=0; i<t.getChildCount(); i++)
+    {
         ((PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
     return null;
@@ -744,13 +684,11 @@ public class EventCollectingVisitor implements PromelaVisitor
     //Store a reference to the current symbol table inside the node t
     t.setSymbolTable(mSymbolTable);
 
-    for(int i=0;i<t.getChildCount();i++){
+    for(int i=0;i<t.getChildCount();i++)
+    {
         final PromelaTree node = (PromelaTree)t.getChild(i);
         node.acceptVisitor(this);
     }
-
-    //Store the variable names in order inside the node t
-    //
 
     //Are leaving the current context, so move back to the upper level of the table
     mSymbolTable = mSymbolTable.getParentTable();
@@ -914,14 +852,14 @@ public class EventCollectingVisitor implements PromelaVisitor
     {
       if(ch.getType().get(y).equals("byte"))
       {
-        if(!mSymbolTable.containsKey(labels.get(y+1)))
+        if(mSymbolTable.containsKey(labels.get(y+1)))
         {
-        final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
-        indexes.add(c);
+          indexes.add(null);
         }
         else
         {
-          indexes.add(null);
+          final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
+          indexes.add(c);
         }
       }
       else if(ch.getType().get(y).equals("mtype"))
@@ -933,31 +871,18 @@ public class EventCollectingVisitor implements PromelaVisitor
           if(node.getText().equals("mtype"))
           {
             indexes.add(mFactory.createSimpleIdentifierProxy(labels.get(y+1)));
-            final Message msg = new Message(indexes);
-            msg.addRecipient(n);
-            ch.addMessages(msg);
-/*
-            for(final Map.Entry<String,PromelaTree> entry : mSymbolTable.getEntrySet())
-            {
-              final List<SimpleExpressionProxy> tempIndex = new ArrayList<SimpleExpressionProxy>();
-              if(entry.getValue() instanceof NameTreeNode && entry.getValue().getText().equals("mtype"))
-              {
-                final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(entry.getKey());
-                tempIndex.add(c);
-                final Message msg = new Message(indexes);
-                msg.addRecipient(n);
-                ch.addMessages(msg);
-                tempIndex.remove(c);
-              }
-            }*/
           }
           else
           {
+            //I don't think it is possible to get here
             indexes.add(null);
-            final Message msg = new Message(indexes);
-            msg.addRecipient(n);
-            ch.addMessages(msg);
           }
+        }
+        else if(mSymbolTable.containsKey(labels.get(y+1))
+          && mSymbolTable.get(labels.get(y+1)) instanceof VardefTreeNode)
+        {
+          //TODO Add in for variable assignment to mtype?
+          indexes.add(null);
         }
       }
     }
@@ -1055,8 +980,14 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
     else if(t.getParent() instanceof TypeTreeNode)
     {
-      //This is a mtype definition, so add in the string as a reference to its parent
-      //The parent is a TypeTreeNode, with text of "mtype"
+      Tree tree = t;
+      while(!(tree instanceof ModuleTreeNode))
+      {
+        tree = tree.getParent();
+      }
+      ((ModuleTreeNode)tree).addMtype(t.getText());
+
+      //This is a mtype definition, so add in the string as a reference to itself
       if(mSymbolTable.put(t.getText(), t) == false)
       {
         //Error, the name was already taken
@@ -1090,8 +1021,10 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitSemicolon(final SemicolonTreeNode t)
   {
-    if(t.getChildCount()>0){
-      for(int i=0;i<t.getChildCount();i++){
+    if(t.getChildCount()>0)
+    {
+      for(int i=0;i<t.getChildCount();i++)
+      {
         ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
       }
     }
@@ -1101,14 +1034,18 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Object visitType(final TypeTreeNode t)
   {
     //TODO: Add in integer and boolean
-    if(t.getText().equals("byte")){
+    if(t.getText().equals("byte"))
+    {
       //flag = "byte";
       lowerEnd.add("0");
       upperEnd.add("255");
     }
-    else if(t.getText().equals("mtype") && t.getParent() instanceof ModuleTreeNode){
-      if(t.getChildCount()>0){
-        for(int i=0;i<t.getChildCount();i++){
+    else if(t.getText().equals("mtype") && t.getParent() instanceof ModuleTreeNode)
+    {
+      if(t.getChildCount()>0)
+      {
+        for(int i=0;i<t.getChildCount();i++)
+        {
           ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
         }
       }
@@ -1123,8 +1060,10 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitCondition(final ConditionTreeNode t)
   {
-    if(t.getChildCount()>0){
-      for(int i=0;i<t.getChildCount();i++){
+    if(t.getChildCount()>0)
+    {
+      for(int i=0;i<t.getChildCount();i++)
+      {
         ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
       }
     }
@@ -1133,8 +1072,10 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
-    if(t.getChildCount()>0){
-      for(int i=0;i<t.getChildCount();i++){
+    if(t.getChildCount()>0)
+    {
+      for(int i=0;i<t.getChildCount();i++)
+      {
         ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
       }
     }
@@ -1148,8 +1089,10 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   public Object visitLabel(final LabelTreeNode t)
   {
-    if(t.getChildCount()>0){
-      for(int i=0;i<t.getChildCount();i++){
+    if(t.getChildCount()>0)
+    {
+      for(int i=0;i<t.getChildCount();i++)
+      {
         ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
       }
     }

@@ -1,27 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="p108c" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Imported from Promela file p108c.pml.</ns2:Comment>
+<Module Name="p108g" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Imported from Promela file p108g.pml.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="exch_ch">
-            <RangeList>
-                <EnumSetExpression Text="[A_0,A_1]">
-                    <SimpleIdentifier Name="A_0"/>
-                    <SimpleIdentifier Name="A_1"/>
-                </EnumSetExpression>
-                <EnumSetExpression Text="[B_0,B_1]">
-                    <SimpleIdentifier Name="B_0"/>
-                    <SimpleIdentifier Name="B_1"/>
-                </EnumSetExpression>
-                <EnumSetExpression Text="[TRUE,FALSE]">
-                    <SimpleIdentifier Name="TRUE"/>
-                    <SimpleIdentifier Name="FALSE"/>
-                </EnumSetExpression>
-            </RangeList>
-        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_A">
             <RangeList>
-                <EnumSetExpression Text="[A_0,A_1]">
+                <EnumSetExpression>
                     <SimpleIdentifier Name="A_0"/>
                     <SimpleIdentifier Name="A_1"/>
                 </EnumSetExpression>
@@ -29,16 +13,35 @@
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="run_B">
             <RangeList>
-                <EnumSetExpression Text="[B_0,B_1]">
+                <EnumSetExpression>
                     <SimpleIdentifier Name="B_0"/>
                     <SimpleIdentifier Name="B_1"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="exch_ch">
+            <RangeList>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="A_0"/>
+                    <SimpleIdentifier Name="A_1"/>
+                </EnumSetExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="B_0"/>
+                    <SimpleIdentifier Name="B_1"/>
+                </EnumSetExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="TRUE"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
     </EventDeclList>
     <ComponentList>
         <ForeachComponent Name="procid">
-            <EnumSetExpression Text="[A_0,A_1]">
+            <EnumSetExpression>
                 <SimpleIdentifier Name="A_0"/>
                 <SimpleIdentifier Name="A_1"/>
             </EnumSetExpression>
@@ -54,7 +57,7 @@
                                     <Point Y="64" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-7" X="9"/>
+                                    <Point Y="0" X="-31"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="A_1">
@@ -62,7 +65,7 @@
                                     <Point Y="144" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-6" X="9"/>
+                                    <Point Y="0" X="-31"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="A_2">
@@ -70,7 +73,7 @@
                                     <Point Y="224" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-5" X="7"/>
+                                    <Point Y="-1" X="-31"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="A_3">
@@ -81,7 +84,7 @@
                                     <Point Y="304" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-5" X="7"/>
+                                    <Point Y="10" X="0"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
@@ -92,7 +95,7 @@
                                         <SimpleIdentifier Name="procid"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-8" X="5"/>
+                                        <Point Y="-12" X="5"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -101,32 +104,39 @@
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="procid"/>
                                         <SimpleIdentifier Name="B_0"/>
+                                        <IntConstant Value="0"/>
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="procid"/>
                                         <SimpleIdentifier Name="B_1"/>
+                                        <IntConstant Value="0"/>
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-20" X="4"/>
+                                        <Point Y="-16" X="8"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <EndPointGeometry>
+                                    <Point Y="224" X="80"/>
+                                </EndPointGeometry>
                             </Edge>
                             <Edge Target="A_3" Source="A_2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="procid"/>
                                         <SimpleIdentifier Name="B_0"/>
-                                        <SimpleIdentifier Name="FALSE"/>
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="procid"/>
                                         <SimpleIdentifier Name="B_1"/>
-                                        <SimpleIdentifier Name="FALSE"/>
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-18" X="4"/>
+                                        <Point Y="-29" X="8"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -136,7 +146,7 @@
             </ComponentList>
         </ForeachComponent>
         <ForeachComponent Name="procid">
-            <EnumSetExpression Text="[B_0,B_1]">
+            <EnumSetExpression>
                 <SimpleIdentifier Name="B_0"/>
                 <SimpleIdentifier Name="B_1"/>
             </EnumSetExpression>
@@ -171,7 +181,7 @@
                                     <Point Y="64" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-6" X="-32"/>
+                                    <Point Y="-7" X="9"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_1">
@@ -179,7 +189,7 @@
                                     <Point Y="144" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-5" X="-29"/>
+                                    <Point Y="-6" X="9"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_2">
@@ -187,7 +197,7 @@
                                     <Point Y="224" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-10" X="-32"/>
+                                    <Point Y="-5" X="7"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="B_3">
@@ -198,7 +208,7 @@
                                     <Point Y="304" X="80"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="-7" X="-32"/>
+                                    <Point Y="10" X="0"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
@@ -209,7 +219,7 @@
                                         <SimpleIdentifier Name="procid"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-13" X="6"/>
+                                        <Point Y="-8" X="5"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -218,25 +228,17 @@
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="A_0"/>
                                         <SimpleIdentifier Name="procid"/>
-                                        <SimpleIdentifier Name="FALSE"/>
-                                    </IndexedIdentifier>
-                                    <IndexedIdentifier Name="exch_ch">
-                                        <SimpleIdentifier Name="A_0"/>
-                                        <SimpleIdentifier Name="procid"/>
+                                        <IntConstant Value="0"/>
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="A_1"/>
                                         <SimpleIdentifier Name="procid"/>
-                                        <SimpleIdentifier Name="FALSE"/>
-                                    </IndexedIdentifier>
-                                    <IndexedIdentifier Name="exch_ch">
-                                        <SimpleIdentifier Name="A_1"/>
-                                        <SimpleIdentifier Name="procid"/>
+                                        <IntConstant Value="0"/>
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-33" X="3"/>
+                                        <Point Y="-22" X="3"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -245,25 +247,17 @@
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="A_0"/>
                                         <SimpleIdentifier Name="procid"/>
-                                        <SimpleIdentifier Name="FALSE"/>
-                                    </IndexedIdentifier>
-                                    <IndexedIdentifier Name="exch_ch">
-                                        <SimpleIdentifier Name="A_0"/>
-                                        <SimpleIdentifier Name="procid"/>
+                                        <IntConstant Value="0"/>
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="A_1"/>
                                         <SimpleIdentifier Name="procid"/>
-                                        <SimpleIdentifier Name="FALSE"/>
-                                    </IndexedIdentifier>
-                                    <IndexedIdentifier Name="exch_ch">
-                                        <SimpleIdentifier Name="A_1"/>
-                                        <SimpleIdentifier Name="procid"/>
+                                        <IntConstant Value="0"/>
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-34" X="4"/>
+                                        <Point Y="-10" X="8"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -285,37 +279,21 @@
                     </SimpleNode>
                     <SimpleNode Name="init_1">
                         <PointGeometry>
-                            <Point Y="112" X="80"/>
+                            <Point Y="128" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-4" X="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_2">
-                        <PointGeometry>
-                            <Point Y="176" X="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="init_3">
-                        <PointGeometry>
-                            <Point Y="240" X="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="init_4">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="304" X="80"/>
+                            <Point Y="208" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -330,28 +308,9 @@
                     </Edge>
                     <Edge Target="init_2" Source="init_1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="run_A"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="init_3" Source="init_2">
-                        <LabelBlock>
                             <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point Y="176" X="80"/>
-                        </StartPointGeometry>
-                    </Edge>
-                    <Edge Target="init_4" Source="init_3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="run_B"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="4"/>
+                                <Point Y="-7" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

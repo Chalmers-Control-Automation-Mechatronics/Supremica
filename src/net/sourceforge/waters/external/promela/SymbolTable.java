@@ -27,8 +27,7 @@ public class SymbolTable
   String mName;//The name for the current symbol table this is used to retrieve the symbol table from its parent
 
   /**
-   * The constructor for the symbol table class
-   * @author Ethan Duff
+   * The default constructor for the symbol table class
    */
   public SymbolTable()
   {
@@ -37,6 +36,12 @@ public class SymbolTable
 
     mParentTable = null;
     mChildTables = new HashMap<String, SymbolTable>();
+
+    //Now, add in the integer constant values into the variable table
+    mVariableTable.put("bit", new IntegerTreeNode(1));
+    mVariableTable.put("byte", new IntegerTreeNode(255));
+    mVariableTable.put("short", new IntegerTreeNode(65535));
+    mVariableTable.put("int", new IntegerTreeNode(0));//TODO Work out how this works
   }
 
   /**
@@ -54,7 +59,6 @@ public class SymbolTable
 
   /**
    * A method to get the parent symbol table for the current table
-   * @author Ethan Duff
    * @return The parent symbol table to the current table. May be null if there is no parent
    */
   public SymbolTable getParentTable()
@@ -154,15 +158,15 @@ public class SymbolTable
   }
 
   /**
-   * A method to retrieve the classification of a variable
-   * @author Ethan Duff
-   * @param name The name of the variable that is being retrieved
-   * @return The VardefTreeNode containing the variable classification, or null if the variable does not exist
+   * A method to retrieve the value matching the given key
+   * @param name The name of the key that is being retrieved
+   * @return The PromelaTree containing the value,, or null if the key does not exist
    */
   public PromelaTree get(final String name)
   {
     if(mVariableTable.containsKey(name))
     {
+      //The key is contained, so return the value matching it
       return mVariableTable.get(name);
     }
     else if(mParentTable != null)
@@ -177,11 +181,19 @@ public class SymbolTable
     }
   }
 
+  /**
+   * A method to get all of the names of the keys for this level in the symbol table
+   * @return An ArrayList of Strings containing the keys
+   */
   public ArrayList<String> getLocalKeys()
   {
     return mVariableNames;
   }
 
+  /**
+   * A method to get all of the entries in the symbol table
+   * @return A Set containing all of the entries in the symbol table
+   */
   public Set<Entry<String,PromelaTree>> getEntrySet()
   {
     final HashSet<Entry<String, PromelaTree>> returnSet = new HashSet<Entry<String,PromelaTree>>();
@@ -196,7 +208,6 @@ public class SymbolTable
 
   /**
    * A method to check if a given name is free for use
-   * @author Ethan Duff
    * @param name The name that is requested to be used
    * @return True if the name is free, false if the name is already taken
    */
