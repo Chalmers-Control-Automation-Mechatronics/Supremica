@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="woeq_5" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="woeq05" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A test for the weak observation equivalence simplifier. This tests whether initial states and transitions are correctly added across tau-victims not directly linked to the start state.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name=":symbols">

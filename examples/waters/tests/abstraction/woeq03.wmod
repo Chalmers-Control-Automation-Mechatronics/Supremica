@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="woeq_3" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="woeq03" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>This test checks whether silent transitions are handled correctly by the weak observation equivalence algorithm. States S0 and S1 are weakly observation equivalent, but not observaration equivalent, but the outgoing tau-transitions to S2 and S4 must be removed, and the merged state marked.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
