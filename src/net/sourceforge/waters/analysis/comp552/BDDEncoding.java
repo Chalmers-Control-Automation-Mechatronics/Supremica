@@ -85,10 +85,12 @@ public class BDDEncoding
     // Encode events ...
     final Collection<EventProxy> events = model.getEvents();
     int numEvents = events.size();
+    mEventList = new ArrayList<EventProxy>(numEvents);
     mEventMap = new HashMap<EventProxy,Integer>(numEvents);
     int index = 0;
     for (final EventProxy event : events) {
       if (event.getKind() != EventKind.PROPOSITION) {
+        mEventList.add(event);
         mEventMap.put(event, index++);
       }
     }
@@ -160,7 +162,7 @@ public class BDDEncoding
 
   /**
    * Computes a BDD representing the monolithic transition relation of this
-   * encoding's model.
+   * encoding's model without event bits.
    * @return A BDD over the current and next state variables of all automata
    *         in the model, which is true precisely when there is a transition
    *         between the current and next state in the synchronous composition
@@ -168,7 +170,26 @@ public class BDDEncoding
    */
   public BDD getTransitionRelationBDD()
   {
-    // First compose the transition relations of all automata, bottom-up ...
+    final BDD trans = getTransitionRelationBDDWithEvents();
+    final BDDVarSet eventVars = getEventVarSet();
+    final BDD result = trans.exist(eventVars);
+    trans.free();
+    eventVars.free();
+    return result;
+  }
+
+  /**
+   * Computes a BDD representing the monolithic transition relation of this
+   * encoding's model with event bits.
+   * @return A BDD over the event, current state, and next state variables of
+   *         all automata in the model, which is true precisely when there is
+   *         a transition with the event between the current and next state
+   *         in the synchronous composition of all automata in the encoded
+   *         model.
+   */
+  public BDD getTransitionRelationBDDWithEvents()
+  {
+    // Compose the transition relations of all automata, bottom-up ...
     final BDD trans = mBDDFactory.one();
     final int end = mAutomata.size();
     final ListIterator<AutomatonEncoding> iter = mAutomata.listIterator(end);
@@ -177,14 +198,7 @@ public class BDDEncoding
       final BDD autTrans = enc.getTransitionRelationBDD();
       trans.andWith(autTrans);
     }
-    // The resultant BDD includes the event variables and all state and next
-    // state variables. Most model checking algorithms only use the transition
-    // information, so we quantify out the event variables.
-    final BDDVarSet eventVars = getEventVarSet();
-    final BDD result = trans.exist(eventVars);
-    trans.free();
-    eventVars.free();
-    return result;
+    return trans;
   }
 
   /**
@@ -202,6 +216,61 @@ public class BDDEncoding
       return mBDDFactory.zero();
     } else {
       return encodeBDD(code, 0, mNumEventBits, 1);
+    }
+  }
+
+  /**
+   * <P>Finds an event that can satisfy a given BDD. This method traverses
+   * the given BDD to find a bit combination of the event variables that can
+   * make the conditions of this BDD true. If found, this bit combination
+   * is mapped to an event object.</P>
+   * <P>This method can be used to find a counterexample. Given a BDD encoding
+   * constraints on states and events, an event satisfying the constraints
+   * can be found. Note that choosing an event imposes further constraints,
+   * so the next step should be intersect the constraints with the BDD
+   * for the returned event.</P>
+   * @param  bdd          The BDD to be examined, which should use the event
+   *                      variables. It may use other variables as well.
+   * @return One possible event that may be true under the constraints of
+   *         the given BDD, or <CODE>null</CODE>.
+   * @see #getEventBDD(EventProxy) getEventBDD()
+   */
+  public EventProxy findEvent(final BDD bdd)
+  {
+    // No event if the BDD is constant false.
+    if (bdd.isZero()) {
+      return null;
+    }
+    BDD current = bdd;
+    int code = 0;
+    while (!current.isOne()) {
+      final BDD low = current.low();
+      final BDD high = current.high();
+      // Follow paths, but never touch 0-terminal.
+      if (low.isZero()) {
+        current = high;
+      } else if (high.isZero()) {
+        current = low;
+      } else if (low.level() < high.level()) {
+        current = high;
+      } else {
+        current = low;
+      }
+      // If following 1-branch of an event variable,
+      // set corresponding bit in event code.
+      if (current == high) {
+        final int varindex = current.var();
+        if (varindex < mNumEventBits) {
+          final int bitindex = mNumEventBits - varindex - 1;
+          code |= (1 << bitindex);
+        }
+      }
+    }
+    // Look up event with identified code.
+    if (code < mEventList.size()) {
+      return mEventList.get(code);
+    } else {
+      return null;
     }
   }
 
@@ -642,8 +711,13 @@ public class BDDEncoding
    */
   private final BDDFactory mBDDFactory;
   /**
+   * A list containing all non-proposition events of the model in the
+   * indexed by their event codes.
+   */
+  private final List<EventProxy> mEventList;
+  /**
    * A map that assigns each non-proposition event of the model to an
-   * integer code.
+   * integer code. This map is the reverse of the {@link #mEventList}.
    */
   private final Map<EventProxy,Integer> mEventMap;
   /**
