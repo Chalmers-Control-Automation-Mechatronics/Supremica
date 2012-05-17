@@ -13,6 +13,7 @@ package net.sourceforge.waters.gui.command;
 import gnu.trove.THashSet;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,9 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 
 
 /**
@@ -142,12 +145,29 @@ public abstract class AbstractEditCommand
     final int size = inserts.size();
     final Set<Proxy> set = new THashSet<Proxy>(size);
     final List<Proxy> result = new ArrayList<Proxy>(size);
+    boolean newLabelBlock = true;
+    LabelBlockSubject block = null;
     for (final InsertInfo insert : inserts) {
       final Proxy proxy = insert.getProxy();
+      final Subject subject = (Subject) proxy;
+      //only bother if it is still possible that its a new labelblock
+      if (newLabelBlock) {
+        if (block == null) {
+          block = SubjectTools.getAncestor(subject, LabelBlockSubject.class);
+        } else if (!SubjectTools.isAncestor(block, subject)) {
+           newLabelBlock = false;
+        }
+        if (block == null || block.getEventList().size() != size) {
+          newLabelBlock = false;
+        }
+      }
       final Proxy ancestor = mPanel.getSelectableAncestor(proxy);
       if (ancestor != null && set.add(ancestor)) {
         result.add(ancestor);
       }
+    }
+    if (newLabelBlock) {
+      return Collections.singletonList((Proxy) block);
     }
     return result;
   }

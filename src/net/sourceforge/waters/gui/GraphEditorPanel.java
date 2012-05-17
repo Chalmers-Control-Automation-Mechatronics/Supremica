@@ -977,6 +977,7 @@ public class GraphEditorPanel
    * node on this panel.
    * @param  pos        the coordinate of the new node.
    */
+  //TODO return cmd
   void doCreateSimpleNode(final Point2D pos)
   {
     final GraphSubject graph = getGraph();
@@ -1117,11 +1118,21 @@ public class GraphEditorPanel
       .getWatersSelectionOwner() == GraphEditorPanel.this;
   }
 
+  //TODO where to put this?
+  private boolean addToSelectedSet(final ProxySubject subject){
+    if (mSelectedSet.add(subject)) {
+      mSelectedList.add(subject);
+      return true;
+    }
+    return false;
+  }
+
 
   //#########################################################################
   //# Low-level Selection Handling
   private void fireSelectionChanged()
   {
+    mLastCommand = null;
     if (mInternalDragAction == null) {
       final EditorChangedEvent event = new SelectionChangedEvent(this);
       fireEditorChangedEvent(event);
@@ -4373,29 +4384,20 @@ public class GraphEditorPanel
         if (subject instanceof IdentifierSubject) {
           block = SubjectTools.getAncestor(subject, LabelBlockSubject.class);
           if (block != null) {
-            if (mSelectedSet.add(block)) {
-              mSelectedList.add(block);
-              change = true;
+            change |= addToSelectedSet(block);
+            if (!block.getEventList().isEmpty()) {
+              change |= addToSelectedSet(subject);
             }
-            if (mSelectedSet.add(subject)) {
-              mSelectedList.add(subject);
-              change = true;
-            }
+
           }
         } else if (subject instanceof ForeachSubject) {
           final ForeachSubject foreach = (ForeachSubject) subject;
           block = SubjectTools.getAncestor(subject, LabelBlockSubject.class);
           if (block != null) {
-            if (mSelectedSet.add(block)) {
-              mSelectedList.add(block);
-              change = true;
-            }
+            change |= addToSelectedSet(block);
             if (block.getEventListModifiable().size() > 1
                 || foreach.getBodyModifiable().size() > 0) {
-              if (mSelectedSet.add(subject)) {
-                mSelectedList.add(subject);
-                change = true;
-              }
+              change |= addToSelectedSet(subject);
             }
             change |= addChildrenToSelection(foreach);
           }
@@ -4409,9 +4411,7 @@ public class GraphEditorPanel
               final EdgeSubject edge = (EdgeSubject)ancestor;
               final LabelBlockSubject labelBlock = edge.getLabelBlock();
               final GuardActionBlockSubject guard = edge.getGuardActionBlock();
-              if(mSelectedSet.add(labelBlock)) {
-                mSelectedList.add(labelBlock);
-              }
+              addToSelectedSet(labelBlock);
               if(guard != null && mSelectedSet.add(guard)) {
                 mSelectedList.add(guard);
               }
@@ -4419,9 +4419,7 @@ public class GraphEditorPanel
             else if(ancestor instanceof SimpleNodeSubject){
               final SimpleNodeSubject node = (SimpleNodeSubject)ancestor;
               final LabelGeometrySubject label = node.getLabelGeometry();
-              if(mSelectedSet.add(label)) {
-                mSelectedList.add(label);
-              }
+              addToSelectedSet(label);
             }
           }
 
@@ -4430,15 +4428,13 @@ public class GraphEditorPanel
       return change;
     }
 
+
     private boolean addChildrenToSelection(final ForeachSubject foreach)
     {
       final ListSubject<AbstractSubject> list = foreach.getBodyModifiable();
       boolean change = false;
       for (final ProxySubject p : list) {
-        if (mSelectedSet.add(p)) {
-          mSelectedList.add(p);
-          change = true;
-        }
+          change |= addToSelectedSet(p);
         if (p instanceof ForeachSubject) {
           change |= addChildrenToSelection((ForeachSubject) p);
         }
