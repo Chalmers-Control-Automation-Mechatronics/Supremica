@@ -2530,6 +2530,7 @@ public class GraphEditorPanel
       mShiftDown = false;
     }
 
+    // TODO Make sure this gets called so shift-drag-select works again.
     private InternalDragActionSelect(final Point start, final boolean shift)
     {
       this(start);
@@ -2771,10 +2772,13 @@ public class GraphEditorPanel
                                   final boolean shiftDown)
     {
       super(start);
-      mClickedLabel = label;
       mShiftDown = shiftDown;
-      addToSelection(mClickedLabel);
+      mClickedLabel = label;
+      if (label != null) {
+        addToSelection(label);
+      }
       mExternalDragStatus = DragOverStatus.NOTDRAG;
+      mHasDragged = false;
     }
 
     private InternalDragActionDND(final Point point)
@@ -2787,14 +2791,13 @@ public class GraphEditorPanel
     @Override
     boolean continueDrag(final MouseEvent event)
     {
-      final boolean draggedBefore = true;
       final boolean draggedNow = super.continueDrag(event.getPoint());
-      if(!draggedBefore && draggedNow){
-        if(event.isShiftDown()){
+      if (!mHasDragged && draggedNow) {
+        mHasDragged = true;
+        if (event.isShiftDown()) {
           getTransferHandler().exportAsDrag(GraphEditorPanel.this, event,
-                                          TransferHandler.COPY);
-        }
-        else{
+                                            TransferHandler.COPY);
+        } else {
           getTransferHandler().exportAsDrag(GraphEditorPanel.this, event,
                                             TransferHandler.MOVE);
         }
@@ -2802,7 +2805,7 @@ public class GraphEditorPanel
       return draggedNow;
     }
 
-
+    @Override
     void cancelDrag(final Point point)
     {
       super.cancelDrag(point);
@@ -3132,6 +3135,8 @@ public class GraphEditorPanel
       }
     }
 
+    //#######################################################################
+    //# Data Members
     private double mY;
     private double mX;
     private final ProxySubject mClickedLabel;
@@ -3142,6 +3147,7 @@ public class GraphEditorPanel
     private List<ProxySubject> mDraggedList;
     private DragOverStatus mExternalDragStatus;
     private final boolean mShiftDown;
+    private boolean mHasDragged;
 
   }
 
