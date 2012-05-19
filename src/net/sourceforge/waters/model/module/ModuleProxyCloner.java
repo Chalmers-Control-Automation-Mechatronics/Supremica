@@ -109,7 +109,7 @@ public class ModuleProxyCloner
    * This methods creates a clone of a graph's nodes and edges using
    * the standard factory of this cloner, then creates a new graph 
    * using another factory given as an argument.
-   * @param  graph    The graph to be duplicated.
+   * @param  proxy    The graph to be duplicated.
    * @param  factory  The factory used to create the new graph.
    * @return The cloned graph.
    */

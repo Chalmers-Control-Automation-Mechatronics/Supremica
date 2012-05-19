@@ -1650,7 +1650,7 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap \
         "   * using another factory given as an argument."
     Java_WriteLn $stream $umap \
-        "   * @param  graph    The graph to be duplicated."
+        "   * @param  proxy    The graph to be duplicated."
     Java_WriteLn $stream $umap \
         "   * @param  factory  The factory used to create the new graph."
     Java_WriteLn $stream $umap "   * @return The cloned graph."
@@ -3246,9 +3246,12 @@ proc Aux_Hash {text hash0} {
     scan $ch "%c" value
     set result [expr 5 * $result + $value]
   }
-  set result [expr $result & 0xffffffffffffffff]
-  if {$result >= 0x8000000000000000} {
-    incr result -0x10000000000000000
+  catch {
+    set delta -0x10000000000000000
+    set result [expr $result & 0xffffffffffffffff]
+    if {$result >= 0x8000000000000000} {
+      incr result $delta
+    }
   }
   return $result
 }
