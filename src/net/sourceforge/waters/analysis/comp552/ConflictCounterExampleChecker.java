@@ -67,9 +67,11 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <P>To verify a counterexample, the counterexample checker first determines
  * whether all components in a given model accept all events in the
  * counterexample. If this is the case, it furthermore checks whether the
- * counterexample's end state is indeed blocking. This is done using a
- * language inclusion check, which may run for several seconds or even
- * minutes depending on the model size.</P>
+ * counterexample's end state is indeed blocking. This is done using an
+ * language inclusion check, which explicitly enumerates the states of the
+ * synchronous product. This may run for several seconds or even minutes,
+ * and depending on the amount of memory available, it will only be able
+ * to handle models with 50-100 million reachable states.</P>
  *
  * @author Robi Malik
  */

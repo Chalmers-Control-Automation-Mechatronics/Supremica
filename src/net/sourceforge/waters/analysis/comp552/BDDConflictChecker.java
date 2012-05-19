@@ -173,6 +173,18 @@ public class BDDConflictChecker extends ModelChecker
       // Use this BDD for something (well, sort of) ...
       initNotMarked.free();
 
+      // Finally, some event encoding and decoding ...
+      if (enc.getNumberOfProperEvents() > 1) {
+        // Encode the second event in the model as a BDD.
+        final EventProxy event1 = enc.getEvent(1);
+        final BDD eventBDD = enc.getEventBDD(event1);
+        // Decode the BDD back to an event.
+        final EventProxy bddEvent = enc.findEvent(eventBDD);
+        // This should give back the event.
+        assert event1 == bddEvent : "Unexpected event found";
+        eventBDD.free();
+      }
+
       // Still no real progress towards conflict checking.
       // Let us just leave ...
       return true;

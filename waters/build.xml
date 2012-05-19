@@ -641,12 +641,14 @@
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
         <include
-          name="net/sourceforge/waters/analysis/comp552/ConflictChecker.java"/>
+          name="net/sourceforge/waters/analysis/comp552/BDDConflictChecker.java"/>
         <include
-          name="net/sourceforge/waters/analysis/comp552/ConflictMain.java"/>
+          name="net/sourceforge/waters/analysis/comp552/BDDConflictMain.java"/>
+        <include
+          name="net/sourceforge/waters/analysis/comp552/BDDEncoding.java"/>
+        <include name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
-        <include name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.java"/>
         <include name="net/sourceforge/waters/model/**"/>
         <exclude name="net/sourceforge/waters/model/analysis/**"/>
         <include name="net/sourceforge/waters/plain/**"/>

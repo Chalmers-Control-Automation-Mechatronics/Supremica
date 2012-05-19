@@ -38,8 +38,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * and the current and next states of each automaton. To compute the
  * synchronous product transition relation, first the transition relation
  * is built for each automaton, tagged with event codes. The transition
- * relations of all automata are combined using logical AND, and the
- * event bits are removed from the result using existential quantification.</P>
+ * relations of all automata are combined using logical AND, and the event
+ * bits are removed from the result using existential quantification.</P>
  *
  * <P>The variable ordering used is such that the event variables appear first,
  * followed by the current and next state bits of all automata. The bits for
@@ -52,9 +52,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <H4>You are encouraged to modify this class or replace it by something
  * better.</H4>
  *
- * <P>This class mainly serves as a demonstration to show how to encode
+ * <P>This class mainly serves as a demonstration how to encode
  * automata using BDDs. It is kept simple and leaves a lot of room for
- * performance improvement. Things that can be improved include are:</P>
+ * performance improvement. Things that can be improved:</P>
  * <OL>
  * <LI>Find a better variable ordering.</LI>
  * <LI>It is better to avoid computing monolithic transition relation as
@@ -202,6 +202,29 @@ public class BDDEncoding
   }
 
   /**
+   * Returns the number of non-proposition events in this encoding.
+   */
+  public int getNumberOfProperEvents()
+  {
+    return mEventList.size();
+  }
+
+  /**
+   * Retrieves the event with the given code.
+   * @param  code         The integer code assigned to the event.
+   *                      Non-proposition events are assigned codes starting
+   *                      at&nbsp;0 in the order they appear in the input
+   *                      model.
+   * @return The event with the given code.
+   * @throws IndexOutOfBoundsException if the encoding has no event with
+   *                      the given code.
+   */
+  public EventProxy getEvent(final int code)
+  {
+    return mEventList.get(code);
+  }
+
+  /**
    * Computes a BDD encoding an event.
    * @param  event        The event to be encoded.
    * @return A BDD over the event variables, which is true precisely when
@@ -244,6 +267,7 @@ public class BDDEncoding
     BDD current = bdd;
     int code = 0;
     while (!current.isOne()) {
+      final int varindex = current.var();
       final BDD low = current.low();
       final BDD high = current.high();
       // Follow paths, but never touch 0-terminal.
@@ -258,12 +282,9 @@ public class BDDEncoding
       }
       // If following 1-branch of an event variable,
       // set corresponding bit in event code.
-      if (current == high) {
-        final int varindex = current.var();
-        if (varindex < mNumEventBits) {
-          final int bitindex = mNumEventBits - varindex - 1;
-          code |= (1 << bitindex);
-        }
+      if (current == high && varindex < mNumEventBits) {
+        final int bitindex = mNumEventBits - varindex - 1;
+        code |= (1 << bitindex);
       }
     }
     // Look up event with identified code.
@@ -538,11 +559,11 @@ public class BDDEncoding
      * marked in this automaton. The resulting BDD is composed using logical
      * AND with the given BDD.</P>
      * <P>Since BDDs are best constructed bottom-up, this method works most
-     * efficiently when the given BDD only contains variables that appear later
-     * in the variable ordering than the current state variables of this
+     * efficiently when the given BDD only contains variables that appear
+     * later in the variable ordering than the current state variables of this
      * automaton.</P>
-     * @param  otherBDD      A BDD to which the marked states of this automaton
-     *                       are added.
+     * @param  otherBDD      A BDD to which the marked states of this
+     *                       automaton are added.
      * @param  marking       The marking to be considered. This should be an
      *                       event of type {@link EventKind#PROPOSITION
      *                       PROPOSITION}, which is used by the model.
@@ -573,8 +594,8 @@ public class BDDEncoding
      * Computes a BDD representing the transition relation of this automaton.
      * @return A BDD over the event variables of the model and the current and
      *         next state variables of this automaton, which is true precisely
-     *         when there is a transition between the current and next state in
-     *         this automaton using the encoded event.
+     *         when there is a transition between the current and next state
+     *         in this automaton using the encoded event.
      */
     private BDD getTransitionRelationBDD()
     {
