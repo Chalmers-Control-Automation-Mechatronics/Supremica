@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="transferline" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Model of a transfer line in a manufacturing system according to W.M. Wonham. This is the parametrisable version, with N functional blocks in sequence.
+<Module Name="transferline_block" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Model of a transfer line in a manufacturing system according to W.M. Wonham. This is a blocking version of the parametrisable model with N functional blocks in sequence.
 Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online http://www.control.utoronto.ca/people/profs/wonham/wonham.html]</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
@@ -56,14 +56,6 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="init">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="tu_accept">
-                        <IntConstant Value="0"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="tu_load">
-                        <IntConstant Value="0"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="WORKING">
                         <PointGeometry>
@@ -131,21 +123,16 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
             </Graph>
         </SimpleComponent>
         <ForeachComponent Name="G">
-            <SimpleIdentifier Name="GROUPS"/>
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="N"/>
+            </BinaryExpression>
             <ComponentList>
                 <SimpleComponent Kind="PLANT">
                     <IndexedIdentifier Name="machine">
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="machine_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="machine_unload">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="WORKING">
                                 <PointGeometry>
@@ -217,17 +204,6 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="tu_accept">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_reject">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="WORKING">
                                 <PointGeometry>
@@ -297,283 +273,19 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         </EdgeList>
                     </Graph>
                 </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="G">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="N"/>
+            </BinaryExpression>
+            <ComponentList>
                 <SimpleComponent Kind="SPEC">
-                    <IndexedIdentifier Name="b1sup1">
+                    <IndexedIdentifier Name="b1sup">
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="tu_accept">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_accept">
-                                <BinaryExpression Operator="-">
-                                    <SimpleIdentifier Name="G"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_load">
-                                <BinaryExpression Operator="-">
-                                    <SimpleIdentifier Name="G"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </IndexedIdentifier>
-                        </LabelBlock>
-                        <NodeList>
-                            <SimpleNode Initial="true" Name="EMPTY">
-                                <EventList>
-                                    <SimpleIdentifier Name=":accepting"/>
-                                </EventList>
-                                <PointGeometry>
-                                    <Point Y="80" X="208"/>
-                                </PointGeometry>
-                                <InitialArrowGeometry>
-                                    <Point Y="-5" X="-5"/>
-                                </InitialArrowGeometry>
-                                <LabelGeometry>
-                                    <Point Y="-3" X="-51"/>
-                                </LabelGeometry>
-                            </SimpleNode>
-                            <SimpleNode Name="FILLED1">
-                                <PointGeometry>
-                                    <Point Y="160" X="208"/>
-                                </PointGeometry>
-                                <LabelGeometry>
-                                    <Point Y="0" X="-58"/>
-                                </LabelGeometry>
-                            </SimpleNode>
-                            <SimpleNode Name="FILLED2">
-                                <PointGeometry>
-                                    <Point Y="240" X="208"/>
-                                </PointGeometry>
-                                <LabelGeometry>
-                                    <Point Y="0" X="-59"/>
-                                </LabelGeometry>
-                            </SimpleNode>
-                            <SimpleNode Name="FILLED3">
-                                <PointGeometry>
-                                    <Point Y="320" X="208"/>
-                                </PointGeometry>
-                                <LabelGeometry>
-                                    <Point Y="-1" X="-57"/>
-                                </LabelGeometry>
-                            </SimpleNode>
-                        </NodeList>
-                        <EdgeList>
-                            <Edge Target="FILLED2" Source="FILLED2">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_load">
-                                        <BinaryExpression Operator="-">
-                                            <SimpleIdentifier Name="G"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-4" X="3"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="240" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="240" X="250"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="240" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                            <Edge Target="FILLED3" Source="FILLED2">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
-                                        <BinaryExpression Operator="-">
-                                            <SimpleIdentifier Name="G"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-10" X="-94"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="240" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="280" X="192"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="320" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                            <Edge Target="FILLED1" Source="FILLED2">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
-                                        <SimpleIdentifier Name="G"/>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-12" X="4"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="240" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="199" X="226"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="160" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                            <Edge Target="EMPTY" Source="EMPTY">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
-                                        <SimpleIdentifier Name="G"/>
-                                    </IndexedIdentifier>
-                                    <IndexedIdentifier Name="tu_load">
-                                        <BinaryExpression Operator="-">
-                                            <SimpleIdentifier Name="G"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-19" X="5"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="80" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="82" X="251"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="80" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                            <Edge Target="FILLED1" Source="EMPTY">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
-                                        <BinaryExpression Operator="-">
-                                            <SimpleIdentifier Name="G"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-11" X="-98"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="80" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="120" X="190"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="160" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                            <Edge Target="FILLED2" Source="FILLED3">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
-                                        <SimpleIdentifier Name="G"/>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-8" X="10"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="320" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="280" X="225"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="240" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                            <Edge Target="FILLED2" Source="FILLED1">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
-                                        <BinaryExpression Operator="-">
-                                            <SimpleIdentifier Name="G"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-12" X="-96"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="160" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="200" X="191"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="240" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                            <Edge Target="EMPTY" Source="FILLED1">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
-                                        <SimpleIdentifier Name="G"/>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-10" X="8"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="160" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="120" X="226"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="80" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                            <Edge Target="FILLED1" Source="FILLED1">
-                                <LabelBlock>
-                                    <IndexedIdentifier Name="tu_load">
-                                        <BinaryExpression Operator="-">
-                                            <SimpleIdentifier Name="G"/>
-                                            <IntConstant Value="1"/>
-                                        </BinaryExpression>
-                                    </IndexedIdentifier>
-                                    <LabelGeometry Anchor="NW">
-                                        <Point Y="-5" X="6"/>
-                                    </LabelGeometry>
-                                </LabelBlock>
-                                <StartPointGeometry>
-                                    <Point Y="160" X="208"/>
-                                </StartPointGeometry>
-                                <SplineGeometry>
-                                    <Point Y="162" X="249"/>
-                                </SplineGeometry>
-                                <EndPointGeometry>
-                                    <Point Y="160" X="208"/>
-                                </EndPointGeometry>
-                            </Edge>
-                        </EdgeList>
-                    </Graph>
-                </SimpleComponent>
-                <SimpleComponent Kind="SPEC">
-                    <IndexedIdentifier Name="b1sup2">
-                        <SimpleIdentifier Name="G"/>
-                    </IndexedIdentifier>
-                    <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="machine_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_accept">
-                                <BinaryExpression Operator="-">
-                                    <SimpleIdentifier Name="G"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_reject">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Initial="true" Name="EMPTY">
                                 <EventList>
@@ -617,13 +329,13 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         <EdgeList>
                             <Edge Target="FILLED3" Source="FILLED2">
                                 <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
+                                    <IndexedIdentifier Name="tu_load">
                                         <BinaryExpression Operator="-">
                                             <SimpleIdentifier Name="G"/>
                                             <IntConstant Value="1"/>
                                         </BinaryExpression>
                                     </IndexedIdentifier>
-                                    <IndexedIdentifier Name="tu_reject">
+                                    <IndexedIdentifier Name="tu_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
@@ -680,13 +392,13 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                             </Edge>
                             <Edge Target="FILLED2" Source="FILLED1">
                                 <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
+                                    <IndexedIdentifier Name="tu_load">
                                         <BinaryExpression Operator="-">
                                             <SimpleIdentifier Name="G"/>
                                             <IntConstant Value="1"/>
                                         </BinaryExpression>
                                     </IndexedIdentifier>
-                                    <IndexedIdentifier Name="tu_reject">
+                                    <IndexedIdentifier Name="tu_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
@@ -724,13 +436,13 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                             </Edge>
                             <Edge Target="FILLED1" Source="EMPTY">
                                 <LabelBlock>
-                                    <IndexedIdentifier Name="tu_accept">
+                                    <IndexedIdentifier Name="tu_load">
                                         <BinaryExpression Operator="-">
                                             <SimpleIdentifier Name="G"/>
                                             <IntConstant Value="1"/>
                                         </BinaryExpression>
                                     </IndexedIdentifier>
-                                    <IndexedIdentifier Name="tu_reject">
+                                    <IndexedIdentifier Name="tu_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
@@ -755,17 +467,6 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="machine_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="machine_unload">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Initial="true" Name="EMPTY">
                                 <EventList>

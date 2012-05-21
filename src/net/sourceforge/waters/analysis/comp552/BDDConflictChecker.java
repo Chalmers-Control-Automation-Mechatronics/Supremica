@@ -1,5 +1,6 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: COMP452/552-10B Assignment 3
+//# PROJECT: COMP452/552-12A Assignment 3
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDConflictChecker
 //###########################################################################
