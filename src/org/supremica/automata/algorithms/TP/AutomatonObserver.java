@@ -4,6 +4,7 @@
  */
 package org.supremica.automata.algorithms.TP;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
@@ -11,8 +12,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.plain.des.EventElement;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import org.supremica.automata.ExtendedAutomaton;
 
 /**
@@ -38,7 +37,8 @@ public class AutomatonObserver {
         Stack<NodeProxy> stk = new Stack<NodeProxy>();
         Stack<EdgeProxy> upTrans = new Stack<EdgeProxy>();
         Stack<EdgeProxy> downTrans = new Stack<EdgeProxy>();
-                
+        
+        eqStates.add(state);
         stk.push(state);
         
         while(!stk.empty()){
@@ -72,6 +72,9 @@ public class AutomatonObserver {
     }
     
     public HashSet<NodeProxy> EquivalentStates(NodeProxy state){
-        return EquivalentStates(state, true);
+        HashSet<NodeProxy> eqStates = new HashSet<NodeProxy>();
+        eqStates.addAll(EquivalentStates(state, true));
+        eqStates.addAll(EquivalentStates(state, false));
+        return eqStates;
     }
 }

@@ -17,14 +17,12 @@ import org.supremica.automata.ExtendedAutomaton;
 public class AutomataTP {
     
     private final ExtendedAutomata theAutomata;
-    private final List<EventProxy> localEvents;
     
-    public AutomataTP(ExtendedAutomata exAutomata, List<EventProxy> localEvents){
+    public AutomataTP(ExtendedAutomata exAutomata){
         this.theAutomata = exAutomata;
-        this.localEvents = localEvents;
     }
      
-    public void project(){
+    public void project(List<EventProxy> localEvents){
     }
        
 }
