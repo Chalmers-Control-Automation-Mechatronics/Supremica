@@ -4610,24 +4610,29 @@ public class GraphEditorPanel
           elist.getEventListModifiable();
         int pos = startpos < 0 ? list.size() : startpos;
         final List<? extends Proxy> selected;
-       if(isSourceOfDrag()){
-         selected = GraphEditorPanel.this.getCurrentSelection();
-       }
-       else{
-         selected = dropList;
-       }
-        for (final Proxy proxy : selected) {
-          final ProxySubject sub = (ProxySubject) proxy;
-          for (int i = 0; i < data.size(); i++) {
-            if(eq.equals(data.get(i), proxy)){
+        if (isSourceOfDrag()) {
+          selected = GraphEditorPanel.this.getCurrentSelection();
+        } else {
+          selected = dropList;
+        }
+
+        final int p = pos;
+        for (int i = 0; i < data.size(); i++) {
+          for (final Proxy proxy : selected) {
+            final ProxySubject sub = (ProxySubject) proxy;
+            if (eq.equals(data.get(i), proxy)) {
               if (sub.getParent().equals(dropList)) {
-                if(dropList.indexOf(sub) == pos || dropList.indexOf(sub) == pos-1){
-                  data.remove(i);
+                if (dropList.indexOf(sub) == p
+                    || dropList.indexOf(sub) == p - 1) {
+                  if (isContiguous(selected, data, dropList)) {
+                    return;
+                  }
+                } else if (dropAction != DnDConstants.ACTION_MOVE) {
+                  if (isContiguous(selected, data, dropList)) {
+                    return;
+                  }
                 }
-                else if (dropAction != DnDConstants.ACTION_MOVE) {
-                  data.remove(i);
-                }
-                else if(dropList.indexOf(sub) < pos){
+                if (dropList.indexOf(sub) < p) {
                   pos--;
                 }
               } else {
@@ -4638,12 +4643,37 @@ public class GraphEditorPanel
             }
           }
         }
+
         for (final Proxy proxy : data) {
           final ProxySubject newident = (ProxySubject) cloner.getClone(proxy);
           GraphEditorPanel.this.addInsertInfo(inserts, newident, dropList,
                                               pos++);
         }
       }
+    }
+
+    private boolean isContiguous(final List<? extends Proxy> selected,
+                                 final List<? extends Proxy> data,
+                                 final ListSubject<AbstractSubject> dropList){
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      int in = -1;
+      final boolean cont = true;
+      for (int i = 0; i < data.size(); i++) {
+        for (final Proxy proxy : selected) {
+          final ProxySubject sub = (ProxySubject) proxy;
+          if (eq.equals(data.get(i), proxy)) {
+            if (sub.getParent().equals(dropList)) {
+              if (dropList.indexOf(sub) == in + 1 || in == -1) {
+                in = dropList.indexOf(sub);
+              } else {
+                return false;
+              }
+            }
+          }
+        }
+      }
+      return cont;
     }
 
     //#######################################################################
