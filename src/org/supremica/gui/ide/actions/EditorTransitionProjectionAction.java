@@ -5,13 +5,17 @@
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.HashSet;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.TP.AutomataTP;
+import org.supremica.automata.algorithms.TP.AutomatonObserver;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -52,8 +56,25 @@ public class EditorTransitionProjectionAction
             logger.error("There is no EFA to abstract. Create one in Editor panel and run again.");
             return;
         }
-        
         logger.info("Transition projection running ... ");
+        final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
+        for(ExtendedAutomaton efa:exAutomata){
+            NodeProxy init=null;;
+            for(NodeProxy node : efa.getNodes()){
+                if(node.getName().equals("Sx"))
+                    init = node;
+            }
+            AutomatonObserver observer = new AutomatonObserver(efa);
+            HashSet<NodeProxy> EquivalentStates;
+            EquivalentStates = observer.findEquivalentStates(init, true);
+            logger.info("EqStates down: " + EquivalentStates.toString());
+            EquivalentStates = observer.findEquivalentStates(init, false);
+            logger.info("EqStates up: " + EquivalentStates.toString());
+            EquivalentStates = observer.findEquivalentStates(init);
+            logger.info("EqStates: " + EquivalentStates.toString());
+
+        }
+        logger.info("Transition projection end");
         
     }
 
