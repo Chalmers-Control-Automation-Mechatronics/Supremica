@@ -21,7 +21,7 @@ public class AutomataTP {
     public AutomataTP(ExtendedAutomata exAutomata){
         this.theAutomata = exAutomata;
     }
-     
+ 
     public void project(List<EventProxy> localEvents){
     }
        

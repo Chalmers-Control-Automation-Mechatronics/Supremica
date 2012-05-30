@@ -59,24 +59,24 @@ public class EditorTransitionProjectionAction
         logger.info("Transition projection running ... ");
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
         for(ExtendedAutomaton efa:exAutomata){
-            NodeProxy init=null;;
-            for(NodeProxy node : efa.getNodes()){
-                if(node.getName().equals("Sx"))
-                    init = node;
-            }
+            String s = "";
             AutomatonObserver observer = new AutomatonObserver(efa);
-            HashSet<NodeProxy> EquivalentStates;
-            EquivalentStates = observer.findEquivalentStates(init, true);
-            logger.info("EqStates down: " + EquivalentStates.toString());
-            EquivalentStates = observer.findEquivalentStates(init, false);
-            logger.info("EqStates up: " + EquivalentStates.toString());
-            EquivalentStates = observer.findEquivalentStates(init);
-            logger.info("EqStates: " + EquivalentStates.toString());
-
+            s += ("\n EFA: " + efa.getName()
+                    + "\n Observable event: " + observer.getObservableEvents()
+                    + "\n Unobservable events: " + observer.getUnobservableEvents());
+            HashSet<HashSet<NodeProxy>> congruence = observer.getCongruence();
+            for(HashSet<NodeProxy> p : congruence){
+                s += "\n Coset members: {";
+                for(NodeProxy st : p)
+                    s += " " + st.getName() + " ";
+                s += "}";
+            }
+            s += "\n Observer calculate in [" 
+                    + observer.getObserverTimer() 
+                    + "] and in [" + observer.getNrIterations() 
+                    + "] iterations. \n ----------------------------";
+            logger.info(s);
         }
         logger.info("Transition projection end");
-        
     }
-
-    
 }
