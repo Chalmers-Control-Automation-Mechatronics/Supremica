@@ -57,14 +57,18 @@ public class EditorTransitionProjectionAction
             return;
         }
         logger.info("Transition projection running ... ");
+        String s = "";
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
+        AutomatonObserver observer = new AutomatonObserver(exAutomata);
+        s += "\n All shared event: " + observer.getSharedEvents() 
+                + "\n All local events: " + observer.getLocalEvents()
+                + "\n +++++++++++++++++";
+
         for(ExtendedAutomaton efa:exAutomata){
-            String s = "";
-            AutomatonObserver observer = new AutomatonObserver(efa);
             s += ("\n EFA: " + efa.getName()
-                    + "\n Observable event: " + observer.getObservableEvents()
-                    + "\n Unobservable events: " + observer.getUnobservableEvents());
-            HashSet<HashSet<NodeProxy>> congruence = observer.getCongruence();
+                    + "\n Shared event: " + observer.getSharedEvents(efa)
+                    + "\n LocalEvents events: " + observer.getLocalEvents(efa));
+            HashSet<HashSet<NodeProxy>> congruence = observer.getCongruence(efa);
             for(HashSet<NodeProxy> p : congruence){
                 s += "\n Coset members: {";
                 for(NodeProxy st : p)
@@ -75,8 +79,8 @@ public class EditorTransitionProjectionAction
                     + observer.getObserverTimer() 
                     + "] within [" + observer.getNrIterations() 
                     + "] iterations. \n ----------------------------";
-            logger.info(s);
         }
+        logger.info(s);
         logger.info("Transition projection end");
     }
 }

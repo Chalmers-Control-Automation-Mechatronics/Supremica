@@ -32,7 +32,7 @@
             <ide-actions>
                 <action name="build">
                     <script>${ant.script}</script>
-                    <target>compile_supremica</target>
+                    <target>compile_supremica_xlint</target>
                 </action>
                 <action name="clean">
                     <script>${ant.script}</script>
@@ -53,7 +53,7 @@
                 <action name="rebuild">
                     <script>${ant.script}</script>
                     <target>clean</target>
-                    <target>compile_supremica</target>
+                    <target>compile_supremica_xlint</target>
                 </action>
                 <action name="debug">
                     <script>nbproject/ide-targets.xml</script>
