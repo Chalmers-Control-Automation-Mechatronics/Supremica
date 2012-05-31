@@ -179,7 +179,7 @@ public final class Config
       new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
 			  "Enable instantiation and other advanced features");
     public static final BooleanProperty OPTIMIZING_COMPILER =
-      new BooleanProperty(PropertyType.GUI, "optimizingCompiler", true,
+      new BooleanProperty(PropertyType.GUI, "optimizingCompiler", false,
 			  "Remove redundant events, transitions, and components " +
               "when compiling");
     public static final BooleanProperty USE_EVENT_ALPHABET =
