@@ -71,9 +71,9 @@ public class EditorTransitionProjectionAction
                     s += " " + st.getName() + " ";
                 s += "}";
             }
-            s += "\n Observer calculate in [" 
+            s += "\n Observer calculated in [" 
                     + observer.getObserverTimer() 
-                    + "] and in [" + observer.getNrIterations() 
+                    + "] within [" + observer.getNrIterations() 
                     + "] iterations. \n ----------------------------";
             logger.info(s);
         }

@@ -9,9 +9,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.plain.module.EventDeclElement;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -40,15 +38,16 @@ public class AutomatonObserver {
      */    
     public AutomatonObserver(ExtendedAutomaton exAutomaton){
         this.exAutomaton = exAutomaton;
-        observableEvents = new HashSet<EventDeclProxy>();
-        unobservableEvents = new HashSet<EventDeclProxy>();
+        this.observableEvents = new HashSet<EventDeclProxy>();
+        this.unobservableEvents = new HashSet<EventDeclProxy>();
         for(EventDeclProxy event : this.exAutomaton.getAlphabet()){
             if(event.isObservable())
                 observableEvents.add(event);
             else
                 unobservableEvents.add(event);
         }
-        observerTimer = new ActionTimer();
+        this.observerTimer = new ActionTimer();
+        this.nrQCIteration = 0;
     }
     
     public HashSet<EventDeclProxy> getObservableEvents(){
@@ -199,19 +198,20 @@ public class AutomatonObserver {
     }
             
     private HashSet<Partition> getQC(){
-        Stack<Partition> W = new Stack<Partition>(); // Set W in WONG paper 
+        Stack<Partition> W = new Stack<Partition>(); // Set W (splitter) in WONG paper 
         HashSet<Partition> R = new HashSet<Partition>(); // Set Rho in WONG paper 
-        HashSet<NodeProxy> Q,phiB,inter,diff;
-        Partition B,X;
+        HashSet<NodeProxy> Q,phiB,inter,diff; // Sets of initial partition, phiB, intersection, and difference
+        Partition B,X; // B: temporary partition X: partition in Rho
         Q = new HashSet<NodeProxy>(exAutomaton.getNodes());
         W.push(new Partition(Q));
         R.add(new Partition(Q));
+        // New event Tao_m to handle marked states
         EventDeclSubject m = new EventDeclSubject(new SimpleIdentifierSubject("TAOm"), EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, null, null, null);
         observableEvents.add(m);
         int i = 0;
         while(!W.isEmpty()){
-            i++;
             B = W.pop();
+            i++;
             for(EventDeclProxy e : observableEvents){
                 HashSet<Partition> I = new HashSet<Partition>();
                 HashSet<Partition> I12 = new HashSet<Partition>();
@@ -298,12 +298,6 @@ public class AutomatonObserver {
         return qc;
     }
     
-    private void getQuotiont(HashSet<Partition> ps){
-        for(Partition p : ps){
-            
-        }
-    }
-    
     class Partition{
         private HashSet<NodeProxy> coset;
 
@@ -338,7 +332,5 @@ public class AutomatonObserver {
         public boolean removeState(NodeProxy state){
             return coset.remove(state);
         }
-        
     }
-    
 }
