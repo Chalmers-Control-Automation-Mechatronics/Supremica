@@ -163,6 +163,8 @@ public class BDDEncoding
   /**
    * Computes a BDD representing the monolithic transition relation of this
    * encoding's model without event bits.
+   * This method builds the BDD from the automata model, which is a
+   * computationally expensive operation.
    * @return A BDD over the current and next state variables of all automata
    *         in the model, which is true precisely when there is a transition
    *         between the current and next state in the synchronous composition
@@ -181,6 +183,8 @@ public class BDDEncoding
   /**
    * Computes a BDD representing the monolithic transition relation of this
    * encoding's model with event bits.
+   * This method builds the BDD from the automata model, which is a
+   * computationally expensive operation.
    * @return A BDD over the event, current state, and next state variables of
    *         all automata in the model, which is true precisely when there is
    *         a transition with the event between the current and next state
@@ -301,6 +305,8 @@ public class BDDEncoding
    * Variable sets can be used with the {@link BDD#exist(BDDVarSet) exist()}
    * or {@link BDD#relprod(BDD, BDDVarSet) relprod()} or similar methods to
    * evaluate Boolean quantification of BDDs.
+   * This method runs in linear complexity in the number of automaton
+   * variables, provided the initial variable ordering has not changed.
    */
   public BDDVarSet getCurrentStateVarSet()
   {
@@ -321,6 +327,8 @@ public class BDDEncoding
    * Variable sets can be used with the {@link BDD#exist(BDDVarSet) exist()}
    * or {@link BDD#relprod(BDD, BDDVarSet) relprod()} or similar methods to
    * evaluate Boolean quantification of BDDs.
+   * This method runs in linear complexity in the number of automaton
+   * variables, provided the initial variable ordering has not changed.
    */
   public BDDVarSet getNextStateVarSet()
   {
@@ -354,6 +362,8 @@ public class BDDEncoding
    * BDD pairings can be used with the {@link BDD#replace(BDDPairing) replace()}
    * or {@link BDD#replaceWith(BDDPairing) replaceWith()} methods to
    * substitute variables in a BDD.
+   * This method runs in linear complexity in the number of automaton
+   * variables, provided the initial variable ordering has not changed.
    */
   public BDDPairing getCurrentStateToNextStatePairing()
   {
@@ -373,6 +383,8 @@ public class BDDEncoding
    * BDD pairings can be used with the {@link BDD#replace(BDDPairing) replace()}
    * or {@link BDD#replaceWith(BDDPairing) replaceWith()} methods to
    * substitute variables in a BDD.
+   * This method runs in linear complexity in the number of automaton
+   * variables, provided the initial variable ordering has not changed.
    */
   public BDDPairing getNextStateToCurrentStatePairing()
   {
@@ -508,10 +520,10 @@ public class BDDEncoding
      * Since the automaton uses two sets of variables for the current and next
      * state, the actual number of bits allocated is double this number. The
      * range of allocated bits is from {@link #getFirstVariableIndex()} to
-     * {@link #getFirstVariableIndex()}&nbsp;+&nbsp;2*({@link
-     * #getNumberOfBits()}-1). Variables are allocated in an interleaving
-     * fashion, with each current state followed by a next state bit. The
-     * most significant bit appears first in the ordering.
+     * {@link #getFirstVariableIndex()}&nbsp;+ 2*{@link
+     * #getNumberOfBits()}&nbsp;-&nbsp;1. Variables are allocated in an
+     * interleaving fashion, with each current state followed by a next state
+     * bit. The most significant bit appears first in the ordering.
      */
     private int getNumberOfBits()
     {

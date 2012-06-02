@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
+import gnu.trove.TIntStack;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -88,7 +89,7 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     @Override
     public int getPreferredInputConfiguration()
     {
-      return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+      return ListBufferTransitionRelation.CONFIG_ALL;
     }
 
     @Override
@@ -99,16 +100,12 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       } else {
         // 1. Collect initial state set.
         final ListBufferTransitionRelation rel = getTransitionRelation();
-        System.out.println("Initial relation:");
-        System.out.println(rel.toString());
+
         final int numStates = rel.getNumberOfStates();
-        System.out.println("numstates="+numStates);
         final TIntHashSet init = new TIntHashSet();
         for (int state = 0; state < numStates; state++) {
-          System.out.println("Now looking at state "+state);
           if (rel.isInitial(state)) {
             if (mTauIterator == null) {
-              System.out.println("No tau events, adding state "+state);
               init.add(state);
             } else {
               checkAbort();
@@ -118,21 +115,16 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
                 init.add(tausucc);
               }
             }
-          } else {
-            System.out.println("state is not initial state, skipping");
           }
         }
         int last = 0;
         if (!init.isEmpty()) {
-          System.out.println("Found initial states.");
           final int offset = mStateSetBuffer.add(init);
-          System.out.println("First offset is "+offset);
           mSetOffsets.add(offset);
           last = offset;
         } else if (numStates == 0) {
           return false;
         }
-        System.out.println("~~~Part 2~~~");
         // 2. Expand subset states.
         final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
         final ArrayList<Integer> current = new ArrayList<Integer>();
@@ -141,9 +133,7 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         for (int source = 0; source < mSetOffsets.size(); source++) {
           final int set = mSetOffsets.get(source);
 
-          System.out.println("Offset number "+source+" is "+set);
           for (final int event : mEventIndexes) {
-            System.out.println("Checking for e"+event+" in set #"+ set);
             checkAbort();
 
             // set iterators
@@ -152,35 +142,24 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
             // first state in set
             int leading = 0;
             boolean firstiter = false;
-            System.out.println("leading state is #"+leading);
             // for each state in current set
             while (iter.advance()) {
               final int state = iter.getCurrentData();
               if (!firstiter) leading = state;
               firstiter = true;
-              System.out.println("Looking at state "+state);
               mEventIterator.resume(state);
               while (mEventIterator.advance()) {
                 final int target = mEventIterator.getCurrentTargetState();
-                System.out.println("Event e"+event+" can go to state "+target+", adding "+target+" to current arraylist");
                 current.add(target);
                 if (state == leading) {
-                  System.out.println("Adding target "+target+" to leading list");
                   leadingcurrent.add(target);
-                } else {
-                  System.out.println("Not adding target "+target+" to leading list");
                 }
-
               }
             }
             if (current.isEmpty()) continue;
             if (!leadingcurrent.isEmpty()) {
-              //current.sort();
-              // add all permutations of current
               for (int l = 0; l < leadingcurrent.size(); l++) {
                 // swap leading to the front
-                //System.out.println("Looking at leadingcurrent number "+l+" which is "+leadingcurrent.get(l));
-                //System.out.println("And it is in position "+current.indexOf(leadingcurrent.get(l))+" of current");
                 Collections.swap(current, 0, current.indexOf(leadingcurrent.get(l)));
                 // prepare for add to stateSetBuffer
                 Collections.sort(current.subList(1, current.size()));
@@ -188,7 +167,6 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
                 for (int i = 0; i < acurrent.length; i++) acurrent[i] = current.get(i);
 
                 final int offset = mStateSetBuffer.add(acurrent);
-                //System.out.println("new offset from adding new set to buffer is "+offset);
 
                 final int target;
                 if (offset > last) {
@@ -203,17 +181,10 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
                 }
                 // add transitions for each permutation we just added
                 mTransitionBuffer.addTransition(source, event, target);
-
               }
-
-
-            } else {
-              System.out.println("No matches found for e"+event+" in set #"+set);
             }
             current.clear();
             leadingcurrent.clear();
-            System.out.println(mTransitionBuffer.toString());
-            System.out.println("--------------------");
           }
         }
 
@@ -231,21 +202,16 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         final int numDetStates = mSetOffsets.size();
         final int numProps = rel.getNumberOfPropositions();
         final long usedProps = rel.getUsedPropositions();
-        final IntStateBuffer detStates =
-          new IntStateBuffer(numDetStates, numProps, usedProps);
+        final IntStateBuffer detStates = new IntStateBuffer(numDetStates, numProps, usedProps);
         detStates.setInitial(0, true);
         final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
         for (int detstate = 0; detstate < numDetStates; detstate++) {
-          long markings = detStates.createMarkings();
           final int offset = mSetOffsets.get(detstate);
           iter.reset(offset);
-          //while (iter.advance()) {
           iter.advance();
-            final int state = iter.getCurrentData();
-            final long stateMarkings = rel.getAllMarkings(state);
-            markings = detStates.mergeMarkings(markings, stateMarkings);
-          //}
-          detStates.setAllMarkings(detstate, markings);
+          final int state = iter.getCurrentData();
+          final long stateMarkings = rel.getAllMarkings(state);
+          detStates.setAllMarkings(detstate, stateMarkings);
         }
         detStates.removeRedundantPropositions();
         mSetOffsets = null;
@@ -255,12 +221,88 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         rel.reset(detStates, numTrans, config);
         rel.removeEvent(EventEncoding.TAU);
         mTransitionBuffer.addOutgoingTransitions(rel);
-        mTransitionBuffer = null;
+mTransitionBuffer = null;
         rel.removeProperSelfLoopEvents();
+        if (!certainconfalgo(rel)) System.out.println("Error");
 
       }
+
     }
-  //#########################################################################
+
+    protected boolean certainconfalgo(final ListBufferTransitionRelation rel) throws AnalysisException
+      {
+        //final ListBufferTransitionRelation rel = getTransitionRelation();
+        TIntHashSet blacklist = findbadstates(rel);
+        if (blacklist.size() == 0) return true;
+
+        final int dumpstate = blacklist.toArray()[0];
+        // TODO: ensure dump state is not marked
+
+        while(blacklist.size() > 1) { // keep going until no more changes (except dump state?)
+          final int[] blacklist_arr = blacklist.toArray();
+          for (int i = 0; i < blacklist.size(); i++) {
+            // TODO: add brothers of items on blacklist to blacklist
+          }
+
+          // for each item on blacklist, all transitions in get redirected to dump state
+          // then remove item from transition relation (set reachable false)
+          for (int i = 0; i < blacklist.size(); i++) {
+            rel.moveIncomingTransitions(blacklist_arr[i], dumpstate);
+            rel.setReachable(blacklist_arr[i], false);
+            // TODO: (if item is initial, set dump state to be initial)
+          }
+
+          blacklist = findbadstates(rel);
+        }
+        return true;
+      }
+
+    protected TIntHashSet findbadstates(final ListBufferTransitionRelation rel) throws AnalysisException {
+        final TIntHashSet badstates = new TIntHashSet();
+
+        final TransitionIterator prediter = rel.createPredecessorsReadOnlyIterator();
+        final int alphaID = getPreconditionMarkingID();
+        final int defaultID = getDefaultMarkingID();
+
+        final int numStates = rel.getNumberOfStates();
+        final TIntHashSet coreachableStates = new TIntHashSet(numStates);
+        final TIntStack unvisitedStates = new TIntStack();
+        // Creates a hash set of all states which can reach an omega marked or alpha
+        // marked state.
+        for (int sourceID = 0; sourceID < numStates; sourceID++) {
+          System.out.println("marking a:"+rel.isMarked(sourceID, defaultID));
+          System.out.println("marking b:"+rel.isMarked(sourceID, alphaID));
+          System.out.println("reachable:"+rel.isReachable(sourceID));
+          if ((rel.isMarked(sourceID, defaultID) ||
+               rel.isMarked(sourceID, alphaID)) &&
+              rel.isReachable(sourceID) &&
+              coreachableStates.add(sourceID) ) {
+            checkAbort();
+            unvisitedStates.push(sourceID);
+            while (unvisitedStates.size() > 0) {
+              final int newSource = unvisitedStates.pop();
+              prediter.resetState(newSource);
+              while (prediter.advance()) {
+                final int predID = prediter.getCurrentSourceState();
+                if (rel.isReachable(predID) && coreachableStates.add(predID)) {
+                  unvisitedStates.push(predID);
+                }
+              }
+            }
+          }
+        }
+        // Blacklist states which cannot reach a state marked alpha or omega.
+
+        for (int sourceID = 0; sourceID < numStates; sourceID++) {
+          if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
+            badstates.add(sourceID);
+          }
+        }
+
+        return badstates;
+    }
+
+    //#########################################################################
     //# Data Members
     private final int mStateLimit = Integer.MAX_VALUE;
     private final int mTransitionLimit = Integer.MAX_VALUE;

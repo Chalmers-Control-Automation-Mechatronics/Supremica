@@ -25,6 +25,14 @@ public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
     return new CertainConflictsTRSimplifier();
   }
 
+  public void test_certainconflicts_8() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_8.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   public void test_certainconflicts_1() throws Exception
   {
     final String group = "tests";
