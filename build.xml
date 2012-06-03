@@ -700,10 +700,12 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/IDE.cmd" perm="644"/>
         <copy file="${templates}/IDE" todir="${dist}"/> 
         <chmod file="${dist}/IDE" perm="755"/>
-        <copy file="${templates}/vw" todir="${dist}"/>  
-        <chmod file="${dist}/vw" perm="755"/>   
-        <copy file="${templates}/wcheck" todir="${dist}"/>      
-        <chmod file="${dist}/wcheck" perm="755"/>       
+        <copy file="${templates}/susyna2waters" todir="${dist}"/>
+        <chmod file="${dist}/susyna2waters" perm="755"/>
+        <copy file="${templates}/vw" todir="${dist}"/>
+        <chmod file="${dist}/vw" perm="755"/>
+        <copy file="${templates}/wcheck" todir="${dist}"/>
+        <chmod file="${dist}/wcheck" perm="755"/>
         <copy file="${templates}/demo" todir="${dist}"/>
         <chmod file="${dist}/demo" perm="755"/>
         <copy file="${templates}/demo.cmd" todir="${dist}"/>
