@@ -8,50 +8,37 @@
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
             <!-- Do not use Project Properties customizer when editing this file manually. -->
             <name>Supremica</name>
-            <properties>
-                <property name="project.dir">.</property>
-                <property name="ant.script">${project.dir}/build.xml</property>
-            </properties>
+            <properties/>
             <folders>
-                <source-folder>
-                    <label>trunk</label>
-                    <location>${project.dir}</location>
-                </source-folder>
                 <source-folder>
                     <label>Supremica</label>
                     <location>.</location>
-                    <encoding>UTF-8</encoding>
+                    <encoding>windows-1252</encoding>
                 </source-folder>
                 <source-folder>
                     <label>src</label>
                     <type>java</type>
-                    <location>${project.dir}/src</location>
-                    <encoding>UTF-8</encoding>
+                    <location>src</location>
+                    <encoding>windows-1252</encoding>
                 </source-folder>
             </folders>
             <ide-actions>
                 <action name="build">
-                    <script>${ant.script}</script>
                     <target>compile_supremica</target>
                 </action>
                 <action name="clean">
-                    <script>${ant.script}</script>
                     <target>clean</target>
                 </action>
                 <action name="javadoc">
-                    <script>${ant.script}</script>
                     <target>doc</target>
                 </action>
                 <action name="run">
-                    <script>${ant.script}</script>
                     <target>runLocal</target>
                 </action>
                 <action name="test">
-                    <script>${ant.script}</script>
                     <target>test_min</target>
                 </action>
                 <action name="rebuild">
-                    <script>${ant.script}</script>
                     <target>clean</target>
                     <target>compile_supremica</target>
                 </action>
@@ -59,41 +46,20 @@
                     <script>nbproject/ide-targets.xml</script>
                     <target>debug-nb</target>
                 </action>
-                <action name="debug.single">
-                    <script>nbproject/ide-file-targets.xml</script>
-                    <target>debug-selected-file-in-src</target>
-                    <context>
-                        <property>debug.class</property>
-                        <folder>${project.dir}/src</folder>
-                        <pattern>\.java$</pattern>
-                        <format>java-name</format>
-                        <arity>
-                            <one-file-only/>
-                        </arity>
-                    </context>
-                </action>
-                <action name="run.single">
-                    <script>nbproject/ide-file-targets.xml</script>
-                    <target>run-selected-file-in-src</target>
-                    <context>
-                        <property>run.class</property>
-                        <folder>${project.dir}/tests/src</folder>
-                        <pattern>\.java$</pattern>
-                        <format>java-name</format>
-                        <arity>
-                            <one-file-only/>
-                        </arity>
-                    </context>
-                </action>
             </ide-actions>
+            <export>
+                <type>folder</type>
+                <location>dist</location>
+                <build-target>compile_supremica</build-target>
+            </export>
             <view>
                 <items>
                     <source-folder style="packages">
                         <label>src</label>
-                        <location>${project.dir}/src</location>
+                        <location>src</location>
                     </source-folder>
                     <source-file>
-                        <location>${ant.script}</location>
+                        <location>build.xml</location>
                     </source-file>
                 </items>
                 <context-menu>
@@ -108,33 +74,13 @@
             </view>
             <subprojects/>
         </general-data>
-        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
             <compilation-unit>
-                <package-root>${project.dir}/src</package-root>
+                <package-root>src</package-root>
                 <classpath mode="compile">lib/unjared</classpath>
-                <source-level>1.6</source-level>
+                <built-to>dist</built-to>
+                <source-level>1.5</source-level>
             </compilation-unit>
         </java-data>
-        <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
-            <module name="org-netbeans-modules-editor-indent">
-                <node name="CodeStyle">
-                    <node name="project"/>
-                </node>
-                <node name="text">
-                    <node name="x-java">
-                        <node name="CodeStyle">
-                            <node name="project"/>
-                        </node>
-                        <node name="project"/>
-                    </node>
-                    <node name="project"/>
-                    <node name="CodeStyle"/>
-                </node>
-                <node name="application"/>
-                <node name="project"/>
-                <node name="x-java"/>
-            </module>
-            <module name="org-netbeans-modules-projectimport-eclipse-core"/>
-        </preferences>
     </configuration>
 </project>
