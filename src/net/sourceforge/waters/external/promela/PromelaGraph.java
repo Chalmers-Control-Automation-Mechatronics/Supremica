@@ -27,6 +27,29 @@ public class PromelaGraph
     mPromelaStartNode = start;
     //mPromelaEndNode = end;
   }
+
+  public PromelaGraph()
+  {
+    mPromelaNodes = new ArrayList<PromelaNode>();
+    mPromelaStartNode = new PromelaNode();
+    mPromelaNodes.add(mPromelaStartNode);
+    final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
+    mPromelaNodes.add(promelaEndNode);
+  }
+
+  public void addEdge(final PromelaNode source, final PromelaNode target,
+                      final List<IdentifierProxy> events, final ModuleProxyFactory mFactory)
+  {
+    final ModuleProxyCloner cloner = mFactory.getCloner();
+    final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(cloner.getClonedList(events));
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final Comparator<SimpleExpressionProxy> comparator = new ExpressionComparator(optable);
+    Collections.sort(tempLabel, comparator);
+    final PromelaLabel label = new PromelaLabel(tempLabel);
+    final PromelaEdge edge = new PromelaEdge(source, target, label);
+    mPromelaEdges.add(edge);
+  }
+
   public PromelaGraph(final List<PromelaNode> nodes, final List<PromelaEdge> edges){
     mPromelaNodes = nodes;
     mPromelaEdges = edges;
@@ -56,8 +79,7 @@ public class PromelaGraph
     final ModuleProxyCloner cloner = mFactory.getCloner();
     final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(cloner.getClonedList(events));
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    final Comparator<SimpleExpressionProxy> comparator =
-      new ExpressionComparator(optable);
+    final Comparator<SimpleExpressionProxy> comparator = new ExpressionComparator(optable);
     if(tempLabel.size()>1){
       Collections.sort(tempLabel, comparator);
     }

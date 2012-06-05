@@ -176,7 +176,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="B_0">
                                 <PointGeometry>
-                                    <Point Y="64" X="80"/>
+                                    <Point Y="80" X="240"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-6" X="-32"/>
@@ -184,7 +184,7 @@
                             </SimpleNode>
                             <SimpleNode Name="B_1">
                                 <PointGeometry>
-                                    <Point Y="144" X="80"/>
+                                    <Point Y="160" X="240"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-5" X="-29"/>
@@ -195,7 +195,7 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="224" X="80"/>
+                                    <Point Y="240" X="240"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-10" X="-32"/>
@@ -222,6 +222,22 @@
                                         <IntConstant Value="121"/>
                                     </IndexedIdentifier>
                                     <IndexedIdentifier Name="exch_name">
+                                        <SimpleIdentifier Name="A_1"/>
+                                        <SimpleIdentifier Name="procid"/>
+                                        <IntConstant Value="33"/>
+                                        <IntConstant Value="121"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-24" X="-210"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="201" X="224"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="B_2" Source="B_1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="exch_name">
                                         <SimpleIdentifier Name="A_0"/>
                                         <SimpleIdentifier Name="procid"/>
                                         <IntConstant Value="33"/>
@@ -231,18 +247,15 @@
                                         <SimpleIdentifier Name="A_1"/>
                                         <SimpleIdentifier Name="procid"/>
                                         <IntConstant Value="33"/>
-                                        <IntConstant Value="121"/>
-                                    </IndexedIdentifier>
-                                    <IndexedIdentifier Name="exch_name">
-                                        <SimpleIdentifier Name="A_1"/>
-                                        <SimpleIdentifier Name="procid"/>
-                                        <IntConstant Value="33"/>
                                         <IntConstant Value="124"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-33" X="3"/>
+                                        <Point Y="-26" X="9"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="201" X="256"/>
+                                </SplineGeometry>
                             </Edge>
                         </EdgeList>
                     </Graph>

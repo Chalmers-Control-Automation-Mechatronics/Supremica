@@ -51,8 +51,8 @@ tokens{
 package net.sourceforge.waters.external.promela.parser;
 
 
+import net.sourceforge.waters.external.promela.*;
 import net.sourceforge.waters.external.promela.ast.*;
-import net.sourceforge.waters.external.promela.PromelaParserError;
 
 }
 
@@ -65,6 +65,7 @@ import net.sourceforge.waters.external.promela.PromelaParserError;
 @members {
   private ArrayList<PromelaParserError> errors = new ArrayList<PromelaParserError>();
   private Stack paraphrases = new Stack();
+  private PromelaMType mMType = new PromelaMType("mtype");
   
   public ArrayList<PromelaParserError> getErrors() {
     return errors;
@@ -97,7 +98,7 @@ specRule
 @init  { paraphrases.push("in specification"); }
 @after { paraphrases.pop(); }
 	:	moduleRule+ EOF
-		-> ^(MODULE_ROOT<ModuleTreeNode> moduleRule*)
+		-> ^(MODULE_ROOT<ModuleTreeNode>[mMType] moduleRule*)
 	;
 
 moduleRule
@@ -341,7 +342,7 @@ decl_lstRule
 
 //modified
 one_declRule
-@init  { paraphrases.push("in declaration"); boolean visible = true; String type="";}
+@init  { paraphrases.push("in declaration"); boolean visible = true; PromelaType type=null;}
 @after { paraphrases.pop(); }
 	:	(visibleRule {visible = $visibleRule.visible;})? typenameRule {type = $typenameRule.type;} ivarRule (COMMA ivarRule)*
 		-> ^(VARDEFINITION<VardefTreeNode>[visible, type] ivarRule+)
@@ -417,13 +418,14 @@ pollRule
 //		-> ^(STATEMENT constRule typenameRule* )
 //	;
 	
-typenameRule returns [String type]
-	:	BIT | BOOL {$type = "bit";}
-		 | BYTE {$type = "byte";}
-		 | SHORT {$type = "short";}
-		| INT {$type = "int";}
-		| MTYPE {$type = "mtype";}
-		| unameRule
+typenameRule returns [PromelaType type]
+	:	BIT {$type = PromelaIntRange.BIT;}
+	| BOOL {$type = PromelaIntRange.BIT;}
+	| BYTE {$type = PromelaIntRange.BYTE;}
+	| SHORT {$type = PromelaIntRange.SHORT;}
+	| INT {$type = PromelaIntRange.INT;}
+	| MTYPE {$type = mMType;}
+	| unameRule
 		
 	;
 typeRule

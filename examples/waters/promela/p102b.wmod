@@ -272,15 +272,18 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="B_0">
                         <PointGeometry>
-                            <Point Y="64" X="80"/>
+                            <Point Y="80" X="208"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-31" X="-10"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="B_1">
                         <PointGeometry>
-                            <Point Y="144" X="80"/>
+                            <Point Y="160" X="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-6" X="9"/>
@@ -288,7 +291,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_2">
                         <PointGeometry>
-                            <Point Y="224" X="80"/>
+                            <Point Y="240" X="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-5" X="7"/>
@@ -299,7 +302,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="304" X="80"/>
+                            <Point Y="320" X="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="9"/>
@@ -321,14 +324,13 @@
                                 <IntConstant Value="1"/>
                                 <IntConstant Value="3"/>
                             </IndexedIdentifier>
-                            <IndexedIdentifier Name="recv_ch">
-                                <IntConstant Value="1"/>
-                                <IntConstant Value="4"/>
-                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="3"/>
+                                <Point Y="-16" X="-92"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="201" X="193"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Target="B_3" Source="B_2">
                         <LabelBlock>
@@ -336,14 +338,41 @@
                                 <IntConstant Value="1"/>
                                 <IntConstant Value="4"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="-94"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="278" X="194"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="B_2" Source="B_1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="recv_ch">
+                                <IntConstant Value="1"/>
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="200" X="225"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="B_3" Source="B_2">
+                        <LabelBlock>
                             <IndexedIdentifier Name="recv_ch">
                                 <IntConstant Value="2"/>
                                 <IntConstant Value="4"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="4"/>
+                                <Point Y="-10" X="7"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="280" X="225"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

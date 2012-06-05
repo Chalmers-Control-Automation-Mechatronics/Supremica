@@ -1,13 +1,13 @@
 package net.sourceforge.waters.external.promela.ast;
 
+import net.sourceforge.waters.external.promela.PromelaType;
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
 public class VardefTreeNode extends PromelaTree
 {
-
-  public VardefTreeNode(final int token, final boolean visible, final String type)
+  public VardefTreeNode(final int token, final boolean visible, final PromelaType type)
   {
     this((Token)new CommonToken(token,"Vardefinition"));
     mVisible = visible;
@@ -48,9 +48,9 @@ public class VardefTreeNode extends PromelaTree
   /**
    * A method to get the type of the variable(s) that are being created
    * @author Ethan Duff
-   * @return A string indicating the type of the variable. Will be 'bit' 'byte' 'short' 'int' 'mtype'
+   * @return A promela type matching this variable
    */
-  public String getVariableType()
+  public PromelaType getVariableType()
   {
     return mVariableType;
   }
@@ -70,8 +70,7 @@ public class VardefTreeNode extends PromelaTree
 
   //NEW<============================================================================================================================================
   private boolean mVisible;
-  private String mVariableType;
+  private PromelaType mVariableType;
   private boolean mGlobal;
   //===============================================================================================================================================>
-
 }

@@ -210,7 +210,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="B_0">
                                 <PointGeometry>
-                                    <Point Y="48" X="64"/>
+                                    <Point Y="64" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-4" X="6"/>
@@ -218,7 +218,7 @@
                             </SimpleNode>
                             <SimpleNode Name="B_1">
                                 <PointGeometry>
-                                    <Point Y="128" X="64"/>
+                                    <Point Y="144" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-7" X="8"/>
@@ -226,7 +226,7 @@
                             </SimpleNode>
                             <SimpleNode Name="B_2">
                                 <PointGeometry>
-                                    <Point Y="208" X="64"/>
+                                    <Point Y="224" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-5" X="8"/>
@@ -237,7 +237,7 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="288" X="64"/>
+                                    <Point Y="304" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-6" X="8"/>
@@ -261,14 +261,13 @@
                                         <SimpleIdentifier Name="procid"/>
                                         <IntConstant Value="0"/>
                                     </IndexedIdentifier>
-                                    <IndexedIdentifier Name="exch_ab">
-                                        <SimpleIdentifier Name="procid"/>
-                                        <IntConstant Value="1"/>
-                                    </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-17" X="4"/>
+                                        <Point Y="-8" X="-126"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="181" X="197"/>
+                                </SplineGeometry>
                             </Edge>
                             <Edge Target="B_3" Source="B_2">
                                 <LabelBlock>
@@ -286,6 +285,20 @@
                                         <Point Y="-19" X="3"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                            </Edge>
+                            <Edge Target="B_2" Source="B_1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="exch_ab">
+                                        <SimpleIdentifier Name="procid"/>
+                                        <IntConstant Value="1"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-5" X="3"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="182" X="256"/>
+                                </SplineGeometry>
                             </Edge>
                         </EdgeList>
                     </Graph>

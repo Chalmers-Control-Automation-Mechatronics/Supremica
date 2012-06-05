@@ -99,12 +99,13 @@
                 <EnumSetExpression>
                     <SimpleIdentifier Name="DATA"/>
                     <SimpleIdentifier Name="FV"/>
+                    <SimpleIdentifier Name=":undefined"/>
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
                 <BinaryExpression Operator="==">
                     <SimpleIdentifier Name="var_B_data"/>
-                    <SimpleIdentifier Name="DATA"/>
+                    <SimpleIdentifier Name=":undefined"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
@@ -127,7 +128,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="B_0">
                         <PointGeometry>
-                            <Point Y="64" X="80"/>
+                            <Point Y="64" X="320"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="9"/>
@@ -135,7 +136,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_1">
                         <PointGeometry>
-                            <Point Y="144" X="80"/>
+                            <Point Y="144" X="320"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-6" X="9"/>
@@ -146,7 +147,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="224" X="80"/>
+                            <Point Y="224" X="320"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-5" X="7"/>
@@ -168,18 +169,38 @@
                                 <SimpleIdentifier Name="DATA"/>
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="-121"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="185" X="227"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="B_2" Source="B_1">
+                        <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <SimpleIdentifier Name="DATA"/>
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-61"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="B_2" Source="B_1">
+                        <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <SimpleIdentifier Name="FV"/>
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="3"/>
+                                <Point Y="-10" X="7"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="183" X="399"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

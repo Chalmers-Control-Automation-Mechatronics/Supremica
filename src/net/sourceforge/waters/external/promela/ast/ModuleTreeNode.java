@@ -1,21 +1,23 @@
 package net.sourceforge.waters.external.promela.ast;
 
-import java.util.ArrayList;
+import java.util.List;
 
+import net.sourceforge.waters.external.promela.PromelaMType;
 import net.sourceforge.waters.external.promela.PromelaVisitor;
 import org.antlr.runtime.*;
 
 public class ModuleTreeNode extends PromelaTree
 {
-  public ModuleTreeNode(final Token token)
+  public ModuleTreeNode(final Token token, final PromelaMType mtype)
   {
     super(token);
     mEx = token.getText();
+    mMTypes = mtype;
   }
 
-  public ModuleTreeNode(final int token)
+  public ModuleTreeNode(final int token, final PromelaMType mtype)
   {
-    this((Token)new CommonToken(token,"Root"));
+    this((Token)new CommonToken(token,"Root"), mtype);
     mEx = "Root";
   }
 
@@ -24,7 +26,7 @@ public class ModuleTreeNode extends PromelaTree
       return "Module";
   }
 
-  private ArrayList<String> mMtypes;
+  private final PromelaMType mMTypes;
   private String mEx;
 
   public String getValue()
@@ -32,20 +34,14 @@ public class ModuleTreeNode extends PromelaTree
       return mEx;
   }
 
-  public ArrayList<String> getMtypes()
+  public List<String> getMtypes()
   {
-    if(mMtypes == null)
-      mMtypes = new ArrayList<String>();
-
-    return mMtypes;
+    return mMTypes.getMTypes();
   }
 
   public void addMtype(final String mtype)
   {
-    if(mMtypes == null)
-      mMtypes = new ArrayList<String>();
-
-    mMtypes.add(mtype);
+    mMTypes.addMType(mtype);
   }
 
   public Object acceptVisitor(final PromelaVisitor visitor)
