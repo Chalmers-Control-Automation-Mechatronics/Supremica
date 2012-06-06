@@ -1311,8 +1311,8 @@ public class GraphEditorPanel
         }
       }
       //only select the labelblock if the focus is on the labels within or if
-      //the labelblock is already selected
-      if(!collection2.isEmpty() || isSelected(block)){
+      //the labelblock is already selected or if its a DND action
+      if(!collection2.isEmpty() || isSelected(block) || mInternalDragAction instanceof InternalDragActionDND){
         collectFocusableObjectAtPosition(block, point, collection);
       }
       final GuardActionBlockSubject ga = edge.getGuardActionBlock();
