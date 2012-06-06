@@ -59,7 +59,30 @@ public class EditorTransitionProjectionAction
         logger.info("Transition projection running ... ");
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
         AutomatonObserver observer = new AutomatonObserver(exAutomata);
+        int nbrOriNodes = 0;
+        int nbrObsNodes = 0;
+        int nbrOriTrans = 0;
+        int nbrObsTrans = 0;
+        
+        for(ExtendedAutomaton efa:exAutomata){
+            nbrOriNodes += efa.getNodes().size();
+            nbrOriTrans += efa.getTransitions().size();
+        }
+        
         observer.compute();
+        
+        for(ExtendedAutomaton efa:exAutomata)
+            if(efa.getName().contains("_QUO")){
+                nbrObsNodes += efa.getNodes().size();
+                nbrObsTrans += efa.getTransitions().size();
+            }
+        
+        logger.info("\n Transition Projection"
+                + "\n -----------------------"
+                + "\n Nbr original nodes: " + nbrOriNodes + "\n Nbr original transitions: " + nbrOriTrans
+                + "\n Nbr observer nodes: " + nbrObsNodes + "\n Nbr observer transitions: " + nbrObsTrans
+                + "\n Nbr local events: " + observer.getAllLocalEvents().size()
+                + "\n Computation time: " + observer.getObserverTimer());
         logger.info("Transition projection end");
     }
 }
