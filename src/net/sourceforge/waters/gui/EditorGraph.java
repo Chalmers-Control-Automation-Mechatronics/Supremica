@@ -35,15 +35,18 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
@@ -55,10 +58,12 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
@@ -112,7 +117,7 @@ class EditorGraph
       final LabelBlockSubject blocked = graph.getBlockedEvents();
       mBlockedEvents = blocked.clone();
       mBlockedEvents.setParent(this);
-      new LabelBlockChangeRecord(blocked, mBlockedEvents);
+      mChangeRecordCreator.createChangeRecordForLabelBlock(blocked, mBlockedEvents);
     } else {
       mBlockedEvents = null;
     }
@@ -1283,6 +1288,36 @@ class EditorGraph
     }
   }
 
+//#########################################################################
+  //# Inner Class IdentifierChangeRecord
+  private class IdentifierChangeRecord
+    extends ChangeRecord
+  {
+    //#######################################################################
+    //# Constructors
+    IdentifierChangeRecord(final IdentifierSubject original,
+                     final IdentifierSubject fake)
+    {
+      super(original, fake, ModelChangeEvent.NO_CHANGE);
+    }
+
+  }
+
+//#########################################################################
+  //# Inner Class ForeachChangeRecord
+  private class ForeachChangeRecord
+    extends ChangeRecord
+  {
+    //#######################################################################
+    //# Constructors
+    ForeachChangeRecord(final ForeachSubject original,
+                     final ForeachSubject fake)
+    {
+      super(original, fake, ModelChangeEvent.NO_CHANGE);
+    }
+
+  }
+
 
   //#########################################################################
   //# Inner Class EdgeChangeRecord
@@ -1294,7 +1329,7 @@ class EditorGraph
     EdgeChangeRecord(final EdgeSubject original,
                      final EdgeSubject fake)
     {
-      super(original, fake);
+      this(original, fake, ModelChangeEvent.NO_CHANGE);
     }
 
     EdgeChangeRecord(final EdgeSubject original,
@@ -1302,6 +1337,9 @@ class EditorGraph
                      final int kind)
     {
       super(original, fake, kind);
+      final LabelBlockSubject originalLB = original.getLabelBlock();
+      final LabelBlockSubject fakeLB = fake.getLabelBlock();
+      mChangeRecordCreator.createChangeRecordForLabelBlock(originalLB, fakeLB);
     }
 
     //#######################################################################
@@ -1668,9 +1706,16 @@ class EditorGraph
     public ProxySubject visitLabelBlockProxy(final LabelBlockProxy original)
     {
       final LabelBlockSubject osubject = (LabelBlockSubject) original;
-      final EdgeSubject oedge = (EdgeSubject) osubject.getParent();
-      final EdgeSubject fedge = (EdgeSubject) getFake(oedge);
-      return fedge.getLabelBlock();
+      final Subject parent = osubject.getParent();
+      if (parent instanceof EdgeSubject) {
+        final EdgeSubject oedge = (EdgeSubject) parent;
+        final EdgeSubject fedge = (EdgeSubject) getFake(oedge);
+        return fedge.getLabelBlock();
+      }
+      else {
+        return mBlockedEvents;
+      }
+
     }
 
     public GuardActionBlockSubject visitGuardActionBlockProxy
@@ -1691,6 +1736,7 @@ class EditorGraph
       final SimpleNodeSubject fnode = (SimpleNodeSubject) getFake(onode);
       return fnode.getLabelGeometry();
     }
+
   }
 
 
@@ -1783,6 +1829,24 @@ class EditorGraph
       }
     }
 
+    private void createChangeRecordForLabelBlock(final LabelBlockSubject original,
+                                                         final LabelBlockSubject fake)
+    {
+      try {
+        mFake = fake;
+        mOriginal = original;
+        final ListSubject<AbstractSubject> originalList = original.getEventListModifiable();
+        final ListSubject<AbstractSubject> fakeList = fake.getEventListModifiable();
+        for(int i = 0; i < originalList.size(); i++){
+          mOriginal = originalList.get(i);
+          mFake = fakeList.get(i);
+          mOriginal.acceptVisitor(this);
+        }
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public ChangeRecord visitEdgeProxy(final EdgeProxy fake)
@@ -1790,6 +1854,20 @@ class EditorGraph
       final EdgeSubject oedge = (EdgeSubject) mOriginal;
       final EdgeSubject fedge = (EdgeSubject) mFake;
       return new EdgeChangeRecord(oedge, fedge, mKind);
+    }
+
+    public ChangeRecord visitForeachProxy(final ForeachProxy fake) throws VisitorException{
+      final ForeachSubject oforeach = (ForeachSubject)mOriginal;
+      final ForeachSubject fforeach = (ForeachSubject)mFake;
+      new ForeachChangeRecord(oforeach, fforeach);
+      final ListSubject<AbstractSubject> originalList = oforeach.getBodyModifiable();
+      final ListSubject<AbstractSubject> fakeList = fforeach.getBodyModifiable();
+      for(int i = 0; i < originalList.size(); i++){
+        mOriginal = originalList.get(i);
+        mFake = fakeList.get(i);
+        mOriginal.acceptVisitor(this);
+      }
+      return null;
     }
 
     public ChangeRecord visitGroupNodeProxy(final GroupNodeProxy fake)
@@ -1808,6 +1886,14 @@ class EditorGraph
         (GuardActionBlockSubject) mFake;
       return new GuardActionBlockChangeRecord(oblock, fblock, mKind);
     }
+
+    public ChangeRecord visitIdentifierProxy
+    (final IdentifierProxy fake)
+  {
+    final IdentifierSubject oident = (IdentifierSubject) mOriginal;
+    final IdentifierSubject fident = (IdentifierSubject) mFake;
+    return new IdentifierChangeRecord(oident, fident);
+  }
 
     public ChangeRecord visitLabelBlockProxy(final LabelBlockProxy fake)
     {

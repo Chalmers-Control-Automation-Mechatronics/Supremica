@@ -2634,19 +2634,7 @@ public class GraphEditorPanel
                                    final boolean shiftDown)
     {
       super(start);
-      mClickedObjectWasSelected = clicked != null && isSelected(clicked);
-      mMovedObject = mFocusedObject;
       mShiftDown = shiftDown;
-      //mCanSelectLabels = canSelectLabels(mClickedObject);
-      if (mMovedObject == null || !mClickedObjectWasSelected) {
-        if (!shiftDown && mMovedObject != null) {
-          replaceSelection(mMovedObject);
-        } else if (!shiftDown) {
-          clearSelection();
-        } else if (mMovedObject != null) {
-          addToSelection(mMovedObject);
-        }
-      }
 
       Point2D snap = null;
       if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
@@ -2731,8 +2719,6 @@ public class GraphEditorPanel
     //# Data Members
 
     private final Point2D mSnapPoint;
-    private final boolean mClickedObjectWasSelected;
-    private final ProxySubject mMovedObject;
     private MoveVisitor mMoveVisitor;
     @SuppressWarnings("unused")
     private final boolean mShiftDown;
