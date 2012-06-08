@@ -1925,7 +1925,7 @@ public class GraphEditorPanel
           if(mFocusedObject == subject || !isSelected(subject)){
             final Handle handle = getClickedHandle(subject, event);
             if(handle == null){
-              mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown());
+              mInternalDragAction = new InternalDragActionMove(mStartPoint);
             }
             else{
               switch (handle.getType()) {
@@ -2068,7 +2068,7 @@ public class GraphEditorPanel
             final Handle handle = getClickedHandle(subject, event);
             if (handle == null) {
               mInternalDragAction =
-                new InternalDragActionMove(mStartPoint, event.isShiftDown());
+                new InternalDragActionMove(mStartPoint);
             } else {
               if(handle.getType() == HandleType.INITIAL){
                 mInternalDragAction =
@@ -2120,7 +2120,7 @@ public class GraphEditorPanel
         } else {
           final Handle handle = getClickedHandle(mFocusedObject, event);
           if (handle == null) {
-            mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown());
+            mInternalDragAction = new InternalDragActionMove(mStartPoint);
           } else {
             mInternalDragAction =
               new InternalDragActionResizeGroupNode(handle, mStartPoint);
@@ -2201,7 +2201,7 @@ public class GraphEditorPanel
           if(mFocusedObject == item || !isSelected(item)){
             final Handle handle = getClickedHandle(item, event);
             if(handle == null && canBeSelected(item)){
-              mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown());
+              mInternalDragAction = new InternalDragActionMove(mStartPoint);
             }
             else{
               if (item instanceof NodeSubject) {
@@ -2211,7 +2211,7 @@ public class GraphEditorPanel
               } else if (item instanceof EdgeSubject) {
                 if (handle == null) {
                   mInternalDragAction =
-                    new InternalDragActionMove(mStartPoint, event.isShiftDown());
+                    new InternalDragActionMove(mStartPoint);
                 } else {
                   mInternalDragAction =
                     new InternalDragActionEdge(handle, mStartPoint);
@@ -2369,7 +2369,12 @@ public class GraphEditorPanel
 
     boolean continueDrag(final MouseEvent event)
     {
+      mShiftDown = event.isShiftDown();
       return continueDrag(event.getPoint());
+    }
+
+    public boolean isShiftDown(){
+      return mShiftDown;
     }
 
 
@@ -2437,6 +2442,7 @@ public class GraphEditorPanel
      * Cached copy of drag rectangle.
      */
     private Rectangle mDragRectangle;
+    private boolean mShiftDown;
   }
 
 
@@ -2623,18 +2629,26 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionMove(final Point start,
-                                   final boolean shiftDown)
+    private InternalDragActionMove(final Point start)
     {
-      this(mFocusedObject, start, shiftDown);
+      this(mFocusedObject, start);
     }
 
     private InternalDragActionMove(final ProxySubject clicked,
-                                   final Point start,
-                                   final boolean shiftDown)
+                                   final Point start)
     {
       super(start);
-      mShiftDown = shiftDown;
+      mClickedObjectWasSelected = clicked != null && isSelected(clicked);
+      mMovedObject = mFocusedObject;
+      if (mMovedObject == null || !mClickedObjectWasSelected) {
+        if (!isShiftDown() && mMovedObject != null) {
+          replaceSelection(mMovedObject);
+        } else if (!isShiftDown()) {
+          clearSelection();
+        } else if (mMovedObject != null) {
+          addToSelection(mMovedObject);
+        }
+      }
 
       Point2D snap = null;
       if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
@@ -2695,9 +2709,19 @@ public class GraphEditorPanel
       } else if (!super.continueDrag(point)) {
         return false;
       }
-      //TODO add directional moves only for when shift is down
-      final int dx = getDragCurrentOnGrid().x - start.x;
-       final int dy = getDragCurrentOnGrid().y - start.y;
+      //TODO figure way of using shiftdown better ?
+      //Also, drag is not so smooth
+        int dx = getDragCurrentOnGrid().x - start.x;
+       int dy = getDragCurrentOnGrid().y - start.y;
+       if(isShiftDown()){
+         //use squares because dx and dy can be negative
+         if(dx*dx < dy*dy){
+           dx = 0;
+         }
+         else{
+           dy = 0;
+         }
+       }
       mMoveVisitor.moveAll(dx, dy);
       return true;
     }
@@ -2720,9 +2744,8 @@ public class GraphEditorPanel
 
     private final Point2D mSnapPoint;
     private MoveVisitor mMoveVisitor;
-    @SuppressWarnings("unused")
-    private final boolean mShiftDown;
-
+    private final boolean mClickedObjectWasSelected;
+    private final ProxySubject mMovedObject;
   }
 
 
