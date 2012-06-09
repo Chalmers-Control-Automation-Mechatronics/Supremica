@@ -1914,23 +1914,24 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public void mouseDragged(final MouseEvent event)
     {
-      if(mInternalDragAction == null){
-        if(mFocusedObject == null){
-          mInternalDragAction = new InternalDragActionSelect(mStartPoint, event.isShiftDown());
-        }
-        else{
+      if (mInternalDragAction == null) {
+        if (mFocusedObject == null) {
+          mInternalDragAction =
+            new InternalDragActionSelect(mStartPoint, event.isShiftDown());
+        } else {
           final ProxySubject subject = getItemToBeSelected(event);
-          if(mFocusedObject == subject || !isSelected(subject)){
+          if (mFocusedObject == subject || !isSelected(subject)) {
             final Handle handle = getClickedHandle(subject, event);
-            if(handle == null){
+            if (handle == null) {
               mInternalDragAction = new InternalDragActionMove(mStartPoint);
-            }
-            else{
+            } else {
               switch (handle.getType()) {
               case INITIAL:
-                mInternalDragAction = new InternalDragActionInitial(mStartPoint);
+                mInternalDragAction =
+                  new InternalDragActionInitial(mStartPoint);
                 break;
               case SOURCE:
               case TARGET:
@@ -1945,23 +1946,20 @@ public class GraphEditorPanel
               case SW:
               case S:
               case SE:
-                mInternalDragAction = new InternalDragActionResizeGroupNode(handle, mStartPoint);
+                mInternalDragAction =
+                  new InternalDragActionResizeGroupNode(handle, mStartPoint);
                 break;
               default:
-                throw new IllegalStateException
-                  ("Unknown handle type: " + handle.getType());
+                throw new IllegalStateException("Unknown handle type: " +
+                                                handle.getType());
               }
             }
-          }
-          else{
-             mInternalDragAction = new InternalDragActionDND(mStartPoint);
+          } else {
+            mInternalDragAction = new InternalDragActionDND(mStartPoint);
           }
         }
       }
       super.mouseDragged(event);
-
-
-
     }
 
   }
@@ -2113,10 +2111,13 @@ public class GraphEditorPanel
       super.mousePressed(event);
     }
 
-    public void mouseDragged(final MouseEvent event){
+    @Override
+    public void mouseDragged(final MouseEvent event)
+    {
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
-          mInternalDragAction = new InternalDragActionCreateGroupNode(mStartPoint);
+          mInternalDragAction =
+            new InternalDragActionCreateGroupNode(mStartPoint);
         } else {
           final Handle handle = getClickedHandle(mFocusedObject, event);
           if (handle == null) {
@@ -2190,6 +2191,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public void mouseDragged(final MouseEvent event)
     {
       if (mInternalDragAction == null) {
@@ -2198,24 +2200,19 @@ public class GraphEditorPanel
             new InternalDragActionSelect(mStartPoint, event.isShiftDown());
         } else {
           final ProxySubject item = getItemToBeSelected(event);
-          if(mFocusedObject == item || !isSelected(item)){
+          if (mFocusedObject == item || !isSelected(item)){
             final Handle handle = getClickedHandle(item, event);
-            if(handle == null && canBeSelected(item)){
+            if (handle == null && canBeSelected(item)){
               mInternalDragAction = new InternalDragActionMove(mStartPoint);
-            }
-            else{
-              if (item instanceof NodeSubject) {
-                // Clicking on node or nodegroup --- create edge.
+            } else if (item instanceof NodeSubject) {
+              // Clicking on node or nodegroup --- create edge.
+              mInternalDragAction = new InternalDragActionEdge(mStartPoint);
+            } else if (item instanceof EdgeSubject) {
+              if (handle == null) {
+                mInternalDragAction = new InternalDragActionMove(mStartPoint);
+              } else {
                 mInternalDragAction =
-                  new InternalDragActionEdge(mStartPoint);
-              } else if (item instanceof EdgeSubject) {
-                if (handle == null) {
-                  mInternalDragAction =
-                    new InternalDragActionMove(mStartPoint);
-                } else {
-                  mInternalDragAction =
-                    new InternalDragActionEdge(handle, mStartPoint);
-                }
+                  new InternalDragActionEdge(handle, mStartPoint);
               }
             }
           }
@@ -2631,25 +2628,12 @@ public class GraphEditorPanel
     //# Constructors
     private InternalDragActionMove(final Point start)
     {
-      this(mFocusedObject, start);
-    }
-
-    private InternalDragActionMove(final ProxySubject clicked,
-                                   final Point start)
-    {
       super(start);
-      mClickedObjectWasSelected = clicked != null && isSelected(clicked);
-      mMovedObject = mFocusedObject;
-      if (mMovedObject == null || !mClickedObjectWasSelected) {
-        if (!isShiftDown() && mMovedObject != null) {
-          replaceSelection(mMovedObject);
-        } else if (!isShiftDown()) {
-          clearSelection();
-        } else if (mMovedObject != null) {
-          addToSelection(mMovedObject);
-        }
+      if (!isShiftDown()) {
+        replaceSelection(mFocusedObject);
+      } else if (!isSelected(mFocusedObject)) {
+        addToSelection(mFocusedObject);
       }
-
       Point2D snap = null;
       if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
         // Move operation snaps to grid when a node is moved.
@@ -2744,8 +2728,6 @@ public class GraphEditorPanel
 
     private final Point2D mSnapPoint;
     private MoveVisitor mMoveVisitor;
-    private final boolean mClickedObjectWasSelected;
-    private final ProxySubject mMovedObject;
   }
 
 
