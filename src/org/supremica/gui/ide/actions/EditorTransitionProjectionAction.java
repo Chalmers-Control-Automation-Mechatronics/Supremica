@@ -6,6 +6,7 @@ package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -15,7 +16,7 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.TP.AutomataTP;
-import org.supremica.automata.algorithms.TP.AutomatonObserver;
+import org.supremica.automata.algorithms.TP.AutomatonTP;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -58,7 +59,7 @@ public class EditorTransitionProjectionAction
         }
         logger.info("Transition projection running ... ");
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
-        AutomatonObserver observer = new AutomatonObserver(exAutomata);
+        AutomataTP TP = new AutomataTP(exAutomata);
         int nbrOriNodes = 0;
         int nbrObsNodes = 0;
         int nbrOriTrans = 0;
@@ -69,20 +70,29 @@ public class EditorTransitionProjectionAction
             nbrOriTrans += efa.getTransitions().size();
         }
         
-        observer.compute();
+        TP.compute();
         
         for(ExtendedAutomaton efa:exAutomata)
             if(efa.getName().contains("_QUO")){
                 nbrObsNodes += efa.getNodes().size();
                 nbrObsTrans += efa.getTransitions().size();
             }
+        String t = "{";
+        for (Iterator<EventDeclProxy> it = TP.getAllLocalEvents().iterator(); it.hasNext();) {
+            EventDeclProxy e = it.next();
+            if(it.hasNext())
+                t += e.getName() + ", ";
+            else
+                t += e.getName();
+        }
+        t += "}";
         
         logger.info("\n Transition Projection"
                 + "\n -----------------------"
                 + "\n Nbr original nodes: " + nbrOriNodes + "\n Nbr original transitions: " + nbrOriTrans
-                + "\n Nbr observer nodes: " + nbrObsNodes + "\n Nbr observer transitions: " + nbrObsTrans
-                + "\n Nbr local events: " + observer.getAllLocalEvents().size()
-                + "\n Computation time: " + observer.getObserverTimer());
+                + "\n Nbr TP nodes: " + nbrObsNodes + "\n Nbr TP transitions: " + nbrObsTrans
+                + "\n Local events: " + t
+                + "\n Computation time: " + TP.getTimer());
         logger.info("Transition projection end");
     }
 }
