@@ -184,7 +184,11 @@ class TeachingSecurityManager extends SecurityManager
             super.checkPermission(perm);
           }
         } else if (action.equals("write")) {
-          super.checkPermission(perm);
+          if (name.equals("sun.font.fontmanager")) {
+            // With Java 1.7, needed by AWT for loading rectangle ???
+          } else {
+            super.checkPermission(perm);
+          }
         }
       }
     } else if (perm instanceof ReflectPermission) {
