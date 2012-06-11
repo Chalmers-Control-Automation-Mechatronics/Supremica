@@ -9,40 +9,42 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
-import net.sourceforge.waters.model.compiler.instance.EventKindException;
-import net.sourceforge.waters.plain.module.IdentifierElement;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.automata.*;
+import org.supremica.gui.ide.IDE;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 /**
  *
  * @author shoaei
  */
 public class ADSConverter {
-    private final URL mURL;
+    private final Logger logger = LoggerFactory.createLogger(IDE.class); 
     private final ExtendedAutomata exAutomata;
+    private final ModuleSubjectFactory factory;
     
-    public ADSConverter(final URI uri, ExtendedAutomata exAutomata) throws MalformedURLException{
-        mURL = uri.toURL();
+    public ADSConverter(ExtendedAutomata exAutomata) throws MalformedURLException{
         this.exAutomata = exAutomata;
+        this.factory = ModuleSubjectFactory.getInstance();
     }
     
-    public ExtendedAutomaton conver() throws IOException{
-        ExtendedAutomaton ex = null;
+    public ExtendedAutomaton convert(final URI uri) throws IOException{
+        URL mURL = uri.toURL();
         final InputStream stream = mURL.openStream();
         final Reader raw = new InputStreamReader(stream);
         final BufferedReader reader = new BufferedReader(raw);
         String name;
-        int stateSize = 0;
         HashSet<String> markedStates = new HashSet<String>();
         HashSet<String[]> transitions = new HashSet<String[]>();
         String s;
         s=reader.readLine();
-        System.err.println(s.contains("CTCT ADS"));
         if(!s.contains("CTCT ADS")){
-            return ex;
+            logger.error("The file format is not CTCT ADS");
+            return null;
         }
         reader.readLine();
         name = reader.readLine();
@@ -59,24 +61,17 @@ public class ADSConverter {
             
             switch(step){
                 case 1:
-                    try{
-                        stateSize = Integer.parseInt(s);
-                        break;
-                    } catch(NumberFormatException e){
-                        System.err.println("Step 1 error");
-                        return ex;
-                    }
-                    
+                    break;
                 case 2:
                     try{
                         markedStates.add(s);
                         break;
                     } catch(NumberFormatException e){
-                        System.err.println("Step 2 error");
-                        return ex;
+                        logger.error("There is problem in marker states part");
+                        return null;
                     }
                 case 3:
-                    
+                    break;
                 case 4:
                     String[] split = s.split("\\s+");
                     transitions.add(split);
@@ -84,10 +79,23 @@ public class ADSConverter {
             }
         }
         
-
-        ex = new ExtendedAutomaton(name, exAutomata, false);
+        ExtendedAutomaton ex = new ExtendedAutomaton(name, exAutomata, false);
         boolean isInitial, isMark;
         HashSet<String> alphabet = new HashSet<String>();
+        
+        boolean hasMarked = false;
+        for(EventDeclProxy e:exAutomata.getModule().getEventDeclList())
+            if(e.getKind() == EventKind.PROPOSITION && e.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME))
+                hasMarked = true;
+        if(!markedStates.isEmpty() && !hasMarked){
+            exAutomata.getModule().getEventDeclListModifiable().add
+                        (factory.createEventDeclProxy(factory.createSimpleIdentifierProxy
+                        (EventDeclProxy.DEFAULT_MARKING_NAME), EventKind.PROPOSITION));            
+        }
+            
+        for(EventDeclProxy e:exAutomata.getUnionAlphabet())
+            alphabet.add(e.getName());
+        
         for(String[] t:transitions){
             String source = t[0];
             String event = t[1];
@@ -123,17 +131,13 @@ public class ADSConverter {
             else
                 kind = "uncontrollable";
             
-            if(alphabet.add(event))
+            if(!alphabet.contains(event)){
+                alphabet.add(event);
                 exAutomata.addEvent(event, kind);
+            }
             
             ex.addTransition(source, target, event + ";", "", "");
         }
-
-//        if(ex.getNodes().size() != stateSize){
-//            System.err.println("State size is not matched.");
-//            return null;
-//        }
-        
         return ex;
     }
 }
