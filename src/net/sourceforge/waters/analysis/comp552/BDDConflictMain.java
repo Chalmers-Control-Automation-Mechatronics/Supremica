@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -110,11 +111,9 @@ public class BDDConflictMain
           System.out.println("nonconflicting");
         } else {
           System.out.println("CONFLICTING");
-          /*
           System.out.println("Counterexample:");
-          final ConflictTraceProxy counterex = checker.getCounterExample();
+          final TraceProxy counterex = checker.getCounterExample();
           System.out.println(counterex.toString());
-          */
         }
       }
 
