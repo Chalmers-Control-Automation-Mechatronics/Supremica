@@ -61,11 +61,77 @@ public class EditorTransitionProjectionAction
         if(dialog.isTPSelected()){
             final int nbrOfComponents = module.getComponentList().size();
             if(nbrOfComponents == 0){
-                logger.error("There is no EFA to abstract. Create one in Editor panel and run again.");
+                logger.error("There is no EFA to abstract. Create one in editor panel and run again");
                 return;
             }
-            
+            logger.info("Transition Projections is running ...");
             AutomataTP TP = new AutomataTP(exAutomata);
+            if(dialog.isLocalSelected()){
+                String localText = dialog.getLocalText().trim();
+                HashSet<EventDeclProxy> locEvents = new HashSet<EventDeclProxy>();
+                HashSet<String> events = new HashSet<String>();
+                if(localText == null || localText.isEmpty()){
+                    TP.compute();
+                } else if(localText.contains(",")){
+                    String[] split = localText.split(",");
+                    for(String t:split)
+                        if(!t.isEmpty())
+                            events.add(t);
+
+                    for(EventDeclProxy e:exAutomata.getUnionAlphabet())
+                        if(events.contains(e.getName()))
+                            locEvents.add(e);
+
+                    TP.setLocalEvents(locEvents);
+                    TP.compute();
+
+                } else {
+                    for(EventDeclProxy ee:exAutomata.getUnionAlphabet())
+                        if(localText.equals(ee.getName()))
+                            locEvents.add(ee);
+
+                    if(locEvents.isEmpty()){
+                        TP.compute();
+                    } else {
+                        TP.setLocalEvents(locEvents);
+                        TP.compute();
+                    }
+                }                
+            } else if (dialog.isShareSelected()){
+                String textShare = dialog.getShareText().trim();
+                HashSet<EventDeclProxy> shareEvents = new HashSet<EventDeclProxy>();
+                HashSet<String> events = new HashSet<String>();
+                if(textShare == null || textShare.isEmpty()){
+                    TP.compute();
+                } else if(textShare.contains(",")){
+                    String[] split = textShare.split(",");
+                    for(String t:split)
+                        if(!t.isEmpty())
+                            events.add(t);
+
+                    for(EventDeclProxy e:exAutomata.getUnionAlphabet())
+                        if(events.contains(e.getName()))
+                            shareEvents.add(e);
+                    
+                    TP.setSharedEvents(shareEvents);
+                    TP.compute();
+
+                } else {
+                    for(EventDeclProxy ee:exAutomata.getUnionAlphabet())
+                        if(textShare.equals(ee.getName()))
+                            shareEvents.add(ee);
+
+                    if(shareEvents.isEmpty()){
+                        TP.compute();
+                    } else {
+                        TP.setSharedEvents(shareEvents);
+                        TP.compute();
+                    }
+                }                
+            } else {
+                TP.compute();
+            }
+            
             int nbrOriNodes = 0;
             int nbrObsNodes = 0;
             int nbrOriTrans = 0;
@@ -75,8 +141,6 @@ public class EditorTransitionProjectionAction
                 nbrOriNodes += efa.getNodes().size();
                 nbrOriTrans += efa.getTransitions().size();
             }
-
-            TP.compute();
 
             for(ExtendedAutomaton efa:exAutomata)
                 if(efa.getName().contains("_QUO")){
@@ -101,7 +165,8 @@ public class EditorTransitionProjectionAction
                     + "\n Computation time: " + TP.getTimer());
             logger.info("Transition projection end");
         }
-        else if(dialog.isImportSelected()){
+        
+        if(dialog.isImportSelected()){
             File[] files = dialog.getSelectedFiles();
             if(files != null){
                 for(File file : files){

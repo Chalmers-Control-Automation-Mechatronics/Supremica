@@ -40,7 +40,7 @@ public class DESConverter {
             System.err.print("File signature is invalid.\n");
         
         int endian = reader.readInt();
-        if(endian != (int)0xaa00ff00)
+        if(endian != (int)0xff00aa55)
             System.err.println("File endian is incorrect.\n");
         
         int block_type, data_size;

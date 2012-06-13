@@ -20,7 +20,6 @@ import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import org.supremica.util.ActionTimer;
 
 /**
  *
@@ -31,11 +30,11 @@ public class AutomatonTP {
     private final Logger logger = LoggerFactory.createLogger(IDE.class);    
     private final ExtendedAutomata exAutomata;
     private final ExtendedAutomaton efa;
-    private final ActionTimer TP;
     private HashSet<EventDeclProxy> sharedEvents;
     private HashSet<EventDeclProxy> localEvents;
     private final ModuleSubjectFactory factory;
     private final ExpressionParser parser;
+    private Transitions transitions;
     
     /**
      * The constructor method of the AutomatonTP class.
@@ -46,36 +45,43 @@ public class AutomatonTP {
         this.efa = EFA;
         this.factory = ModuleSubjectFactory.getInstance();
         this.parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-        this.TP = new ActionTimer();
         this.localEvents = localEvents;
         this.sharedEvents = eventDifference(new HashSet<EventDeclProxy>(efa.getAlphabet()), localEvents);
+        this.transitions = new Transitions();
+        this.transitions.AddAllTransitions(efa);
     }
     
     public ExtendedAutomaton compute(){        
+        System.err.println("Transition Projections automaton computing [" + efa.getName() + "] ...");
         ExtendedAutomaton quotient;  
+        boolean hasUncontrollable = !efa.getUncontrollableAlphabet().isEmpty();
         int i = 0;
-        TP.reset();
-        TP.start();
         while(true){
             ++i;
             HashSet<Partition> quasi_congruence = getQC(efa);
             quotient = getQuotient(efa, quasi_congruence);
-            boolean hasLocalTransitions = extendEvent(efa, quotient, quasi_congruence);
+            System.err.println("Q: " + quotient.getNodes().size());
+            boolean hasLocalTransitions = extendEvent(quotient, quasi_congruence);
             if(!hasLocalTransitions){
-                boolean isOCC = checkOCC(quotient, efa, quasi_congruence);
-                if(isOCC){
+                if(hasUncontrollable){
+                    boolean isOCC = checkOCC(quotient, efa, quasi_congruence);
+                    if(isOCC){
+                        break;
+                    }
+                } else {
                     break;
                 }
             }
             if(i>500) throw new UnsupportedOperationException("Something is wrong. The algorithm can't calculate the abstracted model after 500 iterations. "
                     + "Check the algorithm or increase the number of iteration.");
         }
-        TP.stop();
         removeLocalEvents(quotient);
         return quotient;
     }
     
     private HashSet<Partition> getQC(ExtendedAutomaton efa){
+        System.err.println("QC computing  ...");
+        System.err.println("Shared: " + sharedEvents);
         Stack<Partition> W = new Stack<Partition>(); // Set W (splitter) in WONG paper 
         HashSet<Partition> R = new HashSet<Partition>(); // Set Rho in WONG paper 
         HashSet<NodeProxy> Q,phiB,inter,diff; // Sets of initial partition, phiB, intersection, and difference
@@ -87,18 +93,27 @@ public class AutomatonTP {
         EventDeclSubject m = new EventDeclSubject(new SimpleIdentifierSubject("TAOm"), EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, null, null, null);
         sharedEvents.add(m);
         efa.getAlphabet().add(m);
+        int i = 0;
         while(!W.isEmpty()){
+            i++;
+            if(i>1000) throw new UnsupportedOperationException("Something is wrong when computing QC. The algorithm can't calculate the QC after 500 iterations"
+                    + "Check the algorithm or increase the number of iteration.");
+            
+            
             B = W.pop();
-            for(EventDeclProxy e : efa.getAlphabet()){
-                if(!sharedEvents.contains(e)) continue;
+            System.err.println("\n ---------------- \n QC step 1 W: " + W.size() + "\n ---------------- \n");
+            for(EventDeclProxy e : sharedEvents){
+                System.err.println("QC step 1 e: " + e.getName());
+                //if(!sharedEvents.contains(e)) continue;
                 HashSet<Partition> I = new HashSet<Partition>();
                 HashSet<Partition> I12 = new HashSet<Partition>();
                 
                 if(e.getName().equals("TAOm"))
                     phiB = phiTAOm(efa, B.getCoset());
                 else
-                    phiB = phiTao(efa, B.getCoset(),e);
+                    phiB = phiTao(B.getCoset(),e);
                 
+                System.err.println("QC step 2");
                 if(phiB.isEmpty()) continue;
                 
                 for (Iterator<Partition> it = R.iterator(); it.hasNext();) {
@@ -147,15 +162,14 @@ public class AutomatonTP {
             p.setState(node);
         }
         
-        for(EdgeProxy tran:efa.getTransitions()){
-            NodeProxy targetState = getCorrespondingState(tran.getTarget(), ps);
-            NodeProxy sourceState = getCorrespondingState(tran.getSource(), ps);
-            for(Proxy event:tran.getLabelBlock().getEventList()){
-                EventDeclProxy e = getEvent(event);
+        for(Object[] tran : transitions){
+            NodeProxy sourceState = getCorrespondingState((NodeProxy)tran[0], ps);
+            NodeProxy targetState = getCorrespondingState((NodeProxy)tran[1], ps);
+                EventDeclProxy e = (EventDeclProxy)tran[2];
                 String guardText = "";
                 String actionText = "";
-                try {guardText = tran.getGuardActionBlock().getGuards().get(0).toString();} catch (Exception exp) {}
-                try {actionText = tran.getGuardActionBlock().getActions().get(0).toString();} catch (Exception exp) {}
+                try {guardText = ((SimpleExpressionProxy)tran[3]).toString();} catch (Exception exp) {}
+                try {actionText = ((BinaryExpressionProxy)tran[4]).toString();} catch (Exception exp) {}
                 if(!hasTransition(graph.getEdges(), sourceState, targetState, e)){
                     final List<Proxy> events = new LinkedList<Proxy>();
                     events.add(factory.createSimpleIdentifierProxy(e.getName()));
@@ -196,14 +210,13 @@ public class AutomatonTP {
                         edges.add(newEdge);
                     }
                 }
-            }
         }
         SimpleComponentSubject component = factory.createSimpleComponentProxy(identifier, efa.getKind(), graph);
         ExtendedAutomaton quotient = new ExtendedAutomaton(exAutomata, component);
         return quotient;
     }
     
-    private boolean extendEvent(ExtendedAutomaton efa, ExtendedAutomaton quotient, HashSet<Partition> ps){
+    private boolean extendEvent(ExtendedAutomaton quotient, HashSet<Partition> ps){
         
         // Enlargement from the local events in quotient EFA
         HashSet<EventDeclProxy> B = new HashSet<EventDeclProxy>();
@@ -219,7 +232,7 @@ public class AutomatonTP {
         // The local events hidden in these cosets
         HashSet<EventDeclProxy> H = new HashSet<EventDeclProxy>();
         for(NodeProxy node:N)
-            H.addAll(getHiddenLocalEvents(efa, getPartition(node, ps)));
+            H.addAll(getHiddenLocalEvents(getPartition(node, ps)));
         
         // The set of events which are in H but not in B
         HashSet<EventDeclProxy> H_B = eventDifference(H, B);
@@ -229,7 +242,7 @@ public class AutomatonTP {
         for(EventDeclProxy e : H_B){
             addLocalEvent(e);
             for(NodeProxy y : N){
-                if(!split(y, ps, quotient, efa)){
+                if(!split(y, ps, quotient)){
                     addSharedEvent(e);
                     break;
                 }
@@ -259,11 +272,10 @@ public class AutomatonTP {
                     Stack<NodeProxy> stack = new Stack<NodeProxy>();
                     for(EventDeclProxy event : map.keySet()){
                         HashSet<NodeProxy> targetCoset = getPartition(map.get(event), ps).getCoset();
-                        for(EdgeProxy tran : efa.getTransitions()){
-                            if(sourceCoset.contains(tran.getSource()) && targetCoset.contains(tran.getTarget())){
-                                for(Proxy evt : tran.getLabelBlock().getEventList())
-                                    if(getEvent(evt).getName().equals(event.getName()))
-                                        stack.add(tran.getSource());
+                        for(Object[] tran : transitions){
+                            if(sourceCoset.contains((NodeProxy)tran[0]) && targetCoset.contains((NodeProxy)tran[1])){
+                                if(((EventDeclProxy)tran[2]).getName().equals(event.getName()))
+                                    stack.add((NodeProxy)tran[0]);
                             }
                         }
                     }
@@ -348,12 +360,12 @@ public class AutomatonTP {
      * @param direction The direction of the breadth-first search. <CODE>true</CODE> for downstream and <CODE>false</CODE> for upstream
      * @return The set of the equivalent states or <CODE>null</CODE> if <B>state</B> is not a state in the given automaton
      */
-    private HashSet<NodeProxy> findEquivalentStates(ExtendedAutomaton efa, NodeProxy state, boolean downstream){
+    private HashSet<NodeProxy> findEquivalentStates(NodeProxy state, boolean downstream){
         
         HashSet<NodeProxy> eqStates = new HashSet<NodeProxy>();
         Stack<NodeProxy> stk = new Stack<NodeProxy>();
-        Stack<EdgeProxy> upTrans = new Stack<EdgeProxy>();
-        Stack<EdgeProxy> downTrans = new Stack<EdgeProxy>();
+        Stack<Object[]> upTrans = new Stack<Object[]>();
+        Stack<Object[]> downTrans = new Stack<Object[]>();
 
         if(!efa.getNodes().contains(state))
             return eqStates;
@@ -365,24 +377,21 @@ public class AutomatonTP {
             NodeProxy currstate = stk.pop();
 
             if(downstream)
-                downTrans.addAll(getDownStreamEdges(efa,currstate));
+                downTrans.addAll(getDownStreamEdges(currstate));
             else
-                upTrans.addAll(getUpStreamEdges(efa,currstate));
+                upTrans.addAll(getUpStreamEdges(currstate));
             
             while(!upTrans.isEmpty() || !downTrans.isEmpty()){
-                EdgeProxy tran = (downstream)?downTrans.pop():upTrans.pop();
-                List<Proxy> eventList = tran.getLabelBlock().getEventList();
-                for(Proxy event : eventList){
-                    EventDeclProxy e = getEvent(event);
+                Object[] tran = (downstream)?downTrans.pop():upTrans.pop();
+                    EventDeclProxy e = (EventDeclProxy)tran[2];
                     for(EventDeclProxy ev : localEvents){
                         if(ev.equals(e)){
-                            NodeProxy nxState = (downstream)?tran.getTarget():tran.getSource();
+                            NodeProxy nxState = (downstream)?(NodeProxy)tran[1]:(NodeProxy)tran[0];
                             boolean result = eqStates.add(nxState);
                             if(result) stk.push(nxState);
                             break;
                         }
                     }
-                }
             }
         }
         return eqStates;
@@ -395,10 +404,10 @@ public class AutomatonTP {
      * @param direction The direction of the breadth-first search. <CODE>true</CODE> for downstream and <CODE>false</CODE> for upstream
      * @return The set of the equivalent states
      */    
-    private HashSet<NodeProxy> findEquivalentStates(ExtendedAutomaton efa, HashSet<NodeProxy> states, boolean downstream){
+    private HashSet<NodeProxy> findEquivalentStates(HashSet<NodeProxy> states, boolean downstream){
         HashSet<NodeProxy> eqStates = new HashSet<NodeProxy>();
         for(NodeProxy state : states)
-            eqStates.addAll(findEquivalentStates(efa, state, downstream));
+            eqStates.addAll(findEquivalentStates(state, downstream));
         
         return eqStates;
     }
@@ -407,10 +416,10 @@ public class AutomatonTP {
      * @param state An state in the automaton
      * @return Set of the equivalent states
      */
-    private HashSet<NodeProxy> findEquivalentStates(ExtendedAutomaton efa, NodeProxy state){
+    private HashSet<NodeProxy> findEquivalentStates(NodeProxy state){
         HashSet<NodeProxy> eqStates = new HashSet<NodeProxy>();
-        eqStates.addAll(findEquivalentStates(efa, state, true));
-        eqStates.addAll(findEquivalentStates(efa, state, false));
+        eqStates.addAll(findEquivalentStates(state, true));
+        eqStates.addAll(findEquivalentStates(state, false));
         return eqStates;
     }
     
@@ -418,79 +427,87 @@ public class AutomatonTP {
         return exAutomata.eventIdToProxy(((SimpleIdentifierSubject)event).getName());
     }
     
-    private HashSet<EdgeProxy> getUpStreamEdges(ExtendedAutomaton efa, NodeProxy st){
-        HashSet<EdgeProxy> upTrans = new HashSet<EdgeProxy>();
-            for(EdgeProxy e : efa.getTransitions())
-                if(e.getTarget().getName().equals(st.getName()))
-                    upTrans.add(e);
-        return upTrans;
-    }
+//    private HashSet<EdgeProxy> getUpStreamEdges(ExtendedAutomaton efa, NodeProxy st){
+//        HashSet<EdgeProxy> upTrans = new HashSet<EdgeProxy>();
+//            for(EdgeProxy e : efa.getTransitions())
+//                if(e.getTarget().getName().equals(st.getName()))
+//                    upTrans.add(e);
+//        return upTrans;
+//    }
 
-    private HashSet<EdgeProxy> getDownStreamEdges(ExtendedAutomaton efa, NodeProxy st){
-        HashSet<EdgeProxy> downTrans = new HashSet<EdgeProxy>();
-            for(EdgeProxy e : efa.getTransitions())
-                if(e.getSource().getName().equals(st.getName()))
-                    downTrans.add(e);
-        return downTrans;
+//    private HashSet<EdgeProxy> getDownStreamEdges(ExtendedAutomaton efa, NodeProxy st){
+//        HashSet<EdgeProxy> downTrans = new HashSet<EdgeProxy>();
+//            for(EdgeProxy e : efa.getTransitions())
+//                if(e.getSource().getName().equals(st.getName()))
+//                    downTrans.add(e);
+//        return downTrans;
+//    }
+
+    private HashSet<Object[]> getUpStreamEdges(NodeProxy st){
+        return transitions.getIncommingTransitions(st);
     }
     
-    private HashSet<NodeProxy> findImdPreImg(ExtendedAutomaton efa, NodeProxy state, EventDeclProxy event){
+    private HashSet<Object[]> getDownStreamEdges(NodeProxy st){
+        return transitions.getOutgoingTransitions(st);
+    }
+    
+    private HashSet<NodeProxy> findImdPreImg(NodeProxy state, EventDeclProxy event){
         HashSet<NodeProxy> eqStates = new HashSet<NodeProxy>();
         HashSet<NodeProxy> imdImg = new HashSet<NodeProxy>();
         Stack<NodeProxy> stk = new Stack<NodeProxy>();
-        Stack<EdgeProxy> upTrans = new Stack<EdgeProxy>();
+        Stack<Object[]> upTrans = new Stack<Object[]>();
 
         eqStates.add(state);
         stk.push(state);
 
         while(!stk.empty()){
             NodeProxy currstate = stk.pop();
-            upTrans.addAll(getUpStreamEdges(efa, currstate));
+            upTrans.addAll(getUpStreamEdges(currstate));
 
             while(!upTrans.isEmpty()){
-                EdgeProxy tran = upTrans.pop();
-                for(Proxy evnt : tran.getLabelBlock().getEventList()){
-                    EventDeclProxy e = getEvent(evnt);
-                    NodeProxy nxState = tran.getSource();
-                    if(localEvents.contains(e)){
-                        boolean result = eqStates.add(nxState);
-                        if(result) stk.push(nxState);
-                    }
-                    else if(e.getName().equals(event.getName())){
-                        imdImg.add(nxState);
-                    }
-                    break;
+                Object[] tran = upTrans.pop();
+                EventDeclProxy e = (EventDeclProxy)tran[2];
+                NodeProxy nxState = (NodeProxy)tran[0];
+                if(localEvents.contains(e)){
+                    boolean result = eqStates.add(nxState);
+                    if(result) stk.push(nxState);
+                }
+                else if(e.getName().equals(event.getName())){
+                    imdImg.add(nxState);
                 }
             }
         }
         return imdImg;
     }
 
-    private HashSet<NodeProxy> findImdPreImg(ExtendedAutomaton efa, HashSet<NodeProxy> states, EventDeclProxy event){
+    private HashSet<NodeProxy> findImdPreImg(HashSet<NodeProxy> states, EventDeclProxy event){
         HashSet<NodeProxy> imdImg = new HashSet<NodeProxy>();
         for(NodeProxy state : states)
-            imdImg.addAll(findImdPreImg(efa, state, event));
+            imdImg.addAll(findImdPreImg(state, event));
 
         return imdImg;
     }
                 
-    private HashSet<NodeProxy> phiTao(ExtendedAutomaton efa, HashSet<NodeProxy> b, EventDeclProxy e) {
-        HashSet<NodeProxy> imdImg = findImdPreImg(efa, b, e);
-        HashSet<NodeProxy> phiB = findEquivalentStates(efa, imdImg, false);
+    private HashSet<NodeProxy> phiTao(HashSet<NodeProxy> b, EventDeclProxy e) {
+        System.err.println("phiTao: imdImg");
+        HashSet<NodeProxy> imdImg = findImdPreImg(b, e);
+        System.err.println("phiTao: phiB");
+        HashSet<NodeProxy> phiB = findEquivalentStates(imdImg, false);
         return phiB;
     }
 
     private HashSet<NodeProxy> phiTAOm(ExtendedAutomaton efa, HashSet<NodeProxy> b) {
         HashSet<NodeProxy> phiB = new HashSet<NodeProxy>();
+        System.err.println("phiTAom: phiB");
         Set<NodeProxy> m = efa.getMarkedLocations();
         for(NodeProxy st : b)
             if(m.contains(st))
-                phiB=findEquivalentStates(efa, st, false);
+                phiB=findEquivalentStates(st, false);
         
         return phiB;
     }    
 
-    private boolean split(NodeProxy y, HashSet<Partition> ps, ExtendedAutomaton quotient, ExtendedAutomaton efa) {
+    private boolean split(NodeProxy y, HashSet<Partition> ps, ExtendedAutomaton quotient) {
         boolean answer;
         HashMap<EventDeclProxy, HashSet<EdgeProxy>> ndTransitions = getNdTransitions(y, quotient);
         Partition yP = getPartition(y, ps);
@@ -500,31 +517,29 @@ public class AutomatonTP {
             for(EdgeProxy ndTran:ndTrans)
                 targetPs.add(getPartition(ndTran.getTarget(), ps));
         
-            answer = nopath(yP, ndEvent, targetPs, efa);
+            answer = nopath(yP, ndEvent, targetPs);
             if(!answer)
                 return answer;
         }
         return true;
     }
 
-    private boolean nopath(Partition y, EventDeclProxy ndEvent, HashSet<Partition> ys, ExtendedAutomaton efa) {
+    private boolean nopath(Partition y, EventDeclProxy ndEvent, HashSet<Partition> ys) {
         HashMap<Partition, HashSet<NodeProxy>> yMap = new HashMap<Partition, HashSet<NodeProxy>>();
         for(Partition p:ys)
             yMap.put(p, new HashSet<NodeProxy>());
         
         for(NodeProxy yNode : y.getCoset()){
-            ArrayList<EdgeSubject> trans = efa.getLocationToOutgoingEdgesMap().get(yNode);
-            for(EdgeSubject tran:trans){
-                for(Proxy evt:tran.getLabelBlock().getEventList()){
-                    EventDeclProxy e = getEvent(evt);
+            HashSet<Object[]> trans = transitions.getOutgoingTransitions(yNode);
+            for(Object[] tran : trans){
+                    EventDeclProxy e = (EventDeclProxy)tran[2];
                     if(e.getName().equals(ndEvent.getName())){
                         for(Partition p:yMap.keySet()){
-                            if(p.getCoset().contains(tran.getTarget())){
-                                yMap.get(p).add(tran.getSource());
+                            if(p.getCoset().contains((NodeProxy)tran[1])){
+                                yMap.get(p).add((NodeProxy)tran[0]);
                             }
                         }
                     }
-                }
             }
         }
         ArrayList<HashSet<NodeProxy>> Es = new ArrayList<HashSet<NodeProxy>>();
@@ -534,12 +549,12 @@ public class AutomatonTP {
         HashSet<NodeProxy> Ei, Ej;
         for(int i=0;i<Es.size();i++) {
             for(int j=i+1;j<Es.size();j++) {
-                Ei = findEquivalentStates(efa, Es.get(i), true);
+                Ei = findEquivalentStates(Es.get(i), true);
                 Ej = Es.get(j);
                 if(!stateIntersection(Ei, Ej).isEmpty())
                     return false;
                 Ei=Es.get(i);
-                Ej = findEquivalentStates(efa, Es.get(j), true);
+                Ej = findEquivalentStates(Es.get(j), true);
                 if(!stateIntersection(Ei, Ej).isEmpty())
                     return false;
             }
@@ -547,18 +562,16 @@ public class AutomatonTP {
         return true;
     }
     
-    private HashSet<EventDeclProxy> getHiddenLocalEvents(ExtendedAutomaton efa, Partition partition) {
+    private HashSet<EventDeclProxy> getHiddenLocalEvents(Partition partition) {
         HashSet<EventDeclProxy> hiddenEvents = new HashSet<EventDeclProxy>();
         HashSet<NodeProxy> nodes = partition.getCoset();
-        for(EdgeProxy tran:efa.getTransitions()){
-            NodeProxy sourceNode = tran.getSource();
-            NodeProxy targetNode = tran.getTarget();
+        for(Object[] tran:transitions){
+            NodeProxy sourceNode = (NodeProxy)tran[0];
+            NodeProxy targetNode = (NodeProxy)tran[1];
             if(nodes.contains(sourceNode) && nodes.contains(targetNode)){
-                for(Proxy event:tran.getLabelBlock().getEventList()){
-                    EventDeclProxy e = getEvent(event);
-                    if(localEvents.contains(e)){
-                        hiddenEvents.add(e);
-                    }
+                EventDeclProxy e = (EventDeclProxy)tran[2];
+                if(localEvents.contains(e)){
+                    hiddenEvents.add(e);
                 }
             }
         }
@@ -566,21 +579,16 @@ public class AutomatonTP {
     }
 
     private HashSet<NodeProxy> getNdStates(ExtendedAutomaton quotient) {
+        Transitions trans = new Transitions();
+        trans.AddAllTransitions(quotient);
         HashSet<NodeProxy> ndStates = new HashSet<NodeProxy>();
-        HashMap<NodeProxy, ArrayList<EdgeSubject>> map = quotient.getLocationToOutgoingEdgesMap();
-        outerloop:
-        for(NodeProxy st:map.keySet()){
-            ArrayList<EdgeSubject> edges = map.get(st);
-            HashSet<EventDeclProxy> events = new HashSet<EventDeclProxy>();
-            for(EdgeSubject edge:edges){
-                for(Proxy evt:edge.getLabelBlock().getEventList()){
-                    EventDeclProxy e = getEvent(evt);
-                    if(!events.contains(e)){
-                        events.add(e);
-                    } else {
-                        ndStates.add(st);
-                        continue outerloop;
-                    }
+        for(NodeProxy node : quotient.getNodes()){
+            HashSet<String> events = new HashSet<String>();
+            for(Object[] tran : trans.getOutgoingTransitions(node)){
+                boolean hasNotThis = events.add(((EventDeclProxy)tran[2]).getName());
+                if(!hasNotThis){
+                    ndStates.add(node);
+                    break;
                 }
             }
         }
@@ -661,10 +669,6 @@ public class AutomatonTP {
             if(efa.isLocationForbidden(st))
                 return true;
         return false;
-    }
-    
-    public ActionTimer getObserverTimer(){
-        return TP;
     }
     
     private HashSet<NodeProxy> stateIntersection(HashSet<NodeProxy> x, HashSet<NodeProxy> y){
@@ -757,4 +761,70 @@ public class AutomatonTP {
             return this.state;
         }
     }
+    
+    class Transitions implements Iterable<Object[]> {
+        private HashSet<Object[]> transitions;
+        public Transitions(){
+            this.transitions = new HashSet<Object[]>();
+        }
+        
+        public void AddAllTransitions(ExtendedAutomaton efa){
+            for(EdgeProxy tran : efa.getTransitions())
+                for(Proxy e:tran.getLabelBlock().getEventList()){
+                    Object[] t = new Object[5];
+                    t[0] = tran.getSource();
+                    t[1] = tran.getTarget();
+                    t[2] = getEvent(e);
+                    if(tran.getGuardActionBlock() != null && !tran.getGuardActionBlock().getGuards().isEmpty())
+                        t[3] = tran.getGuardActionBlock().getGuards().get(0);
+                    else 
+                        t[3] = null;
+
+                    if(tran.getGuardActionBlock() != null && !tran.getGuardActionBlock().getActions().isEmpty())
+                        t[4] = tran.getGuardActionBlock().getActions().get(0);
+                    else 
+                        t[4] = null;
+                    
+                    
+                    transitions.add(t);
+                }
+        }
+        
+        public void addTransition(NodeProxy source, NodeProxy target, EventDeclProxy event, 
+                SimpleExpressionProxy guard, BinaryExpressionProxy action){
+            Object[] t = new Object[5];
+            t[0] = source;
+            t[1] = target;
+            t[2] = event;
+            t[3] = guard;
+            t[4] = action;
+            transitions.add(t);
+        }
+        
+        public HashSet<Object[]> getTransitions(){
+            return transitions;
+        }
+        
+        public HashSet<Object[]> getOutgoingTransitions(NodeProxy node){
+            HashSet<Object[]> out = new HashSet<Object[]>();
+            for(Object[] t:transitions)
+                if((NodeProxy)t[0] == node)
+                    out.add(t);
+            return out;
+        }
+        
+        public HashSet<Object[]> getIncommingTransitions(NodeProxy node){
+            HashSet<Object[]> out = new HashSet<Object[]>();
+            for(Object[] t:transitions)
+                if((NodeProxy)t[1] == node)
+                    out.add(t);
+            return out;
+        }
+
+        public Iterator<Object[]> iterator() {
+            return transitions.iterator();
+        }
+        
+    }
+    
 }
