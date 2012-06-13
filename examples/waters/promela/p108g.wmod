@@ -159,6 +159,7 @@
                         <EnumSetExpression>
                             <SimpleIdentifier Name="TRUE"/>
                             <SimpleIdentifier Name="FALSE"/>
+                            <SimpleIdentifier Name=":undefined"/>
                         </EnumSetExpression>
                     </VariableRange>
                     <VariableInitial>
@@ -166,7 +167,7 @@
                             <IndexedIdentifier Name="var_B_x">
                                 <SimpleIdentifier Name="procid"/>
                             </IndexedIdentifier>
-                            <SimpleIdentifier Name="TRUE"/>
+                            <SimpleIdentifier Name=":undefined"/>
                         </BinaryExpression>
                     </VariableInitial>
                 </VariableComponent>
@@ -286,14 +287,30 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="init_2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="208" X="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="init_3">
+                        <PointGeometry>
+                            <Point Y="272" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="init_4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="336" X="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -308,9 +325,25 @@
                     </Edge>
                     <Edge Target="init_2" Source="init_1">
                         <LabelBlock>
+                            <SimpleIdentifier Name="run_A"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="init_3" Source="init_2">
+                        <LabelBlock>
                             <SimpleIdentifier Name="run_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="5"/>
+                                <Point Y="-7" X="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="init_4" Source="init_3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="run_B"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

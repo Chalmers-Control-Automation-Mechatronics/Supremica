@@ -176,7 +176,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="C_0">
                                 <PointGeometry>
-                                    <Point Y="64" X="80"/>
+                                    <Point Y="64" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-7" X="9"/>
@@ -184,7 +184,7 @@
                             </SimpleNode>
                             <SimpleNode Name="C_1">
                                 <PointGeometry>
-                                    <Point Y="144" X="80"/>
+                                    <Point Y="144" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-6" X="9"/>
@@ -195,7 +195,7 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="224" X="80"/>
+                                    <Point Y="224" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-5" X="7"/>
@@ -219,14 +219,27 @@
                                         <SimpleIdentifier Name="procid"/>
                                         <IntConstant Value="0"/>
                                     </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-9" X="-130"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="184" X="197"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Target="C_2" Source="C_1">
+                                <LabelBlock>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="procid"/>
                                         <IntConstant Value="3"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-19" X="4"/>
+                                        <Point Y="-10" X="4"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="184" X="254"/>
+                                </SplineGeometry>
                             </Edge>
                         </EdgeList>
                     </Graph>

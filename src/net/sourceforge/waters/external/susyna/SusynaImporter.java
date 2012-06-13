@@ -96,7 +96,7 @@ public class SusynaImporter
     mHandlersPass1.put("alphabet", new AlphabetListHandler());
     mHandlersPass1.put("controllable", new ControllableListHandler());
     mHandlersPass1.put("observable", new ObservableListHandler());
-    mHandlersPass1.put("transitions", new IdleListHandler());
+    mHandlersPass1.put("transitions", new TransitionListHandler1());
     mHandlersPass1.put("kind", new IdleListHandler());
     mHandlersPass2 = new HashMap<String,ListHandler>(16);
     mHandlersPass2.put("states", new IdleListHandler());
@@ -105,8 +105,31 @@ public class SusynaImporter
     mHandlersPass2.put("alphabet", new IdleListHandler());
     mHandlersPass2.put("controllable", new IdleListHandler());
     mHandlersPass2.put("observable", new IdleListHandler());
-    mHandlersPass2.put("transitions", new TransitionListHandler());
+    mHandlersPass2.put("transitions", new TransitionListHandler2());
     mHandlersPass2.put("kind", new IdleListHandler());
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Configures how initial tau transitions (so-called unobservable events)
+   * are converted.
+   * @see TauConversionMethod
+   */
+  public void setTauConversionMethod(final TauConversionMethod method)
+  {
+    mTauConversionMethod = method;
+  }
+
+  /**
+   * Returns how initial tau transitions (so-called unobservable events)
+   * are converted.
+   * @see TauConversionMethod
+   */
+  public TauConversionMethod getTauConversionMethod()
+  {
+    return mTauConversionMethod;
   }
 
 
@@ -134,9 +157,16 @@ public class SusynaImporter
       final List<EventProxy> events = createLocalEvents(name);
       final List<StateProxy> states = createStates();
       readAutomaton(file, name, mHandlersPass2);
-      final AutomatonProxy aut =
-        mFactory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                      events, states, mTransitions);
+      final ComponentKind kind;
+      if (name.startsWith("req")) {
+        kind = ComponentKind.SPEC;
+      } else if (name.startsWith("sup")) {
+        kind = ComponentKind.SUPERVISOR;
+      } else {
+        kind = ComponentKind.PLANT;
+      }
+      final AutomatonProxy aut = mFactory.createAutomatonProxy
+        (name, kind, events, states, mTransitions);
       automata.add(aut);
       mLocalEventMap.clear();
       mStateMap.clear();
@@ -198,24 +228,19 @@ public class SusynaImporter
       mLocalEventMap.entrySet().iterator();
     while (iter.hasNext()) {
       final Map.Entry<String,EventInfo> entry = iter.next();
-      EventInfo local = entry.getValue();
-      final EventProxy event;
-      if (local.isObservable()) {
-        final String name = entry.getKey();
+      final EventInfo local = entry.getValue();
+      EventProxy event = local.createEvent(autname);
+      if (event != null) {
+        final String name = event.getName();
         final EventInfo global = mGlobalEventMap.get(name);
         if (global == null) {
           mGlobalEventMap.put(name, local);
         } else {
-          local = global;
           entry.setValue(global);
+          event = global.createEvent(autname);
         }
-        event = local.createEvent(autname);
-      } else {
-        event = local.createEvent(autname);
-        final String name = event.getName();
-        mGlobalEventMap.put(name, local);
+        events.add(event);
       }
-      events.add(event);
     }
     Collections.sort(events);
     events.add(mMarking);
@@ -228,7 +253,9 @@ public class SusynaImporter
     final List<StateProxy> states = new ArrayList<StateProxy>(size);
     for (final StateInfo info : mStateMap.values()) {
       final StateProxy state = info.createState();
-      states.add(state);
+      if (state != null) {
+        states.add(state);
+      }
     }
     Collections.sort(states);
     return states;
@@ -568,8 +595,8 @@ public class SusynaImporter
 
 
   //#########################################################################
-  //# Inner Class TransitionListHandler
-  private class TransitionListHandler extends ListHandler
+  //# Inner Class TransitionListHandler1
+  private class TransitionListHandler1 extends ListHandler
   {
 
     //#######################################################################
@@ -580,15 +607,44 @@ public class SusynaImporter
                           final String targetName)
       throws SusynaParseException
     {
-      final StateInfo srcInfo = getState(srcName);
-      final StateProxy srcState = srcInfo.getState();
       final EventInfo eventInfo = getLocalEvent(label);
-      final EventProxy event = eventInfo.getEvent();
-      final StateInfo targetInfo = getState(targetName);
-      final StateProxy targetState = targetInfo.getState();
-      final TransitionProxy trans =
-        mFactory.createTransitionProxy(srcState, event, targetState);
-      mTransitions.add(trans);
+      if (!eventInfo.isObservable() &&
+          mTauConversionMethod == TauConversionMethod.REMOVE) {
+        final StateInfo srcInfo = getState(srcName);
+        srcInfo.setFake();
+        final StateInfo targetInfo = getState(targetName);
+        targetInfo.setInitial();
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class TransitionListHandler2
+  private class TransitionListHandler2 extends ListHandler
+  {
+
+    //#######################################################################
+    //# Interface ListHandler
+    @Override
+    void handleTransition(final String srcName,
+                          final String label,
+                          final String targetName)
+      throws SusynaParseException
+    {
+      final EventInfo eventInfo = getLocalEvent(label);
+      if (eventInfo.isObservable() ||
+          mTauConversionMethod != TauConversionMethod.REMOVE) {
+        final EventProxy event = eventInfo.getEvent();
+        final StateInfo srcInfo = getState(srcName);
+        final StateProxy srcState = srcInfo.getState();
+        final StateInfo targetInfo = getState(targetName);
+        final StateProxy targetState = targetInfo.getState();
+        final TransitionProxy trans =
+          mFactory.createTransitionProxy(srcState, event, targetState);
+        mTransitions.add(trans);
+      }
     }
 
   }
@@ -620,6 +676,11 @@ public class SusynaImporter
       mMarked = true;
     }
 
+    private void setFake()
+    {
+      mFake = true;
+    }
+
     private StateProxy getState()
     {
       return mState;
@@ -627,7 +688,9 @@ public class SusynaImporter
 
     private StateProxy createState()
     {
-      if (mState == null) {
+      if (mFake) {
+        return null;
+      } else if (mState == null) {
         final String name = getStandardisedName();
         final Collection<EventProxy> props = mMarked ? mMarkings : null;
         mState = mFactory.createStateProxy(name, mInitial, props);
@@ -652,6 +715,7 @@ public class SusynaImporter
     private final String mName;
     private boolean mInitial;
     private boolean mMarked;
+    private boolean mFake;
     private StateProxy mState;
   }
 
@@ -699,7 +763,19 @@ public class SusynaImporter
         if (mObservable) {
           name = mName;
         } else {
-          name = mName + ":" + autname;
+          switch (mTauConversionMethod) {
+          case LOCAL:
+            name = mName + ":" + autname;
+            break;
+          case SHARED:
+            name = mName;
+            break;
+          case REMOVE:
+            return null;
+          default:
+            throw new IllegalStateException("Unknown TauConversionMethod " +
+                                            mTauConversionMethod + "!");
+          }
         }
         final EventKind kind =
           mControllable ? EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE;
@@ -718,10 +794,41 @@ public class SusynaImporter
 
 
   //#########################################################################
+  //# Inner Enumeration TauConversionMethod
+  /**
+   * Susyna automata are normalised in a form with a single initial state
+   * linked by a transition labelled by an unobservable event called "tau"
+   * to the actual initial states of the automaton. This is unnecessary and
+   * may cause complications in Waters. The converter can create individual
+   * "tau" events for each automaton, or a single event shared by all
+   * automata, or remove these transitions and produce automata with
+   * multiple initial states instead.
+   */
+  public static enum TauConversionMethod
+  {
+    /**
+     * Create individual "tau" events for each automaton.
+     */
+    LOCAL,
+    /**
+     * Create one "tau" event shared by all automata.
+     */
+    SHARED,
+    /**
+     * Remove initial "tau" transitions and replace by initial states.
+     */
+    REMOVE
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
   private final Map<String,ListHandler> mHandlersPass1;
   private final Map<String,ListHandler> mHandlersPass2;
+
+  private TauConversionMethod mTauConversionMethod =
+    TauConversionMethod.REMOVE;
 
   private Map<String,EventInfo> mGlobalEventMap;
   private Map<String,EventInfo> mLocalEventMap;

@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="2linkalt" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Part of 6-link Linear Cluster Tool model received from Rong Su.
+Plants and specs used by 2linkalt.py script.
+This model is controllable and conflicting.
+It has 9552 reachable states and a diameter of 38.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="pick_10"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pick_11"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pick_12"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pick_13"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pick_20"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pick_21"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pick_22"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pick_23"/>
+        <EventDecl Kind="CONTROLLABLE" Name="place_10"/>
+        <EventDecl Kind="CONTROLLABLE" Name="place_11"/>
+        <EventDecl Kind="CONTROLLABLE" Name="place_12"/>
+        <EventDecl Kind="CONTROLLABLE" Name="place_13"/>
+        <EventDecl Kind="CONTROLLABLE" Name="place_20"/>
+        <EventDecl Kind="CONTROLLABLE" Name="place_21"/>
+        <EventDecl Kind="CONTROLLABLE" Name="place_22"/>
+        <EventDecl Kind="CONTROLLABLE" Name="place_23"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="process_11"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="process_12"/>
+        <EventDecl Kind="CONTROLLABLE" Name="process_13"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="process_21"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="process_22"/>
+        <EventDecl Kind="CONTROLLABLE" Name="process_23"/>
+        <EventDecl Kind="CONTROLLABLE" Name="r1_turn"/>
+        <EventDecl Kind="CONTROLLABLE" Name="r1_turn_ccw"/>
+        <EventDecl Kind="CONTROLLABLE" Name="r2_turn"/>
+        <EventDecl Kind="CONTROLLABLE" Name="r2_turn_ccw"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="pm10">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_10"/>
+                            <SimpleIdentifier Name="place_10"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="pm11">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="process_11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_11"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="pm12">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_12"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="process_12"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_12"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="pm13">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_13"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="process_13"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_13"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="pm20">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_13"/>
+                            <SimpleIdentifier Name="place_20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_13"/>
+                            <SimpleIdentifier Name="pick_20"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="pm21">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="process_21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_21"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="pm22">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="process_22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_22"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="pm23">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="process_23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_23"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="reqlinkalt12">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s8"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_12"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_13"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_13"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_13"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="reqp11">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_11"/>
+                            <SimpleIdentifier Name="place_12"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="reqp12">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_11"/>
+                            <SimpleIdentifier Name="pick_12"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_13"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="reqp13">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_13"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_10"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="reqp21">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_21"/>
+                            <SimpleIdentifier Name="place_22"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="reqp22">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_21"/>
+                            <SimpleIdentifier Name="pick_22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_23"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="reqp23">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_20"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="robot1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s8"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_13"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_12"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_13"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_12"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r1_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="robot2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s8"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pick_22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_20"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_21"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="place_22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="r2_turn_ccw"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

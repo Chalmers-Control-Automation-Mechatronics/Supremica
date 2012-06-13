@@ -131,7 +131,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="B_0">
                         <PointGeometry>
-                            <Point Y="64" X="80"/>
+                            <Point Y="64" X="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-6" X="-32"/>
@@ -139,7 +139,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_1">
                         <PointGeometry>
-                            <Point Y="144" X="80"/>
+                            <Point Y="144" X="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-5" X="-29"/>
@@ -147,7 +147,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_2">
                         <PointGeometry>
-                            <Point Y="224" X="80"/>
+                            <Point Y="224" X="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-10" X="-32"/>
@@ -158,7 +158,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="304" X="80"/>
+                            <Point Y="304" X="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="-32"/>
@@ -186,29 +186,6 @@
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-17" X="2"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="B_3" Source="B_2">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="exch_ch">
-                                <SimpleIdentifier Name="A_0"/>
-                                <SimpleIdentifier Name="FALSE"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="exch_ch">
-                                <SimpleIdentifier Name="A_0"/>
-                                <SimpleIdentifier Name="TRUE"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="exch_ch">
-                                <SimpleIdentifier Name="A_1"/>
-                                <SimpleIdentifier Name="FALSE"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="exch_ch">
-                                <SimpleIdentifier Name="A_1"/>
-                                <SimpleIdentifier Name="TRUE"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

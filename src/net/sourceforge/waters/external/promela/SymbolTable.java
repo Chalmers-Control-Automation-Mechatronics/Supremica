@@ -38,10 +38,14 @@ public class SymbolTable
     mChildTables = new HashMap<String, SymbolTable>();
 
     //Now, add in the integer constant values into the variable table
-    mVariableTable.put("bit", new IntegerTreeNode(1));
-    mVariableTable.put("byte", new IntegerTreeNode(255));
-    mVariableTable.put("short", new IntegerTreeNode(65535));
-    mVariableTable.put("int", new IntegerTreeNode(0));//TODO Work out how this works
+    mVariableTable.put("bit_lower", new IntegerTreeNode(0));
+    mVariableTable.put("bit_upper", new IntegerTreeNode(1));
+    mVariableTable.put("byte_lower", new IntegerTreeNode(0));
+    mVariableTable.put("byte_upper", new IntegerTreeNode(255));
+    mVariableTable.put("short_lower", new IntegerTreeNode(0));
+    mVariableTable.put("short_upper", new IntegerTreeNode(0));
+    mVariableTable.put("int_lower", new IntegerTreeNode(0));
+    mVariableTable.put("int_upper", new IntegerTreeNode(0));
   }
 
   /**

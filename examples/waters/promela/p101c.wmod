@@ -110,7 +110,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="B_0">
                         <PointGeometry>
-                            <Point Y="64" X="80"/>
+                            <Point Y="64" X="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="9"/>
@@ -118,7 +118,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_1">
                         <PointGeometry>
-                            <Point Y="144" X="80"/>
+                            <Point Y="144" X="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-6" X="9"/>
@@ -129,7 +129,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="224" X="80"/>
+                            <Point Y="224" X="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-5" X="7"/>
@@ -151,14 +151,27 @@
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="121"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-116"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="187" X="127"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="B_2" Source="B_1">
+                        <LabelBlock>
                             <IndexedIdentifier Name="exch_name">
                                 <IntConstant Value="33"/>
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="5"/>
+                                <Point Y="-13" X="7"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="188" X="167"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

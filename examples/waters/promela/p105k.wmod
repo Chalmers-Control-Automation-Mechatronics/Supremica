@@ -204,7 +204,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="C_0">
                         <PointGeometry>
-                            <Point Y="48" X="64"/>
+                            <Point Y="64" X="288"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-10" X="6"/>
@@ -212,7 +212,7 @@
                     </SimpleNode>
                     <SimpleNode Name="C_1">
                         <PointGeometry>
-                            <Point Y="128" X="64"/>
+                            <Point Y="144" X="288"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-11" X="10"/>
@@ -223,7 +223,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="208" X="64"/>
+                            <Point Y="224" X="288"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="8"/>
@@ -246,6 +246,16 @@
                                 <SimpleIdentifier Name="C_0"/>
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-14" X="-156"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="182" X="198"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="C_2" Source="C_1">
+                        <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <SimpleIdentifier Name="A_0"/>
                                 <SimpleIdentifier Name="C_0"/>
@@ -256,15 +266,25 @@
                                 <SimpleIdentifier Name="C_0"/>
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-17" X="-65"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="C_2" Source="C_1">
+                        <LabelBlock>
                             <IndexedIdentifier Name="exch_ch">
                                 <SimpleIdentifier Name="B_0"/>
                                 <SimpleIdentifier Name="C_0"/>
                                 <IntConstant Value="3"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-32" X="7"/>
+                                <Point Y="-5" X="17"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="185" X="379"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
