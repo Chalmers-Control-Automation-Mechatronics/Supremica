@@ -2,6 +2,10 @@ package net.sourceforge.waters.analysis.certainconf;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -25,12 +29,17 @@ public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
     return new CertainConflictsTRSimplifier();
   }
 
-  public void test_certainconflicts_8() throws Exception
+  @Override
+  protected EventEncoding createEventEncoding(final ProductDESProxy des,
+                                              final AutomatonProxy aut)
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "certainconflicts_8.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    return createEventEncodingWithPropositions(des, aut);
+  }
+
+  @Override
+  protected void configureTransitionRelationSimplifier()
+  {
+    configureTransitionRelationSimplifierWithPropositions();
   }
 
   public void test_certainconflicts_1() throws Exception
@@ -46,6 +55,62 @@ public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "certainconflicts_2.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_3() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_3.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_4() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_4.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_5() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_5.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_6() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_6.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_7() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_7.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_8() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_8.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_9() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_9.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

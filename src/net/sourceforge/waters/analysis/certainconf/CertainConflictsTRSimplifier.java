@@ -68,8 +68,9 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         }
 
         final int numStates = rel.getNumberOfStates();
+        nTemp = numStates;
         mSetOffsets = new TIntArrayList(numStates);
-        mStateSetBuffer = new IntSetBuffer(numStates);
+        mStateSetBuffer = new IntSetBuffer(numStates, 0, -1);
         mTransitionBuffer = new PreTransitionBuffer(numEvents, mTransitionLimit);
     }
 
@@ -89,7 +90,7 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     @Override
     public int getPreferredInputConfiguration()
     {
-      return ListBufferTransitionRelation.CONFIG_ALL;
+      return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     }
 
     @Override
@@ -214,92 +215,229 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
           detStates.setAllMarkings(detstate, stateMarkings);
         }
         detStates.removeRedundantPropositions();
-        mSetOffsets = null;
-        mStateSetBuffer = null;
+        //mSetOffsets = null;
+        //mStateSetBuffer = null; need it later!
         final int numTrans = mTransitionBuffer.size();
-        final int config = getPreferredInputConfiguration();
-        rel.reset(detStates, numTrans, config);
+        rel.reset(detStates, numTrans, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
         rel.removeEvent(EventEncoding.TAU);
         mTransitionBuffer.addOutgoingTransitions(rel);
-mTransitionBuffer = null;
-        rel.removeProperSelfLoopEvents();
+        rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+        //rel.removeProperSelfLoopEvents();
         if (!certainconfalgo(rel)) System.out.println("Error");
+        rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        rel.checkReachability();
+        rel.removeProperSelfLoopEvents();
 
       }
 
     }
 
     protected boolean certainconfalgo(final ListBufferTransitionRelation rel) throws AnalysisException
+    {
+      System.out.println("Welcome to the certain conflicts algorithm");
+      boolean brothersAdded = false;
+      //final int dumpstate = blacklist.toArray()[0];
+      // TODO: ensure dump state is not marked
+      // not necessary : only way a marked state could be in set is as a brother - not from this list
+      mBadStates = new TIntHashSet();
+
+      do
       {
-        //final ListBufferTransitionRelation rel = getTransitionRelation();
-        TIntHashSet blacklist = findbadstates(rel);
-        if (blacklist.size() == 0) return true;
+        mBadStates = findbadstates(rel);
+        System.out.println("Found bad states:");
+        PrintIntSet(mBadStates);
+        final int before = mBadStates.size();
+        if (before == 0) return true;
+          final int[] brothers = findbrothers(mBadStates);
+          for (int j = 0; j < brothers.length; j++) mBadStates.add(brothers[j]);
+          brothersAdded = mBadStates.size() != before;
+      } while (brothersAdded);
 
-        final int dumpstate = blacklist.toArray()[0];
-        // TODO: ensure dump state is not marked
+      System.out.println("The finding of bad states is complete, here is badstates:");
+      PrintIntSet(mBadStates);
+      // select dump state as first item
+      final int[] allBadStates = mBadStates.toArray();
+      final int dumpstate = allBadStates[0];
+      System.out.println("Selecting dump state: " + dumpstate);
+      //
 
-        while(blacklist.size() > 1) { // keep going until no more changes (except dump state?)
-          final int[] blacklist_arr = blacklist.toArray();
-          for (int i = 0; i < blacklist.size(); i++) {
-            // TODO: add brothers of items on blacklist to blacklist
+      for (int i = 1; i < allBadStates.length; i++) {
+        final TransitionIterator iter =  rel.createPredecessorsModifyingIterator();
+        iter.resetState(allBadStates[i]);
+        while (iter.advance()){
+          if (!mBadStates.contains(iter.getCurrentSourceState()))
+          {
+           // rel.moveIncomingTransitions(allBadStates[i], dumpstate);
+            rel.addTransition(iter.getCurrentSourceState(), iter.getCurrentEvent(), dumpstate);
+
           }
 
-          // for each item on blacklist, all transitions in get redirected to dump state
-          // then remove item from transition relation (set reachable false)
-          for (int i = 0; i < blacklist.size(); i++) {
-            rel.moveIncomingTransitions(blacklist_arr[i], dumpstate);
-            rel.setReachable(blacklist_arr[i], false);
-            // TODO: (if item is initial, set dump state to be initial)
-          }
-
-          blacklist = findbadstates(rel);
+          iter.remove();
+        // outgoing from dump
         }
-        return true;
+        System.out.println("Moving incoming transitions into " + allBadStates[i] + " to " + dumpstate);
       }
 
-    protected TIntHashSet findbadstates(final ListBufferTransitionRelation rel) throws AnalysisException {
-        final TIntHashSet badstates = new TIntHashSet();
+      return true;
+    }
 
-        final TransitionIterator prediter = rel.createPredecessorsReadOnlyIterator();
-        final int alphaID = getPreconditionMarkingID();
-        final int defaultID = getDefaultMarkingID();
+    @SuppressWarnings("unchecked")
+    protected int[] findbrothers(final TIntHashSet badstateshashset)
+    {
+      final int[] badstates = badstateshashset.toArray();
+      System.out.println("finding brothers of:");
+     PrintIntSet(badstates);
+      //final ArrayList<Integer> alBrothers = new ArrayList<Integer>();
+      final TIntHashSet brothers = new TIntHashSet();
+      final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
+      for (int i = 0; i < badstates.length; i++)
+      {
+        final int badstate = badstates[i];
+        iter.reset(badstate);
+        System.out.println("Looking at state" + badstate);
+        ArrayList<Integer> t = new ArrayList<Integer>();
+        while (iter.advance())
+        {
+          t.add(iter.getCurrentData());
+        }
+        // now permute t
+        System.out.println("State " + badstate + " is set:");
+        PrintIntSet(t);
+        final ArrayList<Integer> originalt = (ArrayList<Integer>) t.clone();
+        System.out.println("Now permuting");
+        for (int j = 1; j < t.size(); j++)
+        {
+          t = (ArrayList<Integer>) originalt.clone();
+          Collections.swap(t, 0, j);
+          // TODO: improve. (only an int[])
+          Collections.sort(t.subList(1, t.size()));
+          System.out.println("Permuted:");
+          PrintIntSet(t);
+          final int[] t_arr = new int[t.size()];
+          for (int k = 0; k < t_arr.length; k++)
+              t_arr[k] = t.get(k);
+          final int indexinset = mStateSetBuffer.get(t_arr);
+          if (indexinset > -1)
+          {
+            System.out.println("Found brother, state #" + indexinset);
+              brothers.add(indexinset);
+          }
+        }
+      }
 
-        final int numStates = rel.getNumberOfStates();
-        final TIntHashSet coreachableStates = new TIntHashSet(numStates);
-        final TIntStack unvisitedStates = new TIntStack();
-        // Creates a hash set of all states which can reach an omega marked or alpha
-        // marked state.
-        for (int sourceID = 0; sourceID < numStates; sourceID++) {
-          System.out.println("marking a:"+rel.isMarked(sourceID, defaultID));
-          System.out.println("marking b:"+rel.isMarked(sourceID, alphaID));
-          System.out.println("reachable:"+rel.isReachable(sourceID));
-          if ((rel.isMarked(sourceID, defaultID) ||
-               rel.isMarked(sourceID, alphaID)) &&
-              rel.isReachable(sourceID) &&
-              coreachableStates.add(sourceID) ) {
-            checkAbort();
-            unvisitedStates.push(sourceID);
-            while (unvisitedStates.size() > 0) {
-              final int newSource = unvisitedStates.pop();
-              prediter.resetState(newSource);
-              while (prediter.advance()) {
-                final int predID = prediter.getCurrentSourceState();
-                if (rel.isReachable(predID) && coreachableStates.add(predID)) {
-                  unvisitedStates.push(predID);
-                }
+      System.out.println("Returning " + brothers.size() + " brothers");
+      return brothers.toArray();
+    }
+
+    protected void PrintIntSet(final int[] in) {
+      String s = "[";
+      for (int i = 0; i < in.length; i++) {
+        s += in[i];
+        if (i < in.length - 1) s += ",";
+      }
+      s += "]";
+      System.out.println(s);
+    }
+    protected void PrintIntSet(final TIntArrayList in) {
+      String s = "[";
+      for (int i = 0; i < in.size(); i++) {
+        s += in.get(i);
+        if (i < in.size() - 1) s += ",";
+      }
+      s += "]";
+      System.out.println(s);
+    }
+    protected void PrintIntSet(final ArrayList<Integer> in) {
+      String s = "[";
+      for (int i = 0; i < in.size(); i++) {
+        s += in.get(i);
+        if (i < in.size() - 1) s += ",";
+      }
+      s += "]";
+      System.out.println(s);
+    }
+    protected void PrintIntSet(final TIntHashSet in) {
+      PrintIntSet(in.toArray());
+    }
+    protected void PrintIntSet(final TIntStack in) {
+      PrintIntSet(in.toNativeArray());
+
+    }
+
+    protected TIntHashSet findbadstates(final ListBufferTransitionRelation rel) throws AnalysisException
+    {
+      System.out.println("~~~~~findbadstates start~~~~~");
+      System.out.println("Known bad states: ");
+      PrintIntSet(mBadStates);
+      final TIntHashSet badstates = new TIntHashSet();
+      final TransitionIterator prediter = rel.createPredecessorsReadOnlyIterator();
+      final int defaultID = getDefaultMarkingID();
+
+      final int numStates = rel.getNumberOfStates();
+      final TIntHashSet coreachableStates = new TIntHashSet(numStates);
+      final TIntStack unvisitedStates = new TIntStack();
+      // Creates a hash set of all states which can reach an omega marked or alpha
+      // marked state
+      for (int sourceID = 0; sourceID < numStates; sourceID++) {
+        System.out.println("Looking at state " + sourceID);
+        //final TIntHashSet old_coreachableStates = (TIntHashSet) coreachableStates.clone();
+        System.out.println("Storing old value of coreachableStates: ");
+        //PrintIntSet(old_coreachableStates);
+        if (rel.isMarked(sourceID, defaultID) &&
+            rel.isReachable(sourceID) &&
+            !mBadStates.contains(sourceID) &&
+            coreachableStates.add(sourceID) ) {
+          System.out.println("State " + sourceID + " is marked and not bad, so added to coreachable");
+          checkAbort();
+          unvisitedStates.push(sourceID);
+          System.out.println("unvisitedstates is now");
+          PrintIntSet(unvisitedStates);
+
+
+          while (unvisitedStates.size() > 0) {
+            final int newSource = unvisitedStates.pop();
+
+            System.out.println("Popped " + newSource + " from the unvisitedStates stack");
+            prediter.resetState(newSource);
+            //System.out.println("NOGOODPRED IS NOW TRUE");
+            //boolean noGoodPred = true;
+
+            while (prediter.advance()) {
+              final int predID = prediter.getCurrentSourceState();
+              System.out.println(predID + " leads into " + newSource);
+              if (rel.isReachable(predID) && !mBadStates.contains(predID) && predID != newSource && coreachableStates.add(predID)) {
+                //noGoodPred = false;
+                //System.out.println("NOGOODPRED IS NOW FALSE");
+                System.out.println(predID + " is a legit predecessor");
+                unvisitedStates.push(predID);
               }
             }
+           // if (rel.isInitial(newSource)) noGoodPred = false;
+            System.out.println("co-reachable states now : ");
+            PrintIntSet(coreachableStates);
+            /*if (noGoodPred)
+            {
+              System.out.println("But they were all bad so reset CRS:");
+              coreachableStates = (TIntHashSet) old_coreachableStates.clone();
+              PrintIntSet(coreachableStates);
+              PrintIntSet(old_coreachableStates);
+              unvisitedStates.clear();
+              break;
+            }*/
           }
         }
-        // Blacklist states which cannot reach a state marked alpha or omega.
+      }
+      // Blacklist states which cannot reach a state marked alpha or omega.
 
-        for (int sourceID = 0; sourceID < numStates; sourceID++) {
-          if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
-            badstates.add(sourceID);
-          }
+      for (int sourceID = 0; sourceID < numStates; sourceID++) {
+        if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
+          badstates.add(sourceID);
+          // remove marking
+          rel.setMarked(sourceID, getDefaultMarkingID(), false);
         }
+      }
 
-        return badstates;
+      return badstates;
     }
 
     //#########################################################################
@@ -312,6 +450,8 @@ mTransitionBuffer = null;
     private TransitionIterator mTauIterator;
     private TransitionIterator mEventIterator;
     private TIntArrayList mSetOffsets;
+    private TIntHashSet mBadStates;
     private IntSetBuffer mStateSetBuffer;
     private PreTransitionBuffer mTransitionBuffer;
+    private int nTemp;
 }
