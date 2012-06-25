@@ -68,7 +68,6 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         }
 
         final int numStates = rel.getNumberOfStates();
-        nTemp = numStates;
         mSetOffsets = new TIntArrayList(numStates);
         mStateSetBuffer = new IntSetBuffer(numStates, 0, -1);
         mTransitionBuffer = new PreTransitionBuffer(numEvents, mTransitionLimit);
@@ -453,5 +452,5 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     private TIntHashSet mBadStates;
     private IntSetBuffer mStateSetBuffer;
     private PreTransitionBuffer mTransitionBuffer;
-    private int nTemp;
+
 }
