@@ -111,6 +111,16 @@ public class SimpleNodeProxyShape
     }
   }
 
+  @Override
+  public Handle getClickedHandle(final int x, final int y)
+  {
+    if (mCircleShape.contains(x, y)) {
+      return null;
+    } else {
+      return super.getClickedHandle(x, y);
+    }
+  }
+
 
   //#########################################################################
   //# Static Drawing
