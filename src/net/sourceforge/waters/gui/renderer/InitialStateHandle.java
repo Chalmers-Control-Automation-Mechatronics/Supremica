@@ -57,7 +57,6 @@ class InitialStateHandle
     normdir.setLocation(-dx, -dy);
     final GeneralPath arrow = EdgeProxyShape.createArrowHead(border, normdir);
     mShape = new GeneralPath(GeneralPath.WIND_NON_ZERO, 2);
-    //mShape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 2);
     mShape.append(mLine, false);
     mShape.append(arrow, false);
   }
@@ -78,6 +77,7 @@ class InitialStateHandle
     return mShape;
   }
 
+  @Override
   public void draw(final Graphics2D g2d, final RenderingInformation status)
   {
     super.draw(g2d, status);
@@ -88,10 +88,11 @@ class InitialStateHandle
   public boolean isClicked(final int x, final int y)
   {
     final int radius = Config.GUI_EDITOR_NODE_RADIUS.get() + 1;
-    final double dist = mLine.ptSegDist(x, y);
+    final double distSq = mLine.ptSegDistSq(x, y);
     final Point2D center = GeometryTools.getPosition(mNode);
-    final boolean ret = dist < 6 && (center.distanceSq(x, y) > radius*radius);
-    return ret;
+    return
+      distSq < CLICK_TOLERANCE_SQ &&
+      center.distanceSq(x, y) > radius * radius;
   }
 
 
@@ -101,8 +102,10 @@ class InitialStateHandle
   private final Line2D mLine;
   private final SimpleNodeProxy mNode;
 
+
   //#########################################################################
   //# Class Constants
   static final double INITARROW_LENGTH = 18.0;
+  private static final double CLICK_TOLERANCE_SQ = 6.0 * 6.0;
 
 }
