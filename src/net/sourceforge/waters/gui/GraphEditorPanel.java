@@ -1742,7 +1742,7 @@ public class GraphEditorPanel
             if (event.isShiftDown()) {
               removeFromSelection(item);
             } else {
-              //nothing
+              replaceSelection(item);
             }
           }else{
             if (event.isShiftDown()) {
@@ -1933,7 +1933,7 @@ public class GraphEditorPanel
           if (mFocusedObject == subject || !isSelected(subject)) {
             final Handle handle = getClickedHandle(subject, mStartPoint);
             if (handle == null) {
-              mInternalDragAction = new InternalDragActionMove(mStartPoint);
+              mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown());
             } else {
               switch (handle.getType()) {
               case INITIAL:
@@ -2073,7 +2073,7 @@ public class GraphEditorPanel
             final Handle handle = getClickedHandle(subject, mStartPoint);
             if (handle == null) {
               mInternalDragAction =
-                new InternalDragActionMove(mStartPoint);
+                new InternalDragActionMove(mStartPoint, event.isShiftDown());
             } else {
               if(handle.getType() == HandleType.INITIAL){
                 mInternalDragAction =
@@ -2128,7 +2128,7 @@ public class GraphEditorPanel
         } else {
           final Handle handle = getClickedHandle(mFocusedObject, mStartPoint);
           if (handle == null) {
-            mInternalDragAction = new InternalDragActionMove(mStartPoint);
+            mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown());
           } else {
             mInternalDragAction =
               new InternalDragActionResizeGroupNode(handle, mStartPoint);
@@ -2210,13 +2210,13 @@ public class GraphEditorPanel
           if (mFocusedObject == item || !isSelected(item)){
             final Handle handle = getClickedHandle(item, mStartPoint);
             if (handle == null && canBeSelected(item)){
-              mInternalDragAction = new InternalDragActionMove(mStartPoint);
+              mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown());
             } else if (item instanceof NodeSubject) {
               // Clicking on node or nodegroup --- create edge.
               mInternalDragAction = new InternalDragActionEdge(mStartPoint);
             } else if (item instanceof EdgeSubject) {
               if (handle == null) {
-                mInternalDragAction = new InternalDragActionMove(mStartPoint);
+                mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown());
               } else {
                 mInternalDragAction =
                   new InternalDragActionEdge(handle, mStartPoint);
@@ -2633,14 +2633,17 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionMove(final Point start)
+    private InternalDragActionMove(final Point start, final boolean shiftDown)
     {
       super(start);
-      if (!isShiftDown()) {
-        replaceSelection(mFocusedObject);
+      if (!shiftDown) {
+        if (!isSelected(mFocusedObject)) {
+          replaceSelection(mFocusedObject);
+        }
       } else if (!isSelected(mFocusedObject)) {
-        addToSelection(mFocusedObject);
+          addToSelection(mFocusedObject);
       }
+
       Point2D snap = null;
       if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
         // Move operation snaps to grid when a node is moved.
