@@ -725,6 +725,7 @@
                 <LabelBlock>
                     <SimpleIdentifier Name="e1"/>
                     <SimpleIdentifier Name="e2"/>
+                    <SimpleIdentifier Name=":accepting"/>
                     <LabelGeometry Anchor="NW">
                         <Point Y="68" X="113"/>
                     </LabelGeometry>
@@ -746,7 +747,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0.S0">
                         <PointGeometry>
-                            <Point Y="227" X="270"/>
+                            <Point Y="272" X="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="5" X="5"/>
@@ -784,7 +785,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="491" X="184"/>
+                            <Point Y="416" X="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="5" X="5"/>
@@ -795,10 +796,10 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="591" X="186"/>
+                            <Point Y="464" X="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point Y="-10" X="20"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4.S3S4S5S6">
@@ -865,7 +866,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="656" X="184"/>
+                            <Point Y="512" X="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="5" X="5"/>
@@ -876,10 +877,10 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="501" X="121"/>
+                            <Point Y="432" X="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point Y="-29" X="-24"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S7.S7">
@@ -927,7 +928,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="299" X="254"/>
+                            <Point Y="322" X="248"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S4.S3S4S5S6" Source="S1.S1S2S3">
@@ -986,7 +987,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="498" X="150"/>
+                            <Point Y="427" X="149"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S3.S3S6" Source="S3.S3S6">
@@ -997,7 +998,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="629" X="215"/>
+                            <Point Y="502" X="221"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S7.S6S7" Source="S3.S3S6">
@@ -1053,7 +1054,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point Y="7" X="11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
