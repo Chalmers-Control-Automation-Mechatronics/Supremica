@@ -76,7 +76,7 @@ public class Renderer
             .getGuardActionBlock())));
         for (final BinaryExpressionProxy action : edge.getGuardActionBlock().getActions()) {
           queue.offer(new ShapeToRender(producer.getShape(action),
-              new RenderingInformation(false, false, EditorColor.ACTIONCOLOR,
+              new RenderingInformation(false, false, false, EditorColor.ACTIONCOLOR,
                   EditorColor.ACTIONCOLOR, 0)));
         }
         final List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
@@ -85,13 +85,13 @@ public class Renderer
         {
             final SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
             queue.offer(new ShapeToRender(producer.getShape(guard),
-                new RenderingInformation(false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
+                new RenderingInformation(false, false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
         }
         else if(guards.size() == 2)
         {
             final SimpleExpressionProxy guard = guards.get(0);
             queue.offer(new ShapeToRender(producer.getShape(guard),
-                new RenderingInformation(false, false, EditorColor.ADDEDGUARDCOLOR, EditorColor.ADDEDGUARDCOLOR, 0)));
+                new RenderingInformation(false, false, false, EditorColor.ADDEDGUARDCOLOR, EditorColor.ADDEDGUARDCOLOR, 0)));
         }
         else if(guards.size() == 3)
         {
@@ -103,7 +103,7 @@ public class Renderer
 
                 final SimpleExpressionProxy guard = guards.get(i); //Change color
                 queue.offer(new ShapeToRender(producer.getShape(guard),
-                    new RenderingInformation(false, false, guardColor, guardColor, 0)));
+                    new RenderingInformation(false, false, false, guardColor, guardColor, 0)));
             }
         }
       }

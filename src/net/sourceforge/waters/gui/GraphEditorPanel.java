@@ -1371,12 +1371,16 @@ public class GraphEditorPanel
    * @param  event  The mouse event being processed.
    * @return The handle clicked, or <CODE>null</CODE>
    */
-  private Handle getClickedHandle(final ProxySubject item,
-                                  final Point point)
+  private Handle getClickedHandle(final ProxySubject item, final Point point)
   {
     if (isSelected(item)) {
       final int x = point.x;
       final int y = point.y;
+      final boolean handlesAreShown = getShapeProducer().getRenderingContext()
+            .getRenderingInformation(item).showHandles();
+      if (!handlesAreShown) {
+        return null;
+      }
       final ProxyShape shape = getShapeProducer().getShape(item);
       return shape.getClickedHandle(x, y);
     } else {
@@ -1531,17 +1535,8 @@ public class GraphEditorPanel
       final ProxySubject item = (ProxySubject) proxy;
       final boolean focused = isRenderedFocused(item);
       final boolean selected = isRenderedSelected(item);
-      final boolean showHandles;
-      if (!selected) {
-        showHandles = false;
-      } else if (mInternalDragAction != null) {
-        // *** BUG ***
-        // Label block boundary treated as handle---ugly!
-        // ***
-        showHandles = item instanceof LabelBlockSubject;
-      } else {
-        showHandles = mController.canBeSelected(item);
-      }
+      final boolean showHandles = getCurrentSelection().size() == 1;
+        //showHandles = mController.canBeSelected(item);
       final boolean error = isError(item);
       int priority = getPriority(item);
       if (mDontDraw.contains(item)) {
@@ -1556,7 +1551,7 @@ public class GraphEditorPanel
         dragover = DragOverStatus.NOTDRAG;
       }
       return new RenderingInformation
-        (showHandles, focused,
+        (selected, showHandles, focused,
          EditorColor.getColor(item, dragover, selected,
                               error, mIsPermanentFocusOwner),
          EditorColor.getShadowColor(item, dragover, selected,

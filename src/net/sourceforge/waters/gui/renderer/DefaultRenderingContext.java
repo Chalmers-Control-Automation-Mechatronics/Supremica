@@ -64,7 +64,7 @@ public class DefaultRenderingContext
   public RenderingInformation getRenderingInformation(final Proxy proxy)
   {
     return new RenderingInformation
-      (false, false,
+      (false, false, false,
        EditorColor.getColor
          (proxy, GraphPanel.DragOverStatus.NOTDRAG, false, false, true),
        EditorColor.getShadowColor
