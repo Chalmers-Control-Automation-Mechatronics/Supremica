@@ -221,28 +221,28 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         mTransitionBuffer.addOutgoingTransitions(rel);
         rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
 
-        certainconfalgo(rel);
+        final int dumpstate = certainconfalgo(rel);
         rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        if (dumpstate > -1) rel.removeOutgoingTransitions(dumpstate);
         rel.checkReachability();
         rel.removeProperSelfLoopEvents();
-
       }
 
     }
 
-    protected void certainconfalgo(final ListBufferTransitionRelation rel) throws AnalysisException
+    protected int certainconfalgo(final ListBufferTransitionRelation rel) throws AnalysisException
     {
       // to determine when no new states have been added to bad states
       boolean brothersAdded = false;
       // keep track of bad states
       mBadStates = new TIntHashSet();
       // total number of states
-      final int numStates = rel.getNumberOfStates();
+      //final int numStates = rel.getNumberOfStates();
 
       do
       {
           final int before = updateBadStates(rel);
-          if (before == 0) return;
+          if (before == 0) return -1;
           // find brothers of bad states (they'll be added to mBadStates
           // and go again if new states were added.
           brothersAdded = findBrothers() != before;
@@ -251,62 +251,57 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       // select dump state as first item
       final int[] allBadStates = mBadStates.toArray();
       final int dumpstate = allBadStates[0];
+        for (int i = 0; i < mBadStates.size(); i++)
+        {
+            final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
+            final int s = allBadStates[i];
+            iter.resetState(s);
+            while (iter.advance())
+            {
+                final int from = iter.getCurrentSourceState();
 
-      for (int i = 0; i < numStates; i++) {
-          final TransitionIterator iter =  rel.createPredecessorsModifyingIterator();
-          iter.resetState(i);
-          while (iter.advance())
-          {
-              final int from = iter.getCurrentSourceState();
-              // remove transitions into the dump state from other bad states
-              if (i == dumpstate )
-              {
-                  if (mBadStates.contains(from)) iter.remove();
-                  continue;
-              }
-              // redirect transitions from good states, from bad to dump
-              else if (mBadStates.contains(i) && !mBadStates.contains(from))
-              {
-                  rel.addTransition(from, iter.getCurrentEvent(), dumpstate);
-                  if (rel.isInitial(i))
-                      rel.setInitial(dumpstate, true);
-              }
+                if (i == 0 && !mBadStates.contains(from))
+                    continue;
 
-              if (mBadStates.contains(i) || from == dumpstate)
-                  iter.remove();
-          }
-      }
+                if (!mBadStates.contains(from))
+                {
+                    rel.addTransition(from, iter.getCurrentEvent(), dumpstate);
+                    if (rel.isInitial(s))
+                    {
+                        rel.setInitial(dumpstate, true);
+                    }
+                }
+                iter.remove();
+            }
+        }
+        return dumpstate;
     }
 
-    @SuppressWarnings("unchecked")
     protected int findBrothers()
     {
       final int[] arr_mBadStates = mBadStates.toArray();
 
-      final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
-
       for (int i = 0; i < arr_mBadStates.length; i++)
       {
-          final int badstate = arr_mBadStates[i];
-          iter.reset(badstate);
+          final int[] badStateSet = mStateSetBuffer.getSet(arr_mBadStates[i]);
 
-          // get the current set of states
-          final ArrayList<Integer> t = new ArrayList<Integer>();
-          while (iter.advance())
-              t.add(iter.getCurrentData());
+          //now permute badStateSet
+          // first order it, but remember what was originally first, no need to do again
 
-          // now permute set
-          for (int j = 1; j < t.size(); j++)
+          for (int j = 1; j < badStateSet.length; j++)
           {
-              final ArrayList<Integer> perm = (ArrayList<Integer>)t.clone();
-              Collections.swap(perm, 0, j);
-              // TODO: improve. (only an int[])
-              Collections.sort(perm.subList(1, perm.size()));
+              if (badStateSet[j] < badStateSet[j-1])
+                  arraySwap(badStateSet, j, j-1);
+              else break;
+          }
 
-              final int[] t_arr = new int[perm.size()];
-              for (int k = 0; k < t_arr.length; k++)
-                  t_arr[k] = perm.get(k);
-              final int indexinset = mStateSetBuffer.get(t_arr);
+          // now permute
+          for (int j = 0; j < badStateSet.length; j++)
+          {
+              arraySwap(badStateSet, 0, j);
+
+              final int indexinset = mStateSetBuffer.get(badStateSet);
+
               if (indexinset > -1)
                   mBadStates.add(indexinset);
           }
@@ -314,9 +309,12 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       return mBadStates.size();
     }
 
-    protected void testfunc()
+    protected void arraySwap(final int[] arr, final int swap1, final int swap2)
     {
-
+        if (swap1 == swap2) return;
+        final int temp = arr[swap1];
+        arr[swap1] = arr[swap2];
+        arr[swap2] = temp;
     }
 
     // this function updates the values in the variable mBadStates

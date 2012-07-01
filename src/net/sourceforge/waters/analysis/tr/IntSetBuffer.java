@@ -154,6 +154,25 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    return mDirectory.get(mNextFreeOffset);
   }
 
+  public int[] getSet(final int index)
+  {
+    final int blockno = index >>> BLOCK_SHIFT;
+
+    final int[] block = mBlocks.get(blockno);
+    final int offset = index & BLOCK_MASK;
+    int data = block[offset];
+    final int count = data & mSizeMask;
+    final int[] result = new int[count];
+    data = data >>> mSizeShift;
+    for (int i = 0; i < count; i++)
+    {
+        result[i] = data & mDataMask;
+        data = data >>> mDataShift;
+    }
+
+    return result;
+  }
+
   /**
    * Adds the data in the given list as a set to this integer set buffer.
    * @param  data   List of integers forming a new set. The list must be
