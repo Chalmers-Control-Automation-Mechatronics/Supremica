@@ -86,7 +86,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   Map<PromelaNode,PromelaEdge> mSourceOfBreakNode = new HashMap<PromelaNode,PromelaEdge>();
 
-  Map<String,PromelaNode> mGotoNode = new HashMap<String,PromelaNode>();
+  private final Map<String,PromelaNode> mGotoNode = new HashMap<String,PromelaNode>();
 
   Map<String,PromelaNode> mLabelEnd = new HashMap<String,PromelaNode>();
 
@@ -172,7 +172,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       }
     }
 
-    final PromelaGraph newGraph = new PromelaGraph(ident,false);
+    final PromelaGraph newGraph = new PromelaGraph(ident);
     g = PromelaGraph.sequentialComposition(newGraph, g,mUnWinding,mFactory);
     final GraphProxy graph = g.createGraphProxy(mFactory, procName);
     SimpleComponentProxy component;
@@ -1477,7 +1477,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitInitialStatement(final InitialStatementTreeNode t)
   {
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("initrun");
-    final PromelaGraph initGraph = new PromelaGraph(ident,false);
+    final PromelaGraph initGraph = new PromelaGraph(ident);
     return initGraph;
   }
 
@@ -1485,7 +1485,6 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     final String name = t.getChild(0).getText();
     PromelaGraph graph=null;
-    final boolean isEnd = checkEnd(t.getParent());
     if(!mIsInit)
     {
 
@@ -1503,14 +1502,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
           indexes.add(id);
           //final IndexedIdentifierProxy ident = mFactory.createIndexedIdentifierProxy("run_"+name,indexes);
           final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
-          graph = new PromelaGraph(ident,isEnd);
+          graph = new PromelaGraph(ident);
         }
         copyOfOccur.put(name,occur2-1);
       }
       else
       {
         final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("run_"+name);
-        graph = new PromelaGraph(ident,isEnd);
+        graph = new PromelaGraph(ident);
       }
     }
     return graph;
@@ -1608,21 +1607,18 @@ public class GraphCollectingVisitor implements PromelaVisitor
   public Object visitCondition(final ConditionTreeNode t)
   {
     PromelaGraph result = null;
-    final boolean isEnd = checkEnd(t.getParent());
-    for(int i=0;i<t.getChildCount();i++)
-    {
+    for (int i = 0; i < t.getChildCount(); i++) {
       mUnWinding = true;
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
-      result = PromelaGraph.combineComposition(result,step,mUnWinding,isEnd,mFactory);
+      result =
+        PromelaGraph.combineComposition(result, step, mUnWinding, mFactory);
     }
-
     return result;
   }
 
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
     final boolean unwinding = mUnWinding;
-    final boolean isEnd = checkEnd(t.getParent());
     counter =counter+1;
     Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode))
@@ -1639,8 +1635,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(i));
       branches.add(step);
     }
-    //final boolean isEnd = false;
-    result = PromelaGraph.doCombineComposition2(branches, unwinding,isEnd,mFactory);
+    result =
+      PromelaGraph.doCombineComposition2(branches, unwinding, mFactory);
     mLabelEnd.put(""+counter,endNode);
 
     return result;
@@ -1727,12 +1723,15 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   public Object visitLabel(final LabelTreeNode t)
   {
-    PromelaGraph result = null;
-
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
-    result = PromelaGraph.sequentialComposition(result,step,mUnWinding,mFactory);
-    mGotoNode.put(t.getText(), result.getStart());
-
+    final PromelaGraph result =
+      PromelaGraph.sequentialComposition(null, step, mUnWinding, mFactory);
+    final String name = t.getText();
+    final PromelaNode start = result.getStart();
+    mGotoNode.put(name, start);
+    if (name.startsWith("end")) {
+      start.setAccepting(true);
+    }
     return result;
   }
 

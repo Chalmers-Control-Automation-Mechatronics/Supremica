@@ -118,6 +118,7 @@ public class SimpleNodeProxyShape
                               final Rectangle2D bounds,
                               final List<Color> colors)
   {
+    graphics.setStroke(SINGLESTROKE);
     if (colors == null) {
       final Arc2D arc = new Arc2D.Double(bounds, 0, 360, Arc2D.OPEN);
       graphics.draw(arc);

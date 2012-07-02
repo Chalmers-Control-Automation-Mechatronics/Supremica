@@ -26,18 +26,18 @@ public abstract class AbstractRendererShape
   {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                        RenderingHints.VALUE_ANTIALIAS_ON);
-        
+
     // Draw shadow if focused
     if (status.isFocused()) {
       g.setColor(status.getShadowColor());
       g.setStroke(SHADOWSTROKE);
       g.draw(getShape());
     }
-        
+
     // Draw shape
     g.setColor(status.getColor());
     g.setStroke(BASICSTROKE);
-    g.draw(getShape());    
+    g.draw(getShape());
   }
 
   public Rectangle2D getBounds2D()

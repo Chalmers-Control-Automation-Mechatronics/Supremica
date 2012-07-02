@@ -47,8 +47,8 @@ public class TitledLabelBlockProxyShape
 
   //#########################################################################
   //# Simple Access
-  boolean getShowsHandlesWhenEmpty()
-  {
+  @Override
+  boolean shouldBeDrawn(){
     return true;
   }
 
@@ -76,6 +76,7 @@ public class TitledLabelBlockProxyShape
     g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
                        RenderingHints.VALUE_FRACTIONALMETRICS_ON);
     g.setFont(mFont);
+    g.setStroke(BASICSTROKE);
     g.setColor(status.getColor());
     g.drawString(mTitle, x, y);
   }

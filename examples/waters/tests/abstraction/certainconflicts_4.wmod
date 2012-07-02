@@ -590,6 +590,7 @@
                 <LabelBlock>
                     <SimpleIdentifier Name="e1"/>
                     <SimpleIdentifier Name="e2"/>
+                    <SimpleIdentifier Name=":accepting"/>
                     <LabelGeometry Anchor="NW">
                         <Point Y="33" X="143"/>
                     </LabelGeometry>

@@ -609,7 +609,7 @@ public class AutomatonDisplayPane
                                        false, false, false);
           final int prio = getPriority(orig);
           return new RenderingInformation
-            (false, false, foreground, shadow, prio);
+            (false, false, false, foreground, shadow, prio);
         } else {
           final boolean selected;
           if (orig == mFocusedItem) {
@@ -634,7 +634,7 @@ public class AutomatonDisplayPane
             final Color shadow = status.getShadowColor(selected);
             final int prio = getPriority(orig);
             return new RenderingInformation
-              (false, true, foreground, shadow, prio);
+              (false, false, true, foreground, shadow, prio);
           } else {
             return super.getRenderingInformation(orig);
           }
