@@ -55,10 +55,9 @@ public class PromelaGraph
     mPromelaEdges = edges;
   }
 
-  public PromelaGraph(final IdentifierProxy ident, final boolean isEnd)
+  public PromelaGraph(final IdentifierProxy ident)
   {
     mPromelaStartNode = new PromelaNode();
-    mPromelaStartNode.setEndLabel(isEnd);
     final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
 
     final Collection<SimpleExpressionProxy> labelBlock = new ArrayList<SimpleExpressionProxy>();
@@ -97,7 +96,7 @@ public class PromelaGraph
 
   public PromelaGraph(final List<IdentifierProxy> events, final boolean isEnd, final ModuleProxyFactory mFactory){
     mPromelaStartNode = new PromelaNode();
-    mPromelaStartNode.setEndLabel(isEnd);
+    mPromelaStartNode.setAccepting(isEnd);
     final PromelaNode promelaEndNode = new PromelaNode(PromelaNode.EndType.END);
     final ModuleProxyCloner cloner = mFactory.getCloner();
     final List<SimpleExpressionProxy> tempLabel = new ArrayList<SimpleExpressionProxy>(cloner.getClonedList(events));
@@ -303,7 +302,6 @@ public class PromelaGraph
   public static PromelaGraph combineComposition(final PromelaGraph first,
                                                 final PromelaGraph second,
                                                 final boolean unwind,
-                                                final boolean isEnd,
                                                 final ModuleProxyFactory factory)
   {
 
@@ -324,7 +322,6 @@ public class PromelaGraph
       PromelaGraph output = null;
 
       final PromelaNode newStartNode = new PromelaNode();
-      newStartNode.setEndLabel(isEnd);
       final PromelaNode newEndNode = new PromelaNode(PromelaNode.EndType.END);
       final List<PromelaEdge> edgesOfResult =
         new ArrayList<PromelaEdge>();  // edgesOfFirst.size() + edgesOfSecond.size()
@@ -515,7 +512,6 @@ public class PromelaGraph
 
   public static PromelaGraph doCombineComposition2(final List<PromelaGraph> branches,
                                                    final boolean unwinding,
-                                                   final boolean isEnd,
                                                    final ModuleProxyFactory factory){
     //comparator
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
@@ -524,8 +520,6 @@ public class PromelaGraph
     //create nodes
     final List<PromelaNode> nodes = new ArrayList<PromelaNode>();
     final PromelaNode newStartNode = new PromelaNode();
-    newStartNode.setEndLabel(isEnd);
-
     PromelaNode secondStart;
     nodes.add(newStartNode);
     for(final PromelaGraph branch: branches){
@@ -638,7 +632,7 @@ public class PromelaGraph
     for (final PromelaNode node : getNodes()) {
       final boolean initial = (node == this.getStart());
 
-      final boolean marked = (node.isEnd() || node.isEndLabel());
+      final boolean marked = (node.isEnd() || node.isAccepting());
       proxy = node.createNode(name, index++, initial, marked, mFactory);
       mNodes.add(proxy);
     }
