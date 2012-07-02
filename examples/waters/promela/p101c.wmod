@@ -110,7 +110,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="B_0">
                         <PointGeometry>
-                            <Point Y="64" X="144"/>
+                            <Point Y="64" X="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="9"/>
@@ -118,7 +118,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_1">
                         <PointGeometry>
-                            <Point Y="144" X="144"/>
+                            <Point Y="144" X="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-6" X="9"/>
@@ -129,7 +129,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="224" X="144"/>
+                            <Point Y="224" X="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-5" X="7"/>
@@ -152,12 +152,23 @@
                                 <IntConstant Value="121"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="-116"/>
+                                <Point Y="-25" X="-136"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="187" X="127"/>
+                            <Point Y="187" X="175"/>
                         </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_B_state"/>
+                                    <IntConstant Value="121"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-6" X="-119"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                     <Edge Target="B_2" Source="B_1">
                         <LabelBlock>
@@ -166,12 +177,23 @@
                                 <IntConstant Value="124"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="7"/>
+                                <Point Y="-28" X="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="188" X="167"/>
+                            <Point Y="188" X="215"/>
                         </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_B_state"/>
+                                    <IntConstant Value="124"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="12"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>

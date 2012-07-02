@@ -210,6 +210,17 @@
                         <SplineGeometry>
                             <Point Y="181" X="155"/>
                         </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_state"/>
+                                    <IntConstant Value="121"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-110"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                     <Edge Target="B_2" Source="B_1">
                         <LabelBlock>
@@ -224,6 +235,17 @@
                         <SplineGeometry>
                             <Point Y="185" X="193"/>
                         </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_state"/>
+                                    <IntConstant Value="124"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="4" X="13"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
