@@ -605,7 +605,8 @@ public class CompositionalConflictChecker
     if (useProperCertainConflicts)
     {
       final CertainConflictsTRSimplifier certainConflictsRemover = new CertainConflictsTRSimplifier();
-      ccindex = chain.add(certainConflictsRemover);
+      chain.add(certainConflictsRemover);
+      ccindex = -1;
     }
     else
     {
