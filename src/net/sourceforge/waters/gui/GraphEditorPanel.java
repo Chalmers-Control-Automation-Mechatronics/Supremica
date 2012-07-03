@@ -2675,44 +2675,30 @@ public class GraphEditorPanel
     @Override
     void modifiersChanged(final int key, final boolean pressed){
       final Point start = getDragStart();
-      int dx = 0;
-      int dy = 0;
+      int dx;
+      int dy;
       if(key == KeyEvent.VK_CONTROL){
-        final int ix = start.x;
-        final int iy = start.y;
-        dx = (int) (mCurrentPoint.getX() - ix);
-        dy = (int) (mCurrentPoint.getY() - iy);
+        if(pressed || !shouldSnapToGrid()){
+          final Point next = nextPoint(start, mCurrentPoint);
+          dx = next.x;
+          dy = next.y;
+        }
+        else{
+            final Point next = nextSnappedPoint(start, mCurrentPoint);
+            setDragCurrent(mCurrentPoint, next);
+            dx = getDragCurrentOnGrid().x - start.x;
+            dy = getDragCurrentOnGrid().y - start.y;
+        }
       }
       else {
         if (shouldSnapToGrid()) {
-        final double rx = mSnapPoint.getX();
-        final double ry = mSnapPoint.getY();
-        final int ix = start.x;
-        final int iy = start.y;
-        final double x = mCurrentPoint.getX() - ix;
-        final double y = mCurrentPoint.getY() - iy;
-        final int sx = (int) Math.round(findGrid(rx + x) - rx);
-        final int sy = (int) Math.round(findGrid(ry + y) - ry);
-        final Point snapped = new Point(ix + sx, iy + sy);
-        setDragCurrent(mCurrentPoint, snapped);
+          final Point next = nextSnappedPoint(start, mCurrentPoint);
+          setDragCurrent(mCurrentPoint, next);
         }
         dx = getDragCurrentOnGrid().x - start.x;
         dy = getDragCurrentOnGrid().y - start.y;
       }
-      if (key == KeyEvent.VK_SHIFT && pressed) {
-        if (Math.abs(dx) < Math.abs(dy)) {
-          dx = 0;
-        } else {
-          dy = 0;
-        }
-      }
-      //if the item is dragged to where it originally was then don't commit
-      if (dx == 0 && dy == 0) {
-        mShouldCommit = false;
-      } else {
-        mShouldCommit = true;
-      }
-      mMoveVisitor.moveAll(dx, dy);
+      move(key == KeyEvent.VK_SHIFT && pressed, dx, dy);
     }
 
     //#######################################################################
@@ -2732,33 +2718,60 @@ public class GraphEditorPanel
       }
     }
 
+    private Point nextPoint(final Point start, final Point current){
+      final int dx = (int) (current.getX() - start.x);
+      final int dy = (int) (current.getY() - start.y);
+      return new Point(dx, dy);
+    }
+
+    private Point nextSnappedPoint(final Point start, final Point current){
+      final double rx = mSnapPoint.getX();
+      final double ry = mSnapPoint.getY();
+      final int ix = start.x;
+      final int iy = start.y;
+      final double x = current.getX() - ix;
+      final double y = current.getY() - iy;
+      final int sx = (int) Math.round(findGrid(rx + x) - rx);
+      final int sy = (int) Math.round(findGrid(ry + y) - ry);
+      final Point snapped = new Point(ix + sx, iy + sy);
+      return snapped;
+    }
+
+    private void move(final boolean directional, int x, int y){
+      if (directional) {
+        if (Math.abs(x) < Math.abs(y)) {
+          x = 0;
+        } else {
+          y = 0;
+        }
+      }
+      //if the item is dragged to where it originally was then don't commit
+      if (x == 0 && y == 0) {
+        mShouldCommit = false;
+      } else {
+        mShouldCommit = true;
+      }
+      mMoveVisitor.moveAll(x, y);
+    }
+
     //#######################################################################
     //# Dragging
     boolean continueDrag(final Point point)
     {
       final Point start = getDragStart();
-      int dx = 0;
-      int dy = 0;
+      int dx;
+      int dy;
       if (isControlDown()) {
-        final int ix = start.x;
-        final int iy = start.y;
-        dx = (int) (point.getX() - ix);
-        dy = (int) (point.getY() - iy);
+        final Point next = nextPoint(start, point);
+        dx = next.x;
+        dy = next.y;
       } else {
         if (shouldSnapToGrid()) {
-          final double rx = mSnapPoint.getX();
-          final double ry = mSnapPoint.getY();
-          final int ix = start.x;
-          final int iy = start.y;
-          final double x = point.getX() - ix;
-          final double y = point.getY() - iy;
-          final int sx = (int) Math.round(findGrid(rx + x) - rx);
-          final int sy = (int) Math.round(findGrid(ry + y) - ry);
-          final Point snapped = new Point(ix + sx, iy + sy);
-          if (snapped.equals(getDragCurrentOnGrid())) {
+          final Point next = nextSnappedPoint(start, point);
+          if (next.equals(getDragCurrentOnGrid())) {
             return false;
           }
-          setDragCurrent(point, snapped);
+          setDragCurrent(point, next);
         } else if (!super.continueDrag(point)) {
           return false;
         }
@@ -2766,21 +2779,7 @@ public class GraphEditorPanel
         dy = getDragCurrentOnGrid().y - start.y;
       }
       createSecondaryGraph();
-
-      if (isShiftDown()) {
-        if (Math.abs(dx) < Math.abs(dy)) {
-          dx = 0;
-        } else {
-          dy = 0;
-        }
-      }
-      //if the item is dragged to where it originally was then don't commit
-      if (dx == 0 && dy == 0) {
-        mShouldCommit = false;
-      } else {
-        mShouldCommit = true;
-      }
-      mMoveVisitor.moveAll(dx, dy);
+      move(isShiftDown(), dx, dy);
       return true;
     }
 
