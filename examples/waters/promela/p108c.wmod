@@ -227,12 +227,25 @@
                                         <SimpleIdentifier Name="FALSE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-19" X="-186"/>
+                                        <Point Y="-23" X="-184"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
                                     <Point Y="183" X="275"/>
                                 </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_B_x">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <SimpleIdentifier Name="FALSE"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="10" X="-159"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                             <Edge Target="B_3" Source="B_2">
                                 <LabelBlock>
@@ -253,6 +266,19 @@
                                 <SplineGeometry>
                                     <Point Y="260" X="274"/>
                                 </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_B_x">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <SimpleIdentifier Name="FALSE"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="17" X="-162"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                             <Edge Target="B_2" Source="B_1">
                                 <LabelBlock>
@@ -273,6 +299,19 @@
                                 <SplineGeometry>
                                     <Point Y="183" X="335"/>
                                 </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_B_x">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <SimpleIdentifier Name="TRUE"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="13" X="8"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                             <Edge Target="B_3" Source="B_2">
                                 <LabelBlock>
@@ -293,6 +332,19 @@
                                 <SplineGeometry>
                                     <Point Y="262" X="336"/>
                                 </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_B_x">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <SimpleIdentifier Name="TRUE"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="10" X="10"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                         </EdgeList>
                     </Graph>

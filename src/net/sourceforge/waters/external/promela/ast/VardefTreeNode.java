@@ -34,7 +34,6 @@ public class VardefTreeNode extends PromelaTree
     return  visitor.visitVar(this);
   }
 
-  //NEW<============================================================================================================================================
   /**
    * A method to get the visibility of the variable(s) that are being created
    * @author Ethan Duff
@@ -64,13 +63,9 @@ public class VardefTreeNode extends PromelaTree
   {
     return mGlobal;
   }
-  //===============================================================================================================================================>
 
   private final String mChanState;
-
-  //NEW<============================================================================================================================================
   private boolean mVisible;
   private PromelaType mVariableType;
   private boolean mGlobal;
-  //===============================================================================================================================================>
 }

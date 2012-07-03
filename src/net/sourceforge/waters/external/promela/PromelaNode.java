@@ -99,9 +99,7 @@ public class PromelaNode
   public boolean isGoto(){
     return mEndType == EndType.GOTO;
   }
-  public boolean isEndLabel(){
-    return mEndType == EndType.ENDLABEL;
-  }
+
   public void setBreak(final boolean i){
     mEndType = EndType.BREAK;
   }
@@ -110,9 +108,16 @@ public class PromelaNode
       mEndType = EndType.END;
     }
   }
-  public void setEndLabel(final boolean i){
-    if(i){
-      mEndType = EndType.ENDLABEL;
+
+  public boolean isAccepting()
+  {
+    return mAccepting;
+  }
+
+  public void setAccepting(final boolean acc)
+  {
+    if (acc) {
+      mAccepting = acc;
     }
   }
 
@@ -123,7 +128,6 @@ public class PromelaNode
     NONE,
     END,
     BREAK,
-    ENDLABEL,
     GOTO;
   }
 
@@ -133,6 +137,6 @@ public class PromelaNode
   private EndType mEndType;
   private final String mGotoLabel;
   private SimpleNodeProxy mNode;
-
+  private boolean mAccepting;
 
 }
