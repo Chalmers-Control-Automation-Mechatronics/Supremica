@@ -65,6 +65,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
+import net.sourceforge.waters.analysis.certainconf.CertainConflictsTRSimplifier;
 
 /**
  * <P>A compositional conflict checker that can be configured to use different
@@ -578,7 +579,8 @@ public class CompositionalConflictChecker
 
   private AbstractionProcedure createStandardNonblockingAbstractionChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
-     final boolean includeNonAlphaDeterminisation)
+     final boolean includeNonAlphaDeterminisation,
+     final boolean useProperCertainConflicts)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
@@ -599,9 +601,19 @@ public class CompositionalConflictChecker
     final int limit = getInternalTransitionLimit();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     chain.add(incomingEquivalenceSimplifier);
-    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
-      new LimitedCertainConflictsTRSimplifier();
-    final int ccindex = chain.add(certainConflictsRemover);
+    final int ccindex;
+    if (useProperCertainConflicts)
+    {
+      final CertainConflictsTRSimplifier certainConflictsRemover = new CertainConflictsTRSimplifier();
+      ccindex = chain.add(certainConflictsRemover);
+    }
+    else
+    {
+      final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
+        new LimitedCertainConflictsTRSimplifier();
+      ccindex = chain.add(certainConflictsRemover);
+    }
+
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
@@ -1027,7 +1039,7 @@ public class CompositionalConflictChecker
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, false);
+           WEAK_OBSERVATION_EQUIVALENCE, false, false);
       }
     },
     /**
@@ -1046,7 +1058,20 @@ public class CompositionalConflictChecker
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, true);
+           WEAK_OBSERVATION_EQUIVALENCE, true, false);
+      }
+    },
+    /**
+     * Automata are minimised according to <I>certain conflicts</I>.
+     */
+    CC {
+      @Override
+      AbstractionProcedure createAbstractionRule
+        (final CompositionalConflictChecker checker)
+      {
+        return checker.createStandardNonblockingAbstractionChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           OBSERVATION_EQUIVALENCE, false, true);
       }
     },
     /**

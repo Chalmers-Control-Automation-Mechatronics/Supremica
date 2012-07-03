@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 
 
-class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
+public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
   public CertainConflictsTRSimplifier()
   {
