@@ -48,6 +48,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.TransferHandler.TransferSupport;
 
@@ -1670,94 +1671,55 @@ public class GraphEditorPanel
     //# Interface java.awt.MouseListener
     public void mouseClicked(final MouseEvent event)
     {
-      final ProxySubject item = getItemToBeSelected(event);
+      final ProxySubject item = mItem;
       if (canBeSelected(item)) {
         final List<ProxySubject> list = getListOfSelectedLabels();
-        if (item instanceof LabelBlockSubject){
+        if (event.isShiftDown() || event.isControlDown()) {
           if (isSelected(item)) {
-            if (event.isShiftDown() || event.isControlDown()) {
-              if(list.isEmpty()){
-                removeFromSelection(item);
-              }
-              else{
-                //do nothing if there are labels selected and you shift click on label space
-              }
-            } else {
-              if (list.isEmpty()) {
-                replaceSelection(item);
-              }
-              else{
-                removeFromSelection(list);
-              }
-            }
-          }
-          else{
-            if (event.isShiftDown() || event.isControlDown()) {
-              if(!list.isEmpty()){
-                removeFromSelection(list);
-              }
-              toggleSelection(item);
-            }
-            else{
-              replaceSelection(item);
-            }
-          }
-        }
-        else if(item instanceof IdentifierSubject ||
-              item instanceof ForeachSubject) {
-          if (isSelected(item)) {
-            if (event.isShiftDown() || event.isControlDown()) {
+            if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
               removeFromSelection(item);
             }
             else{
-              replaceSelection(item);
+               if(list.isEmpty()){
+                 removeFromSelection(item);
+               }
             }
-          }
-          else{
-            if (event.isShiftDown() || event.isControlDown()) {
-              if(list.isEmpty()){
-                if(mSelection.size() > 1){
-                  //if there are more things selected, toggle the labelblock
-                  final LabelBlockSubject block = SubjectTools.getAncestor(item, LabelBlockSubject.class);
-                  toggleSelection(block);
-                }
-                else{
-                  //if the only thing selected is the labelblock, add the label
+         } else {
+           if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
+             if(list.isEmpty()){
+               if(mSelection.size() > 1){
+                 //if there are more things selected, toggle the labelblock
+                 final LabelBlockSubject block = SubjectTools.getAncestor(item, LabelBlockSubject.class);
+                 toggleSelection(block);
+               }
+               else{
+                 //if the only thing selected is the labelblock, add the label
+                 replaceSelection(item);
+               }
+             }
+           }
+         }
+        } else {
+          if (isSelected(item)) {
+            if (item instanceof LabelBlockSubject) {
+              if (list.isEmpty()) {
+                if (mSelection.size() > 1) {
                   replaceSelection(item);
                 }
               }
               else{
-                toggleSelection(item);
+                  removeFromSelection(list);
               }
             }
-            else{
-                replaceSelection(item);
-            }
-          }
-        }
-        else{
-          if (isSelected(item)) {
-            if (event.isShiftDown() || event.isControlDown()) {
-              removeFromSelection(item);
-            } else {
-              replaceSelection(item);
-            }
-          }else{
-            if (event.isShiftDown() || event.isControlDown()) {
-              removeFromSelection(list);
-              toggleSelection(item);
-            } else {
+
+          } else {
+            if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
               replaceSelection(item);
             }
           }
-        }
-      } else {
-        if(event.isShiftDown() || event.isControlDown()){
-          //nothing??
-        }else{
-          clearSelection();
         }
       }
+      mItem = null;
     }
 
     private List<ProxySubject> getListOfSelectedLabels(){
@@ -1770,12 +1732,67 @@ public class GraphEditorPanel
       return list;
     }
 
+    private void onlyWhenInFocus(final MouseEvent event){
+      if(mIsPermanentFocusOwner){
+        final ProxySubject item = getItemToBeSelected(event);
+        final List<ProxySubject> list = getListOfSelectedLabels();
+        mItem = item;
+        if (canBeSelected(item)) {
+          if (event.isShiftDown() || event.isControlDown()) {
+            if (!isSelected(item)) {
+             if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
+               if(!list.isEmpty()){
+                 toggleSelection(item);
+                 mItem = null;
+               }
+             }
+             else{
+               if(!list.isEmpty()){
+                 removeFromSelection(list);
+               }
+               toggleSelection(item);
+               mItem = null;
+             }
+           }
+          } else {
+            if (!isSelected(item)) {
+              if(!(item instanceof IdentifierSubject) && !(item instanceof ForeachSubject)){
+                replaceSelection(item);
+              }
+            }
+          }
+        }
+        else{
+          if(event.isShiftDown() || event.isControlDown()){
+            if(!list.isEmpty()){
+              removeFromSelection(list);
+            }
+          }
+          else{
+            clearSelection();
+          }
+        }
+        mStartPoint = event.getPoint();
+        mPopupFactory.maybeShowPopup
+          (GraphEditorPanel.this, event, mFocusedObject);
+      }
+      else{
+        requestFocusInWindow();
+        SwingUtilities.invokeLater(new Runnable(){
+
+          public void run()
+          {
+            onlyWhenInFocus(event);
+          }
+
+        });
+      }
+    }
+
+
     public void mousePressed(final MouseEvent event)
     {
-      mStartPoint = event.getPoint();
-      requestFocusInWindow();
-      mPopupFactory.maybeShowPopup
-        (GraphEditorPanel.this, event, mFocusedObject);
+      onlyWhenInFocus(event);
     }
 
     public void mouseReleased(final MouseEvent event)
@@ -1836,6 +1853,7 @@ public class GraphEditorPanel
     }
 
     protected Point mStartPoint;
+    private ProxySubject mItem;
 
   }
 
