@@ -56,6 +56,11 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
   public IntSetBuffer(final int numValues, final int initialSize)
   {
+    this(numValues, 0, 0);
+  }
+
+  public IntSetBuffer(final int numValues, final int initialSize, final int defaultHashSetValue)
+  {
     mSizeShift = AutomatonTools.log2(numValues + 1);
     mSizeMask = (1 << mSizeShift) - 1;
     mDataShift = AutomatonTools.log2(numValues);
@@ -63,7 +68,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
     mBlocks = new ArrayList<int[]>();
     final int[] block = new int[BLOCK_SIZE];
     mBlocks.add(block);
-    mDirectory = new WatersIntHashSet(initialSize, this);
+    mDirectory = new WatersIntHashSet(initialSize, defaultHashSetValue, this);
     mSize = mNextFreeOffset = 0;
   }
 
@@ -113,6 +118,58 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       mSize++;
       mNextFreeOffset += words;
     }
+    return result;
+  }
+
+  public int get(final int[] data) {
+
+    final int count = data.length;
+    final int words = getNumberOfWords(count);
+    ensureCapacity(words);
+    int blockno = mNextFreeOffset >>> BLOCK_SHIFT;
+    int[] block = mBlocks.get(blockno);
+    int offset = mNextFreeOffset & BLOCK_MASK;
+    long current = count;
+    int shift = mSizeShift;
+    for (final long value : data) {
+      current |= (value << shift);
+      shift += mDataShift;
+      if (shift >= 32) {
+        if (offset >= BLOCK_SIZE) {
+          offset = 0;
+          block = mBlocks.get(++blockno);
+        }
+        block[offset++] = (int) (current & 0xffffffffL);
+        current >>>= 32;
+        shift -= 32;
+      }
+    }
+    if (shift > 0) {
+      if (offset >= BLOCK_SIZE) {
+        offset = 0;
+        block = mBlocks.get(++blockno);
+      }
+      block[offset] = (int) (current & 0xffffffffL);
+    }
+   return mDirectory.get(mNextFreeOffset);
+  }
+
+  public int[] getSet(final int index)
+  {
+    final int blockno = index >>> BLOCK_SHIFT;
+
+    final int[] block = mBlocks.get(blockno);
+    final int offset = index & BLOCK_MASK;
+    int data = block[offset];
+    final int count = data & mSizeMask;
+    final int[] result = new int[count];
+    data = data >>> mSizeShift;
+    for (int i = 0; i < count; i++)
+    {
+        result[i] = data & mDataMask;
+        data = data >>> mDataShift;
+    }
+
     return result;
   }
 

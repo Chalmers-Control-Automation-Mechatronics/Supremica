@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 
 
-class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
+public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
   public CertainConflictsTRSimplifier()
   {
@@ -69,7 +69,7 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
         final int numStates = rel.getNumberOfStates();
         mSetOffsets = new TIntArrayList(numStates);
-        mStateSetBuffer = new IntSetBuffer(numStates);
+        mStateSetBuffer = new IntSetBuffer(numStates, 0, -1);
         mTransitionBuffer = new PreTransitionBuffer(numEvents, mTransitionLimit);
     }
 
@@ -89,7 +89,7 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     @Override
     public int getPreferredInputConfiguration()
     {
-      return ListBufferTransitionRelation.CONFIG_ALL;
+      return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     }
 
     @Override
@@ -214,92 +214,157 @@ class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
           detStates.setAllMarkings(detstate, stateMarkings);
         }
         detStates.removeRedundantPropositions();
-        mSetOffsets = null;
-        mStateSetBuffer = null;
+
         final int numTrans = mTransitionBuffer.size();
-        final int config = getPreferredInputConfiguration();
-        rel.reset(detStates, numTrans, config);
+        rel.reset(detStates, numTrans, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
         rel.removeEvent(EventEncoding.TAU);
         mTransitionBuffer.addOutgoingTransitions(rel);
-mTransitionBuffer = null;
-        rel.removeProperSelfLoopEvents();
-        if (!certainconfalgo(rel)) System.out.println("Error");
+        rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
 
+        final int dumpstate = certainconfalgo(rel);
+        rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        if (dumpstate > -1) rel.removeOutgoingTransitions(dumpstate);
+        rel.checkReachability();
+        rel.removeProperSelfLoopEvents();
       }
 
     }
 
-    protected boolean certainconfalgo(final ListBufferTransitionRelation rel) throws AnalysisException
+    protected int certainconfalgo(final ListBufferTransitionRelation rel) throws AnalysisException
+    {
+      // to determine when no new states have been added to bad states
+      boolean brothersAdded = false;
+      // keep track of bad states
+      mBadStates = new TIntHashSet();
+      // total number of states
+      //final int numStates = rel.getNumberOfStates();
+
+      do
       {
-        //final ListBufferTransitionRelation rel = getTransitionRelation();
-        TIntHashSet blacklist = findbadstates(rel);
-        if (blacklist.size() == 0) return true;
+          final int before = updateBadStates(rel);
+          if (before == 0) return -1;
+          // find brothers of bad states (they'll be added to mBadStates
+          // and go again if new states were added.
+          brothersAdded = findBrothers() != before;
+      } while (brothersAdded);
 
-        final int dumpstate = blacklist.toArray()[0];
-        // TODO: ensure dump state is not marked
+      // select dump state as first item
+      final int[] allBadStates = mBadStates.toArray();
+      final int dumpstate = allBadStates[0];
+        for (int i = 0; i < mBadStates.size(); i++)
+        {
+            final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
+            final int s = allBadStates[i];
+            iter.resetState(s);
+            while (iter.advance())
+            {
+                final int from = iter.getCurrentSourceState();
 
-        while(blacklist.size() > 1) { // keep going until no more changes (except dump state?)
-          final int[] blacklist_arr = blacklist.toArray();
-          for (int i = 0; i < blacklist.size(); i++) {
-            // TODO: add brothers of items on blacklist to blacklist
-          }
+                if (i == 0 && !mBadStates.contains(from))
+                    continue;
 
-          // for each item on blacklist, all transitions in get redirected to dump state
-          // then remove item from transition relation (set reachable false)
-          for (int i = 0; i < blacklist.size(); i++) {
-            rel.moveIncomingTransitions(blacklist_arr[i], dumpstate);
-            rel.setReachable(blacklist_arr[i], false);
-            // TODO: (if item is initial, set dump state to be initial)
-          }
-
-          blacklist = findbadstates(rel);
+                if (!mBadStates.contains(from))
+                {
+                    rel.addTransition(from, iter.getCurrentEvent(), dumpstate);
+                    if (rel.isInitial(s))
+                    {
+                        rel.setInitial(dumpstate, true);
+                    }
+                }
+                iter.remove();
+            }
         }
-        return true;
+        return dumpstate;
+    }
+
+    protected int findBrothers()
+    {
+      final int[] arr_mBadStates = mBadStates.toArray();
+
+      for (int i = 0; i < arr_mBadStates.length; i++)
+      {
+          final int[] badStateSet = mStateSetBuffer.getSet(arr_mBadStates[i]);
+
+          //now permute badStateSet
+          // first order it, but remember what was originally first, no need to do again
+
+          for (int j = 1; j < badStateSet.length; j++)
+          {
+              if (badStateSet[j] < badStateSet[j-1])
+                  arraySwap(badStateSet, j, j-1);
+              else break;
+          }
+
+          // now permute
+          for (int j = 0; j < badStateSet.length; j++)
+          {
+              arraySwap(badStateSet, 0, j);
+
+              final int indexinset = mStateSetBuffer.get(badStateSet);
+
+              if (indexinset > -1)
+                  mBadStates.add(indexinset);
+          }
       }
+      return mBadStates.size();
+    }
 
-    protected TIntHashSet findbadstates(final ListBufferTransitionRelation rel) throws AnalysisException {
-        final TIntHashSet badstates = new TIntHashSet();
+    protected void arraySwap(final int[] arr, final int swap1, final int swap2)
+    {
+        if (swap1 == swap2) return;
+        final int temp = arr[swap1];
+        arr[swap1] = arr[swap2];
+        arr[swap2] = temp;
+    }
 
+    // this function updates the values in the variable mBadStates
+    // it returns the number of states in mBadStates
+    protected int updateBadStates(final ListBufferTransitionRelation rel) throws AnalysisException
+    {
         final TransitionIterator prediter = rel.createPredecessorsReadOnlyIterator();
-        final int alphaID = getPreconditionMarkingID();
         final int defaultID = getDefaultMarkingID();
 
         final int numStates = rel.getNumberOfStates();
         final TIntHashSet coreachableStates = new TIntHashSet(numStates);
         final TIntStack unvisitedStates = new TIntStack();
         // Creates a hash set of all states which can reach an omega marked or alpha
-        // marked state.
-        for (int sourceID = 0; sourceID < numStates; sourceID++) {
-          System.out.println("marking a:"+rel.isMarked(sourceID, defaultID));
-          System.out.println("marking b:"+rel.isMarked(sourceID, alphaID));
-          System.out.println("reachable:"+rel.isReachable(sourceID));
-          if ((rel.isMarked(sourceID, defaultID) ||
-               rel.isMarked(sourceID, alphaID)) &&
-              rel.isReachable(sourceID) &&
-              coreachableStates.add(sourceID) ) {
-            checkAbort();
-            unvisitedStates.push(sourceID);
-            while (unvisitedStates.size() > 0) {
-              final int newSource = unvisitedStates.pop();
-              prediter.resetState(newSource);
-              while (prediter.advance()) {
-                final int predID = prediter.getCurrentSourceState();
-                if (rel.isReachable(predID) && coreachableStates.add(predID)) {
-                  unvisitedStates.push(predID);
+        // marked state
+        for (int sourceID = 0; sourceID < numStates; sourceID++)
+        {
+            if (rel.isMarked(sourceID, defaultID) &&
+                rel.isReachable(sourceID) &&
+                !mBadStates.contains(sourceID) &&
+                coreachableStates.add(sourceID) )
+            {
+                checkAbort();
+                unvisitedStates.push(sourceID);
+
+                while (unvisitedStates.size() > 0) {
+                    final int newSource = unvisitedStates.pop();
+
+                    prediter.resetState(newSource);
+
+                    while (prediter.advance()) {
+                        final int predID = prediter.getCurrentSourceState();
+                        if (rel.isReachable(predID) && !mBadStates.contains(predID) && predID != newSource && coreachableStates.add(predID))
+                        {
+                            unvisitedStates.push(predID);
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-        // Blacklist states which cannot reach a state marked alpha or omega.
+        // Blacklist states which cannot reach a state marked.
 
         for (int sourceID = 0; sourceID < numStates; sourceID++) {
-          if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
-            badstates.add(sourceID);
-          }
+            if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
+                mBadStates.add(sourceID);
+                // remove marking
+                rel.setMarked(sourceID, getDefaultMarkingID(), false);
+            }
         }
 
-        return badstates;
+        return mBadStates.size();
     }
 
     //#########################################################################
@@ -312,6 +377,7 @@ mTransitionBuffer = null;
     private TransitionIterator mTauIterator;
     private TransitionIterator mEventIterator;
     private TIntArrayList mSetOffsets;
+    private TIntHashSet mBadStates;
     private IntSetBuffer mStateSetBuffer;
     private PreTransitionBuffer mTransitionBuffer;
 }

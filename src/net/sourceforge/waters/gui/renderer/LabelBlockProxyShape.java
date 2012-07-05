@@ -35,16 +35,14 @@ public class LabelBlockProxyShape
 
   //#########################################################################
   //# Simple Access
+  boolean shouldBeDrawn(){
+    return !getProxy().getEventList().isEmpty();
+  }
+
   double getHeight()
   {
     return mHeight;
   }
-
-  boolean getShowsHandlesWhenEmpty()
-  {
-    return false;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RendererShape
@@ -67,13 +65,13 @@ public class LabelBlockProxyShape
   public void draw(final Graphics2D g2d, final RenderingInformation status)
   {
     final Shape shape = getShape();
-    if (status.isFocused()) {
-      g2d.setColor(status.getShadowColor());
-      g2d.setStroke(SHADOWSTROKE);
-      g2d.fill(shape);
-    }
-    if (status.showHandles()) {
-      if (getShowsHandlesWhenEmpty() || !getProxy().getEventList().isEmpty()) {
+    if (shouldBeDrawn()) {
+      if (status.isFocused()) {
+        g2d.setColor(status.getShadowColor());
+        g2d.setStroke(SHADOWSTROKE);
+        g2d.fill(shape);
+      }
+      if (status.isSelected()) {
         g2d.setColor(status.getColor());
         g2d.setStroke(BASICSTROKE);
         g2d.draw(shape);

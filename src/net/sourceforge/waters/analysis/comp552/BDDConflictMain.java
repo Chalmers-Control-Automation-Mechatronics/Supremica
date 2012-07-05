@@ -4,8 +4,16 @@
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDConflictMain
 //##########################################################################
-//# $Id$
-//##########################################################################
+//# This file contains the work of:
+//# Family name:
+//# First name:
+//# Student ID:
+//###########################################################################
+//# You are welcome to edit this file,
+//# but please DO NOT CHANGE the way how the main class communicates
+//# with the BDDConflictChecker class.
+//###########################################################################
+
 
 package net.sourceforge.waters.analysis.comp552;
 

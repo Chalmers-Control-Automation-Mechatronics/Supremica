@@ -4,8 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDEncoding
 //###########################################################################
-//# $Id$
+//# This file contains the work of:
+//# Family name:
+//# First name:
+//# Student ID:
 //###########################################################################
+//# You are welcome to edit this file as much as you like.
+//###########################################################################
+
 
 package net.sourceforge.waters.analysis.comp552;
 
@@ -57,10 +63,10 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * performance improvement. Things that can be improved:</P>
  * <OL>
  * <LI>Find a better variable ordering.</LI>
- * <LI>It is better to avoid computing monolithic transition relation as
- *     returned by {@link BDDEncoding#getTransitionRelationBDD()}, and use
- *     partitioned transition relations instead.</LI>
  * <LI>Disjunctive partitioning is better than conjunctive partitioning.</LI>
+ * <LI>It is better to avoid computing monolithic transition relation as
+ *     returned by {@link BDDEncoding#computeTransitionRelationBDD()}, and
+ *     use partitioned transition relations instead.</LI>
  * <LI>etc.</LI>
  * </OL>
  *
@@ -126,7 +132,7 @@ public class BDDEncoding
    *         model, which is true precisely when the model is in an initial
    *         state.
    */
-  public BDD getInitialStateBDD()
+  public BDD computeInitialStatesBDD()
   {
     BDD init = mBDDFactory.one();
     final int end = mAutomata.size();
@@ -148,7 +154,7 @@ public class BDDEncoding
    *         model, which is true precisely when the model is a state marked
    *         by the given proposition,
    */
-  public BDD getMarkedStateBDD(final EventProxy marking)
+  public BDD computeMarkedStatesBDD(final EventProxy marking)
   {
     BDD terminal = mBDDFactory.one();
     final int end = mAutomata.size();
@@ -170,10 +176,10 @@ public class BDDEncoding
    *         between the current and next state in the synchronous composition
    *         of all automata in the encoded model.
    */
-  public BDD getTransitionRelationBDD()
+  public BDD computeTransitionRelationBDD()
   {
-    final BDD trans = getTransitionRelationBDDWithEvents();
-    final BDDVarSet eventVars = getEventVarSet();
+    final BDD trans = computeTransitionRelationBDDWithEvents();
+    final BDDVarSet eventVars = computeEventVarSet();
     final BDD result = trans.exist(eventVars);
     trans.free();
     eventVars.free();
@@ -191,7 +197,7 @@ public class BDDEncoding
    *         in the synchronous composition of all automata in the encoded
    *         model.
    */
-  public BDD getTransitionRelationBDDWithEvents()
+  public BDD computeTransitionRelationBDDWithEvents()
   {
     // Compose the transition relations of all automata, bottom-up ...
     final BDD trans = mBDDFactory.one();
@@ -234,7 +240,7 @@ public class BDDEncoding
    * @return A BDD over the event variables, which is true precisely when
    *         the event variables encode the given event.
    */
-  public BDD getEventBDD(final EventProxy event)
+  public BDD computeEventBDD(final EventProxy event)
   {
     final Integer code = mEventMap.get(event);
     if (code == null) {
@@ -260,7 +266,7 @@ public class BDDEncoding
    *                      variables. It may use other variables as well.
    * @return One possible event that may be true under the constraints of
    *         the given BDD, or <CODE>null</CODE>.
-   * @see #getEventBDD(EventProxy) getEventBDD()
+   * @see #computeEventBDD(EventProxy) getEventBDD()
    */
   public EventProxy findEvent(final BDD bdd)
   {
@@ -308,7 +314,7 @@ public class BDDEncoding
    * This method runs in linear complexity in the number of automaton
    * variables, provided the initial variable ordering has not changed.
    */
-  public BDDVarSet getCurrentStateVarSet()
+  public BDDVarSet computeCurrentStateVarSet()
   {
     // Most BDD packages represent variable sets as BDDs,
     // so we also build them bottom-up.
@@ -330,7 +336,7 @@ public class BDDEncoding
    * This method runs in linear complexity in the number of automaton
    * variables, provided the initial variable ordering has not changed.
    */
-  public BDDVarSet getNextStateVarSet()
+  public BDDVarSet computeNextStateVarSet()
   {
     final int firstIndex = mNumEventBits + 1;
     final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
@@ -347,7 +353,7 @@ public class BDDEncoding
    * or {@link BDD#relprod(BDD, BDDVarSet) relprod()} or similar methods to
    * evaluate Boolean quantification of BDDs.
    */
-  public BDDVarSet getEventVarSet()
+  public BDDVarSet computeEventVarSet()
   {
     final BDDVarSet varset = mBDDFactory.emptySet();
     for (int varIndex = mNumEventBits - 1; varIndex >= 0; varIndex--) {
@@ -365,7 +371,7 @@ public class BDDEncoding
    * This method runs in linear complexity in the number of automaton
    * variables, provided the initial variable ordering has not changed.
    */
-  public BDDPairing getCurrentStateToNextStatePairing()
+  public BDDPairing computeCurrentStateToNextStatePairing()
   {
     final int firstIndex = mNumEventBits;
     final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
@@ -386,7 +392,7 @@ public class BDDEncoding
    * This method runs in linear complexity in the number of automaton
    * variables, provided the initial variable ordering has not changed.
    */
-  public BDDPairing getNextStateToCurrentStatePairing()
+  public BDDPairing computeNextStateToCurrentStatePairing()
   {
     final int firstIndex = mNumEventBits;
     final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
@@ -638,7 +644,7 @@ public class BDDEncoding
       final BDD bdd = mBDDFactory.zero();
       for (final EventProxy event : mAutomaton.getEvents()) {
         if (event.getKind() != EventKind.PROPOSITION) {
-          final BDD eventBDD = getEventBDD(event);
+          final BDD eventBDD = computeEventBDD(event);
           bdd.orWith(eventBDD);
         }
       }

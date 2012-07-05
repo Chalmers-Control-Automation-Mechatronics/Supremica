@@ -193,9 +193,20 @@
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="4"/>
+                                <Point Y="-25" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_C_val"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="7"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>

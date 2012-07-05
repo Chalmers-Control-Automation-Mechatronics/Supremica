@@ -253,6 +253,17 @@
                         <SplineGeometry>
                             <Point Y="182" X="198"/>
                         </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_C_val"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-153"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                     <Edge Target="C_2" Source="C_1">
                         <LabelBlock>
@@ -267,9 +278,20 @@
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-17" X="-65"/>
+                                <Point Y="-21" X="-64"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_C_val"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="8" X="-42"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                     <Edge Target="C_2" Source="C_1">
                         <LabelBlock>
@@ -279,12 +301,23 @@
                                 <IntConstant Value="3"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-5" X="17"/>
+                                <Point Y="-27" X="8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point Y="185" X="379"/>
                         </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_C_val"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="9"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>

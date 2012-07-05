@@ -302,6 +302,19 @@
                                 <SplineGeometry>
                                     <Point Y="201" X="210"/>
                                 </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_B_state">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="121"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="6" X="-170"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                             <Edge Target="B_2" Source="B_1">
                                 <LabelBlock>
@@ -317,6 +330,19 @@
                                 <SplineGeometry>
                                     <Point Y="198" X="270"/>
                                 </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_B_state">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="124"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="9" X="13"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                         </EdgeList>
                     </Graph>

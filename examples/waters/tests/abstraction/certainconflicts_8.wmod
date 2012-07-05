@@ -238,6 +238,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="112" X="320"/>
                         </PointGeometry>
@@ -246,6 +249,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="128" X="256"/>
                         </PointGeometry>
@@ -377,299 +383,6 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="after">
-            <Graph Deterministic="false">
-                <NodeList>
-                    <SimpleNode Initial="true" Name="S0.S0">
-                        <PointGeometry>
-                            <Point Y="240" X="304"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S1.S1S2">
-                        <PointGeometry>
-                            <Point Y="279" X="249"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S2.S1S2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="199" X="345"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S2.S2">
-                        <PointGeometry>
-                            <Point Y="96" X="368"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-12" X="9"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S2.S2S3S4">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="167" X="233"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-19" X="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S3.S2S3S4">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="258" X="147"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-17" X="4"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S4.S2S3S4">
-                        <PointGeometry>
-                            <Point Y="322" X="257"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-1" X="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S4.S4">
-                        <PointGeometry>
-                            <Point Y="391" X="313"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-12" X="3"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S4.S4S5">
-                        <PointGeometry>
-                            <Point Y="375" X="265"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-13" X="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S5.S4S5">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="103" X="233"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-22" X="-6"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S5.S5">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="144" X="352"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-3" X="-49"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S6.S6">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point Y="423" X="281"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="-22"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="DUMP">
-                        <PointGeometry>
-                            <Point Y="151" X="89"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="-24" X="-10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="S1.S1S2" Source="S0.S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S2.S1S2" Source="S0.S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S3.S2S3S4" Source="S1.S1S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S4.S2S3S4" Source="S1.S1S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S2.S2S3S4" Source="S2.S1S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S5.S5" Source="S2.S1S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="171" X="347"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S2.S2" Source="S2.S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="43" X="366"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S5.S5" Source="S2.S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="116" X="358"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="DUMP" Source="S2.S2S3S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <EndPointGeometry>
-                            <Point Y="151" X="89"/>
-                        </EndPointGeometry>
-                    </Edge>
-                    <Edge Target="S5.S4S5" Source="S2.S2S3S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="-18"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="DUMP" Source="S3.S2S3S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S4.S4S5" Source="S4.S2S3S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="DUMP" Source="S4.S2S3S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="273" X="105"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="151" X="89"/>
-                        </EndPointGeometry>
-                    </Edge>
-                    <Edge Target="S4.S4" Source="S4.S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="427" X="351"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S6.S6" Source="S4.S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="412" X="301"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S4.S4" Source="S4.S4S5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e2"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S6.S6" Source="S4.S4S5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="402" X="271"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="p0">
             <Graph Deterministic="false">
                 <NodeList>
@@ -701,6 +414,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2.S2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="181" X="374"/>
                         </PointGeometry>
@@ -1032,6 +748,10 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2.S2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                            <SimpleIdentifier Name=":forbidden"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="181" X="374"/>
                         </PointGeometry>
@@ -1332,6 +1052,272 @@
                         </LabelBlock>
                         <SplineGeometry>
                             <Point Y="589" X="349"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0.S0">
+                        <PointGeometry>
+                            <Point Y="377" X="311"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1.S1S2">
+                        <PointGeometry>
+                            <Point Y="416" X="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2.S1S2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="336" X="352"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2.S2S3S4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="272" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="11" X="-53"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3.S2S3S4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="368" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-17" X="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S4.S2S3S4">
+                        <PointGeometry>
+                            <Point Y="480" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-1" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S4.S4">
+                        <PointGeometry>
+                            <Point Y="560" X="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-12" X="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S4.S4S5">
+                        <PointGeometry>
+                            <Point Y="528" X="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-13" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S5.S4S5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="224" X="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-20" X="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S5.S5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="243" X="360"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-3" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S6.S6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="576" X="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="-22"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="DUMP">
+                        <PointGeometry>
+                            <Point Y="208" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-24" X="-10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S1.S1S2" Source="S0.S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S2.S1S2" Source="S0.S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S3.S2S3S4" Source="S1.S1S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S4.S2S3S4" Source="S1.S1S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S2.S2S3S4" Source="S2.S1S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="309" X="300"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S5.S5" Source="S2.S1S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="289" X="353"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="DUMP" Source="S2.S2S3S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point Y="208" X="112"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="S5.S4S5" Source="S2.S2S3S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="DUMP" Source="S3.S2S3S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S4.S4S5" Source="S4.S2S3S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-2" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="DUMP" Source="S4.S2S3S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="390" X="93"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="208" X="112"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="S4.S4" Source="S4.S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="596" X="406"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S6.S6" Source="S4.S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="584" X="321"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S4.S4" Source="S4.S4S5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S6.S6" Source="S4.S4S5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="554" X="270"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

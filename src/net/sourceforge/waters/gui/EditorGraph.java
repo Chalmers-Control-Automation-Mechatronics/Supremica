@@ -1320,9 +1320,18 @@ class EditorGraph
                      final int kind)
     {
       super(original, fake, kind);
-      final LabelBlockSubject originalLB = original.getLabelBlock();
-      final LabelBlockSubject fakeLB = fake.getLabelBlock();
-      mChangeRecordCreator.createChangeRecordsForLabelBlock(originalLB, fakeLB);
+      LabelBlockSubject originalLB = null;
+      LabelBlockSubject fakeLB = null;
+      if (original != null) {
+        originalLB = original.getLabelBlock();
+      }
+      if (fake != null) {
+        fakeLB = fake.getLabelBlock();
+      }
+      if (originalLB != null && fakeLB != null) {
+        mChangeRecordCreator.createChangeRecordsForLabelBlock(originalLB,
+                                                              fakeLB);
+      }
     }
 
     //#######################################################################

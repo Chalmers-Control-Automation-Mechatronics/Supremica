@@ -242,6 +242,19 @@
                                         <Point Y="-22" X="3"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_B_x">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <SimpleIdentifier Name="TRUE"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="9" X="7"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                             <Edge Target="B_3" Source="B_2">
                                 <LabelBlock>
@@ -258,9 +271,22 @@
                                         <SimpleIdentifier Name="TRUE"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-10" X="8"/>
+                                        <Point Y="-25" X="10"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_B_x">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <SimpleIdentifier Name="TRUE"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="11" X="15"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                         </EdgeList>
                     </Graph>

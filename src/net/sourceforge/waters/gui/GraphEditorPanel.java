@@ -48,6 +48,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.TransferHandler.TransferSupport;
 
@@ -1371,12 +1372,16 @@ public class GraphEditorPanel
    * @param  event  The mouse event being processed.
    * @return The handle clicked, or <CODE>null</CODE>
    */
-  private Handle getClickedHandle(final ProxySubject item,
-                                  final MouseEvent event)
+  private Handle getClickedHandle(final ProxySubject item, final Point point)
   {
     if (isSelected(item)) {
-      final int x = event.getX();
-      final int y = event.getY();
+      final int x = point.x;
+      final int y = point.y;
+      final boolean handlesAreShown = getShapeProducer().getRenderingContext()
+            .getRenderingInformation(item).showHandles();
+      if (!handlesAreShown) {
+        return null;
+      }
       final ProxyShape shape = getShapeProducer().getShape(item);
       return shape.getClickedHandle(x, y);
     } else {
@@ -1531,17 +1536,8 @@ public class GraphEditorPanel
       final ProxySubject item = (ProxySubject) proxy;
       final boolean focused = isRenderedFocused(item);
       final boolean selected = isRenderedSelected(item);
-      final boolean showHandles;
-      if (!selected) {
-        showHandles = false;
-      } else if (mInternalDragAction != null) {
-        // *** BUG ***
-        // Label block boundary treated as handle---ugly!
-        // ***
-        showHandles = item instanceof LabelBlockSubject;
-      } else {
-        showHandles = mController.canBeSelected(item);
-      }
+      final boolean showHandles = getCurrentSelection().size() == 1;
+        //showHandles = mController.canBeSelected(item);
       final boolean error = isError(item);
       int priority = getPriority(item);
       if (mDontDraw.contains(item)) {
@@ -1556,7 +1552,7 @@ public class GraphEditorPanel
         dragover = DragOverStatus.NOTDRAG;
       }
       return new RenderingInformation
-        (showHandles, focused,
+        (selected, showHandles, focused,
          EditorColor.getColor(item, dragover, selected,
                               error, mIsPermanentFocusOwner),
          EditorColor.getShadowColor(item, dragover, selected,
@@ -1675,84 +1671,55 @@ public class GraphEditorPanel
     //# Interface java.awt.MouseListener
     public void mouseClicked(final MouseEvent event)
     {
-      final ProxySubject item = getItemToBeSelected(event);
+      final ProxySubject item = mItem;
       if (canBeSelected(item)) {
         final List<ProxySubject> list = getListOfSelectedLabels();
-        if (item instanceof LabelBlockSubject){
+        if (event.isShiftDown() || event.isControlDown()) {
           if (isSelected(item)) {
-            if (event.isShiftDown()) {
-              if(list.isEmpty()){
-                removeFromSelection(item);
-              }
-              else{
-                //do nothing if there are labels selected and you shift click on label space
-              }
-            } else {
-              if (!list.isEmpty()) {
-                removeFromSelection(list);
-              }
-            }
-          }
-          else{
-            if (event.isShiftDown()) {
-              if(!list.isEmpty()){
-                removeFromSelection(list);
-              }
-              toggleSelection(item);
-            }
-            else{
-              replaceSelection(item);
-            }
-          }
-        }
-        else if(item instanceof IdentifierSubject ||
-              item instanceof ForeachSubject) {
-          if (isSelected(item)) {
-            if (event.isShiftDown()) {
+            if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
               removeFromSelection(item);
             }
             else{
-              replaceSelection(item);
+               if(list.isEmpty()){
+                 removeFromSelection(item);
+               }
             }
-          }
-          else{
-            if (event.isShiftDown()) {
-              if(list.isEmpty()){
-                final LabelBlockSubject block = SubjectTools.getAncestor(item, LabelBlockSubject.class);
-                toggleSelection(block);
+         } else {
+           if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
+             if(list.isEmpty()){
+               if(mSelection.size() > 1){
+                 //if there are more things selected, toggle the labelblock
+                 final LabelBlockSubject block = SubjectTools.getAncestor(item, LabelBlockSubject.class);
+                 toggleSelection(block);
+               }
+               else{
+                 //if the only thing selected is the labelblock, add the label
+                 replaceSelection(item);
+               }
+             }
+           }
+         }
+        } else {
+          if (isSelected(item)) {
+            if (item instanceof LabelBlockSubject) {
+              if (list.isEmpty()) {
+                if (mSelection.size() > 1) {
+                  replaceSelection(item);
+                }
               }
               else{
-                toggleSelection(item);
+                  removeFromSelection(list);
               }
             }
-            else{
-                replaceSelection(item);
-            }
-          }
-        }
-        else{
-          if (isSelected(item)) {
-            if (event.isShiftDown()) {
-              removeFromSelection(item);
-            } else {
-              //nothing
-            }
-          }else{
-            if (event.isShiftDown()) {
-              removeFromSelection(list);
-              toggleSelection(item);
-            } else {
+
+          } else {
+            if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
               replaceSelection(item);
             }
           }
-        }
-      } else {
-        if(event.isShiftDown()){
-          //nothing??
-        }else{
-          clearSelection();
         }
       }
+      mItem = null;
     }
 
     private List<ProxySubject> getListOfSelectedLabels(){
@@ -1765,12 +1732,67 @@ public class GraphEditorPanel
       return list;
     }
 
+    private void onlyWhenInFocus(final MouseEvent event){
+      if(mIsPermanentFocusOwner){
+        final ProxySubject item = getItemToBeSelected(event);
+        final List<ProxySubject> list = getListOfSelectedLabels();
+        mItem = item;
+        if (canBeSelected(item)) {
+          if (event.isShiftDown() || event.isControlDown()) {
+            if (!isSelected(item)) {
+             if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
+               if(!list.isEmpty()){
+                 toggleSelection(item);
+                 mItem = null;
+               }
+             }
+             else{
+               if(!list.isEmpty()){
+                 removeFromSelection(list);
+               }
+               toggleSelection(item);
+               mItem = null;
+             }
+           }
+          } else {
+            if (!isSelected(item)) {
+              if(!(item instanceof IdentifierSubject) && !(item instanceof ForeachSubject)){
+                replaceSelection(item);
+              }
+            }
+          }
+        }
+        else{
+          if(event.isShiftDown() || event.isControlDown()){
+            if(!list.isEmpty()){
+              removeFromSelection(list);
+            }
+          }
+          else{
+            clearSelection();
+          }
+        }
+        mStartPoint = event.getPoint();
+        mPopupFactory.maybeShowPopup
+          (GraphEditorPanel.this, event, mFocusedObject);
+      }
+      else{
+        requestFocusInWindow();
+        SwingUtilities.invokeLater(new Runnable(){
+
+          public void run()
+          {
+            onlyWhenInFocus(event);
+          }
+
+        });
+      }
+    }
+
+
     public void mousePressed(final MouseEvent event)
     {
-      mStartPoint = event.getPoint();
-      requestFocusInWindow();
-      mPopupFactory.maybeShowPopup
-        (GraphEditorPanel.this, event, mFocusedObject);
+      onlyWhenInFocus(event);
     }
 
     public void mouseReleased(final MouseEvent event)
@@ -1831,6 +1853,7 @@ public class GraphEditorPanel
     }
 
     protected Point mStartPoint;
+    private ProxySubject mItem;
 
   }
 
@@ -1920,13 +1943,13 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(mStartPoint, event.isShiftDown());
+            new InternalDragActionSelect(mStartPoint, event.isShiftDown() || event.isControlDown());
         } else {
           final ProxySubject subject = getItemToBeSelected(event);
           if (mFocusedObject == subject || !isSelected(subject)) {
-            final Handle handle = getClickedHandle(subject, event);
+            final Handle handle = getClickedHandle(subject, mStartPoint);
             if (handle == null) {
-              mInternalDragAction = new InternalDragActionMove(mStartPoint);
+              mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
             } else {
               switch (handle.getType()) {
               case INITIAL:
@@ -2059,14 +2082,14 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(mStartPoint, event.isShiftDown());
+            new InternalDragActionSelect(mStartPoint, event.isShiftDown() || event.isControlDown());
         } else {
           final ProxySubject subject = getItemToBeSelected(event);
           if (mFocusedObject == subject || !isSelected(subject)) {
-            final Handle handle = getClickedHandle(subject, event);
+            final Handle handle = getClickedHandle(subject, mStartPoint);
             if (handle == null) {
               mInternalDragAction =
-                new InternalDragActionMove(mStartPoint);
+                new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
             } else {
               if(handle.getType() == HandleType.INITIAL){
                 mInternalDragAction =
@@ -2119,9 +2142,9 @@ public class GraphEditorPanel
           mInternalDragAction =
             new InternalDragActionCreateGroupNode(mStartPoint);
         } else {
-          final Handle handle = getClickedHandle(mFocusedObject, event);
+          final Handle handle = getClickedHandle(mFocusedObject, mStartPoint);
           if (handle == null) {
-            mInternalDragAction = new InternalDragActionMove(mStartPoint);
+            mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
           } else {
             mInternalDragAction =
               new InternalDragActionResizeGroupNode(handle, mStartPoint);
@@ -2197,19 +2220,19 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(mStartPoint, event.isShiftDown());
+            new InternalDragActionSelect(mStartPoint, event.isShiftDown() || event.isControlDown());
         } else {
           final ProxySubject item = getItemToBeSelected(event);
           if (mFocusedObject == item || !isSelected(item)){
-            final Handle handle = getClickedHandle(item, event);
+            final Handle handle = getClickedHandle(item, mStartPoint);
             if (handle == null && canBeSelected(item)){
-              mInternalDragAction = new InternalDragActionMove(mStartPoint);
+              mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
             } else if (item instanceof NodeSubject) {
               // Clicking on node or nodegroup --- create edge.
               mInternalDragAction = new InternalDragActionEdge(mStartPoint);
             } else if (item instanceof EdgeSubject) {
               if (handle == null) {
-                mInternalDragAction = new InternalDragActionMove(mStartPoint);
+                mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
               } else {
                 mInternalDragAction =
                   new InternalDragActionEdge(handle, mStartPoint);
@@ -2318,6 +2341,10 @@ public class GraphEditorPanel
       return false;
     }
 
+    void modifiersChanged(final int key, final boolean pressed){
+
+    }
+
 
     //#######################################################################
     //# Temporary Selection
@@ -2367,7 +2394,12 @@ public class GraphEditorPanel
     boolean continueDrag(final MouseEvent event)
     {
       mShiftDown = event.isShiftDown();
+      mControlDown = event.isControlDown();
       return continueDrag(event.getPoint());
+    }
+
+    public boolean isControlDown(){
+      return mControlDown;
     }
 
     public boolean isShiftDown(){
@@ -2440,6 +2472,7 @@ public class GraphEditorPanel
      */
     private Rectangle mDragRectangle;
     private boolean mShiftDown;
+    private boolean mControlDown;
   }
 
 
@@ -2516,14 +2549,15 @@ public class GraphEditorPanel
     {
       super(start);
       copyCurrentSelection();
-      mShiftDown = false;
+      mShiftOrControlDown = false;
     }
 
-    private InternalDragActionSelect(final Point start, final boolean shift)
+    private InternalDragActionSelect(final Point start, final boolean shiftOrControlDown)
     {
       this(start);
-      mShiftDown = shift;
+      mShiftOrControlDown = shiftOrControlDown;
     }
+
 
     //#######################################################################
     //# Dragging
@@ -2533,7 +2567,7 @@ public class GraphEditorPanel
         final List<ProxySubject> dragged = getDragSelection();
         final List<ProxySubject> prev = getPreviousSelection();
         final Selection newSelection;
-        if (mShiftDown) {
+        if (mShiftOrControlDown) {
           newSelection = new Selection(prev);
           ProxySubject subject;
           for(int i = 0; i < dragged.size(); i++){
@@ -2613,7 +2647,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Data Members
-    private boolean mShiftDown;
+    private boolean mShiftOrControlDown;
 
   }
 
@@ -2626,14 +2660,17 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionMove(final Point start)
+    private InternalDragActionMove(final Point start, final boolean shiftOrControlDown)
     {
       super(start);
-      if (!isShiftDown()) {
-        replaceSelection(mFocusedObject);
+      if (!shiftOrControlDown) {
+        if (!isSelected(mFocusedObject)) {
+          replaceSelection(mFocusedObject);
+        }
       } else if (!isSelected(mFocusedObject)) {
-        addToSelection(mFocusedObject);
+          addToSelection(mFocusedObject);
       }
+      mShouldCommit = true;
       Point2D snap = null;
       if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
         // Move operation snaps to grid when a node is moved.
@@ -2653,6 +2690,35 @@ public class GraphEditorPanel
       mSnapPoint = snap;
     }
 
+    @Override
+    void modifiersChanged(final int key, final boolean pressed){
+      final Point start = getDragStart();
+      int dx;
+      int dy;
+      if(key == KeyEvent.VK_CONTROL){
+        if(pressed || !shouldSnapToGrid()){
+          final Point next = nextPoint(start, mCurrentPoint);
+          dx = next.x;
+          dy = next.y;
+        }
+        else{
+            final Point next = nextSnappedPoint(start, mCurrentPoint);
+            setDragCurrent(mCurrentPoint, next);
+            dx = getDragCurrentOnGrid().x - start.x;
+            dy = getDragCurrentOnGrid().y - start.y;
+        }
+      }
+      else {
+        if (shouldSnapToGrid()) {
+          final Point next = nextSnappedPoint(start, mCurrentPoint);
+          setDragCurrent(mCurrentPoint, next);
+        }
+        dx = getDragCurrentOnGrid().x - start.x;
+        dy = getDragCurrentOnGrid().y - start.y;
+      }
+      move(key == KeyEvent.VK_SHIFT && pressed, dx, dy);
+    }
+
     //#######################################################################
     //# Simple Access
     boolean shouldSnapToGrid()
@@ -2670,50 +2736,77 @@ public class GraphEditorPanel
       }
     }
 
+    private Point nextPoint(final Point start, final Point current){
+      final int dx = (int) (current.getX() - start.x);
+      final int dy = (int) (current.getY() - start.y);
+      return new Point(dx, dy);
+    }
+
+    private Point nextSnappedPoint(final Point start, final Point current){
+      final double rx = mSnapPoint.getX();
+      final double ry = mSnapPoint.getY();
+      final int ix = start.x;
+      final int iy = start.y;
+      final double x = current.getX() - ix;
+      final double y = current.getY() - iy;
+      final int sx = (int) Math.round(findGrid(rx + x) - rx);
+      final int sy = (int) Math.round(findGrid(ry + y) - ry);
+      final Point snapped = new Point(ix + sx, iy + sy);
+      return snapped;
+    }
+
+    private void move(final boolean directional, int x, int y){
+      if (directional) {
+        if (Math.abs(x) < Math.abs(y)) {
+          x = 0;
+        } else {
+          y = 0;
+        }
+      }
+      //if the item is dragged to where it originally was then don't commit
+      if (x == 0 && y == 0) {
+        mShouldCommit = false;
+      } else {
+        mShouldCommit = true;
+      }
+      mMoveVisitor.moveAll(x, y);
+    }
+
     //#######################################################################
     //# Dragging
     boolean continueDrag(final Point point)
     {
       final Point start = getDragStart();
-      if (shouldSnapToGrid()) {
-        final double rx = mSnapPoint.getX();
-        final double ry = mSnapPoint.getY();
-        final int ix = start.x;
-        final int iy = start.y;
-        final double dx = point.getX() - ix;
-        final double dy = point.getY() - iy;
-        final int sx = (int) Math.round(findGrid(rx + dx) - rx);
-        final int sy = (int) Math.round(findGrid(ry + dy) - ry);
-        final Point snapped = new Point(ix + sx, iy + sy);
-        if (snapped.equals(getDragCurrentOnGrid())) {
+      int dx;
+      int dy;
+      if (isControlDown()) {
+        final Point next = nextPoint(start, point);
+        dx = next.x;
+        dy = next.y;
+      } else {
+        if (shouldSnapToGrid()) {
+          final Point next = nextSnappedPoint(start, point);
+          if (next.equals(getDragCurrentOnGrid())) {
+            return false;
+          }
+          setDragCurrent(point, next);
+        } else if (!super.continueDrag(point)) {
           return false;
         }
-        setDragCurrent(point, snapped);
-        createSecondaryGraph();
-      } else if (!super.continueDrag(point)) {
-        return false;
+        dx = getDragCurrentOnGrid().x - start.x;
+        dy = getDragCurrentOnGrid().y - start.y;
       }
-      //TODO figure way of using shiftdown better ?
-      //Also, drag is not so smooth
-        int dx = getDragCurrentOnGrid().x - start.x;
-       int dy = getDragCurrentOnGrid().y - start.y;
-       if(isShiftDown()){
-         //use squares because dx and dy can be negative
-         if(dx*dx < dy*dy){
-           dx = 0;
-         }
-         else{
-           dy = 0;
-         }
-       }
-      mMoveVisitor.moveAll(dx, dy);
+      createSecondaryGraph();
+      move(isShiftDown(), dx, dy);
       return true;
     }
 
     void commitSecondaryGraph()
     {
-      super.commitSecondaryGraph();
-      mMoveVisitor = null;
+      if(mShouldCommit){
+        super.commitSecondaryGraph();
+      }
+       mMoveVisitor = null;
     }
 
     void cancelDrag(final Point point)
@@ -2728,6 +2821,7 @@ public class GraphEditorPanel
 
     private final Point2D mSnapPoint;
     private MoveVisitor mMoveVisitor;
+    private boolean mShouldCommit;
   }
 
 
@@ -2752,7 +2846,7 @@ public class GraphEditorPanel
     {
       final boolean draggedNow = super.continueDrag(event.getPoint());
       if (draggedNow) {
-        if (event.isShiftDown()) {
+        if (event.isShiftDown() || event.isControlDown()) {
           getTransferHandler().exportAsDrag(GraphEditorPanel.this, event,
                                             TransferHandler.COPY);
         } else {
@@ -3097,6 +3191,7 @@ public class GraphEditorPanel
       replaceSelection(mFocusedObject);
     }
 
+
     //#######################################################################
     //# Dragging
     boolean continueDrag(final Point point)
@@ -3245,6 +3340,7 @@ public class GraphEditorPanel
           ("Unknown group node handle type: " + handle.getType());
       }
     }
+
 
     //#######################################################################
     //# Simple Access
@@ -3431,6 +3527,7 @@ public class GraphEditorPanel
           ("Unknown edge handle type: " + handle.getType() + "!");
       }
     }
+
 
     //#######################################################################
     //# Dragging
@@ -3628,6 +3725,7 @@ public class GraphEditorPanel
         for (final ProxySubject item : mMovedObjects) {
           item.acceptVisitor(this);
         }
+        scrollToVisible(getCurrentSelection());
       } catch (final VisitorException exception) {
         throw new WatersRuntimeException(exception);
       }
@@ -3850,6 +3948,17 @@ public class GraphEditorPanel
   private class KeySpy extends KeyAdapter
   {
 
+    @Override
+    public void keyReleased(final KeyEvent e){
+      final int keyCode = e.getKeyCode();
+      if(keyCode == KeyEvent.VK_SHIFT || keyCode == KeyEvent.VK_CONTROL){
+        if(mInternalDragAction != null){
+          mInternalDragAction.modifiersChanged(keyCode, false);
+        }
+      }
+    }
+
+    @Override
     public void keyPressed(final KeyEvent e)
     {
       final int keyCode = e.getKeyCode();
@@ -3862,6 +3971,7 @@ public class GraphEditorPanel
       final boolean right =
         keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT;
       if (isAGeometryMove() && (up || down || left || right)) {
+        e.consume();
         mMoveVisitor = new MoveVisitor();
         createSecondaryGraph();
         final int x = left ? -1 : right ? 1 : 0;
@@ -3874,24 +3984,32 @@ public class GraphEditorPanel
         final CompoundCommand move = new CompoundCommand();
         boolean execute = false;
         final List<ProxySubject> selectionList = getReorderedSelectionList();
-        final List<InsertInfo> deletes = getDeletes(selectionList);
-        final List<InsertInfo> inserts = getInserts(selectionList, up, down);
-        if (inserts != null && deletes != null) {
-          final Command del =
-            new DeleteCommand(deletes, GraphEditorPanel.this, true);
-          final Command ins =
-            new InsertCommand(inserts, GraphEditorPanel.this, null);
-          move.addCommand(del);
-          move.addCommand(ins);
-          final List<Proxy> proxies = InsertInfo.getProxies(inserts);
-          final String named = ProxyNamer.getCollectionClassName(proxies);
-          move.setName(named + " Movement");
-          execute = true;
+        if (!selectionList.isEmpty()) {
+          final List<InsertInfo> deletes = getDeletes(selectionList);
+          final List<InsertInfo> inserts =
+            getInserts(selectionList, up, down);
+          if (inserts != null && deletes != null) {
+            final Command del =
+              new DeleteCommand(deletes, GraphEditorPanel.this, true);
+            final Command ins =
+              new InsertCommand(inserts, GraphEditorPanel.this, null);
+            move.addCommand(del);
+            move.addCommand(ins);
+            final List<Proxy> proxies = InsertInfo.getProxies(inserts);
+            final String named = ProxyNamer.getCollectionClassName(proxies);
+            move.setName(named + " Movement");
+            execute = true;
+          }
         }
         if (execute) {
           move.end();
           e.consume();
           getUndoInterface().executeCommand(move);
+        }
+      }
+      else if(keyCode == KeyEvent.VK_SHIFT || keyCode == KeyEvent.VK_CONTROL){
+        if(mInternalDragAction != null){
+          mInternalDragAction.modifiersChanged(keyCode, true);
         }
       }
     }
@@ -3924,14 +4042,18 @@ public class GraphEditorPanel
 
     private boolean isAGeometryMove()
     {
+      boolean geoMove = false;
       for (final ProxySubject proxy : getCurrentSelection()) {
         if (proxy instanceof ForeachSubject) {
           return false;
         } else if (proxy instanceof IdentifierSubject) {
           return false;
         }
+        else{
+          geoMove = true;
+        }
       }
-      return true;
+      return geoMove;
     }
 
     private List<InsertInfo> getDeletes(final List<ProxySubject> selections)
