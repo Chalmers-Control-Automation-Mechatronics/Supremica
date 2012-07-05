@@ -50,34 +50,25 @@
 
 /*
  * @author Goran Cengic (cengic@chalmers.se)
+ * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
+ * @version %I%, %G%
+ * @since 1.0
  */
 
 package org.supremica.automata;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
+import java.util.*;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.VariableComponentSubject;
+import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
@@ -90,6 +81,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private final ArrayList<ExtendedAutomaton> theExAutomata;
     private Map<String, EventDeclProxy> eventIdToProxyMap;
     private Map<ExtendedAutomaton,Integer> exAutomatonToIndex;
+    private Map<String, ExtendedAutomaton> stringToExAutomaton;
     private boolean negativeValuesIncluded = false;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
@@ -120,6 +112,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         controllableAlphabet = new HashSet<EventDeclProxy>();
         plantAlphabet = new HashSet<EventDeclProxy>();
         exAutomatonToIndex = new HashMap<ExtendedAutomaton, Integer>();
+        stringToExAutomaton = new HashMap<String, ExtendedAutomaton>();
     }
 
     public ExtendedAutomata(final ModuleSubject module)
@@ -134,20 +127,14 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             {
                 unionAlphabet.add(e);
                 if(e.getKind() == EventKind.UNCONTROLLABLE)
-                {
                     uncontrollableAlphabet.add(e);
-                }
                 else
-                {
                     controllableAlphabet.add(e);
-                }
             }
         }
         eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
         for(final EventDeclProxy e:module.getEventDeclList())
-        {
             eventIdToProxyMap.put(e.getName(), e);
-        }
 
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
 
@@ -194,7 +181,6 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     var2MinMaxValMap.put(varName, minMax);
                 }
 
-//                int currDomain = upperBound-lowerBound+1;
                 int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
                 var2domainMap.put(var.getName(), negativeValuesIncluded?currDomain*2:currDomain);
                 if(currDomain>domain)
@@ -202,7 +188,6 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             }
         }
 
-//        negativeValuesIncluded = true;
         //we multiply the domain with 2 to add 1 extra bit for the sign
         if(negativeValuesIncluded)
         {
@@ -232,6 +217,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 }
                 theExAutomata.add(exAutomaton);
                 exAutomatonToIndex.put(exAutomaton, nbrOfExAutomata);
+                stringToExAutomaton.put(exAutomaton.getName(), exAutomaton);
                 nbrOfExAutomata++;
             }
         }
@@ -275,15 +261,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         factory.createSimpleIdentifierProxy(name);
                 module = new ModuleSubject(name, null);
 
-                // make marking proposition
-        final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy
-            (EventDeclProxy.DEFAULT_MARKING_NAME);
-                module.getEventDeclListModifiable().add
-            (factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
-
-                this.expand = expand;
-
-                new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+        // make marking proposition
+        final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+        module.getEventDeclListModifiable().add(factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
+        this.expand = expand;
+        ExpressionParser expressionParser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
     }
 
     public int getExAutomatonIndex(ExtendedAutomaton efa)
@@ -385,10 +367,10 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return unionAlphabet;
     }
 
-	public void addEvent(final String name)
-	{
-		addEvent(name,"controllable");
-	}
+    public void addEvent(final String name)
+    {
+        addEvent(name,EventKind.CONTROLLABLE.value());
+    }
 
 
     public Iterator<ExtendedAutomaton> iterator()
@@ -396,27 +378,97 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return theExAutomata.iterator();
     }
 
-    public void addEvent(final String name, final String kind)
-    {
-        final SimpleIdentifierProxy ident =
-        factory.createSimpleIdentifierProxy(name);
-            if (kind.equals("controllable")) {
-                    module.getEventDeclListModifiable().add
-            (factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE));
-            } else if (kind.equals("uncontrollable")) {
-                    module.getEventDeclListModifiable().add
-            (factory.createEventDeclProxy(ident,
-                                          EventKind.UNCONTROLLABLE));
-            }
+    public boolean addEvent(EventDeclProxy event){
+        if(eventIdToProxyMap.get(event.getName()) == null){
+            module.getEventDeclListModifiable().add((EventDeclSubject)event);
+            eventIdToProxyMap.put(event.getName(), event);
+            if(event.getKind() == EventKind.CONTROLLABLE)
+                controllableAlphabet.add(event);
+            else if(event.getKind() == EventKind.UNCONTROLLABLE)
+                uncontrollableAlphabet.add(event);
+            return true;
+        }
+        return false;
     }
 
+    public void addEvent(final String name, final String kind){
+        addEvent(name, kind, true);
+    }
+    
+    public EventDeclProxy addEvent(final String name, final String kind, final boolean observable)
+    {
+        EventDeclProxy event = eventIdToProxyMap.get(name);
+        if(event == null){
+            final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy(name);
+            if (kind.equalsIgnoreCase(EventKind.CONTROLLABLE.value())) {
+                event = factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
+                module.getEventDeclListModifiable().add((EventDeclSubject)event);
+                if(!eventIdToProxyMap.containsKey(name)){
+                    controllableAlphabet.add(event);
+                    eventIdToProxyMap.put(name, event);
+                }
+            } else if (kind.equalsIgnoreCase(EventKind.UNCONTROLLABLE.value())) {
+                event = factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
+                module.getEventDeclListModifiable().add((EventDeclSubject)event);
+                if(!eventIdToProxyMap.containsKey(name)){
+                    uncontrollableAlphabet.add(event);
+                    eventIdToProxyMap.put(name, event);
+                }
+            } else if (kind.equalsIgnoreCase(EventKind.PROPOSITION.value())){
+                event = factory.createEventDeclProxy(ident, EventKind.PROPOSITION, observable, ScopeKind.LOCAL, null, null, null);
+                module.getEventDeclListModifiable().add((EventDeclSubject)event);
+                eventIdToProxyMap.put(name, event);
+            }
+        }
+        return event;
+    }
 
+    public final Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr)
+    {
+        final Set<VariableComponentProxy> vars = new HashSet<VariableComponentProxy>();
+        for(final Proxy proxy:module.getComponentList())
+        {
+            if(proxy instanceof VariableComponentProxy)
+            {
+                final VariableComponentProxy var = (VariableComponentProxy)proxy;
+                if(expr.toString().contains(var.getName()))
+                    vars.add(var);
+            }
+        }
+        return vars;
+    }
+    /**
+     * Add the automaton to the list of automata. All events will be added to the union alphabet set.
+     * @param exAutomaton The EFA
+     */
     public void addAutomaton(final ExtendedAutomaton exAutomaton)
     {
         theExAutomata.add(exAutomaton);
+        stringToExAutomaton.put(exAutomaton.getName(), exAutomaton);
         module.getComponentListModifiable().add(exAutomaton.getComponent());
+        for(EventDeclProxy event : exAutomaton.getAlphabet()){
+            if(eventIdToProxyMap.get(event.getName()) == null){
+                eventIdToProxyMap.put(event.getName(), event);
+                module.getEventDeclListModifiable().add((EventDeclSubject)event);
+                unionAlphabet.add(event);
+                if (event.getKind().value().equals("controllable") || event.getKind().equals(EventKind.CONTROLLABLE)) {
+                    controllableAlphabet.add(event);
+                } else if (event.getKind().value().equals("uncontrollable") || event.getKind().equals(EventKind.UNCONTROLLABLE)) {
+                    uncontrollableAlphabet.add(event);
+                }
+                if(exAutomaton.getKind() == ComponentKind.PLANT){
+                    plantAlphabet.add(event);
+                }
+            }
+        }
+        if(!exAutomaton.getMarkedLocations().isEmpty())
+            addEvent(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION.value());
     }
-
+    
+    public ExtendedAutomaton getExtendedAutomaton(String name){
+        return stringToExAutomaton.get(name);
+    }
+    
     public HashSet<EventDeclProxy> getPlantAlphabet()
     {
         return plantAlphabet;
@@ -432,24 +484,24 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return components;
     }
 
-	public void writeToFile(final File file)
-	{
+    public void writeToFile(final File file)
+    {
 
-		if (expand)
-		{
-			ExtendedAutomataExpander.expandTransitions(module);
-		}
+        if (expand)
+        {
+            ExtendedAutomataExpander.expandTransitions(module);
+        }
 
-		try
-		{
-			final JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());
-			marshaller.marshal(module, file);
-		}
-		catch (final Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+        try
+        {
+            final JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());
+            marshaller.marshal(module, file);
+        }
+        catch (final Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
 
     //######################################################################

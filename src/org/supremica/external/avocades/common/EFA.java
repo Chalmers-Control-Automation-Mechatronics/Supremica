@@ -1,6 +1,8 @@
 package org.supremica.external.avocades.common;
 
 import java.util.LinkedList;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 
 import org.supremica.automata.ExtendedAutomaton;
 
@@ -49,8 +51,8 @@ public class EFA extends ExtendedAutomaton{
 	   super.addTransition(from,to,event,guard,action);
    }
    
-   public void addState(String name){
-	   this.addState(name, false, false);
+   public NodeProxy addState(String name){
+	   return this.addState(name, false, false);
    }
    
    public void addInitialState(String name){
@@ -68,22 +70,22 @@ public class EFA extends ExtendedAutomaton{
    /**
     * 
     */
-   public void addState(String name, boolean accepting, boolean initial){
+   public NodeProxy addState(String name, boolean accepting, boolean initial){
 	 //check in data
        if(name == null){
-           return;
+           return null;
        }else if(name.length() == 0){
-    	   return;
+    	   return null;
        }
        
        //check if we already added this state
        if(states.contains(name)){
-    	   return;
+    	   return null;
        }
- 
        //add new state
-       super.addState(name, accepting, initial,false);
+       NodeProxy state = super.addState(name, accepting, initial,false);
        states.add(name);
+       return state;
    }
    
    /**
@@ -114,13 +116,13 @@ public class EFA extends ExtendedAutomaton{
        }
    }
    
-   public void addEvent(String event, String kind){
+   public EventDeclProxy addEvent(String event, String kind){
        
        //check in data
        if(event == null ){
-           return;
+           return null;
        }else if(event.length() == 0){
-    	   return;
+    	   return null;
        }
        
        //parse event
@@ -134,6 +136,7 @@ public class EFA extends ExtendedAutomaton{
     		   events.add(es[i]);
     	   }
        }
+       return null;
    }
    
    
