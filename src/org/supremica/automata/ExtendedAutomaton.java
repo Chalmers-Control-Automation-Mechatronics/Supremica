@@ -50,48 +50,25 @@
 
 /*
  * @author Goran Cengic (cengic@chalmers.se)
+ * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
+ * @version %I%, %G%
+ * @since 1.0
  */
 
 package org.supremica.automata;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
+import java.util.*;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.PlainEventListSubject;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 public class ExtendedAutomaton
@@ -99,49 +76,86 @@ public class ExtendedAutomaton
 
     private boolean allAcceptingStates = false;
 
-    private final String name;
+    private String name;
     private final ExtendedAutomata automata;
     private final ModuleSubjectFactory factory;
     private IdentifierSubject identifier;
-    private final ModuleSubject module;
     private final SimpleComponentSubject component;
     private final GraphSubject graph;
     private final ExpressionParser parser;
-    private List<EventDeclProxy> alphabet;
-    private List<EventDeclProxy> uncontrollableAlphabet;
+    private HashSet<EventDeclProxy> alphabet;
+    private HashSet<EventDeclProxy> uncontrollableAlphabet;
+    private HashSet<EventDeclProxy> controllableAlphabet;
     private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToOutgoingEdgesMap;
     private HashMap<NodeProxy,ArrayList<EdgeSubject>> locationToIngoingEdgesMap;
     private HashMap<String,NodeProxy> nameToLocationMap;
-    private List<NodeProxy> nodes;
+    private HashSet<NodeProxy> nodes;
     private Set<NodeProxy> initialLocations;
     private Set<NodeProxy> acceptedLocations;
     private Set<NodeProxy> forbiddenLocations;
     private final NodeProxy blockedLocation = null;
     private Map<EventDeclProxy,Set<VariableComponentProxy>> guardVariables;
     private Map<EventDeclProxy,Set<VariableComponentProxy>> actionVariables;
-
+    private Map<String, EventDeclProxy> eventIdToProxyMap;
     private Set<VariableComponentProxy> usedSourceVariables;
     private Set<VariableComponentProxy> usedTargetVariables;
-
+    
+    
+    @Deprecated
     public ExtendedAutomaton(final String name, final ExtendedAutomata automata, final boolean acceptingStates)
     {
         this.name = name;
-
         factory = ModuleSubjectFactory.getInstance();
-
         this.automata = automata;
-
-        module = automata.getModule();
-
         identifier = factory.createSimpleIdentifierProxy(name);
         graph = factory.createGraphProxy();
         component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
-
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-
         allAcceptingStates = acceptingStates;
+        nodes = new HashSet<NodeProxy>();
+        initialLocations = new HashSet<NodeProxy>();
+        forbiddenLocations = new HashSet<NodeProxy>();
+        acceptedLocations = new HashSet<NodeProxy>();
+        locationToOutgoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>();
+        locationToIngoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>();
+        nameToLocationMap = new HashMap<String, NodeProxy>();
+        alphabet = new HashSet<EventDeclProxy>();
+        uncontrollableAlphabet = new HashSet<EventDeclProxy>();
+        controllableAlphabet = new HashSet<EventDeclProxy>();
+        eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
+        usedSourceVariables = null;
+        usedTargetVariables = null;
+        guardVariables = null;
+        actionVariables = null;
+        
     }
 
+    public ExtendedAutomaton(final String name, final ComponentKind kind)
+    {
+        this.name = name;
+        this.automata = null;
+        factory = ModuleSubjectFactory.getInstance();
+        identifier = factory.createSimpleIdentifierProxy(name);
+        graph = factory.createGraphProxy();
+        component = factory.createSimpleComponentProxy(identifier, kind, graph);
+        parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+        nodes = new HashSet<NodeProxy>();
+        initialLocations = new HashSet<NodeProxy>();
+        forbiddenLocations = new HashSet<NodeProxy>();
+        acceptedLocations = new HashSet<NodeProxy>();
+        locationToOutgoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>();
+        locationToIngoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>();
+        nameToLocationMap = new HashMap<String, NodeProxy>();
+        alphabet = new HashSet<EventDeclProxy>();
+        eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
+        uncontrollableAlphabet = new HashSet<EventDeclProxy>();
+        controllableAlphabet = new HashSet<EventDeclProxy>();
+        usedSourceVariables = null;
+        usedTargetVariables = null;
+        guardVariables = null;
+        actionVariables = null;        
+    }
+    
     public ExtendedAutomaton(final ExtendedAutomata automata, final SimpleComponentSubject component)
     {
         this.name = component.getName();
@@ -149,20 +163,19 @@ public class ExtendedAutomaton
         this.automata = automata;
         this.component = component;
         graph = component.getGraph();
-        module = automata.getModule();
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-        nodes = new ArrayList<NodeProxy>();
+        nodes = new HashSet<NodeProxy>();
         nodes.addAll(graph.getNodes());
-
+        controllableAlphabet = new HashSet<EventDeclProxy>();
         initialLocations = new HashSet<NodeProxy>();
         forbiddenLocations = new HashSet<NodeProxy>();
         acceptedLocations = new HashSet<NodeProxy>();
-
+        eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
         locationToOutgoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(nodes.size());
         locationToIngoingEdgesMap = new HashMap<NodeProxy, ArrayList<EdgeSubject>>(nodes.size());
         nameToLocationMap = new HashMap<String, NodeProxy>(nodes.size());
-        alphabet = new ArrayList<EventDeclProxy>();
-        uncontrollableAlphabet = new ArrayList<EventDeclProxy>();
+        alphabet = new HashSet<EventDeclProxy>();
+        uncontrollableAlphabet = new HashSet<EventDeclProxy>();
 
         final HashMap<NodeProxy, HashSet<String>> locationToOutgoingEventsMap = new HashMap<NodeProxy, HashSet<String>>(nodes.size());
 
@@ -193,21 +206,19 @@ public class ExtendedAutomaton
         }
 
         final EventListExpressionProxy blockedEvents = component.getGraph().getBlockedEvents();
-        final HashSet<String> unconAlphabetString = new HashSet<String>();
         if(blockedEvents != null)
         {
             for(final Proxy event:blockedEvents.getEventList())
             {
                 final String eventName = ((SimpleIdentifierSubject)event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
-                if(!alphabet.contains(e))
+                if(!eventIdToProxyMap.containsKey(eventName)){
+                    eventIdToProxyMap.put(eventName, e);
                     alphabet.add(e);
-                if(e.getKind() == EventKind.UNCONTROLLABLE)
-                {
-                    if(!uncontrollableAlphabet.contains(e))
+                    if(e.getKind() == EventKind.CONTROLLABLE)
+                        controllableAlphabet.add(e);
+                    else if(e.getKind() == EventKind.UNCONTROLLABLE)
                         uncontrollableAlphabet.add(e);
-
-                    unconAlphabetString.add(e.getName());
                 }
             }
         }
@@ -224,7 +235,7 @@ public class ExtendedAutomaton
                 {
                     if(!edge.getGuardActionBlock().getGuards().isEmpty())
                     {
-                        final Set<VariableComponentProxy> vars = extractVariablesFromExpr(edge.getGuardActionBlock().getGuards().get(0));
+                        final Set<VariableComponentProxy> vars = automata.extractVariablesFromExpr(edge.getGuardActionBlock().getGuards().get(0));
 
                         usedSourceVariables.addAll(vars);
                         if(guardVariables.get(e) == null)
@@ -245,142 +256,59 @@ public class ExtendedAutomaton
                     {
                         for(final SimpleExpressionProxy action:edge.getGuardActionBlock().getActions())
                         {
-                            final Set<VariableComponentProxy> vars = extractVariablesFromExpr(((BinaryExpressionProxy)action).getLeft());
+                            final Set<VariableComponentProxy> vars = automata.extractVariablesFromExpr(((BinaryExpressionProxy)action).getLeft());
                             usedTargetVariables.addAll(vars);
                             if(actionVariables.get(e) == null)
                                 actionVariables.put(e, vars);
                             else
                                 actionVariables.get(e).addAll(vars);
                         }
-
                     }
-
                 }
 
-                if(!alphabet.contains(e))
+                if(!eventIdToProxyMap.containsKey(eventName)){
+                    eventIdToProxyMap.put(eventName, e);
                     alphabet.add(e);
+                    if(e.getKind() == EventKind.CONTROLLABLE)
+                        controllableAlphabet.add(e);
+                    else if(e.getKind() == EventKind.UNCONTROLLABLE)
+                        uncontrollableAlphabet.add(e);
+                }
+                
                 locationToOutgoingEventsMap.get(edge.getSource()).add(e.getName());
 
                 if(e.getKind() == EventKind.UNCONTROLLABLE)
                 {
                     if(!uncontrollableAlphabet.contains(e))
                         uncontrollableAlphabet.add(e);
-
-                    unconAlphabetString.add(e.getName());
                 }
             }
             locationToOutgoingEdgesMap.get(edge.getSource()).add(edge);
             locationToIngoingEdgesMap.get(edge.getTarget()).add(edge);
         }
-
-
-        //PLANTIFY
- /*       if(isSpecification() && uncontrollableAlphabet.size()>0)
-        {
-            //Add a blocked state for "plantify" purposes
-//            final List<Proxy> propList = new LinkedList<Proxy>();
-//            propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
-//            PlainEventListSubject markingProposition = factory.createPlainEventListProxy(propList);
-            NodeSubject bNode = factory.createSimpleNodeProxy(name, null,false, null, null, null);
-            bNode.setName("BlOcKeDStAtE");
-            NodeProxy blockedNode = (NodeProxy)bNode;
-            nodes.add(blockedNode);
-            blockedLocation = blockedNode;
-
-            locationToOutgoingEdgesMap.put(blockedLocation, new ArrayList<EdgeSubject>());
-            //Make a transition with an uncontrollble event(UE) to the blocked state from source states where
-            //the UE does not exist on the outgoing transitions
-            //(transformation of specification to plant to later consider the controllabailty problem as a blocking problem).
-
-            for(NodeProxy node:nodes)
-            {
-                if(!isLocationPlantifiedBlocked(node) && !forbiddenLocations.contains(node))
-                {
-                    ArrayList<EdgeSubject> edges = (ArrayList<EdgeSubject>)locationToOutgoingEdgesMap.get(node).clone();
-                    if(edges.isEmpty())
-                    {
-                        EdgeSubject newEdge = null;
-                        ArrayList<Proxy> es = new ArrayList<Proxy>();
-                        for(String e:unconAlphabetString)
-                        {
-                            es.add(factory.createSimpleIdentifierProxy(e));
-                        }
-                        LabelBlockSubject uncommonLabelBlock = factory.createLabelBlockProxy(es,null);
-
-                        newEdge = factory.createEdgeProxy(node, blockedLocation, uncommonLabelBlock, null, null, null, null);
-
-                        locationToOutgoingEdgesMap.get(node).add(newEdge);
-                    }
-                    else
-                    {
-                        for(EdgeSubject edge:edges)
-                        {
-
-                            EdgeSubject newEdge = null;
-                            HashSet<String> commonUnEvents = new HashSet<String>(unconAlphabetString);
-                            HashSet<String> uncommonUnEvents = new HashSet<String>(unconAlphabetString);
-
-                            commonUnEvents.retainAll(locationToOutgoingEventsMap.get(edge.getSource()));
-                            uncommonUnEvents.removeAll(commonUnEvents);
-
-                            //Create a transition (without guards and actions) from source to the forbidden state with all uncontrollable events that are not included in "edge"
-                            if(uncommonUnEvents.size()>0)
-                            {
-                                ArrayList<Proxy> es = new ArrayList<Proxy>();
-                                for(String e:uncommonUnEvents)
-                                {
-                                    es.add(factory.createSimpleIdentifierProxy(e));
-                                }
-                                LabelBlockSubject uncommonLabelBlock = factory.createLabelBlockProxy(es,null);
-
-                                newEdge = factory.createEdgeProxy(edge.getSource(), blockedLocation, uncommonLabelBlock, null, null, null, null);
-                            }
-
-                            //Create a transition from source to the forbidden state with an uncontrollable event that is included in "edge" but with the complement of edge.guard
-                            GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
-                            List<SimpleExpressionSubject> blockGuards = guardActionBlock.getGuardsModifiable();
-                            if(edge.getGuardActionBlock() != null)
-                            {
-                                for(SimpleExpressionProxy guard:edge.getGuardActionBlock().getGuards())
-                                {
-                                    try{blockGuards.add((SimpleExpressionSubject)parser.parse("!("+guard.getPlainText()+")", Operator.TYPE_BOOLEAN));}catch(ParseException e){}
-                                }
-
-                                if(commonUnEvents.size()>0)
-                                {
-                                    ArrayList<Proxy> es = new ArrayList<Proxy>();
-                                    for(String e:commonUnEvents)
-                                    {
-                                        es.add(factory.createSimpleIdentifierProxy(e));
-                                    }
-                                    LabelBlockSubject commonLabelBlock = factory.createLabelBlockProxy(es,null);
-
-                                    if(!edge.getGuardActionBlock().getGuards().isEmpty())
-                                        newEdge = factory.createEdgeProxy(edge.getSource(), blockedLocation, commonLabelBlock, guardActionBlock, null, null, null);
-                                }
-                            }
-
-                            if(newEdge != null)
-                            {
-                                locationToOutgoingEdgesMap.get(edge.getSource()).add(newEdge);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-*/
     }
 
+    public void setAllAcceptingStates(final boolean allAcceptingStates){
+        this.allAcceptingStates = allAcceptingStates;
+    }
+    
     public Collection<EdgeProxy> getTransitions()
     {
         return component.getGraph().getEdges();
     }
-
+    
+    /**
+     * Deprecated method.
+     * @param expr
+     * @return
+     * @deprecated Use extractVariablesFromExpr method in ExtendedAutomata instead
+     * @see ExtendedAutomata
+     */
+    @Deprecated
     public Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr)
     {
         final Set<VariableComponentProxy> vars = new HashSet<VariableComponentProxy>();
-        for(final Proxy proxy:module.getComponentList())
+        for(final Proxy proxy:automata.getModule().getComponentList())
         {
             if(proxy instanceof VariableComponentProxy)
             {
@@ -391,26 +319,41 @@ public class ExtendedAutomaton
                 }
             }
         }
-
         return vars;
     }
-
+    /**
+     * Returns the set of variables used in guards of transitions labeled by event @param e
+     * @param e Event
+     * @return Set of variables or <CODE>Null</CODE> if ExtendedAutomata is not provided in the constructor or event is not available
+     */
     public Set<VariableComponentProxy> getGuardVariables(final EventDeclProxy e)
     {
         return guardVariables.get(e);
     }
 
+    /**
+     * Returns the set of variables used in actions of transitions labeled by event @param e
+     * @param e Event
+     * @return Set of variables or <CODE>Null</CODE> if ExtendedAutomata is not provided in the constructor or event is not available
+     */
     public Set<VariableComponentProxy> getActionVariables(final EventDeclProxy e)
     {
         return actionVariables.get(e);
     }
 
-
+    /**
+     * 
+     * @return Set of variables or <CODE>Null</CODE> if ExtendedAutomata is not provided in the constructor or event is not available
+     */
     public Set<VariableComponentProxy> getUsedSourceVariables()
     {
         return usedSourceVariables;
     }
 
+    /**
+     * 
+     * @return Set of variables or <CODE>Null</CODE> if ExtendedAutomata is not provided in the constructor or event is not available
+     */
     public Set<VariableComponentProxy> getUsedTargetVariables()
     {
         return usedTargetVariables;
@@ -470,6 +413,16 @@ public class ExtendedAutomaton
         return  locationToIngoingEdgesMap;
     }
 
+    public  ArrayList<EdgeSubject> getOutgoingEdges(NodeProxy location)
+    {
+        return  locationToOutgoingEdgesMap.get(location);
+    }
+
+    public  ArrayList<EdgeSubject> getIngoingEdges(NodeProxy location)
+    {
+        return  locationToIngoingEdgesMap.get(location);
+    }
+    
     public ComponentKind getKind()
     {
         return component.getKind();
@@ -477,14 +430,19 @@ public class ExtendedAutomaton
 
     public List<NodeProxy> getNodes()
     {
-        return nodes;
+        return new ArrayList<NodeProxy>(nodes);
     }
 
     public NodeProxy getLocationWithName(final String name)
     {
         return nameToLocationMap.get(name);
     }
-
+    
+    public EventDeclProxy getEvent(final String name)
+    {
+        return eventIdToProxyMap.get(name);
+    }
+    
     public int nbrOfNodes()
     {
         return nodes.size();
@@ -497,32 +455,36 @@ public class ExtendedAutomaton
 
     public SimpleComponentSubject getComponent()
     {
-            return component;
+        return component;
     }
 
     public List<EventDeclProxy> getAlphabet()
     {
-        return alphabet;
+        return new ArrayList<EventDeclProxy>(alphabet);
     }
 
     public List<EventDeclProxy> getUncontrollableAlphabet()
     {
-        return uncontrollableAlphabet;
+        return new ArrayList<EventDeclProxy>(uncontrollableAlphabet);
     }
 
-	public void addState(final String name)
+    public List<EventDeclProxy> getControllableAlphabet()
     {
-            if (allAcceptingStates)
-            {
-                    addState(name, true, false, false);
-            }
-            else
-            {
-                    addState(name, false, false, false);
-            }
+        return new ArrayList<EventDeclProxy>(controllableAlphabet);
+    }
+    
+    public NodeProxy addState(final String name)
+    {
+        NodeProxy state;
+        if (allAcceptingStates)
+            state = addState(name, true, false, false);
+        else
+            state =  addState(name, false, false, false);
+        
+        return state;
     }
 
-    public SimpleNodeSubject addState(final String name, final boolean accepting, final boolean initial, final boolean forbidden)
+    public NodeProxy addState(final String name, final boolean accepting, final boolean initial, final boolean forbidden)
     {
         SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
         if (node == null)
@@ -530,17 +492,26 @@ public class ExtendedAutomaton
             final List<Proxy> propList = new LinkedList<Proxy>();
             if (accepting)
             {
-                    propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
+                propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
             }
             if (forbidden)
             {
-                    propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
+                propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
             }
 
             final PlainEventListSubject markingProposition = factory.createPlainEventListProxy(propList);
 
             node = factory.createSimpleNodeProxy(name, markingProposition,initial, null, null, null);
             graph.getNodesModifiable().add (node);
+            nodes.add(node);
+            nameToLocationMap.put(name, node);
+            
+            if(accepting)
+                acceptedLocations.add(node);
+            if(forbidden)
+                forbiddenLocations.add(node);
+            if(initial)
+                initialLocations.add(node);
         }
 
         return node;
@@ -551,129 +522,243 @@ public class ExtendedAutomaton
         return (component.getKind() == ComponentKind.SPEC);
     }
 
+    public boolean isPlant()
+    {
+        return (component.getKind() == ComponentKind.PLANT);
+    }
 
+    public EventDeclProxy addEvent(final String name, final String kind, final boolean observable)
+    {
+        EventDeclProxy event = eventIdToProxyMap.get(name);
+        if(event == null){
+            final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy(name);
+            if (kind.equalsIgnoreCase(EventKind.CONTROLLABLE.value())) {
+                event = factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
+                alphabet.add(event);
+                eventIdToProxyMap.put(name, event);
+                controllableAlphabet.add(event);
+            } else if (kind.equalsIgnoreCase(EventKind.UNCONTROLLABLE.value())) {
+                event = factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
+                alphabet.add(event);
+                eventIdToProxyMap.put(name, event);
+                uncontrollableAlphabet.add(event);
+            } else if (kind.equalsIgnoreCase(EventKind.PROPOSITION.value())){
+                event = factory.createEventDeclProxy(ident, EventKind.PROPOSITION, observable, ScopeKind.LOCAL, null, null, null);
+                alphabet.add(event);
+                eventIdToProxyMap.put(name, event);
+            }
+        }
+        return event;
+    }
+
+    public boolean addEvent(EventDeclProxy event){
+        if(eventIdToProxyMap.get(event.getName()) == null){
+            eventIdToProxyMap.put(event.getName(), event);
+            alphabet.add(event);
+            if(event.getKind() == EventKind.CONTROLLABLE)
+                controllableAlphabet.add(event);
+            else if(event.getKind() == EventKind.UNCONTROLLABLE)
+                uncontrollableAlphabet.add(event);
+            return true;
+        }
+        return false;
+    }
+    
+    public EventDeclProxy addEvent(final String name, final String kind){
+        return addEvent(name, kind, true);
+    }  
+       
     /**
      * Adds transition to the extended finite automaton
      *
-     * @param from  name of the source state
-     * @param to name of the destination state
-     * @param label semi-colon separated list of event names for the transition
-     * @param guardIn guard expression for the transition
-     * @param actionIn action expression for the transition
+     * @param source  Name of the source state, if has not defined before will be added
+     * @param target Name of the target state, if has not defined before will be added
+     * @param label An event name or semi-colon separated list of event names for this transition, if has not defined before will be added as controllable
+     * @param guardIn Guard expression for the transition. Use <code>toString</code> method to convert any SimpleExpressionProxy element
+     * @param actionIn Action expression for the transition. Use <code>toString</code> method to convert any BinaryExpressionProxy element
      */
-    public void addTransition(final String from, final String to, final String label, final String guardIn, final String actionIn)
+    public void addTransition(final String source, final String target, final String label, final String guardIn, final String actionIn)
     {
-            final SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
-            if (fromNode == null)
-            {
-                    System.out.println("ExtendedAutomaton.addTransition(): From node " + from + " does not exist!");
-            }
-            final SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
-            if (toNode == null)
-            {
-                    System.out.println("ExtendedAutomaton.addTransition(): To node " + to + " does not exist!");
-            }
+        NodeProxy fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(source);
+        if (fromNode == null)
+        {
+                System.out.println("ExtendedAutomaton.addTransition(): From node " + source + " does not exist and therefore, creating one!");
+                fromNode = addState(source);
+        }
+        
+        NodeProxy toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(target);
+        if (toNode == null)
+        {
+                System.out.println("ExtendedAutomaton.addTransition(): To node " + target + " does not exist and therefore, creating one!");
+                toNode = addState(target);
+        }
 
-            // parse label into event name list and make LabelBlockSubject
-            final List<Proxy> events = new LinkedList<Proxy>();
-            String remainingEvents = label;
-            String curEvent;
+        // parse label into event name list and make LabelBlockSubject
+        final List<Proxy> events = new LinkedList<Proxy>();
+        String remainingEvents = label;
+        String curEvent;
+        if(label.contains(";")){
             while(remainingEvents.contains(";"))
             {
-                    curEvent = remainingEvents.substring(0,remainingEvents.indexOf(";"));
-                    remainingEvents = remainingEvents.substring(remainingEvents.indexOf(";") + 1);
-                    events.add(factory.createSimpleIdentifierProxy(curEvent));
+                curEvent = remainingEvents.substring(0,remainingEvents.indexOf(";"));
+                remainingEvents = remainingEvents.substring(remainingEvents.indexOf(";") + 1);
+                EventDeclProxy event = eventIdToProxyMap.get(curEvent);
+                if (event == null){
+                    System.out.println("ExtendedAutomaton.addTransition(): Event " + curEvent + " does not exist and therefore, creating one controllable!");
+                    event = addEvent(curEvent, EventKind.CONTROLLABLE.name(), true);
+                }
+                events.add(factory.createSimpleIdentifierProxy(event.getName()));
 
-                    // Add event declaration to the module if needed
-        automata.includeControllableEvent(curEvent);
             }
-            final LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
+        } else {
+            EventDeclProxy event = eventIdToProxyMap.get(label.trim());
+            if (event == null){
+                System.out.println("ExtendedAutomaton.addTransition(): Event " + label.trim() + " does not exist and therefore, creating one controllable!");
+                event = addEvent(label.trim(), EventKind.CONTROLLABLE.name(), true);
+            }
+            events.add(factory.createSimpleIdentifierProxy(event.getName()));
+        }
 
-            // make GuardActionSubject
-            // Get guard ...
-            SimpleExpressionSubject guard = null;
-            try
-            {
-                    final String guardText = guardIn;
-                    if (guardText != null && !guardText.trim().equals(""))
-                    {
-                            guard = (SimpleExpressionSubject) parser.parse(guardText, Operator.TYPE_BOOLEAN);
-                    }
-            }
-            catch (final ParseException exception)
-            {
-                    System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
-                    System.out.println("\t automaton: " + name);
-                    System.out.print("\t from: " + from);
-                    System.out.println(" to: " + to);
-                    System.out.println("\t label: " + label);
-                    System.out.println("\t guard: " + guardIn);
-                    System.out.println("\t action: " + actionIn);
-                    return;
-            }
-            // Get actions ...
-            List<BinaryExpressionSubject> actions = null;
-            final String actionText = actionIn;
-            if (actionText != null && !actionText.trim().equals(""))
-            {
-                    final String[] texts = actionIn.split(";");
-                    actions = new ArrayList<BinaryExpressionSubject>(texts.length);
-                    for (final String text : texts)
-                    {
-                            if (text.length() > 0)
-                            {
-                                    try
-                                    {
-                                            final SimpleExpressionSubject action = (SimpleExpressionSubject) parser.parse(text);
-                                            if (!(action instanceof BinaryExpressionSubject))
-                                            {
-                                                    throw new TypeMismatchException(action, "ACTION");
-                                            }
-                                            final BinaryExpressionSubject binaction = (BinaryExpressionSubject) action;
-                                            actions.add(binaction);
-                                    }
-                                    catch (final ParseException exception)
-                                    {
-                                            System.out.println("ExtendedAutomaton.addTransition(): Syntax error in action!");
-                                            System.out.println("\t automaton: " + name);
-                                            System.out.print("\t from: " + from);
-                                            System.out.println(" to: " + to);
-                                            System.out.println("\t label: " + label);
-                                            System.out.println("\t guard: " + guardIn);
-                                            System.out.println("\t action: " + actionIn);
-                                            return;
-                                    }
-                                    catch (final TypeMismatchException exception)
-                                    {
-                                            System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
-                                            System.out.println("\t automaton: " + name);
-                                            System.out.print("\t from: " + from);
-                                            System.out.println(" to: " + to);
-                                            System.out.println("\t label: " + label);
-                                            System.out.println("\t guard: " + guardIn);
-                                            System.out.println("\t action: " + actionIn);
-                                            return;
-                                    }
-                            }
-                    }
-            }
+        final LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
 
-            // Store parsed results ...
-            final GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
-            final List<SimpleExpressionSubject> blockGuards = guardActionBlock.getGuardsModifiable();
-            blockGuards.clear();
-            if (guard != null)
-            {
-                    blockGuards.add(guard);
-            }
-            final List<BinaryExpressionSubject> blockActions = guardActionBlock.getActionsModifiable();
-            blockActions.clear();
-            if (actions != null)
-            {
-                    blockActions.addAll(actions);
-            }
+        // make GuardActionSubject
+        // Get guard ...
+        SimpleExpressionSubject guard = null;
+        try
+        {
+                final String guardText = guardIn;
+                if (guardText != null && !guardText.trim().equals(""))
+                {
+                        guard = (SimpleExpressionSubject) parser.parse(guardText, Operator.TYPE_BOOLEAN);
+                }
+        }
+        catch (final ParseException exc)
+        {
+                System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
+                System.out.println("\t automaton: " + name);
+                System.out.print("\t from: " + source);
+                System.out.println(" to: " + target);
+                System.out.println("\t label: " + label);
+                System.out.println("\t guard: " + guardIn);
+                System.out.println("\t action: " + actionIn);
+                return;
+        }
+        // Get actions ...
+        List<BinaryExpressionSubject> actions = null;
+        final String actionText = actionIn;
+        if (actionText != null && !actionText.trim().equals(""))
+        {
+                final String[] texts = actionIn.split(";");
+                actions = new ArrayList<BinaryExpressionSubject>(texts.length);
+                for (final String text : texts)
+                {
+                        if (text.length() > 0)
+                        {
+                                try
+                                {
+                                        final SimpleExpressionSubject action = (SimpleExpressionSubject) parser.parse(text);
+                                        if (!(action instanceof BinaryExpressionSubject))
+                                        {
+                                                throw new TypeMismatchException(action, "ACTION");
+                                        }
+                                        final BinaryExpressionSubject binaction = (BinaryExpressionSubject) action;
+                                        actions.add(binaction);
+                                }
+                                catch (final ParseException exception)
+                                {
+                                        System.out.println("ExtendedAutomaton.addTransition(): Syntax error in action!");
+                                        System.out.println("\t automaton: " + name);
+                                        System.out.print("\t from: " + source);
+                                        System.out.println(" to: " + target);
+                                        System.out.println("\t label: " + label);
+                                        System.out.println("\t guard: " + guardIn);
+                                        System.out.println("\t action: " + actionIn);
+                                        return;
+                                }
+                                catch (final TypeMismatchException exception)
+                                {
+                                        System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
+                                        System.out.println("\t automaton: " + name);
+                                        System.out.print("\t from: " + source);
+                                        System.out.println(" to: " + target);
+                                        System.out.println("\t label: " + label);
+                                        System.out.println("\t guard: " + guardIn);
+                                        System.out.println("\t action: " + actionIn);
+                                        return;
+                                }
+                        }
+                }
+        }
 
-            final EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
-            graph.getEdgesModifiable().add(newEdge);
+        // Store parsed results ...
+        final GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
+        final List<SimpleExpressionSubject> blockGuards = guardActionBlock.getGuardsModifiable();
+        blockGuards.clear();
+        if (guard != null)
+        {
+                blockGuards.add(guard);
+        }
+        final List<BinaryExpressionSubject> blockActions = guardActionBlock.getActionsModifiable();
+        blockActions.clear();
+        if (actions != null)
+        {
+            blockActions.addAll(actions);
+        }
+
+        final EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
+        graph.getEdgesModifiable().add(newEdge);
+        ArrayList<EdgeSubject> inEdges = locationToIngoingEdgesMap.get(toNode);
+        ArrayList<EdgeSubject> outEdges = locationToOutgoingEdgesMap.get(fromNode);
+        if(inEdges == null){
+            locationToIngoingEdgesMap.put(toNode, new ArrayList<EdgeSubject>(){{add(newEdge);}});
+        } else {
+            inEdges.add(newEdge);
+        }
+        if(outEdges == null){
+            locationToOutgoingEdgesMap.put(fromNode, new ArrayList<EdgeSubject>(){{add(newEdge);}});
+        } else {
+            outEdges.add(newEdge);
+        }
     }
+    
+    public void setKind(ComponentKind kind){
+        component.setKind(kind);
+    }
+    
+    public void setName(String newName){
+        this.name = newName;
+        component.setIdentifier(new SimpleIdentifierSubject(newName));
+    }
+    
+    @Override
+    public ExtendedAutomaton clone(){
+        return new ExtendedAutomaton(automata, component.clone());
+    }
+    
+    @Override
+    public String toString(){
+        return this.name;
+    }
+    
+    public static Collection<? extends Proxy> setUnion(Collection<? extends Proxy> x, Collection<? extends Proxy> y){
+        Collection<Proxy> result = new HashSet<Proxy>();
+        result.addAll(x);
+        result.addAll(y);
+        return result;
+    }  
+    
+    public static Collection<? extends Proxy> setIntersection(Collection<? extends Proxy> x, Collection<? extends Proxy> y){
+        Collection<Proxy> result = new HashSet<Proxy>(x);
+        result.retainAll(y);
+        return result;
+    }
+    
+    public static Collection<? extends Proxy> setDifference(Collection<? extends Proxy> x, Collection<? extends Proxy> y){
+        Collection<Proxy> result = new HashSet<Proxy>();
+        for (Proxy n:x)
+            if(!y.contains(n))
+                result.add(n);
+        return result;
+    }    
+    
 }
