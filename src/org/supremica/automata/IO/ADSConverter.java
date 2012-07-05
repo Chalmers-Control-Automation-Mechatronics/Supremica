@@ -1,0 +1,110 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.supremica.automata.IO;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.HashSet;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.automata.ExtendedAutomaton;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
+/**
+ * ADSConverter class to convert ADS files to ExtendedAutomaton. 
+ * 
+ * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
+ * @version %I%, %G%
+ * @since 1.0
+ */
+
+public class ADSConverter {
+    private final Logger logger = LoggerFactory.createLogger(ADSConverter.class);
+    private final URI uri;
+    
+    public ADSConverter(final URI uri) throws MalformedURLException{
+        this.uri = uri;
+    }
+    
+    public ExtendedAutomaton getExtendedAutomaton() throws IOException{
+        URL mURL = uri.toURL();
+        final InputStream stream = mURL.openStream();
+        final Reader raw = new InputStreamReader(stream);
+        final BufferedReader reader = new BufferedReader(raw);
+        String name;
+        HashSet<String> markedStates = new HashSet<String>();
+        HashSet<String[]> transitions = new HashSet<String[]>();
+        String s;
+        s=reader.readLine();
+        if(!s.contains("CTCT ADS")){
+            logger.error("The file format is not CTCT ADS");
+            return null;
+        }
+        reader.readLine();
+        name = reader.readLine();
+        
+        int step = 0;
+        while((s=reader.readLine())!=null){
+            if(s.contains("#") || s.contains(":"))
+                continue;
+            
+            if(s.isEmpty()){
+                step++;
+                continue;
+            }
+            
+            switch(step){
+                case 1:
+                    break;
+                case 2:
+                    try{
+                        markedStates.add(s);
+                        break;
+                    } catch(NumberFormatException e){
+                        logger.error("There is problem in marker states part");
+                        return null;
+                    }
+                case 3:
+                    break;
+                case 4:
+                    String[] split = s.split("\\s+");
+                    transitions.add(split);
+                    break;
+            }
+        }
+        
+        ExtendedAutomaton ex = new ExtendedAutomaton(name, ComponentKind.PLANT);
+        boolean isInitial, isMark;
+        
+        for(String[] t:transitions){
+            String source = t[0];
+            String event = t[1];
+            String target = t[2];
+
+            isInitial = (Integer.parseInt(source) == 0)?true:false;
+            isMark = (markedStates.contains(source))?true:false;
+            ex.addState(source, isMark, isInitial, false);
+            
+            isInitial = (Integer.parseInt(target) == 0)?true:false;
+            isMark = (markedStates.contains(target))?true:false;
+                        
+            ex.addState(target, isMark, isInitial, false);
+            
+            boolean isObservable = (Integer.parseInt(event) == 1000)?false:true;
+            String kind;
+            if(isObservable)
+                kind = (Integer.parseInt(event)%2 != 0)?EventKind.CONTROLLABLE.value():EventKind.UNCONTROLLABLE.value();
+            else 
+                kind = EventKind.CONTROLLABLE.value();
+            
+            ex.addEvent(event, kind, isObservable);
+            ex.addTransition(source, target, event, null, null);
+        }
+        return ex;
+    }
+}
