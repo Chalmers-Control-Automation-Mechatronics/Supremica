@@ -99,6 +99,8 @@ public class ExtendedAutomaton
     private Map<String, EventDeclProxy> eventIdToProxyMap;
     private Set<VariableComponentProxy> usedSourceVariables;
     private Set<VariableComponentProxy> usedTargetVariables;
+    private HashSet<SimpleExpressionProxy> allGuards;
+    private HashSet<BinaryExpressionProxy> allActions;
     
     
     @Deprecated
@@ -123,6 +125,8 @@ public class ExtendedAutomaton
         uncontrollableAlphabet = new HashSet<EventDeclProxy>();
         controllableAlphabet = new HashSet<EventDeclProxy>();
         eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
+        allGuards = new HashSet<SimpleExpressionProxy>();
+        allActions = new HashSet<BinaryExpressionProxy>();
         usedSourceVariables = null;
         usedTargetVariables = null;
         guardVariables = null;
@@ -150,6 +154,8 @@ public class ExtendedAutomaton
         eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
         uncontrollableAlphabet = new HashSet<EventDeclProxy>();
         controllableAlphabet = new HashSet<EventDeclProxy>();
+        allGuards = new HashSet<SimpleExpressionProxy>();
+        allActions = new HashSet<BinaryExpressionProxy>();
         usedSourceVariables = null;
         usedTargetVariables = null;
         guardVariables = null;
@@ -176,6 +182,8 @@ public class ExtendedAutomaton
         nameToLocationMap = new HashMap<String, NodeProxy>(nodes.size());
         alphabet = new HashSet<EventDeclProxy>();
         uncontrollableAlphabet = new HashSet<EventDeclProxy>();
+        allGuards = new HashSet<SimpleExpressionProxy>();
+        allActions = new HashSet<BinaryExpressionProxy>();
 
         final HashMap<NodeProxy, HashSet<String>> locationToOutgoingEventsMap = new HashMap<NodeProxy, HashSet<String>>(nodes.size());
 
@@ -235,7 +243,9 @@ public class ExtendedAutomaton
                 {
                     if(!edge.getGuardActionBlock().getGuards().isEmpty())
                     {
-                        final Set<VariableComponentProxy> vars = automata.extractVariablesFromExpr(edge.getGuardActionBlock().getGuards().get(0));
+                        SimpleExpressionProxy guard = edge.getGuardActionBlock().getGuards().get(0);
+                        allGuards.add(guard);
+                        final Set<VariableComponentProxy> vars = automata.extractVariablesFromExpr(guard);
 
                         usedSourceVariables.addAll(vars);
                         if(guardVariables.get(e) == null)
@@ -254,9 +264,10 @@ public class ExtendedAutomaton
 
                     if(!edge.getGuardActionBlock().getActions().isEmpty())
                     {
-                        for(final SimpleExpressionProxy action:edge.getGuardActionBlock().getActions())
+                        for(final BinaryExpressionProxy action:edge.getGuardActionBlock().getActions())
                         {
-                            final Set<VariableComponentProxy> vars = automata.extractVariablesFromExpr(((BinaryExpressionProxy)action).getLeft());
+                            allActions.add(action);
+                            final Set<VariableComponentProxy> vars = automata.extractVariablesFromExpr(action.getLeft());
                             usedTargetVariables.addAll(vars);
                             if(actionVariables.get(e) == null)
                                 actionVariables.put(e, vars);
@@ -696,13 +707,17 @@ public class ExtendedAutomaton
         blockGuards.clear();
         if (guard != null)
         {
-                blockGuards.add(guard);
+            blockGuards.add(guard);
+            allGuards.add(guard);
         }
         final List<BinaryExpressionSubject> blockActions = guardActionBlock.getActionsModifiable();
         blockActions.clear();
         if (actions != null)
         {
-            blockActions.addAll(actions);
+            for(BinaryExpressionSubject action : actions){
+                blockActions.add(action);
+                allActions.add(action);
+            }
         }
 
         final EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
@@ -728,6 +743,14 @@ public class ExtendedAutomaton
     public void setName(String newName){
         this.name = newName;
         component.setIdentifier(new SimpleIdentifierSubject(newName));
+    }
+    
+    public HashSet<SimpleExpressionProxy> getAllGuards(){
+        return allGuards;
+    }
+    
+    public HashSet<BinaryExpressionProxy> getAllActions(){
+        return allActions;
     }
     
     @Override

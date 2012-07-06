@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -18,8 +19,11 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
 /**
- *
- * @author shoaei
+ * AutomatonTransitionProjection class to project the given EFA/DFA. 
+ * 
+ * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
+ * @version %I%, %G%
+ * @since 1.0
  */
 public class AutomatonTransitionProjection {
     
@@ -101,7 +105,7 @@ public class AutomatonTransitionProjection {
                             if(currGuards.length > 1){
                                 currGuards = ExtendedAutomataIndexFormHelper.clearMaxInteger(currGuards);
                                 for(int currGuard : currGuards){
-                                    SimpleExpressionProxy guardExp = indexMap.getExpressionAt(currGuard);
+                                    SimpleExpressionProxy guardExp = indexMap.getGuardExpressionAt(currGuard);
                                     if(states.length == 1){
                                         guard = guardExp.toString();
                                         break;
@@ -110,7 +114,7 @@ public class AutomatonTransitionProjection {
                                     if(guard.isEmpty())
                                         guard = strGuard;
                                     else
-                                        guard += cot.getAndOperator().getName() + strGuard;
+                                        guard += cot.getOrOperator().getName() + strGuard;
                                 }
                             }
                         } catch(Exception exc){}
@@ -119,11 +123,13 @@ public class AutomatonTransitionProjection {
                             if(currActions.length > 1){
                                 currActions = ExtendedAutomataIndexFormHelper.clearMaxInteger(currActions);
                                 for(int currAction : currActions){
-                                    SimpleExpressionProxy actionExp = indexMap.getExpressionAt(currAction);
-                                    if(action.isEmpty())
+                                    BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(currAction);
+                                    if(action.isEmpty()){
                                         action = actionExp.toString();
-                                    else
-                                        action += "; " + actionExp.toString();
+                                    } else {
+                                        if(!action.contains(actionExp.toString()))
+                                            action += "; " + actionExp.toString();
+                                    }
                                 }
                             }
                         } catch(Exception exc){}
@@ -134,7 +140,6 @@ public class AutomatonTransitionProjection {
         }
         return prjEFA;
     }
-    
     
     private void project(){
         boolean hasLocalEvents;
@@ -365,7 +370,6 @@ public class AutomatonTransitionProjection {
         return isOCC;
     }
 
-
     /**
      * Method to find the observation-equivalent states for the given <B>state</B>. The set of states in the coset are connected
      * to the <B>state</B> via unobservable or local transitions. Note that by default all transitions are observable.
@@ -425,13 +429,6 @@ public class AutomatonTransitionProjection {
         return eqStates;
     }
 
-    private TIntHashSet findEquivalentStates(int state){
-        TIntHashSet eqStates = new TIntHashSet();
-        eqStates.addAll(findEquivalentStates(state, true).toArray());
-        eqStates.addAll(findEquivalentStates(state, false).toArray());
-        return eqStates;
-    }
-    
     private TIntHashSet findImdPreImg(int state, int event){
         TIntHashSet eqStates = new TIntHashSet();
         TIntHashSet imdImg = new TIntHashSet();
@@ -513,9 +510,7 @@ public class AutomatonTransitionProjection {
             answer = nopath(ndQuoPartition, ndEvent, nextPs);
             if(!answer)
                 return answer;
-            
         }
-
         return true;
     }
 
@@ -537,6 +532,7 @@ public class AutomatonTransitionProjection {
                 }
             }
         }
+        
         ArrayList<TIntHashSet> Es = new ArrayList<TIntHashSet>();
         for(TIntHashSet value:yMap.values())
             Es.add(value);

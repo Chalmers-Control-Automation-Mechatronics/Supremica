@@ -55,6 +55,7 @@ public class AutomataTransitionProjection {
         unionAlphabet = new TIntHashSet();
         for(int event = 0; event < indexAutomata.getNbrUnionEvents(); event++)
             unionAlphabet.add(event);
+        
         if(automatic){
             localEvents = getLocalEventSet(exAutomata);
             sharedEvents = ExtendedAutomataIndexFormHelper.setDifference(unionAlphabet, localEvents);
@@ -71,8 +72,14 @@ public class AutomataTransitionProjection {
      */
     public ExtendedAutomaton projectEFA(String name){
         ExtendedAutomaton efa = exAutomata.getExtendedAutomaton(name);
+        int i;
+        if(efa.getName().equals("demux2taken: Event Queue"))
+            i = 0;
         Args.checkForNull(efa);
         int exAutomatonIndex = indexMap.getExtendedAutomatonIndex(efa);
+        boolean result = checkForActionConsistency(exAutomatonIndex);
+        if(!result)
+            return null;
         TIntHashSet currAlphabet = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getAlphabetEventsTable()[exAutomatonIndex]);
         TIntHashSet currLocalEvents = ExtendedAutomataIndexFormHelper.setIntersection(localEvents, currAlphabet);
         AutomatonTransitionProjection tp = new AutomatonTransitionProjection(indexAutomata, exAutomatonIndex, currLocalEvents.toArray());
@@ -109,9 +116,9 @@ public class AutomataTransitionProjection {
             for(int[] gs : gss){
                 if(gs.length == 1)
                     continue;
-                gs = ExtendedAutomataIndexFormHelper.clearMaxInteger(gs);
                 for(int g : gs){
-                    strAllGuards += indexMap.getExpressionAt(g).toString();
+                    if(g != Integer.MAX_VALUE)
+                        strAllGuards += " " + indexMap.getGuardExpressionAt(g).toString();
                 }
             }
         }
@@ -131,7 +138,7 @@ public class AutomataTransitionProjection {
             // Checking the local events conditions based on my paper (for EFAs)
             if(!indexMap.hasAnyGuard(currAutomaton) && !indexMap.hasAnyAction(currAutomaton)){
                 locEvents.addAll(temp.toArray());
-                return locEvents;
+                continue;
             }
                 
             outerloop:
@@ -151,7 +158,7 @@ public class AutomataTransitionProjection {
                 
                 actions = ExtendedAutomataIndexFormHelper.clearMaxInteger(actions);
                 for(int action : actions){
-                    BinaryExpressionProxy actionExp = (BinaryExpressionProxy) indexMap.getExpressionAt(action);
+                    BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(action);
                     Set<VariableComponentProxy> actionRightVars = exAutomata.extractVariablesFromExpr(actionExp.getRight());
                     // If the action is in the form of, e.g., x += 1, x-=1, or x = y + 1 the it is not local  
                     if(actionExp.getOperator().equals(cot.getIncrementOperator()) || actionExp.getOperator().equals(cot.getDecrementOperator()) || !actionRightVars.isEmpty()){
@@ -203,6 +210,37 @@ public class AutomataTransitionProjection {
             localEvents.add(indexMap.getEventIndex(event));
         
         sharedEvents.addAll(ExtendedAutomataIndexFormHelper.setDifference(unionAlphabet, localEvents).toArray());
+    }
+
+    /**
+     * Checking if all transitions labeled with the same event have the same actions.
+     * @param automatonIndex Index of the current automaton
+     * @return <code>true</code> if the condition holds otherwise <code>false</code>
+     */
+    private boolean checkForActionConsistency(int automatonIndex){
+        int[][][] stateEventTable = indexAutomata.getActionStateEventTable()[automatonIndex];
+        TIntHashSet alphabet = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getAlphabetEventsTable()[automatonIndex]);
+        for(int ev : alphabet.toArray()){
+            HashSet<String> set = new HashSet<String>();
+            for(int[][] state : stateEventTable){
+                int[] actions = state[ev];
+                if(actions == null || actions.length == 1)
+                    continue;
+                String str = "";
+                for(int action : actions){
+                    if(action != Integer.MAX_VALUE)
+                        str += indexMap.getActionExpressionAt(action).toString();
+                }
+                if(!str.isEmpty())
+                    set.add(str);
+            }
+            if(set.size()>1){
+                logger.debug(indexMap.getExtendedAutomatonAt(automatonIndex).getName() 
+                        + " > " + indexMap.getEventAt(ev).getName()+" > Multiple actions");
+                return false;
+            }
+        }
+        return true;
     }
 
 }

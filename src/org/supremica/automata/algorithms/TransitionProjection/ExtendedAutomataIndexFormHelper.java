@@ -8,7 +8,9 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.util.Args;
 
 /**
- * ExtendedAutomataIndexFormHelper is the class to help using ExtendedAutomataIndexForm. This class is an adopted version of AutomataIndexFormHelper to support Extended Finite Automata.
+ * ExtendedAutomataIndexFormHelper is the class to help using ExtendedAutomataIndexForm. This class is an adopted version of 
+ * AutomataIndexFormHelper to support Extended Finite Automata.
+ * 
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0

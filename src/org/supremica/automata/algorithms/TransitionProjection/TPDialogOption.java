@@ -2,7 +2,7 @@
 package org.supremica.automata.algorithms.TransitionProjection;
 
 /**
- * TPDialog option class.
+ * TPDialog option class to use in TPDialog form.
  * 
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%

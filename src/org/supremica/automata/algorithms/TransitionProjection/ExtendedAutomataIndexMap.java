@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.supremica.automata.algorithms.TransitionProjection;
 
 import java.util.HashMap;
@@ -14,8 +11,11 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.util.Args;
 
 /**
- *
- * @author shoaei
+ * ExtendedAutomataIndexMap class to index given EFA/DFA
+ * 
+ * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
+ * @version %I%, %G%
+ * @since 1.0
  */
 public class ExtendedAutomataIndexMap {
     private final Logger logger = LoggerFactory.createLogger(ExtendedAutomataIndexMap.class);
@@ -24,8 +24,10 @@ public class ExtendedAutomataIndexMap {
     private final HashMap<ExtendedAutomatonAndLocationEntry, Integer> exAutomatonLocationEntryToIndexMap;
     private final HashMap<ExtendedAutomatonAndLocationIndexEntry, NodeProxy> exAutomatonLocationIndexEntryToLocationMap;
     private final HashMap<EventDeclProxy, Integer> eventToIndexMap;
-    private final HashMap<ExtendedAutomatonAndExpressionEntry, Integer> expressionEntryToIndexMap;
-    private final HashMap<Integer, ExtendedAutomatonAndExpressionEntry> expressionIndexEntryToExpressionMap;
+    private final HashMap<SimpleExpressionProxy, Integer> gExpressionEntryToIndexMap;
+    private final HashMap<Integer, SimpleExpressionProxy> gExpressionIndexEntryToExpressionMap;
+    private final HashMap<BinaryExpressionProxy, Integer> aExpressionEntryToIndexMap;
+    private final HashMap<Integer, BinaryExpressionProxy> aExpressionIndexEntryToExpressionMap;
     private final EventDeclProxy[] indexToEventArray;
     private boolean hasActions[];
     private boolean hasGuards[];
@@ -47,13 +49,17 @@ public class ExtendedAutomataIndexMap {
         exAutomatonLocationIndexEntryToLocationMap = new HashMap<ExtendedAutomatonAndLocationIndexEntry, NodeProxy>(initialLocationMapCapacity*2);
         eventToIndexMap = new HashMap<EventDeclProxy, Integer>(unionAlphabet.size()*2);
         indexToEventArray = new EventDeclProxy[unionAlphabet.size()];
-        expressionEntryToIndexMap = new HashMap<ExtendedAutomatonAndExpressionEntry, Integer>();
-        expressionIndexEntryToExpressionMap = new HashMap<Integer, ExtendedAutomatonAndExpressionEntry>();
+        gExpressionEntryToIndexMap = new HashMap<SimpleExpressionProxy, Integer>();
+        gExpressionIndexEntryToExpressionMap = new HashMap<Integer, SimpleExpressionProxy>();
+        aExpressionEntryToIndexMap = new HashMap<BinaryExpressionProxy, Integer>();
+        aExpressionIndexEntryToExpressionMap = new HashMap<Integer, BinaryExpressionProxy>();
+        
         hasActions = new boolean[exAutomata.size()];
         hasGuards = new boolean[exAutomata.size()];
         // The exAutomatonIndex and the locationIndex hashmaps are filled
         int exAutomatonIndex = 0;
-        int expIndex = 0;
+        int gIndex = 0;
+        int aIndex = 0;
         for (ExtendedAutomaton currExAutomaton : exAutomata)
         {   
             // The exAutomatonIndex hashtable is updated
@@ -69,36 +75,21 @@ public class ExtendedAutomataIndexMap {
                 locationIndex++;
             }
             
-            for(EdgeProxy arc : currExAutomaton.getTransitions()){
-                try{
-                    List<SimpleExpressionProxy> guards = arc.getGuardActionBlock().getGuards();
-                    for(SimpleExpressionProxy g : guards){
-                        ExtendedAutomatonAndExpressionEntry expEntry = new ExtendedAutomatonAndExpressionEntry(g);
-                        if(!expressionEntryToIndexMap.containsKey(expEntry)){
-                            
-                            expressionEntryToIndexMap.put(expEntry, expIndex);
-                            expressionIndexEntryToExpressionMap.put(expIndex, expEntry);
-                            expIndex++;
-                        }
-                    }
-                    if(!hasGuards[exAutomatonIndex])
-                        hasGuards[exAutomatonIndex] = true;
-                    
-                } catch(Exception e){}
-                try{
-                    List<BinaryExpressionProxy> actions = arc.getGuardActionBlock().getActions();
-                    for(BinaryExpressionProxy a : actions){
-                        ExtendedAutomatonAndExpressionEntry expEntry = new ExtendedAutomatonAndExpressionEntry(a);
-                        if(!expressionEntryToIndexMap.containsKey(expEntry)){
-                            expressionEntryToIndexMap.put(expEntry, expIndex);
-                            expressionIndexEntryToExpressionMap.put(expIndex, expEntry);
-                            expIndex++;
-                        }
-                    }
-                    if(!hasActions[exAutomatonIndex])
-                        hasActions[exAutomatonIndex] = true;
-                } catch(Exception e){}
+            for(SimpleExpressionProxy g : currExAutomaton.getAllGuards()){
+                gExpressionEntryToIndexMap.put(g, gIndex);
+                gExpressionIndexEntryToExpressionMap.put(gIndex, g);
+                gIndex++;
             }
+
+            for(BinaryExpressionProxy a : currExAutomaton.getAllActions()){
+                aExpressionEntryToIndexMap.put(a, aIndex);
+                aExpressionIndexEntryToExpressionMap.put(aIndex, a);
+                aIndex++;
+            }
+            
+            hasGuards[exAutomatonIndex] = (gIndex > 0)?true:false;
+            hasActions[exAutomatonIndex] = (aIndex > 0)?true:false;
+            
             exAutomatonIndex++;
         }
         
@@ -197,16 +188,28 @@ public class ExtendedAutomataIndexMap {
         return getLocationAt(currExAutomaton, locationIndex);
     }
     
-    public int getExpressionIndex(final SimpleExpressionProxy exp)
+    public int getGuardExpressionIndex(final SimpleExpressionProxy exp)
     {
         Args.checkForNull(exp);
-        return expressionEntryToIndexMap.get(new ExtendedAutomatonAndExpressionEntry(exp));
+        return gExpressionEntryToIndexMap.get(exp);
     }
     
-    public SimpleExpressionProxy getExpressionAt(final int expIndex)
+    public SimpleExpressionProxy getGuardExpressionAt(final int expIndex)
     {
         Args.checkForIndex(expIndex);
-        return (SimpleExpressionProxy)expressionIndexEntryToExpressionMap.get(expIndex).exp;
+        return gExpressionIndexEntryToExpressionMap.get(expIndex);
+    }
+
+    public int getActionExpressionIndex(final BinaryExpressionProxy exp)
+    {
+        Args.checkForNull(exp);
+        return aExpressionEntryToIndexMap.get(exp);
+    }
+    
+    public BinaryExpressionProxy getActionExpressionAt(final int expIndex)
+    {
+        Args.checkForIndex(expIndex);
+        return aExpressionIndexEntryToExpressionMap.get(expIndex);
     }
     
     public boolean hasAnyGuard(final int exAutomatonIndex){
