@@ -1,7 +1,10 @@
 
 package org.supremica.automata.algorithms.TransitionProjection;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeSet;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -255,7 +258,7 @@ public class ExtendedAutomataIndexForm {
                     try{
                         List<SimpleExpressionProxy> guards = tran.getGuardActionBlock().getGuards();
                         for(SimpleExpressionProxy guard : guards){
-                            int guardIndex = indexMap.getExpressionIndex(guard);
+                            int guardIndex = indexMap.getGuardExpressionIndex(guard);
                             int[] guardTable = eventGuradTable[automatonIndex][indexEvent];
                             int[] guardStateTable = guardStateEventTable[automatonIndex][indexSource][indexEvent];
                             eventGuradTable[automatonIndex][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(guardIndex, guardTable);
@@ -267,7 +270,7 @@ public class ExtendedAutomataIndexForm {
                     try{
                         List<BinaryExpressionProxy> actions = tran.getGuardActionBlock().getActions();
                         for(BinaryExpressionProxy action : actions){
-                            int actionIndex = indexMap.getExpressionIndex(action);
+                            int actionIndex = indexMap.getActionExpressionIndex(action);
                             int[] actionTable = eventActionTable[automatonIndex][indexEvent];
                             int[] actionStateTable = actionStateEventTable[automatonIndex][indexSource][indexEvent];
                             eventActionTable[automatonIndex][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(actionIndex, actionTable);

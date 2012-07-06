@@ -129,15 +129,25 @@ public class EditorTransitionProjectionAction
             if(dialog.showResult())
                 logger.info("Transition Projection start");
             
+            HashSet<String> projectedEFAs = new HashSet<String>();
             for(String efa : components){
                 ExtendedAutomaton oriEFA = exAutomata.getExtendedAutomaton(efa);
                 nbrOriNodes += oriEFA.getNodes().size();
                 nbrOriTrans += oriEFA.getTransitions().size();
+                
+                ExtendedAutomaton prjEFA = TP.projectEFA(efa);
+                if(prjEFA == null){
+                    logger.error("EFA '"+ efa + "' has transitions with the same event but diffrent actions. It will be not project.");
+                    continue;
+                }
+                projectedEFAs.add(efa);
                 if(dialog.showResult())
                     logger.info("Projecting " + efa + " ...");
-                ExtendedAutomaton prjEFA = TP.projectEFA(efa);
+                
+                
                 if(dialog.showResult())
                     logger.info("Projection finish in " + TP.getTimer());
+                
                 String name = oriEFA.getName();
                 if(dialog.getNamingOption() == TPDialogOption.SUFFIXNAME_SELECTED)
                     name += dialog.getSuffixName();
@@ -152,7 +162,7 @@ public class EditorTransitionProjectionAction
             }
             
             if(dialog.removeOriginalEFAs()){
-                for(String comp : components){
+                for(String comp : projectedEFAs){
                     ExtendedAutomaton efa = exAutomata.getExtendedAutomaton(comp);
                     exAutomata.getModule().getComponentListModifiable().remove(efa.getComponent());
                 }
