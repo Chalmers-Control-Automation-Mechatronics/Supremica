@@ -21,64 +21,66 @@ import org.supremica.util.BDD.graph.Graph;
 import org.supremica.util.BDD.graph.Node;
 
 /**
- * Sort extended finite automata together with variables at the same time. 
+ * Sort extended finite automata together with variables at the same time.
  * The algorithm is the combination of PCG and FORCE
- * Some implementations are adopted from Arash's work. 
- * 
+ * Some implementations are adopted from Arash's work.
+ *
  * @author zhennan
  * @version 1.0
- * 
+ *
  */
 public class FORCEAutomatonVariableSorter {
-    
-    private ExtendedAutomata origin;
+
+    private final ExtendedAutomata origin;
     List<Object> variableOrdering; // the result variable ordering list to return
     List<String> variableOrderingNames;  // the result name list to return
     List<String> initialOrderingNames;
-    
-    
-    public FORCEAutomatonVariableSorter(ExtendedAutomata originAutomata, List<String> variableOrderingNames) {
+
+
+    public FORCEAutomatonVariableSorter(final ExtendedAutomata originAutomata, final List<String> variableOrderingNames) {
         this.origin = originAutomata;
         this.variableOrdering = new ArrayList<Object>(origin.size() + origin.getVars().size());
         this.variableOrderingNames = new ArrayList<String>(origin.size() + origin.getVars().size());
         this.initialOrderingNames = variableOrderingNames;
     }
-    
+
     public void sort(){
 
         // Retrieve the automaton list and variable list from the original automata
-        List<ExtendedAutomaton> automatonList = origin.getExtendedAutomataList();
-        List<VariableComponentProxy> variableList = origin.getVars();
+        final List<ExtendedAutomaton> automatonList = origin.getExtendedAutomataList();
+        final List<VariableComponentProxy> variableList = origin.getVars();
 
-        List<AutVar> autVarList = new ArrayList<AutVar>(automatonList.size() + variableList.size());
+        final List<AutVar> autVarList = new ArrayList<AutVar>(automatonList.size() + variableList.size());
 
         // Build the autVarList by iterating each efa and extracting variables from transitiions
-        Map<String, AutVar> var2AutVar = new HashMap<String, AutVar>(variableList.size());
+        final Map<String, AutVar> var2AutVar = new HashMap<String, AutVar>(variableList.size());
 
-        for (ExtendedAutomaton efa : automatonList) {
+        for (final ExtendedAutomaton efa : automatonList) {
             var2AutVar.put(efa.getName(), new AutVar(AutVar.TYPE_EFA, efa, efa.getName(), new HashSet<EventDeclProxy>(efa.getAlphabet())));
-            for (EdgeProxy anEdge : efa.getTransitions()) {
-                HashSet<EventDeclProxy> eventsOfCurrEdge = new HashSet<EventDeclProxy>();
-                for (Iterator<Proxy> eventIterator = anEdge.getLabelBlock().getEventList().iterator(); eventIterator.hasNext();) {
-                    String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
+            for (final EdgeProxy anEdge : efa.getTransitions()) {
+                final HashSet<EventDeclProxy> eventsOfCurrEdge = new HashSet<EventDeclProxy>();
+                for (final Iterator<Proxy> eventIterator = anEdge.getLabelBlock().getEventList().iterator(); eventIterator.hasNext();) {
+                    final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
                     eventsOfCurrEdge.add(origin.eventIdToProxy(eventName));
                 }
-                if(anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getGuards() != null && 
+                if(anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getGuards() != null &&
                         !anEdge.getGuardActionBlock().getGuards().isEmpty()){
+                    @SuppressWarnings("deprecation")
+                    final
                     Set<VariableComponentProxy> variablesOfCurrEdge = efa.extractVariablesFromExpr(anEdge.getGuardActionBlock().getGuards().get(0));
-                    for(VariableComponentProxy aVar: variablesOfCurrEdge){
-                        String varName = aVar.getName();
+                    for(final VariableComponentProxy aVar: variablesOfCurrEdge){
+                        final String varName = aVar.getName();
                         if(!var2AutVar.containsKey(varName))
                             var2AutVar.put(varName, new AutVar(AutVar.TYPE_VAR, aVar, aVar.getName(), eventsOfCurrEdge));
                         else
                             var2AutVar.get(varName).getRelatedAlphabet().addAll(eventsOfCurrEdge);
                     }
                 }
-                if(anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getActions() != null && 
+                if(anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getActions() != null &&
                         !anEdge.getGuardActionBlock().getActions().isEmpty()){
-                    for(BinaryExpressionProxy anAction: anEdge.getGuardActionBlock().getActions()){
-                        String variableName = anAction.getLeft().toString();
-                        VariableComponentProxy aVar = origin.getVariableByName(variableName);
+                    for(final BinaryExpressionProxy anAction: anEdge.getGuardActionBlock().getActions()){
+                        final String variableName = anAction.getLeft().toString();
+                        final VariableComponentProxy aVar = origin.getVariableByName(variableName);
                         if(!var2AutVar.containsKey(variableName))
                             var2AutVar.put(variableName, new AutVar(AutVar.TYPE_VAR, aVar, aVar.getName(), eventsOfCurrEdge));
                         else
@@ -87,37 +89,37 @@ public class FORCEAutomatonVariableSorter {
                 }
             }
         }
-        
-        
+
+
         for(int i = 1; i < initialOrderingNames.size() - 1; i ++){
             autVarList.add(var2AutVar.get(initialOrderingNames.get(i)));
         }
-        
+
         // Build the graph from the autVarList which is necessary for FORCE algorithm of Arash's version
-        Graph graph = buildGraph(autVarList);
-        
+        final Graph graph = buildGraph(autVarList);
+
         // Call FORCE algorithm to get the ordering
-        FORCEAlgorithmAdapter algo = new FORCEAlgorithmAdapter(graph, false);
+        final FORCEAlgorithmAdapter algo = new FORCEAlgorithmAdapter(graph, false);
         algo.init();
-        int [] ordering = algo.ordering();
-        
+        final int [] ordering = algo.ordering();
+
         // Fill in these two field
         for(int i = 0; i < ordering.length; i++){
             variableOrdering.add(autVarList.get(ordering[i]).getOwner());
             variableOrderingNames.add(autVarList.get(ordering[i]).getLabel());
         }
     }
-    
-    private Graph buildGraph( List<AutVar> autVarList ){
 
-        int size = autVarList.size();
-        Graph graph = new Graph(false);
-        HashMap<AutVar, Node> autVar2node = new HashMap<AutVar, Node>();
+    private Graph buildGraph( final List<AutVar> autVarList ){
+
+        final int size = autVarList.size();
+        final Graph graph = new Graph(false);
+        final HashMap<AutVar, Node> autVar2node = new HashMap<AutVar, Node>();
 
         // add the nodes:
         for (int i = 0; i < autVarList.size(); i++) {
-            AutVar anAutvar = autVarList.get(i);
-            Node n = new Node(i);
+            final AutVar anAutvar = autVarList.get(i);
+            final Node n = new Node(i);
             n.owner = anAutvar.getOwner();
             n.label = anAutvar.getLabel();
             n.extra1 = i;
@@ -126,27 +128,27 @@ public class FORCEAutomatonVariableSorter {
         }
 
         // in order to add the edges, the weight matrix needs to be constructed from the autVarList
-        int[][] weightMatrix = new int[size][size];
+        final int[][] weightMatrix = new int[size][size];
         for (int i = 0; i < size; i++) {
             weightMatrix[i][i] = autVarList.get(i).getRelatedAlphabet().size();
             for (int j = 0; j < i; j++) {
-                HashSet<EventDeclProxy> prevAutVarAlphbet = new HashSet<EventDeclProxy>(autVarList.get(j).getRelatedAlphabet());
+                final HashSet<EventDeclProxy> prevAutVarAlphbet = new HashSet<EventDeclProxy>(autVarList.get(j).getRelatedAlphabet());
                 prevAutVarAlphbet.retainAll(autVarList.get(i).getRelatedAlphabet());
                 weightMatrix[i][j] = weightMatrix[j][i] = prevAutVarAlphbet.size();
             }
         }
 
         // add the edges
-        for (Enumeration<Node> e = graph.getNodes().elements(); e.hasMoreElements();) {
-            
-            Node n1 = e.nextElement();
-            int j = n1.extra1;
-            
+        for (final Enumeration<Node> e = graph.getNodes().elements(); e.hasMoreElements();) {
+
+            final Node n1 = e.nextElement();
+            final int j = n1.extra1;
+
             for (int i = 0; i < size; i++) {
                 if (weightMatrix[j][i] > 0 && i != j) {
-                    AutVar a2 = autVarList.get(i);
-                    Node n2 = autVar2node.get(a2);
-                    Edge ed = graph.addEdge(n1, n2);
+                    final AutVar a2 = autVarList.get(i);
+                    final Node n2 = autVar2node.get(a2);
+                    final Edge ed = graph.addEdge(n1, n2);
                     ed.weight = weightMatrix[j][i];
                 }
             }
@@ -162,21 +164,21 @@ public class FORCEAutomatonVariableSorter {
     public List<String> getVariableOrderingNames() {
         return variableOrderingNames;
     }
-    
+
     /**
      * A helper class for EFA and variables
      */
     static class AutVar{
-        
+
         static final int TYPE_EFA = 0;
         static final int TYPE_VAR = 1;
-        
-        private int type;
-        private Object owner;
-        private String label;
-        private HashSet<EventDeclProxy> relatedAlphabet;
-        
-        public AutVar(int type, Object owner, String label, HashSet<EventDeclProxy> relatedAlphabet){
+
+        private final int type;
+        private final Object owner;
+        private final String label;
+        private final HashSet<EventDeclProxy> relatedAlphabet;
+
+        public AutVar(final int type, final Object owner, final String label, final HashSet<EventDeclProxy> relatedAlphabet){
             this.type = type;
             this.owner = owner;
             this.label = label;
@@ -186,7 +188,7 @@ public class FORCEAutomatonVariableSorter {
         public Object getOwner() {
             return owner;
         }
-        
+
         public String getLabel(){
             return label;
         }
@@ -197,7 +199,7 @@ public class FORCEAutomatonVariableSorter {
 
         public int getType() {
             return type;
-        }        
+        }
     }
-    
+
 }

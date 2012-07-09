@@ -19,15 +19,17 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
 /**
- * AutomatonTransitionProjection class to project the given EFA/DFA. 
- * 
+ * AutomatonTransitionProjection class to project the given EFA/DFA.
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
  */
 public class AutomatonTransitionProjection {
-    
+
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.createLogger(AutomatonTransitionProjection.class);
+
     private final ExtendedAutomataIndexForm indexAutomata;
     private final int indexAutomaton;
     private final ExtendedAutomataIndexMap indexMap;
@@ -35,95 +37,95 @@ public class AutomatonTransitionProjection {
     private final TIntHashSet uncontrollableEvents;
     private final int MARK_EVENT = Short.MAX_VALUE;
     private final int[][] nextStateTable;
-    private TIntHashSet currLocalEvents;
+    private final TIntHashSet currLocalEvents;
     private TIntHashSet currSharedEvents;
     private HashSet<Partition> ps;
-    // <state> x <event> -> <state[]> 
+    // <state> x <event> -> <state[]>
     private int[][][] quotient;
-    
+
     /**
-     * Constructor method of AutomatonTransitionProjection. 
+     * Constructor method of AutomatonTransitionProjection.
      * @param exAutomataIndexForm Index form of the Automata model
      * @param exAutomatonIndex Index of the automaton to be projected
      * @param localEventsIndex Set of local events
      */
-    public AutomatonTransitionProjection(ExtendedAutomataIndexForm exAutomataIndexForm, int exAutomatonIndex, int[] localEventsIndex){
+    public AutomatonTransitionProjection(final ExtendedAutomataIndexForm exAutomataIndexForm, final int exAutomatonIndex, final int[] localEventsIndex){
         indexAutomata = exAutomataIndexForm;
         indexAutomaton = exAutomatonIndex;
         indexMap = exAutomataIndexForm.getAutomataIndexMap();
         nextStateTable = indexAutomata.getNextStateTable()[indexAutomaton];
         currAlphabet = ExtendedAutomataIndexFormHelper.getTrueIndexes(exAutomataIndexForm.getAlphabetEventsTable()[exAutomatonIndex]);
-        TIntHashSet inputLocalEvents = ExtendedAutomataIndexFormHelper.toIntHashSet(localEventsIndex);
-        TIntHashSet epsilon = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getEpsilonEventsTable());
+        final TIntHashSet inputLocalEvents = ExtendedAutomataIndexFormHelper.toIntHashSet(localEventsIndex);
+        final TIntHashSet epsilon = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getEpsilonEventsTable());
         currLocalEvents = ExtendedAutomataIndexFormHelper.setIntersection(currAlphabet, inputLocalEvents);
         currSharedEvents = ExtendedAutomataIndexFormHelper.setDifference(currAlphabet, currLocalEvents);
         currSharedEvents = ExtendedAutomataIndexFormHelper.setDifference(currSharedEvents, epsilon);
-        TIntHashSet allUncontrollableEvents = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getUncontrollableEventsTable());
+        final TIntHashSet allUncontrollableEvents = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getUncontrollableEventsTable());
         uncontrollableEvents = ExtendedAutomataIndexFormHelper.setIntersection(currAlphabet, allUncontrollableEvents);
         ps = null;
         quotient = null;
     }
 
     public ExtendedAutomaton getProjectedEFA(){
-        ExtendedAutomaton originalEFA = indexMap.getExtendedAutomatonAt(indexAutomaton);
-        ExtendedAutomaton prjEFA = new ExtendedAutomaton(originalEFA.getName(), originalEFA.getKind());
-        CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
+        final ExtendedAutomaton originalEFA = indexMap.getExtendedAutomatonAt(indexAutomaton);
+        final ExtendedAutomaton prjEFA = new ExtendedAutomaton(originalEFA.getName(), originalEFA.getKind());
+        final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
         project();
-        for(int e : currSharedEvents.toArray()){
-            EventDeclProxy event = indexMap.getEventAt(e);
+        for(final int e : currSharedEvents.toArray()){
+            final EventDeclProxy event = indexMap.getEventAt(e);
             prjEFA.addEvent(event);
         }
         for(int from = 0; from < quotient.length; from++){
-            Partition pFrom = getPartition(from);
-            int statusFrom = pFrom.getStatus();
-            NodeProxy currSource = prjEFA.addState(getStateName(pFrom.getCoset()), 
-                                         ExtendedAutomataIndexFormHelper.isAccepting(statusFrom), 
-                                         ExtendedAutomataIndexFormHelper.isInitial(statusFrom), 
+            final Partition pFrom = getPartition(from);
+            final int statusFrom = pFrom.getStatus();
+            final NodeProxy currSource = prjEFA.addState(getStateName(pFrom.getCoset()),
+                                         ExtendedAutomataIndexFormHelper.isAccepting(statusFrom),
+                                         ExtendedAutomataIndexFormHelper.isInitial(statusFrom),
                                          false);
             for(int event=0; event<quotient[from].length; event++){
                 int[] states = quotient[from][event];
-                
+
                 if(states.length == 1)
                     continue;
 
                 String guard = "";
                 String action = "";
-                EventDeclProxy currEvent = indexMap.getEventAt(event);
+                final EventDeclProxy currEvent = indexMap.getEventAt(event);
                 states = ExtendedAutomataIndexFormHelper.clearMaxInteger(states);
-                int to = states[0];
-                Partition pTo = getPartition(to);
-                int statusTo = pTo.getStatus();
-                NodeProxy currTarget = prjEFA.addState(getStateName(pTo.getCoset()), 
-                                            ExtendedAutomataIndexFormHelper.isAccepting(statusTo), 
-                                            ExtendedAutomataIndexFormHelper.isInitial(statusTo), 
+                final int to = states[0];
+                final Partition pTo = getPartition(to);
+                final int statusTo = pTo.getStatus();
+                final NodeProxy currTarget = prjEFA.addState(getStateName(pTo.getCoset()),
+                                            ExtendedAutomataIndexFormHelper.isAccepting(statusTo),
+                                            ExtendedAutomataIndexFormHelper.isInitial(statusTo),
                                             false);
                 // If there is any guard then do as follows
                 if(indexMap.hasAnyGuard(indexAutomaton) || indexMap.hasAnyAction(indexAutomaton)){
-                    for(int stFrom : pFrom.getCoset().toArray()){
+                    for(final int stFrom : pFrom.getCoset().toArray()){
                         try{
                             int[] currGuards = indexAutomata.getGuardStateEventTable()[indexAutomaton][stFrom][event];
                             if(currGuards.length > 1){
                                 currGuards = ExtendedAutomataIndexFormHelper.clearMaxInteger(currGuards);
-                                for(int currGuard : currGuards){
-                                    SimpleExpressionProxy guardExp = indexMap.getGuardExpressionAt(currGuard);
+                                for(final int currGuard : currGuards){
+                                    final SimpleExpressionProxy guardExp = indexMap.getGuardExpressionAt(currGuard);
                                     if(states.length == 1){
                                         guard = guardExp.toString();
                                         break;
                                     }
-                                    String strGuard = "(" + guardExp.toString() + ")";
+                                    final String strGuard = "(" + guardExp.toString() + ")";
                                     if(guard.isEmpty())
                                         guard = strGuard;
                                     else
                                         guard += cot.getOrOperator().getName() + strGuard;
                                 }
                             }
-                        } catch(Exception exc){}
+                        } catch(final Exception exc){}
                         try{
                             int[] currActions = indexAutomata.getActionStateEventTable()[indexAutomaton][stFrom][event];
                             if(currActions.length > 1){
                                 currActions = ExtendedAutomataIndexFormHelper.clearMaxInteger(currActions);
-                                for(int currAction : currActions){
-                                    BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(currAction);
+                                for(final int currAction : currActions){
+                                    final BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(currAction);
                                     if(action.isEmpty()){
                                         action = actionExp.toString();
                                     } else {
@@ -132,7 +134,7 @@ public class AutomatonTransitionProjection {
                                     }
                                 }
                             }
-                        } catch(Exception exc){}
+                        } catch(final Exception exc){}
                     }
                 }
                 prjEFA.addTransition(currSource.getName(), currTarget.getName(), currEvent.getName(), guard, action);
@@ -140,7 +142,7 @@ public class AutomatonTransitionProjection {
         }
         return prjEFA;
     }
-    
+
     private void project(){
         boolean hasLocalEvents;
         boolean isOCC = (uncontrollableEvents.isEmpty())?true:false;
@@ -155,39 +157,39 @@ public class AutomatonTransitionProjection {
             }
         }
     }
-    
+
     private HashSet<Partition> getQC(){
-        Stack<Partition> W = new Stack<Partition>(); // Set W (splitter) in WONG paper 
-        HashSet<Partition> R = new HashSet<Partition>(); // Set Rho in WONG paper 
+        final Stack<Partition> W = new Stack<Partition>(); // Set W (splitter) in WONG paper
+        final HashSet<Partition> R = new HashSet<Partition>(); // Set Rho in WONG paper
         TIntHashSet phiB,inter,diff; // Sets of phiB, intersection, and difference
 
-        TIntHashSet Q = new TIntHashSet();
-        
-        int nbrStates = indexAutomata.getAutomataSize()[indexAutomaton];
+        final TIntHashSet Q = new TIntHashSet();
+
+        final int nbrStates = indexAutomata.getAutomataSize()[indexAutomaton];
         for(int i=0; i < nbrStates; i++)
             Q.add(i);
-        
+
         // Initiate the sets W and R with all states
         W.push(new Partition(Q));
         R.add(new Partition(Q));
-        
+
         // New mark event (Tao_m) to handle marked states
         currSharedEvents.add(MARK_EVENT);
         while(!W.isEmpty()){
-            Partition B = W.pop(); // B: temporary partition
-            for(int e : currSharedEvents.toArray()){
-                HashSet<Partition> I = new HashSet<Partition>();
-                HashSet<Partition> I12 = new HashSet<Partition>();
-                
+            final Partition B = W.pop(); // B: temporary partition
+            for(final int e : currSharedEvents.toArray()){
+                final HashSet<Partition> I = new HashSet<Partition>();
+                final HashSet<Partition> I12 = new HashSet<Partition>();
+
                 if(e == MARK_EVENT){
                     phiB = phiTAOm(B.getCoset());
                 } else {
                     phiB = phiTao(B.getCoset(),e);
                 }
                 if(phiB.isEmpty()) continue;
-                
+
                 // X: A partition in Rho
-                for (Partition X : R) {
+                for (final Partition X : R) {
                     inter = ExtendedAutomataIndexFormHelper.setIntersection(X.getCoset(), phiB);
                     if (inter.isEmpty()) continue;
                     diff = ExtendedAutomataIndexFormHelper.setDifference(X.getCoset(), phiB);
@@ -196,12 +198,12 @@ public class AutomatonTransitionProjection {
                     I12.add(new Partition(inter));
                     I12.add(new Partition(diff));
                 }
-                for(Partition p : I){
+                for(final Partition p : I){
                     R.remove(p);
                     W.remove(p);
                 }
-                
-                for(Partition p : I12){
+
+                for(final Partition p : I12){
                     R.add(p);
                     W.push(p);
                 }
@@ -212,7 +214,7 @@ public class AutomatonTransitionProjection {
     }
 
     private void getQuotient(){
-        // <state> x <event> -> <state[]> 
+        // <state> x <event> -> <state[]>
         quotient = new int[ps.size()][indexAutomata.getNbrUnionEvents()][];
         for(int i=0; i<ps.size();i++){
             for(int j=0; j<indexAutomata.getNbrUnionEvents();j++){
@@ -221,83 +223,83 @@ public class AutomatonTransitionProjection {
         }
         // Building up new quotient state space
         int newstate = 0;
-        for(Partition p : ps){
+        for(final Partition p : ps){
             boolean isInitial = false;
             boolean isAccepted = false;
-            boolean isForbbiden = false;
-            for(int st : p.getCoset().toArray()){
-                int status = indexAutomata.getStateStatusTable()[indexAutomaton][st];
+            final boolean isForbbiden = false;
+            for(final int st : p.getCoset().toArray()){
+                final int status = indexAutomata.getStateStatusTable()[indexAutomaton][st];
                 if(!isInitial)
                     isInitial = ExtendedAutomataIndexFormHelper.isInitial(status);
                 if(!isAccepted)
-                    isAccepted = ExtendedAutomataIndexFormHelper.isAccepting(status); 
+                    isAccepted = ExtendedAutomataIndexFormHelper.isAccepting(status);
 //                if(!isForbbiden)
 //                    isForbbiden = ExtendedAutomataIndexFormHelper.isForbidden(status);
             }
-            int status = ExtendedAutomataIndexFormHelper.createStatus(isInitial, isAccepted, isForbbiden);
+            final int status = ExtendedAutomataIndexFormHelper.createStatus(isInitial, isAccepted, isForbbiden);
             p.setState(newstate++, status);
         }
-        for(Partition p : ps){
-            int fromQuotientState = p.getState();
+        for(final Partition p : ps){
+            final int fromQuotientState = p.getState();
             if(fromQuotientState == Integer.MAX_VALUE)
                 throw new NullPointerException("getQuotient : fromQuotientState : Null value");
-            for(int currState : p.getCoset().toArray()){
-                for(int currEvent : currAlphabet.toArray()){
-                    int st = indexAutomata.getNextStateTable()[indexAutomaton][currState][currEvent];
+            for(final int currState : p.getCoset().toArray()){
+                for(final int currEvent : currAlphabet.toArray()){
+                    final int st = indexAutomata.getNextStateTable()[indexAutomaton][currState][currEvent];
                     if(st == Integer.MAX_VALUE)
                         continue;
-                    int toQuotientState = getQuotientState(st, ps);
+                    final int toQuotientState = getQuotientState(st, ps);
                     if(toQuotientState == Integer.MAX_VALUE)
                         throw new NullPointerException("getQuotient : Cannot find state " + st + "in any partition");
-                    int[] currQuotientStates = quotient[fromQuotientState][currEvent];
+                    final int[] currQuotientStates = quotient[fromQuotientState][currEvent];
                     if(currSharedEvents.contains(currEvent) || fromQuotientState != toQuotientState){
                         quotient[fromQuotientState][currEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(toQuotientState,currQuotientStates);
-                    } 
+                    }
                 }
             }
         }
     }
-    
+
     private boolean extendEvent(){
         boolean hasLocalEvent = false;
         // Enlargement from the local events in quotient EFA
-        TIntHashSet B = new TIntHashSet();
-        for(Partition p : ps){
-            int currQuoState = p.getState();
+        final TIntHashSet B = new TIntHashSet();
+        for(final Partition p : ps){
+            final int currQuoState = p.getState();
             if(currQuoState == Integer.MAX_VALUE)
                 throw new NullPointerException("getQuotient : fromQuotientState : Null");
-            
-            for(int currEvent : currAlphabet.toArray()){
-                int[] quoStates = quotient[currQuoState][currEvent];
+
+            for(final int currEvent : currAlphabet.toArray()){
+                final int[] quoStates = quotient[currQuoState][currEvent];
                 if(quoStates.length > 1){
                     B.add(currEvent);
                     currSharedEvents.add(currEvent);
-                    boolean removed = currLocalEvents.remove(currEvent);
+                    final boolean removed = currLocalEvents.remove(currEvent);
                     if(removed) hasLocalEvent = true;
                 }
             }
         }
         // Set of states (partitions) where some share event leads to more than one state (partitions)
-        TIntHashSet N = getNdStates();
-        
+        final TIntHashSet N = getNdStates();
+
         // If it is deterministic then we are done
         if(N.isEmpty())
             return hasLocalEvent;
 
         // The local events hidden in these cosets
-        TIntHashSet H = new TIntHashSet();
-        for(int ndState : N.toArray()){
-            Partition p = getPartition(ndState);
+        final TIntHashSet H = new TIntHashSet();
+        for(final int ndState : N.toArray()){
+            final Partition p = getPartition(ndState);
             H.addAll(getHiddenLocalEvents(p).toArray());
         }
         // The set of events which are in H but not in B
-        TIntHashSet H_B = ExtendedAutomataIndexFormHelper.setDifference(H, B);
-        
+        final TIntHashSet H_B = ExtendedAutomataIndexFormHelper.setDifference(H, B);
+
         addAllSharedEvent(H);
         // Copy of sigma for analyze
-        for(int e : H_B.toArray()){
+        for(final int e : H_B.toArray()){
             addLocalEvent(e);
-            for(int y : N.toArray()){
+            for(final int y : N.toArray()){
                 if(!split(y)){
                     addSharedEvent(e);
                     break;
@@ -310,11 +312,11 @@ public class AutomatonTransitionProjection {
     private boolean checkOCC() {
         boolean isOCC = true;
         for(int state = 0; state < quotient.length; state++){
-            TIntHashSet sourceCoset = getPartition(state).getCoset();
+            final TIntHashSet sourceCoset = getPartition(state).getCoset();
             if(sourceCoset.size() > 1){
                 boolean hasUnconEvent = false;
-                TIntIntHashMap map = new TIntIntHashMap();
-                int[][] eventState = quotient[state];
+                final TIntIntHashMap map = new TIntIntHashMap();
+                final int[][] eventState = quotient[state];
                 for(int event = 0; event < eventState.length; event++){
                     if(uncontrollableEvents.contains(event)){
                         hasUnconEvent = true;
@@ -326,36 +328,36 @@ public class AutomatonTransitionProjection {
                     }
                 }
                 if(hasUnconEvent){
-                    TIntStack stack = new TIntStack();
-                    for(int event : map.keys()){
-                        TIntHashSet targetCoset = getPartition(map.get(event)).getCoset();
-                        for(int source : sourceCoset.toArray()){
+                    final TIntStack stack = new TIntStack();
+                    for(final int event : map.keys()){
+                        final TIntHashSet targetCoset = getPartition(map.get(event)).getCoset();
+                        for(final int source : sourceCoset.toArray()){
                             if(source == Integer.MAX_VALUE)
                                 continue;
-                            int st = nextStateTable[source][event];
+                            final int st = nextStateTable[source][event];
                             if(st == Integer.MAX_VALUE)
                                 continue;
                             if(targetCoset.contains(st))
                                 stack.push(source);
                         }
                     }
-                    
-                    TIntHashSet visited = new TIntHashSet();
+
+                    final TIntHashSet visited = new TIntHashSet();
                     while(stack.size() > 0){
-                        int node = stack.pop();
-                        if(!visited.add(node)) 
+                        final int node = stack.pop();
+                        if(!visited.add(node))
                             continue;
-                        int[][] preEventStates = indexAutomata.getPrevStatesTable()[indexAutomaton][node];
-                        for(int event : currAlphabet.toArray()){
+                        final int[][] preEventStates = indexAutomata.getPrevStatesTable()[indexAutomaton][node];
+                        for(final int event : currAlphabet.toArray()){
                             if(currSharedEvents.contains(event) || indexAutomata.getEpsilonEventsTable()[event])
                                 continue;
-                            
-                            int[] preStates = preEventStates[event];
+
+                            final int[] preStates = preEventStates[event];
                             if(preStates.length == 1)
                                 continue;
-                            
+
                             if(uncontrollableEvents.contains(event)){
-                                for(int preState : preStates)
+                                for(final int preState : preStates)
                                     if(preState != Integer.MAX_VALUE)
                                         stack.push(preState);
                             } else {
@@ -377,33 +379,33 @@ public class AutomatonTransitionProjection {
      * @param direction The direction of the breadth-first search. <CODE>true</CODE> for downstream and <CODE>false</CODE> for upstream
      * @return The set of the equivalent states or empty set if <B>state</B> is not a state in the given automaton
      */
-    private TIntHashSet findEquivalentStates(int state, boolean downstream){
-        TIntHashSet eqStates = new TIntHashSet();
-        TIntStack stk = new TIntStack();
+    private TIntHashSet findEquivalentStates(final int state, final boolean downstream){
+        final TIntHashSet eqStates = new TIntHashSet();
+        final TIntStack stk = new TIntStack();
         eqStates.add(state);
         stk.push(state);
-        
+
         while(stk.size() > 0){
-            int currstate = stk.pop();
+            final int currstate = stk.pop();
             if(downstream){
-                for(int currEvent : currAlphabet.toArray()){
+                for(final int currEvent : currAlphabet.toArray()){
                     if(currLocalEvents.contains(currEvent) || indexAutomata.getEpsilonEventsTable()[currEvent]){
-                        int st = nextStateTable[currstate][currEvent];
+                        final int st = nextStateTable[currstate][currEvent];
                         if(st == Integer.MAX_VALUE)
                             continue;
-                        boolean isNew = eqStates.add(st);
+                        final boolean isNew = eqStates.add(st);
                         if(isNew) stk.push(st);
                     }
                 }
             } else {
-                for(int currEvent : currAlphabet.toArray()){
+                for(final int currEvent : currAlphabet.toArray()){
                     if(currLocalEvents.contains(currEvent) || indexAutomata.getEpsilonEventsTable()[currEvent]){
-                        int[] preStates = indexAutomata.getPrevStatesTable()[indexAutomaton][currstate][currEvent];
+                        final int[] preStates = indexAutomata.getPrevStatesTable()[indexAutomaton][currstate][currEvent];
                         if(preStates.length == 1)
                             continue;
-                        for(int pre : preStates){
+                        for(final int pre : preStates){
                             if(pre == Integer.MAX_VALUE) continue;
-                            boolean isNew = eqStates.add(pre);
+                            final boolean isNew = eqStates.add(pre);
                             if(isNew) stk.push(pre);
                         }
                     }
@@ -412,99 +414,99 @@ public class AutomatonTransitionProjection {
         }
         return eqStates;
     }
-    
+
    /**
      * Method to find the coset of observation-equivalent states for the input set of <B>states</B>. The set of states in the coset are connected
      * to each state in the set <B>states</B> via unobservable transitions. Note that by default all transitions are observable.
      * @param states Set of state in the automaton
      * @param direction The direction of the breadth-first search. <CODE>true</CODE> for downstream and <CODE>false</CODE> for upstream
      * @return The set of the equivalent states
-     */    
-    private TIntHashSet findEquivalentStates(TIntHashSet states, boolean downstream){
-        TIntHashSet eqStates = new TIntHashSet();
-        for(TIntIterator itr = states.iterator();itr.hasNext();){
-            TIntHashSet eqsts = findEquivalentStates(itr.next(), downstream);
+     */
+    private TIntHashSet findEquivalentStates(final TIntHashSet states, final boolean downstream){
+        final TIntHashSet eqStates = new TIntHashSet();
+        for(final TIntIterator itr = states.iterator();itr.hasNext();){
+            final TIntHashSet eqsts = findEquivalentStates(itr.next(), downstream);
             eqStates.addAll(eqsts.toArray());
         }
         return eqStates;
     }
 
-    private TIntHashSet findImdPreImg(int state, int event){
-        TIntHashSet eqStates = new TIntHashSet();
-        TIntHashSet imdImg = new TIntHashSet();
-        TIntStack stk = new TIntStack();
+    private TIntHashSet findImdPreImg(final int state, final int event){
+        final TIntHashSet eqStates = new TIntHashSet();
+        final TIntHashSet imdImg = new TIntHashSet();
+        final TIntStack stk = new TIntStack();
 
         eqStates.add(state);
         stk.push(state);
         while(stk.size() > 0){
-            int currstate = stk.pop();
-            for(int currEvent : currAlphabet.toArray()){
-                int[] preStates = indexAutomata.getPrevStatesTable()[indexAutomaton][currstate][currEvent];
+            final int currstate = stk.pop();
+            for(final int currEvent : currAlphabet.toArray()){
+                final int[] preStates = indexAutomata.getPrevStatesTable()[indexAutomaton][currstate][currEvent];
                 if(preStates.length == 1)
                     continue;
                 if(currLocalEvents.contains(currEvent) || indexAutomata.getEpsilonEventsTable()[currEvent]){
-                    for(int pre : preStates){
+                    for(final int pre : preStates){
                         if(pre == Integer.MAX_VALUE)
                             continue;
-                        boolean isNew = eqStates.add(pre);
+                        final boolean isNew = eqStates.add(pre);
                         if(isNew) stk.push(pre);
                     }
                 } else if(currEvent == event){
-                    for(int preState : preStates){
+                    for(final int preState : preStates){
                         if(preState == Integer.MAX_VALUE)
                             continue;
                         imdImg.add(preState);
-                    }                    
+                    }
                 }
             }
         }
         return imdImg;
     }
 
-    private TIntHashSet findImdPreImg(TIntHashSet states, int event){
-        TIntHashSet imdImg = new TIntHashSet();
-        for(TIntIterator itr = states.iterator();itr.hasNext();)
+    private TIntHashSet findImdPreImg(final TIntHashSet states, final int event){
+        final TIntHashSet imdImg = new TIntHashSet();
+        for(final TIntIterator itr = states.iterator();itr.hasNext();)
             imdImg.addAll(findImdPreImg(itr.next(), event).toArray());
 
         return imdImg;
     }
-                
-    private TIntHashSet phiTao(TIntHashSet b, int e) {
-        TIntHashSet imdImg = findImdPreImg(b, e);
-        TIntHashSet phiB = findEquivalentStates(imdImg, false);
+
+    private TIntHashSet phiTao(final TIntHashSet b, final int e) {
+        final TIntHashSet imdImg = findImdPreImg(b, e);
+        final TIntHashSet phiB = findEquivalentStates(imdImg, false);
         return phiB;
     }
 
-    private TIntHashSet phiTAOm(TIntHashSet b) {
-        TIntHashSet phiB = new TIntHashSet();
-        for(TIntIterator itr = b.iterator(); itr.hasNext();){
-            int st = itr.next();
-            int status = indexAutomata.getStateStatusTable()[indexAutomaton][st];
+    private TIntHashSet phiTAOm(final TIntHashSet b) {
+        final TIntHashSet phiB = new TIntHashSet();
+        for(final TIntIterator itr = b.iterator(); itr.hasNext();){
+            final int st = itr.next();
+            final int status = indexAutomata.getStateStatusTable()[indexAutomaton][st];
             if(ExtendedAutomataIndexFormHelper.isAccepting(status))
                 phiB.addAll(findEquivalentStates(st, false).toArray());
         }
         return phiB;
-    }    
+    }
 
-    private boolean split(int ndQuoState) {
+    private boolean split(final int ndQuoState) {
         boolean answer;
-        Partition ndQuoPartition = getPartition(ndQuoState);
-        TIntHashSet ndEvents = new TIntHashSet();
-        int[][] eventState = quotient[ndQuoState];
+        final Partition ndQuoPartition = getPartition(ndQuoState);
+        final TIntHashSet ndEvents = new TIntHashSet();
+        final int[][] eventState = quotient[ndQuoState];
         for(int i=0; i < eventState.length; i++){
-            int[] states = eventState[i];
+            final int[] states = eventState[i];
             if(states.length == 1)
                 continue;
             else if(states.length > 2)
                 ndEvents.add(i);
         }
-        
-        for(int ndEvent : ndEvents.toArray()){
+
+        for(final int ndEvent : ndEvents.toArray()){
             int[] nextQuoStates = quotient[ndQuoState][ndEvent];
             nextQuoStates = ExtendedAutomataIndexFormHelper.clearMaxInteger(nextQuoStates);
-            HashSet<Partition> nextPs = new HashSet<Partition>();
-            for(int nextQuoState : nextQuoStates){
-                Partition p = getPartition(nextQuoState);
+            final HashSet<Partition> nextPs = new HashSet<Partition>();
+            for(final int nextQuoState : nextQuoStates){
+                final Partition p = getPartition(nextQuoState);
                 nextPs.add(p);
             }
             answer = nopath(ndQuoPartition, ndEvent, nextPs);
@@ -514,35 +516,35 @@ public class AutomatonTransitionProjection {
         return true;
     }
 
-    private boolean nopath(Partition y, int ndEvent, HashSet<Partition> ys) {
-        HashMap<Partition, TIntHashSet> yMap = new HashMap<Partition, TIntHashSet>();
-        for(Partition p:ys)
+    private boolean nopath(final Partition y, final int ndEvent, final HashSet<Partition> ys) {
+        final HashMap<Partition, TIntHashSet> yMap = new HashMap<Partition, TIntHashSet>();
+        for(final Partition p:ys)
             yMap.put(p, new TIntHashSet());
 
-        for(int yNode : y.getCoset().toArray()){
-            int st = nextStateTable[yNode][ndEvent];
+        for(final int yNode : y.getCoset().toArray()){
+            final int st = nextStateTable[yNode][ndEvent];
 
             if(st == Integer.MAX_VALUE)
                 continue;
 
-            for(Partition p:yMap.keySet()){
-                TIntHashSet coset = p.getCoset();
+            for(final Partition p:yMap.keySet()){
+                final TIntHashSet coset = p.getCoset();
                 if(coset.contains(st)){
                     yMap.get(p).add(yNode);
                 }
             }
         }
-        
-        ArrayList<TIntHashSet> Es = new ArrayList<TIntHashSet>();
-        for(TIntHashSet value:yMap.values())
+
+        final ArrayList<TIntHashSet> Es = new ArrayList<TIntHashSet>();
+        for(final TIntHashSet value:yMap.values())
             Es.add(value);
-        
+
         TIntHashSet Ei, Ej;
         for(int i=0;i<Es.size();i++) {
             for(int j=i+1;j<Es.size();j++) {
                 Ei = findEquivalentStates(Es.get(i), true);
                 Ej = Es.get(j);
-                
+
                 if(!ExtendedAutomataIndexFormHelper.setIntersection(Ei, Ej).isEmpty())
                     return false;
                 Ei=Es.get(i);
@@ -553,13 +555,13 @@ public class AutomatonTransitionProjection {
         }
         return true;
     }
-    
-    private TIntHashSet getHiddenLocalEvents(Partition p) {
-        TIntHashSet hiddenEvents = new TIntHashSet();
-        for(int node : p.getCoset().toArray()){
+
+    private TIntHashSet getHiddenLocalEvents(final Partition p) {
+        final TIntHashSet hiddenEvents = new TIntHashSet();
+        for(final int node : p.getCoset().toArray()){
             int[] activeEvents = indexAutomata.getOutgoingEventsTable()[indexAutomaton][node];
             activeEvents = ExtendedAutomataIndexFormHelper.clearMaxInteger(activeEvents);
-            for(int event : activeEvents)
+            for(final int event : activeEvents)
                 if(currLocalEvents.contains(event) && indexAutomata.getEpsilonEventsTable()[event])
                     hiddenEvents.add(event);
         }
@@ -567,11 +569,11 @@ public class AutomatonTransitionProjection {
     }
 
     private TIntHashSet getNdStates() {
-        TIntHashSet ndStates = new TIntHashSet();
+        final TIntHashSet ndStates = new TIntHashSet();
         for(int i=0; i < quotient.length; i++){
-            int[][] events = quotient[i];
+            final int[][] events = quotient[i];
             for(int j=0; j < events.length; j++){
-                int[] states = events[j];
+                final int[] states = events[j];
                 if(states.length == 1)
                     continue;
                 else if(states.length > 2)
@@ -581,18 +583,18 @@ public class AutomatonTransitionProjection {
         return ndStates;
     }
 
-    private Partition getPartition(int state){
-        for(Partition p:ps)
+    private Partition getPartition(final int state){
+        for(final Partition p:ps)
             if(p.getState() == state)
                 return p;
         return null;
     }
-    
-    private String getStateName(TIntHashSet coset) {
+
+    private String getStateName(final TIntHashSet coset) {
         String s = "{";
-        for (TIntIterator it = coset.iterator(); it.hasNext();) {
-            int st = it.next();
-            NodeProxy loc = indexMap.getLocationAt(indexAutomaton, st);
+        for (final TIntIterator it = coset.iterator(); it.hasNext();) {
+            final int st = it.next();
+            final NodeProxy loc = indexMap.getLocationAt(indexAutomaton, st);
             if(it.hasNext())
                 s += loc.getName() + ",";
             else
@@ -601,24 +603,24 @@ public class AutomatonTransitionProjection {
         return s;
     }
 
-    private void addSharedEvent(int event){
+    private void addSharedEvent(final int event){
         currSharedEvents.add(event);
         currLocalEvents.remove(event);
     }
 
-    private void addLocalEvent(int event){
+    private void addLocalEvent(final int event){
         currLocalEvents.add(event);
         currSharedEvents.remove(event);
     }
 
-    private void addAllSharedEvent(TIntHashSet events){
+    private void addAllSharedEvent(final TIntHashSet events){
         currSharedEvents.addAll(events.toArray());
         currLocalEvents.removeAll(events.toArray());
     }
 
-    private int getQuotientState(int state, HashSet<Partition> ps) {
-        for(Partition p : ps){
-            for(int st : p.getCoset().toArray()){
+    private int getQuotientState(final int state, final HashSet<Partition> ps) {
+        for(final Partition p : ps){
+            for(final int st : p.getCoset().toArray()){
                 if(state == st){
                     return p.getState();
                 }
@@ -626,21 +628,21 @@ public class AutomatonTransitionProjection {
         }
         return Integer.MAX_VALUE;
     }
-    
+
     public HashSet<Integer> getSharedEvents(){
-        HashSet<Integer> shared = new HashSet<Integer>();
-        for(int e : currSharedEvents.toArray())
+        final HashSet<Integer> shared = new HashSet<Integer>();
+        for(final int e : currSharedEvents.toArray())
             shared.add(e);
         return shared;
     }
 
     public HashSet<Integer> getLocalEvents(){
-        HashSet<Integer> local = new HashSet<Integer>();
-        for(int e : currLocalEvents.toArray())
+        final HashSet<Integer> local = new HashSet<Integer>();
+        for(final int e : currLocalEvents.toArray())
             local.add(e);
         return local;
     }
-    
+
     class Partition{
         private TIntHashSet coset;
         private int state;
@@ -652,40 +654,40 @@ public class AutomatonTransitionProjection {
             status = Integer.MAX_VALUE;
         }
 
-        public Partition(TIntHashSet coset){
+        public Partition(final TIntHashSet coset){
             this.coset = coset;
             state = Integer.MAX_VALUE;
             status = Integer.MAX_VALUE;
         }
-        
+
         public TIntHashSet getCoset(){
             return coset;
         }
-        
-        public void setCoset(TIntHashSet coset){
+
+        public void setCoset(final TIntHashSet coset){
             this.coset = coset;
         }
-        
+
         public void clear(){
             this.coset.clear();
             this.state = Integer.MAX_VALUE;
             this.status = Integer.MAX_VALUE;
         }
-        
-        public void setState(int state, int status){
+
+        public void setState(final int state, final int status){
             this.state = state;
             this.status = status;
         }
-        
+
         public int getState(){
             return this.state;
         }
-        
+
         public int getStatus(){
             return this.status;
         }
-        
+
     }
 }
-    
-    
+
+

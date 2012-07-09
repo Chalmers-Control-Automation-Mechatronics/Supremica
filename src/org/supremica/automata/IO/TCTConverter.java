@@ -9,15 +9,16 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashSet;
+
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-import org.supremica.automata.ExtendedAutomata;
+
 import org.supremica.automata.ExtendedAutomaton;
 
 
 /**
- * TCTConverter class to import TCT binary files. 
- * 
+ * TCTConverter class to import TCT binary files.
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
@@ -29,16 +30,16 @@ public class TCTConverter {
     private HashSet<Integer[]> transitions;
     private HashSet<Integer> states;
     private final URI uri;
-    
-    public TCTConverter(URI uri){
+
+    public TCTConverter(final URI uri){
         this.uri = uri;
     }
-    
-    private void readDES(URL url) throws IOException{
+
+    private void readDES(final URL url) throws IOException{
         final InputStream stream = url.openStream();
-        DataInputStream reader = new DataInputStream(stream);
+        final DataInputStream reader = new DataInputStream(stream);
         byte[] b;
-        
+
         b = new byte[5];
         reader.read(b);
         String str = new String(b);
@@ -51,64 +52,64 @@ public class TCTConverter {
         } else {
             throw new IOException("The file is not compatible with TCT!\n");
         }
-            
+
         b = new byte[7];
         reader.read(b);
         str = new String(b);
         if(!str.trim().equals("Z8^0L;1"))
             throw new IOException("Wrong signature!\n");
-        
-        int endian = readLEInt(reader);
+
+        final int endian = readLEInt(reader);
         if(endian != 0xFF00AA55){
             throw new IOException("Wrong endian!\n");
         }
 
-        int[] block = new int[2];
+        final int[] block = new int[2];
 	block[0] = readLEInt(reader); //Read block type and size.
         block[1] = readLEInt(reader);
 	if(block[0]== 1)
             throw new IOException("Wrong block type!\n");
-        
-        int nbrStates = readLEInt(reader);
-        
+
+        final int nbrStates = readLEInt(reader);
+
 	if(readLEInt(reader) != 0)
             throw new IOException("Initial state not 0!\n");
-        
+
         markedStates = new HashSet<Integer>(nbrStates);
 	while(true)
-	{	
-            long markedState = readLEInt(reader);
-            if(markedState == -1L) 
+	{
+            final long markedState = readLEInt(reader);
+            if(markedState == -1L)
                 break;
             markedStates.add((int)markedState);
 	}
-        
+
 	//Read in the transitions
 	//Note: sizeof(long)=sizeof(int)=4,sizeof(short)=2,sizeof(char)=1.
-        
+
         alphabet = new HashSet<Integer>();
         transitions = new HashSet<Integer[]>();
-        states = new HashSet<Integer>(nbrStates); 
+        states = new HashSet<Integer>(nbrStates);
         Integer[] transition;
         int transNo = 0;
-        
+
 	while(true)
-	{	
-            long exit = readLEInt(reader); //The exit state of one transition
-            if(exit == -1L) 
+	{
+            final long exit = readLEInt(reader); //The exit state of one transition
+            if(exit == -1L)
                 break;
             states.add((int)exit);
-            short nt = readLEShort(reader);
+            final short nt = readLEShort(reader);
             transNo += nt;
 
             for(short j=0; j<nt; j++)
-            {	
-                int temp = readLEInt(reader);
-                int entrance = temp & 0x003fffff;
-                long event = (temp & 0xffffffffL) >> 22;
+            {
+                final int temp = readLEInt(reader);
+                final int entrance = temp & 0x003fffff;
+                final long event = (temp & 0xffffffffL) >> 22;
                 states.add(entrance);
                 alphabet.add((int)event); //Insert a new event.
-                
+
                 //Create a new transition and add it to the exit state.
                 transition = new Integer[3];
                 transition[0] = (int)exit;
@@ -117,53 +118,53 @@ public class TCTConverter {
                 transitions.add(transition);
             }
 	}
-        
+
         if(transNo != transitions.size())
             throw new IOException("Wrong number of transitions!/n");
- 
+
     }
-    
+
     public ExtendedAutomaton getExtendedAutomaton() throws IOException{
         readDES(uri.toURL());
-        String file = uri.toURL().getFile();
-        String name = file.substring(file.lastIndexOf('/')+1, file.lastIndexOf('.'));
-        ExtendedAutomaton des = new ExtendedAutomaton(name, ComponentKind.PLANT);
-        
-        for(Integer st : states){
-            String stName = Integer.toString(st);
-            boolean isInitial = (st == 0)?true:false;
-            boolean isMarked = markedStates.contains(st);
+        final String file = uri.toURL().getFile();
+        final String name = file.substring(file.lastIndexOf('/')+1, file.lastIndexOf('.'));
+        final ExtendedAutomaton des = new ExtendedAutomaton(name, ComponentKind.PLANT);
+
+        for(final Integer st : states){
+            final String stName = Integer.toString(st);
+            final boolean isInitial = (st == 0)?true:false;
+            final boolean isMarked = markedStates.contains(st);
             des.addState(stName, isMarked, isInitial, false);
         }
-        
+
         EventKind kind;
         boolean isObservable;
-        for(Integer e : alphabet){
+        for(final Integer e : alphabet){
             isObservable = (e == 1000)?false:true;
             if(!isObservable)
                 kind = EventKind.CONTROLLABLE;
-            else 
+            else
                 kind = (e%2 != 0)?EventKind.CONTROLLABLE:EventKind.UNCONTROLLABLE;
-            
+
             des.addEvent(Integer.toString(e), kind.value(), isObservable);
         }
-        
-        for(Integer[] tran : transitions){
+
+        for(final Integer[] tran : transitions){
             des.addTransition(Integer.toString(tran[0]), Integer.toString(tran[2]), Integer.toString(tran[1]), null, null);
         }
         return des;
     }
-    
-    private int readLEInt(DataInputStream reader) throws IOException{
-        byte[] b = new byte[4];
+
+    private int readLEInt(final DataInputStream reader) throws IOException{
+        final byte[] b = new byte[4];
         reader.read(b);
         return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
-    
-    private short readLEShort(DataInputStream reader) throws IOException{
-        byte[] b = new byte[2];
+
+    private short readLEShort(final DataInputStream reader) throws IOException{
+        final byte[] b = new byte[2];
         reader.read(b);
         return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getShort();
     }
-    
+
 }
