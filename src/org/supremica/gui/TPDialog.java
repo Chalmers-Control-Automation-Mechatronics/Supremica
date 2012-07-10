@@ -26,7 +26,7 @@ public class TPDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         if(!isSelectionEmpty){
-            jRadioButtonSelectedEFAs.setSelected(true);
+            jRadioButtonAllEFAs.setSelected(true);
         } else {
             jRadioButtonAllEFAs.setSelected(true);
             jRadioButtonSelectedEFAs.setEnabled(false);
@@ -41,16 +41,27 @@ public class TPDialog extends javax.swing.JDialog {
 
     @Override
     protected JRootPane createRootPane() {
-        ActionListener actionListener = new ActionListener() { 
+        ActionListener actionListenerEscape = new ActionListener() { 
                 public void actionPerformed(ActionEvent actionEvent) { 
                     projectNow = false;
                     setVisible(false);
                 } 
             }; 
+        ActionListener actionListenerEnter = new ActionListener() { 
+                public void actionPerformed(ActionEvent actionEvent) { 
+                    projectNow = true;
+                    setVisible(false);
+                } 
+            }; 
+        
         JRootPane theRootPane = new JRootPane(); 
-        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0); 
-        theRootPane.registerKeyboardAction(actionListener, stroke, 
+        KeyStroke strokeEscape = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0); 
+        KeyStroke strokeEnter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0); 
+        theRootPane.registerKeyboardAction(actionListenerEscape, strokeEscape, 
         JComponent.WHEN_IN_FOCUSED_WINDOW); 
+        theRootPane.registerKeyboardAction(actionListenerEnter, strokeEnter, 
+        JComponent.WHEN_IN_FOCUSED_WINDOW); 
+        
         return theRootPane;         
     }
     

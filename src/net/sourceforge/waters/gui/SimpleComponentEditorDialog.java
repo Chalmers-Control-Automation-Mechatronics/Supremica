@@ -442,7 +442,7 @@ public class SimpleComponentEditorDialog
   private static final GraphSubject GRAPH_TEMPLATE = new GraphSubject();
   private static final SimpleComponentSubject COMPONENT_TEMPLATE =
     new SimpleComponentSubject(new SimpleIdentifierSubject(""),
-                               ComponentKind.SPEC,
+                               ComponentKind.PLANT,
                                GRAPH_TEMPLATE);
   private static final Transferable TRANSFERABLE =
     WatersDataFlavor.createTransferable(COMPONENT_TEMPLATE);

@@ -429,7 +429,7 @@ public class ExtendedAutomaton
         return  locationToOutgoingEdgesMap.get(location);
     }
 
-    public  ArrayList<EdgeSubject> getIngoingEdges(NodeProxy location)
+    public  ArrayList<EdgeSubject> getIncommingEdges(NodeProxy location)
     {
         return  locationToIngoingEdgesMap.get(location);
     }
@@ -454,6 +454,11 @@ public class ExtendedAutomaton
         return eventIdToProxyMap.get(name);
     }
     
+    public EventDeclProxy getEvent(final Proxy event)
+    {
+        return eventIdToProxyMap.get(((SimpleIdentifierSubject)event).getName());
+    }
+
     public int nbrOfNodes()
     {
         return nodes.size();
@@ -753,6 +758,29 @@ public class ExtendedAutomaton
         return allActions;
     }
     
+    /**
+     * Check if the current EFA is nondeterministic
+     * @return The corresponding <code>NondeterministicEFAException</code> 
+     * or <code>Null</code> if it is deterministic.
+     */
+    public NondeterministicEFAException isNondeterministic(){
+        if(initialLocations.size() > 1)
+            return new NondeterministicEFAException(this);
+        
+        for(NodeProxy node : locationToIngoingEdgesMap.keySet()){
+            HashSet<EventDeclProxy> events = new HashSet<EventDeclProxy>();
+            for(EdgeSubject tran : locationToIngoingEdgesMap.get(node)){
+                for(Proxy event : tran.getLabelBlock().getEventList()){
+                    EventDeclProxy e = getEvent(event);
+                    boolean added = events.add(e);
+                    if(!added)
+                        return new NondeterministicEFAException(this, node, e);
+                }
+            }
+        }
+        return null;
+    }
+    
     @Override
     public ExtendedAutomaton clone(){
         return new ExtendedAutomaton(automata, component.clone());
@@ -776,7 +804,7 @@ public class ExtendedAutomaton
         return result;
     }
     
-    public static Collection<? extends Proxy> setDifference(Collection<? extends Proxy> x, Collection<? extends Proxy> y){
+    public static Collection<? extends Proxy> setMinus(Collection<? extends Proxy> x, Collection<? extends Proxy> y){
         Collection<Proxy> result = new HashSet<Proxy>();
         for (Proxy n:x)
             if(!y.contains(n))

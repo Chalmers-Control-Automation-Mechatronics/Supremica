@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="Supremica-IDE">
+    <import file="../build.xml"/>
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#debugj2se) -->
+    <target name="debug-nb">
+        <nbjpdastart addressproperty="jpda.address" name="Supremica" transport="dt_socket">
+            <classpath>
+                <pathelement location="build"/>
+                <pathelement location="lib/unjared"/>
+                <pathelement location="images"/>
+                <pathelement location="examples"/>
+                <pathelement path="${java.class.path}"/>
+            </classpath>
+        </nbjpdastart>
+        <java classname="${supremica_basepackage}.gui.ide.IDE" fork="yes">
+            <arg value="-p"/>
+            <arg value="dist/SupremicaProperties.cfg"/>
+            <classpath>
+                <pathelement location="build"/>
+                <pathelement location="lib/unjared"/>
+                <pathelement location="images"/>
+                <pathelement location="examples"/>
+                <pathelement path="${java.class.path}"/>
+            </classpath>
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx1024M"/>
+            <jvmarg value="-Djava.library.path=${dist}"/>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+        </java>
+    </target>
+</project>

@@ -10,10 +10,13 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
+import org.supremica.automata.NondeterministicEFAException;
 import org.supremica.automata.algorithms.TransitionProjection.AutomataTransitionProjection;
 import org.supremica.automata.algorithms.TransitionProjection.TPDialogOption;
 import org.supremica.gui.TPDialog;
@@ -55,10 +58,13 @@ public class EditorTransitionProjectionAction
     public void doAction() {        
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();        
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
-
+        HashSet<EventDeclProxy> uniAlphabet = new HashSet<EventDeclProxy>();
+        for(ExtendedAutomaton efa:exAutomata)
+            uniAlphabet.addAll(efa.getAlphabet());
+        
         final int nbrOfComponents = module.getComponentList().size();
         if(nbrOfComponents == 0){
-            logger.error("There is no model in the editor. Please create or open one and then run again");
+            logger.error("There is no component in the editor. Please create or open one and then run it again");
             return;
         }        
         
@@ -132,21 +138,25 @@ public class EditorTransitionProjectionAction
             HashSet<String> projectedEFAs = new HashSet<String>();
             for(String efa : components){
                 ExtendedAutomaton oriEFA = exAutomata.getExtendedAutomaton(efa);
-                nbrOriNodes += oriEFA.getNodes().size();
-                nbrOriTrans += oriEFA.getTransitions().size();
-                
-                ExtendedAutomaton prjEFA = TP.projectEFA(efa);
-                if(prjEFA == null){
-                    logger.error("EFA '"+ efa + "' has transitions with the same event but diffrent actions. It will be not project.");
+                if(oriEFA.isNondeterministic() != null){
+                    logger.error("EFA '" + efa +"' is nondeterministic and therefore, is skipped!");
                     continue;
                 }
+                
+                nbrOriNodes += oriEFA.getNodes().size();
+                nbrOriTrans += oriEFA.getTransitions().size();
+
+                ExtendedAutomaton prjEFA = TP.projectEFA(efa);
+                
+                if(prjEFA.getAlphabet().size() == oriEFA.getAlphabet().size() 
+                        && prjEFA.getNodes().size() == oriEFA.getNodes().size()){
+                   continue;
+                }
+                
                 projectedEFAs.add(efa);
-                if(dialog.showResult())
-                    logger.info("Projecting " + efa + " ...");
-                
                 
                 if(dialog.showResult())
-                    logger.info("Projection finish in " + TP.getTimer());
+                    logger.info("Projecting <" + efa + "> finished in " + TP.getTimer());
                 
                 String name = oriEFA.getName();
                 if(dialog.getNamingOption() == TPDialogOption.SUFFIXNAME_SELECTED)
@@ -167,17 +177,22 @@ public class EditorTransitionProjectionAction
                     exAutomata.getModule().getComponentListModifiable().remove(efa.getComponent());
                 }
             }
-                
+            if(!prjs.isEmpty()){    
             for(ExtendedAutomaton efa : prjs)
                 exAutomata.addAutomaton(efa);
+            } else {
+                logger.info("There are no local events to project so no EFA has been projected");
+                return;
+            }
+            
             
             if(dialog.showResult()){
-                HashSet<EventDeclProxy> events = new HashSet<EventDeclProxy>();
+                HashSet<EventDeclProxy> uniPrjAlphabet = new HashSet<EventDeclProxy>();
                 for(ExtendedAutomaton efa : prjs)
-                    events.addAll(efa.getAlphabet());
+                    uniPrjAlphabet.addAll(efa.getAlphabet());
                 
                 @SuppressWarnings("unchecked")
-                HashSet<EventDeclProxy> locEvents = (HashSet<EventDeclProxy>) ExtendedAutomaton.setDifference(exAutomata.getUnionAlphabet(), events);
+                HashSet<EventDeclProxy> locEvents = (HashSet<EventDeclProxy>) ExtendedAutomaton.setMinus(uniAlphabet, uniPrjAlphabet);
                 String l = "{";
                 for (Iterator<EventDeclProxy> it = locEvents.iterator(); it.hasNext();) {
                     EventDeclProxy e = it.next();
@@ -192,9 +207,9 @@ public class EditorTransitionProjectionAction
                         + "\n Projection Result"
                         + "\n -----------------------"
                         + "\n Nbr original nodes: " + nbrOriNodes 
-                        + "\n Nbr original transitions: " + nbrOriTrans
+//                        + "\n Nbr original transitions: " + nbrOriTrans
                         + "\n Nbr TP nodes: " + nbrPrjNodes 
-                        + "\n Nbr TP transitions: " + nbrPrjTrans
+//                        + "\n Nbr TP transitions: " + nbrPrjTrans
                         + "\n Local events: " + l
                         + "\n Total computation time: " + elapsed/1000F + " seconds");                
             }

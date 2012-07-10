@@ -322,7 +322,7 @@ public class ExtendedAutomataIndexFormHelper {
         return result;
     }
     
-    public static TIntHashSet setDifference(TIntHashSet x, TIntHashSet y){
+    public static TIntHashSet setMinus(TIntHashSet x, TIntHashSet y){
         if(x == null || x.isEmpty())
             return new TIntHashSet();
         else if(y == null || y.isEmpty())
