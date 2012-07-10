@@ -8,44 +8,45 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.util.Args;
 
 /**
- * ExtendedAutomataIndexFormHelper is the class to help using ExtendedAutomataIndexForm. This class is an adopted version of 
+ * ExtendedAutomataIndexFormHelper is the class to help using ExtendedAutomataIndexForm. This class is an adopted version of
  * AutomataIndexFormHelper to support Extended Finite Automata.
- * 
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
  */
 public class ExtendedAutomataIndexFormHelper {
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.createLogger(ExtendedAutomataIndexFormHelper.class);
     public static final int STATE_EXTRA_DATA = 2;
     public static final int STATE_STATUS_FROM_END = 1;
     public static final int STATE_PREVSTATE_FROM_END = 2;
     public static final int STATE_NO_PREVSTATE = -1;
-    
+
     /**
      * Allocate a new state + extra data fields
      */
     public static int[] createState(final int nbrOfAutomata)
     {
         final int[] newState = new int[nbrOfAutomata + STATE_EXTRA_DATA];
-        
+
         newState[nbrOfAutomata + STATE_EXTRA_DATA - STATE_PREVSTATE_FROM_END] = STATE_NO_PREVSTATE;
-        
+
         return newState;
     }
-    
+
     /**
      * Create a copy of an existing state
      */
     public static int[] createCopyOfState(final int[] state)
     {
         final int[] newState = new int[state.length];
-        
+
         System.arraycopy(state, 0, newState, 0, state.length);
-        
+
         return newState;
     }
-    
+
     /**
      * Set the previous state index of an existing state
      */
@@ -53,7 +54,7 @@ public class ExtendedAutomataIndexFormHelper {
     {
         state[state.length - STATE_PREVSTATE_FROM_END] = stateIndex;
     }
-    
+
     /**
      * Get the previous state index
      */
@@ -61,7 +62,7 @@ public class ExtendedAutomataIndexFormHelper {
     {
         return state[state.length - STATE_PREVSTATE_FROM_END];
     }
-    
+
     /**
      * bit
      * 0: initial
@@ -75,80 +76,80 @@ public class ExtendedAutomataIndexFormHelper {
     public static int createStatus(final boolean isInitial, final boolean isAccepted, final boolean isForbidden)
     {
         int status = 0;
-        
+
         if (isInitial)
         {
             status |= 1;
         }
-        
+
         if (isAccepted)
         {
             status |= (1 << 1);
         }
-        
+
         if (isForbidden)
         {
             status |= (1 << 2);
         }
-        
+
 //        if (state.isFirst())
 //        {
 //            status |= (1 << 3);
 //        }
-//        
+//
 //        if (state.isLast())
 //        {
 //            status |= (1 << 4);
 //        }
-        
+
         return status;
     }
-    
+
     public static boolean isInitial(final int status)
     {
         return (status & 1) == 1;
     }
-    
+
     public static boolean isAccepting(final int status)
     {
         return ((status >> 1) & 1) == 1;
     }
-    
+
     public static boolean isForbidden(final int status)
     {
         return ((status >> 2) & 1) == 1;
     }
-    
+
 //    public static boolean isFirst(int status)
 //    {
 //        return ((status >> 3) & 1) == 1;
 //    }
-//    
+//
 //    public static boolean isLast(int status)
 //    {
 //        return ((status >> 4) & 1) == 1;
 //    }
-//    
+//
 //    public static boolean isDeadlocked(int status)
 //    {
 //        return ((status >> 6) & 1) == 1;
 //    }
-//    
+//
 //    public static boolean hasInitial(int[] state)
 //    {
 //        return isInitial(state[state.length - STATE_STATUS_FROM_END]);
 //    }
-//    
+//
 //    public static boolean hasAccepting(int[] state)
 //    {
 //        return isAccepting(state[state.length - STATE_STATUS_FROM_END]);
 //    }
-//    
+//
 //    public static boolean hasForbidden(int[] state)
 //    {
 //        return isForbidden(state[state.length - STATE_STATUS_FROM_END]);
 //    }
-    
+
     public static boolean hasValue(final int[] list, final int value){
         for(final int v : list) {
             if(v == value) {
@@ -161,17 +162,17 @@ public class ExtendedAutomataIndexFormHelper {
 //    {
 //        return isFirst(state[state.length - STATE_STATUS_FROM_END]);
 //    }
-//    
+//
 //    public static boolean isLast(int[] state)
 //    {
 //        return isLast(state[state.length - STATE_STATUS_FROM_END]);
 //    }
-//    
+//
 //    public static boolean isDeadlocked(int[] state)
 //    {
 //        return isDeadlocked(state[state.length - STATE_STATUS_FROM_END]);
 //    }
-    
+
     /**
      * Build a state from a string.
      * The string must be of the form
@@ -181,53 +182,53 @@ public class ExtendedAutomataIndexFormHelper {
     {
         final String trimmedString = stringState.trim();
         final int indexOfLeft = trimmedString.indexOf('[');
-        
+
         if (indexOfLeft == -1)
         {
             return null;
         }
-        
+
         final int indexOfRight = trimmedString.indexOf(']');
-        
+
         if (indexOfRight == -1)
         {
             return null;
         }
-        
+
         if (!(indexOfLeft < indexOfRight))
         {
             return null;
         }
-        
+
         final StringTokenizer st = new StringTokenizer(trimmedString.substring(indexOfLeft + 1, indexOfRight));
         final int nbrOfTokens = st.countTokens();
-        
+
         if (nbrOfTokens < 1)
         {
             return null;
         }
-        
+
         final int[] newState = new int[nbrOfTokens];
         int i = 0;
-        
+
         while (st.hasMoreTokens())
         {
             final String currToken = st.nextToken();
-            
+
             try
             {
                 final int tmpInt = Integer.parseInt(currToken);
-                
+
                 newState[i++] = tmpInt;
             }
-            catch (NumberFormatException ex)
+            catch (final NumberFormatException ex)
             {
-                
+
                 // logger.debug(ex.getStackTrace());
                 return null;
             }
         }
-        
+
         if (i == nbrOfTokens)
         {
             return newState;
@@ -237,31 +238,31 @@ public class ExtendedAutomataIndexFormHelper {
             return null;
         }
     }
-    
+
     public static String dumpState(final int[] state)
     {
         if (state == null)
         {
             return "[null]";
         }
-        
+
         final StringBuilder sb = new StringBuilder("[");
-        
+
         for (int i = 0; i < state.length; i++)
         {
             sb.append(state[i]);
-            
+
             if (i != (state.length - 1))
             {
                 sb.append(" ");
             }
         }
-        
+
         sb.append("]");
-        
+
         return sb.toString();
     }
-    
+
     public static TIntHashSet toIntHashSet(final int[] array){
         Args.checkForNull(array);
         final TIntHashSet list = new TIntHashSet();
@@ -272,7 +273,7 @@ public class ExtendedAutomataIndexFormHelper {
         }
         return list;
     }
-    
+
     public static TIntHashSet getTrueIndexes(final boolean[] array){
         Args.checkForNull(array);
         final TIntHashSet trues = new TIntHashSet();
@@ -283,7 +284,7 @@ public class ExtendedAutomataIndexFormHelper {
         }
         return trues;
     }
-    
+
     public static TIntHashSet getFalseIndexes(final boolean[] array){
         Args.checkForNull(array);
         final TIntHashSet falses = new TIntHashSet();
@@ -294,7 +295,7 @@ public class ExtendedAutomataIndexFormHelper {
         }
         return falses;
     }
-    
+
     public static int[] clearMaxInteger(final int[] array){
         Args.checkForNull(array);
         int[] temp = null;
@@ -313,7 +314,7 @@ public class ExtendedAutomataIndexFormHelper {
         }
         return temp;
     }
-    
+
    public static TIntHashSet setUnion(final TIntHashSet x, final TIntHashSet y){
         Args.checkForNull(x);
         Args.checkForNull(y);
@@ -321,18 +322,18 @@ public class ExtendedAutomataIndexFormHelper {
         result.addAll(x.toArray());
         result.addAll(y.toArray());
         return result;
-    }  
-    
+    }
+
     public static TIntHashSet setIntersection(final TIntHashSet x, final TIntHashSet y){
         if(x==null || y==null || x.isEmpty() || y.isEmpty()) {
             return new TIntHashSet();
         }
-        
+
         final TIntHashSet result = new TIntHashSet(x.toArray());
         result.retainAll(y.toArray());
         return result;
     }
-    
+
     public static TIntHashSet setMinus(final TIntHashSet x, final TIntHashSet y){
         if(x == null || x.isEmpty()) {
             return new TIntHashSet();
@@ -340,7 +341,7 @@ public class ExtendedAutomataIndexFormHelper {
         else if(y == null || y.isEmpty()) {
             return new TIntHashSet(x.toArray());
         }
-        
+
         final TIntHashSet result = new TIntHashSet();
         for (final int n : x.toArray()) {
             if(!y.contains(n)) {
@@ -348,7 +349,7 @@ public class ExtendedAutomataIndexFormHelper {
             }
         }
         return result;
-    }      
+    }
 
     public static int[] addToBeginningOfArray(final int value, final int[] array){
         if(array == null){

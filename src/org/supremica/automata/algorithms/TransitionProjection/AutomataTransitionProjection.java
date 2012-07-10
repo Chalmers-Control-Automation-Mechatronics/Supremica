@@ -17,20 +17,21 @@ import org.supremica.util.Args;
 
 /**
  * AutomataTransitionProjection class is the implementation of my Transition Projection abstraction method.
- * To reduce the computation complexity, the controller is synthesized on the model abstraction 
- * of subsystems and the global model of the entire system is unnecessary. Sufficient conditions 
- * such as E-observer and OCC are checked to guarantee the supervisor result in maximally permissive and 
+ * To reduce the computation complexity, the controller is synthesized on the model abstraction
+ * of subsystems and the global model of the entire system is unnecessary. Sufficient conditions
+ * such as E-observer and OCC are checked to guarantee the supervisor result in maximally permissive and
  * nonblocking control to the entire system.
  * For more elaboration on this method see http://publications.lib.chalmers.se/cpl/record/index.xsql?pubid=155706
- * 
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
  */
 
 public class AutomataTransitionProjection {
-    
-    private final Logger logger = LoggerFactory.createLogger(AutomataTransitionProjection.class);        
+
+    @SuppressWarnings("unused")
+    private final Logger logger = LoggerFactory.createLogger(AutomataTransitionProjection.class);
     private final ExtendedAutomata exAutomata;
     private final ActionTimer TPTimer;
     private final ExtendedAutomataIndexForm indexAutomata;
@@ -40,7 +41,7 @@ public class AutomataTransitionProjection {
     private final int nbrAutomaton;
     private final TIntHashSet unionAlphabet;
     private final TIntHashSet epsilon;
-    
+
     /**
      * The constructor of the class.
      * @param automatic <code>true</code>: Automatic event selection <code>false</code>: Manual selection
@@ -49,7 +50,7 @@ public class AutomataTransitionProjection {
     public AutomataTransitionProjection(final ExtendedAutomata exAutomata, final boolean automatic){
         Args.checkForNull(automatic);
         this.exAutomata = exAutomata;
-        TPTimer = new ActionTimer();     
+        TPTimer = new ActionTimer();
         indexAutomata = new ExtendedAutomataIndexForm(exAutomata);
         indexMap = indexAutomata.getAutomataIndexMap();
         nbrAutomaton = exAutomata.size();
@@ -58,7 +59,7 @@ public class AutomataTransitionProjection {
         for(int event = 0; event < indexAutomata.getNbrUnionEvents(); event++) {
             unionAlphabet.add(event);
         }
-        
+
         if(automatic){
             localEvents = getLocalEventSet(exAutomata);
             sharedEvents = ExtendedAutomataIndexFormHelper.setMinus(unionAlphabet, localEvents);
@@ -67,7 +68,7 @@ public class AutomataTransitionProjection {
             sharedEvents = new TIntHashSet();
         }
     }
-    
+
     /**
      * Returns the projected EFA
      * @param name The name of EFA to be projected
@@ -86,7 +87,7 @@ public class AutomataTransitionProjection {
         TPTimer.stop();
         return prjEFA;
     }
-    
+
     /**
      * Automatically calculates the set of local events in which each event:
      * <ul>
@@ -95,15 +96,15 @@ public class AutomataTransitionProjection {
      * <li>Execution of any action on transitions labeled by this event has no effect on any guards evaluation.</li>
      * </ul>
      * Note that if an event is unobservable it is automatically local.
-     * 
+     *
      * @param exAutomata The Extended Automata
      * @return Set of local events
      */
     private TIntHashSet getLocalEventSet(final ExtendedAutomata exAutomata){
-        final TIntHashSet locEvents = new TIntHashSet();       
+        final TIntHashSet locEvents = new TIntHashSet();
         final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
         final boolean[][] alphabetTable = indexAutomata.getAlphabetEventsTable();
-        
+
         // Make a string of all guards
         String strAllGuards = "";
         for(final int[][] gss : indexAutomata.getEventGuardTable()){
@@ -118,7 +119,7 @@ public class AutomataTransitionProjection {
                 }
             }
         }
-            
+
         TIntHashSet temp, sigmai, sigmaj;
         for(int currAutomaton=0; currAutomaton < nbrAutomaton; currAutomaton++){
             temp = new TIntHashSet();
@@ -140,7 +141,7 @@ public class AutomataTransitionProjection {
                 temp.addAll(ExtendedAutomataIndexFormHelper.getTrueIndexes(alphabetTable[currAutomaton]).toArray());
             }
             // Checking the local events conditions based on my paper (for EFAs)
-            if(indexMap.hasAnyGuard(currAutomaton) || indexMap.hasAnyAction(currAutomaton)){    
+            if(indexMap.hasAnyGuard(currAutomaton) || indexMap.hasAnyAction(currAutomaton)){
                 outerloop:
                 for(final int currEvent : temp.toArray()){
                     final int[] guards = indexAutomata.getEventGuardTable()[currAutomaton][currEvent];
@@ -160,7 +161,7 @@ public class AutomataTransitionProjection {
                     for(final int action : actions){
                         final BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(action);
                         final Set<VariableComponentProxy> actionRightVars = exAutomata.extractVariablesFromExpr(actionExp.getRight());
-                        // If the action is in the form of, e.g., x += 1, x-=1, or x = y + 1 the it is not local  
+                        // If the action is in the form of, e.g., x += 1, x-=1, or x = y + 1 the it is not local
                         if(actionExp.getOperator().equals(cot.getIncrementOperator()) || actionExp.getOperator().equals(cot.getDecrementOperator()) || !actionRightVars.isEmpty()){
                             continue outerloop;
                         }
@@ -206,23 +207,23 @@ public class AutomataTransitionProjection {
     }
 
     /**
-     * Setting the set of local events. This will overwrite the current set of local events 
+     * Setting the set of local events. This will overwrite the current set of local events
      * @param locEvents Set of local events
      */
     public void setLocalEvents(final HashSet<EventDeclProxy> locEvents) {
         for(final EventDeclProxy event : locEvents) {
             localEvents.add(indexMap.getEventIndex(event));
         }
-        
+
         sharedEvents.addAll(ExtendedAutomataIndexFormHelper.setMinus(unionAlphabet, localEvents).toArray());
     }
-    
+
     public ExtendedAutomataIndexForm getIndexForm(){
         return indexAutomata;
     }
-    
+
     public ExtendedAutomataIndexMap getIndexMap(){
         return indexMap;
     }
-    
+
 }

@@ -27,6 +27,7 @@ import org.supremica.log.LoggerFactory;
  */
 public class AutomatonTransitionProjection {
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.createLogger(AutomatonTransitionProjection.class);
     private final ExtendedAutomataIndexForm indexAutomata;
     private final int indexAutomaton;
@@ -36,8 +37,8 @@ public class AutomatonTransitionProjection {
     private final int MARK_EVENT = Short.MAX_VALUE;
     private final int[][] nextStateTable;
     private final TIntHashSet currEplsilon;
-    private TIntHashSet currLocalEvents;
-    private TIntHashSet currSharedEvents;
+    private final TIntHashSet currLocalEvents;
+    private final TIntHashSet currSharedEvents;
     private HashSet<Partition> ps;
     // <state> x <event> -> <state[]>
     private int[][][] quotient;
@@ -123,7 +124,7 @@ public class AutomatonTransitionProjection {
                                     }
                                 }
                             }
-                        } catch(Exception exc){}
+                        } catch(final Exception exc){}
                         try{
                             final int[] currActions = indexAutomata.getActionStateEventTable()[indexAutomaton][stFrom][event];
                             if(currActions.length > 1){
@@ -141,7 +142,7 @@ public class AutomatonTransitionProjection {
                                     }
                                 }
                             }
-                        } catch(Exception exc){}
+                        } catch(final Exception exc){}
                     }
                 }
                 prjEFA.addTransition(currSource.getName(), currTarget.getName(), currEvent.getName(), guard, action);
@@ -524,7 +525,7 @@ public class AutomatonTransitionProjection {
      */
     private TIntHashSet findEquivalentStates(final TIntHashSet states, final boolean downstream){
         final TIntHashSet eqStates = new TIntHashSet();
-        for(TIntIterator itr = states.iterator();itr.hasNext();){
+        for(final TIntIterator itr = states.iterator();itr.hasNext();){
             final TIntHashSet eqsts = findEquivalentStates(itr.next(), downstream);
             eqStates.addAll(eqsts.toArray());
         }
@@ -569,7 +570,7 @@ public class AutomatonTransitionProjection {
 
     private TIntHashSet findImdPreImg(final TIntHashSet states, final int event){
         final TIntHashSet imdImg = new TIntHashSet();
-        for(TIntIterator itr = states.iterator();itr.hasNext();) {
+        for(final TIntIterator itr = states.iterator();itr.hasNext();) {
             imdImg.addAll(findImdPreImg(itr.next(), event).toArray());
         }
 
@@ -584,7 +585,7 @@ public class AutomatonTransitionProjection {
 
     private TIntHashSet phiTAOm(final TIntHashSet b) {
         final TIntHashSet phiB = new TIntHashSet();
-        for(TIntIterator itr = b.iterator(); itr.hasNext();){
+        for(final TIntIterator itr = b.iterator(); itr.hasNext();){
             final int st = itr.next();
             final int status = indexAutomata.getStateStatusTable()[indexAutomaton][st];
             if(ExtendedAutomataIndexFormHelper.isAccepting(status)) {
@@ -859,7 +860,7 @@ public class AutomatonTransitionProjection {
 
     private String getStateName(final TIntHashSet coset) {
         String str = "{";
-        for (TIntIterator it = coset.iterator(); it.hasNext();) {
+        for (final TIntIterator it = coset.iterator(); it.hasNext();) {
             final int st = it.next();
             final NodeProxy loc = indexMap.getLocationAt(indexAutomaton, st);
             if(it.hasNext()) {
