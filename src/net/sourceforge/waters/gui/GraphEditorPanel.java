@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -317,6 +318,10 @@ public class GraphEditorPanel
     //TODO
     if (mSelection.size() == 1) {
       return getCurrentSelection().iterator().next();
+    } else if(mSelection.size() > 1){ //used for range selection
+      final Iterator<ProxySubject> iter = getCurrentSelection().iterator();
+      iter.next(); //LabelBlock
+      return iter.next();
     } else {
       return null;
     }
@@ -1042,7 +1047,7 @@ public class GraphEditorPanel
   {
     if (mSelection.size() != 1 || !isSelected(item)) {
       mSelection.clear();
-      mSelection.add(item);
+      mSelection.add(item, true);
       fireSelectionChanged();
     }
   }
@@ -1058,7 +1063,7 @@ public class GraphEditorPanel
    */
   private void addToSelection(final ProxySubject item)
   {
-    if(mSelection.add(item)){
+    if(mSelection.add(item, true)){
       fireSelectionChanged();
     }
   }
@@ -1711,7 +1716,9 @@ public class GraphEditorPanel
                   removeFromSelection(list);
               }
             }
-
+            else{
+              replaceSelection(item);
+            }
           } else {
             if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
               replaceSelection(item);
@@ -1732,53 +1739,159 @@ public class GraphEditorPanel
       return list;
     }
 
-    private void onlyWhenInFocus(final MouseEvent event){
-      if(mIsPermanentFocusOwner){
+    private void addToSelectionWithoutChildren(final ProxySubject item)
+    {
+      if(mSelection.add(item, false)){
+        fireSelectionChanged();
+      }
+    }
+
+    private boolean iterate(final ListSubject<AbstractSubject> listSubject,
+                         final ModuleEqualityVisitor eq,
+                         final ProxySubject item,
+                         final int index){
+      for (int i = index; i < listSubject.size(); i++) {
+        final ProxySubject child = listSubject.get(i);
+        addToSelectionWithoutChildren(child);
+        if(eq.equals(item, child) && eq.equals(
+          (Proxy)item.getParent().getParent(),
+          (Proxy)child.getParent().getParent())){
+          return true;
+        }
+        if(child instanceof ForeachSubject){
+          final ForeachSubject foreach  = (ForeachSubject)child;
+          if(iterate(foreach.getBodyModifiable(), eq, item, 0)){
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    private void addRangeToSelection(final ProxySubject item){
+      final ProxySubject anchor = getSelectionAnchor();
+      clearSelection();
+      addToSelectionWithoutChildren(anchor);
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ProxyShape anchorShape = getShapeProducer().getShape(anchor);
+      final int anchorPoint = (int)anchorShape.getShape().getBounds().getY();
+      final ProxyShape endShape = getShapeProducer().getShape(item);
+      final int endPoint = (int)endShape.getShape().getBounds().getY();
+      if(anchorPoint < endPoint){
+        //down
+        boolean found = false;
+        if(anchor instanceof ForeachSubject){
+          final ForeachSubject foreach = (ForeachSubject) anchor;
+          found = iterate(foreach.getBodyModifiable(), eq, item, 0);
+          if(found){
+            return;
+          }
+        }
+        ProxySubject current = anchor;
+        while (!found) {
+          final ProxySubject parent =
+            (ProxySubject) current.getParent().getParent();
+          if (parent instanceof ForeachSubject) {
+            final ForeachSubject foreach = (ForeachSubject) parent;
+            found =
+              iterate(foreach.getBodyModifiable(), eq, item, foreach
+                .getBodyModifiable().indexOf(current) + 1);
+          } else if (parent instanceof LabelBlockSubject) {
+            final LabelBlockSubject block = (LabelBlockSubject) parent;
+            found =
+              iterate(block.getEventListModifiable(), eq, item, block
+                .getEventListModifiable().indexOf(current) + 1);
+          }
+          current = parent;
+        }
+
+      }
+      else{
+        //up
+        boolean found = false;
+        ProxySubject current = item;
+        boolean first = true;
+        while (!found) {
+          final ProxySubject parent =
+            (ProxySubject) current.getParent().getParent();
+          if (parent instanceof ForeachSubject) {
+            final ForeachSubject foreach = (ForeachSubject) parent;
+             final int index = first ? foreach.getBodyModifiable().indexOf(current) :
+               foreach.getBodyModifiable().indexOf(current) + 1;
+             first = false;
+            found =
+              iterate(foreach.getBodyModifiable(), eq, anchor, index);
+          } else if (parent instanceof LabelBlockSubject) {
+            final LabelBlockSubject block = (LabelBlockSubject) parent;
+            final int index = first ? block.getEventListModifiable().indexOf(current) :
+              block.getEventListModifiable().indexOf(current) + 1;
+            first = false;
+            found =
+              iterate(block.getEventListModifiable(), eq, anchor, index);
+          }
+          current = parent;
+        }
+      }
+    }
+
+    private void onlyWhenInFocus(final MouseEvent event)
+    {
+      if (mIsPermanentFocusOwner) {
         final ProxySubject item = getItemToBeSelected(event);
         final List<ProxySubject> list = getListOfSelectedLabels();
         mItem = item;
         if (canBeSelected(item)) {
           if (event.isShiftDown() || event.isControlDown()) {
             if (!isSelected(item)) {
-             if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
-               if(!list.isEmpty()){
-                 toggleSelection(item);
-                 mItem = null;
-               }
-             }
-             else{
-               if(!list.isEmpty()){
-                 removeFromSelection(list);
-               }
-               toggleSelection(item);
-               mItem = null;
-             }
-           }
+              if (item instanceof IdentifierSubject
+                  || item instanceof ForeachSubject) {
+                if (!list.isEmpty()) {
+                  if (event.isShiftDown()) {
+                    addRangeToSelection(item);
+                  } else {
+                    addToSelection(item);
+                  }
+                  mItem = null;
+                }
+              } else {
+                if (!list.isEmpty()) {
+                  removeFromSelection(list);
+                }
+                toggleSelection(item);
+                mItem = null;
+              }
+            } else {
+              if (item instanceof IdentifierSubject
+                  || item instanceof ForeachSubject) {
+                if (!list.isEmpty() && event.isShiftDown()) {
+                  addRangeToSelection(item);
+                  mItem = null;
+                }
+              }
+            }
           } else {
             if (!isSelected(item)) {
-              if(!(item instanceof IdentifierSubject) && !(item instanceof ForeachSubject)){
+              if (!(item instanceof IdentifierSubject)
+                  && !(item instanceof ForeachSubject)) {
                 replaceSelection(item);
               }
             }
           }
-        }
-        else{
-          if(event.isShiftDown() || event.isControlDown()){
-            if(!list.isEmpty()){
+        } else {
+          if (event.isShiftDown() || event.isControlDown()) {
+            if (!list.isEmpty()) {
               removeFromSelection(list);
             }
-          }
-          else{
+          } else {
             clearSelection();
           }
         }
         mStartPoint = event.getPoint();
-        mPopupFactory.maybeShowPopup
-          (GraphEditorPanel.this, event, mFocusedObject);
-      }
-      else{
+        mPopupFactory.maybeShowPopup(GraphEditorPanel.this, event,
+                                     mFocusedObject);
+      } else {
         requestFocusInWindow();
-        SwingUtilities.invokeLater(new Runnable(){
+        SwingUtilities.invokeLater(new Runnable() {
 
           public void run()
           {
@@ -1788,7 +1901,6 @@ public class GraphEditorPanel
         });
       }
     }
-
 
     public void mousePressed(final MouseEvent event)
     {
@@ -2576,7 +2688,7 @@ public class GraphEditorPanel
               newSelection.remove(subject);
             }
             else{
-              newSelection.add(subject);
+              newSelection.add(subject, true);
             }
           }
         } else {
@@ -4881,7 +4993,7 @@ public class GraphEditorPanel
       return false;
     }
 
-    private boolean add(final ProxySubject subject){
+    private boolean add(final ProxySubject subject, final boolean addChildren){
       boolean change = false;
       final LabelBlockSubject block = SubjectTools.getAncestor(subject, LabelBlockSubject.class);
       if (block != null) {
@@ -4896,7 +5008,9 @@ public class GraphEditorPanel
                 || foreach.getBodyModifiable().size() > 0) {
               change |= addToSet(subject);
             }
-            change |= addChildren(foreach);
+            if(addChildren){
+              change |= addChildren(foreach);
+            }
         }
       }
       else{
@@ -4909,7 +5023,7 @@ public class GraphEditorPanel
       boolean change = false;
       for (final Proxy proxy : items) {
         final ProxySubject subject = (ProxySubject)proxy;
-          change |= add(subject);
+          change |= add(subject, true);
         }
       return change;
     }
