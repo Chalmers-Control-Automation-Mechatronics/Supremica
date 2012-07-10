@@ -17,30 +17,31 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 
 /**
- * TCTUnmarshaller class to import TCT binary files. 
+ * TCTUnmarshaller class to import TCT binary files.
  * This class has been tested for Xptct138 DES files.
- * 
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
  */
 
-public class TCTUnmarshaller implements ProxyUnmarshaller<ModuleProxy>{
+public class TCTUnmarshaller implements ProxyUnmarshaller<ModuleProxy>
+{
     private ModuleSubject module;
-    private final ModuleProxyFactory factory;
-    private DocumentManager manager;
 
-    public TCTUnmarshaller(ModuleProxyFactory factory) {
-        this.factory = factory;
+    public TCTUnmarshaller(final ModuleProxyFactory factory) {
+      // TODO Fix bug - must use factory to create model
+      // this.factory = factory;
     }
 
-    public ModuleProxy unmarshal(URI uri) throws WatersUnmarshalException, IOException {
-        String file = uri.toURL().getFile();
-        String name = file.substring(file.lastIndexOf('/')+1, file.lastIndexOf('.'));
+    public ModuleProxy unmarshal(final URI uri) throws WatersUnmarshalException, IOException {
+        final String file = uri.toURL().getFile();
+        final String name = file.substring(file.lastIndexOf('/')+1, file.lastIndexOf('.'));
+        // TODO Use factory, do not assume subject
         module = new ModuleSubject(name, uri);
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
-        TCTConverter tct = new TCTConverter(uri);
-        ExtendedAutomaton exAutomaton = tct.getExtendedAutomaton();
+        final TCTConverter tct = new TCTConverter(uri);
+        final ExtendedAutomaton exAutomaton = tct.getExtendedAutomaton();
         exAutomata.addAutomaton(exAutomaton);
         return module;
     }
@@ -66,8 +67,8 @@ public class TCTUnmarshaller implements ProxyUnmarshaller<ModuleProxy>{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setDocumentManager(DocumentManager manager) {
-        this.manager = manager;
+    public void setDocumentManager(final DocumentManager manager) {
+        // this.manager = manager;
     }
-    
+
 }

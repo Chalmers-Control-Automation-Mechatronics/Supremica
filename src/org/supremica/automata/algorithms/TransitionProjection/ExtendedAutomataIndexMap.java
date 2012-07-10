@@ -12,13 +12,16 @@ import org.supremica.util.Args;
 
 /**
  * ExtendedAutomataIndexMap class to index given EFA/DFA
- * 
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
  */
 public class ExtendedAutomataIndexMap {
+
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.createLogger(ExtendedAutomataIndexMap.class);
+
     private final HashMap<ExtendedAutomaton, Integer> exAutomatonToIndexMap;
     private final ExtendedAutomaton[] indexToExAutomatonArray;
     private final HashMap<ExtendedAutomatonAndLocationEntry, Integer> exAutomatonLocationEntryToIndexMap;
@@ -29,19 +32,19 @@ public class ExtendedAutomataIndexMap {
     private final HashMap<BinaryExpressionProxy, Integer> aExpressionEntryToIndexMap;
     private final HashMap<Integer, BinaryExpressionProxy> aExpressionIndexEntryToExpressionMap;
     private final EventDeclProxy[] indexToEventArray;
-    private boolean hasActions[];
-    private boolean hasGuards[];
+    private final boolean hasActions[];
+    private final boolean hasGuards[];
 
     ExtendedAutomataIndexMap(final ExtendedAutomata exAutomata) {
         // This useful variable stores the union of the extended automata events
-        List<EventDeclProxy> unionAlphabet = exAutomata.getUnionAlphabet();
-        
+        final List<EventDeclProxy> unionAlphabet = exAutomata.getUnionAlphabet();
+
         int initialLocationMapCapacity = 0;
-        for (ExtendedAutomaton currExAutomaton : exAutomata)
-        {           
+        for (final ExtendedAutomaton currExAutomaton : exAutomata)
+        {
             initialLocationMapCapacity += currExAutomaton.getNodes().size();
         }
- 
+
         // The hashtables are initialized with appropriate capacities.
         exAutomatonToIndexMap = new HashMap<ExtendedAutomaton, Integer>(exAutomata.size()*2);
         indexToExAutomatonArray = new ExtendedAutomaton[exAutomata.size()];
@@ -53,57 +56,57 @@ public class ExtendedAutomataIndexMap {
         gExpressionIndexEntryToExpressionMap = new HashMap<Integer, SimpleExpressionProxy>();
         aExpressionEntryToIndexMap = new HashMap<BinaryExpressionProxy, Integer>();
         aExpressionIndexEntryToExpressionMap = new HashMap<Integer, BinaryExpressionProxy>();
-        
+
         hasActions = new boolean[exAutomata.size()];
         hasGuards = new boolean[exAutomata.size()];
         // The exAutomatonIndex and the locationIndex hashmaps are filled
         int exAutomatonIndex = 0;
         int gIndex = 0;
         int aIndex = 0;
-        for (ExtendedAutomaton currExAutomaton : exAutomata)
-        {   
+        for (final ExtendedAutomaton currExAutomaton : exAutomata)
+        {
             // The exAutomatonIndex hashtable is updated
             exAutomatonToIndexMap.put(currExAutomaton, exAutomatonIndex);
             indexToExAutomatonArray[exAutomatonIndex] = currExAutomaton;
             hasGuards[exAutomatonIndex] = false;
             hasActions[exAutomatonIndex] = false;
             int locationIndex = 0;
-            for (NodeProxy currLocation : currExAutomaton.getNodes())
+            for (final NodeProxy currLocation : currExAutomaton.getNodes())
             {
                 exAutomatonLocationEntryToIndexMap.put(new ExtendedAutomatonAndLocationEntry(currExAutomaton, currLocation), locationIndex);
                 exAutomatonLocationIndexEntryToLocationMap.put(new ExtendedAutomatonAndLocationIndexEntry(currExAutomaton, locationIndex), currLocation);
                 locationIndex++;
             }
-            
-            for(SimpleExpressionProxy g : currExAutomaton.getAllGuards()){
+
+            for(final SimpleExpressionProxy g : currExAutomaton.getAllGuards()){
                 gExpressionEntryToIndexMap.put(g, gIndex);
                 gExpressionIndexEntryToExpressionMap.put(gIndex, g);
                 gIndex++;
             }
 
-            for(BinaryExpressionProxy a : currExAutomaton.getAllActions()){
+            for(final BinaryExpressionProxy a : currExAutomaton.getAllActions()){
                 aExpressionEntryToIndexMap.put(a, aIndex);
                 aExpressionIndexEntryToExpressionMap.put(aIndex, a);
                 aIndex++;
             }
-            
+
             hasGuards[exAutomatonIndex] = (gIndex > 0)?true:false;
             hasActions[exAutomatonIndex] = (aIndex > 0)?true:false;
-            
+
             exAutomatonIndex++;
         }
-        
+
         // The eventIndex map is filled
         int eventIndex = 0;
-        for (EventDeclProxy currEvent : unionAlphabet)
+        for (final EventDeclProxy currEvent : unionAlphabet)
         {
             eventToIndexMap.put(currEvent, eventIndex);
             indexToEventArray[eventIndex] = currEvent;
             eventIndex++;
-        }        
+        }
     }
 
-    
+
     /**
      * Returns the index corresponding to the current exAutomaton, as stored in the
      * exAutomaton index hashtable.
@@ -116,13 +119,13 @@ public class ExtendedAutomataIndexMap {
         Args.checkForNull(exAutomaton);
         return exAutomatonToIndexMap.get(exAutomaton);
     }
-    
+
     public ExtendedAutomaton getExtendedAutomatonAt(final int index)
     {
         Args.checkForIndex(index);
         return indexToExAutomatonArray[index];
     }
-      
+
     /**
      * Returns the index corresponding to the current event, as stored in the
      * event index hashtable.
@@ -135,13 +138,13 @@ public class ExtendedAutomataIndexMap {
         Args.checkForNull(event);
         return eventToIndexMap.get(event);
     }
-    
+
     public EventDeclProxy getEventAt(final int index)
     {
         Args.checkForIndex(index);
         return indexToEventArray[index];
     }
-    
+
     /**
      * Returns the index corresponding to the current location, as stored in the
      * location index hashtable.
@@ -153,27 +156,27 @@ public class ExtendedAutomataIndexMap {
     public int getLocationIndex(final ExtendedAutomaton exAutomaton, final NodeProxy location)
     {
         Args.checkForNull(exAutomaton);
-        Args.checkForNull(location);      
+        Args.checkForNull(location);
         return exAutomatonLocationEntryToIndexMap.get(new ExtendedAutomatonAndLocationEntry(exAutomaton, location));
     }
-    
+
     public int getLocationIndex(final int exAutomatonIndex, final NodeProxy location)
     {
         if (exAutomatonIndex < 0)
         {
             throw new IndexOutOfBoundsException("automatonIndex has to >= 0");
         }
-        ExtendedAutomaton currExAutomaton = getExtendedAutomatonAt(exAutomatonIndex);
+        final ExtendedAutomaton currExAutomaton = getExtendedAutomatonAt(exAutomatonIndex);
         return getLocationIndex(currExAutomaton, location);
     }
-    
+
     public NodeProxy getLocationAt(final ExtendedAutomaton exAutomaton, final int locationIndex)
     {
         Args.checkForNull(exAutomaton);
         Args.checkForIndex(locationIndex);
         return exAutomatonLocationIndexEntryToLocationMap.get(new ExtendedAutomatonAndLocationIndexEntry(exAutomaton, locationIndex));
     }
-    
+
     public NodeProxy getLocationAt(final int exAutomatonIndex, final int locationIndex)
     {
         if (exAutomatonIndex < 0)
@@ -183,17 +186,17 @@ public class ExtendedAutomataIndexMap {
         if (locationIndex < 0)
         {
             throw new IndexOutOfBoundsException("stateIndex has to >= 0");
-        }        
-        ExtendedAutomaton currExAutomaton = getExtendedAutomatonAt(exAutomatonIndex);
+        }
+        final ExtendedAutomaton currExAutomaton = getExtendedAutomatonAt(exAutomatonIndex);
         return getLocationAt(currExAutomaton, locationIndex);
     }
-    
+
     public int getGuardExpressionIndex(final SimpleExpressionProxy exp)
     {
         Args.checkForNull(exp);
         return gExpressionEntryToIndexMap.get(exp);
     }
-    
+
     public SimpleExpressionProxy getGuardExpressionAt(final int expIndex)
     {
         Args.checkForIndex(expIndex);
@@ -205,26 +208,26 @@ public class ExtendedAutomataIndexMap {
         Args.checkForNull(exp);
         return aExpressionEntryToIndexMap.get(exp);
     }
-    
+
     public BinaryExpressionProxy getActionExpressionAt(final int expIndex)
     {
         Args.checkForIndex(expIndex);
         return aExpressionIndexEntryToExpressionMap.get(expIndex);
     }
-    
+
     public boolean hasAnyGuard(final int exAutomatonIndex){
         return hasGuards[exAutomatonIndex];
     }
-    
+
     public boolean hasAnyAction(final int exAutomatonIndex){
         return hasActions[exAutomatonIndex];
     }
-    
+
     static class ExtendedAutomatonAndLocationEntry
     {
         ExtendedAutomaton exAutomaton;
         NodeProxy location;
-        
+
         public ExtendedAutomatonAndLocationEntry(final ExtendedAutomaton exAutomaton, final NodeProxy location)
         {
             this.exAutomaton = exAutomaton;
@@ -236,9 +239,9 @@ public class ExtendedAutomataIndexMap {
         {
             return (exAutomaton.getName() + location.getName()).hashCode();
         }
-        
+
         @Override
-        public boolean equals(Object other)
+        public boolean equals(final Object other)
         {
             if (other instanceof ExtendedAutomatonAndLocationEntry)
             {
@@ -252,8 +255,8 @@ public class ExtendedAutomataIndexMap {
     {
         ExtendedAutomaton exAutomaton;
         int locationIndex;
-        
-        public ExtendedAutomatonAndLocationIndexEntry(ExtendedAutomaton automaton, int locationIndex)
+
+        public ExtendedAutomatonAndLocationIndexEntry(final ExtendedAutomaton automaton, final int locationIndex)
         {
             this.exAutomaton = automaton;
             this.locationIndex = locationIndex;
@@ -264,9 +267,9 @@ public class ExtendedAutomataIndexMap {
         {
             return (exAutomaton.getName().hashCode() * locationIndex);
         }
-        
+
         @Override
-        public boolean equals(Object other)
+        public boolean equals(final Object other)
         {
             if (other instanceof ExtendedAutomatonAndLocationIndexEntry)
             {
@@ -275,11 +278,11 @@ public class ExtendedAutomataIndexMap {
             return false;
         }
     }
-    
+
     static class ExtendedAutomatonAndExpressionEntry
     {
         private final ExpressionProxy exp;
-        
+
         public ExtendedAutomatonAndExpressionEntry(final ExpressionProxy exp)
         {
             this.exp = exp;
@@ -290,9 +293,9 @@ public class ExtendedAutomataIndexMap {
         {
             return (exp.toString()).hashCode();
         }
-        
+
         @Override
-        public boolean equals(Object other)
+        public boolean equals(final Object other)
         {
             if (other instanceof ExtendedAutomatonAndExpressionEntry)
             {
@@ -301,5 +304,5 @@ public class ExtendedAutomataIndexMap {
             return false;
         }
     }
-    
+
 }

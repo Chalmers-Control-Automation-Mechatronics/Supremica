@@ -61,7 +61,6 @@ import java.io.File;
 import java.util.*;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -80,8 +79,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private int nbrOfExAutomata = 0;
     private final ArrayList<ExtendedAutomaton> theExAutomata;
     private Map<String, EventDeclProxy> eventIdToProxyMap;
-    private Map<ExtendedAutomaton,Integer> exAutomatonToIndex;
-    private Map<String, ExtendedAutomaton> stringToExAutomaton;
+    private final Map<ExtendedAutomaton,Integer> exAutomatonToIndex;
+    private final Map<String, ExtendedAutomaton> stringToExAutomaton;
     private boolean negativeValuesIncluded = false;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
@@ -181,7 +180,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     var2MinMaxValMap.put(varName, minMax);
                 }
 
-                int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
+                final int currDomain = ((Math.abs(upperBound) >= Math.abs(lowerBound))?Math.abs(upperBound):Math.abs(lowerBound))+1;
                 var2domainMap.put(var.getName(), negativeValuesIncluded?currDomain*2:currDomain);
                 if(currDomain>domain)
                     domain = currDomain;
@@ -193,7 +192,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         {
             domain *= 2;
         }
-        
+
         for(final AbstractSubject sub:module.getComponentListModifiable())
         {
             if(sub instanceof SimpleComponentSubject)
@@ -235,7 +234,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return modelHasNoSpecs;
     }
 
-    public int getVarDomain(String varName)
+    public int getVarDomain(final String varName)
     {
         return var2domainMap.get(varName);
     }
@@ -265,10 +264,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
         module.getEventDeclListModifiable().add(factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
         this.expand = expand;
-        ExpressionParser expressionParser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
     }
 
-    public int getExAutomatonIndex(ExtendedAutomaton efa)
+    public int getExAutomatonIndex(final ExtendedAutomaton efa)
     {
         return exAutomatonToIndex.get(efa);
     }
@@ -378,7 +376,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return theExAutomata.iterator();
     }
 
-    public boolean addEvent(EventDeclProxy event){
+    public boolean addEvent(final EventDeclProxy event){
         if(eventIdToProxyMap.get(event.getName()) == null){
             module.getEventDeclListModifiable().add((EventDeclSubject)event);
             eventIdToProxyMap.put(event.getName(), event);
@@ -394,7 +392,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public void addEvent(final String name, final String kind){
         addEvent(name, kind, true);
     }
-    
+
     public EventDeclProxy addEvent(final String name, final String kind, final boolean observable)
     {
         EventDeclProxy event = eventIdToProxyMap.get(name);
@@ -446,7 +444,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         theExAutomata.add(exAutomaton);
         stringToExAutomaton.put(exAutomaton.getName(), exAutomaton);
         module.getComponentListModifiable().add(exAutomaton.getComponent());
-        for(EventDeclProxy event : exAutomaton.getAlphabet()){
+        for(final EventDeclProxy event : exAutomaton.getAlphabet()){
             if(eventIdToProxyMap.get(event.getName()) == null){
                 eventIdToProxyMap.put(event.getName(), event);
                 module.getEventDeclListModifiable().add((EventDeclSubject)event);
@@ -464,11 +462,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         if(!exAutomaton.getMarkedLocations().isEmpty())
             addEvent(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION.value());
     }
-    
-    public ExtendedAutomaton getExtendedAutomaton(String name){
+
+    public ExtendedAutomaton getExtendedAutomaton(final String name){
         return stringToExAutomaton.get(name);
     }
-    
+
     public HashSet<EventDeclProxy> getPlantAlphabet()
     {
         return plantAlphabet;
