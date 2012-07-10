@@ -59,7 +59,7 @@ public class EditorTransitionProjectionAction
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();        
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
         HashSet<EventDeclProxy> uniAlphabet = new HashSet<EventDeclProxy>();
-        for(ExtendedAutomaton efa:exAutomata)
+        for(final ExtendedAutomaton efa:exAutomata)
             uniAlphabet.addAll(efa.getAlphabet());
         
         final int nbrOfComponents = module.getComponentList().size();
@@ -71,11 +71,11 @@ public class EditorTransitionProjectionAction
         List<? extends Proxy> currentSelection = ide.getActiveDocumentContainer().getEditorPanel().getComponentsPanel().getCurrentSelection();
         
         HashSet<String> components = new HashSet<String>();
-        for(Proxy item : currentSelection)
+        for(final Proxy item : currentSelection)
             if(item instanceof SimpleComponentSubject)
                 components.add(((SimpleComponentSubject) item).getName());
         
-        TPDialog dialog = new TPDialog(ide.getFrame(), true, components.isEmpty());
+        final TPDialog dialog = new TPDialog(ide.getFrame(), true, components.isEmpty());
         dialog.setLocationRelativeTo(ide.getIDE());
         dialog.setVisible(true);
         
@@ -86,18 +86,18 @@ public class EditorTransitionProjectionAction
                 }
             }
             
-            boolean auto = (dialog.getEventOption() == TPDialogOption.AUTOMATIC_SELECTED)?true:false;
-            AutomataTransitionProjection TP = new AutomataTransitionProjection(exAutomata, auto);
-            List<ExtendedAutomaton> prjs = new ArrayList<ExtendedAutomaton>();
+            final boolean auto = (dialog.getEventOption() == TPDialogOption.AUTOMATIC_SELECTED)?true:false;
+            final AutomataTransitionProjection TP = new AutomataTransitionProjection(exAutomata, auto);
+            final List<ExtendedAutomaton> prjs = new ArrayList<ExtendedAutomaton>();
             
             if(dialog.getEventOption() == TPDialogOption.LOCALEVENT_SELECTED){
-                HashSet<EventDeclProxy> localEvents = new HashSet<EventDeclProxy>();
-                String locals = dialog.getLocalText();
+                final HashSet<EventDeclProxy> localEvents = new HashSet<EventDeclProxy>();
+                final String locals = dialog.getLocalText();
                 if(!locals.isEmpty()){
-                    String[] events = locals.split(",");
-                    for(String ev : events){
+                    final String[] events = locals.split(",");
+                    for(final String ev : events){
                         if(!ev.isEmpty()){
-                            for(EventDeclProxy e:exAutomata.getUnionAlphabet()){
+                            for(final EventDeclProxy e:exAutomata.getUnionAlphabet()){
                                 if(ev.equals(e.getName())){
                                     localEvents.add(e);
                                 }
@@ -109,13 +109,13 @@ public class EditorTransitionProjectionAction
                 }
                 
             } else if(dialog.getEventOption() == TPDialogOption.SHAREDEVENT_SELECTED){
-                HashSet<EventDeclProxy> sharedEvents = new HashSet<EventDeclProxy>();
-                String shared = dialog.getShareText();
+                final HashSet<EventDeclProxy> sharedEvents = new HashSet<EventDeclProxy>();
+                final String shared = dialog.getShareText();
                 if(!shared.isEmpty()){
-                    String[] events = shared.split(",");
-                    for(String ev : events){
+                    final String[] events = shared.split(",");
+                    for(final String ev : events){
                         if(!ev.isEmpty()){
-                            for(EventDeclProxy e:exAutomata.getUnionAlphabet()){
+                            for(final EventDeclProxy e:exAutomata.getUnionAlphabet()){
                                 if(ev.equals(e.getName())){
                                     sharedEvents.add(e);
                                 }
@@ -129,24 +129,21 @@ public class EditorTransitionProjectionAction
             
             int nbrOriNodes = 0;
             int nbrPrjNodes = 0;
-            int nbrOriTrans = 0;
-            int nbrPrjTrans = 0;
             long elapsed = 0;
             if(dialog.showResult())
                 logger.info("Transition Projection start");
             
             HashSet<String> projectedEFAs = new HashSet<String>();
             for(String efa : components){
-                ExtendedAutomaton oriEFA = exAutomata.getExtendedAutomaton(efa);
+                final ExtendedAutomaton oriEFA = exAutomata.getExtendedAutomaton(efa);
                 if(oriEFA.isNondeterministic() != null){
-                    logger.error("EFA '" + efa +"' is nondeterministic and therefore, is skipped!");
+                    logger.error("EFA '" + efa +"' is nondeterministic and therefore it is skipped");
                     continue;
                 }
                 
                 nbrOriNodes += oriEFA.getNodes().size();
-                nbrOriTrans += oriEFA.getTransitions().size();
 
-                ExtendedAutomaton prjEFA = TP.projectEFA(efa);
+                final ExtendedAutomaton prjEFA = TP.projectEFA(efa);
                 
                 if(prjEFA.getAlphabet().size() == oriEFA.getAlphabet().size() 
                         && prjEFA.getNodes().size() == oriEFA.getNodes().size()){
@@ -168,34 +165,33 @@ public class EditorTransitionProjectionAction
                 prjs.add(prjEFA);
                 elapsed += TP.getElapsedTime();
                 nbrPrjNodes += prjEFA.getNodes().size();
-                nbrPrjTrans += prjEFA.getTransitions().size();
             }
             
             if(dialog.removeOriginalEFAs()){
-                for(String comp : projectedEFAs){
+                for(final String comp : projectedEFAs){
                     ExtendedAutomaton efa = exAutomata.getExtendedAutomaton(comp);
                     exAutomata.getModule().getComponentListModifiable().remove(efa.getComponent());
                 }
             }
             if(!prjs.isEmpty()){    
-            for(ExtendedAutomaton efa : prjs)
+            for(final ExtendedAutomaton efa : prjs)
                 exAutomata.addAutomaton(efa);
             } else {
-                logger.info("There are no local events to project so no EFA has been projected");
+                logger.info("No local event can be found so no EFA has been projected");
                 return;
             }
             
             
             if(dialog.showResult()){
-                HashSet<EventDeclProxy> uniPrjAlphabet = new HashSet<EventDeclProxy>();
-                for(ExtendedAutomaton efa : prjs)
+                final HashSet<EventDeclProxy> uniPrjAlphabet = new HashSet<EventDeclProxy>();
+                for(final ExtendedAutomaton efa : prjs)
                     uniPrjAlphabet.addAll(efa.getAlphabet());
                 
                 @SuppressWarnings("unchecked")
-                HashSet<EventDeclProxy> locEvents = (HashSet<EventDeclProxy>) ExtendedAutomaton.setMinus(uniAlphabet, uniPrjAlphabet);
+                final HashSet<EventDeclProxy> locEvents = (HashSet<EventDeclProxy>) ExtendedAutomaton.setMinus(uniAlphabet, uniPrjAlphabet);
                 String l = "{";
-                for (Iterator<EventDeclProxy> it = locEvents.iterator(); it.hasNext();) {
-                    EventDeclProxy e = it.next();
+                for (final Iterator<EventDeclProxy> it = locEvents.iterator(); it.hasNext();) {
+                    final EventDeclProxy e = it.next();
                     if(it.hasNext())
                         l += e.getName() + ", ";
                     else
@@ -207,11 +203,15 @@ public class EditorTransitionProjectionAction
                         + "\n Projection Result"
                         + "\n -----------------------"
                         + "\n Nbr original nodes: " + nbrOriNodes 
-//                        + "\n Nbr original transitions: " + nbrOriTrans
                         + "\n Nbr TP nodes: " + nbrPrjNodes 
-//                        + "\n Nbr TP transitions: " + nbrPrjTrans
                         + "\n Local events: " + l
                         + "\n Total computation time: " + elapsed/1000F + " seconds");                
+            } else {
+                if(prjs.size() == 1){
+                    logger.info(" One EFA was projected in "+ elapsed/1000F + " seconds");
+                } else {
+                    logger.info(prjs.size() + " EFAs were projected in "+ elapsed/1000F + " seconds");
+                }
             }
         }
     }

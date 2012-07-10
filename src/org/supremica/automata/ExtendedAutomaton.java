@@ -767,14 +767,18 @@ public class ExtendedAutomaton
         if(initialLocations.size() > 1)
             return new NondeterministicEFAException(this);
         
-        for(NodeProxy node : locationToIngoingEdgesMap.keySet()){
+        for(NodeProxy node : locationToOutgoingEdgesMap.keySet()){
             HashSet<EventDeclProxy> events = new HashSet<EventDeclProxy>();
-            for(EdgeSubject tran : locationToIngoingEdgesMap.get(node)){
+            for(EdgeSubject tran : locationToOutgoingEdgesMap.get(node)){
                 for(Proxy event : tran.getLabelBlock().getEventList()){
                     EventDeclProxy e = getEvent(event);
                     boolean added = events.add(e);
-                    if(!added)
-                        return new NondeterministicEFAException(this, node, e);
+                    if(!added){
+                        SimpleExpressionProxy guard = null;
+                        try{guard = tran.getGuardActionBlock().getGuards().get(0);} catch (Exception exp){}
+                        if(guard == null)
+                            return new NondeterministicEFAException(this, node, e);
+                    }
                 }
             }
         }

@@ -33,7 +33,7 @@ public class AutomataTransitionProjection {
     private final Logger logger = LoggerFactory.createLogger(AutomataTransitionProjection.class);        
     private final ExtendedAutomata exAutomata;
     private final ActionTimer TPTimer;
-    private ExtendedAutomataIndexForm indexAutomata;
+    private final ExtendedAutomataIndexForm indexAutomata;
     private final ExtendedAutomataIndexMap indexMap;
     private TIntHashSet localEvents;
     private TIntHashSet sharedEvents;
@@ -46,7 +46,7 @@ public class AutomataTransitionProjection {
      * @param automatic <code>true</code>: Automatic event selection <code>false</code>: Manual selection
      * @param exAutomata ExtendedAutomata containing the EFAs
      */
-    public AutomataTransitionProjection(ExtendedAutomata exAutomata, boolean automatic){
+    public AutomataTransitionProjection(final ExtendedAutomata exAutomata, final boolean automatic){
         Args.checkForNull(automatic);
         this.exAutomata = exAutomata;
         TPTimer = new ActionTimer();     
@@ -55,8 +55,9 @@ public class AutomataTransitionProjection {
         nbrAutomaton = exAutomata.size();
         unionAlphabet = new TIntHashSet();
         epsilon = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getEpsilonEventsTable());
-        for(int event = 0; event < indexAutomata.getNbrUnionEvents(); event++)
+        for(int event = 0; event < indexAutomata.getNbrUnionEvents(); event++) {
             unionAlphabet.add(event);
+        }
         
         if(automatic){
             localEvents = getLocalEventSet(exAutomata);
@@ -72,16 +73,16 @@ public class AutomataTransitionProjection {
      * @param name The name of EFA to be projected
      * @return The projected EFA
      */
-    public ExtendedAutomaton projectEFA(String name){
-        ExtendedAutomaton efa = exAutomata.getExtendedAutomaton(name);
+    public ExtendedAutomaton projectEFA(final String name){
+        final ExtendedAutomaton efa = exAutomata.getExtendedAutomaton(name);
         Args.checkForNull(efa);
-        int exAutomatonIndex = indexMap.getExtendedAutomatonIndex(efa);
-        TIntHashSet currAlphabet = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getAlphabetEventsTable()[exAutomatonIndex]);
-        TIntHashSet currLocalEvents = ExtendedAutomataIndexFormHelper.setIntersection(localEvents, currAlphabet);
-        AutomatonTransitionProjection tp = new AutomatonTransitionProjection(indexAutomata, exAutomatonIndex, currLocalEvents.toArray());
+        final int exAutomatonIndex = indexMap.getExtendedAutomatonIndex(efa);
+        final TIntHashSet currAlphabet = ExtendedAutomataIndexFormHelper.getTrueIndexes(indexAutomata.getAlphabetEventsTable()[exAutomatonIndex]);
+        final TIntHashSet currLocalEvents = ExtendedAutomataIndexFormHelper.setIntersection(localEvents, currAlphabet);
+        final AutomatonTransitionProjection tp = new AutomatonTransitionProjection(indexAutomata, exAutomatonIndex, currLocalEvents.toArray());
         TPTimer.reset();
         TPTimer.start();
-        ExtendedAutomaton prjEFA = tp.getProjectedEFA();
+        final ExtendedAutomaton prjEFA = tp.getProjectedEFA();
         TPTimer.stop();
         return prjEFA;
     }
@@ -98,20 +99,22 @@ public class AutomataTransitionProjection {
      * @param exAutomata The Extended Automata
      * @return Set of local events
      */
-    private TIntHashSet getLocalEventSet(ExtendedAutomata exAutomata){
-        TIntHashSet locEvents = new TIntHashSet();       
-        CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
-        boolean[][] alphabetTable = indexAutomata.getAlphabetEventsTable();
+    private TIntHashSet getLocalEventSet(final ExtendedAutomata exAutomata){
+        final TIntHashSet locEvents = new TIntHashSet();       
+        final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
+        final boolean[][] alphabetTable = indexAutomata.getAlphabetEventsTable();
         
         // Make a string of all guards
         String strAllGuards = "";
-        for(int[][] gss : indexAutomata.getEventGuardTable()){
-            for(int[] gs : gss){
-                if(gs.length == 1)
+        for(final int[][] gss : indexAutomata.getEventGuardTable()){
+            for(final int[] gs : gss){
+                if(gs.length == 1) {
                     continue;
-                for(int g : gs){
-                    if(g != Integer.MAX_VALUE)
+                }
+                for(final int g : gs){
+                    if(g != Integer.MAX_VALUE) {
                         strAllGuards += " " + indexMap.getGuardExpressionAt(g).toString();
+                    }
                 }
             }
         }
@@ -126,8 +129,9 @@ public class AutomataTransitionProjection {
 
                 // Preliminary set of local events (DFA local events) just by checking the events
                 for(int otherAutomaton=0; otherAutomaton<nbrAutomaton; otherAutomaton++){
-                    if(otherAutomaton!=currAutomaton)
+                    if(otherAutomaton!=currAutomaton) {
                         sigmaj = ExtendedAutomataIndexFormHelper.setUnion(sigmaj, ExtendedAutomataIndexFormHelper.getTrueIndexes(alphabetTable[otherAutomaton]));
+                    }
                 }
                 sigmaj = ExtendedAutomataIndexFormHelper.setMinus(sigmaj, epsilon);
                 temp.addAll(ExtendedAutomataIndexFormHelper.setMinus(sigmai, sigmaj).toArray());
@@ -138,11 +142,12 @@ public class AutomataTransitionProjection {
             // Checking the local events conditions based on my paper (for EFAs)
             if(indexMap.hasAnyGuard(currAutomaton) || indexMap.hasAnyAction(currAutomaton)){    
                 outerloop:
-                for(int currEvent : temp.toArray()){
-                    int[] guards = indexAutomata.getEventGuardTable()[currAutomaton][currEvent];
+                for(final int currEvent : temp.toArray()){
+                    final int[] guards = indexAutomata.getEventGuardTable()[currAutomaton][currEvent];
                     // If there is any guard the nexclude this event from the set of local events
-                    if(guards.length > 1)
+                    if(guards.length > 1) {
                         continue outerloop;
+                    }
 
                     int[] actions = indexAutomata.getEventActionTable()[currAutomaton][currEvent];
                     // If no guards and actions then its locals
@@ -152,17 +157,17 @@ public class AutomataTransitionProjection {
                     }
 
                     actions = ExtendedAutomataIndexFormHelper.clearMaxInteger(actions);
-                    for(int action : actions){
-                        BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(action);
-                        Set<VariableComponentProxy> actionRightVars = exAutomata.extractVariablesFromExpr(actionExp.getRight());
+                    for(final int action : actions){
+                        final BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(action);
+                        final Set<VariableComponentProxy> actionRightVars = exAutomata.extractVariablesFromExpr(actionExp.getRight());
                         // If the action is in the form of, e.g., x += 1, x-=1, or x = y + 1 the it is not local  
                         if(actionExp.getOperator().equals(cot.getIncrementOperator()) || actionExp.getOperator().equals(cot.getDecrementOperator()) || !actionRightVars.isEmpty()){
                             continue outerloop;
                         }
 
                         // If the left side avariable appears in any guard then it is not local
-                        Set<VariableComponentProxy> actionLeftVars = exAutomata.extractVariablesFromExpr(actionExp.getLeft());
-                        for(VariableComponentProxy var : actionLeftVars){
+                        final Set<VariableComponentProxy> actionLeftVars = exAutomata.extractVariablesFromExpr(actionExp.getLeft());
+                        for(final VariableComponentProxy var : actionLeftVars){
                             if(strAllGuards.contains(var.getName())){
                                 continue outerloop;
                             }
@@ -193,9 +198,10 @@ public class AutomataTransitionProjection {
      * Setting the set of shared events. This will overwrite the current set of shared events
      * @param shareEvents Set of shred events
      */
-    public void setSharedEvents(HashSet<EventDeclProxy> shareEvents) {
-        for(EventDeclProxy event : shareEvents)
+    public void setSharedEvents(final HashSet<EventDeclProxy> shareEvents) {
+        for(final EventDeclProxy event : shareEvents) {
             sharedEvents.add(indexMap.getEventIndex(event));
+        }
         localEvents = ExtendedAutomataIndexFormHelper.setMinus(unionAlphabet, sharedEvents);
     }
 
@@ -203,9 +209,10 @@ public class AutomataTransitionProjection {
      * Setting the set of local events. This will overwrite the current set of local events 
      * @param locEvents Set of local events
      */
-    public void setLocalEvents(HashSet<EventDeclProxy> locEvents) {
-        for(EventDeclProxy event : locEvents)
+    public void setLocalEvents(final HashSet<EventDeclProxy> locEvents) {
+        for(final EventDeclProxy event : locEvents) {
             localEvents.add(indexMap.getEventIndex(event));
+        }
         
         sharedEvents.addAll(ExtendedAutomataIndexFormHelper.setMinus(unionAlphabet, localEvents).toArray());
     }

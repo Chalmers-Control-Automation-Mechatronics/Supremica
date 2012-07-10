@@ -228,7 +228,7 @@ public class ExtendedAutomataIndexMap {
         ExtendedAutomaton exAutomaton;
         NodeProxy location;
 
-        public ExtendedAutomatonAndLocationEntry(final ExtendedAutomaton exAutomaton, final NodeProxy location)
+        ExtendedAutomatonAndLocationEntry(final ExtendedAutomaton exAutomaton, final NodeProxy location)
         {
             this.exAutomaton = exAutomaton;
             this.location = location;
@@ -256,7 +256,7 @@ public class ExtendedAutomataIndexMap {
         ExtendedAutomaton exAutomaton;
         int locationIndex;
 
-        public ExtendedAutomatonAndLocationIndexEntry(final ExtendedAutomaton automaton, final int locationIndex)
+        ExtendedAutomatonAndLocationIndexEntry(final ExtendedAutomaton automaton, final int locationIndex)
         {
             this.exAutomaton = automaton;
             this.locationIndex = locationIndex;
@@ -283,7 +283,7 @@ public class ExtendedAutomataIndexMap {
     {
         private final ExpressionProxy exp;
 
-        public ExtendedAutomatonAndExpressionEntry(final ExpressionProxy exp)
+        ExtendedAutomatonAndExpressionEntry(final ExpressionProxy exp)
         {
             this.exp = exp;
         }

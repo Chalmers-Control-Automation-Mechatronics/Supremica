@@ -25,9 +25,9 @@ public class ExtendedAutomataIndexFormHelper {
     /**
      * Allocate a new state + extra data fields
      */
-    public static int[] createState(int nbrOfAutomata)
+    public static int[] createState(final int nbrOfAutomata)
     {
-        int[] newState = new int[nbrOfAutomata + STATE_EXTRA_DATA];
+        final int[] newState = new int[nbrOfAutomata + STATE_EXTRA_DATA];
         
         newState[nbrOfAutomata + STATE_EXTRA_DATA - STATE_PREVSTATE_FROM_END] = STATE_NO_PREVSTATE;
         
@@ -37,9 +37,9 @@ public class ExtendedAutomataIndexFormHelper {
     /**
      * Create a copy of an existing state
      */
-    public static int[] createCopyOfState(int[] state)
+    public static int[] createCopyOfState(final int[] state)
     {
-        int[] newState = new int[state.length];
+        final int[] newState = new int[state.length];
         
         System.arraycopy(state, 0, newState, 0, state.length);
         
@@ -49,7 +49,7 @@ public class ExtendedAutomataIndexFormHelper {
     /**
      * Set the previous state index of an existing state
      */
-    public static void setPrevStateIndex(int[] state, int stateIndex)
+    public static void setPrevStateIndex(final int[] state, final int stateIndex)
     {
         state[state.length - STATE_PREVSTATE_FROM_END] = stateIndex;
     }
@@ -57,7 +57,7 @@ public class ExtendedAutomataIndexFormHelper {
     /**
      * Get the previous state index
      */
-    public static int getPrevStateIndex(int[] state)
+    public static int getPrevStateIndex(final int[] state)
     {
         return state[state.length - STATE_PREVSTATE_FROM_END];
     }
@@ -72,7 +72,7 @@ public class ExtendedAutomataIndexFormHelper {
      * 5: fastClearStatus
      * 6: deadlocked
      **/
-    public static int createStatus(boolean isInitial, boolean isAccepted, boolean isForbidden)
+    public static int createStatus(final boolean isInitial, final boolean isAccepted, final boolean isForbidden)
     {
         int status = 0;
         
@@ -104,17 +104,17 @@ public class ExtendedAutomataIndexFormHelper {
         return status;
     }
     
-    public static boolean isInitial(int status)
+    public static boolean isInitial(final int status)
     {
         return (status & 1) == 1;
     }
     
-    public static boolean isAccepting(int status)
+    public static boolean isAccepting(final int status)
     {
         return ((status >> 1) & 1) == 1;
     }
     
-    public static boolean isForbidden(int status)
+    public static boolean isForbidden(final int status)
     {
         return ((status >> 2) & 1) == 1;
     }
@@ -149,10 +149,12 @@ public class ExtendedAutomataIndexFormHelper {
 //        return isForbidden(state[state.length - STATE_STATUS_FROM_END]);
 //    }
     
-    public static boolean hasValue(int[] list, int value){
-        for(int v : list)
-            if(v == value)
+    public static boolean hasValue(final int[] list, final int value){
+        for(final int v : list) {
+            if(v == value) {
                 return true;
+            }
+        }
         return false;
     }
 //    public static boolean isFirst(int[] state)
@@ -175,17 +177,17 @@ public class ExtendedAutomataIndexFormHelper {
      * The string must be of the form
      * [state1 state2 state3 state4 state5 status]
      */
-    public static int[] buildStateFromString(String stringState)
+    public static int[] buildStateFromString(final String stringState)
     {
-        String trimmedString = stringState.trim();
-        int indexOfLeft = trimmedString.indexOf('[');
+        final String trimmedString = stringState.trim();
+        final int indexOfLeft = trimmedString.indexOf('[');
         
         if (indexOfLeft == -1)
         {
             return null;
         }
         
-        int indexOfRight = trimmedString.indexOf(']');
+        final int indexOfRight = trimmedString.indexOf(']');
         
         if (indexOfRight == -1)
         {
@@ -197,24 +199,24 @@ public class ExtendedAutomataIndexFormHelper {
             return null;
         }
         
-        StringTokenizer st = new StringTokenizer(trimmedString.substring(indexOfLeft + 1, indexOfRight));
-        int nbrOfTokens = st.countTokens();
+        final StringTokenizer st = new StringTokenizer(trimmedString.substring(indexOfLeft + 1, indexOfRight));
+        final int nbrOfTokens = st.countTokens();
         
         if (nbrOfTokens < 1)
         {
             return null;
         }
         
-        int[] newState = new int[nbrOfTokens];
+        final int[] newState = new int[nbrOfTokens];
         int i = 0;
         
         while (st.hasMoreTokens())
         {
-            String currToken = st.nextToken();
+            final String currToken = st.nextToken();
             
             try
             {
-                int tmpInt = Integer.parseInt(currToken);
+                final int tmpInt = Integer.parseInt(currToken);
                 
                 newState[i++] = tmpInt;
             }
@@ -236,14 +238,14 @@ public class ExtendedAutomataIndexFormHelper {
         }
     }
     
-    public static String dumpState(int[] state)
+    public static String dumpState(final int[] state)
     {
         if (state == null)
         {
             return "[null]";
         }
         
-        StringBuilder sb = new StringBuilder("[");
+        final StringBuilder sb = new StringBuilder("[");
         
         for (int i = 0; i < state.length; i++)
         {
@@ -260,34 +262,40 @@ public class ExtendedAutomataIndexFormHelper {
         return sb.toString();
     }
     
-    public static TIntHashSet toIntHashSet(int[] array){
+    public static TIntHashSet toIntHashSet(final int[] array){
         Args.checkForNull(array);
-        TIntHashSet list = new TIntHashSet();
-        for(int element : array)
-            if(element != Integer.MAX_VALUE)
+        final TIntHashSet list = new TIntHashSet();
+        for(final int element : array) {
+            if(element != Integer.MAX_VALUE) {
                 list.add(element);
+            }
+        }
         return list;
     }
     
-    public static TIntHashSet getTrueIndexes(boolean[] array){
+    public static TIntHashSet getTrueIndexes(final boolean[] array){
         Args.checkForNull(array);
-        TIntHashSet trues = new TIntHashSet();
-        for(int i=0; i<array.length; i++)
-            if(array[i])
+        final TIntHashSet trues = new TIntHashSet();
+        for(int i=0; i<array.length; i++) {
+            if(array[i]) {
                 trues.add(i);
+            }
+        }
         return trues;
     }
     
-    public static TIntHashSet getFalseIndexes(boolean[] array){
+    public static TIntHashSet getFalseIndexes(final boolean[] array){
         Args.checkForNull(array);
-        TIntHashSet falses = new TIntHashSet();
-        for(int i=0; i<array.length; i++)
-            if(!array[i])
+        final TIntHashSet falses = new TIntHashSet();
+        for(int i=0; i<array.length; i++) {
+            if(!array[i]) {
                 falses.add(i);
+            }
+        }
         return falses;
     }
     
-    public static int[] clearMaxInteger(int[] array){
+    public static int[] clearMaxInteger(final int[] array){
         Args.checkForNull(array);
         int[] temp = null;
         if(array.length == 1){
@@ -297,61 +305,68 @@ public class ExtendedAutomataIndexFormHelper {
         } else {
         temp = new int[array.length - 1];
         int j = 0;
-        for(int i = 0; i < array.length; i++)
-            if(array[i] != Integer.MAX_VALUE)
-                temp[j++] = array[i];
+        for(int i = 0; i < array.length; i++) {
+                if(array[i] != Integer.MAX_VALUE) {
+                    temp[j++] = array[i];
+                }
+            }
         }
         return temp;
     }
     
-   public static TIntHashSet setUnion(TIntHashSet x, TIntHashSet y){
+   public static TIntHashSet setUnion(final TIntHashSet x, final TIntHashSet y){
         Args.checkForNull(x);
         Args.checkForNull(y);
-        TIntHashSet result = new TIntHashSet();
+        final TIntHashSet result = new TIntHashSet();
         result.addAll(x.toArray());
         result.addAll(y.toArray());
         return result;
     }  
     
-    public static TIntHashSet setIntersection(TIntHashSet x, TIntHashSet y){
-        if(x==null || y==null || x.isEmpty() || y.isEmpty())
+    public static TIntHashSet setIntersection(final TIntHashSet x, final TIntHashSet y){
+        if(x==null || y==null || x.isEmpty() || y.isEmpty()) {
             return new TIntHashSet();
+        }
         
-        TIntHashSet result = new TIntHashSet(x.toArray());
+        final TIntHashSet result = new TIntHashSet(x.toArray());
         result.retainAll(y.toArray());
         return result;
     }
     
-    public static TIntHashSet setMinus(TIntHashSet x, TIntHashSet y){
-        if(x == null || x.isEmpty())
+    public static TIntHashSet setMinus(final TIntHashSet x, final TIntHashSet y){
+        if(x == null || x.isEmpty()) {
             return new TIntHashSet();
-        else if(y == null || y.isEmpty())
+        }
+        else if(y == null || y.isEmpty()) {
             return new TIntHashSet(x.toArray());
+        }
         
-        TIntHashSet result = new TIntHashSet();
-        for (int n : x.toArray())
-            if(!y.contains(n))
+        final TIntHashSet result = new TIntHashSet();
+        for (final int n : x.toArray()) {
+            if(!y.contains(n)) {
                 result.add(n);
+            }
+        }
         return result;
     }      
 
-    public static int[] addToBeginningOfArray(int value, int[] array){
+    public static int[] addToBeginningOfArray(final int value, final int[] array){
         if(array == null){
-            int[] temp = new int[]{value};
+            final int[] temp = new int[]{value};
             return temp;
         }
-        int[] temp = new int[array.length + 1];
+        final int[] temp = new int[array.length + 1];
         temp[0] = value;
         System.arraycopy(array, 0, temp, 1, array.length);
         return temp;
     }
 
-    public static int[] addToEndOfArray(int value, int[] array){
+    public static int[] addToEndOfArray(final int value, final int[] array){
         if(array == null){
-            int[] temp = new int[]{value};
+            final int[] temp = new int[]{value};
             return temp;
         }
-        int[] temp = new int[array.length + 1];
+        final int[] temp = new int[array.length + 1];
         System.arraycopy(array, 0, temp, 0, array.length);
         temp[array.length] = value;
         return temp;
