@@ -1077,6 +1077,14 @@ public abstract class TransitionListBuffer
 
 
   //#########################################################################
+  //# Auxiliary Access
+  int makeKey(final int state, final int event)
+  {
+    return (state << mStateShift) | event;
+  }
+
+
+  //#########################################################################
   //# Debugging
   /**
    * Checks the integrity of this transition list buffer.
