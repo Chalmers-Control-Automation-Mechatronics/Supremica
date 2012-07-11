@@ -146,8 +146,18 @@ public class EditorTransitionProjectionAction
                 final ExtendedAutomaton prjEFA = TP.projectEFA(efa);
 
                 if(prjEFA.getAlphabet().size() == oriEFA.getAlphabet().size()
-                        && prjEFA.getNodes().size() == oriEFA.getNodes().size()){
+                        && prjEFA.getNodes().size() == oriEFA.getNodes().size()
+                        && prjEFA.getTransitions().size() == oriEFA.getTransitions().size()){
                     logger.info("The projected EFA for '"+ efa +"' is the same as the original one so keeping the original EFA");
+                    elapsed += TP.getElapsedTime();
+                    nbrPrjNodes += prjEFA.getNodes().size();                    
+                    continue;
+                }
+                
+                if(prjEFA.isNondeterministic() != null){
+                    logger.info("The projected EFA for '"+ efa +"' is nondeterministic so keeping the original EFA");
+                    elapsed += TP.getElapsedTime();
+                    nbrPrjNodes += prjEFA.getNodes().size();                    
                     continue;
                 }
 
@@ -183,9 +193,15 @@ public class EditorTransitionProjectionAction
                 final HashSet<EventDeclProxy> uniPrjAlphabet = new HashSet<EventDeclProxy>();
                 for(final ExtendedAutomaton efa : prjs)
                     uniPrjAlphabet.addAll(efa.getAlphabet());
-
-                @SuppressWarnings("unchecked")
-                final HashSet<EventDeclProxy> locEvents = (HashSet<EventDeclProxy>) ExtendedAutomaton.setMinus(uniAlphabet, uniPrjAlphabet);
+                
+                final HashSet<EventDeclProxy> locEvents = new HashSet<EventDeclProxy>();
+                
+                if(!(uniPrjAlphabet.isEmpty() || uniPrjAlphabet.size() == uniAlphabet.size())){
+                    @SuppressWarnings("unchecked")
+                    final HashSet<EventDeclProxy> temp = (HashSet<EventDeclProxy>) ExtendedAutomaton.setMinus(uniAlphabet, uniPrjAlphabet);        
+                    locEvents.addAll(temp);
+                }
+                
                 String l = "{";
                 for (final Iterator<EventDeclProxy> it = locEvents.iterator(); it.hasNext();) {
                     final EventDeclProxy e = it.next();
@@ -205,7 +221,7 @@ public class EditorTransitionProjectionAction
                         + "\n Total computation time: " + elapsed/1000F + " seconds");
             } else {
                 if(prjs.size() == 1){
-                    logger.info(" One EFA was projected in "+ elapsed/1000F + " seconds");
+                    logger.info("One EFA was projected in "+ elapsed/1000F + " seconds");
                 } else if(prjs.size() > 1){
                     logger.info(prjs.size() + " EFAs were projected in "+ elapsed/1000F + " seconds");
                 }

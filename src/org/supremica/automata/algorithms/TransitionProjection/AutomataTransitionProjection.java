@@ -48,8 +48,8 @@ public class AutomataTransitionProjection {
      * @param exAutomata ExtendedAutomata containing the EFAs
      * 
      * @param automatic <code>true</code>: Automatic event selection <Br />
-     *                  <code>false</code>: Manual selection. Initially local events are empty and
-     *                                      shared event are equal to the union alphabet. Set these sets
+     *                  <code>false</code>: Manual selection. Initially local events set is empty and
+     *                                      shared events set is the union alphabet. Set these sets
      *                                      using the corresponding methods. 
 
      */

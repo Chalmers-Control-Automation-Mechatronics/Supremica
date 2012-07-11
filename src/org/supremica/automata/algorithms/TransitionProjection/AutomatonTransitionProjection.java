@@ -80,10 +80,6 @@ public class AutomatonTransitionProjection {
 
         project();
         
-        if(quotient.length == originalEFA.nbrOfNodes() && currSharedEvents.size() == originalEFA.getAlphabet().size()){
-            return originalEFA;
-        }
-        
         for(int from = 0; from < quotient.length; from++){
             final Partition pFrom = getPartition(from);
             final int statusFrom = pFrom.getStatus();
@@ -102,7 +98,6 @@ public class AutomatonTransitionProjection {
                 prjEFA.addEvent(currEvent);
 
                 final int to = states[0];
-
                 final Partition pTo = getPartition(to);
                 final int statusTo = pTo.getStatus();
                 final NodeProxy currTarget = prjEFA.addState(getStateName(pTo.getCoset()),
