@@ -74,6 +74,12 @@ public class BackupGraphPanel
     super(graph, module);
   }
 
+  public BackupGraphPanel(final GraphSubject graph,
+                          final ModuleSubject module,
+                          final ModuleContext context)
+  {
+    super(graph, module, context);
+  }
 
   //#########################################################################
   //# Simple Access

@@ -23,10 +23,14 @@ import javax.swing.JComponent;
 
 import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
 import net.sourceforge.waters.gui.renderer.MiscShape;
+import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.Renderer;
+import net.sourceforge.waters.gui.renderer.RenderingInformation;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.subject.base.ProxySubject;
 
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
@@ -50,8 +54,16 @@ public class GraphPanel
   //# Constructors
   public GraphPanel(final GraphProxy graph, final ModuleProxy module)
   {
+    this(graph, module, new ModuleContext(module));
+  }
+
+  public GraphPanel(final GraphProxy graph,
+                    final ModuleProxy module,
+                    final ModuleContext context)
+  {
     mGraph = graph;
     mModule = module;
+    mModuleContext = context;
   }
 
 
@@ -146,18 +158,12 @@ public class GraphPanel
    */
   protected void printComponent(final Graphics g)
   {
-    // Paint using other stroke
-    //AbstractRendererShape.setBasicStroke(AbstractRendererShape.OLDTHINSTROKE); // Too thin for presentations
-    //AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE); // Just right?
-    //AbstractRendererShape.setBasicStroke(AbstractRendererShape.DOUBLESTROKE); // Too thick
-
-    // Clear selection?
-
-    // Paint the component on the supplied Graphics instance
-    paintComponent(g, true);
-
-    // Reset selection?
-
+    final ProxyShapeProducer producer = new ProxyShapeProducer(mGraph, new PrintRenderingContext());
+    final Renderer renderer = new Renderer();
+    renderer.renderGraph(getDrawnGraph(),
+                         getDrawnObjects(),
+                         producer,
+                         (Graphics2D) g);
     // Reset stroke
     AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE);
   }
@@ -167,15 +173,7 @@ public class GraphPanel
    */
   protected void paintComponent(final Graphics g)
   {
-    paintComponent(g, false);
-  }
-
-  private void paintComponent(final Graphics g, final boolean printing)
-  {
-    // Only paint the grid if we're not printing!
-    if (!printing) {
-      paintGrid(g);
-    }
+    paintGrid(g);
     final Renderer renderer = new Renderer();
     renderer.renderGraph(getDrawnGraph(),
                          getDrawnObjects(),
@@ -277,11 +275,40 @@ public class GraphPanel
     CANTDROP;
   }
 
+  //##########################################################################
+  //# Inner Class PrintRenderingContext
+  private class PrintRenderingContext extends ModuleRenderingContext
+  {
+
+    //#######################################################################
+    //# Constructor
+    private PrintRenderingContext()
+    {
+      super(mModuleContext);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
+    public RenderingInformation getRenderingInformation(final Proxy proxy)
+    {
+      final ProxySubject item = (ProxySubject) proxy;
+      final int priority = getPriority(item);
+      return new RenderingInformation
+        (false, false, false,
+         EditorColor.getColor(item, DragOverStatus.NOTDRAG, false,
+                              false, false),
+         EditorColor.getShadowColor(item, DragOverStatus.NOTDRAG, false,
+                                    false, false),
+         priority);
+    }
+
+  }
 
   //##########################################################################
   //# Data Members
   private final GraphProxy mGraph;
   private final ModuleProxy mModule;
+  private final ModuleContext mModuleContext;
   private ProxyShapeProducer mShapeProducer;
 
 

@@ -159,7 +159,7 @@ public class GraphEditorPanel
                           final WatersPopupActionManager manager)
     throws GeometryAbsentException
   {
-    super(graph, module);
+    super(graph, module, root.getModuleWindowInterface().getModuleContext());
     mRoot = root;
     mRenderingContext = new EditorRenderingContext();
     final ProxyShapeProducer producer =

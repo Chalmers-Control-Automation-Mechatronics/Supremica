@@ -33,6 +33,7 @@ import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
+import net.sourceforge.waters.gui.actions.GraphSavePDFAction;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
@@ -255,7 +256,8 @@ public class IDEMenuBar extends JMenuBar
       //mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
       final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
       mFileMenu.add(epsprint);
-      mFileMenu.add(mIDE.getActions().editorSavePDFAction.getMenuItem());
+      final Action pdfprint = actions.getAction(GraphSavePDFAction.class);
+      mFileMenu.add(pdfprint);
       mFileMenu.addSeparator();
       final Action exit = actions.getAction(ExitAction.class);
       mFileMenu.add(exit);
