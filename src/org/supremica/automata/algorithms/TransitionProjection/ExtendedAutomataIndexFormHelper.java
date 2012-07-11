@@ -296,25 +296,6 @@ public class ExtendedAutomataIndexFormHelper {
         return falses;
     }
 
-    public static int[] clearMaxInteger(final int[] array){
-        Args.checkForNull(array);
-        int[] temp = null;
-        if(array.length == 1){
-            if(array[0] != Integer.MAX_VALUE){
-                temp = new int[]{array[0]};
-            }
-        } else {
-        temp = new int[array.length - 1];
-        int j = 0;
-        for(int i = 0; i < array.length; i++) {
-                if(array[i] != Integer.MAX_VALUE) {
-                    temp[j++] = array[i];
-                }
-            }
-        }
-        return temp;
-    }
-
    public static TIntHashSet setUnion(final TIntHashSet x, final TIntHashSet y){
         Args.checkForNull(x);
         Args.checkForNull(y);

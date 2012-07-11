@@ -41,11 +41,17 @@ public class AutomataTransitionProjection {
     private final int nbrAutomaton;
     private final TIntHashSet unionAlphabet;
     private final TIntHashSet epsilon;
+    private final int MAX_VALUE = Integer.MAX_VALUE;
 
     /**
      * The constructor of the class.
-     * @param automatic <code>true</code>: Automatic event selection <code>false</code>: Manual selection
      * @param exAutomata ExtendedAutomata containing the EFAs
+     * 
+     * @param automatic <code>true</code>: Automatic event selection <Br />
+     *                  <code>false</code>: Manual selection. Initially local events are empty and
+     *                                      shared event are equal to the union alphabet. Set these sets
+     *                                      using the corresponding methods. 
+
      */
     public AutomataTransitionProjection(final ExtendedAutomata exAutomata, final boolean automatic){
         Args.checkForNull(automatic);
@@ -60,12 +66,12 @@ public class AutomataTransitionProjection {
             unionAlphabet.add(event);
         }
 
-        if(automatic){
+        if(automatic){ // Automatically find the local events
             localEvents = getLocalEventSet(exAutomata);
             sharedEvents = ExtendedAutomataIndexFormHelper.setMinus(unionAlphabet, localEvents);
-        } else {
+        } else { // Manually setting the local / shared events
             localEvents = new TIntHashSet();
-            sharedEvents = new TIntHashSet();
+            sharedEvents = new TIntHashSet(unionAlphabet.toArray());
         }
     }
 
@@ -113,7 +119,7 @@ public class AutomataTransitionProjection {
                     continue;
                 }
                 for(final int g : gs){
-                    if(g != Integer.MAX_VALUE) {
+                    if(g != MAX_VALUE) {
                         strAllGuards += " " + indexMap.getGuardExpressionAt(g).toString();
                     }
                 }
@@ -157,8 +163,10 @@ public class AutomataTransitionProjection {
                         continue outerloop;
                     }
 
-                    actions = ExtendedAutomataIndexFormHelper.clearMaxInteger(actions);
                     for(final int action : actions){
+                        if(action == MAX_VALUE) {
+                            continue;
+                        }
                         final BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(action);
                         final Set<VariableComponentProxy> actionRightVars = exAutomata.extractVariablesFromExpr(actionExp.getRight());
                         // If the action is in the form of, e.g., x += 1, x-=1, or x = y + 1 the it is not local
@@ -191,6 +199,10 @@ public class AutomataTransitionProjection {
         return TPTimer.elapsedTime();
     }
 
+    /**
+     * Return the string form of the current timer
+     * @return Current timer in string
+     */
     public String getTimer(){
         return TPTimer.toString();
     }
@@ -218,10 +230,18 @@ public class AutomataTransitionProjection {
         sharedEvents.addAll(ExtendedAutomataIndexFormHelper.setMinus(unionAlphabet, localEvents).toArray());
     }
 
+    /**
+     * Return the index form of the <code>exAutomata</code>
+     * @return Index form of the given Extended Automata
+     */
     public ExtendedAutomataIndexForm getIndexForm(){
         return indexAutomata;
     }
 
+    /**
+     * Return the index map of the <code>exAutomata</code>
+     * @return Index map of the given Extended Automata
+     */
     public ExtendedAutomataIndexMap getIndexMap(){
         return indexMap;
     }

@@ -87,7 +87,10 @@ public class ExtendedAutomataIndexForm {
     
     // <automaton> x <event> -> <Action[]>
     private int[][][] eventActionTable;
-
+    
+    // Max value 
+    private final int MAX_VALUE = Integer.MAX_VALUE;    
+    
     private final Logger logger = LoggerFactory.createLogger(ExtendedAutomataIndexFormHelper.class);
     private final ExtendedAutomataIndexMap indexMap;
     private final int nbrAutomaton;
@@ -209,7 +212,7 @@ public class ExtendedAutomataIndexForm {
      * For each state in the automaton precompute an array
      * that contains the index of all events that leave the current
      * state. This array must be sorted, and the last element must be
-     * Integer.MAX_VALUE. Note that this computation can not be
+     * MAX_VALUE. Note that this computation can not be
      * done in the states, since they do not know about the alphabet.
      *
      * Insert into enableEventsTable all states that enables a specific event.
@@ -238,8 +241,8 @@ public class ExtendedAutomataIndexForm {
         eventActionTable = new int[nbrOfAutomaton][alphabetSize][];
         for(int i=0; i<nbrOfAutomaton; i++){
             for(int j=0; j< alphabetSize; j++){
-                eventGuradTable[i][j] = new int[]{Integer.MAX_VALUE};
-                eventActionTable[i][j] = new int[]{Integer.MAX_VALUE};
+                eventGuradTable[i][j] = new int[]{MAX_VALUE};
+                eventActionTable[i][j] = new int[]{MAX_VALUE};
             }
         }
                         
@@ -264,7 +267,7 @@ public class ExtendedAutomataIndexForm {
                             eventGuradTable[automatonIndex][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(guardIndex, guardTable);
                             guardStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(guardIndex, guardStateTable);
                         }
-                        guardStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToEndOfArray(Integer.MAX_VALUE, 
+                        guardStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToEndOfArray(MAX_VALUE, 
                                                                                                      guardStateEventTable[automatonIndex][indexSource][indexEvent]);
                     } catch(Exception ex){}
                     try{
@@ -276,7 +279,7 @@ public class ExtendedAutomataIndexForm {
                             eventActionTable[automatonIndex][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(actionIndex, actionTable);
                             actionStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(actionIndex, actionStateTable);
                         }
-                        actionStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToEndOfArray(Integer.MAX_VALUE, 
+                        actionStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToEndOfArray(MAX_VALUE, 
                                                                                                      actionStateEventTable[automatonIndex][indexSource][indexEvent]);
                         
                     } catch(Exception ex){}
@@ -299,7 +302,7 @@ public class ExtendedAutomataIndexForm {
             for (int i = 0; i < alphabetSize; i++)
             {
                 enableEventsTable[currAutomatonIndex][i] = new int[currAutomatonNbrOfStates + 1];
-                enableEventsTable[currAutomatonIndex][i][0] = Integer.MAX_VALUE;
+                enableEventsTable[currAutomatonIndex][i][0] = MAX_VALUE;
             }
 
 
@@ -319,7 +322,7 @@ public class ExtendedAutomataIndexForm {
                 // Set a default value of each nextState
                 for (int i = 0; i < nbrOfEvents; i++)
                 {
-                    nextStateTable[currAutomatonIndex][currStateIndex][i] = Integer.MAX_VALUE;
+                    nextStateTable[currAutomatonIndex][currStateIndex][i] = MAX_VALUE;
                     sortedArcs[i] = new LinkedList<EdgeProxy>();
                 }
 
@@ -361,21 +364,21 @@ public class ExtendedAutomataIndexForm {
                     // Insert all states that enables the current event into
                     // enableEventsTable. This could easily be optimized to avoid the search.
                     int j = 0;
-                    while (enableEventsTable[currAutomatonIndex][thisIndex][j] != Integer.MAX_VALUE)
+                    while (enableEventsTable[currAutomatonIndex][thisIndex][j] != MAX_VALUE)
                     {
                         j++;
                     }
                     enableEventsTable[currAutomatonIndex][thisIndex][j] = currStateIndex;
                     try
                     {
-                        enableEventsTable[currAutomatonIndex][thisIndex][j + 1] = Integer.MAX_VALUE;
+                        enableEventsTable[currAutomatonIndex][thisIndex][j + 1] = MAX_VALUE;
                     }
                     catch (final Exception ex)
                     {
                         logger.error("Error in AutomataIndexForm.generateNextStateTransitionIndices. " + ex);
                     }
                 }
-                outgoingEventsTable[currAutomatonIndex][currStateIndex][i] = Integer.MAX_VALUE;
+                outgoingEventsTable[currAutomatonIndex][currStateIndex][i] = MAX_VALUE;
 
                 // Generate nextStatesTable based on sortedArcs
                 for (i=0; i<nbrOfEvents; i++)
@@ -394,7 +397,7 @@ public class ExtendedAutomataIndexForm {
                         nextStatesTable[currAutomatonIndex][currStateIndex][i][j] = currNextStateIndex;
                         j++;
                     }
-                    nextStatesTable[currAutomatonIndex][currStateIndex][i][j] = Integer.MAX_VALUE;
+                    nextStatesTable[currAutomatonIndex][currStateIndex][i][j] = MAX_VALUE;
                 }
             }
         }
@@ -404,7 +407,7 @@ public class ExtendedAutomataIndexForm {
      * For each state in the automaton precompute an array
      * that contains the index of all events that leave the current
      * state. This array must be sorted, and the last element must be
-     * Integer.MAX_VALUE. Note that this computation can not be
+     * MAX_VALUE. Note that this computation can not be
      * done in the states, since they do not know about the alphabet.
      *
      *@param  theAutomata Description of the Parameter
@@ -439,7 +442,7 @@ public class ExtendedAutomataIndexForm {
                 // Set a default value of each nextState
                 for (int i = 0; i < nbrOfEvents; i++)
                 {
-                    prevStatesTable[currAutomatonIndex][currStateIndex][i] = new int[]{Integer.MAX_VALUE};
+                    prevStatesTable[currAutomatonIndex][currStateIndex][i] = new int[]{MAX_VALUE};
                 }
 
                 // Insert all indices in a tree (sorted), here it is cleared, in the below loop, it is filled
@@ -470,7 +473,7 @@ public class ExtendedAutomataIndexForm {
                     incomingEventsTable[currAutomatonIndex][currStateIndex][i++] = sortedEventIndicesIt.intValue();
                 }
                 
-                incomingEventsTable[currAutomatonIndex][currStateIndex][i] = Integer.MAX_VALUE;
+                incomingEventsTable[currAutomatonIndex][currStateIndex][i] = MAX_VALUE;
             }
         }
     }
@@ -519,7 +522,7 @@ public class ExtendedAutomataIndexForm {
                     currTablePosition++;
                 }
             }
-            eventToAutomatonTable[currEventSynchIndex][currTablePosition] = Integer.MAX_VALUE;
+            eventToAutomatonTable[currEventSynchIndex][currTablePosition] = MAX_VALUE;
         }
     }
 

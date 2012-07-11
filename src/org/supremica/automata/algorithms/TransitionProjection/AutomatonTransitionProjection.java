@@ -34,6 +34,7 @@ public class AutomatonTransitionProjection {
     private final ExtendedAutomataIndexMap indexMap;
     private final TIntHashSet currAlphabet;
     private final TIntHashSet uncontrollableEvents;
+    private final int MAX_VALUE = Integer.MAX_VALUE;    
     private final int MARK_EVENT = Short.MAX_VALUE;
     private final int[][] nextStateTable;
     private final TIntHashSet currEplsilon;
@@ -66,14 +67,23 @@ public class AutomatonTransitionProjection {
         ps = null;
         quotient = null;
     }
-
+    
+    /**
+     * Return the projected EFA. If the projected EFA is the same as the original EFA (number of nodes and alphabet)
+     * then will return <code>Null</code>.
+     * @return Projected EFA or <code>Null</code> if the projected EFA and the original EFA are the same
+     */
     public ExtendedAutomaton getProjectedEFA(){
         final ExtendedAutomaton originalEFA = indexMap.getExtendedAutomatonAt(indexAutomaton);
         final ExtendedAutomaton prjEFA = new ExtendedAutomaton(originalEFA.getName(), originalEFA.getKind());
         final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
 
         project();
-
+        
+        if(quotient.length == originalEFA.nbrOfNodes() && currSharedEvents.size() == originalEFA.getAlphabet().size()){
+            return originalEFA;
+        }
+        
         for(int from = 0; from < quotient.length; from++){
             final Partition pFrom = getPartition(from);
             final int statusFrom = pFrom.getStatus();
@@ -107,8 +117,10 @@ public class AutomatonTransitionProjection {
                         try{
                             int[] currGuards = indexAutomata.getGuardStateEventTable()[indexAutomaton][stFrom][event];
                             if(currGuards.length > 1){
-                                currGuards = ExtendedAutomataIndexFormHelper.clearMaxInteger(currGuards);
                                 for(final int currGuard : currGuards){
+                                    if(currGuard == MAX_VALUE) {
+                                        continue;
+                                    }
                                     final SimpleExpressionProxy guardExp = indexMap.getGuardExpressionAt(currGuard);
                                     if(states.length == 2){
                                         guard = guardExp.toString();
@@ -129,7 +141,7 @@ public class AutomatonTransitionProjection {
                             final int[] currActions = indexAutomata.getActionStateEventTable()[indexAutomaton][stFrom][event];
                             if(currActions.length > 1){
                                 for(final int currAction : currActions){
-                                    if(currAction == Integer.MAX_VALUE) {
+                                    if(currAction == MAX_VALUE) {
                                         continue;
                                     }
                                     final BinaryExpressionProxy actionExp = indexMap.getActionExpressionAt(currAction);
@@ -272,18 +284,18 @@ public class AutomatonTransitionProjection {
 
         for(final Partition p : ps){
             final int source = p.getState();
-            if(source == Integer.MAX_VALUE) {
+            if(source == MAX_VALUE) {
                 throw new NullPointerException("getQuotient : partition returns Null quotiont state");
             }
             for(int event=0; event<indexAutomata.getNbrUnionEvents(); event++){
-                quotient[source][event] = new int[]{Integer.MAX_VALUE};
+                quotient[source][event] = new int[]{MAX_VALUE};
                 for(final int currState : p.getCoset().toArray()){
                     final int next = indexAutomata.getNextStateTable()[indexAutomaton][currState][event];
-                    if(next == Integer.MAX_VALUE) {
+                    if(next == MAX_VALUE) {
                         continue;
                     }
                     final int target = getQuotientState(next, ps);
-                    if(target == Integer.MAX_VALUE) {
+                    if(target == MAX_VALUE) {
                         throw new NullPointerException("getQuotient : finding quotient for the state <" + next + "> returns Null");
                     }
                     final int[] currQuotientStates = quotient[source][event];
@@ -350,27 +362,36 @@ public class AutomatonTransitionProjection {
         }
 
         /**
-         * Second, check for possible critical states, i.e., two or more outgoing transitions with
-         * the same source, label, and target but different actions
+         * Second, if there is any guard or action, check for the possible critical states, i.e., those states which have 
+         * two or more outgoing transitions with the same label and target state but augmented with different actions and in some 
+         * cases guards
          */
         if(indexMap.hasAnyAction(indexAutomaton) || indexMap.hasAnyGuard(indexAutomaton)){
             for(int source = 0; source < quotient.length; source++){
                 for(int event = 0; event < quotient[source].length; event++){
-                    // Removing duplicated states
                     int[] targets = quotient[source][event];
+                    // If the target states is one (+ MAX_VALUE) then it is ok otherwise check them.
+                    // Note that the targets will the same since we do not have nondeterministic behaviour
                     if(targets.length <= 2) {
                         continue;
                     }
-                    targets = ExtendedAutomataIndexFormHelper.clearMaxInteger(targets);
+                    // Removing duplicated states
                     final TIntHashSet temp = new TIntHashSet();
                     for(final int target : targets){
+                        if(target == MAX_VALUE) {
+                            continue;
+                        }
                         final boolean added = temp.add(target);
-                        // If the state is already in the set then it might be critical
+                        // If the target state is already in the set temp then it might be critical so check it
                         if(!added){
+                            // Check for actions
                             final boolean checkActions = checkActions(source, event, target);
+                            // Check for guards
                             final boolean checkGuards = checkGuards(source, event, target);
+                            // If any of above checking fails then do as follows
                             if(!(checkActions && checkGuards)){
-                                // Find the local events hidden in the cosets so by making them observable we may fix the problem otherwise later split them
+                                // Find the local events hidden in the cosets so by making them observable we may fix the problem 
+                                // otherwise later split them
                                 final TIntHashSet H = new TIntHashSet();
                                 final Partition p = getPartition(source);
                                 final TIntHashSet hiddenEvents = getHiddenEvents(p);
@@ -408,7 +429,7 @@ public class AutomatonTransitionProjection {
                         if(states.length == 1) {
                             continue;
                         }
-                        states = ExtendedAutomataIndexFormHelper.clearMaxInteger(states);
+                        // Put the state into the event-state map
                         map.put(event, states[0]);
                     }
                 }
@@ -417,11 +438,11 @@ public class AutomatonTransitionProjection {
                     for(final int event : map.keys()){
                         final TIntHashSet targetCoset = getPartition(map.get(event)).getCoset();
                         for(final int source : sourceCoset.toArray()){
-                            if(source == Integer.MAX_VALUE) {
+                            if(source == MAX_VALUE) {
                                 continue;
                             }
                             final int st = nextStateTable[source][event];
-                            if(st == Integer.MAX_VALUE) {
+                            if(st == MAX_VALUE) {
                                 continue;
                             }
                             if(targetCoset.contains(st)) {
@@ -449,7 +470,7 @@ public class AutomatonTransitionProjection {
 
                             if(uncontrollableEvents.contains(event)){
                                 for(final int preState : preStates) {
-                                    if(preState != Integer.MAX_VALUE) {
+                                    if(preState != MAX_VALUE) {
                                         stack.push(preState);
                                     }
                                 }
@@ -484,7 +505,7 @@ public class AutomatonTransitionProjection {
                 for(final int currEvent : currAlphabet.toArray()){
                     if(currLocalEvents.contains(currEvent)){
                         final int st = nextStateTable[currstate][currEvent];
-                        if(st == Integer.MAX_VALUE) {
+                        if(st == MAX_VALUE) {
                             continue;
                         }
                         final boolean isNew = eqStates.add(st);
@@ -501,7 +522,7 @@ public class AutomatonTransitionProjection {
                             continue;
                         }
                         for(final int pre : preStates){
-                            if(pre == Integer.MAX_VALUE) {
+                            if(pre == MAX_VALUE) {
                                 continue;
                             }
                             final boolean isNew = eqStates.add(pre);
@@ -548,7 +569,7 @@ public class AutomatonTransitionProjection {
                 }
                 if(currLocalEvents.contains(currEvent)){
                     for(final int pre : preStates){
-                        if(pre == Integer.MAX_VALUE) {
+                        if(pre == MAX_VALUE) {
                             continue;
                         }
                         final boolean isNew = eqStates.add(pre);
@@ -558,7 +579,7 @@ public class AutomatonTransitionProjection {
                     }
                 } else if(currEvent == event){
                     for(final int preState : preStates){
-                        if(preState != Integer.MAX_VALUE) {
+                        if(preState != MAX_VALUE) {
                             imdImg.add(preState);
                         }
                     }
@@ -612,9 +633,11 @@ public class AutomatonTransitionProjection {
 
         for(final int ndEvent : ndEvents.toArray()){
             int[] nextQuoStates = quotient[ndQuoState][ndEvent];
-            nextQuoStates = ExtendedAutomataIndexFormHelper.clearMaxInteger(nextQuoStates);
             final HashSet<Partition> nextPs = new HashSet<Partition>();
             for(final int nextQuoState : nextQuoStates){
+                if(nextQuoState == MAX_VALUE) {
+                    continue;
+                }
                 final Partition p = getPartition(nextQuoState);
                 nextPs.add(p);
             }
@@ -660,7 +683,7 @@ public class AutomatonTransitionProjection {
         for(final int yNode : y.getCoset().toArray()){
             final int st = nextStateTable[yNode][ndEvent];
 
-            if(st == Integer.MAX_VALUE) {
+            if(st == MAX_VALUE) {
                 continue;
             }
 
@@ -700,7 +723,7 @@ public class AutomatonTransitionProjection {
         final TIntHashSet states = new TIntHashSet();
         for(final int state : source.getCoset().toArray()){
             final int next = indexAutomata.getNextStateTable()[indexAutomaton][state][event];
-            if(next == Integer.MAX_VALUE || !target.getCoset().contains(next)) {
+            if(next == MAX_VALUE || !target.getCoset().contains(next)) {
                 continue;
             }
             states.add(state);
@@ -723,8 +746,10 @@ public class AutomatonTransitionProjection {
         final TIntHashSet hiddenEvents = new TIntHashSet();
         for(final int state : p.getCoset().toArray()){
             int[] activeEvents = indexAutomata.getOutgoingEventsTable()[indexAutomaton][state];
-            activeEvents = ExtendedAutomataIndexFormHelper.clearMaxInteger(activeEvents);
             for(final int event : activeEvents){
+                if(event == MAX_VALUE) {
+                    continue;
+                }
                 final int next = indexAutomata.getNextStateTable()[indexAutomaton][state][event];
                 if(currLocalEvents.contains(event) && p.getCoset().contains(next) && !currEplsilon.contains(event)) {
                     hiddenEvents.add(event);
@@ -759,7 +784,7 @@ public class AutomatonTransitionProjection {
                 }
                 final TIntHashSet temp = new TIntHashSet();
                 for(final int target : targets){
-                    if(target == Integer.MAX_VALUE) {
+                    if(target == MAX_VALUE) {
                         continue;
                     }
                     final boolean added = temp.add(target);
@@ -767,9 +792,12 @@ public class AutomatonTransitionProjection {
                     if(!added){
                         final boolean checkAction = checkActions(source, event, target);
                         final boolean checkGuard = checkGuards(source, event, target);
-                        if(!(checkAction && checkGuard)){
+                        if(!checkAction){
+                            // For action split
+                            split2(source);
+                        } else if(!checkGuard){
                             final boolean nopath = nopath2(getPartition(source), event, getPartition(target));
-                            // No path then split
+                            // For guard if no path then split
                             if(nopath) {
                                 split2(source);
                             }
@@ -786,7 +814,7 @@ public class AutomatonTransitionProjection {
         final HashSet<String> set = new HashSet<String>();
         for(final int from : fromP.getCoset().toArray()){
             final int next = indexAutomata.getNextStateTable()[indexAutomaton][from][event];
-            if(next == Integer.MAX_VALUE || !toP.getCoset().contains(next)) {
+            if(next == MAX_VALUE || !toP.getCoset().contains(next)) {
                 continue;
             }
 
@@ -797,7 +825,7 @@ public class AutomatonTransitionProjection {
 
             String str = "";
             for(final int action : actions){
-                if(action != Integer.MAX_VALUE) {
+                if(action != MAX_VALUE) {
                     str += indexMap.getActionExpressionAt(action).toString();
                 }
             }
@@ -819,7 +847,7 @@ public class AutomatonTransitionProjection {
         for(final int from : fromP.getCoset().toArray()){
             final int next = indexAutomata.getNextStateTable()[indexAutomaton][from][event];
 
-            if(next == Integer.MAX_VALUE || !toP.getCoset().contains(next)) {
+            if(next == MAX_VALUE || !toP.getCoset().contains(next)) {
                 continue;
             }
 
@@ -830,7 +858,7 @@ public class AutomatonTransitionProjection {
 
             String str = "";
             for(final int guard : guards){
-                if(guard != Integer.MAX_VALUE) {
+                if(guard != MAX_VALUE) {
                     str += indexMap.getGuardExpressionAt(guard).toString();
                 }
             }
@@ -896,9 +924,13 @@ public class AutomatonTransitionProjection {
                 }
             }
         }
-        return Integer.MAX_VALUE;
+        return MAX_VALUE;
     }
 
+    /**
+     * Returns the set of shared events in index form
+     * @return The set of indexed shared events
+     */    
     public HashSet<Integer> getSharedEvents(){
         final HashSet<Integer> shared = new HashSet<Integer>();
         for(final int e : currSharedEvents.toArray()) {
@@ -907,6 +939,10 @@ public class AutomatonTransitionProjection {
         return shared;
     }
 
+    /**
+     * Returns the set of local events in index form
+     * @return The set of indexed local events
+     */
     public HashSet<Integer> getLocalEvents(){
         final HashSet<Integer> local = new HashSet<Integer>();
         for(final int e : currLocalEvents.toArray()) {
@@ -922,14 +958,14 @@ public class AutomatonTransitionProjection {
 
         Partition(){
             coset = new TIntHashSet();
-            state = Integer.MAX_VALUE;
-            status = Integer.MAX_VALUE;
+            state = MAX_VALUE;
+            status = MAX_VALUE;
         }
 
         Partition(final TIntHashSet coset){
             this.coset = coset;
-            state = Integer.MAX_VALUE;
-            status = Integer.MAX_VALUE;
+            state = MAX_VALUE;
+            status = MAX_VALUE;
         }
 
         public TIntHashSet getCoset(){

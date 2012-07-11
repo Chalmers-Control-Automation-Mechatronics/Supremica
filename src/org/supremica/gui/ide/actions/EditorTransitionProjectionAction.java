@@ -147,7 +147,8 @@ public class EditorTransitionProjectionAction
 
                 if(prjEFA.getAlphabet().size() == oriEFA.getAlphabet().size()
                         && prjEFA.getNodes().size() == oriEFA.getNodes().size()){
-                   continue;
+                    logger.info("The projected EFA for '"+ efa +"' is the same as the original one so keeping the original EFA");
+                    continue;
                 }
 
                 projectedEFAs.add(efa);
@@ -173,14 +174,10 @@ public class EditorTransitionProjectionAction
                     exAutomata.getModule().getComponentListModifiable().remove(efa.getComponent());
                 }
             }
-            if(!prjs.isEmpty()){
-            for(final ExtendedAutomaton efa : prjs)
-                exAutomata.addAutomaton(efa);
-            } else {
-                logger.info("No local event can be found so no EFA has been projected");
-                return;
-            }
 
+            for(final ExtendedAutomaton efa : prjs){
+                exAutomata.addAutomaton(efa);
+            }
 
             if(dialog.showResult()){
                 final HashSet<EventDeclProxy> uniPrjAlphabet = new HashSet<EventDeclProxy>();
@@ -209,7 +206,7 @@ public class EditorTransitionProjectionAction
             } else {
                 if(prjs.size() == 1){
                     logger.info(" One EFA was projected in "+ elapsed/1000F + " seconds");
-                } else {
+                } else if(prjs.size() > 1){
                     logger.info(prjs.size() + " EFAs were projected in "+ elapsed/1000F + " seconds");
                 }
             }
