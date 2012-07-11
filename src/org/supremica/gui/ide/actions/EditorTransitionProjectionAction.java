@@ -21,6 +21,7 @@ public class EditorTransitionProjectionAction
                 extends IDEAction
 {
     private static final long serialVersionUID = 1L;
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
     public EditorTransitionProjectionAction(final List<IDEAction> actionList)
