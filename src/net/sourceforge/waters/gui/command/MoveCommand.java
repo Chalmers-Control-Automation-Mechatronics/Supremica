@@ -169,13 +169,14 @@ public class MoveCommand
     if (getUpdatesSelection()) {
       final SelectionOwner panel = getPanel();
       final ProxySubject parent = (ProxySubject) mSubject.getParent();
-      final List<ProxySubject> list;
+      ProxySubject selected = parent;
       if(parent instanceof SimpleNodeSubject){
-        list = Collections.singletonList((ProxySubject) mSubject);
+        final SimpleNodeSubject node = (SimpleNodeSubject)parent;
+        if(node.getLabelGeometry() == mSubject){
+          selected = mSubject;
+        }
       }
-      else{
-        list = Collections.singletonList(parent);
-      }
+      final List<ProxySubject> list = Collections.singletonList(selected);
       panel.replaceSelection(list);
       panel.scrollToVisible(list);
       panel.activate();

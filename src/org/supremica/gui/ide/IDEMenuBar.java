@@ -253,7 +253,6 @@ public class IDEMenuBar extends JMenuBar
       final Action importAction = actions.getAction(ImportAction.class);
       mFileMenu.add(importAction);
       //mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
-      mFileMenu.add(mIDE.getActions().editorSavePostscriptAction.getMenuItem());
       final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
       mFileMenu.add(epsprint);
       mFileMenu.add(mIDE.getActions().editorSavePDFAction.getMenuItem());

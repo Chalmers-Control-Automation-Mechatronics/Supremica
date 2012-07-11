@@ -32,6 +32,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -152,6 +153,8 @@ public class ProxyNamer {
                 EdgeProxy.class, true);
     createEntry(NodeProxy.class, "Node",  Proxy.class, false);
     createEntry(ParameterBindingProxy.class, "Binding");
+    createEntry(PointGeometryProxy.class, "Node Label",
+                SimpleNodeProxy.class, false);
     createEntry(Proxy.class, "Item");
     createEntry(QualifiedIdentifierProxy.class, "Label",
                 IdentifierProxy.class, false);

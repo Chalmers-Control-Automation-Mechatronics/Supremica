@@ -320,8 +320,11 @@ public class GraphEditorPanel
       return getCurrentSelection().iterator().next();
     } else if(mSelection.size() > 1){ //used for range selection
       final Iterator<ProxySubject> iter = getCurrentSelection().iterator();
-      iter.next(); //LabelBlock
-      return iter.next();
+      if(labelsAreSelected()){
+        iter.next(); //LabelBlock
+        return iter.next();
+      }
+      return null;
     } else {
       return null;
     }
@@ -1099,6 +1102,17 @@ public class GraphEditorPanel
       .getWatersSelectionOwner() == GraphEditorPanel.this;
   }
 
+  public boolean labelsAreSelected(){
+    for (final ProxySubject proxy : getCurrentSelection()) {
+      if (proxy instanceof ForeachSubject) {
+        return true;
+      } else if (proxy instanceof IdentifierSubject) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   //#########################################################################
   //# Low-level Selection Handling
@@ -1661,6 +1675,150 @@ public class GraphEditorPanel
       }
     }
 
+    private List<ProxySubject> getListOfSelectedLabels(){
+      final List<ProxySubject> list = new LinkedList<ProxySubject>();
+      for (final ProxySubject sub : getCurrentSelection()) {
+        if (sub instanceof IdentifierSubject || sub instanceof ForeachSubject) {
+          list.add(sub);
+        }
+      }
+      return list;
+    }
+
+    private boolean iterate(final ListSubject<AbstractSubject> listSubject,
+                         final Selection range,
+                         final ModuleEqualityVisitor eq,
+                         final ProxySubject item,
+                         final int index){
+      for (int i = index; i < listSubject.size(); i++) {
+        final ProxySubject child = listSubject.get(i);
+        range.add(child, false);
+        if(eq.equals(item, child) && eq.equals(
+          (Proxy)item.getParent().getParent(),
+          (Proxy)child.getParent().getParent())){
+          return true;
+        }
+        if(child instanceof ForeachSubject){
+          final ForeachSubject foreach  = (ForeachSubject)child;
+          if(iterate(foreach.getBodyModifiable(), range, eq, item, 0)){
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    private void addRangeToSelection(final ProxySubject item){
+      final Selection rangeSelection = new Selection();
+      final ProxySubject anchor = getSelectionAnchor();
+      clearSelection();
+      rangeSelection.add(anchor, false);
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ProxyShape anchorShape = getShapeProducer().getShape(anchor);
+      final int anchorPoint = (int)anchorShape.getShape().getBounds().getY();
+      final ProxyShape endShape = getShapeProducer().getShape(item);
+      final int endPoint = (int)endShape.getShape().getBounds().getY();
+      if(anchorPoint < endPoint){
+        //down
+        boolean found = false;
+        if(anchor instanceof ForeachSubject){
+          final ForeachSubject foreach = (ForeachSubject) anchor;
+          found = iterate(foreach.getBodyModifiable(), rangeSelection, eq, item, 0);
+          if(found){
+            replaceSelection(rangeSelection);
+            return;
+          }
+        }
+        findEndOfRange(rangeSelection, anchor, item, eq, 1);
+      }
+      else{
+        //up
+        findEndOfRange(rangeSelection, item, anchor, eq, 0);
+      }
+      replaceSelection(rangeSelection);
+    }
+
+    private void findEndOfRange(final Selection range, final ProxySubject start, final ProxySubject end,
+                                final ModuleEqualityVisitor eq, final int first){
+      boolean found = false;
+      ProxySubject current = start;
+      int add = first;
+      while (!found) {
+        final ProxySubject parent =
+          (ProxySubject) current.getParent().getParent();
+        if (parent instanceof ForeachSubject) {
+          final ForeachSubject foreach = (ForeachSubject) parent;
+           final int index = foreach.getBodyModifiable().indexOf(current) + add;
+          found =
+            iterate(foreach.getBodyModifiable(), range, eq, end, index);
+        } else if (parent instanceof LabelBlockSubject) {
+          final LabelBlockSubject block = (LabelBlockSubject) parent;
+          final int index = block.getEventListModifiable().indexOf(current) + add;
+          found =
+            iterate(block.getEventListModifiable(), range, eq, end, index);
+        }
+        current = parent;
+        add = 1;
+      }
+    }
+
+    private void mousePressedWhenInFocus(final MouseEvent event)
+    {
+      final ProxySubject item = getItemToBeSelected(event);
+      final List<ProxySubject> list = getListOfSelectedLabels();
+      mItem = item;
+      if (canBeSelected(item)) {
+        if (event.isShiftDown() || event.isControlDown()) {
+          if (!isSelected(item)) {
+            if (item instanceof IdentifierSubject
+                || item instanceof ForeachSubject) {
+              if (!list.isEmpty()) {
+                if (event.isShiftDown()) {
+                  addRangeToSelection(item);
+                } else {
+                  addToSelection(item);
+                }
+                mItem = null;
+              }
+            } else {
+              if (!list.isEmpty()) {
+                removeFromSelection(list);
+              }
+              toggleSelection(item);
+              mItem = null;
+            }
+          } else {
+            if (item instanceof IdentifierSubject
+                || item instanceof ForeachSubject) {
+              if (!list.isEmpty() && event.isShiftDown()) {
+                addRangeToSelection(item);
+                mItem = null;
+              }
+            }
+          }
+        } else {
+          if (!isSelected(item)) {
+            if (!(item instanceof IdentifierSubject)
+                && !(item instanceof ForeachSubject)) {
+              replaceSelection(item);
+            }
+          }
+        }
+      } else {
+        if (event.isShiftDown() || event.isControlDown()) {
+          if (!list.isEmpty()) {
+            removeFromSelection(list);
+          }
+        } else {
+          clearSelection();
+        }
+      }
+      mStartPoint = event.getPoint();
+      mPopupFactory.maybeShowPopup(GraphEditorPanel.this, event,
+                                   mFocusedObject);
+    }
+
+
     //#######################################################################
     //# Additional Callbacks
     /**
@@ -1729,182 +1887,22 @@ public class GraphEditorPanel
       mItem = null;
     }
 
-    private List<ProxySubject> getListOfSelectedLabels(){
-      final List<ProxySubject> list = new LinkedList<ProxySubject>();
-      for (final ProxySubject sub : getCurrentSelection()) {
-        if (sub instanceof IdentifierSubject || sub instanceof ForeachSubject) {
-          list.add(sub);
-        }
-      }
-      return list;
-    }
-
-    private void addToSelectionWithoutChildren(final ProxySubject item)
-    {
-      if(mSelection.add(item, false)){
-        fireSelectionChanged();
-      }
-    }
-
-    private boolean iterate(final ListSubject<AbstractSubject> listSubject,
-                         final ModuleEqualityVisitor eq,
-                         final ProxySubject item,
-                         final int index){
-      for (int i = index; i < listSubject.size(); i++) {
-        final ProxySubject child = listSubject.get(i);
-        addToSelectionWithoutChildren(child);
-        if(eq.equals(item, child) && eq.equals(
-          (Proxy)item.getParent().getParent(),
-          (Proxy)child.getParent().getParent())){
-          return true;
-        }
-        if(child instanceof ForeachSubject){
-          final ForeachSubject foreach  = (ForeachSubject)child;
-          if(iterate(foreach.getBodyModifiable(), eq, item, 0)){
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    private void addRangeToSelection(final ProxySubject item){
-      final ProxySubject anchor = getSelectionAnchor();
-      clearSelection();
-      addToSelectionWithoutChildren(anchor);
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-      final ProxyShape anchorShape = getShapeProducer().getShape(anchor);
-      final int anchorPoint = (int)anchorShape.getShape().getBounds().getY();
-      final ProxyShape endShape = getShapeProducer().getShape(item);
-      final int endPoint = (int)endShape.getShape().getBounds().getY();
-      if(anchorPoint < endPoint){
-        //down
-        boolean found = false;
-        if(anchor instanceof ForeachSubject){
-          final ForeachSubject foreach = (ForeachSubject) anchor;
-          found = iterate(foreach.getBodyModifiable(), eq, item, 0);
-          if(found){
-            return;
-          }
-        }
-        ProxySubject current = anchor;
-        while (!found) {
-          final ProxySubject parent =
-            (ProxySubject) current.getParent().getParent();
-          if (parent instanceof ForeachSubject) {
-            final ForeachSubject foreach = (ForeachSubject) parent;
-            found =
-              iterate(foreach.getBodyModifiable(), eq, item, foreach
-                .getBodyModifiable().indexOf(current) + 1);
-          } else if (parent instanceof LabelBlockSubject) {
-            final LabelBlockSubject block = (LabelBlockSubject) parent;
-            found =
-              iterate(block.getEventListModifiable(), eq, item, block
-                .getEventListModifiable().indexOf(current) + 1);
-          }
-          current = parent;
-        }
-
-      }
-      else{
-        //up
-        boolean found = false;
-        ProxySubject current = item;
-        boolean first = true;
-        while (!found) {
-          final ProxySubject parent =
-            (ProxySubject) current.getParent().getParent();
-          if (parent instanceof ForeachSubject) {
-            final ForeachSubject foreach = (ForeachSubject) parent;
-             final int index = first ? foreach.getBodyModifiable().indexOf(current) :
-               foreach.getBodyModifiable().indexOf(current) + 1;
-             first = false;
-            found =
-              iterate(foreach.getBodyModifiable(), eq, anchor, index);
-          } else if (parent instanceof LabelBlockSubject) {
-            final LabelBlockSubject block = (LabelBlockSubject) parent;
-            final int index = first ? block.getEventListModifiable().indexOf(current) :
-              block.getEventListModifiable().indexOf(current) + 1;
-            first = false;
-            found =
-              iterate(block.getEventListModifiable(), eq, anchor, index);
-          }
-          current = parent;
-        }
-      }
-    }
-
-    private void onlyWhenInFocus(final MouseEvent event)
-    {
-      if (mIsPermanentFocusOwner) {
-        final ProxySubject item = getItemToBeSelected(event);
-        final List<ProxySubject> list = getListOfSelectedLabels();
-        mItem = item;
-        if (canBeSelected(item)) {
-          if (event.isShiftDown() || event.isControlDown()) {
-            if (!isSelected(item)) {
-              if (item instanceof IdentifierSubject
-                  || item instanceof ForeachSubject) {
-                if (!list.isEmpty()) {
-                  if (event.isShiftDown()) {
-                    addRangeToSelection(item);
-                  } else {
-                    addToSelection(item);
-                  }
-                  mItem = null;
-                }
-              } else {
-                if (!list.isEmpty()) {
-                  removeFromSelection(list);
-                }
-                toggleSelection(item);
-                mItem = null;
-              }
-            } else {
-              if (item instanceof IdentifierSubject
-                  || item instanceof ForeachSubject) {
-                if (!list.isEmpty() && event.isShiftDown()) {
-                  addRangeToSelection(item);
-                  mItem = null;
-                }
-              }
-            }
-          } else {
-            if (!isSelected(item)) {
-              if (!(item instanceof IdentifierSubject)
-                  && !(item instanceof ForeachSubject)) {
-                replaceSelection(item);
-              }
-            }
-          }
-        } else {
-          if (event.isShiftDown() || event.isControlDown()) {
-            if (!list.isEmpty()) {
-              removeFromSelection(list);
-            }
-          } else {
-            clearSelection();
-          }
-        }
-        mStartPoint = event.getPoint();
-        mPopupFactory.maybeShowPopup(GraphEditorPanel.this, event,
-                                     mFocusedObject);
-      } else {
-        requestFocusInWindow();
-        SwingUtilities.invokeLater(new Runnable() {
-
-          public void run()
-          {
-            onlyWhenInFocus(event);
-          }
-
-        });
-      }
-    }
-
     public void mousePressed(final MouseEvent event)
     {
-      onlyWhenInFocus(event);
+      if(mIsPermanentFocusOwner){
+        mousePressedWhenInFocus(event);
+      }
+      else{
+        requestFocusInWindow();
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run()
+          {
+            if(mIsPermanentFocusOwner){
+              mousePressedWhenInFocus(event);
+            }
+          }
+        });
+      }
     }
 
     public void mouseReleased(final MouseEvent event)
