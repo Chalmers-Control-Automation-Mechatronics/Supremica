@@ -59,8 +59,9 @@ public class EditorTransitionProjectionAction
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
         final HashSet<EventDeclProxy> uniAlphabet = new HashSet<EventDeclProxy>();
-        for(final ExtendedAutomaton efa:exAutomata)
+        for(final ExtendedAutomaton efa:exAutomata) {
             uniAlphabet.addAll(efa.getAlphabet());
+        }
 
         final int nbrOfComponents = module.getComponentList().size();
         if(nbrOfComponents == 0){
@@ -71,15 +72,18 @@ public class EditorTransitionProjectionAction
         final List<? extends Proxy> currentSelection = ide.getActiveDocumentContainer().getEditorPanel().getComponentsPanel().getCurrentSelection();
 
         final HashSet<String> components = new HashSet<String>();
-        for(final Proxy item : currentSelection)
-            if(item instanceof SimpleComponentSubject)
+        for(final Proxy item : currentSelection) {
+            if (item instanceof SimpleComponentSubject) {
                 components.add(((SimpleComponentSubject) item).getName());
+            }
+        }
 
         final TPDialog dialog = new TPDialog(ide.getFrame(), true, components.isEmpty());
         dialog.setLocationRelativeTo(ide.getIDE());
         dialog.setVisible(true);
 
         if(dialog.isProjectSelected()){
+            boolean show = dialog.showResult();
             if(dialog.getProjectionOption() == TPDialogOption.ALLEFAS_SELECTED){
                 for(final ExtendedAutomaton efa : exAutomata){
                     components.add(efa.getName());
@@ -104,8 +108,9 @@ public class EditorTransitionProjectionAction
                             }
                         }
                     }
-                    if(!localEvents.isEmpty())
+                    if(!localEvents.isEmpty()) {
                         TP.setLocalEvents(localEvents);
+                    }
                 }
 
             } else if(dialog.getEventOption() == TPDialogOption.SHAREDEVENT_SELECTED){
@@ -122,16 +127,18 @@ public class EditorTransitionProjectionAction
                             }
                         }
                     }
-                    if(!sharedEvents.isEmpty())
+                    if(!sharedEvents.isEmpty()) {
                         TP.setSharedEvents(sharedEvents);
+                    }
                 }
             }
 
             int nbrOriNodes = 0;
             int nbrPrjNodes = 0;
             long elapsed = 0;
-            if(dialog.showResult())
+            if(show) {
                 logger.info("Transition Projection start");
+            }
 
             final HashSet<String> projectedEFAs = new HashSet<String>();
             for(final String efa : components){
@@ -148,29 +155,34 @@ public class EditorTransitionProjectionAction
                 if(prjEFA.getAlphabet().size() == oriEFA.getAlphabet().size()
                         && prjEFA.getNodes().size() == oriEFA.getNodes().size()
                         && prjEFA.getTransitions().size() == oriEFA.getTransitions().size()){
-                    logger.info("The projected EFA for '"+ efa +"' is the same as the original one so keeping the original EFA");
                     elapsed += TP.getElapsedTime();
                     nbrPrjNodes += prjEFA.getNodes().size();                    
+                    logger.info("The projected EFA for '"+ efa +"' is the same as the original EFA");
                     continue;
                 }
                 
                 if(prjEFA.isNondeterministic() != null){
-                    logger.info("The projected EFA for '"+ efa +"' is nondeterministic so keeping the original EFA");
                     elapsed += TP.getElapsedTime();
                     nbrPrjNodes += prjEFA.getNodes().size();                    
+                    if(show){
+                        logger.info("The projected EFA for '"+ efa +"' is nondeterministic so keeping the original EFA");
+                    }
                     continue;
                 }
 
                 projectedEFAs.add(efa);
 
-                if(dialog.showResult())
+                if(show) {
                     logger.info("Projecting <" + efa + "> finished in " + TP.getTimer());
+                }
 
                 String name = oriEFA.getName();
-                if(dialog.getNamingOption() == TPDialogOption.SUFFIXNAME_SELECTED)
+                if(dialog.getNamingOption() == TPDialogOption.SUFFIXNAME_SELECTED) {
                     name += dialog.getSuffixName();
-                else if (dialog.getNamingOption() == TPDialogOption.PREFIXNAME_SELECTED)
+                }
+                else if (dialog.getNamingOption() == TPDialogOption.PREFIXNAME_SELECTED) {
                     name = dialog.getPrefixName() + name;
+                }
 
                 prjEFA.setName(name);
                 prjs.add(prjEFA);
@@ -189,10 +201,11 @@ public class EditorTransitionProjectionAction
                 exAutomata.addAutomaton(efa);
             }
 
-            if(dialog.showResult()){
+            if(show){
                 final HashSet<EventDeclProxy> uniPrjAlphabet = new HashSet<EventDeclProxy>();
-                for(final ExtendedAutomaton efa : prjs)
+                for(final ExtendedAutomaton efa : prjs) {
                     uniPrjAlphabet.addAll(efa.getAlphabet());
+                }
                 
                 final HashSet<EventDeclProxy> locEvents = new HashSet<EventDeclProxy>();
                 
@@ -205,10 +218,12 @@ public class EditorTransitionProjectionAction
                 String l = "{";
                 for (final Iterator<EventDeclProxy> it = locEvents.iterator(); it.hasNext();) {
                     final EventDeclProxy e = it.next();
-                    if(it.hasNext())
+                    if(it.hasNext()) {
                         l += e.getName() + ", ";
-                    else
+                    }
+                    else {
                         l += e.getName();
+                    }
                 }
                 l += "}";
 
@@ -221,9 +236,9 @@ public class EditorTransitionProjectionAction
                         + "\n Total computation time: " + elapsed/1000F + " seconds");
             } else {
                 if(prjs.size() == 1){
-                    logger.info("One EFA was projected in "+ elapsed/1000F + " seconds");
+                    logger.info("One EFA is projected in "+ elapsed/1000F + " seconds");
                 } else if(prjs.size() > 1){
-                    logger.info(prjs.size() + " EFAs were projected in "+ elapsed/1000F + " seconds");
+                    logger.info(prjs.size() + " EFAs are projected in "+ elapsed/1000F + " seconds");
                 }
             }
         }

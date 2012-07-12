@@ -209,10 +209,12 @@ public class AutomataTransitionProjection {
 
     /**
      * Setting the set of shared events. This will overwrite the current set of shared events
-     * @param shareEvents Set of shred events
+     * @param events Set of shared events
      */
-    public void setSharedEvents(final HashSet<EventDeclProxy> shareEvents) {
-        for(final EventDeclProxy event : shareEvents) {
+    public void setSharedEvents(final HashSet<EventDeclProxy> events) {
+        sharedEvents.clear();
+        localEvents.clear();
+        for(final EventDeclProxy event : events) {
             sharedEvents.add(indexMap.getEventIndex(event));
         }
         localEvents = ExtendedAutomataIndexFormHelper.setMinus(unionAlphabet, sharedEvents);
@@ -220,13 +222,14 @@ public class AutomataTransitionProjection {
 
     /**
      * Setting the set of local events. This will overwrite the current set of local events
-     * @param locEvents Set of local events
+     * @param events Set of local events
      */
-    public void setLocalEvents(final HashSet<EventDeclProxy> locEvents) {
-        for(final EventDeclProxy event : locEvents) {
+    public void setLocalEvents(final HashSet<EventDeclProxy> events) {
+        sharedEvents.clear();
+        localEvents.clear();
+        for(final EventDeclProxy event : events) {
             localEvents.add(indexMap.getEventIndex(event));
         }
-
         sharedEvents.addAll(ExtendedAutomataIndexFormHelper.setMinus(unionAlphabet, localEvents).toArray());
     }
 
