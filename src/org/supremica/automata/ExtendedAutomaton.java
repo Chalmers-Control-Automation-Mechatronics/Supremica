@@ -791,11 +791,14 @@ public class ExtendedAutomaton
                     final EventDeclProxy e = getEvent(event);
                     final boolean added = events.add(e);
                     if(!added){
-                        SimpleExpressionProxy guard = null;
-                        try{guard = tran.getGuardActionBlock().getGuards().get(0);} catch (final Exception exp){}
-                        if(guard == null) {
-                            return new NondeterministicEFAException(this, node, e);
-                        }
+                        /**
+                         * ToDo: One can check that no two guard of outgoing transitions with the same label
+                         * will be evaluated to true so for sure it is deterministic, e.g., g1:x==1 of 
+                         * transition 1 and g2:x==2 of transition 2 will never evaluate true at the same time
+                         * but for g1:x==1 and g2:y==1 we cannot say so.
+                         * /Mohammad Reza
+                        **/       
+                        return new NondeterministicEFAException(this, node, e);
                     }
                 }
             }

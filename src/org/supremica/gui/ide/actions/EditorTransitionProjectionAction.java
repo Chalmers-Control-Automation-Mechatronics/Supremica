@@ -143,12 +143,14 @@ public class EditorTransitionProjectionAction
             final HashSet<String> projectedEFAs = new HashSet<String>();
             for(final String efa : components){
                 final ExtendedAutomaton oriEFA = exAutomata.getExtendedAutomaton(efa);
+                
+                nbrOriNodes += oriEFA.getNodes().size();
+                
                 if(oriEFA.isNondeterministic() != null){
                     logger.error("EFA '" + efa +"' is nondeterministic and therefore it is skipped");
+                    nbrPrjNodes += oriEFA.getNodes().size();  
                     continue;
                 }
-
-                nbrOriNodes += oriEFA.getNodes().size();
 
                 final ExtendedAutomaton prjEFA = TP.projectEFA(efa);
 
@@ -230,8 +232,9 @@ public class EditorTransitionProjectionAction
                 logger.info("\n -----------------------"
                         + "\n Projection Result"
                         + "\n -----------------------"
-                        + "\n Nbr original nodes: " + nbrOriNodes
-                        + "\n Nbr TP nodes: " + nbrPrjNodes
+                        + "\n Nbr original EFAs node: " + nbrOriNodes
+                        + "\n Nbr projected EFAs node: " + nbrPrjNodes
+                        + "\n Nbr local events: " + locEvents.size()
                         + "\n Local events: " + l
                         + "\n Total computation time: " + elapsed/1000F + " seconds");
             } else {
