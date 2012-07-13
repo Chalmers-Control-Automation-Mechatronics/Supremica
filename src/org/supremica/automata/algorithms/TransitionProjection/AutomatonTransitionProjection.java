@@ -4,7 +4,6 @@ package org.supremica.automata.algorithms.TransitionProjection;
 import gnu.trove.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Stack;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -40,11 +39,11 @@ public class AutomatonTransitionProjection {
     // <state> x <event> -> <state[]>
     private int[][][] quotient;
     // <state> x <coset>
-    private HashMap<Integer, TIntHashSet> mapStateCoset;
+    private TIntObjectHashMap<TIntHashSet> mapStateCoset;
     // <state> x <status>
     private TIntIntHashMap mapStateStatus;
     // partitions
-    private HashSet<TIntHashSet> qc;
+    private THashSet<TIntHashSet> qc;
 
     /**
      * Constructor method of AutomatonTransitionProjection.
@@ -68,7 +67,7 @@ public class AutomatonTransitionProjection {
         uncontrollableEvents = ExtendedAutomataIndexFormHelper.setIntersection(currAlphabet, allUncontrollableEvents);
         quotient = null;
         qc = null;
-        mapStateCoset = new HashMap<Integer, TIntHashSet>();
+        mapStateCoset = new TIntObjectHashMap<TIntHashSet>();
         mapStateStatus = new TIntIntHashMap();
     }
     
@@ -195,9 +194,9 @@ public class AutomatonTransitionProjection {
         }
     }
 
-    private HashSet<TIntHashSet> getQC(){
+    private THashSet<TIntHashSet> getQC(){
         final Stack<TIntHashSet> W = new Stack<TIntHashSet>(); // Set W (splitter) in WONG paper
-        final HashSet<TIntHashSet> R = new HashSet<TIntHashSet>(); // Set Rho in WONG paper
+        final THashSet<TIntHashSet> R = new THashSet<TIntHashSet>(); // Set Rho in WONG paper
         TIntHashSet phiB,inter,diff; // Sets of phiB, intersection, and difference
 
         final TIntHashSet Q = new TIntHashSet();
@@ -217,8 +216,8 @@ public class AutomatonTransitionProjection {
             final TIntHashSet B = W.pop(); // B: temporary partition
             for(final TIntIterator itr = currSharedEvents.iterator(); itr.hasNext();){
                 final int e = itr.next();
-                final HashSet<TIntHashSet> I = new HashSet<TIntHashSet>();
-                final HashSet<TIntHashSet> I12 = new HashSet<TIntHashSet>();
+                final THashSet<TIntHashSet> I = new THashSet<TIntHashSet>();
+                final THashSet<TIntHashSet> I12 = new THashSet<TIntHashSet>();
 
                 if(e == MARK_EVENT){
                     phiB = phiTAOm(B);
@@ -287,10 +286,12 @@ public class AutomatonTransitionProjection {
         // <state> x <event> -> <state[]>
         quotient = new int[qc.size()][indexAutomata.getNbrUnionEvents()][];
 
-        for(final int source : mapStateCoset.keySet()){
+        for(TIntObjectIterator<TIntHashSet> itrm = mapStateCoset.iterator(); itrm.hasNext();){
+            itrm.advance();
+            final int source = itrm.key();
             for(int event=0; event<indexAutomata.getNbrUnionEvents(); event++){
                 quotient[source][event] = new int[]{MAX_VALUE};
-                TIntHashSet sourceCoset = (TIntHashSet) mapStateCoset.get(source);
+                TIntHashSet sourceCoset = itrm.value();
                 for(final TIntIterator itr = sourceCoset.iterator(); itr.hasNext();){
                     final int next = indexAutomata.getNextStateTable()[indexAutomaton][itr.next()][event];
                     if(next == MAX_VALUE) {
@@ -642,7 +643,7 @@ public class AutomatonTransitionProjection {
         for(final TIntIterator itr = ndEvents.iterator(); itr.hasNext();){
             final int ndEvent = itr.next();
             final int[] nextQuoStates = quotient[ndQuoState][ndEvent];
-            final HashSet<TIntHashSet> nextPs = new HashSet<TIntHashSet>();
+            final THashSet<TIntHashSet> nextPs = new THashSet<TIntHashSet>();
             for(final int nextQuoState : nextQuoStates){
                 if(nextQuoState == MAX_VALUE) {
                     continue;
@@ -659,8 +660,8 @@ public class AutomatonTransitionProjection {
     }
 
     private void split2(final int source) {
-        final HashSet<TIntHashSet> newPs = new HashSet<TIntHashSet>();
-        final HashSet<TIntHashSet> removePs = new HashSet<TIntHashSet>();
+        final THashSet<TIntHashSet> newPs = new THashSet<TIntHashSet>();
+        final THashSet<TIntHashSet> removePs = new THashSet<TIntHashSet>();
         for(int event = 0; event < quotient[source].length; event++){
             final int[] states = quotient[source][event];
             if(states.length <= 2) {
@@ -684,7 +685,7 @@ public class AutomatonTransitionProjection {
         getQuotient();
     }
 
-    private boolean nopath(final TIntHashSet y, final int ndEvent, final HashSet<TIntHashSet> ys) {
+    private boolean nopath(final TIntHashSet y, final int ndEvent, final THashSet<TIntHashSet> ys) {
         final HashMap<TIntHashSet, TIntHashSet> yMap = new HashMap<TIntHashSet, TIntHashSet>();
         for(final TIntHashSet p : ys) {
             yMap.put(p, new TIntHashSet());
@@ -821,7 +822,7 @@ public class AutomatonTransitionProjection {
     private boolean checkActions(final int quoFrom, final int event, final int quoTo) {
         final TIntHashSet fromP = mapStateCoset.get(quoFrom);
         final TIntHashSet toP = mapStateCoset.get(quoTo);
-        final HashSet<String> set = new HashSet<String>();
+        final THashSet<String> set = new THashSet<String>();
         for(final TIntIterator itr = fromP.iterator(); itr.hasNext();){
             final int from = itr.next();
             final int next = indexAutomata.getNextStateTable()[indexAutomaton][from][event];
@@ -854,7 +855,7 @@ public class AutomatonTransitionProjection {
     private boolean checkGuards(final int quoFrom, final int event, final int quoTo) {
         final TIntHashSet fromP = mapStateCoset.get(quoFrom);
         final TIntHashSet toP = mapStateCoset.get(quoTo);
-        final HashSet<String> set = new HashSet<String>();
+        final THashSet<String> set = new THashSet<String>();
         for(final TIntIterator itr = fromP.iterator(); itr.hasNext();){
             final int from = itr.next();
             final int next = indexAutomata.getNextStateTable()[indexAutomaton][from][event];
@@ -920,9 +921,10 @@ public class AutomatonTransitionProjection {
     }
 
     private int getQuotientState(final int state) {
-        for(final int p : mapStateCoset.keySet()){
-            if(mapStateCoset.get(p).contains(state)) {
-                return p;
+        for(TIntObjectIterator<TIntHashSet> itr = mapStateCoset.iterator(); itr.hasNext();){
+            itr.advance();
+            if(itr.value().contains(state)) {
+                return itr.key();
             }
         }
         return MAX_VALUE;
@@ -932,8 +934,8 @@ public class AutomatonTransitionProjection {
      * Returns the set of shared events in index form
      * @return The set of indexed shared events
      */    
-    public HashSet<Integer> getSharedEvents(){
-        final HashSet<Integer> shared = new HashSet<Integer>();
+    public THashSet<Integer> getSharedEvents(){
+        final THashSet<Integer> shared = new THashSet<Integer>();
         for(final int e : currSharedEvents.toArray()) {
             shared.add(e);
         }
@@ -944,8 +946,8 @@ public class AutomatonTransitionProjection {
      * Returns the set of local events in index form
      * @return The set of indexed local events
      */
-    public HashSet<Integer> getLocalEvents(){
-        final HashSet<Integer> local = new HashSet<Integer>();
+    public THashSet<Integer> getLocalEvents(){
+        final THashSet<Integer> local = new THashSet<Integer>();
         for(final int e : currLocalEvents.toArray()) {
             local.add(e);
         }
