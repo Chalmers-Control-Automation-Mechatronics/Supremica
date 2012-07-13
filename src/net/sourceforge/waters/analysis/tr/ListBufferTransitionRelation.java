@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
 import gnu.trove.TLongObjectHashMap;
 import java.util.ArrayList;
@@ -1182,10 +1183,6 @@ public class ListBufferTransitionRelation
   /**
    * Checks whether this transition relation represents a deterministic
    * automaton.
-   *
-   * @throws IllegalStateException
-   *           if the transition relation is not configure with a successor
-   *           buffer.
    */
   public boolean isDeterministic()
   {
@@ -1200,19 +1197,30 @@ public class ListBufferTransitionRelation
       }
     }
     if (mSuccessorBuffer == null) {
-      throw createNoBufferException(CONFIG_SUCCESSORS);
-    }
-    final TransitionIterator iter =
-      mSuccessorBuffer.createAllTransitionsReadOnlyIterator();
-    int state = -1;
-    int event = -1;
-    while (iter.advance()) {
-      if (state == iter.getCurrentSourceState()
-          && event == iter.getCurrentEvent()) {
-        return false;
+      final TIntHashSet keys = new TIntHashSet(numStates);
+      final TransitionIterator iter =
+        mPredecessorBuffer.createAllTransitionsReadOnlyIterator();
+      while (iter.advance()) {
+        final int state = iter.getCurrentSourceState();
+        final int event = iter.getCurrentEvent();
+        final int key = mPredecessorBuffer.makeKey(state, event);
+        if (!keys.add(key)) {
+          return false;
+        }
       }
-      state = iter.getCurrentSourceState();
-      event = iter.getCurrentEvent();
+    } else {
+      final TransitionIterator iter =
+        mSuccessorBuffer.createAllTransitionsReadOnlyIterator();
+      int state = -1;
+      int event = -1;
+      while (iter.advance()) {
+        if (state == iter.getCurrentSourceState() &&
+            event == iter.getCurrentEvent()) {
+          return false;
+        }
+        state = iter.getCurrentSourceState();
+        event = iter.getCurrentEvent();
+      }
     }
     return true;
   }
