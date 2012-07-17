@@ -315,10 +315,9 @@ public class GraphEditorPanel
 
   public ProxySubject getSelectionAnchor()
   {
-    //TODO
     if (mSelection.size() == 1) {
       return getCurrentSelection().iterator().next();
-    } else if(mSelection.size() > 1){ //used for range selection
+    } else if(mSelection.size() > 1){   // range selection
       final Iterator<ProxySubject> iter = getCurrentSelection().iterator();
       if(labelsAreSelected()){
         iter.next(); //LabelBlock
@@ -4311,9 +4310,7 @@ public class GraphEditorPanel
           oldList.remove(i);
         }
       }
-      //TODO
-      mSelection.clear();
-      mSelection.add(oldList);
+      mSelection = new Selection(oldList);
       mComparator = new PositionComparator();
       Collections.sort(newList, mComparator);
       return newList;

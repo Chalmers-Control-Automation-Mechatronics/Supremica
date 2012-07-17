@@ -30,15 +30,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 
@@ -86,8 +90,8 @@ public class EditorEditEdgeDialog
     setLayout(layout);
 
     //Button panel
-    FlowLayout buttonLayout = new FlowLayout(FlowLayout.RIGHT, 5, 5);
-    JPanel buttonPanel = new JPanel();
+    final FlowLayout buttonLayout = new FlowLayout(FlowLayout.RIGHT, 5, 5);
+    final JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(buttonLayout);
 
     con.gridx = 2;
@@ -142,7 +146,7 @@ public class EditorEditEdgeDialog
       guardField.setText(guardText);
     }
     guardField.setMargin(new Insets(5, 5, 5, 5));
-    JScrollPane scrollPaneG = new JScrollPane(guardField);
+    final JScrollPane scrollPaneG = new JScrollPane(guardField);
     scrollPaneG.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
     con.gridx = 2;
     con.gridy = 1;
@@ -176,7 +180,7 @@ public class EditorEditEdgeDialog
     final String actionText = buffer.toString();
     actionField.setText(actionText);
     actionField.setMargin(new Insets(5, 5, 5, 5));
-    JScrollPane scrollPaneA = new JScrollPane(actionField);
+    final JScrollPane scrollPaneA = new JScrollPane(actionField);
     scrollPaneA.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
     con.gridx = 2;
     con.gridy = 2;
@@ -216,7 +220,7 @@ public class EditorEditEdgeDialog
       }
       // Get actions ...
       List<BinaryExpressionSubject> actions = null;
-      String actionText = actionField.getText();
+      final String actionText = actionField.getText();
       if (actionText != null && !actionText.trim().equals("")) {
         final String[] texts = actionField.getText().split(";");
         actions = new ArrayList<BinaryExpressionSubject>(texts.length);
@@ -245,10 +249,14 @@ public class EditorEditEdgeDialog
           }
         }
       }
+      final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
       // Store parsed results ...
       final GuardActionBlockSubject block = mEdge.getGuardActionBlock();
+      EditCommand command = null;
       if (block == null) {
         if (guard != null || actions != null) {
+          final EdgeSubject newEdge = (EdgeSubject)cloner.getClone(mEdge);
           final List<SimpleExpressionSubject> guards =
             guard == null ? null : Collections.singletonList(guard);
           // *** BUG ***
@@ -259,25 +267,35 @@ public class EditorEditEdgeDialog
                        LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
           final GuardActionBlockSubject newblock =
             new GuardActionBlockSubject(guards, actions, geo);
-          mEdge.setGuardActionBlock(newblock);
+          newEdge.setGuardActionBlock(newblock);
+          if(!eq.equals(mEdge, newEdge)){
+            command = new EditCommand(mEdge, newEdge, null);
+          }
         }
       } else {
         if (guard == null && actions == null) {
           mEdge.setGuardActionBlock(null);
         } else {
+          final GuardActionBlockSubject newblock = (GuardActionBlockSubject) cloner.getClone(block);
           final List<SimpleExpressionSubject> bguards =
-            block.getGuardsModifiable();
+            newblock.getGuardsModifiable();
           bguards.clear();
           if (guard != null) {
             bguards.add(guard);
           }
           final List<BinaryExpressionSubject> bactions =
-            block.getActionsModifiable();
+            newblock.getActionsModifiable();
           bactions.clear();
           if (actions != null) {
             bactions.addAll(actions);
           }
+          if(!eq.equals(block, newblock)){
+            command = new EditCommand(block, newblock, null);
+          }
         }
+      }
+      if(command != null){
+        mRoot.getUndoInterface().executeCommand(command);
       }
       dispose();
     } else if (event.getActionCommand().equals("Cancel")) {
@@ -290,11 +308,11 @@ public class EditorEditEdgeDialog
   //# Data Members
   private final EdgeSubject mEdge;
   private final ModuleWindowInterface mRoot;
-  private JButton okButton, cancelButton;
-  private JTextPane guardField, actionField;
+  private final JButton okButton, cancelButton;
+  private final JTextPane guardField, actionField;
   private final JLabel guardLabel = new JLabel("Guard:");
   private final JLabel actionLabel = new JLabel("Action:");
-  private GridBagLayout layout;
+  private final GridBagLayout layout;
 
 
   //#########################################################################

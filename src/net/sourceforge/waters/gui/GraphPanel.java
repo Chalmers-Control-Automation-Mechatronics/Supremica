@@ -23,15 +23,11 @@ import javax.swing.JComponent;
 
 import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
 import net.sourceforge.waters.gui.renderer.MiscShape;
-import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
+import net.sourceforge.waters.gui.renderer.PrintRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.Renderer;
-import net.sourceforge.waters.gui.renderer.RenderingInformation;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.subject.base.ProxySubject;
-
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
@@ -77,6 +73,11 @@ public class GraphPanel
   public ModuleProxy getModule()
   {
     return mModule;
+  }
+
+  public ModuleContext getModuleContext()
+  {
+    return mModuleContext;
   }
 
   protected GraphProxy getDrawnGraph()
@@ -158,7 +159,8 @@ public class GraphPanel
    */
   protected void printComponent(final Graphics g)
   {
-    final ProxyShapeProducer producer = new ProxyShapeProducer(mGraph, new PrintRenderingContext());
+    final ProxyShapeProducer producer = new ProxyShapeProducer(mGraph,
+                                   new PrintRenderingContext(mModuleContext));
     final Renderer renderer = new Renderer();
     renderer.renderGraph(getDrawnGraph(),
                          getDrawnObjects(),
@@ -275,34 +277,6 @@ public class GraphPanel
     CANTDROP;
   }
 
-  //##########################################################################
-  //# Inner Class PrintRenderingContext
-  private class PrintRenderingContext extends ModuleRenderingContext
-  {
-
-    //#######################################################################
-    //# Constructor
-    private PrintRenderingContext()
-    {
-      super(mModuleContext);
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
-    public RenderingInformation getRenderingInformation(final Proxy proxy)
-    {
-      final ProxySubject item = (ProxySubject) proxy;
-      final int priority = getPriority(item);
-      return new RenderingInformation
-        (false, false, false,
-         EditorColor.getColor(item, DragOverStatus.NOTDRAG, false,
-                              false, false),
-         EditorColor.getShadowColor(item, DragOverStatus.NOTDRAG, false,
-                                    false, false),
-         priority);
-    }
-
-  }
 
   //##########################################################################
   //# Data Members
