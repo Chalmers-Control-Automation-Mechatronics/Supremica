@@ -65,6 +65,12 @@ public class Message
     return hashVisitor.getListHashCode(this.getMsg());
   }
 
+  @Override
+  public String toString()
+  {
+    return mSenders.toString() + " -> " + mRecipients.toString() + " : " + mMsg.toString();
+  }
+
   public List<SimpleExpressionProxy> getMsg()
   {
     return mMsg;
@@ -78,6 +84,25 @@ public class Message
   public List<String> getRecipients()
   {
     return mRecipients;
+  }
+
+  /**
+   * A method to combine another message with this message
+   * @param m The message to combine into this message
+   */
+  public void combine(final Message m)
+  {
+    for(final String sender : m.getSenders())
+    {
+      if(!mSenders.contains(sender))
+        mSenders.add(sender);
+    }
+
+    for(final String receiver : m.getRecipients())
+    {
+      if(!mRecipients.contains(receiver))
+        mRecipients.add(receiver);
+    }
   }
 
 }
