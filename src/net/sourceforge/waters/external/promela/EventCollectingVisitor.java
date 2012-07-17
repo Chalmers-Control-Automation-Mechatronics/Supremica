@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Hashtable;
 import java.util.Map;
@@ -58,6 +59,8 @@ public class EventCollectingVisitor implements PromelaVisitor
   ArrayList<String> data =new ArrayList<String>();
   ArrayList<String> labels = new ArrayList<String>();
   private final Hashtable<String, ChanInfo> chan = new Hashtable<String,ChanInfo>();
+
+  private final HashMap<String,PromelaChannel> mChannels = new HashMap<String,PromelaChannel>();
 
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
@@ -316,6 +319,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       cloneOutput.removeAll(tempstore);
 
       final ChanInfo c = chanIn.getValue();
+      final PromelaChannel channel = mChannels.get(chanIn.getKey());
       final int lengthOfChan = c.getChanLength();
       final String chanName = chanIn.getKey();
       for(final Message m: cloneOutput)
@@ -325,11 +329,14 @@ public class EventCollectingVisitor implements PromelaVisitor
           if(m.getSenders().size()>1)
           {
             c.setSenders(true);
+            channel.setMultipleSenders(true);
+
           }
           else if(m.getSenders().size()==1)
           {
             final int occurrences = occur.get(m.getSenders().get(0));
             c.setSenders(occurrences>1);
+            channel.setMultipleSenders(occurrences>1);
           }
         }
 
@@ -338,11 +345,13 @@ public class EventCollectingVisitor implements PromelaVisitor
           if(m.getRecipients().size()>1)
           {
             c.setRecipients(true);
+            channel.setMultipleReceivers(true);
           }
           else if(m.getRecipients().size()==1)
           {
             final int occurrences = occur.get(m.getRecipients().get(0));
             c.setRecipients(occurrences>1);
+            channel.setMultipleReceivers(occurrences>1);
           }
         }
       }
@@ -491,51 +500,23 @@ public class EventCollectingVisitor implements PromelaVisitor
           }
         }
       }
+
       List<SimpleExpressionProxy> dataRange;
+
+      dataRange = new ArrayList<SimpleExpressionProxy>();
+
+      getDataRange(cloner, comparator, chanIn, table, dataRange);
       if(chanIn.getValue().getChanLength()==0)
       {
-        dataRange = new ArrayList<SimpleExpressionProxy>();
-
-        for(int i=0;i<table.size();i++)
-        {
-          if(chanIn.getValue().getType().get(i).equals("mtype"))
-          {
-            final EnumSetExpressionProxy en = createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
-            dataRange.add(en);
-          }
-          else
-          {
-            Collections.sort(table.get(i),comparator);
-            final BinaryOperator op = optable.getRangeOperator();
-            final BinaryExpressionProxy range
-            = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)),
-                                                   (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
-            dataRange.add(range);
-          }
-        }
         ranges.addAll(dataRange);
       }
       else
       {
-        dataRange = new ArrayList<SimpleExpressionProxy>();
-        for(int i=0;i<table.size();i++)
-        {
-          if(chanIn.getValue().getType().get(i).equals("mtype"))
-          {
-            final EnumSetExpressionProxy en = createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
-            dataRange.add(en);
-          }
-          else
-          {
-            Collections.sort(table.get(i),comparator);
-            final BinaryOperator op = optable.getRangeOperator();
-            final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
-            dataRange.add(range);
-          }
-        }
         specialRec.addAll(cloner.getClonedList(dataRange));
 
         dataRange = new ArrayList<SimpleExpressionProxy>();
+
+        //Now, add in all of the messages that can be sent, even if they can't be received
         for(int i=0;i<table.size();i++)
         {
           for(final Message m: chanIn.getValue().getOutput())
@@ -545,20 +526,11 @@ public class EventCollectingVisitor implements PromelaVisitor
               table.get(i).add(m.getMsg().get(i));
             }
           }
-          if(chanIn.getValue().getType().get(i).equals("mtype"))
-          {
-            final EnumSetExpressionProxy en =
-              createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
-            dataRange.add(en);
-          }
-          else
-          {
-            Collections.sort(table.get(i),comparator);
-            final BinaryOperator op = optable.getRangeOperator();
-            final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)), (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
-            dataRange.add(range);
-          }
         }
+
+        //Recalculate the range, and add that into the send range
+        getDataRange(cloner, comparator, chanIn, table, dataRange);
+
         specialSend.addAll(dataRange);
       }
 
@@ -637,6 +609,46 @@ public class EventCollectingVisitor implements PromelaVisitor
           final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, true, ScopeKind.LOCAL, indexes, null, null);
 
           mEventDecls.add(event);
+        }
+      }
+    }
+  }
+
+  private void getDataRange(final ModuleProxyCloner cloner,
+                            final Comparator<SimpleExpressionProxy> comparator,
+                            final Map.Entry<String,ChanInfo> chanIn,
+                            final Hashtable<Integer,List<SimpleExpressionProxy>> table,
+                            final List<SimpleExpressionProxy> dataRange)
+  {
+    for(int i=0;i<table.size();i++)
+    {
+      if(chanIn.getValue().getType().get(i).equals("mtype"))
+      {
+        final EnumSetExpressionProxy en = createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
+        dataRange.add(en);
+      }
+      else
+      {
+        Collections.sort(table.get(i),comparator);
+        final BinaryOperator op = optable.getRangeOperator();
+        try
+        {
+          final BinaryExpressionProxy range
+          = mFactory.createBinaryExpressionProxy(op, (SimpleExpressionProxy) cloner.getClone(table.get(i).get(0)),
+                                                 (SimpleExpressionProxy) cloner.getClone(table.get(i).get(table.get(i).size()-1)));
+          dataRange.add(range);
+        }
+        catch(final Exception e)
+        {
+          //This is a variable that is being sent, so the range expression is the range of the variable
+          //Get the left and right values for the variable
+          //TODO Using byte values for now
+          final SimpleIdentifierProxy left = mFactory.createSimpleIdentifierProxy("0");
+          final SimpleIdentifierProxy right = mFactory.createSimpleIdentifierProxy("255");
+
+          final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, left, right);
+
+          dataRange.add(range);
         }
       }
     }
@@ -735,6 +747,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       type.add(t.getChild(i).getText());
     }
     chan.put(name,new ChanInfo(name, chanLength, datalength,type));
+    mChannels.put(name, new PromelaChannel(name, chanLength, type));
 
     return null;
   }
@@ -755,6 +768,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     final String ename = labels.get(0);
     final ChanInfo ch = chan.get(ename);
+    final PromelaChannel channel = mChannels.get(chanName);
     final int length = ch.getChanLength();
     final Collection<SimpleExpressionProxy> indexes = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
     final Collection<SimpleExpressionProxy> indexes2 = new ArrayList<SimpleExpressionProxy>(labels.size()-1);
@@ -762,10 +776,32 @@ public class EventCollectingVisitor implements PromelaVisitor
     {
       if(ch.getType().get(y).equals("byte"))
       {
-        final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
-        indexes.add(c);
-        final IntConstantProxy c2 = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
-        indexes2.add(c2);
+        int i = 0;
+        final String label = labels.get(y+1);
+        boolean isNumber = true;
+        try
+        {
+          i = Integer.parseInt(label);
+          //This is a number
+        }
+        catch(final NumberFormatException e)
+        {
+          //This is the name of a variable
+          isNumber = false;
+        }
+
+        if(isNumber)
+        {
+          final IntConstantProxy c = mFactory.createIntConstantProxy(i);
+          indexes.add(c);
+          final IntConstantProxy c2 = mFactory.createIntConstantProxy(i);
+          indexes2.add(c2);
+        }
+        else
+        {
+          indexes.add(channel.getTypeIdentifier(y, mFactory));
+          indexes2.add(channel.getTypeIdentifier(y, mFactory));
+        }
       }
       else if(ch.getType().get(y).equals("mtype"))
       {
@@ -803,6 +839,8 @@ public class EventCollectingVisitor implements PromelaVisitor
     msg.addSender(n);
     ch.addMessages(msg);
 
+    channel.addSend(msg);
+
     //create indexedIdentifier, and store it for receive statement
     IndexedIdentifierProxy indexEvent = null;
     if (length == 0)
@@ -839,6 +877,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     final String ename = labels.get(0);
     final ChanInfo ch = chan.get(ename);
+    final PromelaChannel channel = mChannels.get(chanName);
     Tree tree = t;
     while (!(tree instanceof ProctypeTreeNode))
     {
@@ -850,19 +889,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     for(int y=0;y<ch.getType().size();y++)
     {
-      if(ch.getType().get(y).equals("byte"))
-      {
-        if(mSymbolTable.containsKey(labels.get(y+1)))
-        {
-          indexes.add(null);
-        }
-        else
-        {
-          final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
-          indexes.add(c);
-        }
-      }
-      else if(ch.getType().get(y).equals("mtype"))
+      if(ch.getType().get(y).equals("mtype"))
       {
         if(mSymbolTable.containsKey(labels.get(y+1))
           && mSymbolTable.get(labels.get(y+1)) instanceof NameTreeNode)
@@ -870,25 +897,38 @@ public class EventCollectingVisitor implements PromelaVisitor
           final TypeTreeNode node = (TypeTreeNode)mSymbolTable.get(labels.get(y+1)).getParent();
           if(node.getText().equals("mtype"))
           {
+            //This is a mtype constant, so add in an identifier for it
             indexes.add(mFactory.createSimpleIdentifierProxy(labels.get(y+1)));
-          }
-          else
-          {
-            //I don't think it is possible to get here
-            indexes.add(null);
           }
         }
         else if(mSymbolTable.containsKey(labels.get(y+1))
           && mSymbolTable.get(labels.get(y+1)) instanceof VardefTreeNode)
         {
-          //TODO Add in for variable assignment to mtype?
-          indexes.add(null);
+          //This is a variable, so add in a simple identifier over the variable type
+          indexes.add(channel.getTypeIdentifier(y, mFactory));
+        }
+      }
+      else
+      {
+        if(mSymbolTable.containsKey(labels.get(y+1)))
+        {
+          //This is a variable, so add in a simple identifier over the variable type
+          indexes.add(channel.getTypeIdentifier(y, mFactory));
+          //indexes.add(null);
+        }
+        else
+        {
+          //This is an integer constant, so add in an identifier for it
+          final IntConstantProxy c = mFactory.createIntConstantProxy(Integer.parseInt(labels.get(y+1)));
+          indexes.add(c);
         }
       }
     }
     final Message msg = new Message(indexes);
     msg.addRecipient(n);
     ch.addMessages(msg);
+
+    channel.addReceive(msg);
 
     return null;
   }
@@ -942,6 +982,11 @@ public class EventCollectingVisitor implements PromelaVisitor
   public Hashtable<String, ChanInfo> getChan()
   {
     return chan;
+  }
+
+  public HashMap<String, PromelaChannel> getChannels()
+  {
+    return mChannels;
   }
 
   public boolean getAtomic()
