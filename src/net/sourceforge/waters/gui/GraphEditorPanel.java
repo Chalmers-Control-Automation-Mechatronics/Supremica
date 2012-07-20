@@ -2865,7 +2865,15 @@ public class GraphEditorPanel
     }
 
     private void move(final boolean directional, int x, int y){
-      if (directional) {
+      boolean edgeMove = false;
+      if(mMoveVisitor.mMovedObjects.size() == 1){
+        final Iterator<ProxySubject> iter = mMoveVisitor.mMovedObjects.iterator();
+        if(iter.next() instanceof EdgeSubject){
+          edgeMove = true;
+        }
+      }
+
+      if (directional && !edgeMove) {
         if (Math.abs(x) < Math.abs(y)) {
           x = 0;
         } else {
@@ -2878,7 +2886,7 @@ public class GraphEditorPanel
       } else {
         mShouldCommit = true;
       }
-      mMoveVisitor.moveAll(x, y);
+      mMoveVisitor.moveAll(x, y, directional && edgeMove);
     }
 
     //#######################################################################
@@ -3825,12 +3833,13 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Invocation
-    private void moveAll(final int dx, final int dy)
+    private void moveAll(final int dx, final int dy, final boolean edgeMove)
     {
       try {
         assert(getSecondaryGraph() != null);
         mDeltaX = dx;
         mDeltaY = dy;
+        mMoveAlongHalfWay = edgeMove;
         for (final ProxySubject item : mMovedObjects) {
           item.acceptVisitor(this);
         }
@@ -3860,7 +3869,7 @@ public class GraphEditorPanel
     {
       final EdgeSubject edge0 = (EdgeSubject) edge;
       if (mEdgeMap == null) {
-        getSecondaryGraph().moveEdgeHandle(edge0, mDeltaX, mDeltaY);
+        getSecondaryGraph().moveEdgeHandle(edge0, mDeltaX, mDeltaY, mMoveAlongHalfWay);
       } else {
         final MovingEdge entry = mEdgeMap.get(edge0);
         entry.move(mDeltaX, mDeltaY);
@@ -3947,6 +3956,7 @@ public class GraphEditorPanel
     private Map<EdgeProxy,MovingEdge> mEdgeMap = null;
     private int mDeltaX;
     private int mDeltaY;
+    private boolean mMoveAlongHalfWay;
 
   }
 
@@ -3993,7 +4003,7 @@ public class GraphEditorPanel
       case MOVE_DONT:
         break;
       case MOVE_FOLLOW:
-        graph.moveEdgeHandle(mEdge, dx, dy);
+        graph.moveEdgeHandle(mEdge, dx, dy, false);
         break;
       case MOVE_SOURCE:
         graph.transformEdge(mEdge, true);
@@ -4085,7 +4095,7 @@ public class GraphEditorPanel
         createSecondaryGraph();
         final int x = left ? -1 : right ? 1 : 0;
         final int y = up ? -1 : down ? 1 : 0;
-        mMoveVisitor.moveAll(x, y);
+        mMoveVisitor.moveAll(x, y, false);
         commitGraph(null, true, true);
         mMoveVisitor = null;
         clearSecondaryGraph();
