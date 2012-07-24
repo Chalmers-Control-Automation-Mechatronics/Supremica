@@ -1856,10 +1856,14 @@ public class ListBufferTransitionRelation
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numEvents, numStates, numTrans);
+    } else {
+      mSuccessorBuffer = null;
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
         new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
+    } else {
+      mPredecessorBuffer = null;
     }
   }
 

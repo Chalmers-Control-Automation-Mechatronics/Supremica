@@ -89,7 +89,7 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nondeterministic
-  public void testNondeterministicCombiniations() throws Exception
+  public void testNondeterministicCombinations() throws Exception
   {
     final String group = "tests";
     final String dir = "nondeterministic";
