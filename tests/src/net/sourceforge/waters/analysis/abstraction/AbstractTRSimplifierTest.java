@@ -289,12 +289,13 @@ public abstract class AbstractTRSimplifierTest
     final EventEncoding eventEnc = createEventEncoding(des, aut);
     final StateEncoding inputStateEnc = createStateEncoding(aut);
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
-    final ListBufferTransitionRelation rel =
+    ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
     rel.checkReachability();
     mSimplifier.setTransitionRelation(rel);
     configureTransitionRelationSimplifier();
     if (mSimplifier.run()) {
+      rel = mSimplifier.getTransitionRelation();
       rel.setName("result");
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();
