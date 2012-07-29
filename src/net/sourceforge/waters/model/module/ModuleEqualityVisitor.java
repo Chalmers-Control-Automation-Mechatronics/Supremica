@@ -687,6 +687,11 @@ public class ModuleEqualityVisitor
       if (!compareProxies(propositions1, propositions2)) {
         return false;
       }
+      final Map<String,String> attributes1 = proxy.getAttributes();
+      final Map<String,String> attributes2 = expected.getAttributes();
+      if (!compareAttributeMaps(attributes1, attributes2)) {
+        return false;
+      }
       setSecondProxy(expected);
       return true;
     } else {

@@ -469,6 +469,8 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     final CompiledEventList event = visitEventListExpressionProxy
       (props0, EventKindMask.TYPEMASK_PROPOSITION);
     final PlainEventListProxy props1 = createPlainEventList(event);
+    final Map<String,String> attribs0 = group.getAttributes();
+    final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
     final Set<NodeProxy> children0 = group.getImmediateChildNodes();
     final int numchildren = children0.size();
     final List<NodeProxy> children1 = new ArrayList<NodeProxy>(numchildren);
@@ -477,7 +479,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       children1.add(child1);
     }
     final GroupNodeProxy compiled =
-      mFactory.createGroupNodeProxy(name, props1, children1, null);
+      mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
     mNodeMap.put(group, compiled);
     mCurrentNodes.add(compiled);
     addSourceInfo(compiled, group);
@@ -738,8 +740,11 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     final CompiledEventList event = visitEventListExpressionProxy
       (props0, EventKindMask.TYPEMASK_PROPOSITION);
     final PlainEventListProxy props1 = createPlainEventList(event);
+    final Map<String,String> attribs0 = node.getAttributes();
+    final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
     final SimpleNodeProxy compiled =
-      mFactory.createSimpleNodeProxy(name, props1, initial, null, null, null);
+      mFactory.createSimpleNodeProxy(name, props1, attribs1,
+                                     initial, null, null, null);
     mNodeMap.put(node, compiled);
     mCurrentNodes.add(compiled);
     addSourceInfo(compiled, node);

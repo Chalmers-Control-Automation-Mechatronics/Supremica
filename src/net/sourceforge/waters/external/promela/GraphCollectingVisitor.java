@@ -288,7 +288,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
     final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(accepting);
     final List<SimpleIdentifierProxy> list = Collections.singletonList(id);
     final PlainEventListProxy eventList = mFactory.createPlainEventListProxy(list);
-    final NodeProxy start = mFactory.createSimpleNodeProxy("empty", eventList, true, null, null, null);
+    final NodeProxy start =
+      mFactory.createSimpleNodeProxy("empty", eventList, null,
+                                     true, null, null, null);
 
     mNodes.add(start);
     loop1:
@@ -408,7 +410,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final SimpleIdentifierProxy id = mFactory.createSimpleIdentifierProxy(accepting);
       final List<SimpleIdentifierProxy> list = Collections.singletonList(id);
       final PlainEventListProxy eventList = mFactory.createPlainEventListProxy(list);
-      final NodeProxy start = mFactory.createSimpleNodeProxy("empty", eventList, true, null, null, null);
+      final NodeProxy start =
+        mFactory.createSimpleNodeProxy("empty", eventList, null,
+                                       true, null, null, null);
       mNodes.add(start);
 
       loop1:

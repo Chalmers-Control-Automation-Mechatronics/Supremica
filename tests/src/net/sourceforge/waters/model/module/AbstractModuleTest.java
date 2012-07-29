@@ -364,7 +364,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final PlainEventListProxy props =
       factory.createPlainEventListProxy(null);
     final SimpleNodeProxy node =
-      factory.createSimpleNodeProxy("s0", props, true, null, null, null);
+      factory.createSimpleNodeProxy("s0", props, null, true, null, null, null);
     final LabelBlockProxy labelblock = factory.createLabelBlockProxy();
     final EdgeProxy edge =
       factory.createEdgeProxy(node, node, labelblock, null, null, null, null);
@@ -403,7 +403,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final PointGeometryProxy arrowgeo =
       factory.createPointGeometryProxy(arrow);
     final SimpleNodeProxy node =
-      factory.createSimpleNodeProxy("s0", props, true,
+      factory.createSimpleNodeProxy("s0", props, null, true,
                                     pointgeo, arrowgeo, null);
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final GraphProxy graph =
@@ -442,14 +442,15 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final PointGeometryProxy pointgeo =
       factory.createPointGeometryProxy(point);
     final SimpleNodeProxy node =
-      factory.createSimpleNodeProxy("s0", nprops, true, pointgeo, null, null);
+      factory.createSimpleNodeProxy("s0", nprops, null,
+                                    true, pointgeo, null, null);
     final PlainEventListProxy gprops =
       factory.createPlainEventListProxy(null);
     final Rectangle2D rect = new Rectangle(0, 0, 100, 100);
     final BoxGeometryProxy boxgeo = factory.createBoxGeometryProxy(rect);
     final List<SimpleNodeProxy> children = Collections.singletonList(node);
     final GroupNodeProxy group =
-      factory.createGroupNodeProxy("g0", gprops, children, boxgeo);
+      factory.createGroupNodeProxy("g0", gprops, null, children, boxgeo);
     final SimpleIdentifierProxy label =
       factory.createSimpleIdentifierProxy(eventname);
     final List<SimpleIdentifierProxy> labels =
@@ -496,17 +497,19 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final PointGeometryProxy pointgeo0 =
       factory.createPointGeometryProxy(point0);
     final SimpleNodeProxy node0 =
-      factory.createSimpleNodeProxy("S0", null, true, pointgeo0, null, null);
+      factory.createSimpleNodeProxy("S0", null, null,
+                                    true, pointgeo0, null, null);
     final Point2D point1 = new Point(160, 208);
     final PointGeometryProxy pointgeo1 =
       factory.createPointGeometryProxy(point1);
     final SimpleNodeProxy node1 =
-      factory.createSimpleNodeProxy("S1", null, false, pointgeo1, null, null);
+      factory.createSimpleNodeProxy("S1", null, null,
+                                    false, pointgeo1, null, null);
     final Rectangle2D rect = new Rectangle(80, 144, 144, 112);
     final BoxGeometryProxy boxgeo = factory.createBoxGeometryProxy(rect);
     final List<SimpleNodeProxy> children = Collections.singletonList(node1);
     final GroupNodeProxy group =
-      factory.createGroupNodeProxy("G0", null, children, boxgeo);
+      factory.createGroupNodeProxy("G0", null, null, children, boxgeo);
     final Point2D start = new Point(80, 207);
     final PointGeometryProxy startgeo =
       factory.createPointGeometryProxy(start);

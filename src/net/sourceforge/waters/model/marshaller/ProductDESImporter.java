@@ -316,7 +316,7 @@ public class ProductDESImporter
     final PlainEventListProxy list =
       mFactory.createPlainEventListProxy(idents);
     return mFactory.createSimpleNodeProxy
-      (name, list, initial, null, null, null);
+      (name, list, null, initial, null, null, null);
   }
 
 

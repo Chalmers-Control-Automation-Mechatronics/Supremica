@@ -14,6 +14,7 @@ package net.sourceforge.waters.subject.module;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -46,15 +47,17 @@ public final class GroupNodeSubject
    * Creates a new group node.
    * @param name The name of the new group node.
    * @param propositions The list of propositions of the new group node, or <CODE>null</CODE> if empty.
+   * @param attributes The attribute map of the new group node, or <CODE>null</CODE> if empty.
    * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
   public GroupNodeSubject(final String name,
                           final PlainEventListProxy propositions,
+                          final Map<String,String> attributes,
                           final Collection<? extends NodeProxy> immediateChildNodes,
                           final BoxGeometryProxy geometry)
   {
-    super(name, propositions);
+    super(name, propositions, attributes);
     if (immediateChildNodes == null) {
       mImmediateChildNodes = new ChildNodeSetSubject();
     } else {
@@ -71,6 +74,7 @@ public final class GroupNodeSubject
    * Creates a new group node using default values.
    * This constructor creates a group node with
    * an empty list of propositions,
+   * an empty attribute map,
    * an empty set of immediate child nodes, and
    * the geometric information set to <CODE>null</CODE>.
    * @param name The name of the new group node.
@@ -78,6 +82,7 @@ public final class GroupNodeSubject
   public GroupNodeSubject(final String name)
   {
     this(name,
+         null,
          null,
          null,
          null);
