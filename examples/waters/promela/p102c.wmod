@@ -6,16 +6,16 @@
         <EventDecl Kind="CONTROLLABLE" Name="recv_ch">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="1"/>
-                    <IntConstant Value="2"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="2"/>
-                    <IntConstant Value="3"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="3"/>
-                    <IntConstant Value="4"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>

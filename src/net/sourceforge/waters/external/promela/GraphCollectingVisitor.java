@@ -638,6 +638,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   {
     final String chanName = t.getChild(0).getText();
     final ChanInfo ch = mVisitor.getChan().get(chanName);
+    final PromelaChannel channel = mVisitor.getChannels().get(chanName);
 
     mMessageArguments = new ArrayList<ChannelData>();
 
@@ -665,7 +666,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
 
     final PromelaGraph graph = new PromelaGraph();
-    createSendMessages(graph, new ArrayList<SimpleExpressionProxy>(), new ArrayList<SimpleExpressionProxy>(), mMessageArguments, 0, ch, name, receivableMessages);
+    createSendMessages(graph, new ArrayList<SimpleExpressionProxy>(), new ArrayList<SimpleExpressionProxy>(), mMessageArguments, 0, channel, name, receivableMessages);
 
     return graph;
   }
@@ -682,13 +683,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
    * Use zero for the initial call to this method.
    * @param receivableMessages The messages that can be received on the channel.
    */
-  private void createSendMessages(final PromelaGraph graph, final ArrayList<SimpleExpressionProxy> currentMessage, final ArrayList<SimpleExpressionProxy> guards, final List<ChannelData> iterList, final int iterIndex, final ChanInfo ch, final String name, final ArrayList<Message> receivableMessages)
+  private void createSendMessages(final PromelaGraph graph, final ArrayList<SimpleExpressionProxy> currentMessage, final ArrayList<SimpleExpressionProxy> guards, final List<ChannelData> iterList, final int iterIndex, final PromelaChannel channel, final String name, final ArrayList<Message> receivableMessages)
   {
     if(iterIndex == iterList.size())
     {
       final ModuleProxyCloner cloner = mFactory.getCloner();
       //Have finished preparing one message, create it
-      createSendGraph(graph, new Message(cloner.getClonedList(currentMessage)), guards, ch, name, receivableMessages);
+      createSendGraphEdge(graph, new Message(cloner.getClonedList(currentMessage)), guards, channel, name, receivableMessages);
 
       //Now, return back to creating more messages, or back to visitSend()
       return;
@@ -701,119 +702,95 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final ChannelData data = iterList.get(iterIndex);
       switch(data.getDataType())
       {
-        case CONSTANT:
+      case CONSTANT:
+      {
+        //This is a constant
+        //Add its value into the message
+        final SimpleExpressionProxy value = data.getPossibleValues();
+        currentMessage.add(value);
+
+        //Make a recursive call to this method, for the next item
+        createSendMessages(graph, currentMessage, guards, iterList, iterIndex+1, channel, name, receivableMessages);
+
+        //Now, this item is finished with, remove it from the message
+        currentMessage.remove(currentMessage.size() - 1);
+        break;
+      }
+      case SHOWN_VARIABLE:
+      {
+        //This is a shown variable
+        final SimpleExpressionProxy values = data.getPossibleValues();
+
+        if(values instanceof BinaryExpressionProxy)
         {
-          //This is a constant
-          //Add its value into the message
-          final SimpleExpressionProxy value = data.getPossibleValues();
-          currentMessage.add(value);
-
-          //Make a recursive call to this method, for the next item
-          createSendMessages(graph, currentMessage, guards, iterList, iterIndex+1, ch, name, receivableMessages);
-
-          //Now, this item is finished with, remove it from the message
-          currentMessage.remove(currentMessage.size() - 1);
-          break;
-        }
-        case SHOWN_VARIABLE:
-        {
-          //This is a shown variable
-          final SimpleExpressionProxy values = data.getPossibleValues();
-
-          if(values instanceof BinaryExpressionProxy)
+          //This is an integer type variable
+          //Iterate over the possible values of the variable
+          final BinaryExpressionProxy range = (BinaryExpressionProxy) values;
+          for(int i = ((IntConstantProxy)range.getLeft()).getValue(); i < ((IntConstantProxy)range.getRight()).getValue(); i++)
           {
-            //This is an integer type variable
-            //Iterate over the possible values of the variable
-            final BinaryExpressionProxy range = (BinaryExpressionProxy) values;
-            for(int i = ((IntConstantProxy)range.getLeft()).getValue(); i < ((IntConstantProxy)range.getRight()).getValue(); i++)
+            data.setValue(i);
+            //Add the current value to the message
+            currentMessage.add(data.getValue());
+
+            if(channel.getLength() > 0 || channel.isReceived(iterIndex, data.getValue()))
             {
-              data.setValue(i);
-              //Add the current value to the message
-              currentMessage.add(data.getValue());
 
-              //Check if this value is sendable on the channel
-              //If it is not sendable, then don't do the recursive call
-              boolean receivable = false;
-              for(final Message m : receivableMessages)
-              {
-                final SimpleExpressionProxy msgItem = m.getMsg().get(iterIndex);
-                if(msgItem == null || msgItem.toString().equals(data.getValue().toString()))
-                {
-                  receivable = true;
-                  break;
-                }
-              }
+              final SimpleExpressionProxy varName = data.getIdentifier().clone();
+              final SimpleExpressionProxy varValue = data.getValue().clone();
+              //Add this value into the guards
+              guards.add(mFactory.createBinaryExpressionProxy(optable.getEqualsOperator(), varName, varValue));
 
-              if(receivable || ch.getChanLength() > 0)
-              {
+              //Make a recursive call for this value of the expression
+              createSendMessages(graph, currentMessage, guards, iterList, iterIndex+1, channel, name, receivableMessages);
 
-                final SimpleExpressionProxy varName = data.getIdentifier().clone();
-                final SimpleExpressionProxy varValue = data.getValue().clone();
-                //Add this value into the guards
-                guards.add(mFactory.createBinaryExpressionProxy(optable.getEqualsOperator(), varName, varValue));
-
-                //Make a recursive call for this value of the expression
-                createSendMessages(graph, currentMessage, guards, iterList, iterIndex+1, ch, name, receivableMessages);
-
-                //Now, remove the value from the guards
-                guards.remove(guards.size() - 1);
-              }
-
-              currentMessage.remove(currentMessage.size()-1);
+              //Now, remove the value from the guards
+              guards.remove(guards.size() - 1);
             }
+
+            currentMessage.remove(currentMessage.size()-1);
           }
-          else
-          {
-            //This is a mtype variable
-            //Iterate over the possible values
-            final EnumSetExpressionProxy range = (EnumSetExpressionProxy) values;
-            for(final SimpleIdentifierProxy item : range.getItems())
-            {
-              data.setValue(item.getName());
-              //Add the current value to the message
-              currentMessage.add(data.getValue());
-
-              //Check if this value is sendable on the channel
-              //If it is not sendable, then don't do the recursive call
-              boolean receivable = false;
-              for(final Message m : receivableMessages)
-              {
-                final SimpleExpressionProxy msgItem = m.getMsg().get(iterIndex);
-                if(msgItem == null || msgItem.toString().equals(data.getValue().toString()))
-                {
-                  receivable = true;
-                  break;
-                }
-              }
-
-              if(receivable || ch.getChanLength() > 0)
-              {
-                //Can send this value on the channel
-                final SimpleExpressionProxy varName = data.getIdentifier().clone();
-                final SimpleExpressionProxy varValue = data.getValue().clone();
-                //Add this value into the guards
-                guards.add(mFactory.createBinaryExpressionProxy(optable.getEqualsOperator(), varName, varValue));
-
-                //Make a recursive call for this value of the expression
-                createSendMessages(graph, currentMessage, guards, iterList, iterIndex+1, ch, name, receivableMessages);
-
-                //Now, remove the value from the guards
-                guards.remove(guards.size() - 1);
-              }
-
-              //Remove this value from the message
-              currentMessage.remove(currentMessage.size()-1);
-            }
-          }
-          break;
         }
-        default:
+        else
         {
-          //This is an error, as cannot send hidden variables
-          System.err.println("ERROR in method GraphCollectingVisitor.createSendMessages()");
-          System.err.println("Attempt to send hidden variable on a channel");
-          //TODO Probably use an exception instead at some point
+          //This is a mtype variable
+          //Iterate over the possible values
+          final EnumSetExpressionProxy range = (EnumSetExpressionProxy) values;
+          for(final SimpleIdentifierProxy item : range.getItems())
+          {
+            data.setValue(item.getName());
+            //Add the current value to the message
+            currentMessage.add(data.getValue());
+
+            //Check if this value is sendable on the channel
+            //If it is not sendable, then don't do the recursive call
+            if(channel.getLength() > 0 || channel.isReceived(iterIndex, data.getValue()))
+            {
+              //Can send this value on the channel
+              final SimpleExpressionProxy varName = data.getIdentifier().clone();
+              final SimpleExpressionProxy varValue = data.getValue().clone();
+              //Add this value into the guards
+              guards.add(mFactory.createBinaryExpressionProxy(optable.getEqualsOperator(), varName, varValue));
+
+              //Make a recursive call for this value of the expression
+              createSendMessages(graph, currentMessage, guards, iterList, iterIndex+1, channel, name, receivableMessages);
+
+              //Now, remove the value from the guards
+              guards.remove(guards.size() - 1);
+            }
+
+            //Remove this value from the message
+            currentMessage.remove(currentMessage.size()-1);
+          }
         }
+        break;
+      }
+      default:
+      {
+        //This is an error, as cannot send hidden variables
+        System.err.println("ERROR in method GraphCollectingVisitor.createSendMessages()");
+        System.err.println("Attempt to send hidden variable on a channel");
+        //TODO Probably use an exception instead at some point
+      }
       }
     }
   }
@@ -827,14 +804,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
    * @param name The name of the channel
    * @param receivableMessages The messages that are capable of being received on the channel
    */
-  private void createSendGraph(final PromelaGraph graph, final Message message, final ArrayList<SimpleExpressionProxy> guards, final ChanInfo ch, final String name, final ArrayList<Message> receivableMessages)
+  private void createSendGraphEdge(final PromelaGraph graph, final Message message, final ArrayList<SimpleExpressionProxy> guards, final PromelaChannel channel, final String name, final ArrayList<Message> receivableMessages)
   {
     final ModuleProxyCloner cloner = mFactory.getCloner();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     final Comparator<SimpleExpressionProxy> comparator = new ExpressionComparator(optable);
-    final int channelLength = ch.getChanLength();
+    final int channelLength = channel.getLength();
 
-    if(ch.getChanLength() > 0 || receivableMessages.contains(message))
+    if(channel.isReceivable(message, mFactory))
     {
       //This message can be received, so add an edge for it
       final List<IdentifierProxy> events = new ArrayList<IdentifierProxy>();
@@ -843,14 +820,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
       final Collection<SimpleIdentifierProxy> senders = new ArrayList<SimpleIdentifierProxy>();
       final Collection<SimpleIdentifierProxy> recvs = new ArrayList<SimpleIdentifierProxy>();
 
-      if(ch.getChanLength() == 0)
-      {
-        getSendersAndReceiversOfSendMessage(name, ch, senders, recvs, receivableMessages.get(receivableMessages.indexOf(message)));
-      }
-      else
-      {
-        getSendersAndReceiversOfSendMessage(name, ch, senders, recvs, message);
-      }
+      final Message match = channel.getMatch(message);
+      message.combine(match);
+
+      //TODO Add in senders and receivers that send variables as well to be in the message
+
+      getSendersAndReceiversOfSendMessage(name, channel, senders, recvs, message);
 
       if(senders.size()>=1 && recvs.size()>=1)
         send_MultipleSendersAndReceivers(cloner, comparator, channelLength, data, events, senders, recvs);
@@ -867,7 +842,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
       final List<SimpleExpressionProxy> edgeGuards;
       if(!guards.isEmpty())
-        edgeGuards = guards;
+        edgeGuards = cloner.getClonedList(guards);
       else
         edgeGuards = null;
       final List<BinaryExpressionProxy> edgeActions = null;
@@ -881,9 +856,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
   }
 
-  private void getSendersAndReceiversOfSendMessage(final String name, final ChanInfo c, final Collection<SimpleIdentifierProxy> senders, final Collection<SimpleIdentifierProxy> recvs, final Message m)
+  private void getSendersAndReceiversOfSendMessage(final String name, final PromelaChannel c, final Collection<SimpleIdentifierProxy> senders, final Collection<SimpleIdentifierProxy> recvs, final Message m)
   {
-    if(c.isSenderPresent())
+    if(c.hasMultipleSenders())
     {
       if(mVisitor.getOccur().get(name)>1)
       {
@@ -897,7 +872,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       }
     }
 
-    if(c.isRecipientPresent())
+    if(c.hasMultipleReceivers())
     {
       Collections.sort(m.getRecipients());
       for(final String n: m.getRecipients())
@@ -937,16 +912,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
           indexEvent = mFactory.createIndexedIdentifierProxy(ename,cloner.getClonedList(in));
         }
 
-        boolean test = false;
-        for(final IdentifierProxy id: events)
-        {
-          if(comparator.compare(id, indexEvent)==0)
-          {
-            test = true;
-            break;
-          }
-        }
-        if(!test)
+        if(!events.contains(indexEvent))
         {
           events.add(indexEvent);
         }
@@ -970,16 +936,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       ename = "send_"+ename;
       indexEvent = mFactory.createIndexedIdentifierProxy(ename,cloner.getClonedList(in));
     }
-    boolean test = false;
-    for(final IdentifierProxy id: events)
-    {
-      if(comparator.compare(id, indexEvent)==0)
-      {
-        test = true;
-        break;
-      }
-    }
-    if(!test)
+
+    if(!events.contains(indexEvent))
     {
       events.add(indexEvent);
     }
@@ -1008,16 +966,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
         indexEvent = mFactory.createIndexedIdentifierProxy(ename,cloner.getClonedList(in));
       }
 
-      boolean test = false;
-      for(final IdentifierProxy id: events)
-      {
-        if(comparator.compare(id, indexEvent)==0)
-        {
-          test = true;
-          break;
-        }
-      }
-      if(!test)
+      if(!events.contains(indexEvent))
       {
         events.add(indexEvent);
       }
@@ -1043,16 +992,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
         ename = "send_"+ename;
         indexEvent = mFactory.createIndexedIdentifierProxy(ename,cloner.getClonedList(in));
       }
-      boolean test = false;
-      for(final IdentifierProxy id: events)
-      {
-        if(comparator.compare(id, indexEvent)==0)
-        {
-          test = true;
-          break;
-        }
-      }
-      if(!test)
+
+      if(!events.contains(indexEvent))
       {
         events.add(indexEvent);
       }
@@ -1111,7 +1052,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     {
       final ModuleProxyCloner cloner = mFactory.getCloner();
       //We have completed a message, add it into the msgList
-      msgList.add(new Message(cloner .getClonedList(currentMessage)));
+      msgList.add(new Message(cloner.getClonedList(currentMessage)));
     }
     else
     {
@@ -1143,22 +1084,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
               //Check if this value can be sent on the channel
               //Make the recursive call if the value is sendable
-              boolean sendable = false;
-              for(final Message m : channel.getSendableMessages())
-              {
-                final SimpleExpressionProxy msgItem = m.getMsg().get(iterIndex);
-
-                //msgItem.equals(data.getValue()) is returning false, not sure why, or how to make it work correctly
-                //so using .toString() for the comparison
-                //Use module equality visitor
-                if(msgItem == null || msgItem.toString().equals(data.getValue().toString()))
-                {
-                  sendable = true;
-                  break;
-                }
-              }
-
-              if(sendable)
+              if(channel.isSent(iterIndex, data.getValue()))
               {
                 createReceiveMessageList(msgList, currentMessage, iterList, iterIndex+1, channel);
               }
@@ -1176,18 +1102,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
               //Check if this value can be sent on the channel
               //Make the recursive call if the value is sendable
-              boolean sendable = false;
-              for(final Message m : channel.getSendableMessages())
-              {
-                final SimpleExpressionProxy msgItem = m.getMsg().get(iterIndex);
-                if(msgItem == null || msgItem.toString().equals(data.getValue().toString()))
-                {
-                  sendable = true;
-                  break;
-                }
-              }
-
-              if(sendable)
+              if(channel.isSent(iterIndex, data.getValue()))
               {
                 createReceiveMessageList(msgList, currentMessage, iterList, iterIndex+1, channel);
               }
@@ -1225,7 +1140,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     if(iterIndex == iterList.size())
     {
       //Have got the messages for one graph edge, create that edge
-      createGraphEdge(graph, msgList, actions, channel, processName);
+      createReceiveGraphEdge(graph, msgList, actions, channel, processName);
     }
     else
     {
@@ -1268,20 +1183,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
             //Check if this value is sendable on the channel
             //If it is not sendable, then don't do the recursive call
-            boolean sendable = false;
-            for(final Message m : channel.getSendableMessages())
+            if(channel.isSent(iterIndex, data.getValue()))
             {
-              final SimpleExpressionProxy msgItem = m.getMsg().get(iterIndex);
-              if(msgItem == null || msgItem.toString().equals(data.getValue().toString()))
-              {
-                sendable = true;
-                break;
-              }
-            }
-
-            if(sendable)
-            {
-
               final SimpleExpressionProxy varName = data.getIdentifier().clone();
               final SimpleExpressionProxy varValue = data.getValue().clone();
               //Add this value into the action collection
@@ -1314,18 +1217,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
             //Check if this value is sendable on the channel
             //If it is not sendable, then don't do the recursive call
-            boolean sendable = false;
-            for(final Message m : channel.getSendableMessages())
-            {
-              final SimpleExpressionProxy msgItem = m.getMsg().get(iterIndex);
-              if(msgItem == null || msgItem.toString().equals(data.getValue().toString()))
-              {
-                sendable = true;
-                break;
-              }
-            }
-
-            if(sendable)
+            if(channel.isSent(iterIndex, data.getValue()))
             {
               final SimpleExpressionProxy varName = data.getIdentifier().clone();
               final SimpleExpressionProxy varValue = data.getValue().clone();
@@ -1362,7 +1254,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
    * @param ch The channel the messages are being sent and received on
    * @param name The name of the process receiving the messages
    */
-  private void createGraphEdge(final PromelaGraph graph, final ArrayList<Message> msgList, final ArrayList<BinaryExpressionProxy> actions, final PromelaChannel channel, final String processName)
+  private void createReceiveGraphEdge(final PromelaGraph graph, final ArrayList<Message> msgList, final ArrayList<BinaryExpressionProxy> actions, final PromelaChannel channel, final String processName)
   {
     final ModuleProxyCloner cloner = mFactory.getCloner();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
@@ -1373,12 +1265,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
     //i.e. discard messages that can't be received on this end from the messages that can be sent on the other end
     final ArrayList<Message> receivingMessages = new ArrayList<Message>();
 
-    for(final Message m: channel.getSendableMessages())
+    for(final Message m : msgList)
     {
-      if(msgList.contains(m) && !(m.getMsg().contains(null)))
-      {
-        receivingMessages.add(m);
-      }
+      if(channel.isReceivable(m, mFactory))
+        receivingMessages.add(channel.getMatch(m));
     }
 
     //Create the events list that matches the messages

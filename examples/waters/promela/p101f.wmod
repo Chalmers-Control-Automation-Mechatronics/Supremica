@@ -8,8 +8,8 @@
         <EventDecl Kind="CONTROLLABLE" Name="exch_msg">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="5"/>
-                    <IntConstant Value="5"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>

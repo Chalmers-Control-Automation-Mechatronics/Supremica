@@ -5,10 +5,11 @@
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="send_ch">
             <RangeList>
-                <EnumSetExpression Text="[D0,D1,FV]">
+                <EnumSetExpression Text="[D0,D1,FV,:undefined]">
                     <SimpleIdentifier Name="D0"/>
                     <SimpleIdentifier Name="D1"/>
                     <SimpleIdentifier Name="FV"/>
+                    <SimpleIdentifier Name=":undefined"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -16,10 +17,11 @@
         <EventDecl Kind="CONTROLLABLE" Name="run_B"/>
         <EventDecl Kind="CONTROLLABLE" Name="recv_ch">
             <RangeList>
-                <EnumSetExpression Text="[D0,D1,FV]">
+                <EnumSetExpression Text="[D0,D1,FV,:undefined]">
                     <SimpleIdentifier Name="D0"/>
                     <SimpleIdentifier Name="D1"/>
                     <SimpleIdentifier Name="FV"/>
+                    <SimpleIdentifier Name=":undefined"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>

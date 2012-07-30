@@ -9,9 +9,10 @@
                     <SimpleIdentifier Name="A_0"/>
                     <SimpleIdentifier Name="A_1"/>
                 </EnumSetExpression>
-                <EnumSetExpression Text="[TRUE,FALSE]">
+                <EnumSetExpression Text="[TRUE,FALSE,:undefined]">
                     <SimpleIdentifier Name="TRUE"/>
                     <SimpleIdentifier Name="FALSE"/>
+                    <SimpleIdentifier Name=":undefined"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>

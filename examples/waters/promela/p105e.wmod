@@ -10,8 +10,8 @@
                     <SimpleIdentifier Name="C_0"/>
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="1"/>
-                    <IntConstant Value="1"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>

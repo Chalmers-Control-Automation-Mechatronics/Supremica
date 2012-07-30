@@ -4,6 +4,9 @@ import java.util.List;
 
 import net.sourceforge.waters.external.promela.PromelaMType;
 import net.sourceforge.waters.external.promela.PromelaVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+
 import org.antlr.runtime.*;
 
 public class ModuleTreeNode extends PromelaTree
@@ -32,6 +35,11 @@ public class ModuleTreeNode extends PromelaTree
   public String getValue()
   {
       return mEx;
+  }
+
+  public SimpleExpressionProxy getMtypeRange(final ModuleProxyFactory factory)
+  {
+    return mMTypes.getRangeExpression(factory);
   }
 
   public List<String> getMtypes()

@@ -5,18 +5,28 @@ import java.util.List;
 
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 public class Message
 {
   private final List<SimpleExpressionProxy> mMsg;
-  private final List<String> mSenders = new ArrayList<String>();
-  private final List<String> mRecipients = new ArrayList<String>();
+  private final List<String> mSenders;
+  private final List<String> mRecipients;
 
 
   public Message(final List<SimpleExpressionProxy> msg)
   {
     mMsg = new ArrayList<SimpleExpressionProxy>(msg);
+    mSenders = new ArrayList<String>();
+    mRecipients = new ArrayList<String>();
+  }
+
+  public Message(final List<SimpleExpressionProxy> msg, final List<String> senders, final List<String> receivers)
+  {
+    mMsg = new ArrayList<SimpleExpressionProxy>(msg);
+    mSenders = new ArrayList<String>(senders);
+    mRecipients = new ArrayList<String>(receivers);
   }
 
   public void addSender(final String sender)
@@ -105,4 +115,9 @@ public class Message
     }
   }
 
+  public Message clone(final ModuleProxyCloner cloner)
+  {
+    final List<SimpleExpressionProxy> msg = cloner.getClonedList(this.mMsg);
+    return new Message(msg, getSenders(), getRecipients());
+  }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Hashtable;
 import java.util.Map;
 
+import net.sourceforge.waters.external.promela.PromelaChannel.Type;
 import net.sourceforge.waters.external.promela.ast.BreakStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelStatementTreeNode;
 import net.sourceforge.waters.external.promela.ast.ChannelTreeNode;
@@ -64,6 +65,8 @@ public class EventCollectingVisitor implements PromelaVisitor
 
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+
+  private ModuleTreeNode mRoot;
 
   ArrayList<String> lowerEnd = new ArrayList<String>();
   ArrayList<String> upperEnd = new ArrayList<String>();
@@ -614,14 +617,38 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
   }
 
-  private void getDataRange(final ModuleProxyCloner cloner,
-                            final Comparator<SimpleExpressionProxy> comparator,
-                            final Map.Entry<String,ChanInfo> chanIn,
-                            final Hashtable<Integer,List<SimpleExpressionProxy>> table,
-                            final List<SimpleExpressionProxy> dataRange)
+  private void getDataRange(final ModuleProxyCloner cloner, final Comparator<SimpleExpressionProxy> comparator, final Map.Entry<String,ChanInfo> chanIn, final Hashtable<Integer,List<SimpleExpressionProxy>> table, final List<SimpleExpressionProxy> dataRange)
   {
+    final PromelaChannel channel = mChannels.get(chanIn.getKey());
+
     for(int i=0;i<table.size();i++)
     {
+      //If it is an mtype, then get the mtype range
+      if(channel.getType(i) == Type.MTYPE)
+      {
+        dataRange.add(mRoot.getMtypeRange(mFactory));
+      }
+
+      //If it as an integer type, the get the integer type range
+      switch (channel.getType(i))
+      {
+      case BIT:
+        dataRange.add(PromelaIntRange.BIT.getRangeExpression(mFactory));
+        break;
+
+      case BYTE:
+        dataRange.add(PromelaIntRange.BYTE.getRangeExpression(mFactory));
+        break;
+
+      case SHORT:
+        dataRange.add(PromelaIntRange.SHORT.getRangeExpression(mFactory));
+        break;
+
+      case INT:
+        dataRange.add(PromelaIntRange.INT.getRangeExpression(mFactory));
+        break;
+      }
+      /*
       if(chanIn.getValue().getType().get(i).equals("mtype"))
       {
         final EnumSetExpressionProxy en = createChannelArgumentEnum(cloner, table, i,chanIn.getValue().getType());
@@ -643,14 +670,15 @@ public class EventCollectingVisitor implements PromelaVisitor
           //This is a variable that is being sent, so the range expression is the range of the variable
           //Get the left and right values for the variable
           //TODO Using byte values for now
-          final SimpleIdentifierProxy left = mFactory.createSimpleIdentifierProxy("0");
-          final SimpleIdentifierProxy right = mFactory.createSimpleIdentifierProxy("255");
+          final IntConstantProxy left = mFactory.createIntConstantProxy(0);
+          final IntConstantProxy right = mFactory.createIntConstantProxy(255);
 
           final BinaryExpressionProxy range = mFactory.createBinaryExpressionProxy(op, left, right);
 
           dataRange.add(range);
         }
-      }
+      }*/
+
     }
   }
 
@@ -677,6 +705,7 @@ public class EventCollectingVisitor implements PromelaVisitor
   //# Interface net.sourceforge.waters.external.promela.PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)
   {
+    mRoot = t;
     final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
     final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(accepting);
     final EventDeclProxy event = mFactory.createEventDeclProxy(ident, EventKind.PROPOSITION);
@@ -776,22 +805,12 @@ public class EventCollectingVisitor implements PromelaVisitor
     {
       if(ch.getType().get(y).equals("byte"))
       {
-        int i = 0;
-        final String label = labels.get(y+1);
-        boolean isNumber = true;
-        try
+        if(!mSymbolTable.containsKey(labels.get(y+1)))
         {
+          //This is a constant
+          int i = 0;
+          final String label = labels.get(y+1);
           i = Integer.parseInt(label);
-          //This is a number
-        }
-        catch(final NumberFormatException e)
-        {
-          //This is the name of a variable
-          isNumber = false;
-        }
-
-        if(isNumber)
-        {
           final IntConstantProxy c = mFactory.createIntConstantProxy(i);
           indexes.add(c);
           final IntConstantProxy c2 = mFactory.createIntConstantProxy(i);
@@ -799,6 +818,7 @@ public class EventCollectingVisitor implements PromelaVisitor
         }
         else
         {
+          //This is a variable
           indexes.add(channel.getTypeIdentifier(y, mFactory));
           indexes2.add(channel.getTypeIdentifier(y, mFactory));
         }
@@ -811,6 +831,11 @@ public class EventCollectingVisitor implements PromelaVisitor
           final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(labels.get(y+1));
           indexes.add(c);
           indexes2.add((SimpleExpressionProxy) cloner.getClone(c));
+        }
+        else if(mSymbolTable.get(labels.get(y+1)) instanceof VardefTreeNode)
+        {
+          indexes.add(channel.getTypeIdentifier(y, mFactory));
+          indexes2.add(channel.getTypeIdentifier(y, mFactory));
         }
       }
     }

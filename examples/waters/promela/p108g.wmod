@@ -33,8 +33,10 @@
                     <IntConstant Value="0"/>
                     <IntConstant Value="0"/>
                 </BinaryExpression>
-                <EnumSetExpression>
+                <EnumSetExpression Text="[TRUE,FALSE,:undefined]">
                     <SimpleIdentifier Name="TRUE"/>
+                    <SimpleIdentifier Name="FALSE"/>
+                    <SimpleIdentifier Name=":undefined"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>

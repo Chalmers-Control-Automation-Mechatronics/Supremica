@@ -30,7 +30,7 @@
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
-                    <IntConstant Value="1"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
@@ -45,8 +45,8 @@
                     <IntConstant Value="2"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="1"/>
-                    <IntConstant Value="2"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>

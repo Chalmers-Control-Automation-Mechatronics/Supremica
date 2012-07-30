@@ -11,7 +11,7 @@
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
-                    <IntConstant Value="3"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>

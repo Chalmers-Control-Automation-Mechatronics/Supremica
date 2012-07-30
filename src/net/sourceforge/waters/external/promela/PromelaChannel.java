@@ -3,7 +3,12 @@ package net.sourceforge.waters.external.promela;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 /**
@@ -29,6 +34,9 @@ public class PromelaChannel
 
   //All of the messages that get sent and received on the channel
   private final HashMap<Message,Message> mMessages;
+
+  private final ProxyAccessorHashSet<SimpleExpressionProxy>[] mSentItems;
+  private final ProxyAccessorHashSet<SimpleExpressionProxy>[] mReceivedItems;
 
   /**
    * The constructor for this class
@@ -70,6 +78,18 @@ public class PromelaChannel
     mMessages = new HashMap<Message,Message>();
     mMultipleReceivers = false;
     mMultipleSenders = false;
+
+    mSentItems = new ProxyAccessorHashSet[types.size()];
+    for(int i = 0; i < types.size(); i++)
+    {
+      mSentItems[i] = new ProxyAccessorHashSet<SimpleExpressionProxy>(ModuleEqualityVisitor.getInstance(false));
+    }
+
+    mReceivedItems = new ProxyAccessorHashSet[types.size()];
+    for(int i = 0; i < types.size(); i++)
+    {
+      mReceivedItems[i] = new ProxyAccessorHashSet<SimpleExpressionProxy>(ModuleEqualityVisitor.getInstance(false));
+    }
   }
 
   /**
@@ -81,7 +101,16 @@ public class PromelaChannel
     {
       //The message was just added
       //The message has new content, so need to keep record of the message items
-      //TODO
+      final List<SimpleExpressionProxy> values = m.getMsg();
+
+      for(int i = 0; i < mSentItems.length; i++)
+      {
+        final SimpleExpressionProxy value = values.get(i);
+        if(!mSentItems[i].containsProxy(value))
+        {
+          mSentItems[i].addProxy(value);
+        }
+      }
     }
     else
     {
@@ -98,7 +127,16 @@ public class PromelaChannel
     {
       //The message was just added
       //The message has new content, so need to keep record of the message items
-      //TODO
+      final List<SimpleExpressionProxy> values = m.getMsg();
+
+      for(int i = 0; i < mReceivedItems.length; i++)
+      {
+        final SimpleExpressionProxy value = values.get(i);
+        if(!mReceivedItems[i].containsProxy(value))
+        {
+          mReceivedItems[i].addProxy(value);
+        }
+      }
     }
     else
     {
@@ -147,20 +185,48 @@ public class PromelaChannel
    * @param m The message to check
    * @return True if the message is sendable, false otherwise
    */
-  public boolean isSendable(final Message m)
+  public boolean isSendable(final Message m, final ModuleProxyFactory factory)
   {
-    //TODO
-    //Also replace any constants with their corresponding variable type
-    //and check if that matches a message with senders
+    if(mLength > 0)
+    {
+      return true;//This is an asynchronous channel, so any message can be sent on it
+    }
+    else
+    {
+      final ModuleProxyCloner cloner = factory.getCloner();
+      return isSendable(m.clone(cloner), 0, factory);
+    }
+  }
 
-    final Message match = mMessages.get(m);
-    if(match == null)
+  private boolean isSendable(final Message m, final int index, final ModuleProxyFactory factory)
+  {
+    //Check if there is more values to change
+    if(index == mDataTypes.length)
+    {
+      //There are no more values to change, so check if the message is a match now
+      final Message match = mMessages.get(m);
+      if(match == null)
+        return false;
+      else
+        return match.hasRecipients();
+    }
+
+    //Check if changing further values will get a match
+    if(isSendable(m, index+1, factory))
+      return true;
+
+    if(isVariable(index, m.getMsg().get(index)))
     {
       return false;
     }
     else
     {
-      return match.hasSenders();
+      //Change the value of the item to be a variable
+      final SimpleExpressionProxy value = m.getMsg().get(index);
+      m.getMsg().set(index, getTypeIdentifier(index, factory));
+      final boolean result = isSendable(m, index+1, factory);
+      m.getMsg().set(index, value);
+      return result;
     }
   }
 
@@ -170,25 +236,84 @@ public class PromelaChannel
    * @param m The message to check
    * @return True if the message is receivable, false otherwise
    */
-  public boolean isReceivable(final Message m)
+  public boolean isReceivable(final Message m, final ModuleProxyFactory factory)
   {
-  //TODO
-    //Also replace any constants with their corresponding variable type
-    //and check if that matches a message with receivers
+    final ModuleProxyCloner cloner = factory.getCloner();
+    return isReceivable(m.clone(cloner), 0, factory);
+  }
 
-    final Message match = mMessages.get(m);
-    if(match == null)
+  private boolean isReceivable(final Message m, final int index, final ModuleProxyFactory factory)
+  {
+    //Check if there is more values to change
+    if(index == mDataTypes.length)
+    {
+      //There are no more values to change, so check if the message is a match now
+      final Message match = mMessages.get(m);
+      if(match == null)
+        return false;
+      else
+        return match.hasSenders();
+    }
+
+    //Check if changing further values will get a match
+    if(isReceivable(m, index+1, factory))
+      return true;
+
+    if(isVariable(index, m.getMsg().get(index)))
     {
       return false;
     }
-    else if(mLength > 0)
-    {
-      return true;
-    }
     else
     {
-      return match.hasRecipients();
+      //Change the value of the item to be a variable
+      final SimpleExpressionProxy value = m.getMsg().get(index);
+      m.getMsg().set(index, getTypeIdentifier(index, factory));
+      final boolean result = isReceivable(m, index+1, factory);
+      m.getMsg().set(index, value);
+      return result;
     }
+  }
+
+  private boolean isVariable(final int index, final SimpleExpressionProxy item)
+  {
+    final String text = item.toString();
+
+    switch(mDataTypes[index])
+    {
+    case BIT:
+      return text.equals("Bit") || text.equals("bit") || text.equals("Bool") || text.equals("bool");
+    case BYTE:
+      return text.equals("Byte") || text.equals("byte");
+    case INT:
+      return text.equals("Int") || text.equals("int");
+    case MTYPE:
+      return text.equals("Mtype") || text.equals("mtype");
+    }
+
+    //This is unreachable, but added because the compiler doesn't know that
+    return false;
+  }
+
+  /**
+   * A method to check if a given item appears in any sent message at the given position
+   * @param index The position that the item might appear in a message
+   * @param item The item that may appear in a message
+   * @return True if the item is contained in a sent message at the given index, false otherwise
+   */
+  public boolean isSent(final int index, final SimpleExpressionProxy item)
+  {
+    return mSentItems[index].containsProxy(item);
+  }
+
+  /**
+   * A method to check if a given item appears in any received message at the given position
+   * @param index The position that the item might appear in a message
+   * @param item The item that may appear in a message
+   * @return The if the item is contained in a received message at the given index, false otherwise
+   */
+  public boolean isReceived(final int index, final SimpleExpressionProxy item)
+  {
+    return mReceivedItems[index].containsProxy(item);
   }
 
   /**
@@ -256,12 +381,21 @@ public class PromelaChannel
   }
 
   /**
-   * A method to get the length of this channel
-   * @return An integer indicating the channel length
+   * A method to get the length of this channel.
+   * @return An integer indicating the channel length.
    */
   public int getLength()
   {
     return mLength;
+  }
+
+  /**
+   * A method to get the number of items sent on this channel at one time.
+   * @return An integer indicating the width.
+   */
+  public int getWidth()
+  {
+    return mDataTypes.length;
   }
 
   /**
@@ -273,6 +407,22 @@ public class PromelaChannel
     return mName;
   }
 
+  /**
+   * A method to get the data type at the given channel position.
+   * @param position The position to get the data type of.
+   * @return A Type containing the data type of items sent and received at this position.
+   */
+  public Type getType(final int position)
+  {
+    return mDataTypes[position];
+  }
+
+  /**
+   * A method to create an identifier for the variable type at the given position.
+   * @param position The position in the message the variable is found.
+   * @param factory The ModuleProxyFactory used for creating Proxys
+   * @return A SimpleIdentifierProxy containing the identifier
+   */
   public SimpleIdentifierProxy getTypeIdentifier(final int position, final ModuleProxyFactory factory)
   {
     switch(mDataTypes[position])
