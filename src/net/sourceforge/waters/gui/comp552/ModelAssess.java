@@ -216,6 +216,7 @@ public class ModelAssess
     final File dir = file.getAbsoluteFile().getParentFile();
     final FileReader stream = new FileReader(file);
     try {
+      @SuppressWarnings("resource")
       final BufferedReader reader = new BufferedReader(stream);
       mSolutions.clear();
       Solution sol = null;
@@ -290,6 +291,7 @@ public class ModelAssess
   {
     final FileReader stream = new FileReader(classlist);
     try {
+      @SuppressWarnings("resource")
       final BufferedReader reader = new BufferedReader(stream);
       mStudents.clear();
       while (true) {

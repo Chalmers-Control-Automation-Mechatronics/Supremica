@@ -838,6 +838,8 @@ public abstract class JAXBAbstractModuleImporter
     mNodeEventListHandler.fromJAXB(this, element, eventList);
     final PlainEventListProxy propositions =
       mFactory.createPlainEventListProxy(eventList);
+    final AttributeMap attribsElement = element.getAttributeMap();
+    final Map<String,String> attribs = importAttributeMap(attribsElement);
     final Collection<NodeProxy> immediateChildNodes =
       new CheckedImportList<NodeProxy>(GroupNodeProxy.class, name, "node");
     final List<NodeRef> immediateChildNodesElement = element.getNodes();
@@ -850,6 +852,7 @@ public abstract class JAXBAbstractModuleImporter
       importBoxGeometry(geometryElement);
     return mFactory.createGroupNodeProxy(name,
                                          propositions,
+                                         attribs,
                                          immediateChildNodes,
                                          geometry);
   }
@@ -1036,6 +1039,8 @@ public abstract class JAXBAbstractModuleImporter
     mNodeEventListHandler.fromJAXB(this, element, eventList);
     final PlainEventListProxy propositions =
       mFactory.createPlainEventListProxy(eventList);
+    final AttributeMap attribsElement = element.getAttributeMap();
+    final Map<String,String> attribs = importAttributeMap(attribsElement);
     final boolean initial = element.isInitial();
     final PointGeometryType pointGeometryElement = element.getPointGeometry();
     final PointGeometryProxy pointGeometry =
@@ -1049,6 +1054,7 @@ public abstract class JAXBAbstractModuleImporter
       importLabelGeometry(labelGeometryElement);
     return mFactory.createSimpleNodeProxy(name,
                                           propositions,
+                                          attribs,
                                           initial,
                                           pointGeometry,
                                           arrowGeometry,

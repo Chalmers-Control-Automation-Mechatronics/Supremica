@@ -514,10 +514,11 @@ public class ExtendedAutomaton
             {
                 propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
             }
-
-            final PlainEventListSubject markingProposition = factory.createPlainEventListProxy(propList);
-
-            node = factory.createSimpleNodeProxy(name, markingProposition,initial, null, null, null);
+            final PlainEventListSubject markingProposition =
+              factory.createPlainEventListProxy(propList);
+            node = factory.createSimpleNodeProxy(name, markingProposition,
+                                                 null, initial,
+                                                 null, null, null);
             graph.getNodesModifiable().add (node);
             nodes.add(node);
             nameToLocationMap.put(name, node);

@@ -169,7 +169,7 @@ public class ListBufferTransitionRelation
     final List<TransitionProxy> list =
       new ArrayList<TransitionProxy>(transitions);
     final int numEvents = eventEnc.getNumberOfProperEvents();
-    final int numStates = stateEnc.getNumberOfIncludingExtraStates();
+    final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
     final int numTrans = aut.getTransitions().size();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
@@ -1182,7 +1182,12 @@ public class ListBufferTransitionRelation
 
   /**
    * Checks whether this transition relation represents a deterministic
-   * automaton.
+   * automaton. A transition relation is deterministic if it has at most
+   * one initial state, and if there exists at most one successor state
+   * for any given source state and event. Note that this method treats the
+   * silent event ({@link EventEncoding#TAU}) as an ordinary event, so a
+   * transition relation with silent transitions may be reported as
+   * deterministic.
    */
   public boolean isDeterministic()
   {
@@ -1856,10 +1861,14 @@ public class ListBufferTransitionRelation
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numEvents, numStates, numTrans);
+    } else {
+      mSuccessorBuffer = null;
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
         new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
+    } else {
+      mPredecessorBuffer = null;
     }
   }
 

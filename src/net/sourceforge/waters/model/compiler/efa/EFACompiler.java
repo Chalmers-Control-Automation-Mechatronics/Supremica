@@ -820,6 +820,8 @@ public class EFACompiler
       final PlainEventListProxy props0 = group.getPropositions();
       final PlainEventListProxy props1 =
         (PlainEventListProxy) mCloner.getClone(props0);
+      final Map<String,String> attribs0 = group.getAttributes();
+      final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
       final Collection<NodeProxy> children0 = group.getImmediateChildNodes();
       final int numchildren = children0.size();
       final Collection<NodeProxy> children1 =
@@ -829,7 +831,7 @@ public class EFACompiler
         children1.add(child1);
       }
       final GroupNodeProxy result =
-        mFactory.createGroupNodeProxy(name, props1, children1, null);
+        mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
       mNodeList.add(result);
       mNodeMap.put(group, result);
       addSourceInfo(result, group);
@@ -925,9 +927,11 @@ public class EFACompiler
       final PlainEventListProxy props0 = node.getPropositions();
       final PlainEventListProxy props1 =
         (PlainEventListProxy) mCloner.getClone(props0);
+      final Map<String,String> attribs0 = node.getAttributes();
+      final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
       final boolean initial = node.isInitial();
       final SimpleNodeProxy result = mFactory.createSimpleNodeProxy
-        (name, props1, initial, null, null, null);
+        (name, props1, attribs1, initial, null, null, null);
       mNodeList.add(result);
       mNodeMap.put(node, result);
       addSourceInfo(result, node);

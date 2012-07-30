@@ -413,7 +413,7 @@ class EditorGraph
   {
     moveEdgeStart(edge0, dx, dy);
     moveEdgeEnd(edge0, dx, dy);
-    moveEdgeHandle(edge0, dx, dy);
+    moveEdgeHandle(edge0, dx, dy, false);
   }
 
   /**
@@ -469,11 +469,45 @@ class EditorGraph
    */
   void moveEdgeHandle(final EdgeSubject edge0,
                       final double dx,
-                      final double dy)
+                      final double dy,
+                      final boolean moveAlongHalfWay)
   {
     final EdgeSubject edge1 = (EdgeSubject) getCopy(edge0);
     final Point2D point = GeometryTools.getTurningPoint1(edge0);
     point.setLocation(point.getX() + dx, point.getY() + dy);
+    if(moveAlongHalfWay && !GeometryTools.isSelfloop(edge1)){
+      final Point2D start = GeometryTools.getStartPoint(edge1);
+      final Point2D end = GeometryTools.getEndPoint(edge1);
+      final double sx = start.getX();
+      final double sy = start.getY();
+      final double ex = end.getX();
+      final double ey = end.getY();
+      final double px = point.getX();
+      final double py = point.getY();
+      final double mx = (sx + ex) / 2;
+      final double my = (sy + ey) / 2;
+      final double sxex = sx - ex;
+      final double syey = sy - ey;
+      double x;
+      double y;
+      //slope is undefined (vertical)
+      if(sxex == 0){
+        x = px;
+        y = my;
+      }
+      //slope = 0 (horizontal)
+      else if(syey == 0){
+        x = mx;
+        y = py;
+      }
+      else{
+         final double eSlope = syey / sxex;
+         final double pSlope = (-1) / eSlope;
+         x = ( - (eSlope * px) + (pSlope * mx) + py -my) / (pSlope - eSlope);
+         y = (eSlope * (x - px)) + py;
+      }
+      point.setLocation(x, y);
+    }
     GeometryTools.createMidGeometry(edge1, point, SplineKind.INTERPOLATING);
   }
 
@@ -1707,7 +1741,6 @@ class EditorGraph
       else {
         return mBlockedEvents;
       }
-
     }
 
     public GuardActionBlockSubject visitGuardActionBlockProxy

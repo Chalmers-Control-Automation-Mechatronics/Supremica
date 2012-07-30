@@ -244,6 +244,7 @@ public class CompositionalAnalysisResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
+    @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
     writer.print("Total number of compositions: ");
     writer.println(mTotalCompositionsCount);

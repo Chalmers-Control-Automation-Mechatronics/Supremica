@@ -1448,7 +1448,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         final EventEncoding eventEnc = createEventEncoding(aut, tau);
         final StateEncoding inputStateEnc = new StateEncoding(aut);
         final int config = mSimplifier.getPreferredInputConfiguration();
-        final ListBufferTransitionRelation rel =
+        ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);
         final int numStates = rel.getNumberOfStates();
@@ -1456,6 +1456,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         final int numMarkings = rel.getNumberOfMarkings();
         mSimplifier.setTransitionRelation(rel);
         if (mSimplifier.run()) {
+          rel = mSimplifier.getTransitionRelation();
           if (rel.getNumberOfReachableStates() == numStates &&
               rel.getNumberOfTransitions() == numTrans &&
               rel.getNumberOfMarkings() == numMarkings) {

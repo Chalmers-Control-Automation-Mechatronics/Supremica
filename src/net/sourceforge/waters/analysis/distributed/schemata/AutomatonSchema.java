@@ -6,12 +6,12 @@ import java.io.Serializable;
 
 public class AutomatonSchema implements Serializable
 {
-  AutomatonSchema(String name,
-		  int[] eventIds,
-		  StateSchema[] states,
-		  int kind,
-		  TransitionSchema[] transitions,
-		  int id)
+  AutomatonSchema(final String name,
+		  final int[] eventIds,
+		  final StateSchema[] states,
+		  final int kind,
+		  final TransitionSchema[] transitions,
+		  final int id)
   {
     mName = name;
     mEventIds = eventIds;
@@ -30,8 +30,8 @@ public class AutomatonSchema implements Serializable
   {
     return mAutomatonId;
   }
-  
-  public int getEventId(int index)
+
+  public int getEventId(final int index)
   {
     return mEventIds[index];
   }
@@ -41,7 +41,7 @@ public class AutomatonSchema implements Serializable
     return mEventIds.length;
   }
 
-  public StateSchema getState(int index)
+  public StateSchema getState(final int index)
   {
     return mStates[index];
   }
@@ -56,7 +56,7 @@ public class AutomatonSchema implements Serializable
     return mKind;
   }
 
-  public TransitionSchema getTransition(int index)
+  public TransitionSchema getTransition(final int index)
   {
     return mTransitions[index];
   }
@@ -66,17 +66,21 @@ public class AutomatonSchema implements Serializable
     return mTransitions.length;
   }
 
+  @Override
   public String toString()
   {
-    Formatter fmt = new Formatter();
-    fmt.format("Name: %s\n", mName);
-    fmt.format("Id: %d\n", mAutomatonId);
-    fmt.format("Events: %s\n", Arrays.toString(mEventIds));
-    fmt.format("Transitions: %s\n", Arrays.deepToString(mTransitions));
-    fmt.format("States: %s\n", Arrays.deepToString(mStates));
-    fmt.format("Kind: %d\n", mKind);
-
-    return fmt.toString();
+    final Formatter fmt = new Formatter();
+    try {
+      fmt.format("Name: %s\n", mName);
+      fmt.format("Id: %d\n", mAutomatonId);
+      fmt.format("Events: %s\n", Arrays.toString(mEventIds));
+      fmt.format("Transitions: %s\n", Arrays.deepToString(mTransitions));
+      fmt.format("States: %s\n", Arrays.deepToString(mStates));
+      fmt.format("Kind: %d\n", mKind);
+      return fmt.toString();
+    } finally {
+      fmt.close();
+    }
   }
 
   /**
@@ -85,9 +89,9 @@ public class AutomatonSchema implements Serializable
    * @param event to check for
    * @return true if event is in the alphabet for this automaton.
    */
-  public boolean hasEvent(int event)
+  public boolean hasEvent(final int event)
   {
-    for (int eventid : mEventIds)
+    for (final int eventid : mEventIds)
       {
 	if (event == eventid)
 	  return true;

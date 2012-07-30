@@ -301,12 +301,6 @@ public class HalfWaySynthesisTRSimplifier
         rel.setUsedEvent(event, false);
       }
       rel.removeRedundantPropositions();
-      final ComponentKind kind = rel.getKind();
-      final ListBufferTransitionRelation abstraction =
-        new ListBufferTransitionRelation(name, kind, 0, 0, 0,
-                                         ListBufferTransitionRelation.
-                                         CONFIG_SUCCESSORS);
-      setTransitionRelation(abstraction);
       mPseudoSupervisor =
         new ListBufferTransitionRelation(name, ComponentKind.SUPERVISOR,
                                          0, 0, 0,

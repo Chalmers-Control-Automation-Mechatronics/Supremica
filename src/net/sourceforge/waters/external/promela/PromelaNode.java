@@ -67,22 +67,18 @@ public class PromelaNode
                                     final boolean marked,
                                     final ModuleProxyFactory factory)
   {
+    final PlainEventListProxy eventList;
     if (marked) {
       final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
       final SimpleIdentifierProxy ident =
           factory.createSimpleIdentifierProxy(accepting);
       final List<SimpleIdentifierProxy> list = Collections.singletonList(ident);
-      final PlainEventListProxy eventList =
-          factory.createPlainEventListProxy(list);
-      mNode =
-          factory.createSimpleNodeProxy(name + "_" + index, eventList, initial,
-                                        null, null, null);
-      return mNode;
+      eventList = factory.createPlainEventListProxy(list);
     } else {
-      mNode =
-          factory.createSimpleNodeProxy(name + "_" + index, null, initial,
-                                        null, null, null);
+      eventList = null;
     }
+    mNode = factory.createSimpleNodeProxy(name + "_" + index, eventList, null,
+                                          initial, null, null, null);
     return mNode;
   }
 

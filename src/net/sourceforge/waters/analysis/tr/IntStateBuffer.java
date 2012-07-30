@@ -61,9 +61,9 @@ public class IntStateBuffer
                         final StateEncoding stateEnc)
     throws OverflowException
   {
-    this(stateEnc.getNumberOfIncludingExtraStates(),
+    this(stateEnc.getNumberOfStatesIncludingExtra(),
          eventEnc.getNumberOfPropositions());
-    final int numStates = stateEnc.getNumberOfIncludingExtraStates();
+    final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
     final int extraStates = stateEnc.getNumberOfExtraStates();
     for (int state = numStates - extraStates; state < numStates; state++) {
       setReachable(state, false);

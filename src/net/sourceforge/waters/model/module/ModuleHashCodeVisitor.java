@@ -439,6 +439,9 @@ public class ModuleHashCodeVisitor
     final PlainEventListProxy propositions = proxy.getPropositions();
     result *= 5;
     result += computeProxyHashCode(propositions);
+    final Map<String,String> attributes = proxy.getAttributes();
+    result *= 5;
+    result += computeOptionalHashCode(attributes);
     return result;
   }
 

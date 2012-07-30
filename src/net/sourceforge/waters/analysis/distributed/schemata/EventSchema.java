@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class EventSchema implements Serializable
 {
-  EventSchema(String name, int kind, boolean observable)
+  EventSchema(final String name, final int kind, final boolean observable)
   {
     mName = name;
     mKind = kind;
@@ -27,10 +27,15 @@ public class EventSchema implements Serializable
     return mObservable;
   }
 
+  @Override
   public String toString()
   {
-    Formatter fmt = new Formatter();
-    return fmt.format("(%s, %d, %b)", mName, mKind, mObservable).toString();
+    final Formatter fmt = new Formatter();
+    try {
+      return fmt.format("(%s, %d, %b)", mName, mKind, mObservable).toString();
+    } finally {
+      fmt.close();
+    }
   }
 
   private final String mName;

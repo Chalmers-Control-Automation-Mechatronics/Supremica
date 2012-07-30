@@ -81,6 +81,7 @@ public class CommandLineTool
     boolean noargs = false;
     int timeout = -1;
     PrintWriter csv = null;
+    final Formatter formatter = new Formatter(System.out);
 
     try {
       if (args.length < 2) {
@@ -204,7 +205,6 @@ public class CommandLineTool
       factory.parse(argIter);
       factory.configure(checker);
 
-      final Formatter formatter = new Formatter(System.out);
       boolean first = true;
       for (final String name : argList) {
         final File filename = new File(name);
@@ -330,6 +330,7 @@ public class CommandLineTool
       if (csv != null) {
         csv.close();
       }
+      formatter.close();
     }
   }
 

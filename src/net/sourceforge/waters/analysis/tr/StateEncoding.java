@@ -254,7 +254,7 @@ public class StateEncoding
     mExtraStates = extra;
   }
 
-  public int getNumberOfIncludingExtraStates()
+  public int getNumberOfStatesIncludingExtra()
   {
     return mStates.length + mExtraStates;
   }

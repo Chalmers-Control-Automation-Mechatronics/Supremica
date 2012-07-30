@@ -60,7 +60,7 @@ import junit.framework.*;
  */
 public class TestAutomataToJava extends TestCase {
 
-	public TestAutomataToJava(String name)
+	public TestAutomataToJava(final String name)
 	{
 		super(name);
 	}
@@ -84,47 +84,54 @@ public class TestAutomataToJava extends TestCase {
 	/**
 	 * Compares the generated java file with the hand-written reference file
 	 */
-	public void testSameAsReferenceFile
-		(String classname, File projFile, File refFile)
-		throws Exception
-	{
-		//Create an empty temporary file that is deleted upon exit
-		File generatedTempJavaFile = File.createTempFile(classname, ".java");
-		//generatedTempJavaFile.deleteOnExit();
-		//Generate java code into the temporary file from the ball process
-		// project
-		Project proj = new ProjectBuildFromXML().build(projFile);
-		AutomataToJava javaExporter = new AutomataToJava(proj, classname);
-		PrintWriter pw =
-			new PrintWriter(new FileWriter(generatedTempJavaFile));
-		javaExporter.serialize(pw);
-		pw.flush(); // needed!!!
-		pw.close();
-		// Open a reader for the reference file and the generated file
-		// respectively
-		LineNumberReader refReader =
-			new LineNumberReader(new FileReader(refFile));
-		LineNumberReader genReader =
-			new LineNumberReader(new FileReader(generatedTempJavaFile));
-		// Compare each line except those where date and version are written
-		String refLine = refReader.readLine();
-		String genLine = genReader.readLine();
-		while (refLine != null && genLine != null) {
-			if (!(genLine.startsWith(" * Supremica version:") &&
-				  refLine.startsWith(" * Supremica version:")) &&
-				!(genLine.startsWith(" * This file was generated at:") &&
-				  refLine.startsWith(" * This file was generated at:"))) {
-				assertEquals("Line " + genReader.getLineNumber(), refLine,
-							 genLine);
-			}
-			refLine = refReader.readLine();
-			genLine = genReader.readLine();
-		}
-		assertNull("The reference file is shorter than the generated file",
-				   genLine);
-		assertNull("The generated file is shorter than the reference file ",
-				   refLine);
-	}
+    public void testSameAsReferenceFile(final String classname, final File projFile,
+                                        final File refFile)
+      throws Exception
+    {
+      //Create an empty temporary file that is deleted upon exit
+      final File generatedTempJavaFile = File.createTempFile(classname, ".java");
+      //generatedTempJavaFile.deleteOnExit();
+      //Generate java code into the temporary file from the ball process
+      // project
+      final Project proj = new ProjectBuildFromXML().build(projFile);
+      final AutomataToJava javaExporter = new AutomataToJava(proj, classname);
+      final PrintWriter pw = new PrintWriter(new FileWriter(generatedTempJavaFile));
+      javaExporter.serialize(pw);
+      pw.flush(); // needed!!!
+      pw.close();
+      // Open a reader for the reference file and the generated file
+      // respectively
+      LineNumberReader refReader = null;
+      LineNumberReader genReader = null;
+      try {
+        refReader = new LineNumberReader(new FileReader(refFile));
+        genReader = new LineNumberReader(new FileReader(generatedTempJavaFile));
+        // Compare each line except those where date and version are written
+        String refLine = refReader.readLine();
+        String genLine = genReader.readLine();
+        while (refLine != null && genLine != null) {
+          if (!(genLine.startsWith(" * Supremica version:") && refLine
+            .startsWith(" * Supremica version:"))
+            && !(genLine.startsWith(" * This file was generated at:") && refLine
+              .startsWith(" * This file was generated at:"))) {
+            assertEquals("Line " + genReader.getLineNumber(), refLine, genLine);
+          }
+          refLine = refReader.readLine();
+          genLine = genReader.readLine();
+        }
+        assertNull("The reference file is shorter than the generated file",
+                   genLine);
+        assertNull("The generated file is shorter than the reference file ",
+                   refLine);
+      } finally {
+        if (genReader != null) {
+          genReader.close();
+        }
+        if (refReader != null) {
+          refReader.close();
+        }
+      }
+    }
 
 	/**
 	 * Assembles and returns a test suite for all the test methods of this test
@@ -132,7 +139,7 @@ public class TestAutomataToJava extends TestCase {
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestAutomataToJava.class);
+		final TestSuite suite = new TestSuite(TestAutomataToJava.class);
 		return suite;
 	}
 }

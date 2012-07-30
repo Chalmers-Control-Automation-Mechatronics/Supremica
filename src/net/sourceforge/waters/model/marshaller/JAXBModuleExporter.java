@@ -937,9 +937,7 @@ public class JAXBModuleExporter
     mModuleSequenceListHandler.toJAXB(this, list, element);
   }
 
-  private void copyNodeProxy
-      (final NodeProxy proxy,
-       final NodeType element)
+  private void copyNodeProxy(final NodeProxy proxy, final NodeType element)
     throws VisitorException
   {
     copyNamedProxy(proxy, element);
@@ -948,6 +946,9 @@ public class JAXBModuleExporter
       (EventListExpression) propositionsProxy.acceptVisitor(this);
     final EventListType propositionsList = propositionsElement.getEventList();
     element.setPropositions(propositionsList);
+    final Map<String,String> attribs = proxy.getAttributes();
+    final AttributeMap attribsElement = createAttributeMap(attribs);
+    element.setAttributeMap(attribsElement);
   }
 
   private void copyParameterBindingProxy

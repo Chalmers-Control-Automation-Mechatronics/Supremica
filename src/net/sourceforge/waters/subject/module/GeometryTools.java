@@ -775,7 +775,7 @@ public final class GeometryTools
    * always adhered to.
    */
   public static void createMidGeometry(final EdgeSubject edge,
-                                       final Point2D newpoint,
+                                        final Point2D newpoint,
                                        final SplineKind kind)
   {
     if (isSelfloop(edge)) {

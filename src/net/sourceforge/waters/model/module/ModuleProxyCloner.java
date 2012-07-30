@@ -363,6 +363,7 @@ public class ModuleProxyCloner
     final PlainEventListProxy propositions0 = proxy.getPropositions();
     final PlainEventListProxy propositions =
       visitPlainEventListProxy(propositions0);
+    final Map<String,String> attributes = proxy.getAttributes();
     final Collection<NodeProxy> immediateChildNodes0 =
       proxy.getImmediateChildNodes();
     final Collection<NodeProxy> immediateChildNodes =
@@ -372,6 +373,7 @@ public class ModuleProxyCloner
       geometry0 == null ? null : visitBoxGeometryProxy(geometry0);
     return mFactory.createGroupNodeProxy(name,
                                          propositions,
+                                         attributes,
                                          immediateChildNodes,
                                          geometry);
   }
@@ -634,6 +636,7 @@ public class ModuleProxyCloner
     final PlainEventListProxy propositions0 = proxy.getPropositions();
     final PlainEventListProxy propositions =
       visitPlainEventListProxy(propositions0);
+    final Map<String,String> attributes = proxy.getAttributes();
     final boolean initial = proxy.isInitial();
     final PointGeometryProxy pointGeometry0 = proxy.getPointGeometry();
     final PointGeometryProxy pointGeometry =
@@ -647,6 +650,7 @@ public class ModuleProxyCloner
       labelGeometry0 == null ? null : visitLabelGeometryProxy(labelGeometry0);
     return mFactory.createSimpleNodeProxy(name,
                                           propositions,
+                                          attributes,
                                           initial,
                                           pointGeometry,
                                           initialArrowGeometry,

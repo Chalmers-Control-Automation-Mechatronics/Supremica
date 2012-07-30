@@ -255,11 +255,13 @@ public class ModuleSubjectFactory
   public GroupNodeSubject createGroupNodeProxy
       (final String name,
        final PlainEventListProxy propositions,
+       final Map<String,String> attributes,
        final Collection<? extends NodeProxy> immediateChildNodes,
        final BoxGeometryProxy geometry)
   {
     return new GroupNodeSubject(name,
                                 propositions,
+                                attributes,
                                 immediateChildNodes,
                                 geometry);
   }
@@ -490,6 +492,7 @@ public class ModuleSubjectFactory
   public SimpleNodeSubject createSimpleNodeProxy
       (final String name,
        final PlainEventListProxy propositions,
+       final Map<String,String> attributes,
        final boolean initial,
        final PointGeometryProxy pointGeometry,
        final PointGeometryProxy initialArrowGeometry,
@@ -497,6 +500,7 @@ public class ModuleSubjectFactory
   {
     return new SimpleNodeSubject(name,
                                  propositions,
+                                 attributes,
                                  initial,
                                  pointGeometry,
                                  initialArrowGeometry,

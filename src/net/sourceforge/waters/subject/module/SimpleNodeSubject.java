@@ -13,6 +13,7 @@
 package net.sourceforge.waters.subject.module;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -44,6 +45,7 @@ public final class SimpleNodeSubject
    * Creates a new simple node.
    * @param name The name of the new simple node.
    * @param propositions The list of propositions of the new simple node, or <CODE>null</CODE> if empty.
+   * @param attributes The attribute map of the new simple node, or <CODE>null</CODE> if empty.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
    * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
@@ -51,12 +53,13 @@ public final class SimpleNodeSubject
    */
   public SimpleNodeSubject(final String name,
                            final PlainEventListProxy propositions,
+                           final Map<String,String> attributes,
                            final boolean initial,
                            final PointGeometryProxy pointGeometry,
                            final PointGeometryProxy initialArrowGeometry,
                            final LabelGeometryProxy labelGeometry)
   {
-    super(name, propositions);
+    super(name, propositions, attributes);
     mIsInitial = initial;
     mPointGeometry = (PointGeometrySubject) pointGeometry;
     if (mPointGeometry != null) {
@@ -76,6 +79,7 @@ public final class SimpleNodeSubject
    * Creates a new simple node using default values.
    * This constructor creates a simple node with
    * an empty list of propositions,
+   * an empty attribute map,
    * the initial status set to <CODE>false</CODE>,
    * the geometric position set to <CODE>null</CODE>,
    * the position of the initial state arrow set to <CODE>null</CODE>, and
@@ -85,6 +89,7 @@ public final class SimpleNodeSubject
   public SimpleNodeSubject(final String name)
   {
     this(name,
+         null,
          null,
          false,
          null,

@@ -365,6 +365,7 @@ public class CompositionalSynthesizerExperiments
     final long start = System.currentTimeMillis();
     runModel("handwritten", null, "transferline.wmod", bindings);
     final long stop = System.currentTimeMillis();
+    @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(System.out);
     final float difftime = 0.001f * (stop - start);
     formatter.format("%.3f s\n", difftime);

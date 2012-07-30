@@ -212,6 +212,8 @@ public class ChainTRSimplifier
       }
       step.setTransitionRelation(rel);
       if (step.run()) {
+        final ListBufferTransitionRelation rel1 = step.getTransitionRelation();
+        setTransitionRelation(rel1);
         if (logger.isDebugEnabled()) {
           logger.debug(rel.getNumberOfReachableStates() + " states, " +
                        rel.getNumberOfTransitions() + " transitions, " +
