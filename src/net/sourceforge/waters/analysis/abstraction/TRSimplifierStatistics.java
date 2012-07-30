@@ -349,6 +349,7 @@ public class TRSimplifierStatistics
   //# Printing
   public void print(final PrintWriter writer)
   {
+    @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
     writer.print("Name of rule: ");
     writer.println(ProxyTools.getShortClassName(mSimplifierClass));

@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class TransitionSchema implements Serializable
 {
-  TransitionSchema(int source, int target, int eventId)
+  TransitionSchema(final int source, final int target, final int eventId)
   {
     mSource = source;
     mTarget = target;
@@ -27,10 +27,15 @@ public class TransitionSchema implements Serializable
     return mEventId;
   }
 
+  @Override
   public String toString()
   {
-    Formatter fmt = new Formatter();
-    return fmt.format("%d -%d-> %d", mSource, mEventId, mTarget).toString();
+    final Formatter fmt = new Formatter();
+    try {
+      return fmt.format("%d -%d-> %d", mSource, mEventId, mTarget).toString();
+    } finally {
+      fmt.close();
+    }
   }
 
   private final int mSource;

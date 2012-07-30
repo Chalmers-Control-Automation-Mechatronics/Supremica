@@ -662,7 +662,7 @@ public class Projection3
             writer.append(',');
           }
           writer.append('\n');
-          writer.flush();
+          writer.close();
           mRowResults = new String[]{"#States","#Events","#Hidden","#Sync.Trans",
                                      "Sync.Time","Syne.States","Det.Time",
                                      "Det.States","Min.Time","Min.States","Overall"};
