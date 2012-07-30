@@ -45,6 +45,7 @@ public class PromelaChannel
    * Zero indicates that this is an exchange channel
    * @param types The type of each item in messages that pass through this channel
    */
+  @SuppressWarnings("unchecked")
   public PromelaChannel(final String name, final int length, final List<String> types)
   {
     mLength = length;

@@ -682,25 +682,6 @@ public class EventCollectingVisitor implements PromelaVisitor
     }
   }
 
-  private EnumSetExpressionProxy createChannelArgumentEnum(final ModuleProxyCloner cloner,
-                                                           final Hashtable<Integer,List<SimpleExpressionProxy>> table,
-                                                           final int argIndex,
-                                                           final List<String> typeList)
-  {
-    final List<SimpleExpressionProxy> rangeValues = table.get(argIndex);
-    final int numValues = rangeValues.size();
-    final List<SimpleIdentifierProxy> enumValues = new ArrayList<SimpleIdentifierProxy>(numValues);
-
-    for (int i=0;i<rangeValues.size();i++)
-    {
-        final SimpleIdentifierProxy cloned = (SimpleIdentifierProxy) cloner.getClone(rangeValues.get(i));
-        enumValues.add(cloned);
-     }
-
-    final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(enumValues);
-    return en;
-  }
-
   //########################################################################
   //# Interface net.sourceforge.waters.external.promela.PromelaVisitor
   public Object visitModule(final ModuleTreeNode t)
