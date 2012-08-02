@@ -808,7 +808,7 @@ public final class GeometryTools
   /**
    * Changes the middle point of an edge.
    * This method changes the edge's spline geometry to reflect the
-   * given new centre point. It produces spline with a single control
+   * given new centre point. It produces a spline with a single control
    * point, or replaces the existing one.
    */
   public static void setSpecifiedMidPoint(final EdgeSubject edge,

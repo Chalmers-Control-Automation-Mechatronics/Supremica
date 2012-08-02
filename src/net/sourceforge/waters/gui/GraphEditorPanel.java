@@ -2886,7 +2886,7 @@ public class GraphEditorPanel
       } else {
         mShouldCommit = true;
       }
-      mMoveVisitor.moveAll(x, y, directional && edgeMove);
+      mMoveVisitor.moveAll(x, y, directional && edgeMove, getDragStart());
     }
 
     //#######################################################################
@@ -3833,13 +3833,15 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Invocation
-    private void moveAll(final int dx, final int dy, final boolean edgeMove)
+    private void moveAll(final int dx, final int dy, final boolean edgeMove,
+                         final Point dragStart)
     {
       try {
         assert(getSecondaryGraph() != null);
         mDeltaX = dx;
         mDeltaY = dy;
         mMoveAlongHalfWay = edgeMove;
+        mDragStart = dragStart;
         for (final ProxySubject item : mMovedObjects) {
           item.acceptVisitor(this);
         }
@@ -3869,7 +3871,8 @@ public class GraphEditorPanel
     {
       final EdgeSubject edge0 = (EdgeSubject) edge;
       if (mEdgeMap == null) {
-        getSecondaryGraph().moveEdgeHandle(edge0, mDeltaX, mDeltaY, mMoveAlongHalfWay);
+        getSecondaryGraph().moveEdgeHandle(edge0, mDeltaX, mDeltaY,
+                                           mMoveAlongHalfWay, mDragStart);
       } else {
         final MovingEdge entry = mEdgeMap.get(edge0);
         entry.move(mDeltaX, mDeltaY);
@@ -3957,6 +3960,7 @@ public class GraphEditorPanel
     private int mDeltaX;
     private int mDeltaY;
     private boolean mMoveAlongHalfWay;
+    private Point mDragStart;
 
   }
 
@@ -4003,7 +4007,7 @@ public class GraphEditorPanel
       case MOVE_DONT:
         break;
       case MOVE_FOLLOW:
-        graph.moveEdgeHandle(mEdge, dx, dy, false);
+        graph.moveEdgeHandle(mEdge, dx, dy, false, null);
         break;
       case MOVE_SOURCE:
         graph.transformEdge(mEdge, true);
@@ -4095,7 +4099,7 @@ public class GraphEditorPanel
         createSecondaryGraph();
         final int x = left ? -1 : right ? 1 : 0;
         final int y = up ? -1 : down ? 1 : 0;
-        mMoveVisitor.moveAll(x, y, false);
+        mMoveVisitor.moveAll(x, y, false, null);
         commitGraph(null, true, true);
         mMoveVisitor = null;
         clearSecondaryGraph();
