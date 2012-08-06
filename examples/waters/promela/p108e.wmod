@@ -25,10 +25,9 @@
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="send_ack">
             <RangeList>
-                <EnumSetExpression Text="[ACK, NACK,:undefined]">
+                <EnumSetExpression>
                     <SimpleIdentifier Name="ACK"/>
                     <SimpleIdentifier Name="NACK"/>
-                    <SimpleIdentifier Name=":undefined"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -38,10 +37,9 @@
                     <SimpleIdentifier Name="A_0"/>
                     <SimpleIdentifier Name="A_1"/>
                 </EnumSetExpression>
-                <EnumSetExpression Text="[ACK, NACK,:undefined]">
+                <EnumSetExpression>
                     <SimpleIdentifier Name="ACK"/>
                     <SimpleIdentifier Name="NACK"/>
-                    <SimpleIdentifier Name=":undefined"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>

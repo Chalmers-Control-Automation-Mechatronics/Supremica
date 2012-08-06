@@ -1,8 +1,9 @@
 package net.sourceforge.waters.external.promela;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -12,7 +13,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 /**
- * A class to store the information about a channel in
+ * A class to store the information about a channel in.
  * TODO Eventually replace ChanInfo.java with this class
  * @author Ethan Duff
  */
@@ -33,7 +34,7 @@ public class PromelaChannel
   private final Type[] mDataTypes;
 
   //All of the messages that get sent and received on the channel
-  private final HashMap<Message,Message> mMessages;
+  private final HashMap<Message, Message> mMessages;
 
   private final ProxyAccessorHashSet<SimpleExpressionProxy>[] mSentItems;
   private final ProxyAccessorHashSet<SimpleExpressionProxy>[] mReceivedItems;
@@ -94,28 +95,107 @@ public class PromelaChannel
   }
 
   /**
-   * A method to add a send statement to the channel
+   * A method to get all of the messages that are sent and received.
+   * Note that this method is expensive to perform, so should be used carefully
+   * @param factory The ModuleProxyFactory used for creating proxys
+   * @param mtypeRange The range of values a mtype can take
+   * @return An ArrayList containing all of the messages
    */
-  public void addSend(final Message m)
+  public ArrayList<Message> getAllMessages(final ModuleProxyFactory factory, final List<String> mtypeRange)
   {
-    if(storeMessage(m))
+    final ArrayList<Message> output = new ArrayList<Message>();
+    for(final Entry<Message,Message> entry : mMessages.entrySet())
     {
-      //The message was just added
-      //The message has new content, so need to keep record of the message items
-      final List<SimpleExpressionProxy> values = m.getMsg();
-
-      for(int i = 0; i < mSentItems.length; i++)
+      final Message current = entry.getValue();
+      if(current.hasSenders())
       {
-        final SimpleExpressionProxy value = values.get(i);
-        if(!mSentItems[i].containsProxy(value))
-        {
-          mSentItems[i].addProxy(value);
-        }
+        expand(current, 0, factory, output, mtypeRange);
+      }
+    }
+
+    return output;
+  }
+
+  private void expand(final Message m, final int i, final ModuleProxyFactory factory, final ArrayList<Message> storage, final List<String> mtypeRange)
+  {
+    if(i == getWidth())
+    {
+      final Message match = getMatch(m, factory);
+      if(match != null)
+      {
+        storage.add(match.clone(factory.getCloner()));
       }
     }
     else
     {
-      //The message already existed, so the receivers were updated
+      if(isVariable(i, m.getMsg().get(i)))
+      {
+        //Substitute this variable for all of its possible values
+        if(mDataTypes[i] == Type.MTYPE)
+        {
+          for(final String s :mtypeRange)
+          {
+            if(isSent(i, factory.createSimpleIdentifierProxy(s)))
+            {
+              m.getMsg().set(i, factory.createSimpleIdentifierProxy(s));
+              expand(m, i+1, factory, storage, mtypeRange);
+            }
+          }
+        }
+        else
+        {
+          PromelaIntRange range;
+          switch(mDataTypes[i])
+          {
+          case BIT:
+            range = PromelaIntRange.BIT;
+            break;
+          case BYTE:
+            range = PromelaIntRange.BYTE;
+            break;
+          case SHORT:
+            range = PromelaIntRange.SHORT;
+            break;
+          case INT:
+            range = PromelaIntRange.INT;
+            break;
+          default:
+            range = null;//This can never be reached, just here so that compiler thinks that it is initialised always
+          }
+
+          for(int j = range.getLower(); j < range.getUpper(); j++)
+          {
+            if(isSent(i, factory.createIntConstantProxy(j)))
+            {
+              m.getMsg().set(i, factory.createIntConstantProxy(j));
+              expand(m, i+1, factory, storage, mtypeRange);
+            }
+          }
+        }
+      }
+      else
+      {
+        expand(m, i+1, factory, storage, mtypeRange);
+      }
+    }
+  }
+
+  /**
+   * A method to add a send statement to the channel
+   */
+  public void addSend(final Message m)
+  {
+    storeMessage(m);
+
+    final List<SimpleExpressionProxy> values = m.getMsg();
+
+    for(int i = 0; i < mSentItems.length; i++)
+    {
+      final SimpleExpressionProxy value = values.get(i);
+      if(!mSentItems[i].containsProxy(value))
+      {
+        mSentItems[i].addProxy(value);
+      }
     }
   }
 
@@ -124,24 +204,17 @@ public class PromelaChannel
    */
   public void addReceive(final Message m)
   {
-    if(storeMessage(m))
-    {
-      //The message was just added
-      //The message has new content, so need to keep record of the message items
-      final List<SimpleExpressionProxy> values = m.getMsg();
+    storeMessage(m);
 
-      for(int i = 0; i < mReceivedItems.length; i++)
-      {
-        final SimpleExpressionProxy value = values.get(i);
-        if(!mReceivedItems[i].containsProxy(value))
-        {
-          mReceivedItems[i].addProxy(value);
-        }
-      }
-    }
-    else
+    final List<SimpleExpressionProxy> values = m.getMsg();
+
+    for(int i = 0; i < mReceivedItems.length; i++)
     {
-      //The message already existed, so the receivers were updated
+      final SimpleExpressionProxy value = values.get(i);
+      if(!mReceivedItems[i].containsProxy(value))
+      {
+        mReceivedItems[i].addProxy(value);
+      }
     }
   }
 
@@ -176,9 +249,56 @@ public class PromelaChannel
    * @param m The template to find the matching message to.
    * @return The matching message, or null if no match is found.
    */
-  public Message getMatch(final Message m)
+  public Message getMatch(final Message m, final ModuleProxyFactory factory)
   {
-    return mMessages.get(m);
+    final ModuleProxyCloner cloner = factory.getCloner();
+    final Message match = mMessages.get(m);
+    if(match == null)
+    {
+      return null;
+    }
+    else
+    {
+      final Message retrievedMessage = mMessages.get(m).clone(cloner);
+
+      getSendersAndReceivers(retrievedMessage, 0, factory);
+
+      return retrievedMessage;
+    }
+  }
+
+  private void getSendersAndReceivers(final Message message, final int index, final ModuleProxyFactory factory)
+  {
+    if(index == mDataTypes.length)
+    {
+      final Message m = mMessages.get(message);
+      if(m != null)
+      {
+        for(final String s : m.getSenders())
+        {
+          message.addSender(s);
+        }
+
+        for(final String s : m.getRecipients())
+        {
+          message.addRecipient(s);
+        }
+      }
+      return;
+    }
+
+    getSendersAndReceivers(message, index+1, factory);
+    if(isVariable(index, message.getMsg().get(index)))
+    {
+      return;
+    }
+    else
+    {
+      final SimpleExpressionProxy value = message.getMsg().get(index);
+      message.getMsg().set(index, getTypeIdentifier(index, factory));
+      getSendersAndReceivers(message, index+1, factory);
+      message.getMsg().set(index, value);
+    }
   }
 
   /**
@@ -275,7 +395,13 @@ public class PromelaChannel
     }
   }
 
-  private boolean isVariable(final int index, final SimpleExpressionProxy item)
+  /**
+   * A method to check if the given item is the variable type of the given channel index
+   * @param index
+   * @param item
+   * @return
+   */
+  public boolean isVariable(final int index, final SimpleExpressionProxy item)
   {
     final String text = item.toString();
 
@@ -288,7 +414,7 @@ public class PromelaChannel
     case INT:
       return text.equals("Int") || text.equals("int");
     case MTYPE:
-      return text.equals("Mtype") || text.equals("mtype");
+      return text.equals(":Mtype") || text.equals(":mtype");
     }
 
     //This is unreachable, but added because the compiler doesn't know that
@@ -317,40 +443,14 @@ public class PromelaChannel
     return mReceivedItems[index].containsProxy(item);
   }
 
-  /**
-   * A method to get all of the messages that can be sent on this channel.
-   * @return A linked list containing the messages
-   */
-  public List<Message> getSendableMessages()
+  public ProxyAccessorHashSet<SimpleExpressionProxy>[] getSentItems()
   {
-    final LinkedList<Message> sendableMessages = new LinkedList<Message>();
-    for(final Message m : mMessages.values())
-    {
-      if(m.hasSenders())
-      {
-        sendableMessages.add(m);
-      }
-    }
-
-    return sendableMessages;
+    return mSentItems;
   }
 
-  /**
-   * A method to get all of the messages that can be received on this channel
-   * @return A linked list containing the messages
-   */
-  public List<Message> getReceivableMessages()
+  public ProxyAccessorHashSet<SimpleExpressionProxy>[] getReceivedItems()
   {
-    final LinkedList<Message> receivableMessages = new LinkedList<Message>();
-    for(final Message m : mMessages.values())
-    {
-      if(m.hasRecipients())
-      {
-        receivableMessages.add(m);
-      }
-    }
-
-    return receivableMessages;
+    return mReceivedItems;
   }
 
   /**

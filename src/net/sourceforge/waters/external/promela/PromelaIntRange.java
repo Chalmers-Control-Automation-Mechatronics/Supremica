@@ -36,4 +36,13 @@ public class PromelaIntRange extends PromelaType
     return factory.createIntConstantProxy(0);
   }
 
+  public int getLower()
+  {
+    return mLower;
+  }
+
+  public int getUpper()
+  {
+    return mUpper;
+  }
 }
