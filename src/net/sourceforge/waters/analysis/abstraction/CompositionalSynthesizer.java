@@ -1201,8 +1201,9 @@ public class CompositionalSynthesizer
     //#######################################################################
     //# Overrides for AbstractionProcedure
     @Override
-    protected AbstractionStep run(final AutomatonProxy aut,
-                                  final Collection<EventProxy> local)
+    protected boolean run(final AutomatonProxy aut,
+                          final Collection<EventProxy> local,
+                          final List<AbstractionStep> steps)
       throws AnalysisException
     {
       try {
@@ -1212,39 +1213,32 @@ public class CompositionalSynthesizer
         final ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);
-        final int numStates = rel.getNumberOfReachableStates();
-        final int numTrans = rel.getNumberOfTransitions();
-        final int numMarkings = rel.getNumberOfMarkings();
         mChain.setTransitionRelation(rel);
         if (mChain.run()) {
-          if (rel.getNumberOfReachableStates() == numStates &&
-              rel.getNumberOfTransitions() == numTrans &&
-              rel.getNumberOfMarkings() == numMarkings) {
-            return null;
-          }
           final ListBufferTransitionRelation original =
             getTransitionRelationBeforeSOE(rel);
           final ListBufferTransitionRelation supervisor =
             getPseudoSupervisor();
           reportSupervisor("halfway synthesis", supervisor);
+          final SynthesisAbstractionStep step;
           if (original == null) {
             final ProductDESProxyFactory factory = getFactory();
             final StateEncoding outputStateEnc = new StateEncoding();
             final AutomatonProxy convertedAut =
               rel.createAutomaton(factory, eventEnc, outputStateEnc);
             reportAbstractionResult(convertedAut, null);
-            return new SynthesisAbstractionStep(convertedAut, aut,
+            step = new SynthesisAbstractionStep(convertedAut, aut,
                                                 supervisor, eventEnc);
           } else {
             final List<int[]> partition = getResultPartition();
-            final SynthesisAbstractionStep step =
-              createDeterministicAutomaton(aut, original, rel,
-                                           partition, eventEnc);
+            step = createDeterministicAutomaton(aut, original, rel,
+                                                partition, eventEnc);
             step.setSupervisor(supervisor);
-            return step;
           }
+          steps.add(step);
+          return true;
         } else {
-          return null;
+          return false;
         }
       } finally {
         mChain.reset();

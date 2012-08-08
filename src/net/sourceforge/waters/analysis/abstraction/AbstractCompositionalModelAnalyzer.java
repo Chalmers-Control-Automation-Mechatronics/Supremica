@@ -1193,14 +1193,17 @@ public abstract class AbstractCompositionalModelAnalyzer
   private boolean applyCandidate(final Candidate candidate)
     throws AnalysisException
   {
+    final List<AbstractionStep> steps = new LinkedList<AbstractionStep>();
     final HidingStep syncStep = composeSynchronousProduct(candidate);
     final Collection<EventProxy> local = candidate.getLocalEvents();
     final int numLocal = local.size();
-    final Collection<EventProxy> notHidden = new ArrayList<EventProxy>(numLocal);
+    // Local events not replaced by tau, for synthesis abstraction.
+    final Collection<EventProxy> notReallyHidden =
+      new ArrayList<EventProxy>(numLocal);
     for (final EventProxy event : local) {
       final EventInfo info = mEventInfoMap.get(event);
       if (info.isLocal() && !info.isTau()) {
-        notHidden.add(event);
+        notReallyHidden.add(event);
       }
     }
     AutomatonProxy aut;
@@ -1209,40 +1212,42 @@ public abstract class AbstractCompositionalModelAnalyzer
       aut = candidate.getAutomata().iterator().next();
       tau = null;
     } else {
+      steps.add(syncStep);
       aut = syncStep.getResultAutomaton();
       tau = syncStep.getTauEvent();
       if (tau != null) {
-        notHidden.add(tau);
+        notReallyHidden.add(tau);
       }
     }
     recordStatistics(aut);
-    final AbstractionStep simpStep = mAbstractionProcedure.run(aut, notHidden);
-    if (syncStep != null || simpStep != null) {
-      if (syncStep != null) {
-        recordAbstractionStep(syncStep);
-      }
-      if (simpStep != null) {
-        final KindTranslator translator = getKindTranslator();
-        final Collection<EventProxy> oldEvents = aut.getEvents();
-        aut = simpStep.getResultAutomaton();
-        final Collection<EventProxy> newEvents =
-          new THashSet<EventProxy>(aut.getEvents());
-        for (final EventProxy event : oldEvents) {
-          if (event != tau &&
-              translator.getEventKind(event) != EventKind.PROPOSITION &&
-              !local.contains(event) && !newEvents.contains(event)) {
-            mMayBeSplit = true;
-            break;
-          }
+    final boolean simplified =
+      mAbstractionProcedure.run(aut, notReallyHidden, steps);
+    if (simplified) {
+      final Collection<EventProxy> oldEvents = aut.getEvents();
+      final int end = steps.size();
+      final AbstractionStep last = steps.listIterator(end).previous();
+      aut = last.getResultAutomaton();
+      final KindTranslator translator = getKindTranslator();
+      final Collection<EventProxy> newEvents =
+        new THashSet<EventProxy>(aut.getEvents());
+      for (final EventProxy event : oldEvents) {
+        if (event != tau &&
+            translator.getEventKind(event) != EventKind.PROPOSITION &&
+            !local.contains(event) && !newEvents.contains(event)) {
+          mMayBeSplit = true;
+          break;
         }
       }
+    }
+    if (steps.isEmpty()) {
+      return false;
+    } else {
       updateEventsToAutomata(aut, candidate.getAutomata());
-      if (simpStep != null) {
-        recordAbstractionStep(simpStep);
+      for (final AbstractionStep step : steps) {
+        // Must be done after updateEventsToAutomata() ...
+        recordAbstractionStep(step);
       }
       return true;
-    } else {
-      return false;
     }
   }
 
@@ -1411,8 +1416,21 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     //#######################################################################
     //# Rule Application
-    protected abstract AbstractionStep run(AutomatonProxy aut,
-                                           Collection<EventProxy> local)
+    /**
+     * Runs this abstraction procedure to simplify an automaton.
+     * This method hides any local events and then attempts to simplify
+     * the given automaton. If abstraction is possible, it creates the
+     * appropriate abstraction steps and adds them to the given list.
+     * @param  aut    The automaton to be simplified.
+     * @param  local  Collection of local events to be hidden.
+     * @param  steps  List to receive new abstraction steps.
+     * @return <CODE>true</CODE> if the automaton was simplified and
+     *         an abstraction step added to the queue, <CODE>false</CODE>
+     *         otherwise.
+     */
+    protected abstract boolean run(AutomatonProxy aut,
+                                   Collection<EventProxy> local,
+                                   List<AbstractionStep> steps)
       throws AnalysisException;
 
     protected abstract void storeStatistics();
@@ -1437,8 +1455,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     //#######################################################################
     //# Overrides for AbstractionProcedure
     @Override
-    protected AbstractionStep run(final AutomatonProxy aut,
-                                  final Collection<EventProxy> local)
+    protected boolean run(final AutomatonProxy aut,
+                          final Collection<EventProxy> local,
+                          final List<AbstractionStep> steps)
       throws AnalysisException
     {
       try {
@@ -1451,6 +1470,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);
+        mSimplifier.setTransitionRelation(rel);
         final int numStates = rel.getNumberOfStates();
         final int numTrans = rel.getNumberOfTransitions();
         final int numMarkings = rel.getNumberOfMarkings();
@@ -1460,17 +1480,19 @@ public abstract class AbstractCompositionalModelAnalyzer
           if (rel.getNumberOfReachableStates() == numStates &&
               rel.getNumberOfTransitions() == numTrans &&
               rel.getNumberOfMarkings() == numMarkings) {
-            return null;
+            return false;
           }
           rel.removeRedundantPropositions();
           final ProductDESProxyFactory factory = getFactory();
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy convertedAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          return createStep
+          final AbstractionStep step = createStep
             (aut, inputStateEnc, convertedAut, outputStateEnc, tau);
+          steps.add(step);
+          return true;
         } else {
-          return null;
+          return false;
         }
       } finally {
         mSimplifier.reset();

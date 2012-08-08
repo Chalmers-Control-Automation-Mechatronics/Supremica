@@ -429,8 +429,9 @@ public class CompositionalSafetyVerifier
     //#######################################################################
     //# Overrides for TRSimplifierAbstractionProcedure
     @Override
-    protected AbstractionStep run(final AutomatonProxy aut,
-                                  final Collection<EventProxy> local)
+    protected boolean run(final AutomatonProxy aut,
+                          final Collection<EventProxy> local,
+                          final List<AbstractionStep> steps)
       throws AnalysisException
     {
       final TransitionRelationSimplifier simplifier = getSimplifier();
@@ -460,8 +461,10 @@ public class CompositionalSafetyVerifier
         final StateEncoding outputStateEnc = new StateEncoding();
         final AutomatonProxy convertedAut =
           rel.createAutomaton(factory, eventEnc, outputStateEnc);
-        return createStep
+        final AbstractionStep step = createStep
           (aut, inputStateEnc, convertedAut, outputStateEnc, tau);
+        steps.add(step);
+        return true;
       } finally {
         simplifier.reset();
       }

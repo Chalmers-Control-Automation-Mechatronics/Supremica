@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="waters/java/src"/>
 	<classpathentry kind="src" path="tests/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="dist/Supremica.jar"/>
+	<classpathentry kind="lib" path="dist/Supremica.jar" sourcepath="src"/>
 	<classpathentry kind="lib" path="dist/SupremicaLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

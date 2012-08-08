@@ -1951,8 +1951,9 @@ public class CompositionalConflictChecker
     //#######################################################################
     //# Rule Application
     @Override
-    protected ObservationEquivalenceStep run
-      (final AutomatonProxy aut, final Collection<EventProxy> local)
+    protected boolean run(final AutomatonProxy aut,
+                          final Collection<EventProxy> local,
+                          final List<AbstractionStep> steps)
       throws AnalysisException
     {
       final long start = System.currentTimeMillis();
@@ -1961,7 +1962,7 @@ public class CompositionalConflictChecker
         mStatistics.recordStart(aut);
         if (local.isEmpty()) {
           mStatistics.recordFinish(aut, false);
-          return null;
+          return false;
         }
         final EventProxy tau = local.iterator().next();
         mSimplifier.setModel(aut);
@@ -1975,7 +1976,7 @@ public class CompositionalConflictChecker
         final AutomatonProxy convertedAut = result.getComputedProxy();
         if (aut == convertedAut) {
           mStatistics.recordFinish(aut, false);
-          return null;
+          return false;
         }
         mStatistics.recordFinish(convertedAut, true);
         final int iter = result.getNumberOfIterations();
@@ -1983,8 +1984,11 @@ public class CompositionalConflictChecker
         final StateEncoding inputEnc = result.getInputEncoding();
         final StateEncoding outputEnc = result.getOutputEncoding();
         final List<int[]> partition = result.getPartition();
-        return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                              inputEnc, partition, outputEnc);
+        final ObservationEquivalenceStep step =
+          new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                         inputEnc, partition, outputEnc);
+        steps.add(step);
+        return true;
       } catch (final AnalysisException exception) {
         mStatistics.recordOverflow(aut);
         throw exception;
