@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -289,8 +289,8 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   {
     final EventProxy event = findEvent(des, eventName);
     final Map<String,String> attribs = event.getAttributes();
-    if (HISCAttributes.getEventType(attribs) !=
-        HISCAttributes.EventType.ANSWER) {
+    if (HISCAttributeFactory.getEventType(attribs) !=
+        HISCAttributeFactory.EventType.ANSWER) {
       fail("The event '" + eventName + "' in model '" + des.getName() +
            "'is not an answer event!");
     }

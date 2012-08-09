@@ -24,6 +24,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,10 +53,13 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
+
+import org.supremica.properties.Config;
 
 
 /**
@@ -80,16 +85,7 @@ class AttributesPanel extends RaisedDialogPanel
 
   AttributesPanel(final Class<? extends Proxy> clazz)
   {
-    mAttributeValues = new TreeMap<String,List<String>>();
-    try {
-      for (final String attrib : HISCAttributes.getApplicableKeys(clazz)) {
-        final List<String> values = HISCAttributes.getApplicableValues(attrib);
-        mAttributeValues.put(attrib, values);
-      }
-    } catch (final NoClassDefFoundError error) {
-      // No attributes --- no problem.
-    }
-
+    mAttributeValues = getAttributeInfo(clazz);
     final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0);
     mTable = new NonTypingTable(model);
     mTable.setTableHeader(null);
@@ -492,7 +488,7 @@ class AttributesPanel extends RaisedDialogPanel
 
   //#########################################################################
   //# Data Members
-  private final Map<String,List<String>> mAttributeValues;
+  private final AttributeInfo mAttributeValues;
   private final TableCellEditor mEditor;
   private final NonTypingTable mTable;
   private final JButton mAddButton;
@@ -500,6 +496,45 @@ class AttributesPanel extends RaisedDialogPanel
 
   private final Action mAddAction;
   private final Action mRemoveAction;
+
+
+  //#########################################################################
+  //# Attribute Maps
+  private static class AttributeInfo extends TreeMap<String,List<String>>
+  {
+    private static final long serialVersionUID = 1L;
+  }
+
+  private static final List<AttributeFactory>
+    ATTRIBUTE_FACTORIES = new LinkedList<AttributeFactory>();
+  private static final Map<Class<? extends Proxy>,AttributeInfo>
+    ATTRIBUTE_INFO_MAP = new HashMap<Class<? extends Proxy>,AttributeInfo>();
+
+  static {
+    //=======================================================================
+    // Register Attribute Factories
+    if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
+      ATTRIBUTE_FACTORIES.add(HISCAttributeFactory.getInstance());
+    }
+    //=======================================================================
+  }
+
+  private static AttributeInfo getAttributeInfo
+    (final Class<? extends Proxy> iface)
+  {
+    AttributeInfo info = ATTRIBUTE_INFO_MAP.get(iface);
+    if (info == null) {
+      info = new AttributeInfo();
+      for (final AttributeFactory factory : ATTRIBUTE_FACTORIES) {
+        for (final String attrib : factory.getApplicableKeys(iface)) {
+          final List<String> values = factory.getApplicableValues(attrib);
+          info.put(attrib, values);
+        }
+      }
+      ATTRIBUTE_INFO_MAP.put(iface, info);
+    }
+    return info;
+  }
 
 
   //#########################################################################

@@ -31,7 +31,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -424,11 +424,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       Map<String,String> attributes = null;
       if (eventType.equals("a")) {
-        attributes = HISCAttributes.ATTRIBUTES_ANSWER;
+        attributes = HISCAttributeFactory.ATTRIBUTES_ANSWER;
       } else if (eventType.equals("r")) {
-        attributes = HISCAttributes.ATTRIBUTES_REQUEST;
+        attributes = HISCAttributeFactory.ATTRIBUTES_REQUEST;
       } else if (eventType.equals("ld")) {
-        attributes = HISCAttributes.ATTRIBUTES_LOWDATA;
+        attributes = HISCAttributeFactory.ATTRIBUTES_LOWDATA;
       }
       eventDecl =
           mFactory.createEventDeclProxy(identifier, controllability, true,
@@ -503,7 +503,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       mComponents.add(mFactory
           .createSimpleComponentProxy(identifier, kind, graph,
-                                      HISCAttributes.ATTRIBUTES_INTERFACE));
+                                      HISCAttributeFactory.ATTRIBUTES_INTERFACE));
     }
   }
 
