@@ -23,6 +23,7 @@ import net.sourceforge.waters.gui.InstanceEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.ParameterBindingEditorDialog;
 import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
+import net.sourceforge.waters.gui.NodeEditorDialog;
 import net.sourceforge.waters.gui.VariableEditorDialog;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -39,6 +40,7 @@ import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.ConstantAliasSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -48,6 +50,7 @@ import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 
 import org.supremica.gui.ide.IDE;
@@ -250,6 +253,17 @@ public class IDEPropertiesAction
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final SimpleComponentSubject subject = (SimpleComponentSubject) comp;
         new SimpleComponentEditorDialog(root, subject);
+      }
+      return true;
+    }
+
+    public Boolean visitSimpleNodeProxy
+      (final SimpleNodeProxy comp)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final SimpleNodeSubject subject = (SimpleNodeSubject) comp;
+        new NodeEditorDialog(root, subject);
       }
       return true;
     }

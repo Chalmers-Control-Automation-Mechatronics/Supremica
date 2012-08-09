@@ -82,7 +82,7 @@ class GraphPopupFactory
       throw exception.getRuntimeException();
     }
   }
-  
+
   protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();

@@ -406,8 +406,11 @@ public class EventTableModel
     {
       switch (event.getKind()) {
       case ModelChangeEvent.ITEM_ADDED:
-        final Proxy value = (Proxy) event.getValue();
-        mIdentifierCollectVisitor.addClonedIdentifiers(value);
+        final Object value = event.getValue();
+        if(value instanceof Proxy){
+          mIdentifierCollectVisitor.addClonedIdentifiers((Proxy) value);
+        }
+
         break;
       case ModelChangeEvent.STATE_CHANGED:
         final Subject source = event.getSource();

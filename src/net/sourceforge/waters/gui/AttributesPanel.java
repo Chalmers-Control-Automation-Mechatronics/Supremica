@@ -20,8 +20,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -39,7 +37,6 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -107,9 +104,9 @@ class AttributesPanel extends RaisedDialogPanel
     mTable.setPreferredScrollableViewportSize(prefsize);
     mTable.setRowSelectionAllowed(true);
     mTable.addEscapeAction();
-    final TableCellEditor editor = new AttributeEditor();
-    mTable.setDefaultEditor(Object.class, editor);
-    mTable.setDefaultEditor(String.class, editor);
+    mEditor = new AttributeEditor();
+    mTable.setDefaultEditor(Object.class, mEditor);
+    mTable.setDefaultEditor(String.class, mEditor);
     final ListSelectionModel selmodel = mTable.getSelectionModel();
     selmodel.addListSelectionListener(new ListSelectionListener() {
       public void valueChanged(final ListSelectionEvent event)
@@ -173,6 +170,8 @@ class AttributesPanel extends RaisedDialogPanel
   //# Simple Access
   Map<String,String> getTableData()
   {
+    mEditor.stopCellEditing();
+    removeEmptyRows();
     final Map<String,String> map = new TreeMap<String,String>();
     final TableModel model = mTable.getModel();
     final int rows = model.getRowCount();
@@ -188,13 +187,25 @@ class AttributesPanel extends RaisedDialogPanel
   {
     final int size = attribs.size();
     final String[][] data = new String[size][2];
-    final int row = 0;
+    int row = 0;
     for (final Map.Entry<String,String> entry : attribs.entrySet()) {
       data[row][0] = entry.getKey();
       data[row][1] = entry.getValue();
+      row++;
     }
     final DefaultTableModel model = (DefaultTableModel) mTable.getModel();
     model.setDataVector(data, COLUMNS);
+  }
+
+  void removeEmptyRows(){
+    final DefaultTableModel model = (DefaultTableModel) mTable.getModel();
+    final int rows = model.getRowCount();
+    for(int r = rows-1; r >= 0; r--){
+      final String value = (String) model.getValueAt(r, 0);
+      if(value.equals("")){
+        model.removeRow(r);;
+      }
+    }
   }
 
 
@@ -409,7 +420,6 @@ class AttributesPanel extends RaisedDialogPanel
   //# Inner Class AttributeEditor
   private class AttributeEditor
     extends DefaultCellEditor
-    implements FocusListener
   {
 
     //#######################################################################
@@ -419,8 +429,6 @@ class AttributesPanel extends RaisedDialogPanel
       super(new JComboBox());
       final JComboBox combo = getComboBox();
       combo.setEditable(true);
-      final JTextField textfield = getTextField();
-      textfield.addFocusListener(this);
     }
 
     //#######################################################################
@@ -461,40 +469,6 @@ class AttributesPanel extends RaisedDialogPanel
       return textfield.getText();
     }
 
-    //#########################################################################
-    //# Interface java.awt.event.FocusListener
-    /**
-     * Does nothing.
-     */
-    public void focusGained(final FocusEvent event)
-    {
-    }
-
-    /**
-     * Fixes a bug in Swing.
-     * Called when the editor component loses focus,
-     * this handler makes sure that every non-temporary loss of focus
-     * causes editing to stop.
-     */
-    public void focusLost(final FocusEvent event)
-    {
-      if (!event.isTemporary()) {
-        // ???
-        // When the focus is transferred within the table, the opposite
-        // component is mAddButton, which does not have request focus enabled.
-        // When the focus is transferred outside the table, the opposite
-        // component is some editable component with request focus enabled.
-        // Only in the latter case, we need to stop editing in the table.
-        final Component opposite = event.getOppositeComponent();
-        if (opposite instanceof JComponent) {
-          final JComponent jopposite = (JComponent) opposite;
-          if (jopposite.isRequestFocusEnabled()); {
-            stopCellEditing();
-          }
-        }
-      }
-    }
-
     //#######################################################################
     //# Auxiliary Methods
     private JComboBox getComboBox()
@@ -519,7 +493,7 @@ class AttributesPanel extends RaisedDialogPanel
   //#########################################################################
   //# Data Members
   private final Map<String,List<String>> mAttributeValues;
-
+  private final TableCellEditor mEditor;
   private final NonTypingTable mTable;
   private final JButton mAddButton;
   private final JButton mRemoveButton;
