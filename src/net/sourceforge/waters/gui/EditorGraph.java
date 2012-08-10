@@ -480,7 +480,8 @@ class EditorGraph
     final Point2D end = GeometryTools.getEndPoint(edge1);
     double x = newpoint.getX();
     double y = newpoint.getY();
-    if(GeometryTools.isSelfloop(edge1)){
+    //dragstart will == null if the self loop is just following a node
+    if(GeometryTools.isSelfloop(edge1) && dragStart != null){
       double hx = dragStart.getX() - start.getX();
       double hy = dragStart.getY() - start.getY();
       double px = hx + dx;
