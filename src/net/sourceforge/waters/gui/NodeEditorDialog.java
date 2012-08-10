@@ -16,6 +16,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.swing.Action;
@@ -29,14 +30,20 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
-import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
@@ -53,7 +60,7 @@ public class NodeEditorDialog
   }
 
   public NodeEditorDialog(final ModuleWindowInterface root,
-                                     final SimpleNodeSubject node)
+                                     final NodeSubject node)
   {
     super(root.getRootWindow());
     if (node == null) {
@@ -70,6 +77,21 @@ public class NodeEditorDialog
     setVisible(true);
   }
 
+//#########################################################################
+  //# Static Invocation
+  public static void showDialog(final NodeSubject node,
+                                final EditorWindowInterface root)
+  {
+    final ModuleWindowInterface rroot = root.getModuleWindowInterface();
+    new NodeEditorDialog(rroot, node);
+  }
+
+  public static void showDialog(final NodeSubject node,
+                                final ModuleWindowInterface root)
+  {
+    new NodeEditorDialog(root, node);
+  }
+
 
   //#########################################################################
   //# Access to Created Item
@@ -77,7 +99,7 @@ public class NodeEditorDialog
    * Gets the Waters subject edited by this dialog.
    * @return A reference to the node being edited by this dialog.
    */
-  public SimpleNodeSubject getEditedItem()
+  public NodeSubject getEditedItem()
   {
     return mNode;
   }
@@ -90,13 +112,7 @@ public class NodeEditorDialog
    */
   private void createComponents()
   {
-    final SimpleNodeSubject template;
-    if (mNode == null) {
-      template = NODE_TEMPLATE;
-    } else {
-      template = mNode;
-    }
-    final ExpressionParser parser = mRoot.getExpressionParser();
+    final NodeSubject template = mNode;
     final ActionListener commithandler = new ActionListener() {
         public void actionPerformed(final ActionEvent event)
         {
@@ -109,9 +125,7 @@ public class NodeEditorDialog
     mNameLabel = new JLabel("Name:");
     final String oldname = template.getName();
     final SimpleIdentifierSubject subject = new SimpleIdentifierSubject(oldname);
-    final FormattedInputParser nameparser =
-      new SimpleIdentifierInputParser(oldname, parser);
-    mNameInput = new SimpleExpressionCell(subject, nameparser);
+    mNameInput = new SimpleExpressionCell(subject,  new NodeNameInputParser(subject));
 
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter node name, eg. \"IDLE\" or \"WORKING\"");
@@ -214,23 +228,46 @@ public class NodeEditorDialog
     if (isInputLocked()) {
       // nothing
     } else {
+      try {
+        mNameInput.commitEdit();
+      } catch (final java.text.ParseException exception) {
+        throw new WatersRuntimeException(exception);
+      }
       final Map<String,String> attribs = mAttributesPanel.getTableData();
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
-        final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-        final PlainEventListProxy propositions = (PlainEventListProxy) cloner.getClone(mNode.getPropositions());
-        final PointGeometryProxy pointGeometry = (PointGeometryProxy) cloner.getClone(mNode.getPointGeometry());
-        final PointGeometryProxy initialArrowGeometry = (PointGeometryProxy) cloner.getClone(mNode.getInitialArrowGeometry());
-        final LabelGeometryProxy labelGeometry = (LabelGeometryProxy) cloner.getClone(mNode.getLabelGeometry());
-
-        final SimpleNodeSubject template =
-          new SimpleNodeSubject(mNameInput.getText(), propositions, attribs,
-                                mNode.isInitial(), pointGeometry,
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(true);
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      NodeSubject template = null;
+      final PlainEventListProxy propositions =
+        (PlainEventListProxy) cloner.getClone(mNode.getPropositions());
+      final String name = mNameInput.getText();
+      if (mNode instanceof SimpleNodeSubject) {
+        final SimpleNodeSubject node = (SimpleNodeSubject) mNode;
+        final PointGeometryProxy pointGeometry =
+          (PointGeometryProxy) cloner.getClone(node.getPointGeometry());
+        final PointGeometryProxy initialArrowGeometry =
+          (PointGeometryProxy) cloner
+            .getClone(node.getInitialArrowGeometry());
+        final LabelGeometryProxy labelGeometry =
+          (LabelGeometryProxy) cloner.getClone(node.getLabelGeometry());
+        template = new SimpleNodeSubject(name, propositions, attribs,
+                                node.isInitial(), pointGeometry,
                                 initialArrowGeometry, labelGeometry);
-        if (!eq.equals(mNode, template)) {
-          final Command command = new EditCommand(mNode, template, null);
-          mRoot.getUndoInterface().executeCommand(command);
-        }
+      } else if (mNode instanceof GroupNodeSubject) {
+        final GroupNodeSubject groupNode = (GroupNodeSubject) mNode;
+        final Collection<? extends NodeProxy> immediateChildNodes =
+          cloner.getClonedList(groupNode.getImmediateChildNodesModifiable());
+        final BoxGeometryProxy geometry =
+          (BoxGeometryProxy) cloner.getClone(groupNode.getGeometry());
+        template = new GroupNodeSubject(name, propositions, attribs,
+                               immediateChildNodes, geometry);
+      }
+
+      if (!eq.equals(mNode, template)) {
+        final Command command = new EditCommand(mNode, template, null);
+        mRoot.getUndoInterface().executeCommand(command);
+      }
       dispose();
     }
   }
@@ -278,7 +315,36 @@ public class NodeEditorDialog
     private static final long serialVersionUID = 1L;
 
   }
+  //#########################################################################
+  //# Inner Class StateNameInputParser
+  private class NodeNameInputParser
+    extends SimpleIdentifierInputParser
+  {
 
+    //#######################################################################
+    //# Constructor
+    private NodeNameInputParser(final SimpleIdentifierProxy oldident)
+    {
+      super(oldident, mRoot.getExpressionParser());
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    public SimpleIdentifierProxy parse(final String text) throws net.sourceforge.waters.model.expr.ParseException
+    {
+      final SimpleIdentifierProxy ident = super.parse(text);
+      final String oldname = getOldName();
+      if (!text.equals(oldname)) {
+        final GraphSubject graph = mRoot.getActiveEditorWindowInterface().getGraphEditorPanel().getGraph();
+        if (graph.getNodesModifiable().containsName(text)) {
+          throw new ParseException
+          ("Node name '" + text + "' is already taken!", 0);
+        }
+      }
+      return ident;
+    }
+
+  }
 
   //#########################################################################
   //# Data Members
@@ -294,13 +360,11 @@ public class NodeEditorDialog
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
-  private final SimpleNodeSubject mNode;
+  private final NodeSubject mNode;
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final SimpleNodeSubject NODE_TEMPLATE =
-                                                   new SimpleNodeSubject("");
 
 }

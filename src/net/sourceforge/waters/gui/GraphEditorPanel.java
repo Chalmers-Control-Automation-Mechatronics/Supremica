@@ -2043,6 +2043,10 @@ public class GraphEditorPanel
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
           EditorEditEdgeDialog.showDialog(edge, mRoot);
         }
+        else if(mFocusedObject instanceof NodeSubject){
+          final NodeSubject node = (NodeSubject)mFocusedObject;
+          NodeEditorDialog.showDialog(node, mRoot);
+        }
       }
     }
 
