@@ -2250,6 +2250,7 @@ public class CompositionalConflictChecker
     /**
      * A flag, indicating that the precondition markings have been reduced
      * during abstraction and need to be recovered for trace expansion.
+     * @see #mRecoveredPreconditionMarking
      */
     private final boolean mHasReducedPreconditionMarking;
     /**
@@ -2269,6 +2270,12 @@ public class CompositionalConflictChecker
     private TIntHashSet mTargetSet;
     /**
      * Recovered precondition marking, if needed.
+     * The recovered precondition marking describes the set of alpha-markings
+     * resulting from alpha-removal applied to the input automaton. When
+     * expanding a counterexample, it is imperative to construct a trace
+     * leading to an alpha-marked in this reduced set, even when checking
+     * standard nonblocking. Other states may be coreachable in the original
+     * automaton, if omega-removal has been used in the abstraction.
      * @see #mHasReducedPreconditionMarking
      */
     private BitSet mRecoveredPreconditionMarking;

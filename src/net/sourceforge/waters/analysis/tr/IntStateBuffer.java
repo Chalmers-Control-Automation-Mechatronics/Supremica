@@ -245,7 +245,12 @@ public class IntStateBuffer
    */
   public boolean isMarked(final int state, final int prop)
   {
-    return (mStateInfo[state] & (1 << prop)) != 0;
+    final int code = 1 << prop;
+    if ((mUsedPropositions & code) != 0) {
+      return (mStateInfo[state] & code) != 0;
+    } else {
+      return true;
+    }
   }
 
   /**

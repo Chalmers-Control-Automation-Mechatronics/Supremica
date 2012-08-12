@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   HISCAttributes
+//# PACKAGE: net.sourceforge.waters.analysis.hisc
+//# CLASS:   HISCAttributeFactory
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -63,7 +63,9 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
  *     in attribute maps.</LI>
  * </UL>
  *
- * <P>This class contains only static methods and constants.</P>
+ * <P>This class also implements the {@link AttributeFactory} interface for
+ * use with the GUI class {@link net.sourceforge.waters.gui.AttributesPanel
+ * AttributePanel}.</P>
  *
  * @author Robi Malik
  */

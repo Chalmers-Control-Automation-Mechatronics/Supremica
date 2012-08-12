@@ -374,7 +374,7 @@ class AttributesPanel extends RaisedDialogPanel
       addAttribute();
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
 
