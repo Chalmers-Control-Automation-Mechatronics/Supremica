@@ -442,9 +442,24 @@
                                         <IntConstant Value="1"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="5" X="2"/>
+                                        <Point Y="-7" X="5"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_C_val">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <IndexedIdentifier Name="var_C_val">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="10" X="7"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                             <Edge Target="C_1" Source="C_1">
                                 <LabelBlock>
@@ -467,7 +482,7 @@
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-26" X="7"/>
+                                        <Point Y="-34" X="7"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
@@ -483,7 +498,7 @@
                                         </BinaryExpression>
                                     </Actions>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="20" X="9"/>
+                                        <Point Y="14" X="11"/>
                                     </LabelGeometry>
                                 </GuardActionBlock>
                             </Edge>

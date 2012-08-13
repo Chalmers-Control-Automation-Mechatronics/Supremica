@@ -45,7 +45,7 @@ public class PromelaEdge
   /**
    * A method to check if this object is equal to another object
    * @param o The object to compare against
-   * @return True if the other object is an equal promela edge.
+   * @return True if the other object is an equal promela edge. <br>
    * Uses value typed equality, and treats all labels as being equal
    * @author Ethan Duff
    */

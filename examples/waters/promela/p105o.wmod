@@ -591,9 +591,24 @@
                                         <IntConstant Value="1"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="16" X="0"/>
+                                        <Point Y="14" X="4"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_C_val">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <IndexedIdentifier Name="var_C_val">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="32" X="4"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                             <Edge Target="C_1" Source="C_1">
                                 <LabelBlock>

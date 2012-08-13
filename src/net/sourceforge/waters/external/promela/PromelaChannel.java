@@ -1,6 +1,7 @@
 package net.sourceforge.waters.external.promela;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -13,7 +14,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 /**
- * A class to store the information about a channel in.
+ * A class to store the information about a channel in.<br>
  * TODO Eventually replace ChanInfo.java with this class
  * @author Ethan Duff
  */
@@ -36,13 +37,17 @@ public class PromelaChannel
   //All of the messages that get sent and received on the channel
   private final HashMap<Message, Message> mMessages;
 
+  //The items that are sent and received in messages
+  //The array index indicates the position in the message that item appeared
   private final ProxyAccessorHashSet<SimpleExpressionProxy>[] mSentItems;
   private final ProxyAccessorHashSet<SimpleExpressionProxy>[] mReceivedItems;
+
+  private final HashMap<String, List<String>> mProcessVariablesUsed;
 
   /**
    * The constructor for this class
    * @param name The name of this channel
-   * @param length How many messages this channel can store.
+   * @param length How many messages this channel can store.<br>
    * Zero indicates that this is an exchange channel
    * @param types The type of each item in messages that pass through this channel
    */
@@ -92,6 +97,8 @@ public class PromelaChannel
     {
       mReceivedItems[i] = new ProxyAccessorHashSet<SimpleExpressionProxy>(ModuleEqualityVisitor.getInstance(false));
     }
+
+    mProcessVariablesUsed = new HashMap<String,List<String>>();
   }
 
   /**
@@ -112,6 +119,7 @@ public class PromelaChannel
         expand(current, 0, factory, output, mtypeRange);
       }
     }
+    Collections.sort(output);
 
     return output;
   }
@@ -181,7 +189,8 @@ public class PromelaChannel
   }
 
   /**
-   * A method to add a send statement to the channel
+   * A method to add a send statement to the channel.
+   * @param m The message to send on the channel.
    */
   public void addSend(final Message m)
   {
@@ -201,6 +210,7 @@ public class PromelaChannel
 
   /**
    * A method to add a receive statement to the channel.
+   * @param m The message to receive on the channel.
    */
   public void addReceive(final Message m)
   {
@@ -219,10 +229,10 @@ public class PromelaChannel
   }
 
   /**
-   * A method to store a given message in the channel.
+   * A method to store a given message in the channel.<br>
    * If the message is already contained, then the senders
    * and receivers of the contained message are updated to
-   * include the senders and receivers of the new message
+   * include the senders and receivers of the new message.
    * @param m The message to store
    * @return True if this is a new message, false if it was already contained.
    */
@@ -244,7 +254,7 @@ public class PromelaChannel
   }
 
   /**
-   * A method to get the messages that matches the given message template.
+   * A method to get the messages that matches the given message template.<br>
    * The returned message will contain all of the senders and receivers of that message.
    * @param m The template to find the matching message to.
    * @return The matching message, or null if no match is found.
@@ -304,6 +314,7 @@ public class PromelaChannel
   /**
    * A method to check if a given message is sendable on this channel
    * @param m The message to check
+   * @param factory The factory used to create proxys with
    * @return True if the message is sendable, false otherwise
    */
   public boolean isSendable(final Message m, final ModuleProxyFactory factory)
@@ -355,6 +366,7 @@ public class PromelaChannel
    * A method to check if a given message is receivable on this channel.
    * If the channel is asynchronous, then will not look to see if anyone can receive this message.
    * @param m The message to check
+   * @param factory The factory used to create proxys with
    * @return True if the message is receivable, false otherwise
    */
   public boolean isReceivable(final Message m, final ModuleProxyFactory factory)
@@ -396,10 +408,10 @@ public class PromelaChannel
   }
 
   /**
-   * A method to check if the given item is the variable type of the given channel index
-   * @param index
-   * @param item
-   * @return
+   * A method to check if an item is a variable
+   * @param index The position in the message the items appears in
+   * @param item The item that may be a variable
+   * @return True if the item is a variable, false otherwise
    */
   public boolean isVariable(final int index, final SimpleExpressionProxy item)
   {
@@ -443,14 +455,63 @@ public class PromelaChannel
     return mReceivedItems[index].containsProxy(item);
   }
 
+  /**
+   * A method to get the items sent on this channel.<br>
+   * The index in the array indicates the position of the item inside a message
+   * @return An array of ProxyAccessorHashSets for SimpleExpressionProxys
+   */
   public ProxyAccessorHashSet<SimpleExpressionProxy>[] getSentItems()
   {
     return mSentItems;
   }
 
+  /**
+   * A method to get the items received on this channel.<br>
+   * The index in the array indicates the position of the item inside a message
+   * @return An array of ProxyAccessorHashSets for SimpleExpressionProxys
+   */
   public ProxyAccessorHashSet<SimpleExpressionProxy>[] getReceivedItems()
   {
     return mReceivedItems;
+  }
+
+  /**
+   * A method to tell this channel about a given process.<br>
+   * This will make room to store variable assignment information about the given process
+   * @param name The name of the process to know about
+   */
+  public void addProcess(final String name)
+  {
+    mProcessVariablesUsed.put(name, new ArrayList<String>());
+  }
+
+  /**
+   * A method to add an assignment for a variable.
+   * @param processName The process that is doing the assignment.
+   * @param variable The variable that is being assigned to.
+   */
+  public void addAssignment(final String processName, final String variable)
+  {
+    if(!mProcessVariablesUsed.containsKey(processName))
+      addProcess(processName);
+
+    final List<String> vars = mProcessVariablesUsed.get(processName);
+    if(!vars.contains(variable))
+      vars.add(variable);
+  }
+
+  /**
+   * A method to get the variables assigned to by a given process
+   * @param processName The name of the process.
+   * @return An ArrayList of Strings
+   */
+  public List<String> getVariableAssignments(final String processName)
+  {
+    final List<String> output = mProcessVariablesUsed.get(processName);
+    if(output == null)
+      return new ArrayList<String>();
+    else
+      return output;
   }
 
   /**

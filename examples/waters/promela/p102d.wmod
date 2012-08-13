@@ -317,7 +317,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="B_0">
                         <PointGeometry>
-                            <Point Y="64" X="224"/>
+                            <Point Y="48" X="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="9"/>
@@ -325,7 +325,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_1">
                         <PointGeometry>
-                            <Point Y="144" X="224"/>
+                            <Point Y="128" X="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-6" X="9"/>
@@ -333,7 +333,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_2">
                         <PointGeometry>
-                            <Point Y="224" X="224"/>
+                            <Point Y="208" X="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-5" X="7"/>
@@ -341,7 +341,7 @@
                     </SimpleNode>
                     <SimpleNode Name="B_3">
                         <PointGeometry>
-                            <Point Y="320" X="224"/>
+                            <Point Y="336" X="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-6" X="8"/>
@@ -352,7 +352,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="400" X="224"/>
+                            <Point Y="432" X="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-7" X="8"/>
@@ -376,17 +376,21 @@
                                 <IntConstant Value="3"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-109"/>
+                                <Point Y="-43" X="-120"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="185" X="202"/>
+                            <Point Y="169" X="218"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=">
+                                <BinaryExpression Operator="=" Text="var_B_x = var_B_x">
                                     <SimpleIdentifier Name="var_B_x"/>
                                     <SimpleIdentifier Name="var_B_x"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="var_B_y = var_B_y">
+                                    <SimpleIdentifier Name="var_B_y"/>
+                                    <SimpleIdentifier Name="var_B_y"/>
                                 </BinaryExpression>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="var_B_z"/>
@@ -394,7 +398,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-1" X="-106"/>
+                                <Point Y="-23" X="-122"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -410,13 +414,17 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="268" X="157"/>
+                            <Point Y="267" X="151"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="var_B_x"/>
                                     <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="var_B_y = var_B_y">
+                                    <SimpleIdentifier Name="var_B_y"/>
+                                    <SimpleIdentifier Name="var_B_y"/>
                                 </BinaryExpression>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="var_B_z"/>
@@ -436,12 +444,12 @@
                                 <IntConstant Value="3"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-26" X="6"/>
+                                <Point Y="-36" X="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=">
+                                <BinaryExpression Operator="=" Text="var_B_x = var_B_x">
                                     <SimpleIdentifier Name="var_B_x"/>
                                     <SimpleIdentifier Name="var_B_x"/>
                                 </BinaryExpression>
@@ -455,7 +463,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="7"/>
+                                <Point Y="-17" X="7"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -467,17 +475,21 @@
                                 <IntConstant Value="4"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-17" X="12"/>
+                                <Point Y="-39" X="16"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="184" X="243"/>
+                            <Point Y="168" X="259"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=">
+                                <BinaryExpression Operator="=" Text="var_B_x = var_B_x">
                                     <SimpleIdentifier Name="var_B_x"/>
                                     <SimpleIdentifier Name="var_B_x"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="var_B_y = var_B_y">
+                                    <SimpleIdentifier Name="var_B_y"/>
+                                    <SimpleIdentifier Name="var_B_y"/>
                                 </BinaryExpression>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="var_B_z"/>
@@ -485,7 +497,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="15"/>
+                                <Point Y="-18" X="17"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -497,7 +509,7 @@
                                 <IntConstant Value="4"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-52"/>
+                                <Point Y="-39" X="-51"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -506,13 +518,17 @@
                                     <SimpleIdentifier Name="var_B_x"/>
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="var_B_y = var_B_y">
+                                    <SimpleIdentifier Name="var_B_y"/>
+                                    <SimpleIdentifier Name="var_B_y"/>
+                                </BinaryExpression>
                                 <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="var_B_z"/>
                                     <IntConstant Value="4"/>
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-43"/>
+                                <Point Y="-20" X="-52"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -524,11 +540,11 @@
                                 <IntConstant Value="3"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="7"/>
+                                <Point Y="-15" X="9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="266" X="292"/>
+                            <Point Y="264" X="331"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -536,7 +552,7 @@
                                     <SimpleIdentifier Name="var_B_x"/>
                                     <IntConstant Value="2"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=">
+                                <BinaryExpression Operator="=" Text="var_B_y = var_B_y">
                                     <SimpleIdentifier Name="var_B_y"/>
                                     <SimpleIdentifier Name="var_B_y"/>
                                 </BinaryExpression>

@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -578,6 +579,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
             labelBlock2.add(ident);
           }
         }
+
         final LabelBlockProxy label2 = mFactory.createLabelBlockProxy(labelBlock2, null);
         if(!labelBlock2.isEmpty())
         {
@@ -676,14 +678,17 @@ public class GraphCollectingVisitor implements PromelaVisitor
   /**
    * A recursive method to create the messages for the given send statement.
    * @param graph The graph to put the send edges on.
-   * @param currentMessage The current message being created.
+   * @param currentMessage The current message being created.<br>
    * For the initial call to this method, pass in a new array list.
-   * @param guards The guard block restricting this send statement.
+   * @param guards The guard block restricting this send statement.<br>
    * For the initial call to this method, pass in a new array list.
    * @param iterList The list of message arguments to iterate over.
-   * @param iterIndex The current index that is being processed in the iterList.
+   * @param iterIndex The current index that is being processed in the iterList.<br>
    * Use zero for the initial call to this method.
    * @param receivableMessages The messages that can be received on the channel.
+   * @param channel The channel the messages are sent on.
+   * @param name The name of the process that is sending the messages.
+   * @author Ethan Duff
    */
   private void createSendMessages(final PromelaGraph graph, final ArrayList<SimpleExpressionProxy> currentMessage, final ArrayList<SimpleExpressionProxy> guards, final List<ChannelData> iterList, final int iterIndex, final PromelaChannel channel, final String name, final ArrayList<Message> receivableMessages)
   {
@@ -805,6 +810,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
    * @param ch The channel that is sending the message
    * @param name The name of the channel
    * @param receivableMessages The messages that are capable of being received on the channel
+   * @author Ethan Duff
    */
   private void createSendGraphEdge(final PromelaGraph graph, final Message message, final ArrayList<SimpleExpressionProxy> guards, final PromelaChannel channel, final String name, final ArrayList<Message> receivableMessages)
   {
@@ -975,6 +981,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
       {
         events.add(indexEvent);
       }
+      if(length!=0)
+        return;
     }
   }
 
@@ -987,7 +995,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
       in.addAll(cloner.getClonedList(data));
       IndexedIdentifierProxy indexEvent;
       String ename = labels.get(0);
-      if(length ==0)
+      if(length == 0)
       {
         ename = "exch_"+ename;
         indexEvent = mFactory.createIndexedIdentifierProxy(ename,cloner.getClonedList(in));
@@ -1002,6 +1010,9 @@ public class GraphCollectingVisitor implements PromelaVisitor
       {
         events.add(indexEvent);
       }
+
+      if(length != 0)
+        return;
     }
   }
 
@@ -1023,11 +1034,50 @@ public class GraphCollectingVisitor implements PromelaVisitor
     {
       tree = tree.getParent();
     }
+    final ProctypeTreeNode proctypeTree = (ProctypeTreeNode) tree;
     final String name = tree.getText();
 
     for(int i = 0; i <t.getChildCount();i++)
     {
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
+    }
+
+    final List<IdentifierProxy> variableIdentifiers = new ArrayList<IdentifierProxy>();
+
+    //Now, create identifiers for all of the variables that are assigned to by the process we are in
+    for(final String s : channel.getVariableAssignments(name))
+    {
+      final boolean local = proctypeTree.getSymbolTable().getLocalKeys().contains(s);
+
+      final String variableScope;
+      if(local)
+      {
+        //This is a local variable to this proctype
+        variableScope = proctypeTree.getText() + "_";
+      }
+      else
+      {
+        variableScope = "";
+      }
+
+      final String variableName = "var_" + variableScope + s;
+      final IdentifierProxy identifier;
+
+      if(local && mVisitor.getOccur().get(proctypeTree.getText()) > 1)//if is [procid] indexed variable
+      {
+        final SimpleIdentifierProxy procid = mFactory.createSimpleIdentifierProxy("procid");
+        final List<SimpleIdentifierProxy> list = Collections.singletonList(procid);
+        identifier = mFactory.createIndexedIdentifierProxy(variableName, list);
+      }
+      else
+      {
+        identifier = mFactory.createSimpleIdentifierProxy(variableName);
+      }
+
+      final VardefTreeNode symbol = (VardefTreeNode) mSymbolTable.get(s);
+
+      if(symbol.isVisible())
+        variableIdentifiers.add(identifier);
     }
 
     //Create the initial message list
@@ -1036,7 +1086,16 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
     //Now, create the graph, and create the messages corresponding to that graph
     final PromelaGraph graph = new PromelaGraph();
-    createReceiveMessages(graph, msgList, new ArrayList<BinaryExpressionProxy>(), mMessageArguments, 0, channel, name);
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final ArrayList<BinaryExpressionProxy> actions = new ArrayList<BinaryExpressionProxy>();
+    for(final IdentifierProxy i : variableIdentifiers)
+    {
+      actions.add(mFactory.createBinaryExpressionProxy(optable.getAssignmentOperator(), i.clone(), i.clone()));
+    }
+    final Comparator<SimpleExpressionProxy> comparator = new ExpressionComparator(optable);
+    Collections.sort(actions, comparator);
+
+    createReceiveMessages(graph, msgList, actions, mMessageArguments, 0, channel, name);
 
     return graph;
   }
@@ -1044,12 +1103,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
   /**
    * A method to create the initial message list for a receive statement.
    * @param msgList The list to store the message into.
-   * @param currentMessage The current message.
+   * @param currentMessage The current message.<br>
    * For the first call to this method, pass in a new ArrayList.
    * @param iterList The list of channel data items to create the message list from.
-   * @param iterIndex The current index into the 'iterList'.
+   * @param iterIndex The current index into the 'iterList'.<br>
    * Use zero when first calling this method.
-   * @param sendableMessages The messages that are sendable on the channel
+   * @param channel The channel the messages are received on
+   * @author Ethan Duff
    */
   private void createReceiveMessageList(final Collection<Message> msgList, final ArrayList<SimpleExpressionProxy> currentMessage, final List<ChannelData> iterList, final int iterIndex, final PromelaChannel channel)
   {
@@ -1130,15 +1190,19 @@ public class GraphCollectingVisitor implements PromelaVisitor
   }
 
   /**
-   * The second pass in creating the messages for a receive statement.
+   * The second pass in creating the messages for a receive statement.<br>
    * This expands on the createMessageList method by adding the shown variables
    * and creating the message edges, before adding them onto the nodes.
    * @param graph The graph to add the edges onto
    * @param msgList The initial message list assigned to by the createMessageList method
-   * @param actions The action block for the variable assignments.  Use an empty array list for the initial call to this method.
-   * @param iter An iterator over all of the channel arguments
-   * @param ch The channel information of the channel the messages are being sent on
-   * @param name The name of the process receiving the messages
+   * @param actions The action block for the variable assignments.<br>
+   * Use an empty array list for the initial call to this method.
+   * @param iterList The list being iterated over.
+   * @param iterIndex The current index in the iteration.<br>
+   * Use Zero for the initial call to this method.
+   * @param channel The channel the messages are being received from
+   * @param processName The name of the process receiving the messages
+   * @author Ethan Duff
    */
   private void createReceiveMessages(final PromelaGraph graph, final ArrayList<Message> msgList, final ArrayList<BinaryExpressionProxy> actions, final List<ChannelData> iterList, final int iterIndex, final PromelaChannel channel, final String processName)
   {
@@ -1150,6 +1214,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     else
     {
       final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+      final ModuleEqualityVisitor equalityVisitor = ModuleEqualityVisitor.getInstance(false);
 
       final ChannelData data = iterList.get(iterIndex);
       if(data.getDataType() == ChannelDataType.SHOWN_VARIABLE)
@@ -1160,30 +1225,30 @@ public class GraphCollectingVisitor implements PromelaVisitor
          * One edge will be added per value of the shown variable
          */
 
-        //Get the index of the shown variable inside the messages
-        //This is the first null value
-        int shownIndex = -1;
-        final Message firstMessage = msgList.get(0);
-        for(int i = 0; i < firstMessage.getMsg().size(); i++)
-        {
-          final SimpleExpressionProxy val = firstMessage.getMsg().get(i);
-          if(val == null)
-          {
-            shownIndex = i;
-            break;
-          }
-        }
-
         final SimpleExpressionProxy values = data.getPossibleValues();
         if(values instanceof BinaryExpressionProxy)
         {
           final BinaryExpressionProxy range = (BinaryExpressionProxy) values;
+
+          //Find this variable in the actions
+          final SimpleExpressionProxy variable = data.getIdentifier();
+          int index = -1;
+          for(int j = 0; j < actions.size(); j++)
+          {
+            final SimpleExpressionProxy current = actions.get(j).getLeft();
+            if(equalityVisitor.equals(variable, current))
+            {
+              index = j;
+              break;
+            }
+          }
+
           for(int i = ((IntConstantProxy)range.getLeft()).getValue(); i < ((IntConstantProxy)range.getRight()).getValue(); i++)
           {
             data.setValue(i);
             for(final Message m : msgList)
             {
-              m.getMsg().set(shownIndex, data.getValue());
+              m.getMsg().set(iterIndex, data.getValue());
             }
 
             //Check if this value is sendable on the channel
@@ -1192,32 +1257,48 @@ public class GraphCollectingVisitor implements PromelaVisitor
             {
               final SimpleExpressionProxy varName = data.getIdentifier().clone();
               final SimpleExpressionProxy varValue = data.getValue().clone();
-              //Add this value into the action collection
-              actions.add(mFactory.createBinaryExpressionProxy(optable.getAssignmentOperator(), varName, varValue));
+              //replace its assignment with the new assignment
+              final BinaryExpressionProxy assignment = mFactory.createBinaryExpressionProxy(optable.getAssignmentOperator(), varName, varValue);
+              final BinaryExpressionProxy old = actions.get(index);
+              actions.set(index, assignment);
 
               //Make a recursive call for this value of the expression
               createReceiveMessages(graph, msgList, actions, iterList, iterIndex+1, channel, processName);
 
-              //Now, remove the value for the action collection
-              actions.remove(actions.size() - 1);
+              //Now, restore the value for the action collection
+              actions.set(index, old);
             }
           }
           //Set the value back to null
           //This is necessary if we return into a loop, as this code will run again
           for(final Message m : msgList)
           {
-            m.getMsg().set(shownIndex, null);
+            m.getMsg().set(iterIndex, null);
           }
         }
         else
         {
           final EnumSetExpressionProxy range = (EnumSetExpressionProxy) values;
+
+          //Find this variable in the actions
+          final SimpleExpressionProxy variable = data.getIdentifier();
+          int index = -1;
+          for(int j = 0; j < actions.size(); j++)
+          {
+            final SimpleExpressionProxy current = actions.get(j).getLeft();
+            if(equalityVisitor.equals(variable, current))
+            {
+              index = j;
+              break;
+            }
+          }
+
           for(final SimpleIdentifierProxy item : range.getItems())
           {
             data.setValue(item.getName());
             for(final Message m : msgList)
             {
-              m.getMsg().set(shownIndex, data.getValue());
+              m.getMsg().set(iterIndex, data.getValue());
             }
 
             //Check if this value is sendable on the channel
@@ -1226,20 +1307,22 @@ public class GraphCollectingVisitor implements PromelaVisitor
             {
               final SimpleExpressionProxy varName = data.getIdentifier().clone();
               final SimpleExpressionProxy varValue = data.getValue().clone();
-              //Add this value into the action collection
-              actions.add(mFactory.createBinaryExpressionProxy(optable.getAssignmentOperator(), varName, varValue));
+              //replace the variable with its assignment
+              final BinaryExpressionProxy assignment = mFactory.createBinaryExpressionProxy(optable.getAssignmentOperator(), varName, varValue);
+              final BinaryExpressionProxy old = actions.get(index);
+              actions.set(index, assignment);
 
               //Make a recursive call for this value of the expression
               createReceiveMessages(graph, msgList, actions, iterList, iterIndex+1, channel, processName);
 
-              //Now, remove the value for the action collection
-              actions.remove(actions.size() - 1);
+              //Now, restore the value for the action collection
+              actions.set(index, old);
             }
             //Set the value back to null
             //This is necessary if we return into a loop, as this code will run again
             for(final Message m : msgList)
             {
-              m.getMsg().set(shownIndex, null);
+              m.getMsg().set(iterIndex, null);
             }
           }
         }
@@ -1253,11 +1336,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
   }
 
   /**
-   * A method to create the graph edge for the given messages being received on the given channel
+   * A method to create the graph edge for the messages being received on the channel
    * @param graph The graph to create the edge on
    * @param msgList The list of messages that can be received
-   * @param ch The channel the messages are being sent and received on
-   * @param name The name of the process receiving the messages
+   * @param channel The channel the messages are being received on
+   * @param processName The name of the process receiving the messages
+   * @param actions The action blocks for variable assignment for the given messages
+   * @author Ethan Duff
    */
   private void createReceiveGraphEdge(final PromelaGraph graph, final ArrayList<Message> msgList, final ArrayList<BinaryExpressionProxy> actions, final PromelaChannel channel, final String processName)
   {
@@ -1313,11 +1398,12 @@ public class GraphCollectingVisitor implements PromelaVisitor
 
   /**
    * A method to get the senders and receivers of a message, for messages received
-   * @param ch The channel information of the channel the messages are being send and received on.
-   * @param name The name of the process receiving the messages.
+   * @param channel The channel the messages are being received on.
+   * @param processName The name of the process receiving the messages.
    * @param m The message to create the senders and receivers for.
    * @param senders The collection to store the senders in.
    * @param recvs The collection to store the receivers in.
+   * @author Ethan Duff
    */
   private void getSendersAndReceiversOfReceiveMessage(final PromelaChannel channel, final Message m, final Collection<SimpleIdentifierProxy> senders, final Collection<SimpleIdentifierProxy> recvs, final String processName)
   {
@@ -1637,13 +1723,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
    * A method to create the channel data from a given name
    * @param t The name tree node containing the name of the item
    * @return A channel data structure containing a representation of the given item.
+   * @author Ethan Duff
    */
   private ChannelData createChannelData(final NameTreeNode t)
   {
-    final Tree symbol = mSymbolTable.get(t.getText());
-    ChannelDataType type;
-    String variableScope = "";
-
     //Find out the scope of the variable
     Tree tree = t;
     while(!(tree instanceof ProctypeTreeNode))
@@ -1651,16 +1734,24 @@ public class GraphCollectingVisitor implements PromelaVisitor
       tree = tree.getParent();
     }
     final ProctypeTreeNode proctypeTree = (ProctypeTreeNode) tree;
-    if(proctypeTree.getSymbolTable().getLocalKeys().contains(t.getText()))
+
+    final boolean local = proctypeTree.getSymbolTable().getLocalKeys().contains(t.getText());
+
+    final String variableScope;
+    if(local)
     {
       //This is a local variable to this proctype
       variableScope = proctypeTree.getText() + "_";
+    }
+    else
+    {
+      variableScope = "";
     }
 
     final String variableName = "var_" + variableScope + t.getText();
     final IdentifierProxy identifier;
 
-    if(mVisitor.getOccur().get(proctypeTree.getText()) > 1)//if is [procid] indexed variable
+    if(local && mVisitor.getOccur().get(proctypeTree.getText()) > 1)//if is [procid] indexed variable
     {
       final SimpleIdentifierProxy procid = mFactory.createSimpleIdentifierProxy("procid");
       final List<SimpleIdentifierProxy> list = Collections.singletonList(procid);
@@ -1671,8 +1762,10 @@ public class GraphCollectingVisitor implements PromelaVisitor
       identifier = mFactory.createSimpleIdentifierProxy(variableName);
     }
 
+    final ChannelDataType type;
     final SimpleExpressionProxy range;
 
+    final Tree symbol = mSymbolTable.get(t.getText());
     if(symbol instanceof VardefTreeNode)
     {
       final boolean visible = ((VardefTreeNode) symbol).isVisible();

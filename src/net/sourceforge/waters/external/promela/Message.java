@@ -8,7 +8,7 @@ import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
-public class Message
+public class Message implements Comparable<Message>
 {
   private final List<SimpleExpressionProxy> mMsg;
   private final List<String> mSenders;
@@ -119,5 +119,26 @@ public class Message
   {
     final List<SimpleExpressionProxy> msg = cloner.getClonedList(this.mMsg);
     return new Message(msg, getSenders(), getRecipients());
+  }
+
+  /**
+   * A method to compare this message with another message. <br>
+   * Only the message content is checked in the comparison
+   * @param other The message to compare this message to.
+   */
+  public int compareTo(final Message other)
+  {
+    final List<SimpleExpressionProxy> content = other.getMsg();
+    for(int i = 0; i < mMsg.size(); i++)
+    {
+      final String s = mMsg.get(i).toString();
+      final String s2 = content.get(i).toString();
+      final int value = s.compareTo(s2);
+      if(value > 0)
+        return 1;
+      else if(value < 0)
+        return -1;
+    }
+    return 0;
   }
 }

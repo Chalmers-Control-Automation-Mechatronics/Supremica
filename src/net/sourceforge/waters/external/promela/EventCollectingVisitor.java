@@ -142,7 +142,6 @@ public class EventCollectingVisitor implements PromelaVisitor
   public void makeMsg()
   {
     final ModuleProxyCloner cloner = mFactory.getCloner();
-    //TODO I have no idea why this todo is here -- Was here before me. Ethan Duff
     final Comparator<SimpleExpressionProxy> comparator = new ExpressionComparator(optable);
     for(final Map.Entry<String,ChanInfo> chanIn: chan.entrySet())
     {
@@ -446,6 +445,7 @@ public class EventCollectingVisitor implements PromelaVisitor
             final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(s);
             tempList.add(ident);
           }
+          Collections.sort((ArrayList<SimpleIdentifierProxy>)tempList);
           final EnumSetExpressionProxy en = mFactory.createEnumSetExpressionProxy(tempList);
           ranges.add(en);
           specialSend.add((SimpleExpressionProxy) cloner.getClone(en));
@@ -671,15 +671,26 @@ public class EventCollectingVisitor implements PromelaVisitor
         else
         {
           //Add in the range for all mtypes used for this channel
-          final List<SimpleIdentifierProxy> values = new ArrayList<SimpleIdentifierProxy>();
+          final List<String> values = new ArrayList<String>();
           iter = items[i].iterator();
           while(iter.hasNext())
           {
             final SimpleExpressionProxy expression = iter.next();
-            values.add(mFactory.createSimpleIdentifierProxy(expression.toString()));
+            values.add(expression.toString());
           }
 
-          dataRange.add(mFactory.createEnumSetExpressionProxy(values));
+          //Now, sort the values into the order they appear in the mtype range
+          final List<String> order = mRoot.getMtypes();
+          final List<SimpleIdentifierProxy> sortedValues = new ArrayList<SimpleIdentifierProxy>();
+          for(final String s : order)
+          {
+            if(values.contains(s))
+            {
+              sortedValues.add(mFactory.createSimpleIdentifierProxy(s));
+            }
+          }
+
+          dataRange.add(mFactory.createEnumSetExpressionProxy(sortedValues));
         }
       }
       else
@@ -880,7 +891,6 @@ public class EventCollectingVisitor implements PromelaVisitor
       }
       else if(ch.getType().get(y).equals("mtype"))
       {
-        //TODO add mtype variable sending here
         if(mSymbolTable.get(labels.get(y+1)) instanceof NameTreeNode)
         {
           final IdentifierProxy c = mFactory.createSimpleIdentifierProxy(labels.get(y+1));
@@ -955,8 +965,7 @@ public class EventCollectingVisitor implements PromelaVisitor
       ( (PromelaTree) t.getChild(i)).acceptVisitor(this);
     }
 
-    final String ename = labels.get(0);
-    final ChanInfo ch = chan.get(ename);
+    final ChanInfo ch = chan.get(chanName);
     final PromelaChannel channel = mChannels.get(chanName);
     Tree tree = t;
     while (!(tree instanceof ProctypeTreeNode))
@@ -969,7 +978,7 @@ public class EventCollectingVisitor implements PromelaVisitor
 
     for(int y=0;y<ch.getType().size();y++)
     {
-      if(ch.getType().get(y).equals("mtype"))
+      if(channel.getType(y) == Type.MTYPE)
       {
         if(mSymbolTable.containsKey(labels.get(y+1))
           && mSymbolTable.get(labels.get(y+1)) instanceof NameTreeNode)
@@ -986,6 +995,9 @@ public class EventCollectingVisitor implements PromelaVisitor
         {
           //This is a variable, so add in a simple identifier over the variable type
           indexes.add(channel.getTypeIdentifier(y, mFactory));
+
+          //Register this variable assignment on the channel
+          channel.addAssignment(n, labels.get(y+1));
         }
       }
       else
@@ -994,7 +1006,9 @@ public class EventCollectingVisitor implements PromelaVisitor
         {
           //This is a variable, so add in a simple identifier over the variable type
           indexes.add(channel.getTypeIdentifier(y, mFactory));
-          //indexes.add(null);
+
+          //Register this variable assignment on the channel
+          channel.addAssignment(n, labels.get(y+1));
         }
         else
         {
