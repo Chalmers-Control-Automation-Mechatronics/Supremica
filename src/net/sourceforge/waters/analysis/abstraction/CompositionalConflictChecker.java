@@ -172,6 +172,18 @@ public class CompositionalConflictChecker
     return mPreconditionMarking;
   }
 
+  public EventProxy getUsedPreconditionMarking()
+  {
+    final AbstractionProcedure proc = getAbstractionProcedure();
+    if (proc instanceof ConflictCheckerAbstractionProcedure) {
+      final ConflictCheckerAbstractionProcedure cproc =
+        (ConflictCheckerAbstractionProcedure) proc;
+      return cproc.getUsedPreconditionMarking();
+    } else {
+      return null;
+    }
+  }
+
   @Override
   public ConflictTraceProxy getCounterExample()
   {
@@ -2077,7 +2089,25 @@ public class CompositionalConflictChecker
       super(resultAut, originalAut, tau, originalStateEnc);
       mPartition = partition;
       mHasReducedPreconditionMarking = reduced;
+      mResultStateEncoding = resultStateEnc;
       mReverseOutputStateMap = resultStateEnc.getStateCodeMap();
+    }
+
+    //#######################################################################
+    //# Simple Access
+    StateEncoding getResultStateEncoding()
+    {
+      return mResultStateEncoding;
+    }
+
+    List<int[]> getPartition()
+    {
+      return mPartition;
+    }
+
+    boolean hasReducedPreconditionMarking()
+    {
+      return mHasReducedPreconditionMarking;
     }
 
     //#######################################################################
@@ -2253,6 +2283,8 @@ public class CompositionalConflictChecker
      * @see #mRecoveredPreconditionMarking
      */
     private final boolean mHasReducedPreconditionMarking;
+
+    private final StateEncoding mResultStateEncoding;
     /**
      * Reverse encoding of output states. Maps states in output automaton
      * (simplified automaton) to state code in output transition relation.
@@ -2354,6 +2386,25 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Trace Computation
+    @Override
+    protected List<TraceStepProxy> convertTraceSteps
+      (final List<TraceStepProxy> traceSteps)
+      throws AnalysisException
+    {
+      final EventProxy tau = getTau();
+      final EventProxy preconditionMarking = getUsedPreconditionMarking();
+      final AutomatonProxy resultAut = getResultAutomaton();
+      final StateEncoding resultStateEnc = getResultStateEncoding();
+      final AutomatonProxy originalAut = getOriginalAutomaton();
+      final List<int[]> partition = getPartition();
+      final boolean reduced = hasReducedPreconditionMarking();
+      final ObservationEquivalenceTraceExpander expander =
+        new ObservationEquivalenceTraceExpander
+          (CompositionalConflictChecker.this, tau, preconditionMarking,
+           resultAut, resultStateEnc, originalAut, partition, reduced);
+      return expander.convertTraceSteps(traceSteps);
+    }
+
     @Override
     List<SearchRecord> convertCrucialSteps
       (final List<SearchRecord> crucialSteps)
@@ -2526,6 +2577,25 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Trace Computation
+    @Override
+    protected List<TraceStepProxy> convertTraceSteps
+      (final List<TraceStepProxy> traceSteps)
+      throws AnalysisException
+    {
+      final EventProxy tau = getTau();
+      final EventProxy preconditionMarking = getUsedPreconditionMarking();
+      final AutomatonProxy resultAut = getResultAutomaton();
+      final StateEncoding resultStateEnc = getResultStateEncoding();
+      final AutomatonProxy originalAut = getOriginalAutomaton();
+      final List<int[]> partition = getPartition();
+      final boolean reduced = hasReducedPreconditionMarking();
+      final ConflictEquivalenceTraceExpander expander =
+        new ConflictEquivalenceTraceExpander
+          (CompositionalConflictChecker.this, tau, preconditionMarking,
+           resultAut, resultStateEnc, originalAut, partition, reduced);
+      return expander.convertTraceSteps(traceSteps);
+    }
+
     @Override
     List<SearchRecord> convertCrucialSteps
       (final List<SearchRecord> crucialSteps)
