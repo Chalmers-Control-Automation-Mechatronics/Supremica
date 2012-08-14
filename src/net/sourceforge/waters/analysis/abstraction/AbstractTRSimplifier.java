@@ -134,6 +134,12 @@ public abstract class AbstractTRSimplifier
     return mStatistics;
   }
 
+  public void collectStatistics(final List<TRSimplifierStatistics> list)
+  {
+    final TRSimplifierStatistics stats = getStatistics();
+    list.add(stats);
+  }
+
   public void reset()
   {
     mTransitionRelation = null;

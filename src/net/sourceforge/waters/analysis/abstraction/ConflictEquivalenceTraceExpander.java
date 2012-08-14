@@ -55,12 +55,13 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
      final AutomatonProxy resultAut,
      final StateEncoding resultStateEnc,
      final AutomatonProxy originalAut,
+     final StateEncoding originalStateEnc,
      final List<int[]> partition,
      final boolean preconditionMarkingReduced)
     throws AnalysisException
   {
     super(verifier, tau, preconditionMarking,
-          resultAut, resultStateEnc, originalAut,
+          resultAut, resultStateEnc, originalAut, originalStateEnc,
           partition, preconditionMarkingReduced);
   }
 

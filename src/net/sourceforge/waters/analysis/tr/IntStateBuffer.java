@@ -240,6 +240,10 @@ public class IntStateBuffer
 
   /**
    * Checks whether a state is marked.
+   * This method reports a state as marked if the indicated proposition is
+   * not marked as used (marked by default for proposition not in the
+   * automaton alphabet), or if the state is explicitly marked by the
+   * proposition.
    * @param  state   ID of the state to be tested.
    * @param  prop    ID of the marking proposition to be tested.
    */

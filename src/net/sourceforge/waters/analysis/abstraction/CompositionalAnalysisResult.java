@@ -11,9 +11,9 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Formatter;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -150,24 +150,8 @@ public class CompositionalAnalysisResult
   public void setSimplifierStatistics
     (final TransitionRelationSimplifier simplifier)
   {
-    if (simplifier instanceof ChainTRSimplifier) {
-      final ChainTRSimplifier chain = (ChainTRSimplifier) simplifier;
-      setSimplifierStatistics(chain);
-    } else {
-      final TRSimplifierStatistics stats = simplifier.getStatistics();
-      mSimplifierStatistics = Collections.singletonList(stats);
-    }
-  }
-
-  public void setSimplifierStatistics(final ChainTRSimplifier chain)
-  {
-    final int size = chain.size();
-    mSimplifierStatistics = new ArrayList<TRSimplifierStatistics>(size);
-    for (int index = 0; index < size; index++) {
-      final TransitionRelationSimplifier step = chain.getStep(index);
-      final TRSimplifierStatistics stats = step.getStatistics();
-      mSimplifierStatistics.add(stats);
-    }
+    mSimplifierStatistics = new LinkedList<TRSimplifierStatistics>();
+    simplifier.collectStatistics(mSimplifierStatistics);
   }
 
   public void addSynchronousProductAnalysisResult(final AnalysisResult result)

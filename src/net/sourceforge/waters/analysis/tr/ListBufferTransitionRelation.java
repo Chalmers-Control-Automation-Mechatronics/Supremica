@@ -545,7 +545,10 @@ public class ListBufferTransitionRelation
 
   /**
    * Tests whether a state is marked with a particular proposition.
-   *
+   * This method reports a state as marked if the indicated proposition is
+   * not marked as used (marked by default for proposition not in the
+   * automaton alphabet), or if the state is explicitly marked by the
+   * proposition.
    * @param state
    *          ID of the state to be tested.
    * @param prop
@@ -2165,7 +2168,7 @@ public class ListBufferTransitionRelation
           if (props == null) {
             props = new ArrayList<EventProxy>(numProps);
             for (int p = 0; p < numProps; p++) {
-              if (isMarked(s, p)) {
+              if (isUsedProposition(p) && isMarked(s, p)) {
                 final EventProxy prop = eventEnc.getProposition(p);
                 props.add(prop);
               }

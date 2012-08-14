@@ -150,6 +150,14 @@ public class ChainTRSimplifier
   }
 
   @Override
+  public void collectStatistics(final List<TRSimplifierStatistics> list)
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.collectStatistics(list);
+    }
+  }
+
+  @Override
   public void reset()
   {
     super.reset();
@@ -182,7 +190,8 @@ public class ChainTRSimplifier
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for net.sourceforge.waters.analysis.abstraction.
+  //# AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
   throws AnalysisException
@@ -226,8 +235,11 @@ public class ChainTRSimplifier
           mReducedMarkings[prop] |= step.isReducedMarking(prop);
         }
         if (isPartitioning()) {
-          final List<int[]> partition = step.getResultPartition();
-          mergePartitions(partition);
+          final List<int[]> currentPartition = getResultPartition();
+          final List<int[]> newPartition = step.getResultPartition();
+          final List<int[]> combinedPartition =
+            mergePartitions(currentPartition, newPartition);
+          setResultPartitionList(combinedPartition);
         }
       }
     }
@@ -236,31 +248,30 @@ public class ChainTRSimplifier
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void mergePartitions(final List<int[]> next)
+  //# Merging Partitions
+  static List<int[]> mergePartitions(final List<int[]> part1,
+                                     final List<int[]> part2)
   {
-    if (next == null) {
-      return;
-    }
-    final List<int[]> current = getResultPartition();
-    if (current == null) {
-      setResultPartitionList(next);
-      return;
-    }
-    final int nextSize = next.size();
-    final List<int[]> result = new ArrayList<int[]>(nextSize);
-    final TIntArrayList clazz = new TIntArrayList();
-    for (final int[] clazz2 : next) {
-      for (final int state2 : clazz2) {
-        final int[] clazz1 = current.get(state2);
-        for (final int state1 : clazz1) {
-          clazz.add(state1);
+    if (part1 == null) {
+      return part2;
+    } else if (part2 == null) {
+      return part1;
+    } else {
+      final int size2 = part2.size();
+      final List<int[]> result = new ArrayList<int[]>(size2);
+      final TIntArrayList clazz = new TIntArrayList();
+      for (final int[] clazz2 : part2) {
+        for (final int state2 : clazz2) {
+          final int[] clazz1 = part1.get(state2);
+          for (final int state1 : clazz1) {
+            clazz.add(state1);
+          }
         }
+        result.add(clazz.toNativeArray());
+        clazz.clear();
       }
-      result.add(clazz.toNativeArray());
-      clazz.clear();
+      return result;
     }
-    setResultPartitionList(result);
   }
 
 

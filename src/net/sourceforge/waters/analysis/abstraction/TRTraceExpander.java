@@ -33,6 +33,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 
 
 /**
@@ -61,7 +62,7 @@ public abstract class TRTraceExpander
     throws AnalysisException
   {
     this(verifier, tau, null,
-         resultAut, resultStateEnc, originalAut, partition, false);
+         resultAut, resultStateEnc, originalAut, null, partition, false);
   }
 
   protected TRTraceExpander(final AbstractCompositionalModelVerifier verifier,
@@ -70,13 +71,15 @@ public abstract class TRTraceExpander
                             final AutomatonProxy resultAut,
                             final StateEncoding resultStateEnc,
                             final AutomatonProxy originalAut,
+                            final StateEncoding originalStateEnc,
                             final List<int[]> partition,
                             final boolean preconditionMarkingReduced)
     throws AnalysisException
   {
     this(verifier, null, tau, preconditionMarking,
          resultAut, resultStateEnc.getStateCodeMap(),
-         originalAut, null, partition, preconditionMarkingReduced);
+         originalAut, originalStateEnc,
+         partition, preconditionMarkingReduced);
   }
 
   private TRTraceExpander(final AbstractCompositionalModelVerifier verifier,
@@ -137,9 +140,29 @@ public abstract class TRTraceExpander
 
   //#######################################################################
   //# Simple Access
+  AbstractCompositionalModelVerifier getModelVerifier()
+  {
+    return mModelVerifier;
+  }
+
   ListBufferTransitionRelation getTransitionRelation()
   {
     return mTransitionRelation;
+  }
+
+  EventEncoding getEventEncoding()
+  {
+    return mEventEncoding;
+  }
+
+  AutomatonProxy getOriginalAutomaton()
+  {
+    return mOriginalAutomaton;
+  }
+
+  AutomatonProxy getResultAutomaton()
+  {
+    return mResultAutomaton;
   }
 
 
@@ -152,6 +175,52 @@ public abstract class TRTraceExpander
 
   //#######################################################################
   //# Trace Computation
+  /**
+   * Fills in the target states in the state maps for each step of the trace
+   * for the result automaton.
+   */
+  List<TraceStepProxy> getSaturatedTraceSteps
+    (final List<TraceStepProxy> steps,
+     final Collection<AutomatonProxy> automata)
+  {
+    final ProductDESProxyFactory factory = mModelVerifier.getFactory();
+    final int numAutomata = automata.size();
+    final int numSteps = steps.size();
+    final List<TraceStepProxy> convertedSteps =
+        new ArrayList<TraceStepProxy>(numSteps);
+    final Iterator<TraceStepProxy> iter = steps.iterator();
+
+    final TraceStepProxy firstStep = iter.next();
+    final Map<AutomatonProxy,StateProxy> firstMap = firstStep.getStateMap();
+    final Map<AutomatonProxy,StateProxy> convertedFirstMap =
+      new HashMap<AutomatonProxy,StateProxy>(numAutomata);
+    for (final AutomatonProxy aut : automata) {
+      final StateProxy state = getInitialState(aut, firstMap);
+      convertedFirstMap.put(aut, state);
+    }
+    final TraceStepProxy convertedFirstStep =
+      factory.createTraceStepProxy(null, convertedFirstMap);
+    convertedSteps.add(convertedFirstStep);
+    Map<AutomatonProxy,StateProxy> previousStepMap = convertedFirstMap;
+    while (iter.hasNext()) {
+      final TraceStepProxy step = iter.next();
+      final EventProxy event = step.getEvent();
+      final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+      final Map<AutomatonProxy,StateProxy> convertedStepMap =
+        new HashMap<AutomatonProxy,StateProxy>(numAutomata);
+      for (final AutomatonProxy aut : automata) {
+        final StateProxy prev = previousStepMap.get(aut);
+        final StateProxy state = findSuccessor(aut, event, prev, stepMap);
+        convertedStepMap.put(aut, state);
+      }
+      final TraceStepProxy convertedStep =
+        factory.createTraceStepProxy(event, convertedStepMap);
+      convertedSteps.add(convertedStep);
+      previousStepMap = convertedStepMap;
+    }
+    return convertedSteps;
+  }
+
   List<SearchRecord> getCrucialSteps(final List<TraceStepProxy> traceSteps)
   {
     final int tau = EventEncoding.TAU;
@@ -312,6 +381,53 @@ public abstract class TRTraceExpander
 
   //#######################################################################
   //# Auxiliary Methods
+  /**
+   * Finds the initial state of an automaton in a trace.
+   * A trace step's map is passed for the case of multiple initial states.
+   */
+  private StateProxy getInitialState
+    (final AutomatonProxy aut, final Map<AutomatonProxy,StateProxy> stepMap)
+  {
+    // If there is more than one initial state, the trace has the info.
+    StateProxy initial = stepMap.get(aut);
+    // Otherwise there is only one initial state.
+    if (initial == null) {
+      for (final StateProxy state : aut.getStates()) {
+        if (state.isInitial()) {
+          initial = state;
+          break;
+        }
+      }
+    }
+    return initial;
+  }
+
+  /**
+   * Finds the successor state in trace, from a given state in an automaton.
+   * A trace step's map is passed for the case of multiple successor states.
+   */
+  private StateProxy findSuccessor(final AutomatonProxy aut,
+                                   final EventProxy event,
+                                   final StateProxy sourceState,
+                                   final Map<AutomatonProxy,StateProxy> stepMap)
+  {
+    // If there is more than one successor state, the trace has the info.
+    final StateProxy targetState = stepMap.get(aut);
+    // Otherwise there is only one successor state.
+    if (targetState == null) {
+      if (aut.getEvents().contains(event)) {
+        for (final TransitionProxy trans : aut.getTransitions()) {
+          if (trans.getEvent() == event && trans.getSource() == sourceState) {
+            return trans.getTarget();
+          }
+        }
+      } else {
+        return sourceState;
+      }
+    }
+    return targetState;
+  }
+
   private void recoverPreconditionMarking()
     throws AnalysisException
   {

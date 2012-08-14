@@ -162,6 +162,11 @@ public class CompositionalConflictChecker
     return mDefaultMarking;
   }
 
+  public EventProxy getUsedDefaultMarking()
+  {
+    return mUsedDefaultMarking;
+  }
+
   public void setPreconditionMarking(final EventProxy alpha)
   {
     mPreconditionMarking = alpha;
@@ -357,6 +362,11 @@ public class CompositionalConflictChecker
       setCurrentMonolithicVerifier(current);
       super.setupMonolithicVerifier();
     }
+  }
+
+  SafetyVerifier getCurrentCompositionalSafetyVerifier()
+  {
+    return mCurrentCompositionalSafetyVerifier;
   }
 
   private void setupSafetyVerifiers()
@@ -614,14 +624,12 @@ public class CompositionalConflictChecker
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     chain.add(incomingEquivalenceSimplifier);
     final int ccindex;
-    if (useProperCertainConflicts)
-    {
-      final CertainConflictsTRSimplifier certainConflictsRemover = new CertainConflictsTRSimplifier();
+    if (useProperCertainConflicts) {
+      final CertainConflictsTRSimplifier certainConflictsRemover =
+        new CertainConflictsTRSimplifier();
       chain.add(certainConflictsRemover);
       ccindex = -1;
-    }
-    else
-    {
+    } else {
       final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
         new LimitedCertainConflictsTRSimplifier();
       ccindex = chain.add(certainConflictsRemover);
@@ -630,17 +638,17 @@ public class CompositionalConflictChecker
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator
+      .setTransitionRemovalMode(ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator
+      .setMarkingMode(ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
     chain.add(bisimulator);
     if (includeNonAlphaDeterminisation) {
       final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
         new NonAlphaDeterminisationTRSimplifier();
-      nonAlphaDeterminiser.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+      nonAlphaDeterminiser
+        .setTransitionRemovalMode(ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
       nonAlphaDeterminiser.setTransitionLimit(limit);
       chain.add(nonAlphaDeterminiser);
     }
@@ -648,6 +656,69 @@ public class CompositionalConflictChecker
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
     return new StandardConflictCheckerAbstractionProcedure(chain, ccindex);
+  }
+
+  private AbstractionProcedure createStandardNonblockingAbstractionChain2
+    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+     final boolean includeNonAlphaDeterminisation,
+     final boolean useProperCertainConflicts)
+  {
+    final ChainTRSimplifier preChain = new ChainTRSimplifier();
+    final ChainTRSimplifier postChain =
+      useProperCertainConflicts ? preChain : new ChainTRSimplifier();
+    final TauLoopRemovalTRSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    preChain.add(loopRemover);
+    final MarkingRemovalTRSimplifier markingRemover =
+      new MarkingRemovalTRSimplifier();
+    preChain.add(markingRemover);
+    final SilentIncomingTRSimplifier silentInRemover =
+      new SilentIncomingTRSimplifier();
+    silentInRemover.setRestrictsToUnreachableStates(true);
+    preChain.add(silentInRemover);
+    final OnlySilentOutgoingTRSimplifier silentOutRemover =
+      new OnlySilentOutgoingTRSimplifier();
+    preChain.add(silentOutRemover);
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    final int limit = getInternalTransitionLimit();
+    incomingEquivalenceSimplifier.setTransitionLimit(limit);
+    preChain.add(incomingEquivalenceSimplifier);
+    LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover = null;
+    if (useProperCertainConflicts) {
+      final CertainConflictsTRSimplifier certainConflictsRemover =
+        new CertainConflictsTRSimplifier();
+      preChain.add(certainConflictsRemover);
+    } else {
+      limitedCertainConflictsRemover =
+        new LimitedCertainConflictsTRSimplifier();
+    }
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionLimit(limit);
+    postChain.add(bisimulator);
+    if (includeNonAlphaDeterminisation) {
+      final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+        new NonAlphaDeterminisationTRSimplifier();
+      nonAlphaDeterminiser.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+      nonAlphaDeterminiser.setTransitionLimit(limit);
+      postChain.add(nonAlphaDeterminiser);
+    }
+    final MarkingSaturationTRSimplifier saturator =
+      new MarkingSaturationTRSimplifier();
+    postChain.add(saturator);
+    if (useProperCertainConflicts) {
+      return new StandardConflictCheckerAbstractionProcedure(preChain, -1);
+    } else {
+      return new StandardConflictCheckerAbstractionProcedure2
+        (preChain, limitedCertainConflictsRemover, postChain);
+    }
   }
 
   private AbstractionProcedure createGeneralisedNonblockingAbstractionChain
@@ -1050,7 +1121,7 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createStandardNonblockingAbstractionChain
+        return checker.createStandardNonblockingAbstractionChain2
           (ObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE, false, false);
       }
@@ -1668,7 +1739,7 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
-  //# Inner Class StandardTRSimplifierAbstractionRule
+  //# Inner Class StandardConflictCheckerAbstractionProcedure
   private class StandardConflictCheckerAbstractionProcedure
     extends ConflictCheckerAbstractionProcedure
   {
@@ -1755,6 +1826,189 @@ public class CompositionalConflictChecker
     //# Data Members
     private LimitedCertainConflictsTRSimplifier mCertainConflictsSimplifier;
     private final int mCertainConflictsIndex;
+  }
+
+
+  //#########################################################################
+  //# Inner Class StandardConflictCheckerAbstractionProcedure
+  protected class StandardConflictCheckerAbstractionProcedure2
+    extends AbstractionProcedure
+  {
+    //#######################################################################
+    //# Constructor
+    protected StandardConflictCheckerAbstractionProcedure2
+      (final ChainTRSimplifier preChain,
+       final LimitedCertainConflictsTRSimplifier ccSimplifier,
+       final ChainTRSimplifier postChain)
+    {
+      mPreChain = preChain;
+      mCertainConflictsSimplifier = ccSimplifier;
+      mPostChain = postChain;
+      mCompleteChain = new ChainTRSimplifier();
+      mCompleteChain.add(preChain);
+      mCompleteChain.add(ccSimplifier);
+      mCompleteChain.add(postChain);
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractionProcedure
+    @Override
+    protected boolean run(final AutomatonProxy aut,
+                          final Collection<EventProxy> local,
+                          final List<AbstractionStep> steps)
+      throws AnalysisException
+    {
+      try {
+        assert local.size() <= 1 : "At most one tau event supported!";
+        final ProductDESProxyFactory factory = getFactory();
+        final Iterator<EventProxy> iter = local.iterator();
+        final EventProxy tau = iter.hasNext() ? iter.next() : null;
+        final EventEncoding eventEnc = createEventEncoding(aut, tau);
+        final StateEncoding inputStateEnc = new StateEncoding(aut);
+        final int config = mPreChain.getPreferredInputConfiguration();
+        ListBufferTransitionRelation rel =
+          new ListBufferTransitionRelation(aut, eventEnc,
+                                           inputStateEnc, config);
+        final int numStates = rel.getNumberOfStates();
+        final int numTrans = rel.getNumberOfTransitions();
+        final int numMarkings = rel.getNumberOfMarkings();
+        AutomatonProxy lastAut = aut;
+        StateEncoding lastStateEnc = inputStateEnc;
+        List<int[]> partition = null;
+        boolean oeq = true;
+        boolean reduced = false;
+        AbstractionStep preStep = null;
+        mPreChain.setTransitionRelation(rel);
+        if (mPreChain.run()) {
+          rel = mPreChain.getTransitionRelation();
+          final StateEncoding outputStateEnc = new StateEncoding();
+          final AutomatonProxy outputAut =
+            rel.createAutomaton(factory, eventEnc, outputStateEnc);
+          partition = mPreChain.getResultPartition();
+          oeq = mPreChain.isObservationEquivalentAbstraction();
+          preStep = createStep(mPreChain, lastAut, lastStateEnc,
+                               outputAut, outputStateEnc, tau,
+                               partition, oeq, false);
+          lastAut = outputAut;
+          lastStateEnc = outputStateEnc;
+        }
+        mCertainConflictsSimplifier.setTransitionRelation(rel);
+        AbstractionStep ccStep = null;
+        if (mCertainConflictsSimplifier.run()) {
+          rel = mCertainConflictsSimplifier.getTransitionRelation();
+          final StateEncoding outputStateEnc = new StateEncoding();
+          final AutomatonProxy outputAut =
+            rel.createAutomaton(factory, eventEnc, outputStateEnc);
+          ccStep = new LimitedCertainConflictsStep
+            (mCertainConflictsSimplifier, outputAut, lastAut,
+             tau, lastStateEnc, outputStateEnc);
+          lastAut = outputAut;
+          lastStateEnc = outputStateEnc;
+        }
+        mPostChain.setTransitionRelation(rel);
+        if (mPostChain.run()) {
+          rel = mPostChain.getTransitionRelation();
+          if (rel.getNumberOfReachableStates() == numStates &&
+              rel.getNumberOfTransitions() == numTrans &&
+              rel.getNumberOfMarkings() == numMarkings) {
+            return false;
+          } else if (ccStep == null) {
+            lastAut = aut;
+            lastStateEnc = inputStateEnc;
+            final List<int[]> part2 = mPostChain.getResultPartition();
+            partition = ChainTRSimplifier.mergePartitions(partition, part2);
+            oeq &= mPostChain.isObservationEquivalentAbstraction();
+          } else {
+            partition = mPostChain.getResultPartition();
+            oeq = mPostChain.isObservationEquivalentAbstraction();
+            reduced = false;
+            if (preStep != null) {
+              steps.add(preStep);
+            }
+            steps.add(ccStep);
+          }
+          final StateEncoding outputStateEnc = new StateEncoding();
+          final AutomatonProxy convertedAut =
+            rel.createAutomaton(factory, eventEnc, outputStateEnc);
+          final AbstractionStep postStep =
+            createStep(mPostChain, lastAut, inputStateEnc,
+                       convertedAut, outputStateEnc, tau,
+                       partition, oeq, reduced);
+          steps.add(postStep);
+        }
+        return !steps.isEmpty();
+      } finally {
+        mCompleteChain.reset();
+      }
+    }
+
+    @Override
+    protected void storeStatistics()
+    {
+      final CompositionalAnalysisResult result = getAnalysisResult();
+      result.setSimplifierStatistics(mCompleteChain);
+    }
+
+    @Override
+    protected void resetStatistics()
+    {
+      mCompleteChain.createStatistics();
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.Abortable
+    public void requestAbort()
+    {
+      mCompleteChain.requestAbort();
+    }
+
+    public boolean isAborting()
+    {
+      return mCompleteChain.isAborting();
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    protected EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                                final EventProxy tau)
+    {
+      final KindTranslator translator = getKindTranslator();
+      Collection<EventProxy> filter = getPropositions();
+      if (filter == null) {
+        filter = Collections.emptyList();
+      }
+      return new EventEncoding(aut, translator, tau, filter,
+                               EventEncoding.FILTER_PROPOSITIONS);
+    }
+
+    private AbstractionStep createStep(final ChainTRSimplifier simplifier,
+                                       final AutomatonProxy input,
+                                       final StateEncoding inputStateEnc,
+                                       final AutomatonProxy output,
+                                       final StateEncoding outputStateEnc,
+                                       final EventProxy tau,
+                                       final List<int[]> partition,
+                                       final boolean oeq,
+                                       final boolean reduced)
+    {
+      if (oeq) {
+        return new ObservationEquivalenceStep(output, input, tau,
+                                              inputStateEnc, partition,
+                                              reduced, outputStateEnc);
+      } else {
+        return new ConflictEquivalenceStep(output, input, tau,
+                                           inputStateEnc, partition,
+                                           reduced, outputStateEnc);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ChainTRSimplifier mPreChain;
+    private final LimitedCertainConflictsTRSimplifier
+      mCertainConflictsSimplifier;
+    private final ChainTRSimplifier mPostChain;
+    private final ChainTRSimplifier mCompleteChain;
   }
 
 
@@ -2396,12 +2650,14 @@ public class CompositionalConflictChecker
       final AutomatonProxy resultAut = getResultAutomaton();
       final StateEncoding resultStateEnc = getResultStateEncoding();
       final AutomatonProxy originalAut = getOriginalAutomaton();
+      final StateEncoding originalStateEnc = getOriginalStateEncoding();
       final List<int[]> partition = getPartition();
       final boolean reduced = hasReducedPreconditionMarking();
       final ObservationEquivalenceTraceExpander expander =
         new ObservationEquivalenceTraceExpander
           (CompositionalConflictChecker.this, tau, preconditionMarking,
-           resultAut, resultStateEnc, originalAut, partition, reduced);
+           resultAut, resultStateEnc, originalAut, originalStateEnc,
+           partition, reduced);
       return expander.convertTraceSteps(traceSteps);
     }
 
@@ -2587,12 +2843,14 @@ public class CompositionalConflictChecker
       final AutomatonProxy resultAut = getResultAutomaton();
       final StateEncoding resultStateEnc = getResultStateEncoding();
       final AutomatonProxy originalAut = getOriginalAutomaton();
+      final StateEncoding originalStateEnc = getOriginalStateEncoding();
       final List<int[]> partition = getPartition();
       final boolean reduced = hasReducedPreconditionMarking();
       final ConflictEquivalenceTraceExpander expander =
         new ConflictEquivalenceTraceExpander
           (CompositionalConflictChecker.this, tau, preconditionMarking,
-           resultAut, resultStateEnc, originalAut, partition, reduced);
+           resultAut, resultStateEnc, originalAut, originalStateEnc,
+           partition, reduced);
       return expander.convertTraceSteps(traceSteps);
     }
 
@@ -2699,7 +2957,7 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
-  //# Inner Class MergeStep
+  //# Inner Class CertainConflictsStep
   /**
    * An abstraction step in which the result automaton is obtained by
    * merging states of the original automaton (automaton quotient).
@@ -2909,7 +3167,7 @@ public class CompositionalConflictChecker
           }
         }
       }
-      return false;
+      return true;
     }
 
     private MergeStep createDelegate(final AutomatonProxy resultAut,
@@ -3023,6 +3281,88 @@ public class CompositionalConflictChecker
      */
     private final boolean mIsObservationEquivalentAfter;
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class LimitedCertainConflictsStep
+  /**
+   * An abstraction step in which the result automaton is obtained by
+   * certain conflicts simplification.
+   */
+  private class LimitedCertainConflictsStep extends AbstractionStep
+  {
+
+    //#######################################################################
+    //# Constructor
+    /**
+     * Creates a new abstraction step record.
+     * @param  simplifier        The certain conflicts simplifier that
+     *                           produced this abstraction.
+     * @param  resultAut         The automaton resulting from abstraction.
+     * @param  originalAut       The automaton before abstraction.
+     * @param  tau               The event representing silent transitions,
+     *                           or <CODE>null</CODE>.
+     * @param  originalStateEnc  State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     * @param  resultStateEnc    State encoding that relates states in the
+     *                           original automaton to state numbers used in
+     *                           the partition.
+     */
+    LimitedCertainConflictsStep
+      (final LimitedCertainConflictsTRSimplifier simplifier,
+       final AutomatonProxy resultAut,
+       final AutomatonProxy originalAut,
+       final EventProxy tau,
+       final StateEncoding originalStateEnc,
+       final StateEncoding resultStateEnc)
+    {
+      super(resultAut, originalAut);
+      mSimplifier = simplifier;
+      mTau = tau;
+      mOriginalStateEncoding = originalStateEnc;
+      mResultStateEncoding = resultStateEnc;
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    @Override
+    protected List<TraceStepProxy> convertTraceSteps
+      (final List<TraceStepProxy> traceSteps)
+      throws AnalysisException
+    {
+      final AutomatonProxy resultAut = getResultAutomaton();
+      final AutomatonProxy originalAut = getOriginalAutomaton();
+      final LimitedCertainConflictsTraceExpander expander =
+        new LimitedCertainConflictsTraceExpander
+          (CompositionalConflictChecker.this, mSimplifier, mTau,
+           resultAut, mResultStateEncoding,
+           originalAut, mOriginalStateEncoding);
+      return expander.convertTraceSteps(traceSteps);
+    }
+
+    //#######################################################################
+    //# Data Members
+    /**
+     * The certain conflicts simplifier used to produce this abstraction.
+     */
+    private final LimitedCertainConflictsTRSimplifier mSimplifier;
+    /**
+     * The event that was hidden from the original automaton,
+     * or <CODE>null</CODE>.
+     */
+    private final EventProxy mTau;
+    /**
+     * State encoding of original automaton. Maps state codes in the input
+     * transition relation to state objects in the input automaton.
+     */
+    private final StateEncoding mOriginalStateEncoding;
+    /**
+     * Reverse encoding of output states. Maps states in output automaton
+     * (simplified automaton) to state code in output transition relation.
+     */
+    private final StateEncoding mResultStateEncoding;
   }
 
 

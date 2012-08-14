@@ -393,13 +393,13 @@ public abstract class AbstractCompositionalModelVerifier
       mModifyingSteps.listIterator(size);
     final Collection<AutomatonProxy> check =
       new THashSet<AutomatonProxy>(currentAutomata);
-    //checkCounterExample(traceSteps, check);
+    //testCounterExample(traceSteps, check);
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
       check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
-      //checkCounterExample(traceSteps, check);
+      //testCounterExample(traceSteps, check);
     }
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> modelAutomata = model.getAutomata();
@@ -555,6 +555,11 @@ public abstract class AbstractCompositionalModelVerifier
     protected EventEncoding getEventEncoding()
     {
       return mEventEncoding;
+    }
+
+    protected StateEncoding getOriginalStateEncoding()
+    {
+      return mOriginalStateEncoding;
     }
 
     //#######################################################################

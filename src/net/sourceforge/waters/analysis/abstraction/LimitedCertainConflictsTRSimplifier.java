@@ -380,10 +380,11 @@ public class LimitedCertainConflictsTRSimplifier
   //#########################################################################
   //# Trace Computation Support
   /**
-   * Creates a test automaton to check whether certain conflicts states of
-   * the given level can be reached. States of certain conflicts are flagged
-   * using selfloops of the given event <CODE>prop</CODE>, which can be tested
-   * for using language inclusion check.
+   * Creates a test automaton to check whether certain conflict states of
+   * the given level can be reached. States of certain conflicts of the
+   * given level are flagged using selfloops of the given event
+   * <CODE>prop</CODE>, so their reachability can be tested using language
+   * inclusion check.
    */
   public AutomatonProxy createTestAutomaton
     (final ProductDESProxyFactory factory,
