@@ -282,7 +282,7 @@ public abstract class AbstractCompositionalModelVerifier
     throws AnalysisException
   {
     setupMonolithicVerifier();
-    mModifyingSteps = new ArrayList<AbstractionStep>();
+    mAbstractionSteps = new ArrayList<AbstractionStep>();
     super.setUp();
   }
 
@@ -291,7 +291,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     super.tearDown();
     mCurrentMonolithicVerifier = null;
-    mModifyingSteps = null;
+    mAbstractionSteps = null;
   }
 
 
@@ -300,7 +300,7 @@ public abstract class AbstractCompositionalModelVerifier
   @Override
   protected void recordAbstractionStep(final AbstractionStep step)
   {
-    mModifyingSteps.add(step);
+    mAbstractionSteps.add(step);
   }
 
   @Override
@@ -388,18 +388,18 @@ public abstract class AbstractCompositionalModelVerifier
     final Collection<AutomatonProxy> currentAutomata = getCurrentAutomata();
     List<TraceStepProxy> traceSteps =
       getSaturatedTraceSteps(unsat, currentAutomata);
-    final int size = mModifyingSteps.size();
+    final int size = mAbstractionSteps.size();
     final ListIterator<AbstractionStep> iter =
-      mModifyingSteps.listIterator(size);
+      mAbstractionSteps.listIterator(size);
     final Collection<AutomatonProxy> check =
       new THashSet<AutomatonProxy>(currentAutomata);
-    //testCounterExample(traceSteps, check);
+    testCounterExample(traceSteps, check);
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
       check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
-      //testCounterExample(traceSteps, check);
+      testCounterExample(traceSteps, check);
     }
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> modelAutomata = model.getAutomata();
@@ -822,6 +822,6 @@ public abstract class AbstractCompositionalModelVerifier
   //# Data Members
   private ModelVerifier mMonolithicVerifier;
   private ModelVerifier mCurrentMonolithicVerifier;
-  private List<AbstractionStep> mModifyingSteps;
+  private List<AbstractionStep> mAbstractionSteps;
 
 }

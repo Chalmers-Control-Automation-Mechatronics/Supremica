@@ -15,7 +15,6 @@ import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -99,15 +98,22 @@ public abstract class TRTraceExpander
       mEventEncoding = eventEnc;
     } else {
       final KindTranslator translator = verifier.getKindTranslator();
+      final Collection<EventProxy> props = verifier.getPropositions();
       if (preconditionMarking == null) {
-        final Collection<EventProxy> filter = Collections.emptyList();
         mEventEncoding =
-          new EventEncoding(originalAut, translator, tau, filter,
+          new EventEncoding(originalAut, translator, tau, props,
                             EventEncoding.FILTER_PROPOSITIONS);
         mPreconditionMarkingID = -1;
       } else {
-        final Collection<EventProxy> filter =
-          Collections.singletonList(preconditionMarking);
+        final Collection<EventProxy> filter;
+        if (props.contains(preconditionMarking)) {
+          filter = props;
+        } else {
+          final int size = props.size() + 1;
+          filter = new ArrayList<EventProxy>(size);
+          filter.addAll(props);
+          filter.add(preconditionMarking);
+        }
         mEventEncoding =
           new EventEncoding(originalAut, translator, tau, filter,
                             EventEncoding.FILTER_PROPOSITIONS);
@@ -155,6 +161,11 @@ public abstract class TRTraceExpander
     return mEventEncoding;
   }
 
+  EventProxy getTauEvent()
+  {
+    return mTauEvent;
+  }
+
   AutomatonProxy getOriginalAutomaton()
   {
     return mOriginalAutomaton;
@@ -163,6 +174,16 @@ public abstract class TRTraceExpander
   AutomatonProxy getResultAutomaton()
   {
     return mResultAutomaton;
+  }
+
+  StateProxy getOriginalAutomatonState(final int code)
+  {
+    return mOriginalStateEncoding.getState(code);
+  }
+
+  int getResultAutomatonStateCode(final StateProxy state)
+  {
+    return mReverseOutputStateMap.get(state);
   }
 
 

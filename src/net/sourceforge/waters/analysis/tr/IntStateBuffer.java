@@ -80,14 +80,19 @@ public class IntStateBuffer
     }
     int i = 0;
     for (final StateProxy state : stateEnc.getStates()) {
-      int tags = tags0;
-      if (state.isInitial()) {
-        tags |= TAG_INITIAL;
-      }
-      for (final EventProxy event : state.getPropositions()) {
-        final int code = eventEnc.getEventCode(event);
-        if (code >= 0) {
-          tags |= 1 << code;
+      int tags;
+      if (state == null) {
+        tags = 0;
+      } else {
+        tags = tags0;
+        if (state.isInitial()) {
+          tags |= TAG_INITIAL;
+        }
+        for (final EventProxy event : state.getPropositions()) {
+          final int code = eventEnc.getEventCode(event);
+          if (code >= 0) {
+            tags |= 1 << code;
+          }
         }
       }
       mStateInfo[i++] = tags;

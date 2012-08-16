@@ -156,6 +156,7 @@ public class LimitedCertainConflictsTRSimplifier
     if (numCoreachable == numReachable) {
       return false;
     }
+    mMaxLevel = BLOCKING;
     final int tauID = EventEncoding.TAU;
     final int numStates = rel.getNumberOfStates();
     final int shift = AutomatonTools.log2(numStates);
@@ -390,7 +391,7 @@ public class LimitedCertainConflictsTRSimplifier
     (final ProductDESProxyFactory factory,
      final EventEncoding eventEnc,
      final StateEncoding stateEnc,
-     final int init,
+     final int initCode,
      final EventProxy prop,
      final int level)
   {
@@ -425,7 +426,9 @@ public class LimitedCertainConflictsTRSimplifier
     int code = 0;
     for (int state = 0; state < numStates; state++) {
       if (isTestState(state, level)) {
-        final StateProxy memstate = new MemStateProxy(code++, state == init);
+        final boolean init =
+          initCode >= 0 ? state == initCode : rel.isInitial(state);
+        final StateProxy memstate = new MemStateProxy(code++, init);
         states[state] = memstate;
         reachable.add(memstate);
         if (mStateInfo[state] == level) {
@@ -540,8 +543,13 @@ public class LimitedCertainConflictsTRSimplifier
 
   private boolean isTestState(final int state, final int level)
   {
-    final int status = mStateInfo[state];
-    return status == COREACHABLE || status >= level;
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (rel.isReachable(state)) {
+      final int status = mStateInfo[state];
+      return status == COREACHABLE || status >= level;
+    } else {
+      return false;
+    }
   }
 
 

@@ -35,7 +35,6 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -340,8 +339,8 @@ public class CompositionalSafetyVerifier
      final Collection<AutomatonProxy> automata)
     throws AnalysisException
   {
-    // TODO
-    TraceChecker.checkCounterExample(steps, automata, true);
+    // TODO Take property into account for safety counterexample ...
+    // TraceChecker.checkCounterExample(steps, automata, true);
   }
 
 
@@ -452,7 +451,9 @@ public class CompositionalSafetyVerifier
         for (final EventProxy event : local) {
           if (mPropertyEventsMap.get(event) == FORBIDDEN) {
             final int e = eventEnc.getEventCode(event);
-            mSubsetConstructionTRSimplifier.setForbiddenEvent(e, true);
+            if (e >= 0) {
+              mSubsetConstructionTRSimplifier.setForbiddenEvent(e, true);
+            }
           }
         }
         simplifier.setTransitionRelation(rel);
